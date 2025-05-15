@@ -385,4 +385,17 @@ public class AccessibilityUtils {
 		}
 		LOG.info("Finished assigning additional facilities data to measure point.");
 	}
+
+
+	// TODO: check if this method is in TripStructureUtils. Otherwise say that here.
+	public static Leg extractLeg(List<? extends PlanElement> planElementsMain, String mode) {
+		List<Leg> legList = planElementsMain.stream().filter(pe -> pe instanceof Leg && ((Leg) pe).getMode().equals(mode)).map(pe -> (Leg) pe).toList();
+
+		if (legList.size() != 1) {
+			throw new RuntimeException("for these accessibility calculations, there should be exactly one leg");
+		}
+
+		return legList.get(0);
+	}
+
 }

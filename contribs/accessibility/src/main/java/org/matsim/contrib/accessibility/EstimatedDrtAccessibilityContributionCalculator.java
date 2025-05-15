@@ -29,6 +29,8 @@ import org.matsim.facilities.Facility;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.matsim.contrib.accessibility.AccessibilityUtils.extractLeg;
+
 /**
  * @author jakobrehmann
  */
@@ -83,7 +85,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		LOG.warn("Initializing calculator for mode " + mode + "...");
 
 		// Prepare measure points
-		aggregatedMeasurePoints = new ConcurrentHashMap<>();
+		this.aggregatedMeasurePoints = new ConcurrentHashMap<>();
 		Gbl.assertNotNull(measuringPoints);
 		Gbl.assertNotNull(measuringPoints.getFacilities());
 
@@ -220,16 +222,6 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		return expSum;
 	}
 
-	// TODO: check if this method is in TripStructureUtils. Otherwise say that here.
-	private static Leg extractLeg(List<? extends PlanElement> planElementsMain, String mode) {
-		List<Leg> legList = planElementsMain.stream().filter(pe -> pe instanceof Leg && ((Leg) pe).getMode().equals(mode)).map(pe -> (Leg) pe).toList();
-
-		if (legList.size() != 1) {
-			throw new RuntimeException("for these accessibility calculations, there should be exactly one leg");
-		}
-
-		return legList.get(0);
-	}
 
 
 	@Override

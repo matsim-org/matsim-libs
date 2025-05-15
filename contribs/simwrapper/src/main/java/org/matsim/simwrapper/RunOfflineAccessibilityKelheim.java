@@ -50,13 +50,13 @@ public class RunOfflineAccessibilityKelheim {
 
 	// todo: move entirely to matsim-kelheim
 	// todo: where are the new output_files being produced, can we stop this?
-	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/kelheim/kelheim-accessibility-dashboard/kexi-seed-1-ASC-2.45-plus10/";
+	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/kelheim/kelheim-accessibility-dashboard/kexi-seed-1-ASC-2.45-plus100/";
 
 	public static void main(String[] args) throws FactoryException {
 
 		// CONFIGURATION
-		List<String> relevantPois = List.of("train_station", "supermarket");
-//		List<String> relevantPois = List.of("train_station");
+//		List<String> relevantPois = List.of("train_station", "supermarket");
+		List<String> relevantPois = List.of("train_station");
 
 		double mapCenterX = 721455;
 		double mapCenterY = 5410601;
@@ -88,39 +88,24 @@ public class RunOfflineAccessibilityKelheim {
 		}
 
 		accConfig.setTimeOfDay(2 * 60 * 60.);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, false);
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.walk, false);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
 
 
 		// Part 1: Generate Parameters for Estimator
 
-//		System.out.println("Beginning Step 1");
-//		EstimatorParameters estimatorParameters = null;
-//		try {
-//			estimatorParameters = step1_generateParams();
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
-//
-//		System.out.println("Finished Step 1");
-//
-//		// Part 2: Calculate Accessibility
-//		// todo: should write anything except the analysis
-//
-//		System.out.println("Beginning Step 2");
-//		step2_calculateAccessibility(estimatorParameters, relevantPois, accConfig);
-//
-//		System.out.println("Finished Step 2");
-//
-//		System.out.println("Beginning Step 3");
+		EstimatorParameters estimatorParameters = step1_generateParams();
+
+		// Part 2: Calculate Accessibility
+
+		step2_calculateAccessibility(estimatorParameters, relevantPois, accConfig);
+
 		// Part 3: Create Dashboard
-		// todo: should delete accessibility_simwrapper.csv and create a new one
 		step3_createDashboard(relevantPois);
-		System.out.println("Finished Step 3");
 
 
 	}
@@ -192,7 +177,8 @@ public class RunOfflineAccessibilityKelheim {
 	}
 
 
-	private static EstimatorParameters step1_generateParams() throws IOException {
+	private static EstimatorParameters step1_generateParams() {
+
 		DoubleList inVehicleTravelTime = new DoubleArrayList();
 		DoubleList directTravelDistance_m = new DoubleArrayList();
 
@@ -209,6 +195,8 @@ public class RunOfflineAccessibilityKelheim {
 				inVehicleTravelTime.add(Double.parseDouble(record.get("inVehicleTravelTime")));
 				directTravelDistance_m.add(Double.parseDouble(record.get("directTravelDistance_m")));
 			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 
 		double waitTime_s = waitTimeSum / n;

@@ -206,7 +206,7 @@ public final class AccessibilityModule extends AbstractModule {
 					Gbl.assertNotNull( nwModeTravelDisutility );
 					calculator = new NetworkModeAccessibilityExpContributionCalculator(mode, nwModeTravelTime, nwModeTravelDisutility, scenario);
 				} else if ( TransportMode.pt.equals( mode ) ){
-					calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.scoring(), scenario );
+					calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode, config.scoring(), scenario, tripRouter);
 				} else if ( Modes4Accessibility.estimatedDrt.name().equals( mode )) {
 					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, this.drtEstimator);
 				} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {

@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.matsim.contrib.accessibility.EstimatedDrtAccessibilityContributionCalculator.extractLeg;
+import static org.matsim.contrib.accessibility.AccessibilityUtils.extractLeg;
+
 
 public class TeleportedModeContributionCalculator implements AccessibilityContributionCalculator {
 
