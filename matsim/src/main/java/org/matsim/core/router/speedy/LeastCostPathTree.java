@@ -171,6 +171,13 @@ public class LeastCostPathTree {
             // it might be that the "real" node is not accessible in the colored graph, but only its colored
             // copies. Loop over all in links and add their colored to nodes to the queue. nkuehnel, May 2025
             for (Link inLink : arrivalLink.getFromNode().getInLinks().values()) {
+                TurnRestrictionsContext.ColoredLink replacedLink = turnRestrictionsContext.replacedLinks
+                        .get(inLink.getId());
+                if (replacedLink != null && replacedLink.toColoredNode != null) {
+                    int coloredArrivalNode = replacedLink.toColoredNode.index();
+                    setData(coloredArrivalNode, 0, arrivalTime, 0);
+                    this.pq.insert(coloredArrivalNode);
+                }
                 List<TurnRestrictionsContext.ColoredLink> coloredLinks = turnRestrictionsContext.coloredLinksPerLinkMap.get(inLink.getId());
                 if (coloredLinks != null) {
                     for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
