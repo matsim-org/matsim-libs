@@ -220,12 +220,14 @@ public final class AccessibilityModule extends AbstractModule {
 					throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
 //								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
-				} else if ( TransportMode.walk.equals( mode ) || TransportMode.bike.equals( mode ) ) {
+				} else if ( Modes4Accessibility.walk.name().equals( mode ) || Modes4Accessibility.bike.name().equals( mode ) ) {
 //					 special case(s), since often in the simulation this is not treated as network route
-//					calculator = new ConstantSpeedAccessibilityExpContributionCalculator( mode, scenario ) ;
-					calculator = new TeleportedModeContributionCalculator(mode, tripRouter, config.scoring());
+					calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode, scenario);
 
+				} else if ( Modes4Accessibility.teleportedWalk.name().equals( mode ) ) {
+					calculator = new TeleportedModeContributionCalculator(TransportMode.walk, tripRouter, config.scoring());
 				} else {
+
 					// see if we find a trip router for that mode
 					final TravelTime travelTime = travelTimes.get( mode );
 					final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( mode );

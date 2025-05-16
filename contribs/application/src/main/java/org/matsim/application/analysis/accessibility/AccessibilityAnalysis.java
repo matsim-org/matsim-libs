@@ -106,7 +106,7 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 				DoubleColumn walkColMod = null;
 				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
 					Column<?> column = iterator.next();
-					if (column.name().equals("walk_accessibility")) {
+					if (column.name().equals("teleportedWalk_accessibility")) {
 						walkColMod = table.doubleColumn(column.name()).add(modifier).setName(column.name());
 						break;
 					}
