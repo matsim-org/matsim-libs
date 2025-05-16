@@ -242,6 +242,19 @@ public class TinyAccessibilityTest {
 		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+
+
+		DrtEstimator drtEstimator = new DirectTripDistanceBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+
+
+		builder.addDrtEstimator(drtEstimator);
+
 		builder.addDataListener( new ResultsComparator() );
 		builder.build().run() ;
 
@@ -300,151 +313,22 @@ public class TinyAccessibilityTest {
 
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , congestedFileName );
+
+		DrtEstimator drtEstimator = new DirectTripDistanceBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+
+
+		builder.addDrtEstimator(drtEstimator);
 //		builder.addDataListener( new ResultsComparator() );
 		builder.build().run() ;
 
 	}
 
-
-	@Test
-	public void runFromEventsDrtCongestedKelheim() throws IOException {
-
-		// input files
-		String stopsFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/kelheim/kelheim-drt-accessibility-JB-master/input/drt-stops-land.xml";
-		String poiFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/kelheim/kelheim-drt-accessibility-JB-master/input/pois_complete.csv";
-//		String eventsFile = "/Users/jakob/git/matsim-kelheim/output/output-kelheim-v3.1-1pct/kelheim-v3.1-1pct.output_events.xml.gz";
-//		String networkFile = "/Users/jakob/git/matsim-kelheim/output/output-kelheim-v3.1-1pct/kelheim-v3.1-1pct.output_network.xml.gz";
-//		String transportScheduleFile = "/Users/jakob/git/matsim-kelheim/output/output-kelheim-v3.1-1pct/kelheim-v3.1-1pct.output_transitSchedule.xml.gz";
-
-		String outputRoot = "../../../public-svn/matsim/scenarios/countries/de/kelheim/kelheim-v3.0/output/1pct/";
-		String eventsFile = outputRoot + "kelheim-v3.0-1pct.output_events.xml.gz";
-		String networkFile = outputRoot + "kelheim-v3.0-1pct.output_network.xml.gz";
-		String transportScheduleFile = outputRoot + "kelheim-v3.0-1pct.output_transitSchedule.xml.gz";
-
-
-
-		double accMeasTime = 12 * 60 * 60.;
-
-		// CONFIG
-		//global
-		final Config config = createTestConfig();
-
-		config.global().setCoordinateSystem("EPSG:25832");
-
-		config.network().setInputFile(networkFile);
-
-
-		// transit
-		config.transit().setTransitScheduleFile(transportScheduleFile);
-
-		// change walk speed to match kelheim scenario
-		config.routing().getTeleportedModeParams().get(TransportMode.walk).setTeleportedModeSpeed(3.8 / 3.6);
-
-		// change scoring default to match kelheim scenario
-		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-		drtParams.setMarginalUtilityOfDistance(-2.5E-4);
-		drtParams.setMarginalUtilityOfTraveling(0.0);
-		config.scoring().addModeParams(drtParams);
-
-		ScoringConfigGroup.ModeParams walkParams = config.scoring().getModes().get(TransportMode.walk);
-		walkParams.setMarginalUtilityOfTraveling(0.0);
-		config.scoring().addModeParams(walkParams);
-
-		// accessibility config
-		double mapCenterX = 721455;
-		double mapCenterY = 5410601;
-
-		double tileSize = 200;
-		double num_rows = 50;
-
-		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-		accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox);
-		accConfig.setBoundingBoxLeft(mapCenterX - num_rows*tileSize - tileSize/2);
-		accConfig.setBoundingBoxRight(mapCenterX + num_rows*tileSize + tileSize/2);
-		accConfig.setBoundingBoxBottom(mapCenterY - num_rows*tileSize - tileSize/2);
-		accConfig.setBoundingBoxTop(mapCenterY + num_rows*tileSize + tileSize/2);
-		accConfig.setTileSize_m((int) tileSize);
-
-		accConfig.setTimeOfDay(accMeasTime);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
-
-		// drt config
-		ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-
-		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
-		drtConfigGroup.transitStopFile = stopsFile;
-
-		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 100000.;
-
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
-		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
-		config.addModule(multiModeDrtConfigGroup);
-		config.addModule(drtConfigGroup);
-
-		// SCENARIO
-
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-
-		// add pois to scenario as facilities
-		readPoiCsv(scenario.getActivityFacilities(), poiFile);
-
-
-		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, eventsFile, List.of("train_station"));
-
-		// configure DRT Estimator with wait time, and ride time parameters
-		DrtEstimator drtEstimator = new DirectTripDistanceBasedDrtEstimator.Builder()
-			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(421.87))
-			.setWaitingTimeDistributionGenerator(new NoDistribution())
-			.setRideDurationEstimator(new ConstantRideDurationEstimator(0.11873288637584138, 71.82))
-			.setRideDurationDistributionGenerator(new NoDistribution())
-			.build();
-
-
-		builder.addDrtEstimator(drtEstimator);
-
-		ConfigUtils.writeConfig(config, utils.getOutputDirectory() + "config.xml");
-
-		builder.build().run();
-
-	}
-
-	private static void readPoiCsv(ActivityFacilities activityFacilities, String filePath) {
-
-		ActivityFacilitiesFactory af = activityFacilities.getFactory();
-		HttpURLConnection connection;
-		try {
-			connection = (HttpURLConnection) new URL(filePath).openConnection();
-			connection.setRequestMethod("GET");
-		} catch (ProtocolException | MalformedURLException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		try (CSVParser parser = new CSVParser(new BufferedReader(new InputStreamReader(connection.getInputStream())),
-
-			CSVFormat.DEFAULT.withDelimiter(',').withFirstRecordAsHeader())) {
-
-			for (CSVRecord record : parser) {
-
-				String id = record.get("id");
-				double x = Double.parseDouble(record.get("x"));
-				double y = Double.parseDouble(record.get("y"));
-				String type = record.get("type");
-				ActivityFacility fac = af.createActivityFacility(Id.create(id, ActivityFacility.class), new Coord(x, y));
-				ActivityOption ao = af.createActivityOption(type);
-				fac.addActivityOption(ao);
-				activityFacilities.addActivityFacility(fac);
-
-
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	private void createDrtStopsFile(String stopsInputFileName) throws IOException {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

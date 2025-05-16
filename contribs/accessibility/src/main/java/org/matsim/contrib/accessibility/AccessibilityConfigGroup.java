@@ -209,11 +209,22 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public void setShapeFileCellBasedAccessibility(String value) {
         this.shapeFileCellBasedAccessibility = value;
     }
+
+
+	@StringSetter(TIME_OF_DAY)
+	private void setTimeOfDayAsString(String value) {
+		this.timeOfDay = Arrays.stream(value.split(",")).map(String::trim).map(Double::valueOf).collect(Collectors.toList());
+	}
 	@StringGetter(TIME_OF_DAY)
+	private String getTimeOfDayAsString() {
+		return CollectionUtils.setToString(timeOfDay.stream().map(Object::toString).collect(Collectors.toSet()));
+	}
+
+
 	public List<Double> getTimeOfDay() {
 		return this.timeOfDay ;
 	}
-	@StringSetter(TIME_OF_DAY)
+
 	public AccessibilityConfigGroup setTimeOfDay(Double timeOfDay) {
 		this.timeOfDay = List.of(timeOfDay);
 		return this;

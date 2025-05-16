@@ -20,7 +20,9 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -59,15 +61,17 @@ import java.util.*;
 public final class AccessibilityModule extends AbstractModule {
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
-	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
+	private final List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
 	private ActivityFacilities measuringPoints;
-	private Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
+	private final Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
 	private boolean pushing2Geoserver = false;
 	private boolean createQGisOutput = false;
 
 	@Override
 	public void install() {
+
+		OptionalBinder.newOptionalBinder(binder(), DrtEstimator.class);
 
 		MapBinder.newMapBinder(binder(), String.class, DvrpRoutingModule.AccessEgressFacilityFinder.class);
 		addControlerListenerBinding().toProvider(new AccessibilityControlerListenerProvider());
@@ -128,7 +132,7 @@ public final class AccessibilityModule extends AbstractModule {
 		Map<String, DvrpRoutingModule.AccessEgressFacilityFinder> map;
 
 		@Inject
-		DrtEstimator drtEstimator;
+		Optional<DrtEstimator> drtEstimator;
 
 		@Override
 		public ControlerListener get() {
@@ -208,7 +212,10 @@ public final class AccessibilityModule extends AbstractModule {
 				} else if ( TransportMode.pt.equals( mode ) ){
 					calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode, config.scoring(), scenario, tripRouter);
 				} else if ( Modes4Accessibility.estimatedDrt.name().equals( mode )) {
-					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, this.drtEstimator);
+					if (this.drtEstimator.isEmpty()) {
+						throw new RuntimeException("DrtEstimator is not present. Please check your configuration.");
+					}
+					calculator = new EstimatedDrtAccessibilityContributionCalculator(mode,  scenario, map.get(TransportMode.drt),this.tripRouter, this.drtEstimator.get());
 				} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
 					throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(

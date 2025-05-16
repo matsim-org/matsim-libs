@@ -3,6 +3,7 @@ package org.matsim.contrib.accessibility;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
@@ -118,7 +119,10 @@ public final class AccessibilityFromEvents{
 
 
 				if(drtEstimator!=null){
-					bind(DrtEstimator.class).toInstance(drtEstimator);
+
+					OptionalBinder.newOptionalBinder(binder(), DrtEstimator.class).setBinding().toInstance(drtEstimator);
+
+//					bind(DrtEstimator.class).toInstance(drtEstimator);
 				}
 
 				install( new TripRouterModule() ) ;
