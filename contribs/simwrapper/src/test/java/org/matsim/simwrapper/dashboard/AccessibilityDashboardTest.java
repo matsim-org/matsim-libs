@@ -93,14 +93,17 @@ public class AccessibilityDashboardTest {
 		acg.setBoundingBoxTop(mapCenterY + num_rows * tileSize + tileSize / 2);
 		acg.setTileSize_m((int) tileSize);
 
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, true);
+
+		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.freespeed, Modes4Accessibility.car, Modes4Accessibility.estimatedDrt);
+
+		for(Modes4Accessibility mode : accModes) {
+			acg.setComputingAccessibilityForMode(mode, true);
+		}
 		acg.setUseParallelization(false);
 
 		// CONTROLLER
-		SimWrapper sw = SimWrapper.create(config).addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), List.of("trainStation", "cityCenter")));
+		SimWrapper sw = SimWrapper.create(config).addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), List.of("trainStation", "cityCenter"), accModes));
+
 		Controler controler = MATSimApplication.prepare(new DrtTestScenario(config), config);
 
 		ActivityFacilitiesFactory af = controler.getScenario().getActivityFacilities().getFactory();

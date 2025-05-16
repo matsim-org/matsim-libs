@@ -7,7 +7,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.geotools.api.referencing.FactoryException;
-import org.locationtech.jts.geom.Envelope;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,68 +59,50 @@ public class RunOfflineAccessibilityKelheim {
 	// todo: where are the new output_files being produced, can we stop this?
 	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/kelheim/kelheim-accessibility-dashboard/kexi-seed-1-ASC-2.45-plus100/";
 
-	public static void main(String[] args) throws FactoryException {
+	public static void main(String[] args) throws FactoryException, TransformException {
 
 		// CONFIGURATION
 //		List<String> relevantPois = List.of("train_station", "supermarket");
 		List<String> relevantPois = List.of("train_station");
 
-		double mapCenterX = 721455;
-		double mapCenterY = 5410601;
-		double tileSize = 500;
-		double num_rows = 50;
-
-
 
 		AccessibilityConfigGroup accConfig = new AccessibilityConfigGroup();
-		accConfig.setBoundingBoxLeft(mapCenterX - num_rows * tileSize - tileSize / 2);
-		accConfig.setBoundingBoxRight(mapCenterX + num_rows * tileSize + tileSize / 2);
-		accConfig.setBoundingBoxBottom(mapCenterY - num_rows * tileSize - tileSize / 2);
-		accConfig.setBoundingBoxTop(mapCenterY + num_rows * tileSize + tileSize / 2);
-		accConfig.setTileSize_m((int) tileSize);
-		if(true) {
-			accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox);
+		accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox);
 
-		} else{
-			accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromFacilitiesObject);
-			ActivityFacilities testFacs = FacilitiesUtils.createActivityFacilities("facilities");
-			ActivityFacility testFac = testFacs.getFactory().createActivityFacility(Id.create("test", ActivityFacility.class), new Coord(mapCenterX - num_rows * tileSize, mapCenterY - num_rows * tileSize - tileSize / 2));
-			testFacs.addActivityFacility(testFac);
-			ActivityFacility testFac2 = testFacs.getFactory().createActivityFacility(Id.create("test2", ActivityFacility.class), new Coord(mapCenterX - num_rows * tileSize + tileSize, mapCenterY - num_rows * tileSize - tileSize / 2));
-			testFacs.addActivityFacility(testFac2);
-			ActivityFacility testFac3 = testFacs.getFactory().createActivityFacility(Id.create("test3", ActivityFacility.class), new Coord(mapCenterX - num_rows * tileSize + 2*  tileSize, mapCenterY - num_rows * tileSize - tileSize / 2));
-			testFacs.addActivityFacility(testFac3);
-			accConfig.setMeasuringPointsFacilities(testFacs);
+		Coordinate leftBottom = transformCoordinate(CRS.decode("EPSG:4326",true),CRS.decode("EPSG:25832"), new Coordinate(11.574, 48.584));
+		Coordinate rightTop = transformCoordinate(CRS.decode("EPSG:4326",true), CRS.decode("EPSG:25832"), new Coordinate(12.095, 48.994));
+		accConfig.setBoundingBoxLeft(leftBottom.x);
+		accConfig.setBoundingBoxBottom(leftBottom.y);
+		accConfig.setBoundingBoxRight(rightTop.x);
+		accConfig.setBoundingBoxTop(rightTop.y);
+		accConfig.setTileSize_m(250);
 
-		}
-
-		List<Double> timesHour = List.of(6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0);
+		List<Double> timesHour = List.of(8.0);
+//		List<Double> timesHour = List.of(8.0, 12.0, 16.0);
+//		List<Double> timesHour = List.of(6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0);
 		List<Double> timesSeconds = timesHour.stream().map(t -> t * 60 * 60).toList();
 
 		accConfig.setTimeOfDay(timesSeconds);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.estimatedDrt, false);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.walk, false);
-		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
+		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.estimatedDrt, Modes4Accessibility.pt, Modes4Accessibility.walk, Modes4Accessibility.car);
+
+		for(Modes4Accessibility mode : accModes) {
+			accConfig.setComputingAccessibilityForMode(mode, true);
+		}
 
 
 		// Part 1: Generate Parameters for Estimator
-
-		EstimatorParameters estimatorParameters = step1_generateParams();
-
 		// Part 2: Calculate Accessibility
 
+		EstimatorParameters estimatorParameters = step1_generateParams();
 		step2_calculateAccessibility(estimatorParameters, relevantPois, accConfig);
 
 		// Part 3: Create Dashboard
-		step3_createDashboard(relevantPois);
+		step3_createDashboard(relevantPois, accModes);
 
 
 	}
 
-	private static void step3_createDashboard(List<String> relevantPois) {
+	private static void step3_createDashboard(List<String> relevantPois, List<Modes4Accessibility> accModes) {
 
 		final Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(OUTPUT_DIR);
@@ -139,7 +128,7 @@ public class RunOfflineAccessibilityKelheim {
 		// Scenario
 //		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		SimWrapper sw = SimWrapper.create(config).addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), relevantPois));
+		SimWrapper sw = SimWrapper.create(config).addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), relevantPois, accModes));
 		boolean append = true;
 		try {
 			sw.generate(Path.of(OUTPUT_DIR), append);
@@ -324,6 +313,27 @@ public class RunOfflineAccessibilityKelheim {
 
 		builder.build().run();
 
+	}
+
+
+	private static Coordinate transformCoordinate(CoordinateReferenceSystem sourceCRS, CoordinateReferenceSystem targetCRS, Coordinate sourceCoordinate) throws TransformException, FactoryException {
+
+		// Create transform
+		boolean lenient = true;
+		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, lenient);
+
+		// Create coordinate
+		GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
+		Point sourcePoint = geometryFactory.createPoint(sourceCoordinate);
+
+		// Transform
+		Point targetPoint = (Point) org.geotools.geometry.jts.JTS.transform(sourcePoint, transform);
+
+		// Output
+		System.out.println("Original (WGS84): " + sourcePoint);
+		System.out.println("Transformed (EPSG:25832): " + targetPoint);
+
+		return targetPoint.getCoordinate();
 	}
 
 	private static void readPoiCsv(ActivityFacilities activityFacilities, String filePath) {
