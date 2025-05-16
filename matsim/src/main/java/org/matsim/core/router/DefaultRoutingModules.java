@@ -54,7 +54,8 @@ public final class DefaultRoutingModules {
 				mode,
 			  scenario,
 				params.getTeleportedModeSpeed(),
-                params.getBeelineDistanceFactor() );
+                params.getBeelineDistanceFactor(),
+				params.getPersonSpeedAttribute() );
 	}
 
 	/**
