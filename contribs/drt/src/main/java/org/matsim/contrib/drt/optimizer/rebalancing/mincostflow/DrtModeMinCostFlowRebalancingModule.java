@@ -80,7 +80,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								.get(REBALANCING_ZONE_SYSTEM).get();
 							return new RelativeDemandEstimatorAsTargetCalculator(
 								getter.getModal(ZonalDemandEstimator.class),
-								zoneSystem, strategyParams.getDemandEstimationPeriod());
+								zoneSystem, strategyParams.getDemandEstimationPeriod(),
+								strategyParams.getTargetBeta()
+							);
 						})).asEagerSingleton();
 						break;
 
