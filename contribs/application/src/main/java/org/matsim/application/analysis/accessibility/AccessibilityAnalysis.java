@@ -101,9 +101,9 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 				table.column("ycoord").setName("y");
 
 				//added 10 to accessibility because grid map can't currently handle negative vals
+				int modifier = 0;
 				List<Column<?>> modCols = new ArrayList<>();
 				DoubleColumn walkColMod = null;
-				int modifier = 100;
 				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
 					Column<?> column = iterator.next();
 					if (column.name().equals("walk_accessibility")) {

@@ -3,6 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
+import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.GridMap;
 
 import java.util.List;
@@ -35,20 +36,21 @@ public class AccessibilityDashboard implements Dashboard {
 
 
 		header.title = "Accessibility";
-		header.description = "Shows accessibility for different modes. Note: 10 utils are added to all values, since negative values can't get be rendered in GridMap";
+		header.description = "Shows accessibility for different modes of transport to different points of interest.";
 
 		for (String poi : pois) {
 
 			for(Modes4Accessibility mode : modes) {
 				layout.row(mode.name() + "-" + poi)
 					.el(GridMap.class, (viz, data) -> {
-						accessibilityDataGridMap(mode.name(), mode.name() + "_accessibility", poi, viz, data);
+						accessibilityDataGridMap(mode.name(), mode.name() + "_accessibility", poi, viz, data, false);
 					});
 
 				if (modes.contains(Modes4Accessibility.walk)) {
 					layout.row(mode.name() + "-" + poi)
 						.el(GridMap.class, (viz, data) -> {
-							accessibilityDataGridMap(mode.name() + " - Walk", mode.name() + "_accessibility_diff", poi, viz, data);
+							accessibilityDataGridMap(mode.name(), mode.name() + "_accessibility_diff", poi, viz, data, true);
+
 						});
 				}
 
@@ -59,11 +61,12 @@ public class AccessibilityDashboard implements Dashboard {
 
 	}
 
-	private void accessibilityDataGridMap(String modeName, String columnName, String poi, GridMap viz, Data data) {
-		viz.title = modeName + " Accessibility to " + poi;
+	private void accessibilityDataGridMap(String modeName, String columnName, String poi, GridMap viz, Data data, boolean isDiff) {
+		viz.title = modeName + (isDiff ? " - walk" :"") + " accessibility to " + poi;
 		viz.unit = "Utils";
-		viz.description = "at 10:00:00";
-		viz.cellSize = 300;
+		viz.description = isDiff ? "white: walk and " + modeName + " are equivalent; green: " + modeName + " is advantageous" : "yellow: high accessibility; purple: low accessibility";
+		viz.setColorRamp(isDiff ? "Greens" : ColorScheme.Viridis);
+		viz.cellSize = 250;
 		viz.opacity = 1.0;
 		viz.maxHeight = 1;
 
