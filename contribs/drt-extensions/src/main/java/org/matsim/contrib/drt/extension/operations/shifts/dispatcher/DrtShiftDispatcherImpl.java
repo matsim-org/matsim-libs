@@ -348,15 +348,19 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             }
 
             final DrtShift active = next.shift();
+            if(active.getEndTime() < now) {
+                throw new RuntimeException(String.format("Could not end shift %s (end time: %f now: %f)", active.getId().toString(), active.getEndTime(), now));
+            }
 
             if (active != next.vehicle().getShifts().peek()) {
                 throw new IllegalStateException("Shifts don't match!");
             }
 
             logger.debug("Scheduling shift end for shift " + next.shift().getId() + " of vehicle " + next.vehicle().getId());
-            scheduleShiftEnd(next);
-            endingShifts.add(next);
-            iterator.remove();
+            if(scheduleShiftEnd(next)) {
+                endingShifts.add(next);
+                iterator.remove();
+            }
         }
     }
 
@@ -451,7 +455,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         }
     }
 
-    private void scheduleShiftEnd(ShiftEntry endingShift) {
+    private boolean scheduleShiftEnd(ShiftEntry endingShift) {
         // hub return
         final Schedule schedule = endingShift.vehicle().getSchedule();
 
@@ -496,15 +500,22 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         IntRange timeRange = new IntRange(endingShift.shift().getEndTime(), Integer.MAX_VALUE);
         if(shiftChangeoverFacility == null) {
             shiftChangeoverFacility = breakFacilityFinder.findFacilityOfType(coord,
-                    OperationFacilityType.hub, timeRange).orElseThrow(() -> new RuntimeException("Could not find shift end location!"));
+                    OperationFacilityType.hub, timeRange).orElse(null);
         }
-        Verify.verify(shiftChangeoverFacility.register(endingShift.vehicle().getId(), timeRange), "Could not register vehicle at facility.");
 
+        if(shiftChangeoverFacility == null) {
+            return false;
+        }
+
+        if (!shiftChangeoverFacility.register(endingShift.vehicle().getId(), timeRange)) {
+            return false;
+        }
 
         shiftTaskScheduler.relocateForShiftChange(endingShift.vehicle(),
                 network.getLinks().get(shiftChangeoverFacility.getLinkId()), endingShift.shift(), shiftChangeoverFacility);
         eventsManager.processEvent(new OperationFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
                 shiftChangeoverFacility.getId()));
+        return true;
     }
 
     @Override
