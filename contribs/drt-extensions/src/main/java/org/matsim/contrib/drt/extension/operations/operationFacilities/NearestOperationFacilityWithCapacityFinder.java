@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.operationFacilities;
 
+import org.apache.commons.lang.math.IntRange;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.common.util.DistanceUtils;
 
@@ -22,7 +23,7 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
     }
 
     @Override
-    public Optional<OperationFacility> findFacilityOfType(Coord coord, OperationFacilityType type) {
+    public Optional<OperationFacility> findFacilityOfType(Coord coord, OperationFacilityType type, IntRange timeRange) {
         Predicate<? super OperationFacility> filter;
         switch (type) {
             case hub:
@@ -36,15 +37,15 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
         }
         return operationFacilities.getDrtOperationFacilities().values().stream()
                 .filter(filter)
-                .filter(OperationFacility::hasCapacity)
+                .filter(opFa -> opFa.hasCapacity(timeRange))
                 .min(Comparator.comparing(
                         f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));
     }
 
     @Override
-    public Optional<OperationFacility> findFacility(Coord coord) {
+    public Optional<OperationFacility> findFacility(Coord coord, IntRange timeRange) {
         return operationFacilities.getDrtOperationFacilities().values().stream()
-                .filter(OperationFacility::hasCapacity)
+                .filter(opFa -> opFa.hasCapacity(timeRange))
                 .min(Comparator.comparing(
                         f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));
 

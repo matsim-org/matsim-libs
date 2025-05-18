@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
+import org.apache.commons.lang.math.IntRange;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
@@ -73,7 +74,7 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 		}
 		WaitForShiftTask waitForShiftStayTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 				vehicle.getStartLink(), operationFacility);
-		boolean success = operationFacility.register(vehicle.getId());
+		boolean success = operationFacility.register(vehicle.getId(), new IntRange(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime()));
 		if (!success) {
 			throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
 					"facility capacity and initial fleet distribution.", vehicle.getId().toString(), operationFacility.getId().toString()));

@@ -50,7 +50,7 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 						.values()
 						.stream()
 						.map(spec -> (OperationFacility)new OperationFacilityImpl(spec.getId(), spec.getLinkId(), spec.getCoord(), spec.getCapacity(),
-								spec.getChargers(), spec.getType()))
+								spec.getChargers(), spec.getType(), getConfig().qsim().getEndTime().orElse(30 * 3600)))
 						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;
 			}
