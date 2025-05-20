@@ -107,7 +107,7 @@ public class OperationFacilityImpl implements OperationFacility {
     }
 
 
-    private static class CapacityManager {
+    static class CapacityManager {
         private final int capacity;
         private final int horizon;         // total number of seconds we support
 
