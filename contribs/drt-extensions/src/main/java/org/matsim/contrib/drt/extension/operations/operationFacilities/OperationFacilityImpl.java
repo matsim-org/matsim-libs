@@ -182,11 +182,11 @@ public class OperationFacilityImpl implements OperationFacility {
 
         public boolean registerShiftBreak(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
             boolean update = breakReservations.containsKey(vehicleId);
+            if(update) {
+                releaseShiftBreak(vehicleId);
+            }
             boolean registered = register(timeRange);
             if(registered) {
-                if(update) {
-                    releaseShiftBreak(vehicleId);
-                }
                 breakReservations.put(vehicleId, timeRange);
             }
             return registered;
@@ -194,11 +194,11 @@ public class OperationFacilityImpl implements OperationFacility {
 
         public boolean registerParkingOutOfShift(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
             boolean update = parkReservations.containsKey(vehicleId);
+            if(update) {
+                releaseParkingOutOfShift(vehicleId);
+            }
             boolean registered = register(timeRange);
             if(registered) {
-                if(update) {
-                    releaseParkingOutOfShift(vehicleId);
-                }
                 parkReservations.put(vehicleId, timeRange);
             }
             return registered;
