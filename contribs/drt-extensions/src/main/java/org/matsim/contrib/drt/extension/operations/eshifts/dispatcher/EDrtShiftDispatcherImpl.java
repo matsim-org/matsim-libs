@@ -83,13 +83,13 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 	}
 
 	private void checkChargingAtHub(double timeStep) {
-		for (OperationFacility operationFacility : operationFacilities.getDrtOperationFacilities().values()) {
+		for (OperationFacility operationFacility : operationFacilities.getFacilities().values()) {
 			List<Id<Charger>> chargerIds = operationFacility.getChargers();
 			if (chargerIds.isEmpty()) {
 				//facility does not have a charger
 				continue;
 			}
-			for (Id<DvrpVehicle> vehicle : operationFacility.getRegisteredVehicles()) {
+			for (Id<DvrpVehicle> vehicle : operationFacility.getParkedOutOfShiftVehicles()) {
 				DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicle);
 				if (dvrpVehicle instanceof EvShiftDvrpVehicle eShiftVehicle) {
 					if (eShiftVehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {

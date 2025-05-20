@@ -29,16 +29,29 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
      * (inclusive). Returns true only if, at all times in that
      * range, #existing reservations < capacity.
      */
-    boolean register(Id<DvrpVehicle> vehicleId, IntRange timeRange);
+    boolean registerOrUpdateShiftBreak(Id<DvrpVehicle> vehicleId, IntRange timeRange);
 
     /**
-     * Remove all reservations ever made for this vehicle.
+     * Reserve one slot for vehicleId over the entire timeRange
+     * (inclusive). Returns true only if, at all times in that
+     * range, #existing reservations < capacity.
      */
-    boolean deregisterVehicle(Id<DvrpVehicle> id);
+    boolean registerOrUpdateParkingOutOfShift(Id<DvrpVehicle> vehicleId, IntRange timeRange);
+
+    /**
+     * Remove shift break reservations made for this vehicle.
+     */
+    boolean deregisterShiftBreak(Id<DvrpVehicle> id);
+    /**
+     * Remove parking reservations made for this vehicle.
+     */
+    boolean deregisterParkingOutOfShift(Id<DvrpVehicle> id);
 
     List<Id<Charger>> getChargers();
 
     OperationFacilityType getType();
 
-    Set<Id<DvrpVehicle>> getRegisteredVehicles();
+    Set<Id<DvrpVehicle>> getShiftBreakVehicles();
+
+    Set<Id<DvrpVehicle>> getParkedOutOfShiftVehicles();
 }

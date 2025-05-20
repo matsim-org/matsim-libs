@@ -35,7 +35,7 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
             default:
                 throw new IllegalArgumentException("Unknown operation facility type!");
         }
-        return operationFacilities.getDrtOperationFacilities().values().stream()
+        return operationFacilities.getFacilities().values().stream()
                 .filter(filter)
                 .filter(opFa -> opFa.hasCapacity(timeRange))
                 .min(Comparator.comparing(
@@ -44,7 +44,7 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
 
     @Override
     public Optional<OperationFacility> findFacility(Coord coord, IntRange timeRange) {
-        return operationFacilities.getDrtOperationFacilities().values().stream()
+        return operationFacilities.getFacilities().values().stream()
                 .filter(opFa -> opFa.hasCapacity(timeRange))
                 .min(Comparator.comparing(
                         f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));

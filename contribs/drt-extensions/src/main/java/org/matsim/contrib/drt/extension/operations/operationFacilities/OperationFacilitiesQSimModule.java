@@ -14,16 +14,13 @@ import static org.matsim.contrib.common.timeprofile.TimeProfileCollector.Profile
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.modal.ModalProviders;
 
 import com.google.common.collect.ImmutableMap;
@@ -59,12 +56,37 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 		addModalQSimComponentBinding().toProvider(
 				modalProvider(dvrpModeInstanceGetter -> {
 					List<OperationFacility> facilitiesList = new ArrayList<>(
-							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getDrtOperationFacilities().values());
+							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getFacilities().values());
 					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
 					ProfileCalculator profileCalculator = () -> facilitiesList.stream()
-							.collect(toImmutableMap(f -> f.getId() + "", f -> (double)f.getRegisteredVehicles().size()));
+							.collect(toImmutableMap(f -> f.getId() + "", f -> (double)f.getParkedOutOfShiftVehicles().size()));
 					return new TimeProfileCollector(header, profileCalculator, 300,
-							"individual_operation_facility_capacity_time_profiles" + "_" + getMode(),
+							"individual_operation_facility_capacity_time_profiles_parked" + "_" + getMode(),
+							dvrpModeInstanceGetter.get(MatsimServices.class));
+				}));
+
+		addModalQSimComponentBinding().toProvider(
+				modalProvider(dvrpModeInstanceGetter -> {
+					List<OperationFacility> facilitiesList = new ArrayList<>(
+							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getFacilities().values());
+					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
+					ProfileCalculator profileCalculator = () -> facilitiesList.stream()
+							.collect(toImmutableMap(f -> f.getId() + "", f -> (double)f.getShiftBreakVehicles().size()));
+					return new TimeProfileCollector(header, profileCalculator, 300,
+							"individual_operation_facility_capacity_time_profiles_shift_break" + "_" + getMode(),
+							dvrpModeInstanceGetter.get(MatsimServices.class));
+				}));
+
+		addModalQSimComponentBinding().toProvider(
+				modalProvider(dvrpModeInstanceGetter -> {
+					List<OperationFacility> facilitiesList = new ArrayList<>(
+							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getFacilities().values());
+					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
+					ProfileCalculator profileCalculator = () -> facilitiesList.stream()
+							.collect(toImmutableMap(f -> f.getId() + "", f ->
+									(double)f.getShiftBreakVehicles().size() + f.getParkedOutOfShiftVehicles().size()));
+					return new TimeProfileCollector(header, profileCalculator, 300,
+							"individual_operation_facility_capacity_time_profiles_all" + "_" + getMode(),
 							dvrpModeInstanceGetter.get(MatsimServices.class));
 				}));
 	}

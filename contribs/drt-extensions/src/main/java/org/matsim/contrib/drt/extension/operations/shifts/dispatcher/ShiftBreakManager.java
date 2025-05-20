@@ -70,7 +70,7 @@ public class ShiftBreakManager {
             IntRange timeRange = new IntRange(drtShiftBreak.getEarliestBreakStartTime(), drtShiftBreak.getLatestBreakEndTime());
             facilityFinder.findFacility(coord, timeRange)
                     .filter(opFa -> opFa.hasCapacity(timeRange))
-                    .filter(fac -> fac.register(entry.vehicle().getId(), timeRange))
+                    .filter(fac -> fac.registerOrUpdateShiftBreak(entry.vehicle().getId(), timeRange))
                     .ifPresentOrElse(fac -> scheduleBreak(entry, fac),
                             () -> {
                                 logger.warn("Could not schedule break for shift {} at time {}", shift.getId(), now);

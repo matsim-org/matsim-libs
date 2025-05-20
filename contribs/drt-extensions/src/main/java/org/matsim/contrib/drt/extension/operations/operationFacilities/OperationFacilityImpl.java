@@ -59,21 +59,31 @@ public class OperationFacilityImpl implements OperationFacility {
         return capacity;
     }
 
-
     @Override
     public boolean hasCapacity(IntRange range) {
         return capacityManager.hasCapacity(range);
     }
 
     @Override
-    public boolean register(Id<DvrpVehicle> vehicleId, IntRange range) {
-        return capacityManager.register(vehicleId, range);
+    public boolean registerOrUpdateShiftBreak(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
+        return capacityManager.registerShiftBreak(vehicleId, timeRange);
     }
 
+    @Override
+    public boolean registerOrUpdateParkingOutOfShift(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
+        return capacityManager.registerParkingOutOfShift(vehicleId, timeRange);
+
+    }
 
     @Override
-    public boolean deregisterVehicle(Id<DvrpVehicle> vehicleId) {
-        return capacityManager.release(vehicleId);
+    public boolean deregisterShiftBreak(Id<DvrpVehicle> vehicleId) {
+        return capacityManager.releaseShiftBreak(vehicleId);
+    }
+
+    @Override
+    public boolean deregisterParkingOutOfShift(Id<DvrpVehicle> vehicleId) {
+        return capacityManager.releaseParkingOutOfShift(vehicleId);
+
     }
 
     @Override
@@ -87,8 +97,13 @@ public class OperationFacilityImpl implements OperationFacility {
     }
 
     @Override
-    public Set<Id<DvrpVehicle>> getRegisteredVehicles() {
-        return Collections.unmodifiableSet(capacityManager.reservations.keySet());
+    public Set<Id<DvrpVehicle>> getShiftBreakVehicles() {
+        return Collections.unmodifiableSet(capacityManager.breakReservations.keySet());
+    }
+
+    @Override
+    public Set<Id<DvrpVehicle>> getParkedOutOfShiftVehicles() {
+        return Collections.unmodifiableSet(capacityManager.parkReservations.keySet());
     }
 
 
@@ -100,8 +115,9 @@ public class OperationFacilityImpl implements OperationFacility {
         private final int[] counts;
         // fullSeconds[t] = true iff counts[t] >= capacity
         private final BitSet fullSeconds;
-        // key -> its reserved [min..max] for later release
-        private final Map<Id<DvrpVehicle>, IntRange> reservations = new HashMap<>();
+
+        private final Map<Id<DvrpVehicle>, IntRange> breakReservations = new HashMap<>();
+        private final Map<Id<DvrpVehicle>, IntRange> parkReservations = new HashMap<>();
 
         public CapacityManager(int capacity, double maxTime) {
             if (capacity < 1) {
@@ -120,10 +136,7 @@ public class OperationFacilityImpl implements OperationFacility {
             return firstFull < 0 || firstFull > to;
         }
 
-        private boolean register(Id<DvrpVehicle> key, IntRange timeRange) {
-            if(reservations.containsKey(key)) {
-                throw new IllegalArgumentException("Multiple reservations per vehicle are not supported at this point.");
-            }
+        private boolean register(IntRange timeRange) {
 
             if (!hasCapacity(timeRange)) {
                 return false;
@@ -139,12 +152,10 @@ public class OperationFacilityImpl implements OperationFacility {
                     fullSeconds.set(t);
                 }
             }
-            reservations.put(key, new IntRange(from, to));
             return true;
         }
 
-        private boolean release(Id<DvrpVehicle> key) {
-            IntRange timeRange = reservations.remove(key);
+        private boolean release(IntRange timeRange) {
             if (timeRange == null) {
                 return false;
             }
@@ -157,6 +168,40 @@ public class OperationFacilityImpl implements OperationFacility {
                 }
             }
             return true;
+        }
+
+        private boolean releaseShiftBreak(Id<DvrpVehicle> vehicleId) {
+            IntRange timeRange = breakReservations.remove(vehicleId);
+            return release(timeRange);
+        }
+
+        private boolean releaseParkingOutOfShift(Id<DvrpVehicle> vehicleId) {
+            IntRange timeRange = parkReservations.remove(vehicleId);
+            return release(timeRange);
+        }
+
+        public boolean registerShiftBreak(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
+            boolean update = breakReservations.containsKey(vehicleId);
+            boolean registered = register(timeRange);
+            if(registered) {
+                if(update) {
+                    releaseShiftBreak(vehicleId);
+                }
+                breakReservations.put(vehicleId, timeRange);
+            }
+            return registered;
+        }
+
+        public boolean registerParkingOutOfShift(Id<DvrpVehicle> vehicleId, IntRange timeRange) {
+            boolean update = parkReservations.containsKey(vehicleId);
+            boolean registered = register(timeRange);
+            if(registered) {
+                if(update) {
+                    releaseParkingOutOfShift(vehicleId);
+                }
+                parkReservations.put(vehicleId, timeRange);
+            }
+            return registered;
         }
     }
 }

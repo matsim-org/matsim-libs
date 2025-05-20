@@ -124,7 +124,7 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
         Schedule schedule = vehicle.getSchedule();
         StayTask stayTask = (StayTask) schedule.getCurrentTask();
         if (stayTask instanceof WaitForShiftTask) {
-            ((WaitForShiftTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
+            ((WaitForShiftTask) stayTask).getFacility().deregisterParkingOutOfShift(vehicle.getId());
             stayTask.setEndTime(now);
             if (stayTask instanceof EDrtWaitForShiftTask eTask) {
                 if (eTask.getChargingTask() != null) {
