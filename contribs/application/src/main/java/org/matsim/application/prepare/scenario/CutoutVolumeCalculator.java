@@ -25,6 +25,9 @@ import java.util.stream.IntStream;
  */
 final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler { // TODO Remove linkEnterEventHandler
 
+	// TODO calculating the timeslices using double can create numerical effects. Investigate this
+	// TODO At the moment, the average tt for each timeslice is only considering vehicles, that LEFT the link during the timeslice. This can cause problems, especially with smaller timeslices
+
 	/**
 	 * Interval of the time slices in seconds
 	 */
@@ -75,6 +78,17 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		vehicle2Person.put(event.getVehicleId(), event.getPersonId());
+	}
+
+	// TODO DEBUG
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		// TODO DEBUG
+		// Check if this vehicle is static traffic
+		if(cutoutPersons.contains(vehicle2Person.get(event.getVehicleId()))){
+			staticDepartTimes.computeIfAbsent(event.getLinkId(), k -> new ArrayList<>());
+			staticDepartTimes.get(event.getLinkId()).add(event.getTime());
+		}
 	}
 
 	@Override
@@ -135,17 +149,6 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 		}
 		int timeslice = (int) Math.floor(time / changeEventsInterval);
 		return linkId2timeslice2accLoad.get(linkId).get(timeslice);
-	}
-
-	// TODO DEBUG
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		// TODO DEBUG
-		// Check if this vehicle is static traffic
-		if(cutoutPersons.contains(vehicle2Person.get(event.getVehicleId()))){
-			staticDepartTimes.computeIfAbsent(event.getLinkId(), k -> new ArrayList<>());
-			staticDepartTimes.get(event.getLinkId()).add(event.getTime());
-		}
 	}
 
 	private static final class CutoutVolume {
@@ -217,6 +220,7 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 			 */
 			double ref_PCE = 1;
 			double ref_cap = network.getLinks().get(linkId).getCapacity();
+			double ref_max = 1/network.getLinks().get(linkId).getCapacity();
 
 			// Get all the departures from this link and filter them to just the current timeslice. Also add interval borders as departures
 			List<Double> departures = departTimes.get(linkId).stream().filter(d -> d >= time && d < time + changeEventsInterval).toList();
@@ -226,7 +230,7 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 				.toList();
 
 			// Get the accumulated capacity of this link, use the total capacity as initial value if acc-cap is not set yet
-			linkId2accumulatedCapacity.putIfAbsent(linkId, ref_cap);
+			linkId2accumulatedCapacity.putIfAbsent(linkId, ref_max);
 			double accumulated_capacity = linkId2accumulatedCapacity.getDouble(linkId);
 
 			// The load respective the average vehicle PCE
@@ -241,19 +245,19 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 
 				// Restoring the link capacity
 				accumulated_capacity += (deltas.get(i) / 3600) * ref_cap;
-				if (accumulated_capacity > ref_cap)
-					accumulated_capacity = ref_cap;
+				if (accumulated_capacity > ref_max)
+					accumulated_capacity = ref_max;
 
 				// Getting the restored accumulated capacity
 				double cap_restored = accumulated_capacity;
 
 				// Now we check, for three different cases:
-				if (cap_restored < averagePCE*time) {
+				if (cap_restored < averagePCE) {
 					// Case 1: The acc-cap was less than the average PCE after the (i-1)-th link event. The vehicle would need to wait for the cap to restore
-					accumulated_load += deltas.get(i) * ((ref_PCE - cap_restored) + ((cap_restored - cap_min) / 2));
-				} else if (cap_min < averagePCE*time) {
+					accumulated_load += deltas.get(i) * (Math.abs(ref_PCE - cap_restored) + (Math.abs(cap_restored - cap_min) / 2));
+				} else if (cap_min < averagePCE) {
 					// Case 2: The acc-cap was partially less than the average PCE after the (i-1)-th link event. The vehicle would neet to wait, but not as long as in case 2
-					accumulated_load += deltas.get(i) * ((cap_min - averagePCE) / 2);
+					accumulated_load += deltas.get(i) * (Math.abs(cap_min - averagePCE) / 2);
 				}
 				// Case 3: The capacity was never lower than the needed average PCE so the vehicle would have no waiting time. The load is remains unchanged.
 				accumulated_capacity = cap_restored;
@@ -267,8 +271,8 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 			} else {
 				accumulated_capacity += (changeEventsInterval / 3600) * ref_cap;
 			}
-			if (accumulated_capacity > ref_cap)
-				accumulated_capacity = ref_cap;
+			if (accumulated_capacity > ref_max)
+				accumulated_capacity = ref_max;
 
 			linkId2accumulatedCapacity.put(linkId, accumulated_capacity);
 			return accumulated_load;
