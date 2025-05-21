@@ -248,10 +248,10 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 				double cap_restored = accumulated_capacity;
 
 				// Now we check, for three different cases:
-				if (cap_restored < averagePCE) {
+				if (cap_restored < averagePCE*time) {
 					// Case 1: The acc-cap was less than the average PCE after the (i-1)-th link event. The vehicle would need to wait for the cap to restore
 					accumulated_load += deltas.get(i) * ((ref_PCE - cap_restored) + ((cap_restored - cap_min) / 2));
-				} else if (cap_min < averagePCE) {
+				} else if (cap_min < averagePCE*time) {
 					// Case 2: The acc-cap was partially less than the average PCE after the (i-1)-th link event. The vehicle would neet to wait, but not as long as in case 2
 					accumulated_load += deltas.get(i) * ((cap_min - averagePCE) / 2);
 				}
