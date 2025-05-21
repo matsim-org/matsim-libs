@@ -345,7 +345,6 @@ class DisallowedNextLinksUtilsTest {
 
 		// * --------------------------------------------------
 
-		// Simplify
 		DisallowedNextLinksUtils.clean(network);
 
 		// * --------------------------------------------------
