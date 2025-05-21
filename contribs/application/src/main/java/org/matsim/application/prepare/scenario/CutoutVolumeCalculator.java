@@ -260,8 +260,13 @@ final class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnter
 			}
 
 			// Now compute the restored accumulated capacitiy at the end of the timeslice
-			double delta_end = time+changeEventsInterval - departures.getLast();
-			accumulated_capacity += (delta_end / 3600) * ref_cap;
+			// If there are no departs, then refresh the accumulated capacity for the whole timeslice
+			if (!departures.isEmpty()) {
+				double delta_end = time + changeEventsInterval - departures.getLast();
+				accumulated_capacity += (delta_end / 3600) * ref_cap;
+			} else {
+				accumulated_capacity += (changeEventsInterval / 3600) * ref_cap;
+			}
 			if (accumulated_capacity > ref_cap)
 				accumulated_capacity = ref_cap;
 
