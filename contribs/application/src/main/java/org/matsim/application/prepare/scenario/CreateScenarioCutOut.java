@@ -549,22 +549,22 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					// 2. The average waiting time, caused by static traffic (wt_s) is computed by multiplying the proportion with the average waiting time w: wt_s = p*w
 					// 3. The final link freespeed (f) is then computed by assuming, that each vehicle has to wait the optimal trave time tt_o and the waiting time from static traffic: f = l/(tt_o+wt_s)
 					// It may happen, that v_s=0 or v_d=0. In this case we have no travel times to work with and we will set the freespeed to the link_freespeed.
-					if (cv.getCutoutLinkVolume(link.getId(), time) == 0 || cv.getTotalLinkVolume(link.getId(), time) == 0)
-						capacity = link.getCapacity();
+					if (cv.getCutoutLinkVolume(link.getId(), time) == 0 || cv.getTotalLinkVolume(link.getId(), time) == 0) {
+						freespeed = link.getFreespeed();
+					} else {
+						// Step 1: proportion (p)
+						double proportion = (double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time);
 
-					// Step 1: proportion (p)
-					double proportion = (double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time);
+						// Step 2: average static waiting time (wt_s)
+						double avgTravelTime = tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
+						double optTravelTime = link.getLength() / link.getFreespeed();
+						double avgWaitingTime = avgTravelTime - optTravelTime;
+						double avgStaticWaitingTime = proportion * avgWaitingTime;
 
-					// Step 2: average static waiting time (wt_s)
-					double avgTravelTime = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
-					double optTravelTime = link.getLength() / link.getFreespeed();
-					double avgWaitingTime = avgTravelTime - optTravelTime;
-					double avgStaticWaitingTime = proportion * avgWaitingTime;
-
-					// Step 3: Final freespeed (f)
-					freespeed = link.getLength()/(optTravelTime+avgStaticWaitingTime);
+						// Step 3: Final freespeed (f)
+						freespeed = link.getLength()/(optTravelTime+avgStaticWaitingTime);
+					}
 				}
-
 
 				boolean speedSame = prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6;
 				boolean capacitySame = prevCapacity != null && Math.abs(capacity - prevCapacity) < 1e-6;
