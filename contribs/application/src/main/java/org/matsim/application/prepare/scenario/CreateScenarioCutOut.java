@@ -318,22 +318,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			builder.setMaxTime(changeEventsMaxTime);
 			tt = builder.build();
 
-			// TODO Temporary, try to get a better fix for the zero traffic problem whe nusing the relativeAdjustment
-			if(capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities){
-				cv = new CutoutVolumeCalculator(
-					changeEventsMaxTime,
-					changeEventsMaxTime,
-					scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
-					scenario
-				);
-			} else {
-				cv = new CutoutVolumeCalculator(
-					changeEventsInterval,
-					changeEventsMaxTime,
-					scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
-					scenario
-				);
-			}
+			cv = new CutoutVolumeCalculator(
+				changeEventsInterval,
+				changeEventsMaxTime,
+				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
+				scenario
+			);
 
 			EventsManager manager = EventsUtils.createEventsManager();
 			manager.addHandler(tt);
@@ -520,15 +510,19 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 				// Adjusting capacity to the link usage
 				double capacity = link.getCapacity();
-				if (capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities) {
-					// If a link outside the shp + buffer has no traffic, then it should not be in the network at all.
-					// If this assertion fails, it implicates a programming error or a weird program configuration.
-					assert cv.getCutoutLinkVolume(link.getId(), time) != 0;
+				if (capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities)
+					// This method will only work, when there is traffic on this link. It is however not guaranteed, that a link will have traffic at all time-intervals.
+					// So there are two important edge-cases to consider:
+					// 1. cutoutVolume is zero -> This will result in a link in the cutout with 0 capacity.
+					// 2. totalTraffic is zero -> this will result in a link with undefined capacity.
+					// In this case, we will simply keep the capacity of the last interval
+					if (cv.getCutoutLinkVolume(link.getId(), time) != 0 && cv.getTotalLinkVolume(link.getId(), time) != 0)
+						capacity = ((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time)) * ((changeEventsInterval / 3600) * link.getCapacity());
+					else if(prevCapacity != null)
+						capacity = prevCapacity;
 
-					capacity = (((double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time)) * ((changeEventsInterval / 3600) * link.getCapacity()));
-				} else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities || capacityCalculation == CapacityCalculation.cleanedFreespeeds)
+				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities || capacityCalculation == CapacityCalculation.cleanedFreespeeds)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
-
 
 				if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
 					// Compute the cleaned travelTimes. The idea is to compute, how long the average vehicle in the scenario would wait in a queue,
