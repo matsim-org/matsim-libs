@@ -114,6 +114,28 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		LOG.info("Finished computing accessibilities.");
 
 		writeCSVFile(outputDirectory);
+		writePoiFile(outputDirectory);
+	}
+
+	private void writePoiFile(String outputDirectory) {
+		LOG.info("Start writing POI output to " + outputDirectory + ".");
+
+		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
+
+		// Write header
+//		writer.writeField(Labels.ID);
+		writer.writeField(Labels.X_COORDINATE);
+		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeNewLine();
+
+		opportunities.getFacilities().values().forEach(facility -> {
+			writer.writeField(facility.getCoord().getX());
+			writer.writeField(facility.getCoord().getY());
+			writer.writeNewLine();
+		});
+
+		writer.close() ;
+		LOG.info("Finished writing POI output to " + outputDirectory + ".");
 	}
 
 
