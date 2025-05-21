@@ -203,6 +203,14 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 	@Override
 	public Integer call() throws Exception {
+		// This is just to make sure, that nobody is using the cleanedFreespeedsSettings with keepFreespeeds activated.
+		// TODO Clean up setting-cobinations and then remove this
+		if ((keepFreespeeds && capacityCalculation == CapacityCalculation.proportionalFreespeedsCleaning)
+		|| (keepFreespeeds && capacityCalculation == CapacityCalculation.modeledFreespeedsCleaning)) {
+			throw new IllegalArgumentException("You set either the proportionalFreespeedsCleaning or modeledFreespeedsCleaning for capacity-calculation in combination with keep-freespeeds." +
+				"This is not useful, as the speed calculation is skipped with these settings. Turn of keep-freespeeds, to continue with the scenario cutout.");
+		}
+
 		//Check CRS
 		if (crs.getInputCRS() == null) {
 			log.error("Input CRS must be specified");
