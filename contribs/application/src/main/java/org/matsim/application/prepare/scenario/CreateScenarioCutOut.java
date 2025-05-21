@@ -499,6 +499,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += changeEventsInterval) {
+				// TODO Due to many experiments and ideas, this part of code got pretty messy. I will clean it up, once we specified which methods will stay in the final cutout-setup
 
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
@@ -521,10 +522,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 					else if(prevCapacity != null)
 						capacity = prevCapacity;
 
-				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities || capacityCalculation == CapacityCalculation.cleanedFreespeeds)
+				else if (capacityCalculation == CapacityCalculation.subtractLostVehiclesCapacities
+						|| capacityCalculation == CapacityCalculation.modeledFreespeedsCleaning
+						|| capacityCalculation == CapacityCalculation.proportionalFreespeedsCleaning)
 					capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
 
-				if (capacityCalculation == CapacityCalculation.cleanedFreespeeds){
+				if (capacityCalculation == CapacityCalculation.modeledFreespeedsCleaning) {
 					// Compute the cleaned travelTimes. The idea is to compute, how long the average vehicle in the scenario would wait in a queue,
 					// if the "static" traffic (the traffic, that will be removed after the cutout) was there. This waiting time is then used to
 					// set the new freespeed accordingly. The capacity will be set to the value, which is "remaining" after the static traffic is subtracted.
@@ -540,6 +543,26 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 					// 4. The freespeed is given by adding the averageWaitingTime to the average travel time of the link
 					freespeed = link.getLength() / (averageWaitingTime+(link.getLength()/link.getFreespeed()));
+				} else if (capacityCalculation == CapacityCalculation.proportionalFreespeedsCleaning) {
+					// In this method we are simply calculating the waiting time, caused by static traffic in following steps:
+					// 1. Calculate proportion (p) of static (v_s) and total traffic volume (v): p = v_s/(v)
+					// 2. The average waiting time, caused by static traffic (wt_s) is computed by multiplying the proportion with the average waiting time w: wt_s = p*w
+					// 3. The final link freespeed (f) is then computed by assuming, that each vehicle has to wait the optimal trave time tt_o and the waiting time from static traffic: f = l/(tt_o+wt_s)
+					// It may happen, that v_s=0 or v_d=0. In this case we have no travel times to work with and we will set the freespeed to the link_freespeed.
+					if (cv.getCutoutLinkVolume(link.getId(), time) == 0 || cv.getTotalLinkVolume(link.getId(), time) == 0)
+						capacity = link.getCapacity();
+
+					// Step 1: proportion (p)
+					double proportion = (double) cv.getCutoutLinkVolume(link.getId(), time) / (double) cv.getTotalLinkVolume(link.getId(), time);
+
+					// Step 2: average static waiting time (wt_s)
+					double avgTravelTime = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
+					double optTravelTime = link.getLength() / link.getFreespeed();
+					double avgWaitingTime = avgTravelTime - optTravelTime;
+					double avgStaticWaitingTime = proportion * avgWaitingTime;
+
+					// Step 3: Final freespeed (f)
+					freespeed = link.getLength()/(optTravelTime+avgStaticWaitingTime);
 				}
 
 
@@ -671,6 +694,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 	}
 
+	// TODO Refactor the settings
 	public enum CapacityCalculation {
 		/**
 		 * Keep the original capacity of the link
@@ -689,11 +713,16 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		relativeAdjustmentOfCapacities,
 
 		/**
+		 * This methods calculates the freespeeds, depending on the proportions of static / dynamic traffic
 		 * TODO This method may or may not work. It is purely theoretical. A test will be done during the next days to see, if it works in practice.
 		 * TODO It is currently an extension of subtractLostVehiclesCapacities, it will get an individual option later
 		 */
-		cleanedFreespeeds
+		proportionalFreespeedsCleaning,
 
+		/**
+		 * This method calculates the freespeeds using a simplified accumulated capacity model.
+		 */
+		modeledFreespeedsCleaning
 	}
 
 
