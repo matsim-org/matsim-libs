@@ -318,12 +318,22 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			builder.setMaxTime(changeEventsMaxTime);
 			tt = builder.build();
 
-			cv = new CutoutVolumeCalculator(
-				changeEventsInterval,
-				changeEventsMaxTime,
-				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
-				scenario
-			);
+			// TODO Temporary, try to get a better fix for the zero traffic problem whe nusing the relativeAdjustment
+			if(capacityCalculation == CapacityCalculation.relativeAdjustmentOfCapacities){
+				cv = new CutoutVolumeCalculator(
+					changeEventsMaxTime,
+					changeEventsMaxTime,
+					scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
+					scenario
+				);
+			} else {
+				cv = new CutoutVolumeCalculator(
+					changeEventsInterval,
+					changeEventsMaxTime,
+					scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet()),
+					scenario
+				);
+			}
 
 			EventsManager manager = EventsUtils.createEventsManager();
 			manager.addHandler(tt);
