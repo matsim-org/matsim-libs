@@ -119,9 +119,9 @@ public class RunMelunPrebooking {
 		drtConfig.setOperationalScheme(OperationalScheme.door2door);
 		drtConfig.setStopDuration(60.0);
 		DrtOptimizationConstraintsSetImpl constraintsParam = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		constraintsParam.maxWaitTime = settings.maxWaitTime;
-		constraintsParam.maxTravelTimeAlpha = settings.maxTravelTimeAlpha;
-		constraintsParam.maxTravelTimeBeta = settings.maxWaitTime;
+		constraintsParam.setMaxWaitTime(settings.maxWaitTime);
+		constraintsParam.setMaxTravelTimeAlpha(settings.maxTravelTimeAlpha);
+		constraintsParam.setMaxTravelTimeBeta(settings.maxWaitTime);
 
 		DrtInsertionSearchParams insertionSearchParams = new ExtensiveInsertionSearchParams();
 		drtConfig.addDrtInsertionSearchParams(insertionSearchParams);
