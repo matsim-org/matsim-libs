@@ -49,7 +49,6 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFunctionFactory {
 
-  @Inject private Network network;
   @Inject private Scenario scenario;
 
 //  private  Id<Carrier> carrierId;
@@ -131,7 +130,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     // scores variable costs per distance
     private void handleEvent(LinkEnterEvent event) {
-      final double distance = network.getLinks().get(event.getLinkId()).getLength();
+      final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
       final double costPerMeter =
               (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
                       .getType()
