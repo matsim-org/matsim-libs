@@ -277,11 +277,14 @@ import org.matsim.vehicles.VehicleType;
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
 		Id<CarrierShipment> carrierShipmentId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
 		var lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
-		var latestEntry = lspShipmentPlan.getMostRecentEntry();
+		LspShipmentPlanElement latestEntry = lspShipmentPlan.getMostRecentEntry();
 		var ressourceIdOfLatestEntry = latestEntry.getResourceId();
 
 		Id<Link> fromLinkId = null;
 
+		// Since this is a shipment, the carrier would want to pick it up at its overall origin.  However, the shipment may already be at an intermediate hub.
+		// "getMostRecentEntry()" (see above) works since we are in the process of constructing the plan.  Possible, latestEntry might already
+		// directly contain the necessary information.
 		for (LSPResource resource : this.lspPlan.getLSP().getResources()) {
 			if (resource instanceof TransshipmentHubResource hubResource) {
 				if (hubResource.getId().equals(ressourceIdOfLatestEntry)) {

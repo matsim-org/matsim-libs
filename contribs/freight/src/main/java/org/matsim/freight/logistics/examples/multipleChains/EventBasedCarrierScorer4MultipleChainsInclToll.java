@@ -52,12 +52,12 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
   @Inject private Network network;
   @Inject private Scenario scenario;
 
-  private Id<Carrier> carrierId;
+//  private  Id<Carrier> carrierId;
 
   public ScoringFunction createScoringFunction(Carrier carrier) {
-    this.carrierId = carrier.getId();
+//    this.carrierId = carrier.getId();
     SumScoringFunction sf = new SumScoringFunction();
-    sf.addScoringFunction(new EventBasedScoring());
+    sf.addScoringFunction(new EventBasedScoring( carrier.getId(), scenario ) );
     return sf;
   }
 
@@ -68,16 +68,20 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
    * distance-dependent costs (using LinkEnterEvent)
    * tolls (using PersonMoneyEvent)
    */
-  private class EventBasedScoring implements ArbitraryEventScoring {
+  private static class EventBasedScoring implements ArbitraryEventScoring {
 
     final Logger log = LogManager.getLogger(EventBasedScoring.class);
     private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
     private final Driver2VehicleEventHandler d2v = new Driver2VehicleEventHandler();
     private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
+    private final Id<Carrier> carrierId;
     private double score;
+    private final Scenario scenario;
 
-    public EventBasedScoring() {
+    public EventBasedScoring( Id<Carrier> carrierId, Scenario scenario ) {
       super();
+		this.carrierId = carrierId;
+		this.scenario = scenario;
 		log.warn("Begin scoring of Carrier: {}", carrierId);
     }
 
