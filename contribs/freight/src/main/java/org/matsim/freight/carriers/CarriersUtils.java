@@ -266,6 +266,17 @@ public class CarriersUtils {
 		for (Future<?> future : futures) {
 			future.get();
 		}
+
+		// close all threads
+		executor.shutdown();
+		try {
+		    if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+		        executor.shutdownNow();
+		    }
+		} catch (InterruptedException e) {
+		    executor.shutdownNow();
+		    Thread.currentThread().interrupt();
+		}
 	}
 
 	/**
