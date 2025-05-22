@@ -83,7 +83,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
 
-	private static final int MATSIM_ITERATIONS = 100;
+	private static final int MATSIM_ITERATIONS = 0;
 	private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it";
 
 
@@ -197,10 +197,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 					bind(CarrierStrategyManager.class)
 						.toProvider(
 							() -> {
-								CarrierStrategyManager strategyManager =
-									CarrierControllerUtils.createDefaultCarrierStrategyManager();
-								strategyManager.addStrategy(
-									new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+								CarrierStrategyManager strategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
+								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 								return strategyManager;
 							});
 					bind(LSPStrategyManager.class)

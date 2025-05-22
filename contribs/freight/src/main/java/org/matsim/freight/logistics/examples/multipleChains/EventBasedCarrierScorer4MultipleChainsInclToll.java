@@ -78,6 +78,7 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     public EventBasedScoring() {
       super();
+		log.warn("Begin scoring of Carrier: {}", carrierId);
     }
 
     @Override
@@ -85,7 +86,8 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     @Override
     public double getScore() {
-      return score;
+		log.warn("End scoring of Carrier: {}", carrierId);
+		return score;
     }
 
     @Override
@@ -139,6 +141,8 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
 
     // scores tolls for vehicles driving on tolled links
     private void handleEvent(PersonMoneyEvent event) {
+		log.warn("Scoring Carrier: {}", carrierId);
+		log.warn("Event : {}", event.toString());
       double tollValue;
 
       if (event.getPurpose().equals("toll")) {
@@ -150,10 +154,11 @@ class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFu
             log.info("Tolling caused by event: {}, tollvalue {}", event, tollValue);
             score = score + tollValue;
           }
-
         }
       }
+
     }
+
   }
 
 }
