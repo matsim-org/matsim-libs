@@ -73,12 +73,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 	private static final double TOLL_VALUE = 1000;
 
-	private static final String CARRIER_PLAN_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-	private static final String VEHICLE_TYPE_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+//	private static final String CARRIER_PLAN_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+//	private static final String VEHICLE_TYPE_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 
 
-	//	private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-//	private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
+	private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
+	private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 	private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
@@ -163,9 +163,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			config.controller().setLastIteration(MATSIM_ITERATIONS);
 		}
 
-		//TODO: Wieder auf public-svn umstellen. Habe aber gerade kein Internet im ICE -.-
-		config.network().setInputFile("../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
-		//config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+//		config.network().setInputFile("../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
+		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 		config.global().setCoordinateSystem("EPSG:31468");
 		config.global().setRandomSeed(4177);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
