@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
@@ -397,11 +398,19 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
+		this.addParameterSet( set, ConfigWriter.Verbosity.all );
+	}
+
+	public void addParameterSet( final ConfigGroup set, ConfigWriter.Verbosity verbosity ){
 		if ( set.getName().equals( TeleportedModeParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
-			log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
-			log.warn( "    warning, use clearTeleportedModeParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
+			if ( verbosity== ConfigWriter.Verbosity.minimal ){
+				// this execution path happens when the reduced config is generated.  We do not want any warnings there.  kai, may'25
+			} else {
+				log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
+				log.warn( "    warning, use clearTeleportedModeParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config." );
+			}
 
 //						  "This functionality was removed for " );
 //			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  " +
@@ -479,12 +488,15 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	}
 
 	public TeleportedModeParams getOrCreateModeRoutingParams( final String mode ) {
+		return this.getOrCreateModeRoutingParams( mode, ConfigWriter.Verbosity.all );
+	}
+	public TeleportedModeParams getOrCreateModeRoutingParams( final String mode, ConfigWriter.Verbosity verbosity ) {
 		TeleportedModeParams pars = getModeRoutingParams().get( mode );
 
 		if ( pars == null ) {
 			pars = (TeleportedModeParams) createParameterSet( TeleportedModeParams.SET_TYPE );
 			pars.setMode( mode );
-			addParameterSet( pars );
+			addParameterSet( pars, verbosity );
 		}
 		if ( this.isLocked() ) {
 			pars.setLocked();
