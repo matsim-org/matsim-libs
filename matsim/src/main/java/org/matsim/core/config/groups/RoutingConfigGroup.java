@@ -146,6 +146,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
 		public static final String TELEPORTED_MODE_FREESPEED_FACTOR = "teleportedModeFreespeedFactor";
+		public static final String PERSON_SPEED_ATTRIBUTE = "personSpeedAttribute";
 
 		private String mode = null;
 
@@ -157,6 +158,9 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		private Double teleportedModeFreespeedFactor = null;
 		private Double teleportedModeFreespeedLimit = Double.POSITIVE_INFINITY ;
 
+		// individual person attribute
+		private String personSpeedAttribute = null;
+
 		private static final String TELEPORTED_MODE_FREESPEED_FACTOR_CMT = "Free-speed factor for a teleported mode. " +
 		"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
 		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
@@ -164,6 +168,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
+
+		private static final String PERSON_SPEED_ATTRIBUTE_CMT = "The name of a person attribute that indicates their individual travel speed. Falling back to teleportedModeSpeed.";
 
 		public TeleportedModeParams( final String mode ) {
 			super( SET_TYPE );
@@ -186,6 +192,11 @@ public final class RoutingConfigGroup extends ConfigGroup {
 				// this should not happen anyway as the setters forbid it
 				throw new RuntimeException( "both teleported mode speed or freespeed factor are set for mode "+mode );
 			}
+
+			if ( teleportedModeFreespeedFactor != null && personSpeedAttribute != null ) {
+				// this should not happen anyway as the setters forbid it
+				throw new RuntimeException( "cannot combine per-person speed attribute and freespeed factor for "+mode );
+			}
 		}
 
 		@Override
@@ -196,7 +207,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 					"Speed for a teleported mode. " +
 					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
 			map.put( TELEPORTED_MODE_FREESPEED_FACTOR, TELEPORTED_MODE_FREESPEED_FACTOR_CMT);
-
+			map.put(PERSON_SPEED_ATTRIBUTE, PERSON_SPEED_ATTRIBUTE_CMT);
 			return map;
 		}
 
@@ -277,6 +288,18 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		@StringGetter("beelineDistanceFactor")
 		public Double getBeelineDistanceFactor() {
 			return this.beelineDistanceFactorForMode ;
+		}
+		
+		@StringSetter(PERSON_SPEED_ATTRIBUTE)
+		public TeleportedModeParams setPersonSpeedAttribute(String val) {
+			testForLocked();
+			this.personSpeedAttribute = val;
+			return this;
+		}
+
+		@StringGetter(PERSON_SPEED_ATTRIBUTE)
+		public String getPersonSpeedAttribute() {
+			return this.personSpeedAttribute;
 		}
 
 	}
