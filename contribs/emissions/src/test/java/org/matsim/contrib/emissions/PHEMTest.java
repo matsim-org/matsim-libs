@@ -566,11 +566,11 @@ public class PHEMTest {
 		}
 
 		// Print out the results as csv TODO Change path to output
-		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each  run.
+		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
 		// If you need the files, you have to change the path to a custom file path.
 		String diff_name = "diff_" + fuel + "_" + cutSetting + "_" + cutSetting.getAttr() + "_out.csv";
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("D:/Projects/VSP/MATSim/PHEMv2/out/" + diff_name),
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"segment",

@@ -206,7 +206,7 @@ library(tidyverse)
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_fixedIntervalLength_60_out.csv")
+  diff_out <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_out.csv")
 
   # Create summarized data fram from MATSim results
   data.MATSIM <- diff_out %>%
@@ -252,7 +252,7 @@ library(tidyverse)
     mutate(model = "SUMO_PHEMLight", value=value/1000)
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_delim("D:/Projects/VSP/MATSim/PHEMv2/sumo_petrol_pl5_output.csv",
+  data.SUMO_PHEMLight5 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_petrol_pl5_output.csv",
                                     delim = ";",
                                     col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                                     col_types = cols(
@@ -275,7 +275,7 @@ library(tidyverse)
 
   # TODO make sure, that this actually is a petrol car! It is just called "default"
   # Load data from SUMO with HBEFA3 and summarize for each interval
-  data.SUMO_HBEFA3 <- read_delim("D:/Projects/VSP/MATSim/PHEM/sumo_hbefa_petrol_output.csv",
+  data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_hbefa_output.csv",
                                  delim = ";",
                                  col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                                  col_types = cols(
@@ -316,8 +316,8 @@ library(tidyverse)
 
   # Line-Plot (for scenarios with more links)
   ggplot(data) +
-    geom_line(aes(x=startTime, y=gPkm, color=model), size=8/nrow(intervals)) +
-    geom_point(aes(x=startTime, y=gPkm, color=model), size=4/nrow(intervals)) +
+    geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
+    geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
     scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
@@ -327,8 +327,8 @@ library(tidyverse)
 
 # ==== Filter out pass.veh ===
 {
-  path_in <- "D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks.csv"
-  path_out <- "D:/Projects/VSP/MATSim/PHEM/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"
+  path_in <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks.csv"
+  path_out <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv"
 
   table <- read_delim(path_in, delim=";")
   table <- table %>%
@@ -483,7 +483,7 @@ library(tidyverse)
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  diff_out <- read_csv("D:/Projects/VSP/MATSim/PHEMv2/out/diff_petrol_fixedIntervalLength_60_out.csv")
+  diff_out <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_out.csv")
 
   # Compute the average difference for each component
   print(paste("CO:", (mean(diff_out$`CO-Factor`)-1)*100, "%"))
