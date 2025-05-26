@@ -82,7 +82,7 @@ public class DrtRoutingModuleTest {
 		final double networkTravelSpeed = 0.83333;
 		final double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
-				networkTravelSpeed, beelineFactor);
+				networkTravelSpeed, beelineFactor, null);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
