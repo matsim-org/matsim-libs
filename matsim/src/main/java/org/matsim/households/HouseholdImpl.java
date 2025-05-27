@@ -19,6 +19,7 @@
 
 package org.matsim.households;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -36,9 +37,9 @@ public class HouseholdImpl implements Household {
 	private List<Id<Person>> memberIds = null;
 	private List<Id<Vehicle>> vehicleDefinitionIds = null;
 	private Income income;
-	
+
 	private final Attributes attributes = new AttributesImpl();
-	
+
 	public HouseholdImpl(Id<Household> id) {
 		this.id = id;
 	}
@@ -62,7 +63,8 @@ public class HouseholdImpl implements Household {
 	public List<Id<Vehicle>> getVehicleIds() {
 		return this.vehicleDefinitionIds;
 	}
-	
+
+	@Override
 	public void setMemberIds(List<Id<Person>> memberIds) {
 		this.memberIds = memberIds;
 	}
@@ -70,6 +72,32 @@ public class HouseholdImpl implements Household {
 	@Override
 	public void setIncome(Income income) {
 		this.income = income;
+	}
+
+	@Override
+	public void addMemberId(Id<Person> personId) {
+		if (this.memberIds == null) {
+			this.memberIds = new ArrayList<>();
+			}
+		this.memberIds.add(personId);
+	}
+
+	@Override
+	public void addVehicleId(Id<Vehicle> vehicleId) {
+		if (this.vehicleDefinitionIds == null) {
+			this.vehicleDefinitionIds = new ArrayList<>();
+		}
+		this.vehicleDefinitionIds.add(vehicleId);
+	}
+
+	@Override
+	public void removeMemberId(Id<Person> personId) {
+		this.memberIds.remove(personId);
+	}
+
+	@Override
+	public void removeVehicleId(Id<Vehicle> vehicleId) {
+		this.vehicleDefinitionIds.remove(vehicleId);
 	}
 
 	public void setVehicleIds(List<Id<Vehicle>> vehicleIds) {
@@ -80,5 +108,5 @@ public class HouseholdImpl implements Household {
 	public Attributes getAttributes() {
 		return attributes;
 	}
-	
+
 }
