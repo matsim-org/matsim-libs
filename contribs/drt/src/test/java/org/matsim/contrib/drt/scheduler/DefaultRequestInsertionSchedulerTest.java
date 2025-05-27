@@ -189,7 +189,10 @@ public class DefaultRequestInsertionSchedulerTest {
     private InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo() {
         return new InsertionDetourTimeCalculator.DetourTimeInfo(
                 new InsertionDetourTimeCalculator.PickupDetourInfo(R1_PU_TIME + STOP_DURATION, 0.),
-                new InsertionDetourTimeCalculator.DropoffDetourInfo(R1_PU_TIME + STOP_DURATION + DRIVE_TIME, 20.)
+                new InsertionDetourTimeCalculator.DropoffDetourInfo(
+                    R1_PU_TIME + STOP_DURATION + DRIVE_TIME,
+                    R1_PU_TIME + STOP_DURATION + DRIVE_TIME,
+                    20.)
         );
     }
 

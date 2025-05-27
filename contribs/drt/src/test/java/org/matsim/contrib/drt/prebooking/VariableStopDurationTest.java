@@ -70,7 +70,7 @@ public class VariableStopDurationTest {
 		 * This means if we increase the pickup duration or the dropoff duration, the
 		 * request should be rejected (see following tests).
 		 */
-		double absoluteDetour = 232.0;
+		double absoluteDetour = 292.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -96,7 +96,7 @@ public class VariableStopDurationTest {
 	@Test
 	void oneRequestExceedingDetourLimitThroughPickup() {
 		// see previous test
-		double absoluteDetour = 232.0;
+		double absoluteDetour = 292.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -120,7 +120,7 @@ public class VariableStopDurationTest {
 	@Test
 	void oneRequestExceedingDetourLimitThroughDropoff() {
 		// see previous test
-		double absoluteDetour = 232.0;
+		double absoluteDetour = 292.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -209,7 +209,7 @@ public class VariableStopDurationTest {
 		 * 
 		 * - Same concept for the wait time
 		 */
-		double absoluteDetour = 267.0;
+		double absoluteDetour = 327.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -238,7 +238,7 @@ public class VariableStopDurationTest {
 	@Test
 	void twoParallelRequestsPushingDropoffViaIncreasingDropoff() {
 		// see above
-		double absoluteDetour = 267.0;
+		double absoluteDetour = 327.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -267,7 +267,7 @@ public class VariableStopDurationTest {
 	@Test
 	void twoParallelRequestsPushingDropoffViaIncreasingPickup() {
 		// see above
-		double absoluteDetour = 267.0;
+		double absoluteDetour = 327.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, absoluteDetour, 60.0) //
@@ -331,7 +331,7 @@ public class VariableStopDurationTest {
 		assertEquals(1125.0, requestB.pickupTime, 1e-3);
 	}
 
-	@Test
+	@Test // FAILING
 	void twoSequentialRequestsPushingPickupViaIncreasingDropoff() {
 		// see above
 		double maximumWaitTime = 315.0;
@@ -360,7 +360,7 @@ public class VariableStopDurationTest {
 		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
 	}
 
-	@Test
+	@Test // FAILING
 	void twoSequentialRequestsPushingPickupViaIncreasingPickup() {
 		// see above
 		double maximumWaitTime = 315.0;

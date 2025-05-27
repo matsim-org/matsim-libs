@@ -40,11 +40,12 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		double stopDuration = provider.calcDropoffDuration(vehicle, request);
 
 		// dropoff duration starts at the planned stop begin time
-		return beginTime + stopDuration;
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 		// first, check when we can start with the dropoff
 		double earliestStartTime = stop.getBeginTime();
 		earliestStartTime = Math.max(earliestStartTime, insertionTime);
-		
+
 		// second, we add the dropoff
 		return Math.max(stop.getEndTime(), earliestStartTime + stopDuration);
 	}

@@ -23,7 +23,7 @@ public class PassengerDelayObjective implements DrtInsertionObjective {
 		VehicleEntry vehicleEntry = insertion.vehicleEntry;
 
 		double totalPickupValue = detourTimeInfo.pickupDetourInfo.departureTime - request.getEarliestStartTime();
-		double totalDropoffValue = detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getEarliestStartTime();
+		double totalDropoffValue = detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getEarliestStartTime();
 
 		double remainingTimeLoss = detourTimeInfo.pickupDetourInfo.pickupTimeLoss;
 

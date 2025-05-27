@@ -11,6 +11,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.Insert
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.drt.stops.StopTimeCalculator.Dropoff;
 
 import com.google.common.base.MoreObjects;
 
@@ -90,17 +91,19 @@ public class InsertionDetourTimeCalculator {
 			double initialStopDuration = stopTask.getEndTime() - stopTask.getBeginTime();
 			double additionalStopDuration = departureTime - arrivalTime - initialStopDuration;
 			
-			return new DropoffDetourInfo(arrivalTime, additionalStopDuration);
+			double todoReplace = arrivalTime;
+			return new DropoffDetourInfo(arrivalTime, todoReplace, additionalStopDuration);
 		}
 
 		double toDropoffDepartureTime = dropoff.previousWaypoint.getDepartureTime();
 		double remainingPickupTimeLoss = calculateRemainingPickupTimeLossAtDropoff(insertion, pickupDetourInfo);
 		double arrivalTime = toDropoffDepartureTime + remainingPickupTimeLoss + toDropoffTT;
-		double departureTime = stopTimeCalculator.initEndTimeForDropoff(vEntry.vehicle, arrivalTime, drtRequest);
+		Dropoff dropoffTime = stopTimeCalculator.initEndTimeForDropoff(vEntry.vehicle, arrivalTime, drtRequest);
+		double departureTime = dropoffTime.endTime();
 		double stopDuration = departureTime - arrivalTime;
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, dropoff.index, toDropoffDepartureTime);
 		double dropoffTimeLoss = toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
-		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
+		return new DropoffDetourInfo(arrivalTime, dropoffTime.dropoffTime(), dropoffTimeLoss);
 	}
 
 	private PickupDetourInfo calcPickupDetourInfoIfPickupToDropoffDetour(VehicleEntry vEntry, InsertionPoint pickup,
@@ -128,10 +131,11 @@ public class InsertionDetourTimeCalculator {
 	private DropoffDetourInfo calcDropoffDetourInfoIfPickupToDropoffDetour(double fromPickupToDropoffTT,
 			double fromDropoffTT, PickupDetourInfo pickupDetourInfo, VehicleEntry vEntry, DrtRequest drtRequest) {
 		double arrivalTime = pickupDetourInfo.departureTime + fromPickupToDropoffTT;
-		double departureTime = stopTimeCalculator.initEndTimeForDropoff(vEntry.vehicle, arrivalTime, drtRequest);
+		Dropoff dropoffTime = stopTimeCalculator.initEndTimeForDropoff(vEntry.vehicle, arrivalTime, drtRequest);
+		double departureTime = dropoffTime.endTime();
 		double stopDuration = departureTime - arrivalTime;
 		double dropoffTimeLoss = stopDuration + fromDropoffTT;
-		return new DropoffDetourInfo(arrivalTime, dropoffTimeLoss);
+		return new DropoffDetourInfo(arrivalTime, dropoffTime.dropoffTime(), dropoffTimeLoss);
 	}
 	
 	private PickupTimeInfo calculatePickupIfSameLink(VehicleEntry vEntry, int pickupIndex, double toPickupDepartureTime, DrtRequest request) {
@@ -240,20 +244,24 @@ public class InsertionDetourTimeCalculator {
 	}
 
 	public static class DropoffDetourInfo {
-		// expected arrival time for the new request
-		public final double arrivalTime;
+		// expected arrival time for the vehicle at the stop
+		public final double vehicleArrivalTime;
+		// expected dropoff time for the inserted request
+		public final double requestDropoffTime;
 		// ADDITIONAL time delay of each stop placed after the dropoff insertion point
 		public final double dropoffTimeLoss;
 
-		public DropoffDetourInfo(double arrivalTime, double dropoffTimeLoss) {
-			this.arrivalTime = arrivalTime;
+		public DropoffDetourInfo(double vehicleArrivalTime, double requestDropoffTime, double dropoffTimeLoss) {
+			this.vehicleArrivalTime = vehicleArrivalTime;
+			this.requestDropoffTime = requestDropoffTime;
 			this.dropoffTimeLoss = dropoffTimeLoss;
 		}
 
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
-					.add("arrivalTime", arrivalTime)
+					.add("vehicleArrivalTime", vehicleArrivalTime)
+					.add("requestDropoffTime", requestDropoffTime)
 					.add("dropoffTimeLoss", dropoffTimeLoss)
 					.toString();
 		}

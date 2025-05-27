@@ -36,9 +36,10 @@ public class DefaultStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
-		return beginTime + stopDuration;
+		// dropoff happens at the beginning
+		return new Dropoff(beginTime + stopDuration, beginTime);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class DefaultStopTimeCalculator implements StopTimeCalculator {
 	@Override
 	public double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime) {
 		// When shifting, we make sure the new duration is the same as the previous one
-		double stopDuration  = stop.getEndTime() - stop.getBeginTime();
+		double stopDuration = stop.getEndTime() - stop.getBeginTime();
 		return beginTime + stopDuration;
 	}
 }

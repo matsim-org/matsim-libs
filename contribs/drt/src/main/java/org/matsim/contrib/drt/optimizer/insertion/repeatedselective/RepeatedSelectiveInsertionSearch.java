@@ -118,7 +118,7 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 		addRelativeDiff(matrixTimeInfo.pickupDetourInfo.pickupTimeLoss, networkTimeInfo.pickupDetourInfo.pickupTimeLoss,
 				networkTimeInfo.pickupDetourInfo.departureTime, pickupTimeLossStats);
 		addRelativeDiff(matrixTimeInfo.dropoffDetourInfo.dropoffTimeLoss,
-				networkTimeInfo.dropoffDetourInfo.dropoffTimeLoss, networkTimeInfo.dropoffDetourInfo.arrivalTime,
+				networkTimeInfo.dropoffDetourInfo.dropoffTimeLoss, networkTimeInfo.dropoffDetourInfo.requestDropoffTime,
 				dropoffTimeLossStats);
 	}
 

@@ -36,6 +36,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
+import org.matsim.contrib.drt.stops.StopTimeCalculator.Dropoff;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
@@ -95,7 +96,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				pickupTask.getEndTime());
 
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
-		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime,
+		verifyTimes("Inconsistent dropoff arrival time", insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime,
 				dropoffTask.getBeginTime());
 
 		verifyTaskContinuity(insertion);
@@ -400,7 +401,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		// insert dropoff stop task
 		double startTime = driveToDropoffTask.getEndTime();
 		int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
-		double stopEndTime = stopTimeCalculator.initEndTimeForDropoff(vehicleEntry.vehicle, startTime, request.getRequest());
+		Dropoff dropoffTime = stopTimeCalculator.initEndTimeForDropoff(vehicleEntry.vehicle, startTime, request.getRequest());
+		double stopEndTime = dropoffTime.endTime();
 		DrtStopTask dropoffStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
 				stopEndTime, request.getToLink());
 		schedule.addTask(taskIdx, dropoffStopTask);

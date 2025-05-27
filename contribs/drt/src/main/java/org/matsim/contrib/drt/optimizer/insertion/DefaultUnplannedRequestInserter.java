@@ -136,7 +136,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			// accept offered drt ride
 			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
 					insertion.detourTimeInfo.pickupDetourInfo.departureTime,
-					insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime);
+					insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime);
 
 			if(acceptedRequest.isPresent()) {
 				var vehicle = insertion.insertion.vehicleEntry.vehicle;

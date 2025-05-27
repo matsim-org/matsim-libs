@@ -32,9 +32,10 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
-		return beginTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+		double endTime = beginTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override

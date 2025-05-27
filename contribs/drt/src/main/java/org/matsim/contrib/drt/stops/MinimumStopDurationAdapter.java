@@ -26,8 +26,11 @@ public class MinimumStopDurationAdapter implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		return Math.max(beginTime + minimumStopDuration, delegate.initEndTimeForDropoff(vehicle, beginTime, request));
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		Dropoff delegate = this.delegate.initEndTimeForDropoff(vehicle, beginTime, request);
+		double endTime = Math.max(beginTime + minimumStopDuration, delegate.endTime());
+
+		return new Dropoff(endTime, delegate.dropoffTime());
 	}
 
 	@Override
