@@ -34,8 +34,6 @@ public class HouseholdsFactoryImpl implements HouseholdsFactory {
 	@Override
 	public HouseholdImpl createHousehold(Id<Household> householdId) {
 		HouseholdImpl hh = new HouseholdImpl(householdId);
-		hh.setMemberIds(new ArrayList<>());
-		hh.setVehicleIds(new ArrayList<>());
 		return hh;
 	}
 

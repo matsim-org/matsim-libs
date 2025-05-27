@@ -35,8 +35,8 @@ public class HouseholdImpl implements Household {
 
 	private final Id<Household> id;
 	private final Attributes attributes = new AttributesImpl();
-	private List<Id<Person>> memberIds = null;
-	private List<Id<Vehicle>> vehicleDefinitionIds = null;
+	private List<Id<Person>> memberIds = new ArrayList<>();
+	private List<Id<Vehicle>> vehicleDefinitionIds = new ArrayList<>();
 	private Income income;
 
 	public HouseholdImpl(Id<Household> id) {
@@ -79,17 +79,11 @@ public class HouseholdImpl implements Household {
 
 	@Override
 	public void addMemberId(Id<Person> personId) {
-		if (this.memberIds == null) {
-			this.memberIds = new ArrayList<>();
-		}
 		this.memberIds.add(personId);
 	}
 
 	@Override
 	public void addVehicleId(Id<Vehicle> vehicleId) {
-		if (this.vehicleDefinitionIds == null) {
-			this.vehicleDefinitionIds = new ArrayList<>();
-		}
 		this.vehicleDefinitionIds.add(vehicleId);
 	}
 
