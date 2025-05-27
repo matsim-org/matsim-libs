@@ -29,7 +29,7 @@ class PassingQueue implements SimDequeue {
 	@Override
 	public void addFirst(DistributedMobsimVehicle vehicle) {
 
-		if (!isEmpty() && peek().getEarliestLinkExitTime() < vehicle.getEarliestLinkExitTime()) {
+		if (!isEmpty() && Math.ceil(peek().getEarliestLinkExitTime()) < vehicle.getEarliestLinkExitTime()) {
 			throw new IllegalArgumentException("A vehicle's exit time must be set to the next time step if it should be added to the end of a link, when a passingQ is used.");
 		}
 
