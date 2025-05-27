@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HouseholdImpl implements Household {
 
-	private Id<Household> id;
+	private final Id<Household> id;
 	private List<Id<Person>> memberIds = null;
 	private List<Id<Vehicle>> vehicleDefinitionIds = null;
 	private Income income;
