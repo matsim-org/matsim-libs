@@ -33,7 +33,7 @@ public class CorrectedStopTimeCalculator implements StopTimeCalculator {
 	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// stop ends after stopDuration has elapsed (dropoff happens at beginning)
 		double endTime = beginTime + stopDuration;
-		return new Dropoff(endTime, endTime);
+		return new Dropoff(endTime, beginTime);
 	}
 
 	@Override
