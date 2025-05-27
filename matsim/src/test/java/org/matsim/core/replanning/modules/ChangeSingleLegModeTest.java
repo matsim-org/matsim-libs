@@ -56,7 +56,7 @@ public class ChangeSingleLegModeTest {
 	void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
 		final ChangeSingleLegMode module = new ChangeSingleLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
@@ -74,8 +74,8 @@ public class ChangeSingleLegModeTest {
 	void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
 
 		final ChangeSingleLegMode module = new ChangeSingleLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};

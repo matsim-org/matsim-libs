@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -45,7 +44,7 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> destLinkId, Id<Vehicle> vehicleId, String mode) {
 
-		List<Link> outLinks = ParkingUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
+		List<Link> outLinks = NetworkUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
 		double shortestDistance = Double.MAX_VALUE;
 		int nrKnownLinks = 0;
 		Id<Link> nextLink = null;

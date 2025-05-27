@@ -260,7 +260,7 @@ public final class EventsToLegs
 				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
-		assert !experiencedRoute.isEmpty();
+		assert !experiencedRoute.isEmpty() : "Experienced route for personId: " + event.getPersonId() + " is empty.";
 		PendingTransitTravel pendingTransitTravel;
 		PendingVehicleTravel pendingVehicleTravel;
 		if (experiencedRoute.size() > 1) { // different links processed
@@ -282,26 +282,26 @@ public final class EventsToLegs
 			// i.e. experiencedRoute.size()==1 && pending transit travel (= person has entered a vehicle)
 
 			final LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
-			assert lineAndRoute != null;
+			assert lineAndRoute != null : "lineAndRoute for vehicle " + pendingTransitTravel.vehicleId + "is null";
 
 			final TransitStopFacility accessFacility = transitSchedule.getFacilities()
 					.get(pendingTransitTravel.accessStop);
-			assert accessFacility != null;
+			assert accessFacility != null : "accessFacility for " + pendingTransitTravel.accessStop + " is null.";
 
 			final TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
-			assert line != null;
+			assert line != null : "Transit line for transitLineId " + lineAndRoute.transitLineId + " is null.";
 
 			final TransitRoute route = line.getRoutes().get(lineAndRoute.transitRouteId);
-			assert route != null;
+			assert route != null : "route for transitRouteId " + lineAndRoute.transitRouteId + " is null.";
 
 			final Id<TransitStopFacility> lastFacilityId = lineAndRoute.lastFacilityId;
 			if (lastFacilityId == null) {
 				LogManager.getLogger(this.getClass()).warn("breakpoint");
 			}
-			assert lastFacilityId != null;
+			assert lastFacilityId != null : "lastFacilityId for " + lineAndRoute + "is null";
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
-			assert egressFacility != null;
+			assert egressFacility != null : "egressFacility for lastFacilityId " + lastFacilityId + " is null.";
 
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
 			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);

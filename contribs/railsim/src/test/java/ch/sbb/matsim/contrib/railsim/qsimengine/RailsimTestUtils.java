@@ -85,6 +85,10 @@ public class RailsimTestUtils {
 		Link fromLink = test.network.getLinks().get(Id.createLinkId(from));
 		Link toLink = test.network.getLinks().get(Id.createLinkId(to));
 
+		//TODO:
+		// this seems inconsistent with the TrainRouter.java class which routes from the _to_ node of the _from_ link
+		// to the _from_ node of the _to_ link, similar to the default MATSim behavior in the rest of the code.
+		// The tests result in arbitrarily different results when changing it here, so we leave it for now. Is this deliberate?
 		LeastCostPathCalculator.Path path = lcp.calcLeastCostPath(fromLink.getFromNode(), toLink.getToNode(), 0, null, null);
 		NetworkRoute route = RouteUtils.createNetworkRoute(path.links.stream().map(Link::getId).toList());
 

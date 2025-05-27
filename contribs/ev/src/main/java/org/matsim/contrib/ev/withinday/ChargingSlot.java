@@ -1,6 +1,6 @@
 package org.matsim.contrib.ev.withinday;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
  * A charging slot represents when an agent intends to charge during the day.
  * Charging slots can be leg-based and activity-based. See ChargingSlotFinder
  * for more information.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public record ChargingSlot(@Nullable Activity startActivity, @Nullable Activity endActivity, @Nullable Leg leg,
