@@ -180,47 +180,166 @@ public final class ProcessNoiseImmissions {
 					bw.write(";" + time2rp2value.get(time ).get(rp ) );
 				}
 
+				for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						bw.write(";");
+						continue;
+					}
+					Double val = map.get(rp);
+					if (val == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						bw.write(";");
+						continue;
+					}
+					bw.write(";" + val);
+				}
+
+
 				// aggregate time intervals
 
+//				double termDay = 0.;
+//				// day: 7-19
+//				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
+//					termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
+//				}
+
 				double termDay = 0.;
-				// day: 7-19
-				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
-					termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
+				// day: 06:00–18:00
+				for (double time = 8 * 3600.; time < 19 * 3600.; time += timeBinSize ) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					termDay += Math.pow(10, imm / 10);
 				}
 
-				double termEvening = 0.;
+
+//				double termEvening = 0.;
+//				// evening: 19-23
+//				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize ) {
+//					termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
+//				}
+
 				// evening: 19-23
-				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize ) {
-					termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
+				double termEvening = 0.;
+				for (double time = 20 * 3600.; time <= 23 * 3600.; time += timeBinSize) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					termEvening += Math.pow(10, (imm + 5) / 10);
 				}
 
-				double termNight = 0.;
-				// night: 23-7
 
+//				double termNight = 0.;
+//				// night: 23-7
+//
+//				// nightA: 23-24
+//				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize ) {
+//					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+//				}
+//				// nightB: 0-7
+//				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize ) {
+//					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+//				}
+
+				// night: 23-7
+				double termNight = 0.;
 				// nightA: 23-24
-				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize ) {
-					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+				for (double time = 24 * 3600.; time <= 24 * 3600.; time += timeBinSize) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					termNight += Math.pow(10, (imm + 10) / 10);
 				}
 				// nightB: 0-7
-				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize ) {
-					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+				for (double time = 1 * 3600.; time <= 7 * 3600.; time += timeBinSize) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					termNight += Math.pow(10, (imm + 10) / 10);
 				}
+
 
 				double Lden = 10 * Math.log10(1./24. * (termDay + termEvening + termNight));
 				bw.write(";" + Lden );
 
+//				double term69 = 0.;
+//				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize ) {
+//					term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+//				}
+//				double L_69 = 10 * Math.log10(1./3. * term69);
+
+
 				double term69 = 0.;
-				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize ) {
-					term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+				for (double time = 7 * 3600.; time <= 9 * 3600.; time += timeBinSize) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					term69 += Math.pow(10, imm / 10);
 				}
 				double L_69 = 10 * Math.log10(1./3. * term69);
+
+
 				bw.write(";" + L_69 );
 
+//				double term1619 = 0.;
+//				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
+//					term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+//				}
+//				double L_1619 = 10 * Math.log10(1./3. * term1619);
+
 				double term1619 = 0.;
-				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
-					term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+				for (double time = 17 * 3600.; time <= 19 * 3600.; time += timeBinSize) {
+					Map<Id<ReceiverPoint>, Double> map = time2rp2value.get(time);
+					if (map == null) {
+						log.warn("No immission data for time=" + time);
+						continue;
+					}
+					Double imm = map.get(rp);
+					if (imm == null) {
+						log.warn("No entry for ReceiverPoint " + rp + " at time=" + time);
+						continue;
+					}
+					term1619 += Math.pow(10, imm / 10);
 				}
 				double L_1619 = 10 * Math.log10(1./3. * term1619);
+
 				bw.write(";" + L_1619 );
 
 				bw.newLine();
