@@ -58,6 +58,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class StuckAgentTest {
 
@@ -153,7 +156,19 @@ public class StuckAgentTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
-        controler.addOverridingModule(new MultiModalModule());
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
+		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
+		controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
