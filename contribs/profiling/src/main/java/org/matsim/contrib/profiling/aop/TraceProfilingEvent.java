@@ -10,6 +10,7 @@ import org.aspectj.lang.Signature;
 @Label("Trace")
 @Description("Event to record the duration and trace data of method calls")
 @Category("MATSim")
+@StackTrace(false) // if tracing all method calls, then stacktrace can be reconstructed and avoiding to additionally record it should improve performance, in all other cases, the stacktrace might be good to record
 public class TraceProfilingEvent extends Event {
 
 	/**
