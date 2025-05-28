@@ -27,7 +27,7 @@ import jdk.jfr.*;
  */
 @Name("matsim.Iteration")
 @Label("MATSim iteration")
-@Description("Event to record the duration of a single iterations")
+@Description("Event to record the duration of a single iteration")
 @Category("MATSim")
 public class JFRIterationEvent extends Event {
 
