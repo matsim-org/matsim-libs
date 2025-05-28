@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * AbstractProfilingEventAspect.aj
+ * MobsimJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -18,22 +18,14 @@
  *                                                                        *
  * ********************************************************************** */
 
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.Event;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import jdk.jfr.*;
 
-public abstract aspect AbstractProfilingEventAspect {
-
-    abstract pointcut eventPoints();
-
-    void around(): eventPoints() {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        jfrEvent.begin();
-        proceed();
-        jfrEvent.commit();
-    }
-}
+/**
+ * Record Mobsim execution duration as a JFR profiling {@link Event}.
+ */
+@Name("matsim.Mobsim")
+@Label("Mobsim")
+@Description("Duration of a mobsim iteration")
+public class MobsimJfrEvent extends MatsimOperationJfrEvent {}

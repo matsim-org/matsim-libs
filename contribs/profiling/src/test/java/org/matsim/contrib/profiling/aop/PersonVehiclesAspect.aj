@@ -2,7 +2,7 @@ package org.matsim.contrib.profiling.aop;
 
 import jdk.jfr.Event;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.profiling.events.JFRMatsimEvent;
+import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 import org.matsim.vehicles.PersonVehicles;
 import org.matsim.vehicles.Vehicle;
 
@@ -16,7 +16,7 @@ public aspect PersonVehiclesAspect {
                     call(Id<Vehicle> PersonVehicles.getVehicle(..));
 
     Id<Vehicle> around(PersonVehicles p, String mode): personVehicles(p,mode) {
-        Event jfrEvent = JFRMatsimEvent.create("scoring AOP: " + p.getClass().getName());
+        Event jfrEvent = MatsimJfrEvent.create("scoring AOP: " + p.getClass().getName());
 
         System.out.println("AOP profiling: " + p.getClass().getSimpleName());
 

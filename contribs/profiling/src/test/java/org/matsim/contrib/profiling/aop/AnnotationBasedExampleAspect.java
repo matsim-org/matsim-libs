@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.matsim.contrib.profiling.events.JFRMatsimEvent;
+import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 
 /**
  * Aspect example using annotations instead of the .aj file type
@@ -26,7 +26,7 @@ public class AnnotationBasedExampleAspect {
 	 */
 	@Before("call(* org.matsim.vehicles.VehicleUtils.getFactory())")
 	public void BeforeGetFactory(JoinPoint.StaticPart thisJoinPointStaticPart) {
-		JFRMatsimEvent.create("Annotated aspect: " + thisJoinPointStaticPart.getSignature()).commit();
+		MatsimJfrEvent.create("Annotated aspect: " + thisJoinPointStaticPart.getSignature()).commit();
 		System.out.println("aspect via annotations: " + thisJoinPointStaticPart.getSignature());
 	}
 

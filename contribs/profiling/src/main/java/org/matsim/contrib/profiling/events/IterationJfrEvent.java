@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * JFRMatsimEvent.java
+ * IterationJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -23,30 +23,19 @@ package org.matsim.contrib.profiling.events;
 import jdk.jfr.*;
 
 /**
- * JFR profiling {@link Event} intended as a marker event to record relevant
- * notifications during MATSim execution without a duration.
+ * Record a MATSim iteration start and end as a JFR profiling {@link Event}.
  */
-@Name("matsim.OperationMarker")
-@Label("MATSim notifications")
-@Description("Notifications about startup, shutdown, replanning, and scoring")
+@Name("matsim.Iteration")
+@Label("MATSim iteration")
+@Description("Event to record the duration of a single iteration")
 @Category("MATSim")
-public class JFRMatsimEvent extends Event {
+public class IterationJfrEvent extends Event {
 
-	@Label("Kind of notification")
-	final String type;
+	@Label("Iteration count")
+	@Unsigned
+	final int iteration;
 
-	public JFRMatsimEvent(String type) {
-		this.type = type;
-	}
-
-	/**
-	 * Factory method to simplify instantiation and usage:
-	 * {@code MatsimEvent.create("startup").commit();}.
-	 * <p>This avoids using {@code new} and a variable.
-	 *
-	 * @param type describing the kind of event
-	 */
-	public static JFRMatsimEvent create(String type) {
-		return new JFRMatsimEvent(type);
+	public IterationJfrEvent(int iteration) {
+		this.iteration = iteration;
 	}
 }

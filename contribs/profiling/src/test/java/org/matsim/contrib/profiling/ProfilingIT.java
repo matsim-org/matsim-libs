@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.profiling.aop.TraceProfilingEvent;
 import org.matsim.contrib.profiling.events.FireDefaultProfilingEventsModule;
-import org.matsim.contrib.profiling.events.JFRMatsimEvent;
+import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 import org.matsim.contrib.profiling.instrument.EnableProfilingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -106,7 +106,7 @@ public class ProfilingIT {
 		eventStream.onEvent(TraceProfilingEvent.class.getName(), e -> hasTraceEvent.set(true));
 		// assert that no events from FireDefaultProfilingEventsModule are here
 		eventStream.onEvent(e -> {
-			if (e.getEventType().getName().startsWith(JFRMatsimEvent.class.getPackageName()) &&
+			if (e.getEventType().getName().startsWith(MatsimJfrEvent.class.getPackageName()) &&
 				!e.getString("type").startsWith("AOP") // test aspects like ScoringListenerProfilingAspect are active
 			) {
 				fail();

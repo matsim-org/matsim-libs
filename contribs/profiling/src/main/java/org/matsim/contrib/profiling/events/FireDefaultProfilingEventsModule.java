@@ -21,123 +21,32 @@
 package org.matsim.contrib.profiling.events;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * Hook into MATSim Listeners to create JFR profiling events at different phases within MATSim.
  * <p>Events to be recorded:
  * <ul>
- *     <li>{@link JFRIterationEvent}</li>
- *     <li>{@link JFRMobsimEvent}</li>
- *     <li>{@link JFRMatsimEvent} on startup, replanning, scoring, and shutdown</li>
+ *     <li>{@link MatsimStartupJfrEvent}</li>
+ *     <li>{@link IterationJfrEvent}</li>
+ *     <li>{@link IterationStartsListenersJfrEvent}</li>
+ *     <li>{@link ReplanningJfrEvent}</li>
+ *     <li>{@link MobsimJfrEvent}</li>
+ *     <li>{@link ScoringJfrEvent}</li>
+ *     <li>{@link IterationEndsListenersJfrEvent}</li>
+ *     <li>{@link MatsimShutdownJfrEvent}</li>
  * </ul>
  */
 public class FireDefaultProfilingEventsModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		var iterationTimer = new JFRIterationTimer();
+		var iterationTimer = new IterationJfrTimer();
 		addControlerListenerBinding().toInstance(iterationTimer.startListener);
 		addControlerListenerBinding().toInstance(iterationTimer);
-		addControlerListenerBinding().to(MatsimEvents.class);
-		addMobsimListenerBinding().to(MobsimTimer.class);
+		var operationsTimer = new OperationsJfrTimer();
+		addControlerListenerBinding().toInstance(operationsTimer.startListener);
+		addControlerListenerBinding().toInstance(operationsTimer);
+		addMobsimListenerBinding().to(MobsimJfrTimer.class);
 	}
 
-	static class JFRIterationTimer implements IterationEndsListener {
-
-		private final StartListener startListener = new StartListener();
-
-		static class StartListener implements IterationStartsListener {
-
-			private JFRIterationEvent event = null;
-
-			/**
-			 * @return Almost highest possible priority to start before most other listeners.
-			 * 		   Run only after {@link org.matsim.contrib.profiling.instrument.EnableProfilingModule#ProfilingStartListener}.
-			 */
-			@Override
-			public double priority() {
-				return Double.MAX_VALUE;
-			}
-
-			@Override
-			public void notifyIterationStarts(IterationStartsEvent iterationStartsEvent) {
-				if (event != null) {
-					event.commit();
-				}
-				event = new JFRIterationEvent(iterationStartsEvent.getIteration());
-				event.begin();
-			}
-
-		}
-
-		/**
-		 * @return Almost lowest possible priority to end after most other listeners.
-		 * 		   Only run before {@link org.matsim.contrib.profiling.instrument.EnableProfilingModule#ProfilingEndListener}.
-		 */
-		@Override
-		public double priority() {
-			return -Double.MAX_VALUE;
-		}
-
-		@Override
-		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
-			if (startListener.event != null) {
-				startListener.event.commit();
-				startListener.event = null;
-			}
-		}
-
-	}
-
-	private static final class MobsimTimer implements MobsimInitializedListener, MobsimBeforeCleanupListener {
-
-		private JFRMobsimEvent event = null;
-
-		@Override
-		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent mobsimBeforeCleanupEvent) {
-			if (event != null) {
-				event.commit();
-				event = null;
-			}
-		}
-
-		@Override
-		public void notifyMobsimInitialized(MobsimInitializedEvent mobsimInitializedEvent) {
-			if (event != null) {
-				event.commit();
-			}
-			event = new JFRMobsimEvent();
-			event.begin();
-		}
-	}
-
-	// todo all of these are ControlerListeners that support priority -> can measure duration with the same shenanigans as above
-	private static final class MatsimEvents implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener {
-
-		@Override
-		public void notifyReplanning(ReplanningEvent replanningEvent) {
-			JFRMatsimEvent.create("replanning").commit();
-		}
-
-		@Override
-		public void notifyScoring(ScoringEvent scoringEvent) {
-			JFRMatsimEvent.create("scoring").commit();
-		}
-
-		@Override
-		public void notifyShutdown(ShutdownEvent shutdownEvent) {
-			JFRMatsimEvent.create("shutdown").commit();
-		}
-
-		@Override
-		public void notifyStartup(StartupEvent startupEvent) {
-			JFRMatsimEvent.create("startup").commit();
-		}
-	}
 }

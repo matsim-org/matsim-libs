@@ -6,7 +6,7 @@ import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.contrib.profiling.events.JFRIterationEvent;
+import org.matsim.contrib.profiling.events.IterationJfrEvent;
 
 import java.awt.*;
 import java.io.IOException;
@@ -141,7 +141,7 @@ public class JFRStopwatch implements AutoCloseable {
 		eventStream.setOrdered(true); // this orders all events by their *commit* time
 		// JFRIterationEvents will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
-		eventStream.onEvent(JFRIterationEvent.class.getAnnotation(Name.class).value(), event -> {
+		eventStream.onEvent(IterationJfrEvent.class.getAnnotation(Name.class).value(), event -> {
 			// start iteration in stopwatch
 			var iteration = event.getInt("iteration");
 			System.out.println(event.getStartTime() + " BEGIN iteration " + iteration);

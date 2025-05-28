@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * AbstractProfilingEventAspect.aj
+ * MobsimJfrTimer.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -18,22 +18,37 @@
  *                                                                        *
  * ********************************************************************** */
 
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.Event;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
-public abstract aspect AbstractProfilingEventAspect {
+/**
+ * Fire a {@link MobsimJfrEvent} at the start and end of mobsim.
+ * <p>Caveat: Since the {@link MobsimInitializedListener} and {@link MobsimBeforeCleanupListener} are no {@link ControlerListener}s,
+ * it is not possible to use the {@link ControlerListener#priority() priority} to let them run before / after all other listeners.
+ */
+class MobsimJfrTimer implements MobsimInitializedListener, MobsimBeforeCleanupListener {
 
-    abstract pointcut eventPoints();
+	private MobsimJfrEvent event = null;
 
-    void around(): eventPoints() {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent mobsimBeforeCleanupEvent) {
+		if (event != null) {
+			event.commit();
+			event = null;
+		}
+	}
 
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        jfrEvent.begin();
-        proceed();
-        jfrEvent.commit();
-    }
+	@Override
+	public void notifyMobsimInitialized(MobsimInitializedEvent mobsimInitializedEvent) {
+		if (event != null) {
+			event.commit();
+		}
+		event = new MobsimJfrEvent();
+		event.begin();
+	}
 }

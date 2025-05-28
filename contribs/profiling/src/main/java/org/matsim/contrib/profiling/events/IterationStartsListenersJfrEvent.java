@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * JFRMobsimEvent.java
+ * IterationStartsListenersJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -20,13 +20,15 @@
 
 package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.*;
+import jdk.jfr.Description;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
 
 /**
- * Record Mobsim execution duration as a JFR profiling {@link Event}.
+ * Record {@link org.matsim.core.controler.listener.IterationStartsListener}s duration as a JFR profiling {@link Event}.
  */
-@Name("matsim.Mobsim")
-@Label("Mobsim duration")
-@Description("To record the duration of a mobsim iteration")
-@Category("MATSim")
-public class JFRMobsimEvent extends Event {}
+@Name("matsim.IterationStartsListener")
+@Label("IterationStartsListener")
+@Description("Duration of MATSim IterationStartsListener operations")
+public class IterationStartsListenersJfrEvent extends MatsimOperationJfrEvent {}

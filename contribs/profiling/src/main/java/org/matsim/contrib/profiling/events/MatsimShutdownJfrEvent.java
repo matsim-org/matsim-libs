@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * JFRIterationEvent.java
+ * MatsimShutdownJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -20,22 +20,15 @@
 
 package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.*;
+import jdk.jfr.Description;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
 
 /**
- * Record a MATSim iteration start and end as a JFR profiling {@link Event}.
+ * Record shutdown duration as a JFR profiling {@link Event}.
  */
-@Name("matsim.Iteration")
-@Label("MATSim iteration")
-@Description("Event to record the duration of a single iteration")
-@Category("MATSim")
-public class JFRIterationEvent extends Event {
-
-	@Label("Iteration count")
-	@Unsigned
-	final int iteration;
-
-	public JFRIterationEvent(int iteration) {
-		this.iteration = iteration;
-	}
-}
+@Name("matsim.Shutdown")
+@Label("Shutdown")
+@Description("Duration of MATSim shutdown")
+public class MatsimShutdownJfrEvent extends MatsimOperationJfrEvent {}

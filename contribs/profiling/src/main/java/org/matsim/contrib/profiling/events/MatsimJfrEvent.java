@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * AbstractProfilingEventAspect.aj
+ * MatsimJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -18,22 +18,35 @@
  *                                                                        *
  * ********************************************************************** */
 
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.events;
 
-import jdk.jfr.Event;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import jdk.jfr.*;
 
-public abstract aspect AbstractProfilingEventAspect {
+/**
+ * JFR profiling {@link Event} intended as a marker event to record relevant
+ * operations during MATSim execution without a duration.
+ */
+@Name("matsim.Operation")
+@Label("Generic MATSim operation")
+@Description("Marking MATSim operations")
+@Category("MATSim")
+public class MatsimJfrEvent extends Event {
 
-    abstract pointcut eventPoints();
+	@Label("Kind of operation")
+	final String type;
 
-    void around(): eventPoints() {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+	public MatsimJfrEvent(String type) {
+		this.type = type;
+	}
 
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        jfrEvent.begin();
-        proceed();
-        jfrEvent.commit();
-    }
+	/**
+	 * Factory method to simplify instantiation and usage:
+	 * {@code MatsimEvent.create("startup").commit();}.
+	 * <p>This avoids using {@code new} and a variable.
+	 *
+	 * @param type describing the kind of event
+	 */
+	public static MatsimJfrEvent create(String type) {
+		return new MatsimJfrEvent(type);
+	}
 }

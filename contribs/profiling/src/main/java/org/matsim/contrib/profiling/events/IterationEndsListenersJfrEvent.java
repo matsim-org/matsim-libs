@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * AbstractProfilingEventAspect.aj
+ * IterationEndsListenersJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -18,22 +18,17 @@
  *                                                                        *
  * ********************************************************************** */
 
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.events;
 
+import jdk.jfr.Description;
 import jdk.jfr.Event;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
 
-public abstract aspect AbstractProfilingEventAspect {
-
-    abstract pointcut eventPoints();
-
-    void around(): eventPoints() {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-
-        jfrEvent.begin();
-        proceed();
-        jfrEvent.commit();
-    }
-}
+/**
+ * Record {@link org.matsim.core.controler.listener.IterationEndsListener}s duration as a JFR profiling {@link Event}.
+ */
+@Name("matsim.IterationEndsListener")
+@Label("IterationEndsListener")
+@Description("Duration of MATSim IterationEndsListener operations")
+public class IterationEndsListenersJfrEvent extends MatsimOperationJfrEvent {}
