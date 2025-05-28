@@ -1,4 +1,38 @@
-library(tidyverse)
+{
+  library(tidyverse)
+
+  # ==== Helper functions ====
+
+  # Reads in the sv from matsim at the given path and returns the datasteeht and intervals from this sheet
+  # model_suffix: optional,  adds a suffix to the 'model'-column which is just "MATSIM" by default
+  read_matsim <- function(path, model_suffix = ""){
+    # Load data from MATSim csv
+    diff_out <- read_csv(path)
+
+    # Create summarized data frame from MATSim results
+    dataframe <- diff_out %>%
+      select(segment, "CO-MATSIM", "CO2(total)-MATSIM", "HC-MATSIM", "PM-MATSIM", "NOx-MATSIM") %>%
+      rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
+      pivot_longer(cols = c("CO-MATSIM",
+                            "CO2-MATSIM",
+                            "HC-MATSIM",
+                            "PMx-MATSIM",
+                            "NOx-MATSIM"), names_to="model", values_to="value") %>%
+      separate(model, c("component", "model"), "-") %>%
+      mutate(segment = as.integer(segment), model = paste(model, model_suffix, sep="_"))
+
+    # Extract the interval times from the matsim-test-file
+    intervals <- diff_out %>%
+      mutate(endTime = startTime+travelTime) %>%
+      select(segment, startTime, endTime, travelTime, lengths) %>%
+      mutate(across(
+        .cols = everything(),
+        .fns = ~ as.integer(.x)
+      ))
+
+    return (list(dataframe, intervals))
+  }
+}
 
 # ==== Plotting of raw SUMO NOx-emissions ====
 {
@@ -275,7 +309,7 @@ library(tidyverse)
 
   # TODO make sure, that this actually is a petrol car! It is just called "default"
   # Load data from SUMO with HBEFA3 and summarize for each interval
-  data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_hbefa_output.csv",
+  data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_average_hbefa3_output.csv",
                                  delim = ";",
                                  col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                                  col_types = cols(
@@ -323,6 +357,66 @@ library(tidyverse)
     ylab("emissions in g/km") +
     theme(text = element_text(size=18))
 
+}
+
+# ==== Plot with different Freespeed-factors
+{
+  # TODO Do this for all MATSim diffs
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_1.2_out.csv", "1.2")
+  data.MATSIM_1_2 <- r[[1]]
+  intervals <- r[[2]]
+
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_1.1_out.csv", "1.1")
+  data.MATSIM_1_1 <- r[[1]]
+
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_1.0_out.csv", "1.0")
+  data.MATSIM_1_0 <- r[[1]]
+
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_1.5_out.csv", "1.5")
+  data.MATSIM_1_5 <- r[[1]]
+
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_2.0_out.csv", "2.0")
+  data.MATSIM_2_0 <- r[[1]]
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_PHEMLight <- read_delim("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/sumo_petrol_output.csv",
+                                    delim = ";",
+                                    col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                    col_types = cols(
+                                      time = col_integer(),
+                                      velocity = col_double(),
+                                      acceleration = col_double(),
+                                      slope = col_double(),
+                                      CO = col_double(),
+                                      CO2 = col_double(),
+                                      HC = col_double(),
+                                      PMx = col_double(),
+                                      NOx = col_double(),
+                                      fuel = col_double(),
+                                      electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
+    group_by(segment, component) %>%
+    summarize(value = sum(value)) %>%
+    mutate(model = "SUMO_PHEMLight", value=value/1000)
+
+
+  # Append all datasets together
+  data_list <- mget(ls(pattern = "^data\\."), envir = .GlobalEnv)
+
+  # recalc: gram -> gram per kilometer
+  data <- do.call(rbind, data_list) %>%
+    merge(intervals, by="segment") %>%
+    mutate(gPkm = value/lengths)
+
+  # Line-Plot (for scenarios with more links)
+  ggplot(data) +
+    geom_line(aes(x=startTime, y=gPkm, color=model), size=16/nrow(intervals)) +
+    geom_point(aes(x=startTime, y=gPkm, color=model), size=8/nrow(intervals)) +
+    #scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
+    facet_wrap(~component, scales="free") +
+    ylab("emissions in g/km") +
+    theme(text = element_text(size=18))
 }
 
 # ==== Filter out pass.veh ===
