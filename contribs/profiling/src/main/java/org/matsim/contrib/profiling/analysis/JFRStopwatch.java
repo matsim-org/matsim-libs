@@ -35,14 +35,21 @@ public class JFRStopwatch implements AutoCloseable {
 		boolean isBegin
 	) {}
 
+	/**
+	* Collect statistics about the min,max,avg time between two sueccessive event samples,
+	* the configured sampling interval, number count of events, and highest number of frames in a stacktrace.
+	*/
 	static class SamplingStatistics {
+		// interval durations
 		String configured;
 		long min = Long.MAX_VALUE;
 		long max;
-		long sum;
-		long count;
+		long sum; // total to calculate the average
+		long count; // event count
+		long maxStacktraceFrameCount;
 
 		Long previousEvent;
+		long interval;
 
 		long avg() {
 			return count > 0 ? sum / count : 0;
@@ -51,16 +58,13 @@ public class JFRStopwatch implements AutoCloseable {
 		void add(RecordedEvent event) {
 			long now = event.getEndTime().toEpochMilli();
 			if (previousEvent != null) {
-				long interval = now - previousEvent;
-				if (interval < min) {
-					min = interval;
-				}
-				if (interval > max) {
-					max = interval;
-				}
+				interval = now - previousEvent;
+				min = Math.min(min, interval);
+				max = Math.max(max, interval);
 				sum += interval;
-				count++;
 			}
+			count++;
+			maxStacktraceFrameCount = Math.max(maxStacktraceFrameCount, event.getStackTrace().getFrames().size());
 			previousEvent = now;
 		}
 
@@ -73,7 +77,8 @@ public class JFRStopwatch implements AutoCloseable {
 					max=%s ms
 					avg=%s ms
 					count=%s
-				]""".formatted(configured, min, max, avg(), count);
+					maxStacktraceFrameCount=%s
+				]""".formatted(configured, min, max, avg(), count, maxStacktraceFrameCount);
 		}
 	}
 
@@ -135,8 +140,9 @@ public class JFRStopwatch implements AutoCloseable {
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
 		eventStream.onEvent(JFRIterationEvent.class.getAnnotation(Name.class).value(), event -> {
 			// start iteration in stopwatch
-			System.out.println(event.getStartTime() + " BEGIN iteration");
-			stopwatch.beginIteration(event.getInt("iteration"), event.getStartTime().toEpochMilli());
+			var iteration = event.getInt("iteration");
+			System.out.println(event.getStartTime() + " BEGIN iteration " + iteration);
+			stopwatch.beginIteration(iteration, event.getStartTime().toEpochMilli());
 			// add all other recorded events to stopwatch
 			synchronized (stages) {
 				stages.forEach((operation, timestamp) -> {
@@ -186,6 +192,7 @@ public class JFRStopwatch implements AutoCloseable {
 						if (methodsInStackTrace.stream().noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
 							stages.put(new Operation(OPERATION_METHODS.get(operation).getRight(), operation, false), event.getEndTime().toEpochMilli());
 							ongoingOperations.removeFirst();
+							System.out.println(OPERATION_METHODS.get(operation).getRight() + " ended with " +  statistics.interval + " ms since previous sample");
 						} else {
 							// only the topmost ongoing operation can be ended
 							// assuming the nested operation has to be higher on the stacktrace and thus exited earlier
@@ -208,6 +215,7 @@ public class JFRStopwatch implements AutoCloseable {
 								stages.putIfAbsent(new Operation(entry.getValue().getRight(), method, true), time);
 								if (!ongoingOperations.contains(entry.getKey())) {
 									ongoingOperations.addFirst(entry.getKey());
+									System.out.println(OPERATION_METHODS.get(entry.getKey()).getRight() + " started with " +  statistics.interval + " ms since previous sample");
 								}
 							});
 
