@@ -186,7 +186,7 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				}
 
 				Link hubLink = network.getLinks()
-						.get(opFas.getDrtOperationFacilities()
+						.get(opFas.getFacilities()
 								.get(currentShift.getOperationFacilityId().get())
 								.getLinkId());
 				int travelTimeEstimate = travelTimeMatrix.getTravelTime(lastLink.getToNode(), hubLink.getToNode(), potentialReturnToHubDepartureTime);
