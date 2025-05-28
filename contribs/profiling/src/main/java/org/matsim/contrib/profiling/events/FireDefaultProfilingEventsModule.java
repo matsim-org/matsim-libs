@@ -117,6 +117,7 @@ public class FireDefaultProfilingEventsModule extends AbstractModule {
 		}
 	}
 
+	// todo all of these are ControlerListeners that support priority -> can measure duration with the same shenanigans as above
 	private static final class MatsimEvents implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener {
 
 		@Override

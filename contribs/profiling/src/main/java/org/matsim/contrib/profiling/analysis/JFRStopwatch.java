@@ -36,7 +36,7 @@ public class JFRStopwatch implements AutoCloseable {
 	) {}
 
 	/**
-	* Collect statistics about the min,max,avg time between two sueccessive event samples,
+	* Collect statistics about the min,max,avg time between two successive event samples,
 	* the configured sampling interval, number count of events, and highest number of frames in a stacktrace.
 	*/
 	static class SamplingStatistics {
