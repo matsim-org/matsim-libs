@@ -55,6 +55,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MultiModalPTCombinationTest {
 
@@ -119,7 +122,20 @@ public class MultiModalPTCombinationTest {
 		controler.getConfig().controller().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 
-        controler.addOverridingModule(new MultiModalModule());
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
+		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
+		controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
