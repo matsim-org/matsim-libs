@@ -42,6 +42,7 @@ public class JFRStopwatch implements AutoCloseable {
 	static class SamplingStatistics {
 		// interval durations
 		String configured;
+		String configuredNative;
 		long min = Long.MAX_VALUE;
 		long max;
 		long sum; // total to calculate the average
@@ -73,12 +74,13 @@ public class JFRStopwatch implements AutoCloseable {
 			return """
 				SamplingStatistics[
 					configured=%s
+					configuredNative=%s
 					min=%s ms
 					max=%s ms
 					avg=%s ms
 					count=%s
 					maxStacktraceFrameCount=%s
-				]""".formatted(configured, min, max, avg(), count, maxStacktraceFrameCount);
+				]""".formatted(configured, configuredNative, min, max, avg(), count, maxStacktraceFrameCount);
 		}
 	}
 
@@ -169,8 +171,41 @@ public class JFRStopwatch implements AutoCloseable {
 			stopwatch.endIteration(event.getEndTime().toEpochMilli());
 		});
 
-		eventStream.onEvent("jdk.ExecutionSample", event -> {
+		eventStream.onEvent("jdk.ExecutionSample", this::handleSampleEvent);
+		eventStream.onEvent("jdk.NativeMethodSample", this::handleSampleEvent);
 
+		var idExecutionSample = new AtomicLong();
+		var idNativeExecutionSample = new AtomicLong();
+
+		eventStream.onMetadata(metadataEvent -> {
+			metadataEvent.getEventTypes()
+				.stream()
+				.filter(eventType -> eventType.getName().equals("jdk.ExecutionSample"))
+				.findFirst()
+				.ifPresent(eventType -> idExecutionSample.set(eventType.getId()));
+		});
+		eventStream.onMetadata(metadataEvent -> {
+			metadataEvent.getEventTypes()
+				.stream()
+				.filter(eventType -> eventType.getName().equals("jdk.NativeMethodSample"))
+				.findFirst()
+				.ifPresent(eventType -> idNativeExecutionSample.set(eventType.getId()));
+		});
+
+		eventStream.onEvent("jdk.ActiveSetting", event -> {
+			if (event.getLong("id") == idExecutionSample.get() && event.getString("name").equals("period")) {
+				System.out.println("Configured Execution Sampling Period: " + event.getString("value"));
+				statistics.configured = event.getString("value");
+			}
+			if (event.getLong("id") == idNativeExecutionSample.get() && event.getString("name").equals("period")) {
+				System.out.println("Configured Native Method Execution Sampling Period: " + event.getString("value"));
+				statistics.configuredNative = event.getString("value");
+			}
+		});
+
+	}
+
+	protected void handleSampleEvent(RecordedEvent event) {
 			// event and attribute names may seem like hidden arcane knowledge, but can be found via `jfr metadata <jfr-file>`
 			var thread = event.getThread("sampledThread"); // getThread() is always null: https://bugs.openjdk.org/browse/JDK-8291503
 			//System.out.println(thread.getJavaName() + "@");
@@ -204,47 +239,28 @@ public class JFRStopwatch implements AutoCloseable {
 				}
 
 				methodsInStackTrace.forEach(recordedMethod -> {
-						var type = recordedMethod.getType().getName();
-						var method = recordedMethod.getName();
-						var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
+					var type = recordedMethod.getType().getName();
+					var method = recordedMethod.getName();
+					var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
 
-						//System.out.println(type + "#" + method);
-						// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
-						// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
+					//System.out.println(type + "#" + method);
+					// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
+					// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
 
-						OPERATION_METHODS.entrySet().stream()
-							.filter(entry -> entry.getValue().getLeft().equals(type) && entry.getKey().equals(method))
-							.findFirst()
-							.ifPresent(entry -> {
-								stages.putIfAbsent(new Operation(entry.getValue().getRight(), method, true), time);
-								if (!ongoingOperations.contains(entry.getKey())) {
-									ongoingOperations.addFirst(entry.getKey());
-									System.out.println(OPERATION_METHODS.get(entry.getKey()).getRight() + " started with " +  statistics.interval + " ms since previous sample");
-								}
-							});
+					OPERATION_METHODS.entrySet().stream()
+						.filter(entry -> entry.getValue().getLeft().equals(type) && entry.getKey().equals(method))
+						.findFirst()
+						.ifPresent(entry -> {
+							stages.putIfAbsent(new Operation(entry.getValue().getRight(), method, true), time);
+							if (!ongoingOperations.contains(entry.getKey())) {
+								ongoingOperations.addFirst(entry.getKey());
+								System.out.println(OPERATION_METHODS.get(entry.getKey()).getRight() + " started with " +  statistics.interval + " ms since previous sample");
+							}
+						});
 
-					});
+				});
 				//System.out.println("---");
 			}
-		});
-
-		var idExecutionSample = new AtomicLong();
-
-		eventStream.onMetadata(metadataEvent -> {
-			metadataEvent.getEventTypes()
-				.stream()
-				.filter(eventType -> eventType.getName().equals("jdk.ExecutionSample"))
-				.findFirst()
-				.ifPresent(eventType -> idExecutionSample.set(eventType.getId()));
-		});
-
-		eventStream.onEvent("jdk.ActiveSetting", event -> {
-			if (event.getLong("id") == idExecutionSample.get() && event.getString("name").equals("period")) {
-				System.out.println("Configured Execution Sampling Period: " + event.getString("value"));
-				statistics.configured = event.getString("value");
-			}
-		});
-
 	}
 
 	public void start() {
