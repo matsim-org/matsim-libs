@@ -1,13 +1,27 @@
 package org.matsim.application.analysis.accessibility;
 
+import it.unimi.dsi.fastutil.ints.Int2DoubleArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.CSVWriter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.LongColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
@@ -18,6 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.matsim.contrib.accessibility.AccessibilityModule.CONFIG_FILENAME_ACCESSIBILITY;
+
 
 @CommandLine.Command(
 	name = "accessibility-offline", description = "Offline Accessibility analysis.",
@@ -33,7 +50,6 @@ import java.util.stream.Collectors;
 
 
 public class AccessibilityAnalysis implements MATSimAppCommand {
-
 
 
 	private static final Logger log = LogManager.getLogger(AccessibilityAnalysis.class);
@@ -97,34 +113,102 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 				Table table = Table.read().csv(options);
 
 				table.removeColumns("id");
-				table.column("xcoord").setName("x");
-				table.column("ycoord").setName("y");
+				DoubleColumn xCol = table.doubleColumn("xcoord");
+				DoubleColumn yCol = table.doubleColumn("ycoord");
+				xCol.setName("x");
+				yCol.setName("y");
 
-				//added 10 to accessibility because grid map can't currently handle negative vals
-				int modifier = 0;
-				List<Column<?>> modCols = new ArrayList<>();
-				DoubleColumn walkColMod = null;
-				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
-					Column<?> column = iterator.next();
-					if (column.name().equals("teleportedWalk_accessibility")) {
-						walkColMod = table.doubleColumn(column.name()).add(modifier).setName(column.name());
-						break;
-					}
+				// Count Population per Pixel
+
+				String populationPath = ApplicationUtils.matchInput("output_plans", input.getRunDirectory()).toAbsolutePath().toString();
+				Config config = ConfigUtils.loadConfig(input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/" + CONFIG_FILENAME_ACCESSIBILITY);
+
+				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+
+				LongColumn popCol = LongColumn.create("population");
+				LongColumn ageCol = LongColumn.create("ageColumn");
+				DoubleColumn incomeCol = DoubleColumn.create("incomeColumn");
+
+
+				for (int i = 0; i < table.rowCount(); i++) {
+					popCol.append(0L);
+					ageCol.append(0);
+					incomeCol.append(0.0);
 				}
 
-				for (Iterator<Column<?>> iterator = table.columns().iterator(); iterator.hasNext(); ) {
-					Column<?> column = iterator.next();
-					if (column.name().endsWith("_accessibility")) {
-						DoubleColumn colMod = table.doubleColumn(column.name()).add(modifier).setName(column.name());
-						modCols.add(colMod);
-						if(walkColMod!=null){
-							DoubleColumn modColWithoutWalk = colMod.subtract(walkColMod).setName(column.name() + "_diff");
-							modCols.add(modColWithoutWalk);
+
+
+				Scenario scenario = ScenarioUtils.createScenario(config);
+
+
+				new PopulationReader(scenario).readFile(populationPath);
+
+
+				Int2DoubleMap incToCount = new Int2DoubleArrayMap();
+				Int2DoubleMap incToPtAccess = new Int2DoubleArrayMap();
+
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					Double homeX = (Double) person.getAttributes().getAttribute("home_x");
+					Double homeY = (Double) person.getAttributes().getAttribute("home_y");
+
+					if (homeX == null || homeY == null) {
+						continue; // Skip this person if home coordinates are not available
+					}
+
+					if(homeX > acg.getBoundingBoxRight() || homeX < acg.getBoundingBoxLeft() || homeY > acg.getBoundingBoxTop() || homeY < acg.getBoundingBoxBottom()) {
+						continue;
+					}
+
+					int age = (Integer) person.getAttributes().getAttribute("age");
+					double income = (Double) person.getAttributes().getAttribute("income");
+					int incClass = Integer.parseInt((String) person.getAttributes().getAttribute("MiD:hheink_gr2"));
+
+
+
+					// Find the closest pixel in the table
+					double closestDistance = Double.MAX_VALUE;
+					int closestRow = -1;
+					for (int i = 0; i < table.rowCount(); i++) {
+						double pixelX = xCol.getDouble(i);
+						double pixelY = yCol.getDouble(i);
+						double distance = Math.sqrt(Math.pow(homeX - pixelX, 2) + Math.pow(homeY - pixelY, 2));
+
+						if (distance < closestDistance) {
+							closestDistance = distance;
+							closestRow = i;
 						}
-						iterator.remove();
+					}
+					popCol.set(closestRow, popCol.getLong(closestRow) + 1);
+					incomeCol.set(closestRow, incomeCol.getDouble(closestRow) + income);
+					ageCol.set(closestRow, ageCol.getLong(closestRow) + age);
+
+					// now the other way around
+					double incCnt = incToCount.getOrDefault(incClass, 0);
+					double ptAccess = incToPtAccess.getOrDefault(incClass, 0);
+					incToCount.put(incClass, incCnt + 1);
+					incToPtAccess.put(incClass, ptAccess + table.doubleColumn("pt_accessibility").getDouble(closestRow));
+				}
+
+
+				//
+				for (int incGroup : incToCount.keySet()) {
+					double count = incToCount.get(incGroup);
+					double ptAccess = incToPtAccess.get(incGroup);
+					if (count > 0) {
+						incToPtAccess.put(incGroup, ptAccess / count);
 					}
 				}
-				modCols.forEach(table::addColumns);
+
+
+
+
+
+				DoubleColumn ageAvg = ageCol.divide(popCol).setName("age");
+				DoubleColumn incomeAvg = incomeCol.divide(popCol).setName("income");
+
+				table.addColumns(popCol, ageAvg, incomeAvg);
+
+
 
 				// Write the modified table to a new CSV file
 				CsvWriteOptions writeOptions = CsvWriteOptions.builder(outputPath)

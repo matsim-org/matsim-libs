@@ -6,6 +6,7 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.GridMap;
+import org.matsim.simwrapper.viz.Scatter;
 import org.matsim.simwrapper.viz.XYTime;
 
 import java.util.Iterator;
@@ -20,6 +21,8 @@ public class AccessibilityDashboard implements Dashboard {
 	private final List<String> pois;
 	private final String coordinateSystem;
 	private final List<Modes4Accessibility> modes;
+
+	private final boolean equity = true;
 
 
 	/**
@@ -76,6 +79,26 @@ public class AccessibilityDashboard implements Dashboard {
 
 				layout.tab(poi).add(modeLeft.name() + "-" + poi);
 			}
+
+			if(equity) {
+				layout.row("scatter-" + poi).el(Scatter.class, (viz, data) -> {
+					viz.title = "PT Accessibility Vs. Income: " + poi;
+					viz.description = "... " + poi;
+
+					viz.dataset = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
+					viz.x = "income";
+					viz.y = "pt_accessibility";
+					viz.xAxisName = "Income";
+					viz.yAxisName = "PT Accessibility";
+
+				});
+				layout.tab(poi).add("scatter-" + poi);
+
+
+			}
+
+
+
 		}
 
 	}

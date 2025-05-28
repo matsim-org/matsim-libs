@@ -59,6 +59,7 @@ import java.util.*;
  * @author dziemke
  */
 public final class AccessibilityModule extends AbstractModule {
+	public static final String CONFIG_FILENAME_ACCESSIBILITY = "configUsedForAccessibilityComputation.xml";
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
 	private final List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
