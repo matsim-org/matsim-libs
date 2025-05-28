@@ -181,6 +181,7 @@ public class EnableProfilingModule extends AbstractModule {
 				// stop recording - automatically dumped since output path is set and then closed as well
 				settings.recording.stop();
 				if (settings.trace) {
+					// todo if multiple recordings with trace are active, this might turn it off with another still running
 					Trace.disable();
 				}
 			}
