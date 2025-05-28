@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class JFRStopwatch implements AutoCloseable {
 
-	private final IterationStopWatch stopwatch = new IterationStopWatch();
+	private final IterationStopWatch stopwatch = new IterationStopWatch(); // todo getter or expose export methods
 	private final EventStream eventStream;
-	private final SamplingStatistics statistics = new SamplingStatistics();
+	private final SamplingStatistics statistics = new SamplingStatistics(); // todo getter
 
 	// linked hashmap to keep insertion order but also hashmap access times
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
@@ -84,6 +84,7 @@ public class JFRStopwatch implements AutoCloseable {
 
 	/**
 	 * Map the stopwatch operation names to their respective pairs of class and method
+	 * todo add option to expand & use proper record objects
 	 */
 	public static final Map<String, Pair<String, String>> OPERATION_METHODS = Map.of(
 		"fireControlerIterationStartsEvent",	Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationStartListeners"),
@@ -170,6 +171,7 @@ public class JFRStopwatch implements AutoCloseable {
 
 		eventStream.onEvent("jdk.ExecutionSample", event -> {
 
+			// event and attribute names may seem like hidden arcane knowledge, but can be found via `jfr metadata <jfr-file>`
 			var thread = event.getThread("sampledThread"); // getThread() is always null: https://bugs.openjdk.org/browse/JDK-8291503
 			//System.out.println(thread.getJavaName() + "@");
 
@@ -207,6 +209,8 @@ public class JFRStopwatch implements AutoCloseable {
 						var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
 
 						//System.out.println(type + "#" + method);
+						// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
+						// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
 
 						OPERATION_METHODS.entrySet().stream()
 							.filter(entry -> entry.getValue().getLeft().equals(type) && entry.getKey().equals(method))
