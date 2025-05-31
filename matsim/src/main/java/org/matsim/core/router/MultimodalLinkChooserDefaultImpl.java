@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
+public class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
 
     private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
 
@@ -18,12 +18,12 @@ class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
     public Link decideAccessLink(RoutingRequest request, Network network) {
     	return decideOnLink(request.getFromFacility(), network);
     }
-    
+
     @Override
     public Link decideEgressLink(RoutingRequest request, Network network) {
     	return decideOnLink(request.getToFacility(), network);
     }
-    
+
     private Link decideOnLink(Facility facility, Network network) {
         Link accessActLink = null ;
 
