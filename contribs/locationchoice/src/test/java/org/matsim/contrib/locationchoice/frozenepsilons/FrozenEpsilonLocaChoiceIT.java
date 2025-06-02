@@ -94,6 +94,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	void testLocationChoiceJan2013() {
 		//	CONFIG:
 		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "../config2.xml");
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		config.controller().setOutputDirectory( utils.getOutputDirectory() );
 		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
@@ -235,6 +236,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	void testFacilitiesAlongALine() {
 		RunType runType = RunType.shortRun ;
 		Config config = ConfigUtils.createConfig() ;
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		switch( runType ) {
 			case shortRun:
 				config.controller().setLastIteration( 2 );
