@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.contrib.profiling.aop.TraceProfilingEvent;
+import org.matsim.contrib.profiling.aop.trace.TraceProfilingEvent;
 import org.matsim.contrib.profiling.events.FireDefaultProfilingEventsModule;
 import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 import org.matsim.contrib.profiling.instrument.EnableProfilingModule;

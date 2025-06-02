@@ -1,4 +1,4 @@
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.aop.trace;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;

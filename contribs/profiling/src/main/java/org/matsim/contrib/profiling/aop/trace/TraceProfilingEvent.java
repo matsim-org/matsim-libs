@@ -1,4 +1,4 @@
-package org.matsim.contrib.profiling.aop;
+package org.matsim.contrib.profiling.aop.trace;
 
 import jdk.jfr.*;
 import org.aspectj.lang.JoinPoint;

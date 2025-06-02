@@ -1,11 +1,13 @@
 package org.matsim.contrib.profiling.instrument;
 
 import org.aspectj.lang.annotation.Pointcut;
+import org.matsim.contrib.profiling.aop.trace.TraceProfilingAspect;
+import org.matsim.contrib.profiling.aop.trace.TraceProfilingEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Instruct, whether {@link org.matsim.contrib.profiling.aop.TraceProfilingAspect} shall create {@link org.matsim.contrib.profiling.aop.TraceProfilingEvent JFR events}.
+ * Instruct, whether {@link TraceProfilingAspect} shall create {@link TraceProfilingEvent JFR events}.
  */
 public final class Trace {
 
