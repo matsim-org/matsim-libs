@@ -15,6 +15,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
@@ -164,6 +165,10 @@ public class MATSimApplicationTest {
 	void run() {
 
 		Config config = ConfigUtils.createConfig();
+
+		// AccessEgressModule wants a network
+		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml");
+
 		Path out = Path.of(utils.getOutputDirectory()).resolve("out");
 
 		config.controller().setOutputDirectory(out.toString());
