@@ -57,7 +57,8 @@ public class RunEvExampleTest{
 		try {
 			String [] args = { RunEvExample.DEFAULT_CONFIG_FILE,
 				"--config:controler.outputDirectory", utils.getOutputDirectory(),
-				"--config:ev.enforceChargingInteractionDuration", "true"
+				"--config:ev.enforceChargingInteractionDuration", "true",
+				"--config:routing.accessEgressType=none"
 			};
 
 			new RunEvExample().run( args );
