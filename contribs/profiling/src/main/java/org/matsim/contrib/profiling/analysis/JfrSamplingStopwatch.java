@@ -17,9 +17,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Service to generate a stopwatch.png from jfr profiling recording files
+ * Service to generate a stopwatch.png from jfr profiling recording files using sampling events and {@link IterationJfrEvent}s.
  */
-public class JFRStopwatch implements AutoCloseable {
+public class JfrSamplingStopwatch implements AutoCloseable {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch(); // todo getter or expose export methods
 	private final EventStream eventStream;
@@ -114,7 +114,7 @@ public class JFRStopwatch implements AutoCloseable {
 			var filePath = Path.of(fileChooser.getDirectory(), fileChooser.getFile());
 
 			System.out.println(filePath);
-			var stopwatch = new JFRStopwatch(EventStream.openFile(filePath));
+			var stopwatch = new JfrSamplingStopwatch(EventStream.openFile(filePath));
 			try (stopwatch) {
 				System.out.println("start");
 				stopwatch.start();
@@ -122,8 +122,8 @@ public class JFRStopwatch implements AutoCloseable {
 
 			System.out.println("--- done");
 			System.out.println(stopwatch.statistics);
-			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".stopwatch.csv", ";");
-			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".stopwatch");
+			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch.csv", ";");
+			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch");
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
@@ -136,7 +136,7 @@ public class JFRStopwatch implements AutoCloseable {
 	 * param: either stream of recordedevents or EventStream?
 	 * former: likely easier to work with, latter better for RAM usage
 	 */
-	public JFRStopwatch(EventStream eventStream) {
+	public JfrSamplingStopwatch(EventStream eventStream) {
 		this.eventStream = eventStream;
 		eventStream.setOrdered(true); // this orders all events by their *commit* time
 		// JFRIterationEvents will occur *after* all the operations happening within them
