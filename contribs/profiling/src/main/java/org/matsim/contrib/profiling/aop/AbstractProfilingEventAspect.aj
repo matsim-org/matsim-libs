@@ -21,16 +21,16 @@
 package org.matsim.contrib.profiling.aop;
 
 import jdk.jfr.Event;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import org.aspectj.lang.JoinPoint;
 
 public abstract aspect AbstractProfilingEventAspect {
 
     abstract pointcut eventPoints();
 
-    void around(): eventPoints() {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+    public abstract Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart);
 
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+    void around(): eventPoints() {
+        Event jfrEvent = createEvent(thisJoinPointStaticPart);
 
         jfrEvent.begin();
         proceed();

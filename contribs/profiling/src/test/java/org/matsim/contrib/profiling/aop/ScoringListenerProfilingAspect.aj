@@ -22,7 +22,11 @@ package org.matsim.contrib.profiling.aop;
 
 //import org.matsim.core.controler.listener.ScoringListener;
 
-public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspect {
+import jdk.jfr.Event;
+import org.aspectj.lang.JoinPoint;
+import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+
+public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspect{
 
     /**
      * Use the full canonical name (including package) in the pointcut declaration to ensure aspectj finds the targeted class
@@ -30,5 +34,11 @@ public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspec
      */
     pointcut eventPoints():
             call(void org.matsim.core.controler.listener.ScoringListener.notifyScoring(..));
+
+    public Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart) {
+        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+        return jfrEvent;
+    }
 
 }
