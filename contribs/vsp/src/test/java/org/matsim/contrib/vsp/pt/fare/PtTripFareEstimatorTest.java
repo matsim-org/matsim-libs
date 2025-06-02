@@ -22,6 +22,9 @@ import org.matsim.modechoice.*;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import playground.vsp.TestScenario;
 
 import java.util.ArrayList;
@@ -79,6 +82,19 @@ public class PtTripFareEstimatorTest {
 		fare.addParameterSet(distanceFare);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config);
+
+		// We need to add a vehicle, it however does not affect the results
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
+		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
 		injector = controler.getInjector();
 
 		injector.injectMembers(this);
