@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * AbstractProfilingEventAspect.aj
+ * ScoringListenerProfilingAspect.aj
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -22,18 +22,23 @@ package org.matsim.contrib.profiling.aop;
 
 import jdk.jfr.Event;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 
-public abstract aspect AbstractProfilingEventAspect {
+@Aspect
+public class ScoringListenerProfilingAspect extends AbstractProfilingEventAspect{
 
-    abstract pointcut eventPoints();
+    /**
+     * Use the full canonical name (including package) in the pointcut declaration to ensure aspectj finds the targeted class.
+     */
+    @Pointcut("call(void org.matsim.core.controler.listener.ScoringListener.notifyScoring(..))")
+    public void eventPoints() {}
 
-    public abstract Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart);
-
-    void around(): eventPoints() {
-        Event jfrEvent = createEvent(thisJoinPointStaticPart);
-
-        jfrEvent.begin();
-        proceed();
-        jfrEvent.commit();
+    public Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart) {
+        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
+        return jfrEvent;
     }
+
 }

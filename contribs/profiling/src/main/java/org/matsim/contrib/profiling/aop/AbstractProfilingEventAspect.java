@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * ScoringListenerProfilingAspect.aj
+ * AbstractProfilingEventAspect.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -20,25 +20,29 @@
 
 package org.matsim.contrib.profiling.aop;
 
-//import org.matsim.core.controler.listener.ScoringListener;
-
 import jdk.jfr.Event;
 import org.aspectj.lang.JoinPoint;
-import org.matsim.contrib.profiling.events.MatsimJfrEvent;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 
-public aspect ScoringListenerProfilingAspect extends AbstractProfilingEventAspect{
+@Aspect
+public abstract class AbstractProfilingEventAspect {
 
-    /**
-     * Use the full canonical name (including package) in the pointcut declaration to ensure aspectj finds the targeted class
-     * or declare an import.
-     */
-    pointcut eventPoints():
-            call(void org.matsim.core.controler.listener.ScoringListener.notifyScoring(..));
+	@Pointcut
+	public abstract void eventPoints();
 
-    public Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart) {
-        Event jfrEvent = MatsimJfrEvent.create("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-        System.out.println("AOP profiling: " + thisJoinPointStaticPart.getSignature());
-        return jfrEvent;
-    }
+	public abstract Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart);
+
+	@Around("eventPoints()")
+	public Object around(ProceedingJoinPoint thisJoinPoint) throws Throwable {
+		Event jfrEvent = createEvent(thisJoinPoint.getStaticPart());
+
+		jfrEvent.begin();
+		var ret = thisJoinPoint.proceed();
+		jfrEvent.commit();
+		return ret;
+	}
 
 }
