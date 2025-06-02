@@ -8,6 +8,7 @@ import org.matsim.application.MATSimApplication;
 import org.matsim.application.MATSimApplicationTest;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -23,6 +24,9 @@ public class LogFileAnalysisTest {
 	void output() throws IOException {
 
 		Config config = ConfigUtils.createConfig();
+
+		// AccessEgressModule wants a network
+		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml");
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(2);
