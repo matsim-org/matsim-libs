@@ -114,25 +114,27 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 
-		/*
-		 * The following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		 *
-		 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
-		 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
-		 * accessEgressToNetworkRouter RoutingModule for walk..
-		 */
+		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
+		if ( !routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+			/*
+			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
+			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
+			 * accessEgressToNetworkRouter RoutingModule for walk..
+			 */
 
-		//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
+			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
 
-		// more precisely: If the transport mode is walk, then code is used that does not need the accessEgressToNetwork router.  kai, jun'22
+			// more precisely: If the transport mode is walk, then code is used that does not need the accessEgressToNetwork router.  kai, jun'22
 
-		if (mode.equals(TransportMode.walk)) {
-			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
+			if (mode.equals(TransportMode.walk)) {
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
+			} else {
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
+			}
 		} else {
-			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
-		}
-
-	}
+			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
+			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
+		}	}
 
 	private void checkNetwork(Network filteredNetwork) {
 		if(routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
