@@ -6,6 +6,7 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForMobsim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.modechoice.*;
@@ -44,6 +45,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 
 	@Test
 	void constraint() {
+		controler.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
