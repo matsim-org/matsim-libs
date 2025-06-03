@@ -1197,6 +1197,15 @@ public final class PopulationUtils {
 
 	public static void sampleDown(Population pop, double sample) {
 		final Random rnd = MatsimRandom.getLocalInstance();
+		List<String> subpopulations = new ArrayList<>(pop.getPersons().values().stream()
+				.map(PopulationUtils::getSubpopulation)
+				.filter(Objects::nonNull)
+				.distinct()
+				.toList());
+		subpopulations.forEach(subpopulation ->	pop.getPersons().values().removeIf(
+			person -> PopulationUtils.getSubpopulation(person).equals(subpopulation)
+				&& rnd.nextDouble() >= sample
+		));
 		log.info("population size before downsampling=" + pop.getPersons().size());
 		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
 		log.info("population size after downsampling=" + pop.getPersons().size());
