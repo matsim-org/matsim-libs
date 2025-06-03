@@ -251,9 +251,9 @@ public class PrebookingTestEnvironment {
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = modeConfig
 				.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxWaitTime = maximumWaitTime;
-		defaultConstraintsSet.maxTravelTimeAlpha = detourRelative;
-		defaultConstraintsSet.maxTravelTimeBeta = detourAbsolute;
+		defaultConstraintsSet.setMaxWaitTime(maximumWaitTime);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(detourRelative);
+		defaultConstraintsSet.setMaxTravelTimeBeta(detourAbsolute);
 		modeConfig.setStopDuration(stopDuration);
 		modeConfig.setIdleVehiclesReturnToDepots(false);
 		modeConfig.setVehiclesFile(null);

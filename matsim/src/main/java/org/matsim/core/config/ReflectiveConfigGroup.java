@@ -524,7 +524,8 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 			var collection = ((Collection<String>)result);
 			Preconditions.checkArgument(collection.stream().noneMatch(String::isBlank),
 					"Collection %s contains blank elements. Only non-blank elements are supported.", collection);
-			return String.join(", ", collection);
+			return
+				collection.stream().sorted().collect(Collectors.joining(", "));
 		} else {
 			return result + "";
 		}

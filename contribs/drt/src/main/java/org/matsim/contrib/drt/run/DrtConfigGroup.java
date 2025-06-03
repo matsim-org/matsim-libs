@@ -396,7 +396,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
 		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
-			Verify.verify(constraintsSet.maxWaitTime >= getStopDuration(),
+			Verify.verify(constraintsSet.getMaxWaitTime() >= getStopDuration(),
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 

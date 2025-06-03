@@ -515,7 +515,7 @@ public class ScoreStatsControlerListenerTest {
 
 		readAndValidateValues(outDir,3, population);
 
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3);
+		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3, null);
 		scoreStatsControlerListener.notifyShutdown(eventShutdown);
 
 	}
