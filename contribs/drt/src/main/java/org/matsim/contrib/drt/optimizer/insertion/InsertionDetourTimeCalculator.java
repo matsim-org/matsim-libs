@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -63,7 +63,7 @@ public class InsertionDetourTimeCalculator {
 			var info = calculatePickupIfSameLink(vEntry, pickup.index, toPickupDepartureTime, drtRequest);
 			return new PickupDetourInfo(info.vehicleDepartureTime, info.requestPickupTime, info.additionalStopDuration);
 		}
-		
+
 		double arrivalTime = toPickupDepartureTime + toPickupTT;
 		Pickup pickupTime = stopTimeCalculator.initEndTimeForPickup(vEntry.vehicle, arrivalTime, drtRequest);
 		double stopDuration = pickupTime.endTime() - arrivalTime;
@@ -85,7 +85,7 @@ public class InsertionDetourTimeCalculator {
 		if (dropoff.newWaypoint.getLink() == dropoff.previousWaypoint.getLink()) {
 			double remainingPickupTimeLoss = calculateRemainingPickupTimeLossAtDropoff(insertion, pickupDetourInfo);
 			double arrivalTime = dropoff.previousWaypoint.getArrivalTime() + remainingPickupTimeLoss;
-			
+
 			DrtStopTask stopTask = findStopTaskIfSameLinkAsPrevious(vEntry, dropoff.index);
 			Dropoff dropoffTime = stopTimeCalculator.updateEndTimeForDropoff(vEntry.vehicle, stopTask, arrivalTime, drtRequest);
 			double departureTime = dropoffTime.endTime();
@@ -111,7 +111,7 @@ public class InsertionDetourTimeCalculator {
 			double toPickupTT, double fromPickupTT, DrtRequest drtRequest) {
 		double toPickupDepartureTime = pickup.previousWaypoint.getDepartureTime();
 
-		PickupTimeInfo info;
+		final PickupTimeInfo info;
 		
 		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
 			// no drive to pickup, but possible additional stop duration
@@ -121,7 +121,7 @@ public class InsertionDetourTimeCalculator {
 			double additionalStopDuration = pickupTime.endTime() - toPickupDepartureTime - toPickupTT;
 			info = new PickupTimeInfo(pickupTime.endTime(), pickupTime.pickupTime(), additionalStopDuration);
 		}
-		
+
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickup.index, toPickupDepartureTime);
 		double pickupTimeLoss = toPickupTT + info.additionalStopDuration + fromPickupTT - replacedDriveTT;
 		return new PickupDetourInfo(info.vehicleDepartureTime, info.requestPickupTime, pickupTimeLoss);
@@ -136,10 +136,10 @@ public class InsertionDetourTimeCalculator {
 		double dropoffTimeLoss = stopDuration + fromDropoffTT;
 		return new DropoffDetourInfo(arrivalTime, dropoffTime.dropoffTime(), dropoffTimeLoss);
 	}
-	
+
 	private PickupTimeInfo calculatePickupIfSameLink(VehicleEntry vEntry, int pickupIndex, double toPickupDepartureTime, DrtRequest request) {
 		DrtStopTask stopTask = findStopTaskIfSameLinkAsPrevious(vEntry, pickupIndex);
-		
+
 		if (stopTask == null) {
 			// case 1: previous waypoint is a drive, we create a new stop
 			// insertion time is the end time of previous waypoint
@@ -165,11 +165,11 @@ public class InsertionDetourTimeCalculator {
 			return new PickupTimeInfo(departureTime, pickupTime.pickupTime(), additionalStopDuration);
 		}
 	}
-	
+
 	private DrtStopTask findStopTaskIfSameLinkAsPrevious(VehicleEntry vEntry, int insertionIdx) {
 		if (insertionIdx == 0) {
 			var startTask = vEntry.start.task;
-			
+
 			if (startTask.isPresent() && STOP.isBaseTypeOf(startTask.get())) {
 				// case 1: we have a preceding and ongoing (started) stop task
 				return (DrtStopTask) startTask.get();
@@ -178,7 +178,7 @@ public class InsertionDetourTimeCalculator {
 			// case 2: we have a preceding (planned) stop task
 			return (DrtStopTask) vEntry.stops.get(insertionIdx - 1).task;
 		}
-		
+
 		return null; // otherwise, there is no stop task before
 	}
 
@@ -195,32 +195,32 @@ public class InsertionDetourTimeCalculator {
 
 		double replacedDriveStartTime = vEntry.getWaypoint(insertionIdx).getDepartureTime();
 		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).task.getBeginTime();
-		
+
 		// reduce by the idle time before the next stop, to get the actual drive time
 		return replacedDriveEndTime - replacedDriveStartTime - vEntry.getPrecedingStayTime(insertionIdx);
 	}
-	
+
 	/*
 	 * When inserting a pickup, we generate a "pickup loss" which describes by how
 	 * much time we have to shift all following tasks to the future.
-	 * 
+	 *
 	 * In the case that some of the following stops are prebooked, however, there
 	 * may be a stay time buffer between the insertion point and the stop. Hence, if
 	 * a following stop only happens in four hours, we may not need to shift the
 	 * task to the future. A preceding stay time, hence, reduces the introduced
 	 * pickup loss.
-	 * 
+	 *
 	 * The present function calculates the remaining pickup loss at the dropoff
 	 * insertion point after deducting all the stay times up to the dropoff.
 	 */
 	public static double calculateRemainingPickupTimeLossAtDropoff(Insertion insertion, PickupDetourInfo pickupDetourInfo) {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		double remainingPickupTimeLoss = pickupDetourInfo.pickupTimeLoss;
-		
+
 		for (int i = insertion.pickup.index + 1; i < insertion.dropoff.index; i++) {
 			remainingPickupTimeLoss = Math.max(remainingPickupTimeLoss - vEntry.getPrecedingStayTime(i), 0.0);
 		}
-		
+
 		return remainingPickupTimeLoss;
 	}
 

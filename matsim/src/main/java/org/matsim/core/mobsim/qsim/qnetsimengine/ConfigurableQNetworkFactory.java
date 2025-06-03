@@ -52,8 +52,8 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+	private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 	private Optional<TurnAcceptanceLogic> turnAcceptanceLogic = Optional.empty();
-	private Optional<VehicleHandler> vehicleHandler = Optional.empty();
 	private Optional<FlowEfficiencyCalculator> flowEfficiencyCalculator = Optional.empty();
 	private Optional<VehicleQ.Factory<QVehicle>> vehicleQFactory = Optional.empty();
 
@@ -91,7 +91,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 		}
 //		linkSpeedCalculator.ifPresent(linkBuilder::setLinkSpeedCalculator);
 		linkBuilder.setLinkSpeedCalculator( this.linkSpeedCalculator );
-		vehicleHandler.ifPresent(linkBuilder::setVehicleHandler);
+		linkBuilder.setVehicleHandler(vehicleHandler);
 
 		return linkBuilder.build(link, toQueueNode);
 	}
@@ -114,7 +114,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	}
 
 	public final void setVehicleHandler(VehicleHandler vehicleHandler) {
-		this.vehicleHandler = Optional.of(vehicleHandler);
+		this.vehicleHandler =vehicleHandler;
 	}
 
 	public final void setVehicleQFactory( VehicleQ.Factory<QVehicle> factory ) {

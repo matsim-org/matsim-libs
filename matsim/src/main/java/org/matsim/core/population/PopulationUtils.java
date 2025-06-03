@@ -20,20 +20,6 @@
 
 package org.matsim.core.population;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -42,30 +28,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PersonRouteCheck;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.population.routes.heavycompressed.HeavyCompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.mediumcompressed.MediumCompressedNetworkRouteFactory;
 import org.matsim.core.router.TripStructureUtils;
@@ -82,12 +56,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.io.*;
+import java.util.*;
+
 /**
  * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
 	private static final Logger log = LogManager.getLogger(PopulationUtils.class);
-	private static final PopulationFactory populationFactory = createPopulation(new PlansConfigGroup(), null).getFactory();
+	private static final PopulationFactory populationFactory = createPopulation(
+			new PlansConfigGroup(), null, null).getFactory();
 
 	/**
 	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
@@ -110,7 +88,19 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config) {
-		return createPopulation(config, null);
+		return createPopulation(config, null, null);
+	}
+
+	/**
+	 * Creates a new Population container. Population instances need a Config, because they need to know
+	 * about the modes of transport.
+	 *
+	 * @param config the configuration which is used to create the Population.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Double scale) {
+		return createPopulation(config, null, scale);
 	}
 
 	/**
@@ -123,10 +113,34 @@ public final class PopulationUtils {
 	 * @return the new Population instance
 	 */
 	public static Population createPopulation(Config config, Network network) {
-		return createPopulation(config.plans(), network);
+		return createPopulation(config.plans(), network, null);
 	}
 
-	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param config  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(Config config, Network network, Double scale) {
+		return createPopulation(config.plans(), network, scale);
+	}
+
+	/**
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param plansConfigGroup  the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @param scale the scale (or sample fraction) of the population which is added as a container attribute.
+	 * @return the new Population instance
+	 */
+	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network, Double scale) {
 		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
 		RouteFactories routeFactory = new RouteFactories();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
@@ -143,7 +157,7 @@ public final class PopulationUtils {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+        return new PopulationImpl(new PopulationFactoryImpl(routeFactory), scale);
 	}
 
 	public static Leg unmodifiableLeg(Leg leg) {
@@ -1211,6 +1225,13 @@ public final class PopulationUtils {
 		return PopulationUtils.equalPopulation(population1, population2);
 	}
 
+	public static PopulationComparison.Result comparePopulations(String path1, String path2) {
+		Population population1 = PopulationUtils.readPopulation(path1);
+		Population population2 = PopulationUtils.readPopulation(path2);
+
+		return PopulationComparison.compare(population1, population2);
+	}
+
 	// ---
 
 	/**
@@ -1265,11 +1286,11 @@ public final class PopulationUtils {
 		person.getAttributes().removeAttribute(SUBPOPULATION_ATTRIBUTE_NAME);
 	}
 
-	public static Population getOrCreateAllpersons(Scenario scenario) {
+	public static Population getOrCreateAllPersons(Scenario scenario) {
 		Population map = (Population) scenario.getScenarioElement("allpersons");
 		if (map == null) {
 			log.info("adding scenario element for allpersons container");
-			map = new PopulationImpl(scenario.getPopulation().getFactory());
+			map = new PopulationImpl(scenario.getPopulation().getFactory(), null);
 			scenario.addScenarioElement("allpersons", map);
 		}
 		return map;
@@ -1278,7 +1299,7 @@ public final class PopulationUtils {
 	private static int tryStdCnt = 5;
 
 	public static Person findPerson(Id<Person> personId, Scenario scenario) {
-		Person person = getOrCreateAllpersons(scenario).getPersons().get(personId);
+		Person person = getOrCreateAllPersons(scenario).getPersons().get(personId);
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;

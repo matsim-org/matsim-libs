@@ -33,8 +33,8 @@ public class EventArray {
 		return size;
 	}
 	public Event get(int index) {
-		assert index < size;
-		assert array[index] != null;
+		assert index < size : "Index " + index + " out of bounds, for array size " + size + ".";
+		assert array[index] != null : "Index " + index + " is null.";
 		return array[index];
 	}
 

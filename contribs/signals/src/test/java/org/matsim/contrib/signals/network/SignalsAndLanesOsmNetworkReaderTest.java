@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
@@ -34,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -387,7 +389,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
         signalReader.parse(inputfile.toString());
 
-        NetworkSimplifier netsimplify = new NetworkSimplifier();
+		NetworkSimplifier netsimplify = NetworkSimplifier.createNetworkSimplifier(network);
         netsimplify.setNodesNotToMerge(signalReader.getNodesNotToMerge());
         netsimplify.run(network);
 
@@ -397,7 +399,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
          * afterwards there is a route from every link to every other link. This may not
          * be the case in the initial network converted from OpenStreetMap.
          */
-        new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network, Set.of(TransportMode.car));
         new LanesAndSignalsCleaner().run(scenario);
 
 

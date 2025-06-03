@@ -30,10 +30,10 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 public class UmlaufImpl implements Umlauf {
-	
+
 	private Id<Umlauf> id;
 	private Id<Vehicle> vehicleId;
-	
+
 	private ArrayList<UmlaufStueckI> umlaufStuecke = new ArrayList<UmlaufStueckI>();
 
 	public UmlaufImpl(Id<Umlauf> id) {
@@ -50,7 +50,7 @@ public class UmlaufImpl implements Umlauf {
 	public Id<Umlauf> getId() {
 		return this.id;
 	}
-	
+
 	@Override
 	public void setVehicleId(final Id<Vehicle> vehicleId) {
 		this.vehicleId = vehicleId;
@@ -66,11 +66,6 @@ public class UmlaufImpl implements Umlauf {
 		return this.vehicleId;
 	}
 
-	@Override
-	public Id<TransitLine> getLineId() {
-		return getLineId(getUmlaufStuecke());
-	}
-
 	private Id<TransitLine> getLineId(Collection<UmlaufStueckI> umlaufInConstruction) {
 		Id<TransitLine> lineId = null;
 		for (UmlaufStueckI umlaufStueck : umlaufInConstruction) {
@@ -82,5 +77,5 @@ public class UmlaufImpl implements Umlauf {
 		}
 		return lineId;
 	}
-	
+
 }

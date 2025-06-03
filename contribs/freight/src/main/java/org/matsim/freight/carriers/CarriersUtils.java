@@ -175,7 +175,7 @@ public class CarriersUtils {
 	public static int getJspritIterations(Carrier carrier) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute(JSPRIT_ITERATIONS);
 		if (result == null) {
-			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritIterations does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		} else {
 			return result;
@@ -249,23 +249,25 @@ public class CarriersUtils {
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
-		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
+		List<Future<?>> futures;
+		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
+			futures = new ArrayList<>();
+			List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+				.toList();
 
-		List<Future<?>> futures = new ArrayList<>();
-		List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-			.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
-			.toList();
-
-		for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
-			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
-				startedVRPCounter, carriers.getCarriers().size());
-			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
-			futures.add(executor.submit(task));
+			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
+				JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
+					startedVRPCounter, carriers.getCarriers().size());
+				log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
+				futures.add(executor.submit(task));
+			}
 		}
 
 		for (Future<?> future : futures) {
 			future.get();
 		}
+
 	}
 
 	/**
@@ -748,7 +750,7 @@ public class CarriersUtils {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}

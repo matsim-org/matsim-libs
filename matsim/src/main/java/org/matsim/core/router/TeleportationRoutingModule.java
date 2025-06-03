@@ -38,6 +38,7 @@ import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
+ * @author sebhoerl
  */
 public class TeleportationRoutingModule implements RoutingModule {
 
@@ -45,15 +46,18 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
+	private final String personSpeedAttribute;
 	private final Scenario scenario;
 
 	public TeleportationRoutingModule(
 			final String mode,
 			final Scenario scenario,
 			final double networkTravelSpeed,
-			final double beelineDistanceFactor) {
+			final double beelineDistanceFactor,
+			final String personSpeedAttribute) {
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;
+		this.personSpeedAttribute = personSpeedAttribute;
 		this.mode = mode;
 		this.scenario = scenario ;
 	}
@@ -113,7 +117,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
-		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
+		int travTime = (int) (estimatedNetworkDistance / getTravelSpeed(person));
 		route.setTravelTime(travTime);
 		route.setDistance(estimatedNetworkDistance);
 		leg.setRoute(route);
@@ -122,6 +126,18 @@ public class TeleportationRoutingModule implements RoutingModule {
 		Leg r = (leg);
 		r.setTravelTime( depTime + travTime - r.getDepartureTime().seconds()); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
+	}
+
+	private double getTravelSpeed(Person person) {
+		if (personSpeedAttribute != null) {
+			Double personSpeed = (Double) person.getAttributes().getAttribute(personSpeedAttribute);
+			
+			if (personSpeed != null) {
+				return personSpeed;
+			}
+		}
+
+		return this.networkTravelSpeed;
 	}
 
 }

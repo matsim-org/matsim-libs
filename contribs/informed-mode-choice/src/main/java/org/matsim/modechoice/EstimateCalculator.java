@@ -14,7 +14,7 @@ import org.matsim.core.utils.timing.TimeTracker;
 import org.matsim.modechoice.constraints.TripConstraint;
 import org.matsim.modechoice.estimators.*;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 

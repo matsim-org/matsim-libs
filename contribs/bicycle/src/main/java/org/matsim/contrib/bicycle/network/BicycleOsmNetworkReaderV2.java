@@ -31,7 +31,6 @@ import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.osm.networkReader.OsmBicycleReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -96,7 +95,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		
 		bicycleNetworkReader.stats(network);
 
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network, Set.of("bicycle", TransportMode.bike, TransportMode.car));
 		new NetworkWriter(network).write(outputXML);
 	}
 

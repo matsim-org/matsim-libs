@@ -97,17 +97,15 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		if (toLink != fromLink) {
 			// (a "true" route)
-			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
 			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
 			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
 			 * ts, june '21
 			 */
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
+			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, departureTime, person, null);
 			if (path == null)
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");
+				throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + " by mode " + this.mode + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime(path.travelTime);

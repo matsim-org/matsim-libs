@@ -21,12 +21,14 @@ package org.matsim.core.controler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.events.AbstractIterationEvent;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**
@@ -98,16 +100,17 @@ public final class ControllerUtils{
 	    String newline = System.lineSeparator();// use native line endings for logfile
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
+
+		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
+			log.info("=== logging config.xml skipped ===");
+			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+		}
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");
 	    log.info("Checking consistency of config...");
 	    config.checkConsistency();
 	    log.info("Checking consistency of config done.");
-	}
-
-	@Deprecated // use 	OutputDirectoryLogging.catchLogEntries() directly.  kai, mar'18
-	public static final void initializeOutputLogging() {
-		OutputDirectoryLogging.catchLogEntries();
 	}
 
 	public static void catchLogEntries() {
@@ -116,6 +119,17 @@ public final class ControllerUtils{
 
 	public static Controller createController( Scenario scenario ) {
 		return new Controler( scenario );
+	}
+
+	/**
+	 * Decides if some functionality should be active in the current iteration if it is
+	 * configured to run only at a specific iteration-interval.
+	 */
+	public static boolean isIterationActive(AbstractIterationEvent event, int interval) {
+		if (interval <= 0) {
+			return false;
+		}
+		return event.isLastIteration() || (event.getIteration() % interval == 0);
 	}
 
 }
