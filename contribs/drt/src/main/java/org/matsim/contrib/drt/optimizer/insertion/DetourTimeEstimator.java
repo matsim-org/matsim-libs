@@ -51,9 +51,15 @@ public interface DetourTimeEstimator {
 
 	static DetourTimeEstimator createExactEstimator(LeastCostPathCalculator router) {
 		return (from, to, departureTime) -> {
+			return router.calcLeastCostPath(from.getToNode(), to.getFromNode(), departureTime, null, null).travelTime;
+		};
+	}
+
+	static DetourTimeEstimator createExactEstimatorUsingVrp(LeastCostPathCalculator router, TravelTime travelTime) {
+		return (from, to, departureTime) -> {
 			synchronized(router) {
-				return router.calcLeastCostPath(from.getToNode(), to.getFromNode(), departureTime, 
-					null, null).travelTime;
+				return VrpPaths.calcAndCreatePath(from, to, departureTime,
+					router, travelTime).getTravelTime();
 			}
 		};
 	}

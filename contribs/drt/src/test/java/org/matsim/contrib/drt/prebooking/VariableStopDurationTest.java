@@ -62,21 +62,19 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void oneRequestAtDetourLimit() {
+	void oneRequest_detourConstraint_ok() {
 		/*-
-		 * One agent is dispatched and we set the absolute allowed detour 
-		 * such that he can just arrive, one second later, and we need to reject him.
-		 * 
-		 * This means if we increase the pickup duration or the dropoff duration, the
-		 * request should be rejected (see following tests).
+		 * - One agent is dispatched
+		 * - We choose the detour constraint such that the request can barely accepted
 		 */
-		double absoluteDetour = 292.0;
+		double detourConstraint = 99.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
+				.configure(600.0, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
@@ -94,69 +92,77 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void oneRequestExceedingDetourLimitThroughPickup() {
-		// see previous test
-		double absoluteDetour = 292.0;
-
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
-				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.endTime(10.0 * 3600.0);
-
-		Controler controller = environment.build();
-		prepare(controller);
-
-		new CustomStopDurationProvider() //
-				.define("personA", 60.0 + 1.0, 60.0) //
-				.install(controller);
-
-		controller.run();
-
-		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertTrue(Double.isNaN(requestA.pickupTime));
-	}
-
-	@Test
-	void oneRequestExceedingDetourLimitThroughDropoff() {
-		// see previous test
-		double absoluteDetour = 292.0;
-
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
-				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.endTime(10.0 * 3600.0);
-
-		Controler controller = environment.build();
-		prepare(controller);
-
-		new CustomStopDurationProvider() //
-				.define("personA", 60.0, 60.0 + 1.0) //
-				.install(controller);
-
-		controller.run();
-
-		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertTrue(Double.isNaN(requestA.pickupTime));
-	}
-
-	@Test
-	void oneRequestAtWaitTimeLimit() {
+	void oneRequest_detourConstraint_excessivePickupDuration() {
 		/*-
-		 * One agent is dispatched and we set the allowed wait time
-		 * such that he can just be picked up. One second later, and we need to reject him.
-		 * 
-		 * This means if we increase the pickup duration, the
-		 * request should be rejected (see following test).
+		 * - See oneRequest_detourConstraint_ok
+		 * - We increase the pickup duration by one second
+		 * - Request should not be accepted anymore
 		 */
-		double maximumWaitTime = 105.0;
+		double detourConstraint = 99.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
+				.configure(600.0, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertTrue(Double.isNaN(requestA.pickupTime));
+	}
+
+	@Test
+	void oneRequest_detourConstraint_excessiveDropoffDuration() {
+		/*-
+		 * - See oneRequest_detourConstraint_ok
+		 * - We increase the dropoff duration by one second
+		 * - Request should not be accepted anymore
+		 */
+		double detourConstraint = 99.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(600.0, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertTrue(Double.isNaN(requestA.pickupTime));
+	}
+
+	@Test
+	void oneRequest_waitTimeConstraint_ok() {
+		/*-
+		 * - One agent is dispatched
+		 * - We choose the maximum wait time such that it can barely dispatched
+		 */
+		double waitTimeConstraint = 61.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, 1000.0, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
@@ -174,21 +180,26 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void oneRequestOverWaitTimeLimit() {
-		// see above
-		double maximumWaitTime = 105.0;
+	void oneRequest_waitTimeConstraint_excessivePickupDuration() {
+		/*-
+		 * - See oneRequest_waitTimeConstraint_ok
+		 * - We increase the pickup duration by one second
+		 * - The request should not be accepted anymore
+		 */
+		double waitTimeConstraint = 61.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
+				.configure(waitTimeConstraint, 1.0, 1000.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
 
 		new CustomStopDurationProvider() //
-				.define("personA", 60.0 + 1.0, 60.0) //
+				.define("personA", 60.0 + 1.0, 60.0) // PICKUP + 1s
 				.install(controller);
 
 		controller.run();
@@ -198,25 +209,27 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void twoParallelRequests() {
+	void twoRequests_ABBA_ok() {
 		/*-
-		 * - We dispatch the first request
-		 * - Another request is picked up and dropped off along the way
-		 * - We adjust the maximum detour of the first request such that
-		 *   we find a viable insertion of the second one (with fixed dropoff time)
-		 * - If we now increase the dropoff time of the second request, we should not 
-		 *   find an insertion anymore (see next test).
+		 * - We dispatch two requests
+		 * - Structure: Pickup A > Pickup B > Dropoff B > Dropoff A
 		 * 
-		 * - Same concept for the wait time
+		 * - Request A acts as the cosntraint
+		 * - Request B acts as the probe that will be modified later
+		 * 
+		 * - We adjust the detour and wait time constraints of request A such that 
+		 *   both requests can barely be dispatched
 		 */
-		double absoluteDetour = 327.0;
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1005.0) //
-				.endTime(10.0 * 3600.0);
+				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
@@ -230,90 +243,106 @@ public class VariableStopDurationTest {
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
 		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
 
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
 		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
 	}
 
 	@Test
-	void twoParallelRequestsPushingDropoffViaIncreasingDropoff() {
-		// see above
-		double absoluteDetour = 327.0;
-
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
-				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1005.0) //
-				.endTime(10.0 * 3600.0);
-
-		Controler controller = environment.build();
-		prepare(controller);
-
-		new CustomStopDurationProvider() //
-				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0, 60.0 + 5.0) //
-				.install(controller);
-
-		controller.run();
-
-		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertEquals(1083.0, requestA.pickupTime, 1e-3);
-
-		RequestInfo requestB = environment.getRequestInfo().get("personB");
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
-	}
-
-	@Test
-	void twoParallelRequestsPushingDropoffViaIncreasingPickup() {
-		// see above
-		double absoluteDetour = 327.0;
-
-		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, absoluteDetour, 60.0) //
-				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1005.0) //
-				.endTime(10.0 * 3600.0);
-
-		Controler controller = environment.build();
-		prepare(controller);
-
-		new CustomStopDurationProvider() //
-				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0 + 5.0, 60.0) //
-				.install(controller);
-
-		controller.run();
-
-		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertEquals(1083.0, requestA.pickupTime, 1e-3);
-
-		RequestInfo requestB = environment.getRequestInfo().get("personB");
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
-	}
-
-	@Test
-	void twoSequentialRequests() {
+	void twoRequests_ABBA_exessivePickupDuration() {
 		/*-
-		 * - We dispatch the first request
-		 * - Another request is picked up and dropped off before
-		 * - We adjust the maximum wait time of the first request such that
-		 *   we find a viable insertion of the second one (with fixed dropoff time)
-		 * - If we now increase the dropoff time of the second request, we should not 
-		 *   find an insertion anymore (see next test).
-		 * 
-		 * - Same concept for the wait time
+		 * - See twoRequests_detourConstraint_ok
+		 * - We increase the pickup duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
 		 */
-		double maximumWaitTime = 266.0;
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
 				.endTime(10.0 * 3600.0) //
-				.setVehicleCapacity(1) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+	}
+
+	@Test
+	void twoRequests_ABBA_exessiveDropoffDuration() {
+		/*-
+		 * - See twoRequests_detourConstraint_ok
+		 * - We increase the dropoff duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+	}
+
+	@Test
+	void twoRequests_BBAA_ok() {
+		/*-
+		 * - We dispatch two requests
+		 * - Structure: Pickup B > Dropoff B > Pickup A > Dropoff A
+		 * 
+		 * - Request A request acts as the constraint
+		 * - Request B acts as the probe that will be modified later
+		 * 
+		 * - We adjust the detour and wait time constraints of request A such that 
+		 *   both requests can barely be dispatched
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
@@ -327,30 +356,30 @@ public class VariableStopDurationTest {
 		controller.run();
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1289.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
-
-		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
-		assertTrue(Double.isFinite(requestB.pickupTime)); // expecting acceptance
-
-		assertEquals(1125.0, requestB.pickupTime, 1e-3);
-		assertEquals(1228.0, requestB.dropoffTime, 1e-3);
-
-		assertEquals(1310.0, requestA.pickupTime, 1e-3);
-		assertEquals(1413.0, requestA.dropoffTime, 1e-3);
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1186.0, requestB.dropoffTime, 1e-3);
 	}
 
 	@Test
-	void twoSequentialRequestsPushingPickupViaIncreasingDropoff() {
-		// see above
-		double maximumWaitTime = 266.0;
+	void twoRequests_BBAA_excessivePickupDuration() {
+		/*-
+		 * - See twoRequests_BBAA_ok
+		 * - We increase the pickup duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
 				.endTime(10.0 * 3600.0) //
-				.setVehicleCapacity(1) //
 				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
@@ -358,33 +387,35 @@ public class VariableStopDurationTest {
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0, 60.0 + 1.0) // ONE SECOND MORE
+				.define("personB", 60.0 + 1.0, 60.0) // PICKUP + 1s
 				.install(controller);
 
 		controller.run();
 
-		RequestInfo requestA = environment.getRequestInfo().get("personA");
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime));
 
-		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
-
-		assertEquals(1188.0, requestA.pickupTime, 1e-3);
-		assertEquals(1291.0, requestA.dropoffTime, 1e-3);
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1167.0, requestA.pickupTime, 1e-3); // earlier than before
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
 	}
 
 	@Test
-	void twoSequentialRequestsPushingPickupViaIncreasingPickup() {
-		// see above
-		double maximumWaitTime = 266.0;
+	void twoRequests_BBAA_excessiveDropoffDuration() {
+		/*-
+		 * - See twoRequests_BBAA_ok
+		 * - We increase the dropoff duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
 				.endTime(10.0 * 3600.0) //
-				.setVehicleCapacity(1) //
 				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
@@ -392,18 +423,670 @@ public class VariableStopDurationTest {
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0 + 1.0, 60.0) // ONE SECOND MORE
+				.define("personB", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime));
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1167.0, requestA.pickupTime, 1e-3); // earlier than before
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
+	}
+
+	@Test
+	void twoRequests_BABA_ok() {
+		/*-
+		 * - We dispatch two requests
+		 * - Structure: Pickup B > Pickup A > Dropoff B > Dropoff A
+		 * 
+		 * - Request A request acts as the constraint
+		 * - Request B acts as the probe that will be modified later
+		 * 
+		 * - We adjust the detour and wait time constraints of request A such that 
+		 *   both requests can barely be dispatched
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
 				.install(controller);
 
 		controller.run();
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1186.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+	}
 
-		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+	@Test
+	void twoRequests_BABA_excessivePickupDuration() {
+		/*-
+		 * - See twoRequests_BABA_ok
+		 * - We increase the pickup duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
 
-		assertEquals(1188.0, requestA.pickupTime, 1e-3);
-		assertEquals(1291.0, requestA.dropoffTime, 1e-3);
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime));
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1125.0, requestA.pickupTime, 1e-3); // earlier than before
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
+	}
+
+	@Test
+	void twoRequests_BABA_excessiveDropoffDuration() {
+		/*-
+		 * - See twoRequests_BABA_ok
+		 * - We increase the dropoff duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime));
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1125.0, requestA.pickupTime, 1e-3); // earlier than before
+		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
+	}
+
+	@Test
+	void twoRequests_ABAB_ok() {
+		/*-
+		 * - We dispatch two requests
+		 * - Structure: Pickup A > Pickup B > Dropoff A > Dropoff B
+		 * 
+		 * - Request A request acts as the constraint
+		 * - Request B acts as the probe that will be modified later
+		 * 
+		 * - We adjust the detour and wait time constraints of request A such that 
+		 *   both requests can barely be dispatched
+		 */
+		double detourConstraint = 262.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1289.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1392.0, requestB.dropoffTime, 1e-3);
+	}
+
+	@Test
+	void twoRequests_ABAB_excessivePickupDuration() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We increase the pickup duration of the probe request by one second
+		 * - We should not be able to disaptch it anymore
+		 */
+		double detourConstraint = 262.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime));
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1228.0, requestA.dropoffTime, 1e-3); // earlier than before
+	}
+
+	@Test
+	void threeRequests_ABBA_ok() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We add a third request in parallel to the probe
+		 * - The third one should be accepted
+		 */
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0) //
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isFinite(requestC.pickupTime)); // expecting acceptance
+	}
+
+	@Test
+	void threeRequests_ABBA_exessivePickupDuration() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We add a third request in parallel to the probe with one second longer pickup duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime)); // expecting rejection
+	}
+
+	@Test
+	void threeRequests_ABBA_exessiveDropoffDuration() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We add a third request in parallel to the probe with one second longer dropoff duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 201.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime)); // expecting rejection
+	}
+
+	@Test
+	void threeRequests_BBAA_ok() {
+		/*-
+		 * - See threeRequests_BBAA_ok
+		 * - We add a third request in parallel to the probe
+		 * - The third one should be accepted
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 3, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0) //
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1289.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1186.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isFinite(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_BBAA_excessivePickupDuration() {
+		/*-
+		 * - See threeRequests_BBAA_ok
+		 * - We add a third request in parallel to the probe with one second longer pickup duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 3, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1289.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1186.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_BBAA_excessiveDropoffDuration() {
+		/*-
+		 * - See threeRequests_BBAA_ok
+		 * - We add a third request in parallel to the probe with one second longer dropoff duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 245.0;
+		double waitTimeConstraint = 245.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 3, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1289.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1186.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_BABA_ok() {
+		/*-
+		 * - See twoRequests_BABA_ok
+		 * - We add a third request in parallel to the probe
+		 * - The third one should be accepted
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0) //
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1186.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isFinite(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_BABA_excessivePickupDuration() {
+		/*-
+		 * - See twoRequests_BABA_ok
+		 * - We add a third request in parallel to the probe with one second longer pickup duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1186.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_BABA_excessiveDropoffDuration() {
+		/*-
+		 * - See twoRequests_BABA_ok
+		 * - We add a third request in parallel to the probe with one second longer dropoff duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 203.0;
+		double waitTimeConstraint = 164.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
+				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0 + 1.0) // DROPOFF + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1186.0, requestA.pickupTime, 1e-3);
+		assertEquals(1392.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1083.0, requestB.pickupTime, 1e-3);
+		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
+		
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_ABAB_ok() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We add a third request in parallel to the probe
+		 * - The third one should be accepted
+		 */
+		double detourConstraint = 262.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.addRequest("personC", 3, 0, 7, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0, 60.0) // 
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1289.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1392.0, requestB.dropoffTime, 1e-3);
+		
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isFinite(requestC.pickupTime));
+	}
+
+	@Test
+	void threeRequests_ABAB_excessivePickupDuration() {
+		/*-
+		 * - See twoRequests_ABAB_ok
+		 * - We add a third request in parallel to the probe with one second longer pickup duration
+		 * - The third request should not be accepted
+		 */
+		double detourConstraint = 262.0;
+		double waitTimeConstraint = 163.0;
+
+		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
+				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.addVehicle("vehicleA", 0, 0) //
+				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
+				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.addRequest("personC", 3, 0, 7, 0, 1002.0) //
+				.endTime(10.0 * 3600.0) //
+				.useExactTravelTimeEstimates();
+
+		Controler controller = environment.build();
+		prepare(controller);
+
+		new CustomStopDurationProvider() //
+				.define("personA", 60.0, 60.0) //
+				.define("personB", 60.0, 60.0) //
+				.define("personC", 60.0 + 1.0, 60.0) // PICKUP + 1s
+				.install(controller);
+
+		controller.run();
+
+		RequestInfo requestA = environment.getRequestInfo().get("personA");
+		assertEquals(1083.0, requestA.pickupTime, 1e-3);
+		assertEquals(1289.0, requestA.dropoffTime, 1e-3);
+
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertEquals(1186.0, requestB.pickupTime, 1e-3);
+		assertEquals(1392.0, requestB.dropoffTime, 1e-3);
+		
+		RequestInfo requestC = environment.getRequestInfo().get("personC");
+		assertTrue(Double.isNaN(requestC.pickupTime));
 	}
 }
