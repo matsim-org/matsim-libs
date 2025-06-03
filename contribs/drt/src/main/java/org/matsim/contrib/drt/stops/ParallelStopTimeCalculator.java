@@ -40,10 +40,17 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		// adding a dropoff may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDurationProvider.calcDropoffDuration(vehicle, request));
+		// update end time
+		double initialDuration = stop.getEndTime() - stop.getBeginTime();
+		double endTime = Math.max(stop.getEndTime(), initialDuration + insertionTime);
+
+		// add the dropoff
+		double dropoffTime = insertionTime + stopDurationProvider.calcDropoffDuration(vehicle, request);
+		endTime = Math.max(endTime, dropoffTime);
+
+		return new Dropoff(endTime, dropoffTime);
 	}
 
 	@Override

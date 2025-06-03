@@ -87,13 +87,13 @@ public class InsertionDetourTimeCalculator {
 			double arrivalTime = dropoff.previousWaypoint.getArrivalTime() + remainingPickupTimeLoss;
 			
 			DrtStopTask stopTask = findStopTaskIfSameLinkAsPrevious(vEntry, dropoff.index);
-			double departureTime = stopTimeCalculator.updateEndTimeForDropoff(vEntry.vehicle, stopTask, arrivalTime, drtRequest);
+			Dropoff dropoffTime = stopTimeCalculator.updateEndTimeForDropoff(vEntry.vehicle, stopTask, arrivalTime, drtRequest);
+			double departureTime = dropoffTime.endTime();
 			
 			double initialStopDuration = stopTask.getEndTime() - stopTask.getBeginTime();
 			double additionalStopDuration = departureTime - arrivalTime - initialStopDuration;
 			
-			double todoReplace = arrivalTime;
-			return new DropoffDetourInfo(arrivalTime, todoReplace, additionalStopDuration);
+			return new DropoffDetourInfo(arrivalTime, dropoffTime.dropoffTime(), additionalStopDuration);
 		}
 
 		double toDropoffDepartureTime = dropoff.previousWaypoint.getDepartureTime();

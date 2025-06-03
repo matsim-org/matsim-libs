@@ -33,18 +33,17 @@ public class CumulativeStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		// stop may have been shifted
+		double initialDuration = stop.getEndTime() - stop.getBeginTime();
+		double endTime = Math.max(stop.getEndTime(), insertionTime + initialDuration);
 
-		if (insertionTime > stop.getBeginTime()) {
-			// insertion has shifted the stop
-			double initialDuration = stop.getEndTime() - stop.getBeginTime();
-			return insertionTime + initialDuration + stopDuration;
-		} else {
-			// no shift, we simply add the new duration
-			return stop.getEndTime() + stopDuration;
-		}
+		// add dropoff
+		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		endTime += stopDuration;
+
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override

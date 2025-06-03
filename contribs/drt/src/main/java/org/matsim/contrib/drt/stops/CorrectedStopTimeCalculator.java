@@ -37,10 +37,13 @@ public class CorrectedStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		// adding a dropoff may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDuration);
+		// adding a dropoff does not change the end time, but the whole task may be
+		// shifted due to a previous pickup insertion
+		double beginTime = Math.max(insertionTime, stop.getBeginTime());
+		double endTime = beginTime + stopDuration;
+		return new Dropoff(endTime, beginTime);
 	}
 
 	@Override

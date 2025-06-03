@@ -376,7 +376,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 				// potentially extend task
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForDropoff(vehicleEntry.vehicle, stopTask,
-						now, request.getRequest()));
+						now, request.getRequest()).endTime());
 				scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
 						stopTask.getTaskIdx() + 1, stopTask.getEndTime());
 

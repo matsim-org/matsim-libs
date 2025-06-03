@@ -63,7 +63,7 @@ public interface StopTimeCalculator {
 	Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request);
 
 	// a dropoff is added to an existing stop
-	double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
+	Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
 
 	// the begin time of an existing stop is shifted
 	double shiftEndTime(DvrpVehicle vehicle, DrtStopTask stop, double beginTime);
