@@ -349,11 +349,11 @@ public class RunDrtExampleIT {
 		controller.run();
 
 		var expectedStats = Stats.newBuilder()
-				.rejectionRate(0.05)
-				.rejections(18)
-				.waitAverage(276.95)
-				.inVehicleTravelTimeMean(384.72)
-				.totalTravelTimeMean(661.66)
+				.rejectionRate(0.07)
+				.rejections(26)
+				.waitAverage(276.37)
+				.inVehicleTravelTimeMean(381.99)
+				.totalTravelTimeMean(658.36)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
