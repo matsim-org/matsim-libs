@@ -2,26 +2,27 @@ package org.matsim.application.analysis.accessibility;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
+import org.matsim.core.utils.gis.GeoFileWriter;
 import picocli.CommandLine;
-import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
-import tech.tablesaw.io.csv.CsvWriteOptions;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"%s/pois_simwrapper.csv"
+		"%s/pois.shp"
 	}
 )
 
@@ -44,6 +45,7 @@ public class PreparePois implements MATSimAppCommand {
 	private final InputOptions input = InputOptions.ofCommand(PreparePois.class);
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(PreparePois.class);
+	public SimpleFeatureBuilder builder;
 
 
 	public static void main(String[] args) {
@@ -52,6 +54,23 @@ public class PreparePois implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
+
+
+		// set up coordinate reference systems and transformations
+		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:25832", true);
+//		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true); // WGS84
+//		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
+
+		// set up shape file builder
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setCRS(sourceCRS); // this needs to happen before setting "the_geom" for Point.class
+		typeBuilder.setName("poi");
+		typeBuilder.add("the_geom", Point.class); // this geometry field must be named "the_geom" for GeoTools to recognize it
+		typeBuilder.add("ID",String.class);
+		typeBuilder.add("type",String.class);
+		builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+
+
 
 
 		Set<String> activityOptions = null;
@@ -66,10 +85,10 @@ public class PreparePois implements MATSimAppCommand {
 		}
 
 
-
 		for (String activityOption : activityOptions) {
-			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois_simwrapper.csv";
+			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois.shp";
 			String inputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois.csv";
+
 
 			try {
 				Path path = Path.of(outputPath);
@@ -95,24 +114,23 @@ public class PreparePois implements MATSimAppCommand {
 				// Read the CSV file into a Table object
 				Table table = Table.read().csv(options);
 
-//				table.removeColumns("id");
-				table.column("xcoord").setName("x");
-				table.column("ycoord").setName("y");
+				Collection<SimpleFeature> features = new ArrayList<>();
 
-				String comment = "# EPSG:25832\n";
+				for (int row = 0; row < table.rowCount(); row++) {
+					GeometryFactory geometryFactory = new GeometryFactory();
+					Point p = geometryFactory.createPoint(new Coordinate(table.doubleColumn("xcoord").get(row), table.doubleColumn("ycoord").get(row)));
 
-				try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
-					writer.write(comment);
-					table.write().csv(writer);
+//					Point wgs84Point = (Point) JTS.transform(p, transform);
+					features.add(builder.buildFeature(null, p, String.valueOf(row), activityOption));
+
 				}
 
+				GeoFileWriter.writeGeometries(features, outputPath);
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
-
 
 		return 0;
 	}

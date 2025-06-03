@@ -4,11 +4,10 @@ import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
 import org.matsim.application.analysis.accessibility.PreparePois;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
-import org.matsim.simwrapper.viz.ColorScheme;
-import org.matsim.simwrapper.viz.GridMap;
-import org.matsim.simwrapper.viz.Scatter;
-import org.matsim.simwrapper.viz.XYTime;
+import org.matsim.simwrapper.viz.*;
+import scala.util.parsing.combinator.testing.Str;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class AccessibilityDashboard implements Dashboard {
 	private final String coordinateSystem;
 	private final List<Modes4Accessibility> modes;
 
-	private final boolean equity = true;
+//	private final boolean equity = true;
 
 
 	/**
@@ -48,18 +47,17 @@ public class AccessibilityDashboard implements Dashboard {
 
 		for (String poi : pois) {
 
-			layout.row("pois-" + poi).el(XYTime.class, (viz, data) -> {
+
+
+			layout.row("pois-" + poi).el(MapPlot.class, ((viz, data) -> {
 				viz.title = "POIs: " + poi;
 				viz.description = "Shows points of interest of type " + poi;
-				viz.file = data.computeWithPlaceholder(PreparePois.class, "%s/pois_simwrapper.csv", poi);
-//				viz.width = 0.75;
-				viz.height = 12.;
-				viz.radius = 50;
-				viz.setColorRamp("Jet", 0, true);
-			});
+				viz.setShape(data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi));
+				viz.display.fill.fixedColors = new String[]{"#f28e2c"};
+
+			}));
 
 			layout.tab(poi).add("pois-" + poi);
-
 
 			for (Iterator<Modes4Accessibility> iterator = modes.iterator(); iterator.hasNext(); ) {
 				Modes4Accessibility modeLeft = iterator.next();
@@ -80,22 +78,22 @@ public class AccessibilityDashboard implements Dashboard {
 				layout.tab(poi).add(modeLeft.name() + "-" + poi);
 			}
 
-			if(equity) {
-				layout.row("scatter-" + poi).el(Scatter.class, (viz, data) -> {
-					viz.title = "PT Accessibility Vs. Income: " + poi;
-					viz.description = "... " + poi;
-
-					viz.dataset = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-					viz.x = "income";
-					viz.y = "pt_accessibility";
-					viz.xAxisName = "Income";
-					viz.yAxisName = "PT Accessibility";
-
-				});
-				layout.tab(poi).add("scatter-" + poi);
-
-
-			}
+//			if(equity) {
+//				layout.row("scatter-" + poi).el(Scatter.class, (viz, data) -> {
+//					viz.title = "PT Accessibility Vs. Income: " + poi;
+//					viz.description = "... " + poi;
+//
+//					viz.dataset = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
+//					viz.x = "income";
+//					viz.y = "pt_accessibility";
+//					viz.xAxisName = "Income";
+//					viz.yAxisName = "PT Accessibility";
+//
+//				});
+//				layout.tab(poi).add("scatter-" + poi);
+//
+//
+//			}
 
 
 
