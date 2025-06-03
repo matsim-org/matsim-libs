@@ -24,7 +24,7 @@ public class ConfigurableCostCalculatorStrategy implements CostCalculationStrate
 	}
 
 	private boolean checkHardInsertion(DrtRequest request, DetourTimeInfo detourTimeInfo) {
-		return detourTimeInfo.pickupDetourInfo.departureTime <= request.getLatestStartTime()
+		return detourTimeInfo.pickupDetourInfo.requestPickupTime <= request.getLatestStartTime()
 				&& detourTimeInfo.dropoffDetourInfo.requestDropoffTime <= request.getLatestArrivalTime();
 	}
 
@@ -33,7 +33,7 @@ public class ConfigurableCostCalculatorStrategy implements CostCalculationStrate
 			return 0.0;
 		} else {
 			double pickupDelay = Math.max(0,
-					detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
+					detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getLatestStartTime());
 
 			double dropoffDelay = Math.max(0,
 					detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getLatestArrivalTime());

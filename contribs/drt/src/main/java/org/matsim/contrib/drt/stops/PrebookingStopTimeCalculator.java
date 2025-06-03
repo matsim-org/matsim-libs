@@ -12,12 +12,13 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		double stopDuration = provider.calcPickupDuration(vehicle, request);
 
 		// pickup duration starts either at the earliest departure time or when stop
 		// beginning is planned
-		return Math.max(request.getEarliestStartTime(), beginTime) + stopDuration;
+		double endTime = Math.max(request.getEarliestStartTime(), beginTime) + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override

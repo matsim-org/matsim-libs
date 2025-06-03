@@ -17,9 +17,9 @@ public class CorrectedStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		// stop ends when pickup time has elapsed
-		return beginTime + stopDuration;
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		// pickup at the end of the stop
+		return new Pickup(beginTime + stopDuration, beginTime + stopDuration);
 	}
 
 	@Override

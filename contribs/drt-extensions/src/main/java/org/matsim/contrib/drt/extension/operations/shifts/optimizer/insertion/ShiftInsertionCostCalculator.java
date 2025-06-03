@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -63,6 +64,10 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 	 */
 	private double calculateStopEnd(DropoffDetourInfo info) {
 		return info.vehicleArrivalTime;
+	}
+
+	private double calculateStopEnd(PickupDetourInfo info) {
+		return info.vehicleDepartureTime;
 	}
 
 	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, DetourTimeInfo detourTimeInfo) {
@@ -164,7 +169,7 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				if(calculateStopEnd(detourTimeInfo.dropoffDetourInfo) < drtShiftBreak.getEarliestBreakStartTime()) {
 					// insertion finished before break corridor
 					//ok
-				} else if(detourTimeInfo.pickupDetourInfo.departureTime > drtShiftBreak.getLatestBreakEndTime()) {
+				} else if(calculateStopEnd(detourTimeInfo.pickupDetourInfo) > drtShiftBreak.getLatestBreakEndTime()) {
 					// insertion start after break corridor
 					//ok
 				} else {

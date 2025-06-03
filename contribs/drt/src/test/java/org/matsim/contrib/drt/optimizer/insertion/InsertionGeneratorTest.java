@@ -107,6 +107,7 @@ public class InsertionGeneratorTest {
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP);
 			var dropoff = new DropoffDetourInfo(start.time + pickup.pickupTimeLoss,
 				start.time + pickup.pickupTimeLoss, STOP_DURATION);
@@ -125,15 +126,17 @@ public class InsertionGeneratorTest {
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
-			var dropoff = new DropoffDetourInfo(pickup.departureTime + TIME_FROM_PICKUP,
-					pickup.departureTime + TIME_FROM_PICKUP,
+			var dropoff = new DropoffDetourInfo(pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
+					pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
 					STOP_DURATION + TIME_FROM_DROPOFF);
 			insertions.add(insertion(insertion, pickup, dropoff));
 		}
 		{//01
 			var insertion = new Insertion(drtRequest, entry, 0, 1);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
 			var dropoff = new DropoffDetourInfo(stop0.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
 					stop0.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
@@ -143,6 +146,7 @@ public class InsertionGeneratorTest {
 		{//11
 			var insertion = new Insertion(drtRequest, entry, 1, 1);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP);
 			var dropoff = new DropoffDetourInfo(stop0.getDepartureTime() + pickup.pickupTimeLoss, 
 					stop0.getDepartureTime() + pickup.pickupTimeLoss, STOP_DURATION);
@@ -161,6 +165,7 @@ public class InsertionGeneratorTest {
 		{//11
 			var insertion = new Insertion(drtRequest, entry, 1, 1);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP);
 			var dropoff = new DropoffDetourInfo(stop0.getDepartureTime() + pickup.pickupTimeLoss, 
 					stop0.getDepartureTime() + pickup.pickupTimeLoss, STOP_DURATION);
@@ -180,15 +185,17 @@ public class InsertionGeneratorTest {
 		{//00
 			var insertion = new Insertion(drtRequest, entry, 0, 0);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
-			var dropoff = new DropoffDetourInfo(pickup.departureTime + TIME_FROM_PICKUP,
-					pickup.departureTime + TIME_FROM_PICKUP,
+			var dropoff = new DropoffDetourInfo(pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
+					pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
 					STOP_DURATION + TIME_FROM_DROPOFF);
 			insertions.add(insertion(insertion, pickup, dropoff));
 		}
 		{//01
 			var insertion = new Insertion(drtRequest, entry, 0, 1);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
 			var dropoff = new DropoffDetourInfo(stop0.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
 					stop0.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
@@ -198,6 +205,7 @@ public class InsertionGeneratorTest {
 		{//02
 			var insertion = new Insertion(drtRequest, entry, 0, 2);
 			var pickup = new PickupDetourInfo(start.time + TIME_TO_PICKUP + STOP_DURATION,
+					start.time + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
 			var dropoff = new DropoffDetourInfo(stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
 					stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
@@ -207,15 +215,17 @@ public class InsertionGeneratorTest {
 		{//11
 			var insertion = new Insertion(drtRequest, entry, 1, 1);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
-			var dropoff = new DropoffDetourInfo(pickup.departureTime + TIME_FROM_PICKUP,
-					pickup.departureTime + TIME_FROM_PICKUP,
+			var dropoff = new DropoffDetourInfo(pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
+					pickup.vehicleDepartureTime + TIME_FROM_PICKUP,
 					STOP_DURATION + TIME_FROM_DROPOFF);
 			insertions.add(insertion(insertion, pickup, dropoff));
 		}
 		{//12
 			var insertion = new Insertion(drtRequest, entry, 1, 2);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
 			var dropoff = new DropoffDetourInfo(stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
 					stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
@@ -225,6 +235,7 @@ public class InsertionGeneratorTest {
 		{//22
 			var insertion = new Insertion(drtRequest, entry, 2, 2);
 			var pickup = new PickupDetourInfo(stop1.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop1.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP);
 			var dropoff = new DropoffDetourInfo(stop1.getDepartureTime() + pickup.pickupTimeLoss, 
 					stop1.getDepartureTime() + pickup.pickupTimeLoss, STOP_DURATION);
@@ -252,6 +263,7 @@ public class InsertionGeneratorTest {
 		{//12
 			var insertion = new Insertion(drtRequest, entry, 1, 2);
 			var pickup = new PickupDetourInfo(stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop0.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP - TIME_REPLACED_DRIVE);
 			var dropoff = new DropoffDetourInfo(stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
 					stop1.getDepartureTime() + pickup.pickupTimeLoss + TIME_TO_DROPOFF,
@@ -261,6 +273,7 @@ public class InsertionGeneratorTest {
 		{//22
 			var insertion = new Insertion(drtRequest, entry, 2, 2);
 			var pickup = new PickupDetourInfo(stop1.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
+					stop1.getDepartureTime() + TIME_TO_PICKUP + STOP_DURATION,
 					TIME_TO_PICKUP + STOP_DURATION + TIME_FROM_PICKUP);
 			var dropoff = new DropoffDetourInfo(stop1.getDepartureTime() + pickup.pickupTimeLoss, 
 					stop1.getDepartureTime() + pickup.pickupTimeLoss, STOP_DURATION);

@@ -88,7 +88,7 @@ public class InsertionDistanceCalculator {
 		double beforePickupDistance = distanceEstimator
 				.calculateDistance(insertion.pickup.previousWaypoint.getDepartureTime(), pickupFromLink, pickupNewLink);
 
-		double afterPickupDistance = distanceEstimator.calculateDistance(detourTimeInfo.pickupDetourInfo.departureTime,
+		double afterPickupDistance = distanceEstimator.calculateDistance(detourTimeInfo.pickupDetourInfo.vehicleDepartureTime,
 				pickupNewLink, pickupToLink);
 
 		addedDistances.add(new DistanceEntry(beforePickupDistance, beforePickupOccupancy));

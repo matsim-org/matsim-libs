@@ -92,7 +92,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	@Override
 	public PickupDropoffTaskPair scheduleRequest(AcceptedDrtRequest request, InsertionWithDetourData insertion) {
 		var pickupTask = insertPickup(request, insertion);
-		verifyTimes("Inconsistent pickup departure time", insertion.detourTimeInfo.pickupDetourInfo.departureTime,
+		verifyTimes("Inconsistent pickup departure time", insertion.detourTimeInfo.pickupDetourInfo.vehicleDepartureTime,
 				pickupTask.getEndTime());
 
 		var dropoffTask = insertDropoff(request, insertion, pickupTask);
@@ -303,7 +303,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 		// insert pickup stop task
 		int taskIdx = beforePickupTask.getTaskIdx() + 1;
-		double stopEndTime = stopTimeCalculator.initEndTimeForPickup(vehicleEntry.vehicle, beforePickupTask.getEndTime(), request.getRequest());
+		double stopEndTime = stopTimeCalculator.initEndTimeForPickup(vehicleEntry.vehicle, beforePickupTask.getEndTime(), request.getRequest()).endTime();
 		DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, beforePickupTask.getEndTime(),
 				stopEndTime, request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);

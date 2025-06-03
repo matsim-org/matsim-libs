@@ -12,9 +12,10 @@ public class CumulativeStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// pickup takes the indicated duration
-		return beginTime + provider.calcPickupDuration(vehicle, request);
+		double endTime = beginTime + provider.calcPickupDuration(vehicle, request);
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override

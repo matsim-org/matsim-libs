@@ -305,14 +305,16 @@ public class VariableStopDurationTest {
 		 * 
 		 * - Same concept for the wait time
 		 */
-		double maximumWaitTime = 315.0;
+		double maximumWaitTime = 266.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.setVehicleCapacity(1) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
@@ -325,67 +327,83 @@ public class VariableStopDurationTest {
 		controller.run();
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertEquals(1310.0, requestA.pickupTime, 1e-3);
-
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
+
+		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
+		assertTrue(Double.isFinite(requestB.pickupTime)); // expecting acceptance
+
 		assertEquals(1125.0, requestB.pickupTime, 1e-3);
+		assertEquals(1228.0, requestB.dropoffTime, 1e-3);
+
+		assertEquals(1310.0, requestA.pickupTime, 1e-3);
+		assertEquals(1413.0, requestA.dropoffTime, 1e-3);
 	}
 
-	@Test // FAILING
+	@Test
 	void twoSequentialRequestsPushingPickupViaIncreasingDropoff() {
 		// see above
-		double maximumWaitTime = 315.0;
+		double maximumWaitTime = 266.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.setVehicleCapacity(1) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0, 60.0 + 1.0) //
+				.define("personB", 60.0, 60.0 + 1.0) // ONE SECOND MORE
 				.install(controller);
 
 		controller.run();
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertEquals(1311.0, requestA.pickupTime, 1e-3); // expecting no delay
-
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
+
+		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
 		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+
+		assertEquals(1188.0, requestA.pickupTime, 1e-3);
+		assertEquals(1291.0, requestA.dropoffTime, 1e-3);
 	}
 
-	@Test // FAILING
+	@Test
 	void twoSequentialRequestsPushingPickupViaIncreasingPickup() {
 		// see above
-		double maximumWaitTime = 315.0;
+		double maximumWaitTime = 266.0;
 
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(maximumWaitTime, 1.0, 1000.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 6, 0, 8, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.endTime(10.0 * 3600.0);
+				.endTime(10.0 * 3600.0) //
+				.setVehicleCapacity(1) //
+				.useExactTravelTimeEstimates();
 
 		Controler controller = environment.build();
 		prepare(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
-				.define("personB", 60.0 + 1.0, 60.0) //
+				.define("personB", 60.0 + 1.0, 60.0) // ONE SECOND MORE
 				.install(controller);
 
 		controller.run();
 
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
-		assertEquals(1310.0, requestA.pickupTime, 1e-3); // expecting no delay
-
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
+
+		assertTrue(Double.isFinite(requestA.pickupTime)); // expecting acceptance
 		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+
+		assertEquals(1188.0, requestA.pickupTime, 1e-3);
+		assertEquals(1291.0, requestA.dropoffTime, 1e-3);
 	}
 }
