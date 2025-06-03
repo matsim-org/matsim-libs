@@ -286,7 +286,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 */
 	@SuppressWarnings("SameParameterValue")
 	private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
-		log.info("create LSP");
+		log.info("create LSP with 2 chains: direct and two-echelon");
 		//Chains
 		LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect);
 		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun);
@@ -439,7 +439,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * @return the LSP
 	 */
 	private static LSP createLspWithDirectChain(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
-		log.info("create LSP");
+		log.info("create LSP with direct chain");
 
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
 			.addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))

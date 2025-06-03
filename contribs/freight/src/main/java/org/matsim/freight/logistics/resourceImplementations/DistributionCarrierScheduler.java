@@ -35,6 +35,7 @@ import org.matsim.freight.carriers.Tour.Leg;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
+import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
@@ -156,8 +157,7 @@ import org.matsim.vehicles.VehicleType;
 			VehicleType vehicleType = ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + lspShipment.getSize()) > vehicleType.getCapacity().getOther().intValue()) {
 				load = 0;
-				Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(
-					createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
+				Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
 				scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 				carrier.getServices().putAll(auxiliaryCarrier.getServices());
 				cumulatedLoadingTime = 0;
@@ -221,11 +221,11 @@ import org.matsim.vehicles.VehicleType;
 		ccBuilder.setFleetSize(FleetSize.INFINITE);
 
 		//copy all vehicles from the original carrier to the auxiliary carrier.
-		var startTime = 0.0; //Todo: set to something meaningful, e.g. arrivalTime of the first shipment.
+		//Todo: maybe add a warning somewhere if time window does not match to the arrival of the LspShipments?
 		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			var cv = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
-				.setEarliestStart(startTime)
-				.setLatestEnd(24 * 60 * 60)
+				.setEarliestStart(carrierVehicle.getEarliestStartTime())
+				.setLatestEnd(carrierVehicle.getLatestEndTime())
 				.build();
 			ccBuilder.addVehicle(cv);
 		}
@@ -234,9 +234,7 @@ import org.matsim.vehicles.VehicleType;
 
 		//add all shipments.
 		for (LspShipment lspShipment : shipmentsToSchedule) {
-			CarrierShipment carrierShipment = convertToCarrierShipment(lspShipment);
-			auxCarrier.getShipments().put(carrierShipment.getId(), carrierShipment);
-			CarriersUtils.addShipment(auxCarrier, carrierShipment);
+			CarriersUtils.addShipment(auxCarrier, convertToCarrierShipment(lspShipment));
 		}
 
 		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
@@ -276,12 +274,12 @@ import org.matsim.vehicles.VehicleType;
 	 */
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
 		Id<CarrierShipment> carrierShipmentId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
-		var lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
+		LspShipmentPlan lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
+		assert lspShipmentPlan != null;
 		LspShipmentPlanElement latestEntry = lspShipmentPlan.getMostRecentEntry();
-		var ressourceIdOfLatestEntry = latestEntry.getResourceId();
+		Id<LSPResource> ressourceIdOfLatestEntry = latestEntry.getResourceId();
 
 		Id<Link> fromLinkId = null;
-
 		// Since this is a shipment, the carrier would want to pick it up at its overall origin.  However, the shipment may already be at an intermediate hub.
 		// "getMostRecentEntry()" (see above) works since we are in the process of constructing the plan.  Possible, latestEntry might already
 		// directly contain the necessary information.
@@ -293,15 +291,14 @@ import org.matsim.vehicles.VehicleType;
 			}
 		}
 
-
-		if (fromLinkId == null) { // Not comming from a hub... use from location of the shipment. TODO: Can this happen?
+		if (fromLinkId == null) { // Not coming from a hub... use from location of the shipment. TODO: Can this happen?
 			fromLinkId = lspShipment.getFrom();
 		}
-	//	Id<Link> fromLinkId = lspShipment.getFrom(); //Todo: needs to be the hub, if there is one. KMT mar'25
 
 		assert fromLinkId != null;
 		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
-			//TODO TimeWindows are not set. This seems to be a problem. KMT'Aug'24
+			.setPickupStartingTimeWindow(TimeWindow.newInstance(latestEntry.getEndTime(), Double.MAX_VALUE)) //Can be picked up at hub once its handling there is done.
+			.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
 			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
 			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 			.build();
