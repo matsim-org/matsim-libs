@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
+import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreatorForOSM_Data;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
@@ -51,7 +52,7 @@ public class TripDistributionMatrixTest {
 	@Test
 	void testTripDistributionCommercialPersonTrafficTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
@@ -137,13 +138,14 @@ public class TripDistributionMatrixTest {
 				}
 			}
 		}
+		Assertions.assertTrue(sumStopServices != 0 && sumStartServices != 0);
 		Assertions.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
 	void testTripDistributionGoodsTraffic() throws IOException {
 
-		Map<String, List<String>> landuseCategoriesAndDataConnection = new HashMap<>();
+		Map<String, List<String>> landuseCategoriesAndDataConnection = new LanduseDataConnectionCreatorForOSM_Data().createLanduseDataConnection();
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
@@ -233,6 +235,7 @@ public class TripDistributionMatrixTest {
 				}
 			}
 		}
+		Assertions.assertTrue(sumStopServices != 0 && sumStartServices != 0);
 		Assertions.assertEquals(sumStartServices, sumStopServices, MatsimTestUtils.EPSILON);
 	}
 }

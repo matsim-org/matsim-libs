@@ -140,7 +140,7 @@ public final class CarrierModule extends AbstractModule {
 		CarriersUtils.writeCarriers( carriers, controllerIO.getOutputFilename("output_carriers.xml" + compression));
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
 		if (!carriers.getCarriers().isEmpty() && config.controller().getDumpDataAtEnd()) {
-			CarriersAnalysis carriersAnalysis = new CarriersAnalysis(controllerIO.getOutputPath(), config.controller().getRunId());
+			CarriersAnalysis carriersAnalysis = new CarriersAnalysis(controllerIO.getOutputPath());
 			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
 		}
 	}

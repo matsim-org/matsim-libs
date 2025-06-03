@@ -26,6 +26,10 @@ public final class TasteVariationsConfigParameterSet extends ReflectiveConfigGro
 	@Comment("List of utility parameters that are loaded from each person.")
 	private Set<ModeUtilityParameters.Type> variationsOf = Set.of();
 
+	@Parameter
+	@Comment("List of subpopulations for which no variations will be applied.")
+	private Set<String> excludeSubpopulations = Set.of();
+
 	public TasteVariationsConfigParameterSet() {
 		super(SET_TYPE);
 	}
@@ -44,6 +48,14 @@ public final class TasteVariationsConfigParameterSet extends ReflectiveConfigGro
 
 	public void setVariationsOf(Set<ModeUtilityParameters.Type> variationsOf) {
 		this.variationsOf = variationsOf;
+	}
+
+	public Set<String> getExcludeSubpopulations() {
+		return excludeSubpopulations;
+	}
+
+	public void setExcludeSubpopulations(Set<String> excludeSubpopulations) {
+		this.excludeSubpopulations = excludeSubpopulations;
 	}
 
 	/**

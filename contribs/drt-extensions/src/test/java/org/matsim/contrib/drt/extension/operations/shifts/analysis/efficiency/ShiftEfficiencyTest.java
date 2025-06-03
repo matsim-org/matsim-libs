@@ -50,11 +50,11 @@ public class ShiftEfficiencyTest {
 		Id<DvrpVehicle> vehicle1 = Id.create("vehicle1", DvrpVehicle.class);
 		Id<OperationFacility> operationFacility1 = Id.create("operationFacility1", OperationFacility.class);
 
-		events.processEvent(new DrtShiftStartedEvent(10 * 3600, "drt", shift1, vehicle1, link1)
+		events.processEvent(new DrtShiftStartedEvent(10 * 3600, "drt", shift1, vehicle1, link1, null)
 		);
 		// should throw because vehicle is already registered with another shift
 		Assertions.assertThrows(RuntimeException.class, () -> {
-			events.processEvent(new DrtShiftStartedEvent(10 * 3600, "drt", shift1, vehicle1, link1));
+			events.processEvent(new DrtShiftStartedEvent(10 * 3600, "drt", shift1, vehicle1, link1, null));
 		});
 
 		Id<Request> request1 = Id.create("request1", Request.class);
@@ -69,7 +69,7 @@ public class ShiftEfficiencyTest {
 		Assertions.assertEquals(FARE, shiftEfficiencyTracker.getCurrentRecord().getRevenueByShift().get(shift1), MatsimTestUtils.EPSILON);
 
 		Assertions.assertFalse(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
-		events.processEvent(new DrtShiftEndedEvent(20 * 3600, "drt", shift1, vehicle1, link1, operationFacility1));
+		events.processEvent(new DrtShiftEndedEvent(20 * 3600, "drt", shift1, vehicle1, link1, operationFacility1, null));
 		Assertions.assertTrue(shiftEfficiencyTracker.getCurrentRecord().getFinishedShifts().containsKey(shift1));
 	}
 }

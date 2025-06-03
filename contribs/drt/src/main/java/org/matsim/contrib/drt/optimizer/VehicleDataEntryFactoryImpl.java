@@ -99,7 +99,7 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 		for (int i = stops.length - 1; i >= 0; i--) {
 			if(stopTasks.get(i) instanceof DrtCapacityChangeTask capacityChangeTask) {
-				assert outgoingOccupancy.isEmpty();
+				assert outgoingOccupancy.isEmpty() : "occupancy SHOULD be empty at this point.";
 				outgoingOccupancy = loadType.getEmptyLoad();
 				stops[i] = new Waypoint.Stop(capacityChangeTask, loadType);
 			} else {

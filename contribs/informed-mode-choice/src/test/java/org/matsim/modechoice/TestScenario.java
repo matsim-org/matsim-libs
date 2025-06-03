@@ -23,7 +23,7 @@ import org.matsim.modechoice.estimators.PtTripEstimator;
 import org.matsim.testcases.MatsimTestUtils;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;

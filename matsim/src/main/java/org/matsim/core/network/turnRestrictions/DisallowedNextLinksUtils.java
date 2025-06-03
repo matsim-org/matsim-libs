@@ -71,10 +71,22 @@ public final class DisallowedNextLinksUtils {
 	public static void clean(Network network) {
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
 
+		Set<Id<Link>> loopLinkIds = links.values().stream()
+				.filter(link -> link.getFromNode().getId().equals(link.getToNode().getId()))
+				.map(Link::getId)
+				.collect(Collectors.toSet());
+
 		links.values().forEach(link -> {
 
 			DisallowedNextLinks dnl = NetworkUtils.getDisallowedNextLinks(link);
 			if (dnl == null) {
+				return;
+			}
+
+			// remove dnls on loop links
+			if (loopLinkIds.contains(link.getId())) {
+				NetworkUtils.removeDisallowedNextLinks(link);
+				LOG.info("Link {}: removed disallowed next link sequences from loop link", link.getId());
 				return;
 			}
 
@@ -104,13 +116,18 @@ public final class DisallowedNextLinksUtils {
 								.map(links::get)
 								.map(Link::getAllowedModes)
 								.allMatch(allowedModes -> allowedModes.contains(mode)))
+						// remove loop links from sequences
+						.map(linkIds -> linkIds.stream()
+								.filter(linkId -> !loopLinkIds.contains(linkId))
+								.toList())
+						.filter(linkIds -> !linkIds.isEmpty())
 						.toList();
 
 				// update mode with valid link sequences
-				final int invalidLinkSequencesCount = linkSequences.size() - validLinkSequences.size();
+				dnl.removeDisallowedLinkSequences(mode);
+				validLinkSequences.forEach(linkIds -> dnl.addDisallowedLinkSequence(mode, linkIds));
+				int invalidLinkSequencesCount = linkSequences.size() - validLinkSequences.size();
 				if (invalidLinkSequencesCount > 0) {
-					dnl.removeDisallowedLinkSequences(mode);
-					validLinkSequences.forEach(linkIds -> dnl.addDisallowedLinkSequence(mode, linkIds));
 					LOG.info("Link {}: Removed {} disallowed next link sequences for mode {}",
 							link.getId(), invalidLinkSequencesCount, mode);
 				}

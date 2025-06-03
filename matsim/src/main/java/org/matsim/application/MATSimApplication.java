@@ -16,7 +16,7 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

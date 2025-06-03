@@ -57,9 +57,7 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 	}
 
 	private double computeAvgIncome(Population population, String subpopulation) {
-		log.info("reading income attribute using " + PersonUtils.class + " of all agents and compute global average.\n" +
-			"Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
-			"Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMoney in their subpopulation's scoring params..");
+		log.info("reading income attribute using {} of all agents and compute global average.\nMake sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \nIncome values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMoney in their subpopulation's scoring params..", PersonUtils.class);
 		OptionalDouble averageIncome = population.getPersons().values().stream()
 			//consider only agents that have a specific income provided
 			.filter(person -> PersonUtils.getIncome(person) != null)
@@ -68,12 +66,13 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 			.filter(dd -> dd >= 0)
 			.average();
 
+		log.info("average income for {} is {}", subpopulation, averageIncome);
+
 		if (averageIncome.isEmpty()) {
 			throw new RuntimeException("you have enabled income dependent scoring but there is not a single income attribute in the population! " +
 				"If you are not aiming for person-specific marginalUtilityOfMoney, better use other PersonScoringParams, e.g. SubpopulationPersonScoringParams, which have higher performance." +
 				"Otherwise, please provide income attributes in the population...");
 		} else {
-			log.info("average income for {} is {}", subpopulation, averageIncome);
 			return averageIncome.getAsDouble();
 		}
 	}
@@ -118,9 +117,15 @@ public class IndividualPersonScoringParameters implements ScoringParametersForPe
 
 			TasteVariationsConfigParameterSet tasteVariationsParams = scoringParameters.getTasteVariationsParams();
 
-			// If there are no taste variations the parameters are ready
+			// If there is no taste variation config the parameters are ready
 			if (tasteVariationsParams == null)
 				return builder.build();
+
+			// Ignore subpopulation if specified
+			if (tasteVariationsParams.getExcludeSubpopulations() != null &&
+				tasteVariationsParams.getExcludeSubpopulations().contains(subPopKey)) {
+				return builder.build();
+			}
 
 			Double personalIncome = PersonUtils.getIncome(person);
 			double refIncome = tasteVariationsParams.getIncomeExponent() > 0 ? avgIncome.computeIfAbsent(subPopKey, (k) -> computeAvgIncome(scenario.getPopulation(), subpopulation)) : Double.NaN;
