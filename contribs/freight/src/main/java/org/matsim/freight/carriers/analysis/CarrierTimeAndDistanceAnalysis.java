@@ -55,9 +55,9 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourStartEventHandler, CarrierTourEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+/*package-private*/ class CarrierTimeAndDistanceAnalysis implements CarrierTourStartEventHandler, CarrierTourEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private final static Logger log = LogManager.getLogger(FreightTimeAndDistanceAnalysisEventsHandler.class);
+	private final static Logger log = LogManager.getLogger(CarrierTimeAndDistanceAnalysis.class);
 	private final String delimiter;
 
 	private final Scenario scenario;
@@ -80,7 +80,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	private final Map<Id<Vehicle>, Double> vehicleEnteredLinkTime = new LinkedHashMap<>();
 
 
-	public FreightTimeAndDistanceAnalysisEventsHandler(String delimiter, Scenario scenario) {
+	/*package-private*/ CarrierTimeAndDistanceAnalysis(String delimiter, Scenario scenario) {
 		this.delimiter = delimiter;
 		this.scenario = scenario;
 	}
@@ -131,7 +131,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 	//If the vehicle leaves a link at the end, the travelTime is calculated and stored.
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		// nessessary if non-carrier vehicles are in the simulation
+		// necessary if non-carrier vehicles are in the simulation
 		if (!vehicleId2CarrierId.containsKey(event.getVehicleId()))
 			return;
 		final Id<Vehicle> vehicleId = event.getVehicleId();
@@ -164,7 +164,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		}
 	}
 
-	void writeTravelTimeAndDistancePerCarrier(String analysisOutputDirectory, Scenario scenario) {
+	/*package-private*/ void writeTravelTimeAndDistancePerCarrier(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perCarrier");
 		//Travel time and distance per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perCarrier.tsv").toString();
@@ -237,7 +237,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		}
 	}
 
-	void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) {
+	/*package-private*/ void writeTravelTimeAndDistancePerVehicle(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perVehicle");
 		//Travel time and distance per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("TimeDistance_perVehicle.tsv").toString();
@@ -310,7 +310,7 @@ public class FreightTimeAndDistanceAnalysisEventsHandler implements CarrierTourS
 		}
 	}
 
-	void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) {
+	/*package-private*/ void writeTravelTimeAndDistancePerVehicleType(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out Time & Distance & Costs ... perVehicleType");
 
 		//----- All VehicleTypes in CarrierVehicleTypes container. Used so that even unused vehTypes appear in the output

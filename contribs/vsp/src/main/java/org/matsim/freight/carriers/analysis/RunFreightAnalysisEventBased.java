@@ -114,9 +114,9 @@ public class RunFreightAnalysisEventBased {
 		// Prepare eventsManager - start of event based Analysis;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		FreightTimeAndDistanceAnalysisEventsHandler freightTimeAndDistanceAnalysisEventsHandler =
-				new FreightTimeAndDistanceAnalysisEventsHandler(delimiter, scenario);
-		eventsManager.addHandler(freightTimeAndDistanceAnalysisEventsHandler);
+		CarrierTimeAndDistanceAnalysis carrierTimeAndDistanceAnalysis =
+				new CarrierTimeAndDistanceAnalysis(delimiter, scenario);
+		eventsManager.addHandler(carrierTimeAndDistanceAnalysis);
 
 		CarrierLoadAnalysis carrierLoadAnalysis = new CarrierLoadAnalysis(delimiter);
 		eventsManager.addHandler(carrierLoadAnalysis);
@@ -129,9 +129,9 @@ public class RunFreightAnalysisEventBased {
 
 		log.info("Analysis completed.");
 		log.info("Writing output...");
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicle(analysisOutputDirectory, scenario);
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
-		freightTimeAndDistanceAnalysisEventsHandler.writeTravelTimeAndDistancePerCarrier(analysisOutputDirectory, scenario);
+		carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicle(analysisOutputDirectory, scenario);
+		carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerVehicleType(analysisOutputDirectory, scenario);
+		carrierTimeAndDistanceAnalysis.writeTravelTimeAndDistancePerCarrier(analysisOutputDirectory, scenario);
 		CarrierPlanAnalysis carrierPlanAnalysis = new CarrierPlanAnalysis(delimiter, CarriersUtils.getCarriers(scenario));
 		carrierPlanAnalysis.runAnalysisAndWriteStats(analysisOutputDirectory, CarriersAnalysis.CarrierAnalysisType.carriersPlans);
 
