@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -356,10 +355,10 @@ public class SecondReloadLSPSchedulingTest {
 		{
 			assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 			ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-			TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+			assertInstanceOf(TransshipmentHubEventHandler.class, eventHandlers.getFirst());
+			TransshipmentHubEventHandler reloadEventHandler = (TransshipmentHubEventHandler) eventHandlers.getFirst();
 
-			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+			for (Entry<CarrierService, TransshipmentHubEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
@@ -386,11 +385,11 @@ public class SecondReloadLSPSchedulingTest {
 			assertEquals(1, secondTranshipmentHubResource.getSimulationTrackers().size());
 			ArrayList<EventHandler> eventHandlers =
 				new ArrayList<>(secondTranshipmentHubResource.getSimulationTrackers());
-			assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-			TransshipmentHubTourEndEventHandler reloadEventHandler =
-				(TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+			assertInstanceOf(TransshipmentHubEventHandler.class, eventHandlers.getFirst());
+			TransshipmentHubEventHandler reloadEventHandler =
+				(TransshipmentHubEventHandler) eventHandlers.getFirst();
 
-			for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+			for (Entry<CarrierService, TransshipmentHubEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 				CarrierService service = entry.getKey();
 				LspShipment shipment = entry.getValue().lspShipment;
 				LogisticChainElement element = entry.getValue().logisticChainElement;
@@ -443,8 +442,8 @@ public class SecondReloadLSPSchedulingTest {
 			}
 
 			{//CollectionServiceEnd
-				assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
-				CollectionServiceEndEventHandler collectionServiceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
+				assertInstanceOf(CollectionJobEventHandler.class, eventHandlers.get(1));
+				CollectionJobEventHandler collectionServiceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
 				CarrierService carrierService = (CarrierService) collectionServiceHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());

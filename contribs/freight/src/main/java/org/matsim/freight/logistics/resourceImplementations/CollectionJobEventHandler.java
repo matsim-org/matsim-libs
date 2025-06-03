@@ -36,7 +36,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
-/*package-private*/ class CollectionServiceEndEventHandler
+/*package-private*/ class CollectionJobEventHandler
     implements AfterMobsimListener,
         CarrierServiceEndEventHandler,
         LSPSimulationTracker<LspShipment> {
@@ -46,7 +46,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
 
-  public CollectionServiceEndEventHandler(
+  public CollectionJobEventHandler(
       CarrierService carrierService,
       LspShipment lspShipment,
       LogisticChainElement element,

@@ -444,15 +444,15 @@ import org.matsim.vehicles.VehicleType;
 	private void addDistributionEventHandlers(Tour.TourActivity tourActivity, LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				DistributionServiceStartEventHandler serviceHandler;
+				DistributionJobEventHandler serviceHandler;
 				LSPTourStartEventHandler tourHandler;
 				switch (tourActivity) {
 					case Tour.ServiceActivity serviceActivity -> {
-						serviceHandler = new DistributionServiceStartEventHandler(serviceActivity.getService(), lspShipment, element, resource);
+						serviceHandler = new DistributionJobEventHandler(serviceActivity.getService(), lspShipment, element, resource);
 						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
 					}
 					case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-						serviceHandler = new DistributionServiceStartEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
+						serviceHandler = new DistributionJobEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
 						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
 					}
 					default -> throw new IllegalStateException("Unexpected value: " + tourActivity);

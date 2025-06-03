@@ -167,7 +167,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, lspShipment, element, resource);
+				CollectionJobEventHandler endHandler = new CollectionJobEventHandler(carrierService, lspShipment, element, resource);
 				lspShipment.addSimulationTracker(endHandler);
 				break;
 			}

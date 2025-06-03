@@ -319,10 +319,10 @@ public class MainRunLSPSchedulingTest {
 
 		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+		assertInstanceOf(TransshipmentHubEventHandler.class, eventHandlers.getFirst());
+		TransshipmentHubEventHandler reloadEventHandler = (TransshipmentHubEventHandler) eventHandlers.getFirst();
 
-		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+		for (Entry<CarrierService, TransshipmentHubEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LspShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().logisticChainElement;
@@ -371,8 +371,8 @@ public class MainRunLSPSchedulingTest {
 			}
 
 			{//CollectionServiceEnd
-				assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
-				CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
+				assertInstanceOf(CollectionJobEventHandler.class, eventHandlers.get(1));
+				CollectionJobEventHandler serviceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
 				CarrierService carrierService = serviceHandler.getCarrierService();
 				assertSame(carrierService.getServiceLinkId(), shipment.getFrom());
 				assertEquals(carrierService.getCapacityDemand(), shipment.getSize());
