@@ -55,6 +55,7 @@ public class OsmTags {
 	public static final String USAGE = "usage";
 	public static final String GAUGE = "gauge";
 	public static final String ELECTRIFIED = "electrified";
+	public static final String VOLTAGE = "voltage";
 	public static final String ETCS = "etcs";
 	public static final String OPERATOR = "operator";
 

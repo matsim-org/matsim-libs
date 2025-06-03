@@ -31,7 +31,9 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * @author ricoraber
- * Rebalancing is done based on the relative demand in the zones.
+ * Within the min cost flow problem, alpha * target(z) + beta vehicles are sent to zone z (if possible).
+ * That is, first, beta vehicles are sent to each zone.
+ * Afterward, we apply rebalancing based on relative demand in the zones for the remaining rebalancable vehicles:
  * If there are more rebalancable vehicles than demand, then the target per zone is simply the demand in that zone.
  * If there are less rebalancable vehicles than demand, then we compute the relative demand per zone: w(zone) = demand(zone) / totalDemand,
  * and the target per zone is target(zone) = w(zone) * number of rebalancable vehicles.
@@ -40,17 +42,21 @@ public class RelativeDemandEstimatorAsTargetCalculator implements RebalancingTar
 	private final ZonalDemandEstimator demandEstimator;
 	private final ZoneSystem zonalSystem;
 	private final double demandEstimationPeriod;
+	private final double beta;
 
-	public RelativeDemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator,	ZoneSystem zonalSystem, double demandEstimationPeriod) {
+	public RelativeDemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator,	ZoneSystem zonalSystem, double demandEstimationPeriod, double beta) {
 		this.demandEstimator = demandEstimator;
 		this.demandEstimationPeriod = demandEstimationPeriod;
 		this.zonalSystem = zonalSystem;
+		this.beta = beta;
 	}
 
 	@Override
 	public ToDoubleFunction<Zone> calculate(double time,
 											Map<Zone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
+		int rebalancableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
+		int numZones = zonalSystem.getZones().size();
+		double remainingVehicles = Math.max(0, rebalancableVehicles - numZones * beta); // How many vehicles are left after sending beta vehicles to each zone
 		ToDoubleFunction<Zone> demandPerZone = demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
 		double totalDemand = zonalSystem.getZones().values().stream()
 				.mapToDouble(demandPerZone)
@@ -59,7 +65,7 @@ public class RelativeDemandEstimatorAsTargetCalculator implements RebalancingTar
 			if (totalDemand > 0) {
 				double demand = demandPerZone.applyAsDouble(zone);
 				double relativeDemand = demand / totalDemand;
-				double targetVehicles = relativeDemand * numAvailableVehicles;
+				double targetVehicles = relativeDemand * remainingVehicles;
 				return Math.min(demand, targetVehicles); // do not send more vehicles than demanded trips
 			} else {
 				return 0;

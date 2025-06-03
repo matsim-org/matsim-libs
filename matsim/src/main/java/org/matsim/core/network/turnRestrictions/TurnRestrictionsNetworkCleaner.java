@@ -187,16 +187,22 @@ public class TurnRestrictionsNetworkCleaner {
         for (Map.Entry<Id<Link>, TurnRestrictionsContext.ColoredLink> idColoredLinkEntry : turnRestrictions.replacedLinks.entrySet()) {
             Link link = network.getLinks().get(idColoredLinkEntry.getValue().link.getId());
             List<Id<Link>> currentPath = new ArrayList<>();
+            Set<Id<Link>> visitedLinkIds = new HashSet<>();
             if (idColoredLinkEntry.getValue().toNode != null) {
                 throw new RuntimeException("Shouldn't happen");
             } else {
-                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions, mode);
+                advance(idColoredLinkEntry.getValue(), currentPath, link, network, turnRestrictions, mode, visitedLinkIds);
             }
         }
     }
 
     private void advance(TurnRestrictionsContext.ColoredLink coloredLink, List<Id<Link>> currentPath,
-                         Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions, String mode) {
+            Link replacedStartLink, Network network, TurnRestrictionsContext turnRestrictions, String mode,
+            Set<Id<Link>> visitedLinkIds) {
+
+        if (!visitedLinkIds.add(coloredLink.link.getId())) {
+            return; // already visited
+        }
 
         if (!network.getLinks().containsKey(coloredLink.link.getId())) {
             // link sequence is not part of the network anymore and doesn't need to be explored.
@@ -244,11 +250,13 @@ public class TurnRestrictionsNetworkCleaner {
                 List<Id<Link>> nextPath = new ArrayList<>(currentPath);
                 nextPath.add(link.link.getId());
                 if (turnRestrictions.replacedLinks.containsKey(link.link.getId())) {
-                    return;
+                    continue;
                 }
-                advance(link, nextPath, replacedStartLink, network, turnRestrictions, mode);
+                advance(link, nextPath, replacedStartLink, network, turnRestrictions, mode, visitedLinkIds);
             }
         }
+
+        visitedLinkIds.remove(coloredLink.link.getId());
     }
 
     private Id<Node> getColoredNodeId(TurnRestrictionsContext.ColoredNode coloredNode) {

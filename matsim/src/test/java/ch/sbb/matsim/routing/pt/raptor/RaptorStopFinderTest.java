@@ -88,7 +88,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(1., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -116,7 +116,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(600., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -160,7 +160,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20*60., 20.*60, 10*60., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000.0, 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000.0, 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -215,7 +215,7 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -251,7 +251,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -300,7 +300,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -355,7 +355,7 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -404,7 +404,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(1., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -433,7 +433,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(600., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -478,7 +478,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20*60., 20.*60, 10*60., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -533,7 +533,7 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -569,7 +569,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -619,7 +619,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -675,7 +675,7 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -739,7 +739,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -784,7 +784,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 10. * 60, 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -829,7 +829,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -881,7 +881,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -933,7 +933,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -982,7 +982,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1028,7 +1028,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 10. * 60, 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1074,7 +1074,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 1., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1127,7 +1127,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1180,7 +1180,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1246,7 +1246,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(10 * 60., 20 * 60., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1293,7 +1293,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 10 * 60., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1349,7 +1349,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1404,7 +1404,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1457,7 +1457,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(10 * 60., 20 * 60., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1505,7 +1505,7 @@ public class RaptorStopFinderTest {
             StopFinderFixture f1 = new StopFinderFixture(20 * 60., 10 * 60., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f1.scenario, 1000., 1.0, null));
 
             f1.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1562,7 +1562,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1618,7 +1618,7 @@ public class RaptorStopFinderTest {
             }
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 1000., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
@@ -1679,9 +1679,9 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5, 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5, 1.0, null));
             routingModules.put("zoomer",
-                    new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
+                    new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1., null));
 
             ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
@@ -1745,9 +1745,9 @@ public class RaptorStopFinderTest {
 
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5, 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5, 1.0, null));
             routingModules.put("zoomer",
-                    new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1.));
+                    new TeleportationRoutingModule("zoomer", f0.scenario, 1000., 1., null));
 
             ScoringConfigGroup.ModeParams modeParams = new ScoringConfigGroup.ModeParams("zoomer");
             modeParams.setMarginalUtilityOfTraveling(0.);
@@ -1812,9 +1812,9 @@ public class RaptorStopFinderTest {
             StopFinderFixture f0 = new StopFinderFixture(10*60., 20*60., 1., 1.);
             Map<String, RoutingModule> routingModules = new HashMap<>();
             routingModules.put(TransportMode.walk,
-                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5., 1.0));
+                    new TeleportationRoutingModule(TransportMode.walk, f0.scenario, 5., 1.0, null));
             routingModules.put(TransportMode.bike,
-                    new TeleportationRoutingModule(TransportMode.bike, f0.scenario, 50., 1.0));
+                    new TeleportationRoutingModule(TransportMode.bike, f0.scenario, 50., 1.0, null));
 
             f0.srrConfig.setUseIntermodalAccessEgress(true);
             SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet walkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
