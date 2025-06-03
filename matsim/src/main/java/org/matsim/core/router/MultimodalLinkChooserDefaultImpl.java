@@ -1,5 +1,6 @@
 package org.matsim.core.router;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -13,6 +14,12 @@ import org.matsim.facilities.Facility;
 public class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
 
     private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
+
+    /**
+     * a deliberately non-public constructor so that this class can only be used with injection ( bind( MultiModalLinkChooserDefaultImpl.class ) )
+     */
+    @Inject
+    /* default */ MultimodalLinkChooserDefaultImpl(){}
 
     @Override
     public Link decideAccessLink(RoutingRequest request, Network network) {
