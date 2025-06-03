@@ -148,8 +148,7 @@ import org.matsim.freight.logistics.shipment.*;
 						}
 					}
 				}
-			} else if ((ResourceImplementationUtils.getCarrierType(carrier)
-				== ResourceImplementationUtils.CARRIER_TYPE.collectionCarrier)) {
+			} else if ((ResourceImplementationUtils.getCarrierType(carrier) == ResourceImplementationUtils.CARRIER_TYPE.collectionCarrier)) {
 				for (TourElement tourElement : tour.getTourElements()) {
 					if (tourElement instanceof ServiceActivity serviceActivity) {
 						if (tour.getEndLinkId() == transshipmentHubResource.getStartLinkId()) {
@@ -163,9 +162,7 @@ import org.matsim.freight.logistics.shipment.*;
 							// reasons, that the handlingEvent start once the vehicle has arrived.
 							// It may change again, once we have unloading events available.
 							final double expUnloadingTime = getTotalUnloadingTime(tour);
-							final double expHandlingDuration =
-								transshipmentHubResource.getCapacityNeedFixed()
-									+ (transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize());
+							final double expHandlingDuration = transshipmentHubResource.getCapacityNeedFixed() + (transshipmentHubResource.getCapacityNeedLinear() * lspShipment.getSize());
 							final double startTime = event.getTime() + expUnloadingTime;
 							final double endTime = startTime + expHandlingDuration;
 
@@ -206,20 +203,14 @@ import org.matsim.freight.logistics.shipment.*;
 		LspShipment lspShipment = servicesWaitedFor.get(carrierService).lspShipment;
 
 		{ // Old logging approach - will be removed at some point in time
-			LspShipmentPlanElement handle =
-				LspShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
+			LspShipmentPlanElement handle = LspShipmentUtils.LoggedShipmentHandleBuilder.newInstance()
 					.setLinkId(linkId)
 					.setResourceId(resourceId)
 					.setStartTime(startTime)
 					.setEndTime(endTime)
 					.setLogisticsChainElement(servicesWaitedFor.get(carrierService).logisticChainElement)
 					.build();
-			Id<LspShipmentPlanElement> loadId =
-				Id.create(
-					handle.getResourceId()
-						+ String.valueOf(handle.getLogisticChainElement().getId())
-						+ handle.getElementType(),
-					LspShipmentPlanElement.class);
+			Id<LspShipmentPlanElement> loadId = Id.create(handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType(), LspShipmentPlanElement.class);
 			if (!lspShipment.getShipmentLog().getPlanElements().containsKey(loadId)) {
 				lspShipment.getShipmentLog().addPlanElement(loadId, handle);
 			}
@@ -233,9 +224,7 @@ import org.matsim.freight.logistics.shipment.*;
 		// discussion.
 		// The start time, must start at the same time as the triggering event. -> keep events stream
 		// ordered.
-		eventsManager.processEvent(
-			new HandlingInHubStartsEvent(
-				event.getTime(), linkId, lspShipment.getId(), resourceId, expHandlingDuration));
+		eventsManager.processEvent(new HandlingInHubStartsEvent(event.getTime(), linkId, lspShipment.getId(), resourceId, expHandlingDuration));
 	}
 
 	private boolean allServicesAreInOnePoint(Tour tour) {
