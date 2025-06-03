@@ -115,11 +115,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		CarrierVehicleTypes vehTypeLarge = new CarrierVehicleTypes();
 		List.of("heavy40t").forEach(type ->
-			vehTypeLarge.getVehicleTypes().put(Id.create(type, VehicleType.class), vehicleTypes.getVehicleTypes().get(Id.create(type, VehicleType.class)))
+			vehTypeLarge.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
 		);
 		CarrierVehicleTypes vehTypeLargeBEV = new CarrierVehicleTypes();
 		List.of("heavy40t_electro").forEach(type ->
-			vehTypeLargeBEV.getVehicleTypes().put(Id.create(type, VehicleType.class), vehicleTypes.getVehicleTypes().get(Id.create(type, VehicleType.class)))
+			vehTypeLargeBEV.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
 		);
 
 
