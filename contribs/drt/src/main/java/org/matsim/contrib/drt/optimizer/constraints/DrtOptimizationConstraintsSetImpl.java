@@ -11,7 +11,7 @@ public class DrtOptimizationConstraintsSetImpl extends DrtOptimizationConstraint
     @Comment("Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
             + "min(unsharedRideTime + maxAbsoluteDetour, maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta). "
             + "Alpha should not be smaller than 1.")
-    @DecimalMin("1.0")
+    @PositiveOrZero
     public double maxTravelTimeAlpha = Double.NaN;// [-]
 
     @Parameter

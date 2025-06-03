@@ -244,7 +244,7 @@ public class PrebookingTestEnvironment {
 							TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 
 							LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-							return DetourTimeEstimator.createExactEstimator(router);
+							return DetourTimeEstimator.createExactEstimator(router, travelTime);
 						}));
 					}
 				});

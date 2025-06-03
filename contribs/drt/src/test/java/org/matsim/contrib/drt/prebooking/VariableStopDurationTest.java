@@ -8,8 +8,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.prebooking.PrebookingTestEnvironment.RequestInfo;
+import org.matsim.contrib.drt.routing.DrtRouteConstraintsCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -17,6 +21,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
@@ -61,16 +66,44 @@ public class VariableStopDurationTest {
 		}
 	}
 
+	private class CustomConstraintsCalculator implements DrtRouteConstraintsCalculator {
+		private final Map<String, DrtRouteConstraints> data = new HashMap<>();
+
+		public CustomConstraintsCalculator define(String personId, double travelTimeConstraint,
+				double waitTimeConstraint) {
+			data.put(personId, new DrtRouteConstraints(travelTimeConstraint, Double.POSITIVE_INFINITY,
+					waitTimeConstraint, Double.POSITIVE_INFINITY, 0.0));
+			return this;
+		}
+
+		@Override
+		public DrtRouteConstraints calculateRouteConstraints(double departureTime, Link accessActLink,
+				Link egressActLink, Person person, Attributes tripAttributes, double unsharedRideTime,
+				double unsharedDistance) {
+			return data.get(person.getId().toString());
+		}
+
+		public void install(Controler controller) {
+			DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
+			DrtRouteConstraintsCalculator self = this;
+
+			controller.addOverridingModule(new AbstractDvrpModeModule(drtConfig.getMode()) {
+				@Override
+				public void install() {
+					bindModal(DrtRouteConstraintsCalculator.class).toInstance(self);
+				}
+			});
+		}
+	}
+
 	@Test
-	void oneRequest_detourConstraint_ok() {
+	void oneRequest_travelTimeConstraint_ok() {
 		/*-
 		 * - One agent is dispatched
-		 * - We choose the detour constraint such that the request can barely accepted
+		 * - We choose the travel time constraint such that the request can barely accepted
 		 */
-		double detourConstraint = 99.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.endTime(10.0 * 3600.0) //
@@ -78,6 +111,10 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 270.0, 1000.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -92,16 +129,14 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void oneRequest_detourConstraint_excessivePickupDuration() {
+	void oneRequest_travelTimeConstraint_excessivePickupDuration() {
 		/*-
-		 * - See oneRequest_detourConstraint_ok
+		 * - See oneRequest_travelTimeConstraint_ok
 		 * - We increase the pickup duration by one second
 		 * - Request should not be accepted anymore
 		 */
-		double detourConstraint = 99.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.endTime(10.0 * 3600.0) //
@@ -109,6 +144,10 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 270.0, 1000.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0 + 1.0, 60.0) // PICKUP + 1s
@@ -121,16 +160,14 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void oneRequest_detourConstraint_excessiveDropoffDuration() {
+	void oneRequest_travelTimeConstraint_excessiveDropoffDuration() {
 		/*-
-		 * - See oneRequest_detourConstraint_ok
+		 * - See oneRequest_travelTimeConstraint_ok
 		 * - We increase the dropoff duration by one second
 		 * - Request should not be accepted anymore
 		 */
-		double detourConstraint = 99.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(600.0, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.endTime(10.0 * 3600.0) //
@@ -138,6 +175,10 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 270.0, 1000.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0 + 1.0) // DROPOFF + 1s
@@ -155,10 +196,8 @@ public class VariableStopDurationTest {
 		 * - One agent is dispatched
 		 * - We choose the maximum wait time such that it can barely dispatched
 		 */
-		double waitTimeConstraint = 61.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, 1000.0, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.endTime(10.0 * 3600.0) //
@@ -166,6 +205,10 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 1000.0, 83.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -186,10 +229,8 @@ public class VariableStopDurationTest {
 		 * - We increase the pickup duration by one second
 		 * - The request should not be accepted anymore
 		 */
-		double waitTimeConstraint = 61.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, 1000.0, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.endTime(10.0 * 3600.0) //
@@ -197,6 +238,10 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 1000.0, 83.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0 + 1.0, 60.0) // PICKUP + 1s
@@ -217,14 +262,11 @@ public class VariableStopDurationTest {
 		 * - Request A acts as the cosntraint
 		 * - Request B acts as the probe that will be modified later
 		 * 
-		 * - We adjust the detour and wait time constraints of request A such that 
+		 * - We adjust the travel time and wait time constraints of request A such that 
 		 *   both requests can barely be dispatched
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -233,6 +275,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -251,17 +298,14 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void twoRequests_ABBA_exessivePickupDuration() {
+	void twoRequests_ABBA_excessivePickupDuration() {
 		/*-
-		 * - See twoRequests_detourConstraint_ok
+		 * - See twoRequests_ABBA_ok
 		 * - We increase the pickup duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -270,6 +314,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -278,26 +327,23 @@ public class VariableStopDurationTest {
 
 		controller.run();
 
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
 		assertEquals(1083.0, requestA.pickupTime, 1e-3);
 		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
-
-		RequestInfo requestB = environment.getRequestInfo().get("personB");
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
 	}
 
 	@Test
-	void twoRequests_ABBA_exessiveDropoffDuration() {
+	void twoRequests_ABBA_excessiveDropoffDuration() {
 		/*-
-		 * - See twoRequests_detourConstraint_ok
+		 * - See twoRequests_ABBA_ok
 		 * - We increase the dropoff duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -307,6 +353,11 @@ public class VariableStopDurationTest {
 		Controler controller = environment.build();
 		prepare(controller);
 
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
+
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
 				.define("personB", 60.0, 60.0 + 1.0) // DROPOFF + 1s
@@ -314,12 +365,12 @@ public class VariableStopDurationTest {
 
 		controller.run();
 
+		RequestInfo requestB = environment.getRequestInfo().get("personB");
+		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
+
 		RequestInfo requestA = environment.getRequestInfo().get("personA");
 		assertEquals(1083.0, requestA.pickupTime, 1e-3);
 		assertEquals(1270.0, requestA.dropoffTime, 1e-3); // earlier than before
-
-		RequestInfo requestB = environment.getRequestInfo().get("personB");
-		assertTrue(Double.isNaN(requestB.pickupTime)); // expecting rejection
 	}
 
 	@Test
@@ -331,14 +382,11 @@ public class VariableStopDurationTest {
 		 * - Request A request acts as the constraint
 		 * - Request B acts as the probe that will be modified later
 		 * 
-		 * - We adjust the detour and wait time constraints of request A such that 
+		 * - We adjust the travel time and wait time constraints of request A such that 
 		 *   both requests can barely be dispatched
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -347,6 +395,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -371,11 +424,8 @@ public class VariableStopDurationTest {
 		 * - We increase the pickup duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -384,6 +434,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -407,11 +462,8 @@ public class VariableStopDurationTest {
 		 * - We increase the dropoff duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -420,6 +472,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -445,14 +502,11 @@ public class VariableStopDurationTest {
 		 * - Request A request acts as the constraint
 		 * - Request B acts as the probe that will be modified later
 		 * 
-		 * - We adjust the detour and wait time constraints of request A such that 
+		 * - We adjust the travel time and wait time constraints of request A such that 
 		 *   both requests can barely be dispatched
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -461,6 +515,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -485,11 +544,8 @@ public class VariableStopDurationTest {
 		 * - We increase the pickup duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -498,6 +554,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -521,11 +582,8 @@ public class VariableStopDurationTest {
 		 * - We increase the dropoff duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -534,6 +592,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -559,14 +622,11 @@ public class VariableStopDurationTest {
 		 * - Request A request acts as the constraint
 		 * - Request B acts as the probe that will be modified later
 		 * 
-		 * - We adjust the detour and wait time constraints of request A such that 
+		 * - We adjust the travel time and wait time constraints of request A such that 
 		 *   both requests can barely be dispatched
 		 */
-		double detourConstraint = 262.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
@@ -576,6 +636,11 @@ public class VariableStopDurationTest {
 		Controler controller = environment.build();
 		prepare(controller);
 
+		new CustomConstraintsCalculator()
+			.define("personA", 229.0, 83.0)
+			.define("personB", 400.0, 200.0)
+			.install(controller);
+			
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
 				.define("personB", 60.0, 60.0) //
@@ -599,11 +664,8 @@ public class VariableStopDurationTest {
 		 * - We increase the pickup duration of the probe request by one second
 		 * - We should not be able to disaptch it anymore
 		 */
-		double detourConstraint = 262.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
@@ -612,6 +674,11 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 229.0, 83.0)
+			.define("personB", 400.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -635,11 +702,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe
 		 * - The third one should be accepted
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -649,6 +713,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+		
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -671,17 +741,14 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void threeRequests_ABBA_exessivePickupDuration() {
+	void threeRequests_ABBA_excessivePickupDuration() {
 		/*-
 		 * - See twoRequests_ABAB_ok
 		 * - We add a third request in parallel to the probe with one second longer pickup duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -691,6 +758,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -713,17 +786,14 @@ public class VariableStopDurationTest {
 	}
 
 	@Test
-	void threeRequests_ABBA_exessiveDropoffDuration() {
+	void threeRequests_ABBA_excessiveDropoffDuration() {
 		/*-
 		 * - See twoRequests_ABAB_ok
 		 * - We add a third request in parallel to the probe with one second longer dropoff duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 201.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
@@ -733,6 +803,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 83.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -761,11 +837,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe
 		 * - The third one should be accepted
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -775,6 +848,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -803,11 +882,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe with one second longer pickup duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -817,6 +893,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -845,11 +927,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe with one second longer dropoff duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 245.0;
-		double waitTimeConstraint = 245.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
@@ -859,6 +938,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 289.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -887,11 +972,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe
 		 * - The third one should be accepted
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -902,6 +984,12 @@ public class VariableStopDurationTest {
 		Controler controller = environment.build();
 		prepare(controller);
 
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
+			
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
 				.define("personB", 60.0, 60.0) //
@@ -929,11 +1017,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe with one second longer pickup duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -943,6 +1028,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -971,11 +1062,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe with one second longer dropoff duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 203.0;
-		double waitTimeConstraint = 164.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
 				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
@@ -985,6 +1073,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 332.0, 186.0)
+			.define("personB", 300.0, 200.0)
+			.define("personC", 300.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -1001,7 +1095,7 @@ public class VariableStopDurationTest {
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
 		assertEquals(1083.0, requestB.pickupTime, 1e-3);
 		assertEquals(1289.0, requestB.dropoffTime, 1e-3);
-		
+
 		RequestInfo requestC = environment.getRequestInfo().get("personC");
 		assertTrue(Double.isNaN(requestC.pickupTime));
 	}
@@ -1013,11 +1107,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe
 		 * - The third one should be accepted
 		 */
-		double detourConstraint = 262.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
@@ -1028,10 +1119,16 @@ public class VariableStopDurationTest {
 		Controler controller = environment.build();
 		prepare(controller);
 
+		new CustomConstraintsCalculator()
+			.define("personA", 229.0, 83.0)
+			.define("personB", 400.0, 200.0)
+			.define("personC", 400.0, 200.0)
+			.install(controller);
+
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
 				.define("personB", 60.0, 60.0) //
-				.define("personC", 60.0, 60.0) // 
+				.define("personC", 60.0, 60.0) //
 				.install(controller);
 
 		controller.run();
@@ -1043,7 +1140,7 @@ public class VariableStopDurationTest {
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
 		assertEquals(1186.0, requestB.pickupTime, 1e-3);
 		assertEquals(1392.0, requestB.dropoffTime, 1e-3);
-		
+
 		RequestInfo requestC = environment.getRequestInfo().get("personC");
 		assertTrue(Double.isFinite(requestC.pickupTime));
 	}
@@ -1055,11 +1152,8 @@ public class VariableStopDurationTest {
 		 * - We add a third request in parallel to the probe with one second longer pickup duration
 		 * - The third request should not be accepted
 		 */
-		double detourConstraint = 262.0;
-		double waitTimeConstraint = 163.0;
-
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
-				.configure(waitTimeConstraint, 1.0, detourConstraint, 60.0) //
+				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
 				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
 				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
@@ -1069,6 +1163,12 @@ public class VariableStopDurationTest {
 
 		Controler controller = environment.build();
 		prepare(controller);
+
+		new CustomConstraintsCalculator()
+			.define("personA", 229.0, 83.0)
+			.define("personB", 400.0, 200.0)
+			.define("personC", 400.0, 200.0)
+			.install(controller);
 
 		new CustomStopDurationProvider() //
 				.define("personA", 60.0, 60.0) //
@@ -1085,7 +1185,7 @@ public class VariableStopDurationTest {
 		RequestInfo requestB = environment.getRequestInfo().get("personB");
 		assertEquals(1186.0, requestB.pickupTime, 1e-3);
 		assertEquals(1392.0, requestB.dropoffTime, 1e-3);
-		
+
 		RequestInfo requestC = environment.getRequestInfo().get("personC");
 		assertTrue(Double.isNaN(requestC.pickupTime));
 	}
