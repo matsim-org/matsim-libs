@@ -25,14 +25,16 @@ public class DefaultStopTimeCalculator implements StopTimeCalculator {
 	@Override
 	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// pickup at the end of the stop
-		return new Pickup(beginTime + stopDuration, beginTime + stopDuration);
+		double endTime = beginTime + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop does not change the end time
-		return stop.getEndTime();
+		double endTime = stop.getEndTime();
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override

@@ -237,6 +237,27 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 				new DetourTimeInfo(new InsertionDetourTimeCalculator.PickupDetourInfo(departureTime, requestPickupTime, pickupTimeLoss),
 						new InsertionDetourTimeCalculator.DropoffDetourInfo(vehicleArrivalTime, requestDropoffTime, dropoffTimeLoss)));
 	}
+	
+	@Test
+	void calculatePickupDetourTimeLoss_start_stop_pickupAppended_stop_dropoffNotAppended() {
+		Waypoint.Start start = start(null, 5, link("start"));
+		Waypoint.Stop stop0 = stop(10, fromLink);
+		Waypoint.Stop stop1 = stop(200, link("other"));
+		VehicleEntry entry = entry(start, stop0, stop1);
+		var detour = new Detour(0., 0., 0., 0.);//all unused
+		var insertion = insertion(entry, 1, 2, detour);
+
+		double departureTime = stop0.getDepartureTime() + STOP_DURATION_ADDED;
+		double pickupTimeLoss = STOP_DURATION_ADDED;
+		double requestPickupTime = departureTime;
+		double vehicleArrivalTime = stop1.getArrivalTime() + STOP_DURATION_ADDED + STOP_DURATION_INITIAL;
+		double requestDropoffTime = vehicleArrivalTime + STOP_DURATION_ADDED;
+		double dropoffTimeLoss = STOP_DURATION_ADDED;
+
+		assertDetourTimeInfo(insertion,
+				new DetourTimeInfo(new InsertionDetourTimeCalculator.PickupDetourInfo(departureTime, requestPickupTime, pickupTimeLoss),
+						new InsertionDetourTimeCalculator.DropoffDetourInfo(vehicleArrivalTime, requestDropoffTime, dropoffTimeLoss)));
+	}
 
 	@Test
 	void replacedDriveTimeEstimator() {

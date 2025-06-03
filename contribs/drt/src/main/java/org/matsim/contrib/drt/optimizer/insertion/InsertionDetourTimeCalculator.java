@@ -151,18 +151,18 @@ public class InsertionDetourTimeCalculator {
 			// case 2: previous waypoint is a planned stop, not started yet
 			// insertion time is the beginning of the planned stop
 			double insertionTime = stopTask.getBeginTime();
-			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask,
-					insertionTime, request);
+			Pickup pickupTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask,
+				insertionTime, request);
+			double departureTime = pickupTime.endTime();
 			double additionalStopDuration = departureTime - stopTask.getEndTime();
-			double todoReplace = departureTime;
-			return new PickupTimeInfo(departureTime, todoReplace, additionalStopDuration);
+			return new PickupTimeInfo(departureTime, pickupTime.pickupTime(), additionalStopDuration);
 		} else {
 			// case 3: previous waypoint is an ongoing (started) stop
 			// insertion is a soon as possible (now)
-			double departureTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, vEntry.createTime, request);
+			Pickup pickupTime = stopTimeCalculator.updateEndTimeForPickup(vEntry.vehicle, stopTask, vEntry.createTime, request);
+			double departureTime = pickupTime.endTime();
 			double additionalStopDuration = departureTime - stopTask.getEndTime();
-			double todoReplace = departureTime;
-			return new PickupTimeInfo(departureTime, todoReplace, additionalStopDuration);
+			return new PickupTimeInfo(departureTime, pickupTime.pickupTime(), additionalStopDuration);
 		}
 	}
 	

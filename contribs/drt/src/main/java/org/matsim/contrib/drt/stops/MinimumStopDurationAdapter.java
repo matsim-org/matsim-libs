@@ -22,10 +22,12 @@ public class MinimumStopDurationAdapter implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		return Math.max(stop.getBeginTime() + minimumStopDuration,
-				delegate.updateEndTimeForPickup(vehicle, stop, insertionTime, request));
+		Pickup delegate = this.delegate.updateEndTimeForPickup(vehicle, stop, insertionTime, request);
+		double endTime = Math.max(stop.getBeginTime() + minimumStopDuration, delegate.endTime());
+
+		return new Pickup(endTime, delegate.pickupTime());
 	}
 
 	@Override

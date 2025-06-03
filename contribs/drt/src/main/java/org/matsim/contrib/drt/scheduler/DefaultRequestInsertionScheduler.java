@@ -253,7 +253,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 				// potentially extend task
 				stopTask.setEndTime(stopTimeCalculator.updateEndTimeForPickup(vehicleEntry.vehicle, stopTask,
-						now, request.getRequest()));
+						now, request.getRequest()).endTime());
 
 				// add drive from pickup
 				if (pickupIdx == dropoffIdx) {

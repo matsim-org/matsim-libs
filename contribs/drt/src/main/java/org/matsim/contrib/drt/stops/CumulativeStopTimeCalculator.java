@@ -19,10 +19,12 @@ public class CumulativeStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// pickup extends the stop duration
-		return stop.getEndTime() + provider.calcPickupDuration(vehicle, request);
+		insertionTime = Math.max(stop.getEndTime(), insertionTime);
+		double endTime = insertionTime + provider.calcPickupDuration(vehicle, request);
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override

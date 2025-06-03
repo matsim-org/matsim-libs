@@ -23,10 +23,12 @@ public class CorrectedStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDuration);
+		double beginTime = Math.max(stop.getBeginTime(), insertionTime);
+		double endTime = beginTime + stopDuration;
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		double stopDuration = provider.calcPickupDuration(vehicle, request);
 
@@ -37,7 +37,10 @@ public class PrebookingStopTimeCalculator implements StopTimeCalculator {
 
 		// from that point on, we add the stop duration, and we never shrink the stop to
 		// account for other assigned requests
-		return Math.max(stop.getEndTime(), earliestStartTime + stopDuration);
+		double pickupTime = earliestStartTime + stopDuration;
+		double endTime = Math.max(stop.getEndTime(), pickupTime);
+
+		return new Pickup(endTime, pickupTime);
 	}
 
 	@Override

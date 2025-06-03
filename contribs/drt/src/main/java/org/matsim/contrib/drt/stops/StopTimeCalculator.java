@@ -57,7 +57,7 @@ public interface StopTimeCalculator {
 	Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request);
 
 	// a pickup is added to an existing stop
-	double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
+	Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime, DrtRequest request);
 
 	// a new stop with a dropoff is created
 	Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request);

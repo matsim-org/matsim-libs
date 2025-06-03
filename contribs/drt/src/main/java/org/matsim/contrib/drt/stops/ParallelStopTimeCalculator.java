@@ -26,10 +26,14 @@ public class ParallelStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// an additional stop may extend the stop duration
-		return Math.max(stop.getEndTime(), insertionTime + stopDurationProvider.calcPickupDuration(vehicle, request));
+		double beginTime = Math.max(stop.getBeginTime(), insertionTime);
+		double pickupTime = beginTime + stopDurationProvider.calcPickupDuration(vehicle, request);
+		double endTime = Math.max(stop.getEndTime(), pickupTime);
+
+		return new Pickup(endTime, pickupTime);
 	}
 
 	@Override
