@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.InvalidAttributeValueException;
+
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +44,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
+import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -225,6 +228,15 @@ public class CarriersUtils {
 
 		Carriers carriers = getCarriers(scenario);
 
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
+		if (result == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
+		}
+
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
 		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
@@ -243,6 +255,8 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
+
+
 
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
@@ -268,13 +282,26 @@ public class CarriersUtils {
 			future.get();
 		}
 
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
+		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There are carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details.");
+		}
+
+
 	}
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
 	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
+	 *
+	 * @deprecated IMO (kmt, jun'25) this method is not needed anymore, since {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} should be used instead.
 	 * @param carrier the carrier
 	 */
+	@Deprecated(since = "jun '25", forRemoval = true)
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
 		if (carrier.getSelectedPlan() == null) {
 			log.warn("Carrier {}: No selected plan available!", carrier.getId());
@@ -304,13 +331,15 @@ public class CarriersUtils {
 	/**
 	 * Checks if all carriers with jobs have at least one plan.
 	 *
+	 * @deprecated IMO (kmt, jun'25) this method used currently. If needed, I suggest to put this functionality into {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 *
 	 * @param carriers the carriers
-	 * @return true if all carriers with jobs have at teast one plan
+	 * @return true if all carriers with jobs have at least one plan
 	 */
+	@Deprecated(since = "jun '25")
 	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
 		for (Carrier carrier : carriers.getCarriers().values())
 			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
-
 		return true;
 	}
 
