@@ -198,14 +198,13 @@ class LSPControllerListener
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		//Currently, the consistency check is done in the startup listener and here.
+		//Here might not be necessary now (jun'25) because replanning will not change the resources available. But I (KMT) wanted to keep it, in case that the check will be extended in the future.
+		//Then it makes sense to have it here as well, and to the chekc before ech iteration starts.
 		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
 		switch (result) {
 			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs before planning was successful.");
-			case CHECK_FAILED -> {
-				log.error("Consistency check failed. Please check the log for details.");
-				//I decided to start with just writing an error message to the log. This may change later to throwing an exception. KMT jun'25
-//			  throw new RuntimeException("Consistency check failed. Aborting now.");
-			}
+			case CHECK_FAILED -> throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
 			default -> throw new IllegalStateException("Unexpected value: " + result);
 		}
 	}
