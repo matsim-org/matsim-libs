@@ -83,7 +83,7 @@ public interface CostCalculationStrategy {
 		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
 		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
 		static final double MAX_RIDE_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of exceeded detour
-		static final double LATE_DIVERSION_VIOLATION_PENALTY = 10;// 1 second of penalty per 1 second of late diversion of onboard requests
+		static final double LATE_DIVERSION_VIOLATION_PENALTY = 10;// 10 second of penalty per 1 second of late diversion of onboard requests
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
@@ -114,7 +114,7 @@ public interface CostCalculationStrategy {
             return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
 					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
 					+ MAX_RIDE_TIME_VIOLATION_PENALTY * detourViolation
-					+ MAX_RIDE_TIME_VIOLATION_PENALTY * lateDiversionViolation
+					+ LATE_DIVERSION_VIOLATION_PENALTY * lateDiversionViolation
 					+ totalTimeLoss;
 		}
 	}
