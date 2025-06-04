@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class TestTraceProfilingAspect extends TraceProfilingAspect {
 
-	@Pointcut("!cflow(adviceexecution()) && call(* org.matsim..*(..))")
+	@Pointcut("!cflow(adviceexecution()) && execution(* org.matsim..*(..))")
 	public void traceTarget() {}
 
 }

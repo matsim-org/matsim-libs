@@ -24,7 +24,7 @@ public class AnnotationBasedExampleAspect {
 	 * @apiNote Advice must be public.
 	 * @param thisJoinPointStaticPart Needs to be a param to get access to it like in the aj files
 	 */
-	@Before("call(* org.matsim.vehicles.VehicleUtils.getFactory())")
+	@Before("execution(* org.matsim.vehicles.VehicleUtils.getFactory())")
 	public void BeforeGetFactory(JoinPoint.StaticPart thisJoinPointStaticPart) {
 		MatsimJfrEvent.create("Annotated aspect: " + thisJoinPointStaticPart.getSignature()).commit();
 		System.out.println("aspect via annotations: " + thisJoinPointStaticPart.getSignature());
@@ -35,7 +35,7 @@ public class AnnotationBasedExampleAspect {
 	/**
 	 * Limit the affected code to only within a given package.
 	 */
-	@Pointcut("call(int org.matsim.core.replanning.ReplanningContext.getIteration()) && within(org.matsim.contrib.profiling.aop.*)")
+	@Pointcut("execution(int org.matsim.core.replanning.ReplanningContext.getIteration()) && within(org.matsim.contrib.profiling.aop.*)")
 	void ReplanningContextGetIteration() {}
 
 	@Around("ReplanningContextGetIteration()")
@@ -44,6 +44,4 @@ public class AnnotationBasedExampleAspect {
 		System.out.println("iteration before incrementing: " + iteration + " - " + p.getSignature());
 		return iteration + 1;
 	}
-
-
 }

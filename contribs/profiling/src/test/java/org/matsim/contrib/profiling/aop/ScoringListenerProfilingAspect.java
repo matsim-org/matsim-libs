@@ -32,7 +32,7 @@ public class ScoringListenerProfilingAspect extends AbstractProfilingEventAspect
     /**
      * Use the full canonical name (including package) in the pointcut declaration to ensure aspectj finds the targeted class.
      */
-    @Pointcut("call(void org.matsim.core.controler.listener.ScoringListener.notifyScoring(..))")
+    @Pointcut("execution(void org.matsim.core.controler.listener.ScoringListener.notifyScoring(..))")
     public void eventPoints() {}
 
     public Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart) {

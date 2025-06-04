@@ -13,7 +13,7 @@ public aspect PersonVehiclesAspect {
      */
     pointcut personVehicles(PersonVehicles p, String mode):
             target(p) && args(mode) &&
-                    call(Id<Vehicle> PersonVehicles.getVehicle(..));
+                    execution(Id<Vehicle> PersonVehicles.getVehicle(..));
 
     Id<Vehicle> around(PersonVehicles p, String mode): personVehicles(p,mode) {
         Event jfrEvent = MatsimJfrEvent.create("scoring AOP: " + p.getClass().getName());
