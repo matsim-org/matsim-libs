@@ -133,10 +133,15 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		} else {
 			InsertionWithDetourData insertion = best.get();
 
+			double dropoffDuration = 
+				insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime -
+				insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime;
+
 			// accept offered drt ride
 			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
-					insertion.detourTimeInfo.pickupDetourInfo.departureTime,
-					insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime);
+					insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
+					insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
+					dropoffDuration);
 
 			if(acceptedRequest.isPresent()) {
 				var vehicle = insertion.insertion.vehicleEntry.vehicle;
