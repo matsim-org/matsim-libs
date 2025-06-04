@@ -28,18 +28,6 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-		// We need to add a vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
-
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
 		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
@@ -64,18 +52,6 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-		// We need to add a vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
-
 		Person person = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("10390"));
 
 		Collection<PlanCandidate> candidates = generator.generate(PlanModel.newInstance(person.getSelectedPlan()));
@@ -91,17 +67,6 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
 
-		// We need to add a vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
 
 		for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
 
@@ -129,18 +94,6 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 	void predefined() {
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
-
-		// We need to add a vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
@@ -177,18 +130,6 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 
 
 		TopKChoicesGenerator generator = injector.getInstance(TopKChoicesGenerator.class);
-
-		// We need to add a vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
 
 		Person person = controler.getScenario().getPopulation().getPersons().get(TestScenario.Agents.get(0));
 
