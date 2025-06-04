@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
@@ -48,7 +49,7 @@ public class PHEMTest {
 	MatsimTestUtils utils = new MatsimTestUtils();
 
 	// TODO Files were changed to local for debugging purposes. CHange them back to the svn entries, when fixed hbefa tables are available
-	private final static String HBEFA_4_1_PATH = "D:/Projects/VSP/MATSim/PHEM/hbefa/";
+	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";
 	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
@@ -186,6 +187,8 @@ public class PHEMTest {
 			double len = segment.stream().map(s -> s.vel/3.6).reduce(0., Double::sum);
 			if (len == 0) continue;
 
+			int time = (segment.getLast().second+1 - drivingSegments.get(finishedSegments).getFirst().second);
+
 			// TODO The freespeed is essential for correct results. Just taking the max value is not the cleanest solution
 			double freespeed = segment.stream().map(s -> s.vel).max(Comparator.naturalOrder()).get()/3.6;
 
@@ -193,7 +196,7 @@ public class PHEMTest {
 			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 1, 1);
 			String roadType = mapping.determineHbefaType(link);
 
-			attributeList.add(new WLTPLinkAttributes((segment.getLast().second+1 - drivingSegments.get(finishedSegments).getFirst().second), len, freespeed, roadType));
+			attributeList.add(new WLTPLinkAttributes(time, len, freespeed, roadType));
 			finishedSegments = i;
 		}
 
@@ -438,6 +441,8 @@ public class PHEMTest {
 		Assertions.assertTrue(testAverages[4]/refComparison.size()-1 <= refAverages[4]/refComparison.size()-1);
 	}
 
+	// ----- Main-test method -----
+
 	static Stream<Arguments> testArgs() {
 		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
 			LinkCutSetting.fromLinkAttributes,
@@ -647,6 +652,8 @@ public class PHEMTest {
 		testValueDeviation(refComparison, comparison);
 		averageDeviation(refComparison, comparison);
 	}
+
+	// ----- Helper definitions -----
 
 	private record DrivingCycleSecond(int second, double vel, double acc){}
 
