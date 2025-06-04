@@ -146,7 +146,8 @@ public class PlanRouterTest {
 					  "walk",
 					  scenario,
 					  1,
-					  0);
+					  0,
+					  null);
 
 				  // TODO I have used the default impls for all needed interfaces. Check if this is okay # aleks
 				  List<? extends PlanElement> trip = DefaultRoutingModules.createAccessEgressNetworkRouter(
