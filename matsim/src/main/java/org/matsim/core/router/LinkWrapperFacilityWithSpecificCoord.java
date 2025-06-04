@@ -33,7 +33,7 @@ import org.matsim.facilities.Facility;
  * Wraps a Link into a Facility with a specific coordinate.
  * Useful for, e.g., Access and egress leg distance calculations
  */
-public final class LinkWrapperFacilityWithSpecificCoord implements Facility, Identifiable<ActivityFacility> {
+public final class LinkWrapperFacilityWithSpecificCoord implements LinkWrapperFacilityI {
 
 	private final Link wrappedLink;
 	private final Coord wrappedCoord;
