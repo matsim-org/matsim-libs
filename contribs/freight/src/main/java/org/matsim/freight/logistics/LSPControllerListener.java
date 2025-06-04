@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import jakarta.annotation.Nullable;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -40,212 +41,194 @@ import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controller.CarrierAgentTracker;
+import org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
 class LSPControllerListener
-    implements StartupListener,
-        BeforeMobsimListener,
-        AfterMobsimListener,
-        ScoringListener,
-        ReplanningListener,
-        IterationStartsListener,
-        IterationEndsListener,
-        ShutdownListener {
-  private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
-  private final Scenario scenario;
-  private final List<EventHandler> registeredHandlers = new ArrayList<>();
+	implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
-  private static int addListenerCnt = 0;
-  private  static final int maxAddListenerCnt = 1;
+	private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
+	private final Scenario scenario;
+	private final List<EventHandler> registeredHandlers = new ArrayList<>();
 
-  @Inject private EventsManager eventsManager;
-  @Inject private MatsimServices matsimServices;
-  @Inject private LSPScorerFactory lspScoringFunctionFactory;
-  @Inject @Nullable private LSPStrategyManager strategyManager;
-  @Inject private OutputDirectoryHierarchy controlerIO;
-  @Inject private CarrierAgentTracker carrierAgentTracker;
+	private static int addListenerCnt = 0;
+	private  static final int maxAddListenerCnt = 1;
+
+	@Inject private EventsManager eventsManager;
+	@Inject private MatsimServices matsimServices;
+	@Inject private LSPScorerFactory lspScoringFunctionFactory;
+	@Inject @Nullable private LSPStrategyManager strategyManager;
+	@Inject private OutputDirectoryHierarchy controlerIO;
+	@Inject private CarrierAgentTracker carrierAgentTracker;
 
 
-  @Inject
-  LSPControllerListener(Scenario scenario) {
-    this.scenario = scenario;
-  }
+	@Inject
+	LSPControllerListener(Scenario scenario) {
+		this.scenario = scenario;
+	}
 
-  @Override
-  public void notifyStartup(StartupEvent event) {
-    //Ensure that all ressource Ids are only there once.
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
+		switch (result) {
+			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs before planning was successful.");
+			case CHECK_FAILED -> throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
+			default -> throw new IllegalStateException("Unexpected value: " + result);
+		}
+	}
 
-    checkForUniqueResourceIds();
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		LSPs lsps = LSPUtils.getLSPs(scenario);
 
-  }
+		// TODO: Why do we add all simTrackers in every iteration beforeMobsim starts?
+		// Doing so results in a lot of "not adding eventsHandler since already added" warnings.
+		// @KN: Would it be possible to do it in (simulation) startup and therefor only oce?
+		for (LSP lsp : lsps.getLSPs().values()) {
+			((LSPImpl) lsp).setScorer(lspScoringFunctionFactory.createScoringFunction());
 
-/**
-* For later steps, e.g. scoring the Ids of the {@link LSPResource} ids must be unique.
- * Otherwise, there are scored several times.
- * <p></p>
- * For the future we may reduce it to unique {@link LSPResource} ids PER {@link LSP}.
- * This means, that the events (also from the carriers) need to have an information obout the LSP it belongs to and that
- * in scoring and analysis this must be taken into account. What itself is another source for errors...
- * KMT jul'24
-*/
-  private void checkForUniqueResourceIds() {
-    List<String> duplicates = new ArrayList<>();
-    Set<String> set = new HashSet<>();
+			// simulation trackers of lsp:
+			registerSimulationTrackers(lsp);
 
-    LSPs lsps = LSPUtils.getLSPs(scenario);
-    for (LSP lsp : lsps.getLSPs().values()) {
-      for (LSPResource lspResource : lsp.getResources()) {
-        String idString = lspResource.getId().toString();
-        if (set.contains(idString)) {
-          duplicates.add(idString);
-        } else {
-          set.add(idString);
-        }
-      }
-    }
+			// simulation trackers of resources:
+			for (LSPResource resource : lsp.getResources()) {
+				registerSimulationTrackers(resource);
+			}
 
-    if (!duplicates.isEmpty()) {
-      log.error("There are non-unique ressource Ids. This must not be! The duplicate ids are: {}.", duplicates.toString());
-      log.error("You may also use output_lsp.xml to check were the duplicates are located");
-      log.error("Aborting now ...");
-      throw new RuntimeException();
-    }
-  }
+			// simulation trackers of shipments:
+			for (LspShipment lspShipment : lsp.getLspShipments()) {
+				registerSimulationTrackers(lspShipment);
+			}
 
-  @Override
-  public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-    LSPs lsps = LSPUtils.getLSPs(scenario);
+			// simulation trackers of solutions:
+			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+				registerSimulationTrackers(solution);
 
-    // TODO: Why do we add all simTrackers in every iteration beforeMobsim starts?
-    // Doing so results in a lot of "not adding eventsHandler since already added" warnings.
-    // @KN: Would it be possible to do it in (simulation) startup and therefor only oce?
-    for (LSP lsp : lsps.getLSPs().values()) {
-      ((LSPImpl) lsp).setScorer(lspScoringFunctionFactory.createScoringFunction());
+				// simulation trackers of solution elements:
+				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+					registerSimulationTrackers(element);
 
-      // simulation trackers of lsp:
-      registerSimulationTrackers(lsp);
+					// simulation trackers of resources:
+					registerSimulationTrackers(element.getResource());
+				}
+			}
+		}
+	}
 
-      // simulation trackers of resources:
-      for (LSPResource resource : lsp.getResources()) {
-        registerSimulationTrackers(resource);
-      }
+	private void registerSimulationTrackers(HasSimulationTrackers<?> hasSimulationTrackers) {
+		// get all simulation trackers ...
+		for (LSPSimulationTracker<?> simulationTracker :
+			hasSimulationTrackers.getSimulationTrackers()) {
+			// ... register them ...
+			if (!registeredHandlers.contains(simulationTracker)) {
+				log.info("adding eventsHandler: {}", simulationTracker);
+				eventsManager.addHandler(simulationTracker);
+				registeredHandlers.add(simulationTracker);
+				matsimServices.addControlerListener(simulationTracker);
+				simulationTracker.setEventsManager(eventsManager);
+			} else if ( addListenerCnt < maxAddListenerCnt ){
+				log.warn("not adding eventsHandler since already added: {}", simulationTracker);
+				addListenerCnt++;
+				if (addListenerCnt == maxAddListenerCnt) {
+					log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
+		}
 
-      // simulation trackers of shipments:
-      for (LspShipment lspShipment : lsp.getLspShipments()) {
-        registerSimulationTrackers(lspShipment);
-      }
+	}
 
-      // simulation trackers of solutions:
-      for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-        registerSimulationTrackers(solution);
+	@Override
+	public void notifyReplanning(ReplanningEvent event) {
+		if (strategyManager == null) {
+			throw new RuntimeException(
+				"You need to set LSPStrategyManager to something meaningful to run iterations.");
+		}
 
-        // simulation trackers of solution elements:
-        for (LogisticChainElement element : solution.getLogisticChainElements()) {
-          registerSimulationTrackers(element);
+		LSPs lsps = LSPUtils.getLSPs(scenario);
+		strategyManager.run(
+			lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
-          // simulation trackers of resources:
-          registerSimulationTrackers(element.getResource());
-        }
-      }
-    }
-  }
+		for (LSP lsp : lsps.getLSPs().values()) {
+			lsp.getSelectedPlan()
+				.getShipmentPlans()
+				.clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some of the times were accumulating over the time. :(
+			lsp.scheduleLogisticChains();
+		}
 
-  private void registerSimulationTrackers(HasSimulationTrackers<?> hasSimulationTrackers) {
-    // get all simulation trackers ...
-    for (LSPSimulationTracker<?> simulationTracker :
-        hasSimulationTrackers.getSimulationTrackers()) {
-      // ... register them ...
-      if (!registeredHandlers.contains(simulationTracker)) {
-        log.info("adding eventsHandler: {}", simulationTracker);
-        eventsManager.addHandler(simulationTracker);
-        registeredHandlers.add(simulationTracker);
-        matsimServices.addControlerListener(simulationTracker);
-        simulationTracker.setEventsManager(eventsManager);
-      } else if ( addListenerCnt < maxAddListenerCnt ){
-        log.warn("not adding eventsHandler since already added: {}", simulationTracker);
-        addListenerCnt++;
-        if (addListenerCnt == maxAddListenerCnt) {
-          log.warn(Gbl.FUTURE_SUPPRESSED);
-        }
-      }
-    }
+		// Update carriers in scenario and CarrierAgentTracker
+		carrierAgentTracker.getCarriers().getCarriers().clear();
+		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
+			CarriersUtils.getCarriers(scenario).addCarrier(carrier);
+			carrierAgentTracker.getCarriers().addCarrier(carrier);
+		}
+	}
 
-  }
+	@Override
+	public void notifyScoring(ScoringEvent scoringEvent) {
+		for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
+			lsp.scoreSelectedPlan();
+		}
+		// yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
+	}
 
-  @Override
-  public void notifyReplanning(ReplanningEvent event) {
-    if (strategyManager == null) {
-      throw new RuntimeException(
-          "You need to set LSPStrategyManager to something meaningful to run iterations.");
-    }
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {}
 
-    LSPs lsps = LSPUtils.getLSPs(scenario);
-    strategyManager.run(
-        lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
+	Carriers getCarriersFromLSP() {
+		LSPs lsps = LSPUtils.getLSPs(scenario);
+		assert !lsps.getLSPs().isEmpty();
 
-    for (LSP lsp : lsps.getLSPs().values()) {
-      lsp.getSelectedPlan()
-          .getShipmentPlans()
-          .clear(); // clear ShipmentPlans to start with clear(n) state. Otherwise, some of the times were
-                    // accumulating over the time. :(
-      lsp.scheduleLogisticChains();
-    }
+		Carriers carriers = new Carriers();
+		for (LSP lsp : lsps.getLSPs().values()) {
+			LSPPlan selectedPlan = lsp.getSelectedPlan();
+			for (LogisticChain solution : selectedPlan.getLogisticChains()) {
+				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+					if (element.getResource() instanceof LSPCarrierResource carrierResource) {
+						Carrier carrier = carrierResource.getCarrier();
+						if (!carriers.getCarriers().containsKey(carrier.getId())) {
+							carriers.addCarrier(carrier);
+						}
+					}
+				}
+			}
+		}
+		return carriers;
+	}
 
-    // Update carriers in scenario and CarrierAgentTracker
-    carrierAgentTracker.getCarriers().getCarriers().clear();
-    for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-      CarriersUtils.getCarriers(scenario).addCarrier(carrier);
-      carrierAgentTracker.getCarriers().addCarrier(carrier);
-    }
-  }
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		//Currently, the consistency check is done in the startup listener and here.
+		//Here might not be necessary now (jun'25) because replanning will not change the resources available. But I (KMT) wanted to keep it, in case that the check will be extended in the future.
+		//Then it makes sense to have it here as well, and to the chekc before ech iteration starts.
+		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
+		switch (result) {
+			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs before planning was successful.");
+			case CHECK_FAILED -> throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
+			default -> throw new IllegalStateException("Unexpected value: " + result);
+		}
+	}
 
-  @Override
-  public void notifyScoring(ScoringEvent scoringEvent) {
-    for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
-      lsp.scoreSelectedPlan();
-    }
-    // yyyyyy might make more sense to register the lsps directly as scoring controler listener (??)
-  }
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getIterationFilename(event.getIteration(), "lsps.xml"));
 
-  @Override
-  public void notifyAfterMobsim(AfterMobsimEvent event) {}
+		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkAfterPlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
+		switch (result) {
+			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs after planning was successful.");
+			case CHECK_FAILED -> {
+				log.error("Consistency check failed. Please check the log for details.");
+				//I decided to start with just writing an error message to the log. This may change later to throwing an exception. KMT jun'25
+//			  throw new RuntimeException("Consistency check failed. Aborting now.");
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + result);
+		}
+	}
 
-  Carriers getCarriersFromLSP() {
-    LSPs lsps = LSPUtils.getLSPs(scenario);
-    assert !lsps.getLSPs().isEmpty();
-
-    Carriers carriers = new Carriers();
-    for (LSP lsp : lsps.getLSPs().values()) {
-      LSPPlan selectedPlan = lsp.getSelectedPlan();
-      for (LogisticChain solution : selectedPlan.getLogisticChains()) {
-        for (LogisticChainElement element : solution.getLogisticChainElements()) {
-          if (element.getResource() instanceof LSPCarrierResource carrierResource) {
-            Carrier carrier = carrierResource.getCarrier();
-            if (!carriers.getCarriers().containsKey(carrier.getId())) {
-              carriers.addCarrier(carrier);
-            }
-          }
-        }
-      }
-    }
-    return carriers;
-  }
-
-  @Override
-  public void notifyIterationStarts(IterationStartsEvent event) {}
-
-  @Override
-  public void notifyIterationEnds(IterationEndsEvent event) {
-    new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario))
-        .write(controlerIO.getIterationFilename(event.getIteration(), "lsps.xml"));
-  }
-
-  @Override
-  public void notifyShutdown(ShutdownEvent event) {
-    new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario))
-        .write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-	CarriersUtils.writeCarriers(scenario,"output_carriers.xml.gz");
-  }
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
+		CarriersUtils.writeCarriers(scenario,"output_carriers.xml.gz");
+	}
 
 }
