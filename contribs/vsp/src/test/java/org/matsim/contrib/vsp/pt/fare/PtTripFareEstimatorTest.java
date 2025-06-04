@@ -87,6 +87,7 @@ public class PtTripFareEstimatorTest {
 		PersonVehicles vehicles = new PersonVehicles();
 		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
 		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
 		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
 		}
