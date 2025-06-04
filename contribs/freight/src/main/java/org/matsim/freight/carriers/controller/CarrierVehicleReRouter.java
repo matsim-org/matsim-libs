@@ -62,15 +62,14 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         vehicleRoutingTransportCosts = getNetworkBasedTransportCosts(network,vehicleTypes,travelTimes,roadPricing);
         vehicleRoutingActivityCosts = new VehicleRoutingActivityCosts() {
 
-            private final double penalty4missedTws = 0.01;
-
-            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Service/WaitingTimeUnit ... but make sure that this where set correctly.
+			//TODO: KMT/jan18 Replace per TimeUnit to per Transport/Service/WaitingTimeUnit ... but make sure that this where set correctly.
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
-                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
+				double penalty4missedTws = 0.01;
+				return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
             }
 
 			@Override
@@ -134,7 +133,7 @@ class CarrierVehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //		SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
         //create carrierPlan from solution
-        CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+        CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
 
         //route plan (currently jsprit does not memorize the routes, thus route the plan)
 //		NetworkRouter.routePlan(plan, networkBasedTransportCosts);

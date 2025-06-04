@@ -65,14 +65,11 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
-		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
-		nodeMap.putAll(network.getNodes());
-
-		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.numberOfThreads, MAX_THREADS));
+		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
 	@VisibleForTesting

@@ -62,7 +62,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 		this.params = params;
 
 		assignmentProblem = new VehicleAssignmentProblem<>(network, travelTime, travelDisutility, router,
-				params.nearestRequestsLimit, params.nearestVehiclesLimit);
+				params.getNearestRequestsLimit(), params.getNearestVehiclesLimit());
 
 		assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
 	}
@@ -91,8 +91,8 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
 		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler.getScheduleInquiry()::isIdle).count();
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ?
-				params.vehPlanningHorizonUndersupply :
-				params.vehPlanningHorizonOversupply;
+				params.getVehPlanningHorizonUndersupply() :
+                params.getVehPlanningHorizonOversupply();
 		return new VehicleData(timer.getTimeOfDay(), scheduler.getScheduleInquiry(),
 				fleet.getVehicles().values().stream(), vehPlanningHorizon);
 	}

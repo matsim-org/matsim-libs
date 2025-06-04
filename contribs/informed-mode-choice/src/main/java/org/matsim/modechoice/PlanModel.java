@@ -1,6 +1,7 @@
 package org.matsim.modechoice;
 
 import com.google.common.collect.Lists;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -8,10 +9,11 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * A coarse model of the daily plan containing the trips and legs for using each mode.
@@ -42,11 +44,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	 * Estimates for all modes and all available {@link ModeOptions}.
 	 */
 	private final Map<String, List<ModeEstimate>> estimates;
-
-	/**
-	 * Flag to indicate all routes have been computed;
-	 */
-	private boolean fullyRouted;
 
 	/**
 	 * Create a new plan model instance from an existing plan.
@@ -217,29 +214,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return Arrays.asList(trips);
 	}
 
-	void setLegs(String mode, List<Leg>[] legs) {
-		mode = mode.intern();
-
-		List<Leg>[] existing = this.legs.putIfAbsent(mode, legs);
-
-		if (existing != null) {
-
-			if (legs.length != existing.length)
-				throw new IllegalArgumentException(String.format("Existing legs have different length than the newly provided: %d vs. %d", existing.length, legs.length));
-
-			// Copy existing non-null legs
-			for (int i = 0; i < legs.length; i++) {
-				List<Leg> l = legs[i];
-				if (l != null)
-					existing[i] = l;
-			}
-		}
-	}
-
-	void setFullyRouted(boolean value) {
-		this.fullyRouted = value;
-	}
-
 	void putEstimate(String mode, List<ModeEstimate> options) {
 		this.estimates.put(mode, options);
 	}
@@ -265,17 +239,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	}
 
 	/**
-	 * Check io estimates are present. Otherwise call {@link PlanModelService}
-	 */
-	public boolean hasEstimates() {
-		return !this.estimates.isEmpty();
-	}
-
-	public boolean isFullyRouted() {
-		return fullyRouted;
-	}
-
-	/**
 	 * Return all possible choice combinations.
 	 */
 	public List<List<ModeEstimate>> combinations() {
@@ -297,18 +260,30 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 		return legs[i];
 	}
 
+	@SuppressWarnings("unchecked")
+	List<Leg>[] getLegs(String mode, List<Leg> def) {
+		return this.legs.computeIfAbsent(mode.intern(), k -> IntStream.range(0, trips.length).mapToObj(i -> def).toArray(List[]::new));
+	}
+
 	/**
-	 * Check whether a mode is available for a trip.
-	 * If for instance not pt option is found in the legs this will return false.
+	 * Check whether a mode is available for a trip or only walk legs are returned for non-walk trips
+	 * (i.e., because pt is not available).
+	 * A route consisting of only feeder modes other than walk (i.e., start->drt_feeder->station->walk->destination)
+	 * should be considered valid per definition of the pt router. This is also true if the pt router uses modeMappings to i.e., metro or bus.
+	 *
 	 */
-	public boolean hasModeForTrip(String mode, int i) {
+	public boolean doesNotConsistOfOnlyWalksLegs(String mode, int i) {
 
 		List<Leg>[] legs = this.legs.get(mode);
 		if (legs == null)
 			return false;
 
 		List<Leg> ll = legs[i];
-		return ll.stream().anyMatch(l -> l.getMode().equals(mode));
+		if (mode.equals(TransportMode.walk)) {
+			return ll.stream().anyMatch(l -> l.getMode().equals(mode));
+		} else {
+			return !ll.stream().allMatch(leg -> leg.getMode().equals(TransportMode.walk));
+		}
 	}
 
 	/**
@@ -317,7 +292,6 @@ public final class PlanModel implements Iterable<TripStructureUtils.Trip>, HasPe
 	public void reset() {
 		legs.clear();
 		estimates.clear();
-		fullyRouted = false;
 	}
 
 	@Override

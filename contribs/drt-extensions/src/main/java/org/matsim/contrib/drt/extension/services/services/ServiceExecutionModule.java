@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 public class ServiceExecutionModule extends AbstractDvrpModeModule {
 
 	public ServiceExecutionModule(DrtConfigGroup drtConfigGroup) {
-		super(drtConfigGroup.mode);
+		super(drtConfigGroup.getMode());
 	}
 
 	@Override

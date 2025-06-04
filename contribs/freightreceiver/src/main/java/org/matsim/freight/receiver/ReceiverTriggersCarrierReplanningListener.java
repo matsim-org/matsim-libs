@@ -82,11 +82,11 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
                                     (int) (Math.round(order.getDailyOrderQuantity()*order.getProduct().getProductType().getRequiredCapacity())) );
                     CarrierShipment newShipment = builder
                                                                   .setDeliveryDuration( order.getServiceDuration() )
-                                                                  .setDeliveryStartsTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
+                                                                  .setDeliveryStartingTimeWindow( receiverPlan.getTimeWindows().get( 0 ) )
                                                                   // TODO This only looks at the FIRST time window. This may need revision once we handle multiple
                                                                   // time windows.
                                                                   .build();
-                    if (newShipment.getDemand() != 0) {
+                    if (newShipment.getCapacityDemand() != 0) {
                         receiverOrder.getCarrier().getShipments().put(newShipment.getId(), newShipment );
                     }
                 }
@@ -109,7 +109,7 @@ class ReceiverTriggersCarrierReplanningListener implements IterationStartsListen
             Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 
             //create a new carrierPlan from the best solution
-            CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf( solutions ) );
+            CarrierPlan newPlan = MatsimJspritFactory.createPlan(Solutions.bestOf( solutions ) );
 
             //route plan
             NetworkRouter.routePlan(newPlan, netBasedCosts);

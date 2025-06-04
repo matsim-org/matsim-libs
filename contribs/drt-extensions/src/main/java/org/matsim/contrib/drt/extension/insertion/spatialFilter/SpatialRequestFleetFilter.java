@@ -22,12 +22,12 @@ package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -40,7 +40,7 @@ import org.matsim.core.utils.geometry.GeometryUtils;
 
 import java.util.*;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
+    import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 /**
  * Filter that periodically updates a spatial search tree with current vehicle positions.
@@ -57,6 +57,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
  */
 public class SpatialRequestFleetFilter implements RequestFleetFilter {
 
+    private double lastTreeUpdate = Double.NEGATIVE_INFINITY;
     private STRtree tree = new STRtree();
 
     private final Fleet fleet;
@@ -75,30 +76,34 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
                                      DrtSpatialRequestFleetFilterParams params) {
         this.fleet = fleet;
         this.mobsimTimer = mobsimTimer;
-        this.expansionIncrementFactor = params.expansionFactor;
-        this.minExpansion = params.minExpansion;
-        this.maxExpansion = params.maxExpansion;
-        this.returnAllIfEmpty = params.returnAllIfEmpty;
-        this.minCandidates = params.minCandidates;
-        this.updateInterval = params.updateInterval;
+        this.expansionIncrementFactor = params.getExpansionFactor();
+        this.minExpansion = params.getMinExpansion();
+        this.maxExpansion = params.getMaxExpansion();
+        this.returnAllIfEmpty = params.isReturnAllIfEmpty();
+        this.minCandidates = params.getMinCandidates();
+        this.updateInterval = params.getUpdateInterval();
     }
 
     @Override
     public Collection<VehicleEntry> filter(DrtRequest drtRequest, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, double now) {
-        if ((mobsimTimer.getTimeOfDay() % updateInterval) == 0) {
+        if (now >= lastTreeUpdate + updateInterval) {
             buildTree();
+            // Alternative (to stick cadence to a "grid"):
+            // lastTreeUpdate = Math.floor(now / updateInterval) * updateInterval;
+            lastTreeUpdate = now;
         }
         return filterEntries(vehicleEntries, drtRequest);
     }
 
     private Collection<VehicleEntry> filterEntries(Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, DrtRequest drtRequest) {
-        List<Id<DvrpVehicle>> result = Collections.emptyList();
+        Collection<VehicleEntry> result = Collections.emptyList();
         Point point = GeometryUtils.createGeotoolsPoint(drtRequest.getFromLink().getToNode().getCoord());
 
         for (double expansion = minExpansion; expansion <= maxExpansion && result.size() < minCandidates; expansion*= expansionIncrementFactor) {
             Envelope envelopeInternal = point.getEnvelopeInternal();
             envelopeInternal.expandBy(expansion);
-            result = tree.query(envelopeInternal);
+            var ids = tree.query(envelopeInternal);
+            result = extract(vehicleEntries, ids);
         }
 
         if(result.size() < minCandidates) {
@@ -107,13 +112,18 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
             }
             return Collections.emptySet();
         }
-        return extract(vehicleEntries, result);
+
+        return result;
     }
 
     private Collection<VehicleEntry> extract(Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, List<Id<DvrpVehicle>> result) {
         Set<VehicleEntry> extracted = new LinkedHashSet<>();
         for (Id<DvrpVehicle> dvrpVehicleId : result) {
-            extracted.add(vehicleEntries.get(dvrpVehicleId));
+            // VehicleEntries only contains available vehicles. The spatial tree might be out of sync with this set of
+            // vehicles and contain vehicles that are not available anymore. Hence, the need to check.
+            if (vehicleEntries.containsKey(dvrpVehicleId)) {
+                extracted.add(vehicleEntries.get(dvrpVehicleId));
+            }
         }
         return extracted;
     }
@@ -123,21 +133,32 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
         for (DvrpVehicle vehicle : fleet.getVehicles().values()) {
             Schedule schedule = vehicle.getSchedule();
             Task startTask;
-            Link start;
+
             if (schedule.getStatus() == Schedule.ScheduleStatus.STARTED) {
                 startTask = schedule.getCurrentTask();
-                start = switch (getBaseTypeOrElseThrow(startTask)) {
-                    case DRIVE -> {
-                        var driveTask = (DriveTask) startTask;
+
+                switch (startTask) {
+                    case StayTask stayTask -> insertVehicleInTree(tree, vehicle, stayTask.getLink().getCoord());
+                    case DriveTask driveTask -> {
                         var diversionPoint = ((OnlineDriveTaskTracker) driveTask.getTaskTracker()).getDiversionPoint();
-                        yield diversionPoint != null ? diversionPoint.link : //diversion possible
-                                driveTask.getPath().getToLink();// too late for diversion
+                        var link = diversionPoint != null ? diversionPoint.link : //diversion possible
+                            driveTask.getPath().getToLink();// too late for diversion
+
+
+                        insertVehicleInTree(tree, vehicle, link.getCoord());
                     }
-                    case STOP -> ((DrtStopTask) startTask).getLink();
-                    case STAY -> ((StayTask) startTask).getLink();
-                };
-                tree.insert(GeometryUtils.createGeotoolsPoint(start.getCoord()).getEnvelopeInternal(), vehicle.getId());
+                    case OperationalStop operationalStop -> {
+                        var coord = operationalStop.getFacility().getCoord();
+                        insertVehicleInTree(tree, vehicle, coord);
+                    }
+                    case null -> throw new RuntimeException("Current task is null for schedule "+schedule+" for vehicle "+vehicle);
+                    default -> throw new RuntimeException("Unknown task type: " + startTask.getClass());
+                }
             }
         }
+    }
+
+    private static void insertVehicleInTree(STRtree tree, DvrpVehicle vehicle, Coord coord) {
+        tree.insert(GeometryUtils.createGeotoolsPoint(coord).getEnvelopeInternal(), vehicle.getId());
     }
 }

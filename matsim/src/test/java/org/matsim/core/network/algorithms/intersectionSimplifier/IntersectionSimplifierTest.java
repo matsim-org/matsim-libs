@@ -23,17 +23,19 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.io.NetworkWriter;
@@ -41,7 +43,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class IntersectionSimplifierTest {
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testComplexIntersection() {
@@ -73,7 +76,7 @@ public class IntersectionSimplifierTest {
 			Assertions.fail("Should not allow to simplify a network more than once");
 		} catch(Exception e) {
 			/* Pass. */
-			e.printStackTrace();
+			LogManager.getLogger(IntersectionSimplifierTest.class).info("Correctly caught exception.", e);
 		}
 	}
 
@@ -94,7 +97,7 @@ public class IntersectionSimplifierTest {
 		Assertions.assertNotNull(centroid, "Must be associated with a cluster.");
 
 		Coord centroidCoord = CoordUtils.createCoord(85.0, 85.0);
-		Assertions.assertTrue(centroidCoord.equals(centroid.getCoord()), "Wrong centroid Coord.");
+        Assertions.assertEquals(centroidCoord, centroid.getCoord(), "Wrong centroid Coord.");
 		Assertions.assertTrue(centroid.getId().toString().contains("-"), "Wrong centroid Id (does not contain \"-\" separator between merged node ids).");
 	}
 
@@ -106,7 +109,7 @@ public class IntersectionSimplifierTest {
 		Network simpleNetwork = is.simplify(network);
 		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		List<Cluster> clusters = is.getClusters();
-		Assertions.assertEquals(6l, clusters.size(), "Wrong number of clusters");
+		Assertions.assertEquals(6L, clusters.size(), "Wrong number of clusters");
 
 		/* Check some clusters. */
 		Cluster c1 = findCluster(clusters, CoordUtils.createCoord(85.0, 85.0));
@@ -128,7 +131,7 @@ public class IntersectionSimplifierTest {
 		Network simpleNetwork = is.simplify(network);
 		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		List<Cluster> clusters = is.getClusters();
-		Assertions.assertEquals(2l, clusters.size(), "Wrong number of clusters");
+		Assertions.assertEquals(2L, clusters.size(), "Wrong number of clusters");
 
 		/* Check some clusters. */
 		Cluster c1 = findCluster(clusters, CoordUtils.createCoord(85.0, 85.0));
@@ -154,10 +157,10 @@ public class IntersectionSimplifierTest {
 		is.writeClustersToFile(utils.getOutputDirectory() + "clusters.csv");
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network1.xml");
 
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork, Set.of(TransportMode.car));
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network2.xml");
 
-		Assertions.assertEquals(18l, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
+		Assertions.assertEquals(18L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
 
 		Assertions.assertNotNull(simpleNetwork.getNodes().get(Id.createNodeId("1")), "Should find node '1'");
 		Assertions.assertNotNull(simpleNetwork.getNodes().get(Id.createNodeId("3")), "Should find node '3'");
@@ -192,10 +195,10 @@ public class IntersectionSimplifierTest {
 		nct.run(simpleNetwork);
 		NetworkSimplifier ns = new NetworkSimplifier();
 		ns.run(simpleNetwork);
-		new NetworkCleaner().run(simpleNetwork);
+		NetworkUtils.cleanNetwork(simpleNetwork, Set.of(TransportMode.car));
 		new NetworkWriter(simpleNetwork).write(utils.getOutputDirectory() + "network.xml");
 
-		Assertions.assertEquals(12l, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
+		Assertions.assertEquals(12L, simpleNetwork.getNodes().size(), "Wrong number of nodes.");
 
 		Assertions.assertNotNull(simpleNetwork.getNodes().get(Id.createNodeId("1")), "Should find node '1'");
 		Assertions.assertNotNull(simpleNetwork.getNodes().get(Id.createNodeId("3")), "Should find node '3'");

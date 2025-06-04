@@ -110,13 +110,19 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 			}
 
 			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
-				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate "
-						+ "to be different than zero. Continuing anyway.") ;
+				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the monetary distance rate "
+						+ "to be different than zero. Continuing anyway.", mode) ;
+				log.warn( "You can also set the width of the routing randomness to zero:");
+				log.warn("\t\tconfig.routing().setRoutingRandomness( 0. );");
+				log.warn( "in code, or");
+				log.warn("\t<module name=\"routing\" >");
+				log.warn("\t\t<param name=\"routingRandomness\" value=\"0.\" />");
+				log.warn("in the xml config");
 			}
 
 			if ( (cnScoringGroup.getModes().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
-				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate "
-						+ "to be different than zero. Continuing anyway.") ;
+				log.warn("There will be no routing randomness for mode={}. The randomization of the travel disutility requires the travel time cost rate "
+						+ "to be different than zero. Continuing anyway.", mode) ;
 			}
 		}
 	}

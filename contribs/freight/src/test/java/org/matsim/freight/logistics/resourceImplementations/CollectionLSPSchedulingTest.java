@@ -33,9 +33,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -55,10 +57,9 @@ public class CollectionLSPSchedulingTest {
 	@BeforeEach
 	public void initialize() {
 
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -197,10 +198,10 @@ public class CollectionLSPSchedulingTest {
 			assertInstanceOf(LSPTourEndEventHandler.class, eventHandlers.getFirst());
 			LSPTourEndEventHandler endHandler = (LSPTourEndEventHandler) eventHandlers.getFirst();
 			assertSame(endHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
-                assertEquals(endHandler.getCarrierService().getDemand(), shipment.getSize());
+                assertEquals(endHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(endHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
-			assertEquals(endHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(endHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(endHandler.getLogisticChainElement(), planElements.get(2).getLogisticChainElement());
 			assertSame(endHandler.getLogisticChainElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(endHandler.getLspShipment(), shipment);
@@ -212,10 +213,10 @@ public class CollectionLSPSchedulingTest {
 			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
-                assertEquals(serviceHandler.getCarrierService().getDemand(), shipment.getSize());
+                assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);
-			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
-			assertEquals(serviceHandler.getCarrierService().getServiceStartTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getStart(), shipment.getPickupTimeWindow().getStart(), 0.0);
+			assertEquals(serviceHandler.getCarrierService().getServiceStaringTimeWindow().getEnd(), shipment.getPickupTimeWindow().getEnd(), 0.0);
 			assertSame(serviceHandler.getElement(), planElements.get(1).getLogisticChainElement());
 			assertSame(serviceHandler.getElement(), collectionLSP.getSelectedPlan().getLogisticChains().iterator().next().getLogisticChainElements().iterator().next());
 			assertSame(serviceHandler.getLspShipment(), shipment);

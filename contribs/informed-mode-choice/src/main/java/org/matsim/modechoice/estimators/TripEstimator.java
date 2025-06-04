@@ -37,7 +37,7 @@ public interface TripEstimator {
 	 * @param option mode availability
 	 * @return Estimated utility
 	 */
-	default double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+	default double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 		throw new UnsupportedOperationException("providesMinEstimate returned true, but estimate function for the whole plan is not implemented yet.");
 	}
 

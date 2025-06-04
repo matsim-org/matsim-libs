@@ -23,23 +23,38 @@ package org.matsim.freight.logistics;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+/**
+ * A container that stores {@link LSP}s.
+ */
 public class LSPs {
 
-  private final Map<Id<LSP>, LSP> lsps = new LinkedHashMap<>();
+	private static final Logger log = LogManager.getLogger(LSPs.class);
+	private final Map<Id<LSP>, LSP> lsps = new LinkedHashMap<>();
 
-  public LSPs(Collection<LSP> lsps) {
-    makeMap(lsps);
-  }
+	public LSPs() {}
 
-  private void makeMap(Collection<LSP> lsps) {
-    for (LSP c : lsps) {
-      this.lsps.put(c.getId(), c);
-    }
-  }
+	public LSPs(Collection<LSP> lsps) {
+		addLsps(lsps);
+	}
 
-  public Map<Id<LSP>, LSP> getLSPs() {
-    return lsps;
-  }
+	public void addLsps(Collection<LSP> lsps) {
+		for (LSP lsp : lsps) {
+			addLsp(lsp);
+		}
+	}
+	public void addLsp(LSP lsp) {
+		if (!lsps.containsKey(lsp.getId())) {
+			lsps.put(lsp.getId(), lsp);
+		}
+		else log.warn("LSP {} already exists. It has NOT been added.", lsp.getId());
+	}
+
+	public Map<Id<LSP>, LSP> getLSPs() {
+		return lsps;
+	}
 }

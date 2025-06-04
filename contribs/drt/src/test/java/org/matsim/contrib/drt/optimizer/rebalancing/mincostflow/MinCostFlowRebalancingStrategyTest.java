@@ -76,8 +76,8 @@ public class MinCostFlowRebalancingStrategyTest {
 
         RebalancingParams rebalancingParams = new RebalancingParams();
         MinCostFlowRebalancingStrategyParams minCostFlowRebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
-        minCostFlowRebalancingStrategyParams.targetAlpha = 1.;
-        minCostFlowRebalancingStrategyParams.targetBeta = 0.;
+        minCostFlowRebalancingStrategyParams.setTargetAlpha(1.);
+        minCostFlowRebalancingStrategyParams.setTargetBeta(0.);
         rebalancingParams.addParameterSet(minCostFlowRebalancingStrategyParams);
 
         AggregatedMinCostRelocationCalculator relocationCalculator = new AggregatedMinCostRelocationCalculator(new MostCentralDrtZoneTargetLinkSelector(zonalSystem));
@@ -96,8 +96,8 @@ public class MinCostFlowRebalancingStrategyTest {
 
         RebalancingParams rebalancingParams = new RebalancingParams();
         MinCostFlowRebalancingStrategyParams minCostFlowRebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
-        minCostFlowRebalancingStrategyParams.targetAlpha = 1.;
-        minCostFlowRebalancingStrategyParams.targetBeta = 0.;
+        minCostFlowRebalancingStrategyParams.setTargetAlpha(1.);
+        minCostFlowRebalancingStrategyParams.setTargetBeta(0.);
         rebalancingParams.addParameterSet(minCostFlowRebalancingStrategyParams);
 
         AggregatedMinCostRelocationCalculator relocationCalculator = new AggregatedMinCostRelocationCalculator(new MostCentralDrtZoneTargetLinkSelector(zonalSystem));
@@ -109,7 +109,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(200, link1, TransportMode.drt));
         estimator.handleEvent(departureEvent(500, link2, TransportMode.drt));
         estimator.handleEvent(departureEvent(1500, link1, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
         List<RebalancingStrategy.Relocation> relocations = strategy.calculateMinCostRelocations(0, rebalanceableVehicles, Collections.emptyMap());
@@ -123,8 +123,8 @@ public class MinCostFlowRebalancingStrategyTest {
 
         RebalancingParams rebalancingParams = new RebalancingParams();
         MinCostFlowRebalancingStrategyParams minCostFlowRebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
-        minCostFlowRebalancingStrategyParams.targetAlpha = 1.;
-        minCostFlowRebalancingStrategyParams.targetBeta = 0.;
+        minCostFlowRebalancingStrategyParams.setTargetAlpha(1.);
+        minCostFlowRebalancingStrategyParams.setTargetBeta(0.);
         rebalancingParams.addParameterSet(minCostFlowRebalancingStrategyParams);
 
         AggregatedMinCostRelocationCalculator relocationCalculator = new AggregatedMinCostRelocationCalculator(new MostCentralDrtZoneTargetLinkSelector(zonalSystem));
@@ -137,7 +137,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(300, link1, TransportMode.drt));
         // 1 expected trip in zone 2
         estimator.handleEvent(departureEvent(100, link2, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
 
@@ -164,7 +164,7 @@ public class MinCostFlowRebalancingStrategyTest {
         rebalanceableVehicles.put(zone1, rebalanceableVehiclesZone1);
 
         //set alpha to 2 -> send two vehicles to zone 2
-        minCostFlowRebalancingStrategyParams.targetAlpha = 2.;
+        minCostFlowRebalancingStrategyParams.setTargetAlpha(2.);
         List<RebalancingStrategy.Relocation> relocations2 = strategy.calculateMinCostRelocations(0, rebalanceableVehicles, Collections.emptyMap());
         Assertions.assertThat(relocations2.size()).isEqualTo(2);
         Assertions.assertThat(relocations2.getFirst().link.getId()).isEqualTo(link2.getId());
@@ -186,7 +186,7 @@ public class MinCostFlowRebalancingStrategyTest {
 
         RebalancingParams rebalancingParams = new RebalancingParams();
         MinCostFlowRebalancingStrategyParams minCostFlowRebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
-        minCostFlowRebalancingStrategyParams.targetCoefficientSource = MinCostFlowRebalancingStrategyParams.TargetCoefficientSource.FromZoneAttribute;
+        minCostFlowRebalancingStrategyParams.setTargetCoefficientSource(MinCostFlowRebalancingStrategyParams.TargetCoefficientSource.FromZoneAttribute);
         rebalancingParams.addParameterSet(minCostFlowRebalancingStrategyParams);
 
         AggregatedMinCostRelocationCalculator relocationCalculator = new AggregatedMinCostRelocationCalculator(new MostCentralDrtZoneTargetLinkSelector(zonalSystem));
@@ -199,7 +199,7 @@ public class MinCostFlowRebalancingStrategyTest {
         estimator.handleEvent(departureEvent(300, link1, TransportMode.drt));
         // 1 expected trip in zone 2
         estimator.handleEvent(departureEvent(100, link2, TransportMode.drt));
-        estimator.reset(1);
+        estimator.notifyIterationEnds(null);
 
         Map<Zone, List<DvrpVehicle>> rebalanceableVehicles = new HashMap<>();
 
@@ -251,7 +251,7 @@ public class MinCostFlowRebalancingStrategyTest {
 
     private PreviousIterationDrtDemandEstimator createEstimator() {
         RebalancingParams rebalancingParams = new RebalancingParams();
-        rebalancingParams.interval = ESTIMATION_PERIOD;
+        rebalancingParams.setInterval(ESTIMATION_PERIOD);
 
         DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
         drtConfigGroup.addParameterSet(rebalancingParams);

@@ -9,7 +9,7 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.NearestParkingDynLeg;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
@@ -85,7 +85,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 //			Leg currentLeg = (Leg) this.currentPlanElement;
 			int planIndexNextActivity = planIndex + 1;
 			Activity nextPlanElement = (Activity) plan.getPlanElements().get(planIndexNextActivity);
-			if (ParkingUtils.checkIfActivityHasNoParking(nextPlanElement)) {
+			if (ParkingSearchUtils.checkIfActivityHasNoParking(nextPlanElement)) {
 				this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 			}
 			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
@@ -127,7 +127,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 
 		if (plan.getPlanElements().size() >= planIndex + 1) {
 			if (plan.getPlanElements().get(planIndex) instanceof Activity && ((Activity) plan.getPlanElements().get(planIndex)).getType().equals(
-				ParkingUtils.WaitingForParkingActivityType)) {
+				ParkingSearchUtils.WaitingForParkingActivityType)) {
 				//now the waiting activity has finished and we can park now
 				this.parkingManager.parkVehicleHere(Id.create(this.agent.getId(), Vehicle.class), agent.getCurrentLinkId(), now);
 				return nextStateAfterNonCarTrip(oldAction, now);
@@ -136,11 +136,11 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 				return nextStateAfterNonCarTrip(oldAction, now);
 			}
 			if (plan.getPlanElements().get(planIndex) instanceof Activity && ((Activity) plan.getPlanElements().get(planIndex)).getType()
-																															   .contains("_GetOff")) {
+				.contains("_GetOff")) {
 				((Activity) plan.getPlanElements().get(planIndex)).setEndTime(now);
 				((Activity) plan.getPlanElements().get(planIndex + 4)).setStartTime(now + ((Activity) plan.getPlanElements()
-																										  .get(planIndex + 2)).getMaximumDuration()
-																															  .seconds());
+					.get(planIndex + 2)).getMaximumDuration()
+					.seconds());
 				// checks if it is possible to stay from getOff until getIn
 				boolean possibleToStay = checkIfParkingIsPossibleUntilNextActivities(this.planIndex, this.planIndex + 2);
 				if (possibleToStay) {
@@ -173,7 +173,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 					throw new RuntimeException(message);
 				}
 				this.currentlyAssignedVehicleId = vehicleId;
-				this.stageInteractionType = ParkingUtils.ParkingStageInteractionType;
+				this.stageInteractionType = ParkingSearchUtils.ParkingStageInteractionType;
 				if (!walkLeg.getTravelTime().equals(OptionalTime.defined(0.))) {
 					this.lastParkActionState = LastParkActionState.WALKTOPARK;
 					return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
@@ -207,7 +207,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
 		Activity beforePlanElement = (Activity) plan.getPlanElements().get(planIndex - 1);
-		if (ParkingUtils.checkIfActivityHasNoParking(beforePlanElement)) {
+		if (ParkingSearchUtils.checkIfActivityHasNoParking(beforePlanElement)) {
 			return nextStateAfterUnParkActivity(oldAction, now); // wenn kein Parken dann einfach weiter
 		}
 		return new IdleDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
@@ -216,7 +216,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 	@Override
 	protected DynAction nextStateAfterCarTrip(DynAction oldAction, double now) {
 		if (this.plan.getPlanElements().get(planIndex + 1) instanceof Activity && ((Activity) this.plan.getPlanElements().get(
-			planIndex + 1)).getType().equals(ParkingUtils.WaitingForParkingActivityType)) {
+			planIndex + 1)).getType().equals(ParkingSearchUtils.WaitingForParkingActivityType)) {
 			//next activity is waiting for parking. Thats why we have no parkVehicleHere at this moment
 			this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 			this.currentlyAssignedVehicleId = null;
@@ -240,7 +240,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		this.currentPlanElement = plan.getPlanElements().get(planIndex + 1);
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		// checks if you can extend parking here until getIn
-		if (nextPlannedActivity.getType().equals(ParkingUtils.ParkingActivityType) && plan.getPlanElements().get(planIndex + 2) instanceof Leg) {
+		if (nextPlannedActivity.getType().equals(ParkingSearchUtils.ParkingActivityType) && plan.getPlanElements().get(planIndex + 2) instanceof Leg) {
 			checkIfParkingIsPossibleUntilNextActivities(planIndex + 1, planIndex + 1);
 		}
 		// switch back to activity
@@ -268,7 +268,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		if (indexOfFollowingActivity == indexOfParkingActivity) {
 			Activity currentActivity = ((Activity) plan.getPlanElements().get(this.planIndex));
 			Activity activityAfterFollowing = ((Activity) plan.getPlanElements().get(this.planIndex + 4));
-			if (agent.getCurrentLinkId().equals(activityAfterFollowing.getLinkId()) && !ParkingUtils.checkIfActivityHasNoParking(
+			if (agent.getCurrentLinkId().equals(activityAfterFollowing.getLinkId()) && !ParkingSearchUtils.checkIfActivityHasNoParking(
 				(Activity) currentPlanElement)) {
 				boolean canParkAtFacilityUntilGetIn = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(
 					agent.getCurrentLinkId(),
@@ -285,7 +285,7 @@ public class NearestParkingSpotAgentLogic extends ParkingAgentLogic {
 		// checks if the now started parking activity can extend until the end of the following GetIn activity
 		else if (indexOfCurrentActivity == indexOfParkingActivity) {
 			Activity currentActivity = ((Activity) plan.getPlanElements().get(this.planIndex + 1));
-			if (agent.getCurrentLinkId().equals(followingActivity.getLinkId()) && !ParkingUtils.checkIfActivityHasNoParking(
+			if (agent.getCurrentLinkId().equals(followingActivity.getLinkId()) && !ParkingSearchUtils.checkIfActivityHasNoParking(
 				followingActivity)) {
 				boolean canParkAtFacilityUntilGetIn = ((FacilityBasedParkingManager) parkingManager).canParkAtThisFacilityUntilEnd(
 					agent.getCurrentLinkId(),

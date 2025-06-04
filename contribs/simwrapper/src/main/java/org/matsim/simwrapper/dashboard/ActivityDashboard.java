@@ -9,7 +9,7 @@ import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.TextBlock;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,16 +22,28 @@ import java.util.stream.Collectors;
 public class ActivityDashboard implements Dashboard {
 
 	private static final String ID_COLUMN = "id";
-	private static final String REF_JOIN = "id";
 
 	private final String shpFile;
 	private final Map<String, String> activityMapping = new LinkedHashMap<>();
 	private final Map<String, String> refCsvs = new LinkedHashMap<>();
-	private final Set<String> countMultipleOccurrencesSet = new HashSet<>();
+	private final Set<String> countSingleOccurrencesSet = new HashSet<>();
 	private List<Indicator> indicators = new ArrayList<>();
 
-	public ActivityDashboard(String shpFile) {
-		this.shpFile = Objects.requireNonNull(shpFile, "Shapefile can not be null!");
+	/**
+	 * Create a new activity dashboard using the default shape file.
+	 * Note that the shape file must contain multiple regions with an "id" column.
+	 * This dashboard can be created with {@link ActivityDashboard(String)} to use a separate shape file for this analysis..
+	 */
+	public ActivityDashboard() {
+		this.shpFile = null;
+	}
+
+	/**
+	 * Create a new activity dashboard using the given shape file.
+	 * @param shpFile Path to the shape file containing an "id" column.
+	 */
+	public ActivityDashboard(@Nullable String shpFile) {
+		this.shpFile = shpFile;
 	}
 
 	/**
@@ -56,8 +68,8 @@ public class ActivityDashboard implements Dashboard {
 		activityMapping.put(name, String.join(",", activities));
 		refCsvs.put(name, refCsv);
 
-		if (countMultipleOccurrences) {
-			countMultipleOccurrencesSet.add(name);
+		if (!countMultipleOccurrences) {
+			countSingleOccurrencesSet.add(name);
 		}
 
 		this.indicators = indicators;
@@ -70,17 +82,16 @@ public class ActivityDashboard implements Dashboard {
 		header.title = "Activities";
 		header.description = "Displays the activities by type and location.";
 
-		List<String> args = new ArrayList<>(List.of("--id-column", ID_COLUMN, "--shp", shpFile));
+		List<String> args = new ArrayList<>(List.of("--id-column", ID_COLUMN));
 		args.add("--activity-mapping");
 		args.add(activityMapping.entrySet().stream()
 			.map(e -> "%s=%s".formatted(e.getKey(), e.getValue()))
 			.collect(Collectors.joining(";")));
 
-		args.add("--single-occurrence");
-		if (!countMultipleOccurrencesSet.isEmpty()) {
-			args.add(String.join(";", countMultipleOccurrencesSet));
+		if (!countSingleOccurrencesSet.isEmpty()) {
+			args.add("--single-occurrence");
+			args.add(String.join(";", countSingleOccurrencesSet));
 		}
-
 
 		for (Map.Entry<String, String> activity : activityMapping.entrySet()) {
 
@@ -102,13 +113,18 @@ public class ActivityDashboard implements Dashboard {
 							viz.height = 8.;
 							String shp = data.resource(shpFile);
 							viz.setShape(shp, ID_COLUMN);
-							viz.addDataset("transit-trips", data.computeWithPlaceholder(ActivityCountAnalysis.class, "activities_%s_per_region.csv", activity.getKey(), args.toArray(new String[0])));
+							viz.addDataset("activities", data.computeWithPlaceholder(ActivityCountAnalysis.class,
+								"activities_%s_per_region.csv", activity.getKey(), args.toArray(new String[0])));
 							viz.display.fill.columnName = ind.name;
-							viz.display.fill.dataset = "transit-trips";
-							viz.display.fill.join = REF_JOIN;
+							viz.display.fill.dataset = "activities";
+							viz.display.fill.join = ID_COLUMN;
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.setColorRamp(ColorScheme.RdBu, 11, false, "0.2, 0.25, 0.33, 0.5, 0.67, 1.5, 2.0, 3.0, 4.0, 5.0");
 							}
+
+							// Needs to use custom shape file
+							if (shpFile != null)
+								data.shp(ActivityCountAnalysis.class, shpFile);
 						});
 
 					if (refCsvs.get(activity.getKey()) != null) {
@@ -120,10 +136,10 @@ public class ActivityDashboard implements Dashboard {
 							String shp = data.resource(shpFile);
 							viz.setShape(shp, ID_COLUMN);
 
-							viz.addDataset("transit-trips", data.resource(refCsvs.get(activity.getKey())));
+							viz.addDataset("activities", data.resource(refCsvs.get(activity.getKey())));
 
-							viz.display.fill.dataset = "transit-trips";
-							viz.display.fill.join = REF_JOIN;
+							viz.display.fill.dataset = "activities";
+							viz.display.fill.join = ID_COLUMN;
 
 							if (ind == Indicator.RELATIVE_DENSITY) {
 								viz.display.fill.columnName = "relative_density";

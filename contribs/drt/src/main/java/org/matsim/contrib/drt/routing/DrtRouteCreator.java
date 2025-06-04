@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2024 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,10 +23,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
@@ -49,19 +50,22 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 	private final LeastCostPathCalculator router;
 
 	private final DrtRouteConstraintsCalculator routeConstraintsCalculator;
+	private final DvrpLoadFromTrip loadFromPerson;
+	private final DvrpLoadType loadType;
 
 	public DrtRouteCreator(DrtConfigGroup drtCfg, Network modalNetwork,
                            LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TravelTime travelTime,
                            TravelDisutilityFactory travelDisutilityFactory,
-                           DrtRouteConstraintsCalculator routeConstraintsCalculator) {
+                           DrtRouteConstraintsCalculator routeConstraintsCalculator,
+						   DvrpLoadFromTrip loadCreator, DvrpLoadType loadType) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
         this.routeConstraintsCalculator = routeConstraintsCalculator;
+		this.loadFromPerson = loadCreator;
+		this.loadType = loadType;
         router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
-
-
 
 	public Route createRoute(double departureTime, Link accessActLink, Link egressActLink, Person person,
 			Attributes tripAttributes, RouteFactories routeFactories) {
@@ -75,12 +79,13 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
-		route.setTravelTime(constraints.maxTravelTime());
-		route.setMaxRideTime(constraints.maxRideTime());
 		route.setDirectRideTime(unsharedRideTime);
-		route.setMaxWaitTime(constraints.maxWaitTime());
+		route.setConstraints(constraints);
 
-		if (this.drtCfg.storeUnsharedPath) {
+		DvrpLoad load = loadFromPerson.getLoad(person, tripAttributes);
+		route.setLoad(load, loadType);
+
+		if (this.drtCfg.isStoreUnsharedPath()) {
 			route.setUnsharedPath(unsharedPath);
 		}
 

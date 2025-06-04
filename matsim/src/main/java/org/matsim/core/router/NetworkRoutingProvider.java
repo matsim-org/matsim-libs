@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -41,6 +41,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import com.google.inject.name.Named;
 
 import java.util.Map;
+import java.util.Set;
 
 public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
@@ -133,6 +134,12 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			}
 		} else {
 			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
+			log.warn( "This can be achieved by something like" );
+			log.warn("\t\tconfig.routing().setAccessEgressType( AccessEgressType.accessEgressModeToLink );");
+			log.warn( "in code or" );
+			log.warn( "\t<module name=\"routing\" >" );
+			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
+			log.warn( "in the config xml.");
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}	}
 
@@ -149,7 +156,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 		int nLinks = filteredNetwork.getLinks().size();
 		int nNodes = filteredNetwork.getNodes().size();
-		new NetworkCleaner().run(filteredNetwork);
+		NetworkUtils.cleanNetwork(filteredNetwork, Set.of(this.routingMode));
 		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
 
 		if(changed) {

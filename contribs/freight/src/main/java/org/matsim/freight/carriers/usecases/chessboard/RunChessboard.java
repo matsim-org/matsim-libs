@@ -69,7 +69,7 @@ public final class RunChessboard {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
-		CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes( scenario );
+		CarrierVehicleTypes types = CarriersUtils.getOrAddCarrierVehicleTypes( scenario );
 
 		Controller controller = ControllerUtils.createController( scenario );
 
@@ -97,7 +97,7 @@ public final class RunChessboard {
 						String dir = controlerIO.getIterationPath(event.getIteration());
 
 						//write plans
-						new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+						CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 						//write stats
 						freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

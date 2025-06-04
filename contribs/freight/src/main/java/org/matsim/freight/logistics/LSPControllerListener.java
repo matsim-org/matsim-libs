@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +37,6 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarrierPlanWriter;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.controller.CarrierAgentTracker;
@@ -246,8 +245,7 @@ class LSPControllerListener
   public void notifyShutdown(ShutdownEvent event) {
     new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario))
         .write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-    new CarrierPlanWriter(CarriersUtils.getCarriers(scenario))
-        .write(controlerIO.getOutputPath() + "/output_carriers.xml.gz");
+	CarriersUtils.writeCarriers(scenario,"output_carriers.xml.gz");
   }
 
 }

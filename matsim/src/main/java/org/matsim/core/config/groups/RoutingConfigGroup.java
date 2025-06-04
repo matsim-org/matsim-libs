@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
@@ -145,6 +146,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
 		public static final String TELEPORTED_MODE_FREESPEED_FACTOR = "teleportedModeFreespeedFactor";
+		public static final String PERSON_SPEED_ATTRIBUTE = "personSpeedAttribute";
 
 		private String mode = null;
 
@@ -156,6 +158,9 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		private Double teleportedModeFreespeedFactor = null;
 		private Double teleportedModeFreespeedLimit = Double.POSITIVE_INFINITY ;
 
+		// individual person attribute
+		private String personSpeedAttribute = null;
+
 		private static final String TELEPORTED_MODE_FREESPEED_FACTOR_CMT = "Free-speed factor for a teleported mode. " +
 		"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
 		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
@@ -163,6 +168,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
+
+		private static final String PERSON_SPEED_ATTRIBUTE_CMT = "The name of a person attribute that indicates their individual travel speed. Falling back to teleportedModeSpeed.";
 
 		public TeleportedModeParams( final String mode ) {
 			super( SET_TYPE );
@@ -185,6 +192,11 @@ public final class RoutingConfigGroup extends ConfigGroup {
 				// this should not happen anyway as the setters forbid it
 				throw new RuntimeException( "both teleported mode speed or freespeed factor are set for mode "+mode );
 			}
+
+			if ( teleportedModeFreespeedFactor != null && personSpeedAttribute != null ) {
+				// this should not happen anyway as the setters forbid it
+				throw new RuntimeException( "cannot combine per-person speed attribute and freespeed factor for "+mode );
+			}
 		}
 
 		@Override
@@ -195,7 +207,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 					"Speed for a teleported mode. " +
 					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
 			map.put( TELEPORTED_MODE_FREESPEED_FACTOR, TELEPORTED_MODE_FREESPEED_FACTOR_CMT);
-
+			map.put(PERSON_SPEED_ATTRIBUTE, PERSON_SPEED_ATTRIBUTE_CMT);
 			return map;
 		}
 
@@ -276,6 +288,18 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		@StringGetter("beelineDistanceFactor")
 		public Double getBeelineDistanceFactor() {
 			return this.beelineDistanceFactorForMode ;
+		}
+		
+		@StringSetter(PERSON_SPEED_ATTRIBUTE)
+		public TeleportedModeParams setPersonSpeedAttribute(String val) {
+			testForLocked();
+			this.personSpeedAttribute = val;
+			return this;
+		}
+
+		@StringGetter(PERSON_SPEED_ATTRIBUTE)
+		public String getPersonSpeedAttribute() {
+			return this.personSpeedAttribute;
 		}
 
 	}
@@ -397,11 +421,19 @@ public final class RoutingConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
+		this.addParameterSet( set, ConfigWriter.Verbosity.all );
+	}
+
+	public void addParameterSet( final ConfigGroup set, ConfigWriter.Verbosity verbosity ){
 		if ( set.getName().equals( TeleportedModeParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
-			log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
-			log.warn( "    warning, use clearTeleportedModeParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
+			if ( verbosity== ConfigWriter.Verbosity.minimal ){
+				// this execution path happens when the reduced config is generated.  We do not want any warnings there.  kai, may'25
+			} else {
+				log.warn( "The first mode routing (= teleported mode) params that are explicitly defined clear the default mode routing (= teleported mode) params.  If you want to avoid this " );
+				log.warn( "    warning, use clearTeleportedModeParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config." );
+			}
 
 //						  "This functionality was removed for " );
 //			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  " +
@@ -479,12 +511,15 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	}
 
 	public TeleportedModeParams getOrCreateModeRoutingParams( final String mode ) {
+		return this.getOrCreateModeRoutingParams( mode, ConfigWriter.Verbosity.all );
+	}
+	public TeleportedModeParams getOrCreateModeRoutingParams( final String mode, ConfigWriter.Verbosity verbosity ) {
 		TeleportedModeParams pars = getModeRoutingParams().get( mode );
 
 		if ( pars == null ) {
 			pars = (TeleportedModeParams) createParameterSet( TeleportedModeParams.SET_TYPE );
 			pars.setMode( mode );
-			addParameterSet( pars );
+			addParameterSet( pars, verbosity );
 		}
 		if ( this.isLocked() ) {
 			pars.setLocked();

@@ -34,15 +34,33 @@ public class DrtRequestInsertionRetryParams extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("The time interval at which rejected request are repeated." + " Default value is 120 s.")
 	@Positive
-	public int retryInterval = 120;
+	private int retryInterval = 120;
 
 	@Parameter
 	@Comment("The maximum age of a request until it gets finally rejected, if not already scheduled."
 			+ " The default value is 0 s (i.e. no retry).")
 	@PositiveOrZero
-	public double maxRequestAge = 0;// no retry by default
+	private double maxRequestAge = 0;// no retry by default
 
 	public DrtRequestInsertionRetryParams() {
 		super(SET_NAME);
+	}
+
+	@Positive
+	public int getRetryInterval() {
+		return retryInterval;
+	}
+
+	public void setRetryInterval(@Positive int retryInterval) {
+		this.retryInterval = retryInterval;
+	}
+
+	@PositiveOrZero
+	public double getMaxRequestAge() {
+		return maxRequestAge;
+	}
+
+	public void setMaxRequestAge(@PositiveOrZero double maxRequestAge) {
+		this.maxRequestAge = maxRequestAge;
 	}
 }

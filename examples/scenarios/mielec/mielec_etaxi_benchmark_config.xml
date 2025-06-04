@@ -30,7 +30,7 @@
 
 		<param name="chargersFile" value="chargers-2-plugs-2.xml"/>
 
-		<param name="timeProfiles" value="true"/>
+		<param name="analysisOutputs" value="TimeProfiles"/>
 	</module>
 
 	<module name="vehicles">

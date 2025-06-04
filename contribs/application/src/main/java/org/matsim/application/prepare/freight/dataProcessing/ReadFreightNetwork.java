@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
+import org.matsim.core.network.NetworkUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -35,15 +35,15 @@ public class ReadFreightNetwork implements MATSimAppCommand {
 
     @Override
     public Integer call() throws Exception {
+        Set<String> modes = new HashSet<>(List.of(TransportMode.car));
         Network network = new SupersonicOsmNetworkReader.Builder()
                 .setCoordinateTransformation(crs.getTransformation())
                 .setPreserveNodeWithId(id -> id == 2)
-                .setAfterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(new HashSet<>(List.of(TransportMode.car))))
+                .setAfterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(modes))
                 .build()
                 .read(input.toString());
 
-        var cleaner = new MultimodalNetworkCleaner(network);
-        cleaner.run(Set.of(TransportMode.car));
+        NetworkUtils.cleanNetwork(network, modes);
 
         new NetworkWriter(network).write(output.toString());
         return 0;

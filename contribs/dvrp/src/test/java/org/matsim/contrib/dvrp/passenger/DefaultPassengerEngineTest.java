@@ -20,11 +20,14 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.END_ACTIVITY;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.MODE;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.START_ACTIVITY;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -42,6 +45,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadModule;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
@@ -171,6 +176,7 @@ public class DefaultPassengerEngineTest {
 	private QSim createQSim(PassengerRequestValidator requestValidator, Class<? extends VrpOptimizer> optimizerClass) {
 		return new QSimBuilder(fixture.config).useDefaults()
 				.addOverridingModule(new MobsimScopeEventHandlingModule())
+				.addOverridingModule(new DvrpLoadModule(MODE, new DvrpLoadParams()))
 				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.DEFAULT))
 				.addQSimModule(new VrpAgentSourceQSimModule(MODE))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {

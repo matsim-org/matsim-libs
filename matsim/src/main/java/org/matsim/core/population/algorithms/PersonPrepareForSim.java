@@ -22,8 +22,10 @@ package org.matsim.core.population.algorithms;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,7 +44,9 @@ import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -201,12 +205,15 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			return;
 		}
 
-		boolean linkModesConsistent = networkRoute.getLinkIds().stream()
-												  .map(l -> scenario.getNetwork().getLinks().get(l))
-												  .allMatch(l -> l.getAllowedModes().contains(leg.getMode()));
+		Optional<Id<Link>> inconsistentLink = networkRoute.getLinkIds().stream()
+												  .filter(linkId -> {
+													  Link link = scenario.getNetwork().getLinks().get(linkId);
+													  return link == null || !link.getAllowedModes().contains(leg.getMode());
+												  })
+			.findFirst();
 
-		if(!linkModesConsistent){
-			String errorMessage = "Route inconsistent with link modes for: Person " + person.getId() + "; Leg '" + leg + "'";
+		if (inconsistentLink.isPresent()) {
+			String errorMessage = "Route inconsistent with link modes for link: " + inconsistentLink.get() + " Person " + person.getId() + "; Leg '" + leg + "'";
 			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset()." +
 				"\n If this is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
 			throw new RuntimeException(errorMessage);

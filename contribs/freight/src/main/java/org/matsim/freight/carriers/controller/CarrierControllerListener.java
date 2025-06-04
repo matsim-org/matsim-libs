@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.controller;
 
 import jakarta.inject.Inject;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

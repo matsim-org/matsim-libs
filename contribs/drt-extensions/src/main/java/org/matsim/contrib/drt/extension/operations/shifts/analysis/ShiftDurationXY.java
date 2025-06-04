@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.analysis;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.contrib.drt.extension.operations.shifts.events.*;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreakSpecification;
@@ -14,7 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,11 +24,11 @@ public class ShiftDurationXY implements DrtShiftStartedEventHandler, DrtShiftEnd
         DrtShiftBreakStartedEventHandler, DrtShiftBreakEndedEventHandler {
 
     private final Provider<DrtShiftsSpecification> shifts;
-    private final Map<Id<DrtShift>, Double> shift2StartTime = new HashMap<>();
-    private final Map<Id<DrtShift>, Double> shift2BreakStartTime = new HashMap<>();
+    private final IdMap<DrtShift, Double> shift2StartTime = new IdMap<>(DrtShift.class);
+    private final IdMap<DrtShift, Double> shift2BreakStartTime = new IdMap<>(DrtShift.class);
 
-    private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualDuration = new HashMap<>();
-    private final Map<Id<DrtShift>, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new HashMap<>();
+    private final IdMap<DrtShift, Tuple<Double,Double>> shift2plannedVsActualDuration = new IdMap<>(DrtShift.class);
+    private final IdMap<DrtShift, Tuple<Double,Double>> shift2plannedVsActualBreakDuration = new IdMap<>(DrtShift.class);
 
     private final String mode;
 

@@ -66,12 +66,12 @@ public final class TrainRouter {
 	 */
 	public List<RailLink> calcRoute(TrainPosition position, RailLink from, RailLink to) {
 
-		Node fromNode = network.getLinks().get(from.getLinkId()).getToNode();
-		Node toNode = network.getLinks().get(to.getLinkId()).getFromNode();
+		Link fromLink = network.getLinks().get(from.getLinkId());
+		Link toLink = network.getLinks().get(to.getLinkId());
 
 		disutility.setPosition(position);
 
-		LeastCostPathCalculator.Path path = lpc.calcLeastCostPath(fromNode, toNode, 0, null, null);
+		LeastCostPathCalculator.Path path = lpc.calcLeastCostPath(fromLink, toLink, 0, null, null);
 
 		return path.links.stream().map(l -> resources.getLink(l.getId())).toList();
 	}
@@ -87,7 +87,10 @@ public final class TrainRouter {
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 			// only works with fixed block
-			return resources.hasCapacity(time, link.getId(), RailResourceManager.ANY_TRACK, position) ? 0 : 1;
+			int weight = resources.hasCapacity(time, link.getId(), RailResourceManager.ANY_TRACK, position) ? 0 : 1;
+
+			// Small offset in the weight prevents dead-locks in case there are loops within the station
+			return weight + 0.00001;
 		}
 
 		@Override

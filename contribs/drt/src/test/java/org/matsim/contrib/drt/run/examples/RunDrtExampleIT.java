@@ -28,9 +28,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -63,10 +66,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.common.base.MoreObjects;
@@ -96,7 +103,7 @@ public class RunDrtExampleIT {
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -131,13 +138,13 @@ public class RunDrtExampleIT {
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
 			// using exactly free-speed estimates
-			selectiveInsertionSearchParams.restrictiveBeelineSpeedFactor = 1;
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);
 			drtCfg.addParameterSet(selectiveInsertionSearchParams);
 
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -172,13 +179,13 @@ public class RunDrtExampleIT {
 			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
 			var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
 			// using adaptive travel time matrix
-			repeatedSelectiveInsertionSearchParams.retryInsertion = 5;
+			repeatedSelectiveInsertionSearchParams.setRetryInsertion(5);
 			drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
 
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setLastIteration(3);
@@ -212,7 +219,7 @@ public class RunDrtExampleIT {
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
 			//relatively high max age to prevent rejections
 			var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-			drtRequestInsertionRetryParams.maxRequestAge = 7200;
+			drtRequestInsertionRetryParams.setMaxRequestAge(7200);
 			drtCfg.addParameterSet(drtRequestInsertionRetryParams);
 		}
 
@@ -371,7 +378,7 @@ public class RunDrtExampleIT {
 
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
 		PrebookingParams prebookingParams = new PrebookingParams();
-		prebookingParams.abortRejectedPrebookings = false;
+		prebookingParams.setAbortRejectedPrebookings(false);
 		drtConfig.addParameterSet(prebookingParams);
 
 		Controler controller = DrtControlerCreator.createControler(config, false);
@@ -398,6 +405,81 @@ public class RunDrtExampleIT {
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
 	}
 
+	@Test
+	void testRunDrtWithPrebookingAndRoutingUpdates() {
+		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_drt_config.xml");
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+				new OTFVisConfigGroup());
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+
+		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(config);
+		drtConfig.setUpdateRoutes(true);
+
+		PrebookingParams prebookingParams = new PrebookingParams();
+		prebookingParams.setAbortRejectedPrebookings(false);
+		drtConfig.addParameterSet(prebookingParams);
+
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
+
+		PrebookingTracker tracker = new PrebookingTracker();
+		tracker.install(controller);
+
+		controller.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(VariableTravelTime.class).toInstance(new VariableTravelTime());
+				addMobsimListenerBinding().to(modalKey(VariableTravelTime.class));
+				bindModal(TravelTime.class).to(modalKey(VariableTravelTime.class));
+			}
+		});
+
+		controller.run();
+
+		assertEquals(124, tracker.immediateScheduled);
+		assertEquals(197, tracker.prebookedScheduled);
+		assertEquals(67, tracker.immediateRejected);
+		assertEquals(8, tracker.prebookedRejected);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.19)
+				.rejections(75)
+				.waitAverage(208.48)
+				.inVehicleTravelTimeMean(367.07)
+				.totalTravelTimeMean(575.55)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	static private class VariableTravelTime implements TravelTime, MobsimBeforeSimStepListener {
+		private final TravelTime delegate = new FreeSpeedTravelTime();
+		private boolean modify = false;
+
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			if (modify) {
+				return 2.0 * delegate.getLinkTravelTime(link, time, person, vehicle);
+			} else {
+				return delegate.getLinkTravelTime(link, time, person, vehicle);
+			}
+		}
+
+		@Override
+		public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+			modify = e.getSimulationTime() >= 11.0 * 3600.0 && e.getSimulationTime() <= 16.0 * 3600.0;
+		}
+	} 
 
 	@Test
 	void testRunDrtOfferRejectionExample() {

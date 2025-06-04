@@ -1,10 +1,5 @@
 package org.matsim.contrib.drt.extension.operations.shifts;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -18,6 +13,11 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecifi
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * @author nkuehnel / MOIA
  */
@@ -26,13 +26,14 @@ public class ShiftsIOTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-
 	private static final String TESTSHIFTSINPUT  = "testShifts.xml";
 	private static final String TESTXMLOUTPUT  = "testShiftsOut.xml";
 
 	private final Id<DrtShift> sid11 = Id.create("11", DrtShift.class);
 	private final Id<DrtShift> sid22 = Id.create("22", DrtShift.class);
 	private final Id<DrtShift> sid33 = Id.create("33", DrtShift.class);
+	private final Id<DrtShift> sid44 = Id.create("44", DrtShift.class);
+
 	private final Id<OperationFacility> oid1 = Id.create("op1", OperationFacility.class);
 	private final Id<OperationFacility> oid2 = Id.create("op2", OperationFacility.class);
 
@@ -64,7 +65,7 @@ public class ShiftsIOTest {
 	}
 
 	private void checkContent(DrtShiftsSpecification shiftsSpecification) {
-		assertEquals(3, shiftsSpecification.getShiftSpecifications().size());
+		assertEquals(4, shiftsSpecification.getShiftSpecifications().size());
 
 		DrtShiftSpecification shiftSpecification1 = shiftsSpecification.getShiftSpecifications().get(sid11);
 		assertNotNull(shiftSpecification1);
@@ -99,5 +100,16 @@ public class ShiftsIOTest {
 		assertEquals(Optional.empty(), shiftSpecification3.getOperationFacilityId());
 		assertEquals(Optional.empty(), shiftSpecification3.getDesignatedVehicleId());
 		assertTrue(shiftSpecification3.getBreak().isEmpty());
+
+		DrtShiftSpecification shiftSpecification4 = shiftsSpecification.getShiftSpecifications().get(sid44);
+		assertNotNull(shiftSpecification4);
+		assertEquals(sid44, shiftSpecification4.getId());
+		assertEquals(22400., shiftSpecification3.getStartTime(), 0);
+		assertEquals(53000., shiftSpecification3.getEndTime(), 0);
+		assertFalse(shiftSpecification4.getOperationFacilityId().isPresent());
+		assertEquals(Optional.empty(), shiftSpecification4.getOperationFacilityId());
+		assertEquals(Optional.empty(), shiftSpecification4.getDesignatedVehicleId());
+		assertTrue(shiftSpecification4.getBreak().isEmpty());
+		assertEquals("wav", shiftSpecification4.getShiftType().orElseThrow());
 	}
 }

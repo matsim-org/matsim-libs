@@ -23,11 +23,11 @@ import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -51,7 +51,7 @@ public class DrtWithExtensionsConfigGroup extends DrtConfigGroup {
 	private DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams;
 
 	public DrtWithExtensionsConfigGroup() {
-		this(DefaultDrtOptimizationConstraintsSet::new);
+		this(DrtOptimizationConstraintsSetImpl::new);
 	}
 
 	public DrtWithExtensionsConfigGroup(Supplier<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSetSupplier) {

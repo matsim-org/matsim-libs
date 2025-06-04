@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -600,6 +601,7 @@ public class ComplexUnschedulerTest {
 		private final DvrpVehicleLookup lookup;
 
 		private int requestIndex = 0;
+		private final IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 
 		Fixture() {
 			this.network = createNetwork();
@@ -625,10 +627,10 @@ public class ComplexUnschedulerTest {
 			Mockito.when(this.lookup.lookupVehicle(Mockito.any())).thenReturn(vehicle);
 
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.stopDuration = 30.0;
-			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime = 600.0;
+			drtConfig.setStopDuration(30.0);
+			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
-			this.entryFactory = new VehicleDataEntryFactoryImpl();
+			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);
 
 			this.timingUpdater = Mockito.mock(ScheduleTimingUpdater.class);
 		}
@@ -636,6 +638,7 @@ public class ComplexUnschedulerTest {
 		AcceptedDrtRequest createRequest() {
 			AcceptedDrtRequest request = Mockito.mock(AcceptedDrtRequest.class);
 			Mockito.when(request.getId()).thenReturn(Id.create("req_" + requestIndex++, Request.class));
+			Mockito.when(request.getLoad()).thenReturn(integerLoadType.getEmptyLoad());
 			return request;
 		}
 

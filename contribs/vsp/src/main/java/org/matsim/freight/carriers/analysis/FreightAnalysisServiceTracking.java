@@ -61,7 +61,7 @@ class FreightAnalysisServiceTracking {
 					if (service.driverId == null) {
 						// if there is no driver, but there is a service which is to be performed at the moment at this place, we guess this could be the event for it.
 						// (Does not work well obviously as soon as there are multiple services at a location that have generous time windows, like e.g. at stores).
-						if (service.service.getServiceStartTimeWindow().getStart() <= activityStartEvent.getTime() && activityStartEvent.getTime() <= service.service.getServiceStartTimeWindow().getEnd()) {
+						if (service.service.getServiceStaringTimeWindow().getStart() <= activityStartEvent.getTime() && activityStartEvent.getTime() <= service.service.getServiceStaringTimeWindow().getEnd()) {
 							service.driverIdGuess = activityStartEvent.getPersonId();
 							service.arrivalTimeGuess = activityStartEvent.getTime();
 						}
