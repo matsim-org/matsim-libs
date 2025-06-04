@@ -170,8 +170,7 @@ import org.matsim.vehicles.VehicleType;
 		}
 		//Restliche Sendungen in einem letzten Vrp planen
 		if (!shipmentsInCurrentTour.isEmpty()) {
-			Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(
-				createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
+			Carrier auxiliaryCarrier = CarrierSchedulerUtils.solveVrpWithJsprit(createAuxiliaryCarrierServiceBased(shipmentsInCurrentTour, availabilityTimeOfLastShipment + cumulatedLoadingTime), scenario);
 			scheduledPlans.add(auxiliaryCarrier.getSelectedPlan());
 			carrier.getServices().putAll(auxiliaryCarrier.getServices());
 			shipmentsInCurrentTour.clear();
@@ -220,11 +219,34 @@ import org.matsim.vehicles.VehicleType;
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance();
 		ccBuilder.setFleetSize(FleetSize.INFINITE);
 
+
+		//add all shipments.
+		for (LspShipment lspShipment : shipmentsToSchedule) {
+			CarriersUtils.addShipment(auxCarrier, convertToCarrierShipment(lspShipment));
+		}
+
 		//copy all vehicles from the original carrier to the auxiliary carrier.
 		//Todo: maybe add a warning somewhere if time window does not match to the arrival of the LspShipments?
+		//Vehicle do not need to start before the first LspShipment is ready to be picked up.
+		double earliestStartTime = Double.MAX_VALUE;
+		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
+			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
+			assert lpsShipmentPlan != null;
+			var endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
+			if (endtime < earliestStartTime) {
+				earliestStartTime = endtime;
+			}
+		}
+		if (earliestStartTime == Double.MAX_VALUE) {
+			log.warn("Earliest start time is still set to Double.MAX_VALUE. This means that no LspShipment was found in the carrier {}. " +
+				"Setting earliest start time to 0.", auxCarrier.getId());
+			earliestStartTime = 0;
+		}
+
+
 		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			var cv = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
-				.setEarliestStart(carrierVehicle.getEarliestStartTime())
+				.setEarliestStart(earliestStartTime)
 				.setLatestEnd(carrierVehicle.getLatestEndTime())
 				.build();
 			ccBuilder.addVehicle(cv);
@@ -232,10 +254,7 @@ import org.matsim.vehicles.VehicleType;
 
 		auxCarrier.setCarrierCapabilities(ccBuilder.build());
 
-		//add all shipments.
-		for (LspShipment lspShipment : shipmentsToSchedule) {
-			CarriersUtils.addShipment(auxCarrier, convertToCarrierShipment(lspShipment));
-		}
+
 
 		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
 
