@@ -350,10 +350,10 @@ public class RunDrtExampleIT {
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.07)
-				.rejections(26)
-				.waitAverage(276.37)
-				.inVehicleTravelTimeMean(381.99)
-				.totalTravelTimeMean(658.36)
+				.rejections(27)
+				.waitAverage(277.39)
+				.inVehicleTravelTimeMean(381.46)
+				.totalTravelTimeMean(658.84)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -665,11 +665,11 @@ public class RunDrtExampleIT {
 		private final Random random = new Random(123);
 
 		@Override
-		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime) {
+		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
 			if (random.nextBoolean()) {
 				return Optional.empty();
 			} else {
-				return delegate.acceptDrtOffer(request, departureTime, arrivalTime);
+				return delegate.acceptDrtOffer(request, departureTime, arrivalTime, dropoffDuration);
 			}
 		}
 	}

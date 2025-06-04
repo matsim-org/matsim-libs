@@ -277,7 +277,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -316,7 +316,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -354,7 +354,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -397,7 +397,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -436,7 +436,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -474,7 +474,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -517,7 +517,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -556,7 +556,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -594,7 +594,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.install(controller);
 
@@ -637,7 +637,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 229.0, 83.0)
+			.define("personA", 289.0, 83.0)
 			.define("personB", 400.0, 200.0)
 			.install(controller);
 			
@@ -676,7 +676,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 229.0, 83.0)
+			.define("personA", 289.0, 83.0)
 			.define("personB", 400.0, 200.0)
 			.install(controller);
 
@@ -715,7 +715,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 		
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -760,7 +760,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -805,7 +805,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 83.0)
+			.define("personA", 392.0, 83.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -850,7 +850,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -895,7 +895,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -940,7 +940,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 289.0)
+			.define("personA", 392.0, 289.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -985,7 +985,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -1030,7 +1030,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -1075,7 +1075,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 332.0, 186.0)
+			.define("personA", 392.0, 186.0)
 			.define("personB", 300.0, 200.0)
 			.define("personC", 300.0, 200.0)
 			.install(controller);
@@ -1120,7 +1120,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 229.0, 83.0)
+			.define("personA", 289.0, 83.0)
 			.define("personB", 400.0, 200.0)
 			.define("personC", 400.0, 200.0)
 			.install(controller);
@@ -1165,7 +1165,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 229.0, 83.0)
+			.define("personA", 289.0, 83.0)
 			.define("personB", 400.0, 200.0)
 			.define("personC", 400.0, 200.0)
 			.install(controller);
