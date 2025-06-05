@@ -128,8 +128,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 		 Collection<Person> companions = new ArrayList<>();
 		 for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			 
-			Set<String> activeModes = getActiveModes(person);
-			if (!activeModes.contains(drtMode)) {
+			if (!isActive(person)) {
 				// skip if mode is configured to generate companions for this agent
 				continue;
 			}
@@ -281,20 +280,15 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 		 this.addCompanionAgents();
 	 }
 
-	 private Set<String> getActiveModes(Person person) {
-		String value = (String) person.getAttributes().getAttribute(personAttribute);
+	 private boolean isActive(Person person) {
+		Boolean value = (Boolean) person.getAttributes().getAttribute(personAttribute);
 
 		if (value == null) {
-			// by default create a companion
-			return Collections.singleton(drtMode);
+			// by default active
+			return true;
 		}
 
-		Set<String> modes = new HashSet<>();
-		for (String mode : value.split(",")) {
-			modes.add(mode.strip());
-		}
-
-		return modes;
+		return value;
 	 }
  }
  
