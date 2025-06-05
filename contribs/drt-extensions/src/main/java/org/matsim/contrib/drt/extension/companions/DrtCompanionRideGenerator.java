@@ -23,7 +23,8 @@
  
  import java.util.ArrayList;
  import java.util.Collection;
- import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashMap;
  import java.util.HashSet;
  import java.util.List;
  import java.util.Map;
@@ -124,7 +125,13 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private void addCompanionAgents() {
 		 Collection<Person> companions = new ArrayList<>();
 		 for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			 for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+			 
+			if (!isActive(person)) {
+				// skip if mode is configured to generate companions for this agent
+				continue;
+			}
+			
+			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				 int additionalCompanions = sampler.select();
  
 				 for (Leg leg : trip.getLegsOnly()) {
@@ -270,6 +277,18 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		 this.addCompanionAgents();
 	 }
- 
+
+	 static public String PERSON_ATTRIBUTE = "drt:companions";
+
+	 private boolean isActive(Person person) {
+		Boolean value = (Boolean) person.getAttributes().getAttribute(PERSON_ATTRIBUTE);
+
+		if (value == null) {
+			// by default active
+			return true;
+		}
+
+		return value;
+	 }
  }
  
