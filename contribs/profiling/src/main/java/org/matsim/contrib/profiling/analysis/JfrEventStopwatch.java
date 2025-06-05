@@ -5,6 +5,7 @@ import jdk.jfr.Name;
 import jdk.jfr.consumer.EventStream;
 import jdk.jfr.consumer.RecordedEvent;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.contrib.profiling.aop.stopwatch.*;
 import org.matsim.contrib.profiling.events.*;
 
 import java.awt.*;
@@ -26,14 +27,18 @@ public class JfrEventStopwatch implements AutoCloseable {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch(); // todo getter or expose export methods
 	private final EventStream eventStream;
+	private String iterationEventName = getEventName(IterationJfrEvent.class); // listener based iteration jfr event by default
+	private int iterationCount = 0;
+	private int operationCount = 0;
 
 	/**
 	 * Long: timestamp
-	 * Sort after all insertions, by operation timestamp
+	 * Sort after all insertions, by operation timestamp, then operation id
 	 */
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new HashMap<>());
 
 	record Operation(
+		int id, // to be able to sort, if timestamps are equal
 		String name,
 		boolean isBegin
 	) {}
@@ -53,9 +58,27 @@ public class JfrEventStopwatch implements AutoCloseable {
 	);
 
 
-	public static final Map<String, String> AOP_EVENT_OPERATIONS = Map.of(
-
+	public static final Map<String, Class<? extends Event>> AOP_EVENT_OPERATIONS = Map.of(
+		"iterationStartsListeners", AopStopwatchIterationStartsJfrEvent.class,
+		"replanning", AopStopwatchReplanningJfrEvent.class,
+		"beforeMobsimListeners", AopStopwatchBeforeMobsimJfrEvent.class,
+		"dump all plans", AopStopwatchDumpAllPlansJfrEvent.class,
+		"prepareForMobsim", AopStopwatchPrepareForMobsimJfrEvent.class,
+		"mobsim", AopStopwatchRunMobsimJfrEvent.class,
+		"afterMobsimListeners", AopStopwatchAfterMobsimJfrEvent.class,
+		"scoring", AopStopwatchScoringJfrEvent.class,
+		"iterationEndsListeners", AopStopwatchIterationEndsJfrEvent.class
 	);
+
+	public static String getEventName(Class<? extends Event> event) {
+		String eventName;
+		try {
+			eventName = event.getAnnotation(Name.class).value();
+		} catch (NullPointerException e) {
+			eventName = event.getName();
+		}
+		return eventName;
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -73,14 +96,19 @@ public class JfrEventStopwatch implements AutoCloseable {
 			System.out.println(filePath);
 			var stopwatch = new JfrEventStopwatch(EventStream.openFile(filePath));
 			try (stopwatch) {
-				LISTENER_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
+				// todo make configurable via main args which one to use
+				//LISTENER_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
+				AOP_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
+				stopwatch.setIterationEvent(AopIterationJfrEvent.class);
 				System.out.println("start");
 				stopwatch.start();
 			}
 
 			System.out.println("--- done");
-			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch.csv", ";");
-			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch");
+			//stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch.csv", ";");
+			//stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch");
+			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch.csv", ";");
+			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch");
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
@@ -95,12 +123,50 @@ public class JfrEventStopwatch implements AutoCloseable {
 	 */
 	public JfrEventStopwatch(EventStream eventStream) {
 		this.eventStream = eventStream;
-		eventStream.setOrdered(true); // this orders all events by their *commit* time
+		eventStream.setOrdered(true); // this orders all events by their *commit* time;
+	}
+
+	public void setIterationEvent(Class<? extends Event> event) {
+		this.iterationEventName = getEventName(event);
+	}
+
+	public void addEvent(String operationName, String eventName) {
+		this.operationEvents.put(operationName, eventName);
+	}
+
+	public void addEvent(String operationName, Class<? extends Event> event) {
+		String eventName =  getEventName(event);
+		this.operationEvents.put(operationName, eventName);
+	}
+
+	protected void handleEvent(String name, RecordedEvent event) {
+		stages.put(new Operation(operationCount, name, true), event.getStartTime().toEpochMilli());
+		stages.put(new Operation(operationCount++, name, false), event.getEndTime().toEpochMilli());
+	}
+
+	protected void initialize() {
+		// if no explicit events configured to listen for, use any encountered event with the category MATSim Stopwatch
+		if (operationEvents.isEmpty()) {
+			eventStream.onEvent(event -> {
+				if (event.getEventType().getCategoryNames().contains("MATSim Stopwatch")) {
+					handleEvent(event.getEventType().getName(), event); // todo but which stopwatch operation name? maybe check for an optional attribute or just use the last part of the event type name?
+				}
+			});
+		} else {
+			operationEvents.forEach((operation, event) -> {
+				eventStream.onEvent(event, recordedEvent -> handleEvent(operation, recordedEvent));
+			});
+		}
+
 		// JFRIterationEvents will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
-		eventStream.onEvent(IterationJfrEvent.class.getAnnotation(Name.class).value(), event -> {
+		eventStream.onEvent(iterationEventName, event -> {
 			// start iteration in stopwatch
-			var iteration = event.getInt("iteration");
+			var iteration = iterationCount++;
+			if (event.hasField("iteration")) {
+				iteration = event.getInt("iteration");
+			}
+
 			System.out.println(event.getStartTime() + " BEGIN iteration " + iteration);
 			stopwatch.beginIteration(iteration, event.getStartTime().toEpochMilli());
 			// add all other recorded events to stopwatch
@@ -108,9 +174,16 @@ public class JfrEventStopwatch implements AutoCloseable {
 				stages.entrySet()
 					.stream()
 					.sorted((e1, e2) -> {
+						// sort by timestamp
 						var l = Long.compare(e1.getValue(), e2.getValue());
 						if (l == 0) {
-							return e1.getKey().isBegin ? -1 : 1;
+							// sort by order of event occurrence if timestamp is equal
+							var id = Integer.compare(e1.getKey().id, e2.getKey().id);
+							if (id == 0) {
+								// if same operation, then begin before end
+								return e1.getKey().isBegin ? -1 : 1;
+							}
+							return id;
 						}
 						return l;
 					}).forEach(entry -> {
@@ -123,46 +196,13 @@ public class JfrEventStopwatch implements AutoCloseable {
 							System.out.println(Instant.ofEpochMilli(timestamp) + " END   " + operation.name);
 							stopwatch.endOperation(operation.name, timestamp);
 						}
-				});
+					});
 				stages.clear();
 			}
 			// end iteration in stopwatch
 			System.out.println(event.getEndTime() + " END   iteration");
 			stopwatch.endIteration(event.getEndTime().toEpochMilli());
 		});
-	}
-
-	public void addEvent(String operationName, String eventName) {
-		this.operationEvents.put(operationName, eventName);
-	}
-
-	public void addEvent(String operationName, Event event) {
-		String eventName;
-		try {
-			eventName = event.getClass().getAnnotation(Name.class).value();
-		} catch (NullPointerException e) {
-			eventName = event.getClass().getName();
-		}
-		this.operationEvents.put(operationName, eventName);
-	}
-
-	protected void handleEvent(String name, RecordedEvent event) {
-		stages.put(new Operation(name, true), event.getStartTime().toEpochMilli());
-		stages.put(new Operation(name, false), event.getEndTime().toEpochMilli());
-	}
-
-	protected void initialize() {
-		if (operationEvents.isEmpty()) {
-			eventStream.onEvent(event -> {
-				if (event.getEventType().getCategoryNames().contains("MATSim Stopwatch")) {
-					handleEvent(event.getEventType().getName(), event); // todo but which stopwatch operation name? maybe check for an optional attribute or just use the last part of the event type name?
-				}
-			});
-		} else {
-			operationEvents.forEach((operation, event) -> {
-				eventStream.onEvent(event, recordedEvent -> handleEvent(operation, recordedEvent));
-			});
-		}
 	}
 
 	public void start() {
