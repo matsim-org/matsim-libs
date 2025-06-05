@@ -27,6 +27,6 @@ import jdk.jfr.*;
  */
 @Name("matsim.Operation")
 @Label("Operation")
-@Description("Duration of a MATSim operation")
-@Category({"MATSim", "MATSim Operation"})
+@Description("Duration of a MATSim operation measured via MATSims listeners")
+@Category({"MATSim", "MATSim Operation Listeners"})
 public abstract class MatsimOperationJfrEvent extends Event {}
