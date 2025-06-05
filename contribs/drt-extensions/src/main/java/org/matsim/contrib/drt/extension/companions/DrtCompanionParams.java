@@ -21,6 +21,8 @@ package org.matsim.contrib.drt.extension.companions;
 
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +38,10 @@ public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurablePar
 
 	public static final String SET_NAME = "companions";
 	private static final String DRT_COMPANION_SAMPLING_WEIGHTS_NAME = "drtCompanionSamplingWeights";
+	private static final String PERSON_ATTRIBUTE = "personAttribute";
 
 	private List<Double> drtCompanionSamplingWeights = List.of(0.7, 0.3);
+	private String personAttribute = "drt:companions";
 
 	public DrtCompanionParams() {
 		super(SET_NAME);
@@ -60,6 +64,16 @@ public class DrtCompanionParams extends ReflectiveConfigGroupWithConfigurablePar
 
 		this.drtCompanionSamplingWeights = Arrays.stream(StringUtils.explode(values, DEFAULT_COLLECTION_DELIMITER))
 				.map(Double::parseDouble).collect(Collectors.toList());
+	}
+
+	@StringSetter(PERSON_ATTRIBUTE)
+	public void setPersonAttribute(String val) {
+		this.personAttribute = val;
+	}
+
+	@StringGetter(PERSON_ATTRIBUTE)
+	public String getPersonAttribute() {
+		return personAttribute;
 	}
 
 	public List<Double> getDrtCompanionSamplingWeights() {

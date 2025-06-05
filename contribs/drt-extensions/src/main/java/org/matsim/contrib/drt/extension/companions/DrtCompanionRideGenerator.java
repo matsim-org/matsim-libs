@@ -23,7 +23,8 @@
  
  import java.util.ArrayList;
  import java.util.Collection;
- import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashMap;
  import java.util.HashSet;
  import java.util.List;
  import java.util.Map;
@@ -68,6 +69,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	 private final Set<Leg> drtLegs = new HashSet<>();
 	 private WeightedRandomSelection<Integer> sampler;
+	 private final String personAttribute;
  
 	 private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
  
@@ -81,6 +83,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 			 final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		 this.scenario = scenario;
 		 this.drtMode = drtMode;
+		 this.personAttribute = drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getPersonAttribute();
 
 		 for (var vehicle : fleet.getVehicleSpecifications().values()) {
 			// need IntegerType to determine the maxCapacity, but this could also be a config option /sh, januar 2025
@@ -124,7 +127,14 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private void addCompanionAgents() {
 		 Collection<Person> companions = new ArrayList<>();
 		 for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			 for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+			 
+			Set<String> activeModes = getActiveModes(person);
+			if (!activeModes.contains(drtMode)) {
+				// skip if mode is configured to generate companions for this agent
+				continue;
+			}
+			
+			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				 int additionalCompanions = sampler.select();
  
 				 for (Leg leg : trip.getLegsOnly()) {
@@ -270,6 +280,21 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		 this.addCompanionAgents();
 	 }
- 
+
+	 private Set<String> getActiveModes(Person person) {
+		String value = (String) person.getAttributes().getAttribute(personAttribute);
+
+		if (value == null) {
+			// by default create a companion
+			return Collections.singleton(drtMode);
+		}
+
+		Set<String> modes = new HashSet<>();
+		for (String mode : value.split(",")) {
+			modes.add(mode.strip());
+		}
+
+		return modes;
+	 }
  }
  
