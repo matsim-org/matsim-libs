@@ -73,7 +73,7 @@ public final class IterationStopWatch {
 	private int nextOperationPosition = 0;
 
 	/** A formatter for dates, used when writing out the data. */
-	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
+	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 	/** data structures to identify nested operations */
 	private Stack<String> currentMeasuredOperations;
