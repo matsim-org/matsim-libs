@@ -69,7 +69,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	 private final Set<Leg> drtLegs = new HashSet<>();
 	 private WeightedRandomSelection<Integer> sampler;
-	 private final String personAttribute;
  
 	 private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
  
@@ -83,7 +82,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 			 final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		 this.scenario = scenario;
 		 this.drtMode = drtMode;
-		 this.personAttribute = drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getPersonAttribute();
 
 		 for (var vehicle : fleet.getVehicleSpecifications().values()) {
 			// need IntegerType to determine the maxCapacity, but this could also be a config option /sh, januar 2025
@@ -280,8 +278,10 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 		 this.addCompanionAgents();
 	 }
 
+	 static public String PERSON_ATTRIBUTE = "drt:companions";
+
 	 private boolean isActive(Person person) {
-		Boolean value = (Boolean) person.getAttributes().getAttribute(personAttribute);
+		Boolean value = (Boolean) person.getAttributes().getAttribute(PERSON_ATTRIBUTE);
 
 		if (value == null) {
 			// by default active
