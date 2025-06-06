@@ -246,28 +246,27 @@ public class TripDistributionMatrix {
 
 		for (String stopZone : getListOfZones()) {
 			for (String modeORvehType : getListOfModesOrVehTypes()) {
+				loopForEachPurpose:
 				for (Integer purpose : getListOfPurposes()) {
-					double trafficVolume = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
+					double trafficVolume = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(
+						purpose);
 					int generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 					if (trafficVolume > generatedTrafficVolume) {
-						if (generatedTrafficVolume == 0) {
-							TripDistributionMatrixKey matrixKey = makeKey(stopZone, stopZone, modeORvehType, purpose,
-								smallScaleCommercialTrafficType);
-							matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
-							generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose,
-								smallScaleCommercialTrafficType);
-						} else {
-							ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());
-							Collections.shuffle(shuffledZones, MatsimRandom.getRandom());
-							for (String startZone : shuffledZones) {
-								TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType,
-										purpose, smallScaleCommercialTrafficType);
-								if (matrixCache.get(matrixKey) > 0) {
-									matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
-									break;
-								}
+						ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());
+						Collections.shuffle(shuffledZones, MatsimRandom.getRandom());
+						// find a startZone which has a trip to the stopZone and increase it by one
+						for (String startZone : shuffledZones) {
+							TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType,
+								purpose, smallScaleCommercialTrafficType);
+							if (matrixCache.get(matrixKey) > 0) {
+								matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
+								continue loopForEachPurpose;
 							}
 						}
+						// if no possible startZone was found, add a inner trip in the stopZone
+						TripDistributionMatrixKey matrixKey = makeKey(stopZone, stopZone, modeORvehType, purpose,
+							smallScaleCommercialTrafficType);
+						matrixCache.replace(matrixKey, matrixCache.get(matrixKey) + 1);
 					}
 				}
 			}
