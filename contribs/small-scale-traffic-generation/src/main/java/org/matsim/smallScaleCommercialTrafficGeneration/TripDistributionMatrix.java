@@ -402,10 +402,8 @@ public class TripDistributionMatrix {
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
 				if (trafficVolumeKey.modeORvehType().equals(modeORvehType)) {
 					double volume = trafficVolume.get(trafficVolumeKey).getDouble(purpose);
-					if (volume == 0)
-						continue;
-					else {
-						double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.getZone(), network,
+					if (volume != 0) {
+						double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.zone(), network,
 							linksPerZone, resistanceFactor, shapeFileZoneNameColumn);
 						sum = sum + (volume * resistanceValue);
 					}
@@ -505,7 +503,7 @@ public class TripDistributionMatrix {
 		int numberOfTrips = 0;
 		ArrayList<String> zones = getListOfZones();
 		for (String stopZone : zones)
-			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType)));
+			numberOfTrips = numberOfTrips + matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
 		return numberOfTrips;
 	}
 
@@ -520,7 +518,7 @@ public class TripDistributionMatrix {
 		int numberOfTrips = 0;
 		ArrayList<String> zones = getListOfZones();
 		for (String startZone : zones)
-			numberOfTrips = numberOfTrips + Math.round(matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType)));
+			numberOfTrips = numberOfTrips + matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
 		return numberOfTrips;
 	}
 
