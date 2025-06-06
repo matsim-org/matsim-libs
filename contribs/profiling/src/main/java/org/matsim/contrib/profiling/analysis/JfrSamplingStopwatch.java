@@ -23,7 +23,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	private final IterationStopWatch stopwatch = new IterationStopWatch(); // todo getter or expose export methods
 	private final EventStream eventStream;
-	private final SamplingStatistics statistics = new SamplingStatistics(); // todo getter
+	private final SamplingStatistics statistics = new SamplingStatistics();
 
 	// linked hashmap to keep insertion order but also hashmap access times
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
@@ -59,7 +59,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	* Collect statistics about the min,max,avg time between two successive event samples,
 	* the configured sampling interval, number count of events, and highest number of frames in a stacktrace.
 	*/
-	static class SamplingStatistics {
+	public static class SamplingStatistics {
 		// interval durations
 		String configured;
 		String configuredNative;
@@ -140,7 +140,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 			}
 
 			System.out.println("--- done");
-			System.out.println(stopwatch.statistics);
+			System.out.println(stopwatch.getStatistics());
 			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch.csv", ";");
 			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch");
 		} catch (Exception e) {
@@ -291,14 +291,31 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		}
 	}
 
-	public void start() {
+	public SamplingStatistics start() {
 		initialize();
 		this.eventStream.start();
+		return getStatistics();
 	}
 
 	public void startAsync() {
 		initialize();
 		this.eventStream.startAsync();
+	}
+
+	public SamplingStatistics getStatistics() {
+		// mutable, but copy of internal statistics to not let anyone meddle while startAsync is still using it
+		var clone = new SamplingStatistics();
+		clone.configured =  statistics.configured;
+		clone.configuredNative = statistics.configuredNative;
+		clone.min = statistics.min;
+		clone.max = statistics.max;
+		clone.sum = statistics.sum;
+		clone.count = statistics.count;
+		clone.maxStacktraceFrameCount = statistics.maxStacktraceFrameCount;
+		clone.previousEvent = statistics.previousEvent;
+		clone.interval =  statistics.interval;
+
+		return clone;
 	}
 
 	@Override
