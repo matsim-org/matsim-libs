@@ -81,9 +81,7 @@ public class TripDistributionMatrix {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((fromZone == null) ? 0 : fromZone.hashCode());
-			long temp;
-			temp = Double.doubleToLongBits(purpose);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + Double.hashCode(purpose);
 			result = prime * result + ((toZone == null) ? 0 : toZone.hashCode());
 			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
 			result = prime * result + ((smallScaleCommercialTrafficType == null) ? 0 : smallScaleCommercialTrafficType.hashCode());
@@ -146,9 +144,7 @@ public class TripDistributionMatrix {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ((fromZone == null) ? 0 : fromZone.hashCode());
-			long temp;
-			temp = Double.doubleToLongBits(purpose);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + Double.hashCode(purpose);
 			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
 			return result;
 		}
