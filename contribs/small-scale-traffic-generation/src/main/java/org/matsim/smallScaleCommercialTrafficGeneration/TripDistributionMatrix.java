@@ -72,9 +72,6 @@ public class TripDistributionMatrix {
 	private record TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose,
 											 String smallScaleCommercialTrafficType) {
 
-		public String getModesORvehType() {
-			return modeORvehType;
-		}
 
 		@Override
 		public int hashCode() {
@@ -470,8 +467,8 @@ public class TripDistributionMatrix {
 	ArrayList<String> getListOfModesOrVehTypes() {
 		if (listOfModesORvehTypes.isEmpty()) {
 			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
-				if (!listOfModesORvehTypes.contains(key.getModesORvehType()))
-					listOfModesORvehTypes.add(key.getModesORvehType());
+				if (!listOfModesORvehTypes.contains(key.modeORvehType()))
+					listOfModesORvehTypes.add(key.modeORvehType());
 			}
 		}
 		return listOfModesORvehTypes;
