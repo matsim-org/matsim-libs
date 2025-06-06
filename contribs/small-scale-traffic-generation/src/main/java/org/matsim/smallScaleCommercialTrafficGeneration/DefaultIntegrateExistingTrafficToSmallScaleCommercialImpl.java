@@ -53,11 +53,11 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 		Object2DoubleMap<Integer> stopVolume = trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey_stop);
 
 		if (startVolume != null && startVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.zone());
 		else if (startVolume != null)
 			startVolume.mergeDouble(purpose, -1, Double::sum);
 		if (stopVolume != null && stopVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.zone());
 		else if (stopVolume != null)
 			stopVolume.mergeDouble(purpose, -1, Double::sum);
 	}
@@ -92,7 +92,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			trafficVolumePerTypeAndZone.keySet());
 		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());
 		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
-			if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)
+			if (trafficVolumeKey.modeORvehType().equals(modeORvehType)
 				&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
 				log.warn(

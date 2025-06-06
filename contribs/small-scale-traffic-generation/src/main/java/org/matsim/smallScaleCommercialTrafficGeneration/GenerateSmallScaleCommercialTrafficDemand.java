@@ -949,8 +949,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		ArrayList<String> listOfZones = new ArrayList<>();
 		trafficVolume_start.forEach((k, v) -> {
-			if (!listOfZones.contains(k.getZone()))
-				listOfZones.add(k.getZone());
+			if (!listOfZones.contains(k.zone()))
+				listOfZones.add(k.zone());
 		});
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
 			.newInstance(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
@@ -962,8 +962,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (count % 50 == 0 || count == 1)
 				log.info("Create OD pair {} of {}", count, trafficVolume_start.size());
 
-			String startZone = trafficVolumeKey.getZone();
-			String modeORvehType = trafficVolumeKey.getModeORvehType();
+			String startZone = trafficVolumeKey.zone();
+			String modeORvehType = trafficVolumeKey.modeORvehType();
 			for (Integer purpose : trafficVolume_start.get(trafficVolumeKey).keySet()) {
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
