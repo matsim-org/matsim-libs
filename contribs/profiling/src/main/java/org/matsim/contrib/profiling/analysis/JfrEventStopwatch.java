@@ -95,20 +95,29 @@ public class JfrEventStopwatch implements AutoCloseable {
 
 			System.out.println(filePath);
 			var stopwatch = new JfrEventStopwatch(EventStream.openFile(filePath));
-			try (stopwatch) {
-				// todo make configurable via main args which one to use
-				//LISTENER_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
+
+			if (Arrays.asList(args).contains("--aop")) {
 				AOP_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
 				stopwatch.setIterationEvent(AopIterationJfrEvent.class);
-				System.out.println("start");
+			} else {
+				LISTENER_EVENT_OPERATIONS.forEach(stopwatch::addEvent);
+			}
+
+			System.out.println("start");
+			try (stopwatch) {
 				stopwatch.start();
 			}
 
 			System.out.println("--- done");
-			//stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch.csv", ";");
-			//stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch");
-			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch.csv", ";");
-			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch");
+
+			if (Arrays.asList(args).contains("--aop")) {
+				stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch.csv", ";");
+				stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".aop-stopwatch");
+			} else {
+				stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch.csv", ";");
+				stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".event-stopwatch");
+			}
+
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		} finally {
