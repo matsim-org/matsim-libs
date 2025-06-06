@@ -294,9 +294,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					case completeSmallScaleCommercialTraffic -> {
 						createCarriersAndDemand(output, scenario, "commercialPersonTraffic",
 							includeExistingModels);
-						includeExistingModels = false; // because already included in the step before
 						createCarriersAndDemand(output, scenario, "goodsTraffic",
-							includeExistingModels);
+							false);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
@@ -329,10 +328,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private void filterFacilitiesForZones(Scenario scenario, Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) {
 		scenario.getActivityFacilities().getFacilities().values().forEach((activityFacility -> {
-			activityFacility.getActivityOptions().values().forEach(activityOption -> {
-				facilitiesPerZone.computeIfAbsent((String) activityFacility.getAttributes().getAttribute("zone"), k -> new HashMap<>())
-					.computeIfAbsent(activityOption.getType(), k -> new ArrayList<>()).add(activityFacility);
-			});
+			activityFacility.getActivityOptions().values().forEach(activityOption -> facilitiesPerZone.computeIfAbsent((String) activityFacility.getAttributes().getAttribute("zone"), k -> new HashMap<>())
+				.computeIfAbsent(activityOption.getType(), k -> new ArrayList<>()).add(activityFacility));
 		}));
 	}
 
@@ -873,7 +870,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			int numberOfPossibleLinks = linksPerZone.get(zone).size();
 
 			// searches and selects the nearest link of the possible links in this zone
-			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, linksPerZone, newLink,
+			newLink = SmallScaleCommercialTrafficUtils.findNearestPossibleLink(zone, noPossibleLinks, linksPerZone, null,
 				centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
