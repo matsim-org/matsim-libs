@@ -70,103 +70,11 @@ public class TripDistributionMatrix {
 	private final String smallScaleCommercialTrafficType;
 
 	private record TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose,
-											 String smallScaleCommercialTrafficType) {
+											 String smallScaleCommercialTrafficType) {}
 
+	private record ResistanceFunktionKey(String fromZone, String toZone) {}
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((fromZone == null) ? 0 : fromZone.hashCode());
-			result = prime * result + Double.hashCode(purpose);
-			result = prime * result + ((toZone == null) ? 0 : toZone.hashCode());
-			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
-			result = prime * result + ((smallScaleCommercialTrafficType == null) ? 0 : smallScaleCommercialTrafficType.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			TripDistributionMatrixKey other = (TripDistributionMatrixKey) obj;
-			if (fromZone == null) {
-				if (other.fromZone != null) return false;
-			} else if (!fromZone.equals(other.fromZone)) return false;
-			if (Double.doubleToLongBits(purpose) != Double.doubleToLongBits(other.purpose)) return false;
-			if (toZone == null) {
-				if (other.toZone != null) return false;
-			} else if (!toZone.equals(other.toZone)) return false;
-			if (modeORvehType == null) {
-				if (other.modeORvehType != null) return false;
-			} else if (!modeORvehType.equals(other.modeORvehType)) return false;
-			if (smallScaleCommercialTrafficType == null) {
-				return other.smallScaleCommercialTrafficType == null;
-			} else return smallScaleCommercialTrafficType.equals(other.smallScaleCommercialTrafficType);
-		}
-	}
-
-	private record ResistanceFunktionKey(String fromZone, String toZone) {
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			ResistanceFunktionKey other = (ResistanceFunktionKey) obj;
-			if (fromZone == null) {
-				if (other.fromZone != null) return false;
-			} else if (!fromZone.equals(other.fromZone)) return false;
-			if (toZone == null) {
-				return other.toZone == null;
-			} else return toZone.equals(other.toZone);
-		}
-	}
-
-	private static class GravityConstantKey {
-		private final String fromZone;
-		private final String modeORvehType;
-		private final int purpose;
-
-		public GravityConstantKey(String fromZone, String mode, int purpose) {
-			super();
-			this.fromZone = fromZone;
-			this.modeORvehType = mode;
-			this.purpose = purpose;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((fromZone == null) ? 0 : fromZone.hashCode());
-			result = prime * result + Double.hashCode(purpose);
-			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			GravityConstantKey other = (GravityConstantKey) obj;
-			if (fromZone == null) {
-				if (other.fromZone != null)
-					return false;
-			} else if (!fromZone.equals(other.fromZone))
-				return false;
-			if (Double.doubleToLongBits(purpose) != Double.doubleToLongBits(other.purpose))
-				return false;
-			if (modeORvehType == null) {
-				return other.modeORvehType == null;
-			} else return modeORvehType.equals(other.modeORvehType);
-		}
-	}
+	private record GravityConstantKey (String fromZone, String modeORvehType, int purpose) {}
 
 	public static class Builder {
 

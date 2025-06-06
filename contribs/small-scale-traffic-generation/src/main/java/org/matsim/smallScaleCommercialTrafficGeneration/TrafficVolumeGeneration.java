@@ -51,22 +51,7 @@ public class TrafficVolumeGeneration {
 	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
 	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
-	public record TrafficVolumeKey(String zone, String modeORvehType) {
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			TrafficVolumeKey other = (TrafficVolumeKey) obj;
-			if (zone == null) {
-				if (other.zone != null) return false;
-			} else if (!zone.equals(other.zone)) return false;
-			if (modeORvehType == null) {
-				return other.modeORvehType == null;
-			} else return modeORvehType.equals(other.modeORvehType);
-		}
-	}
+	public record TrafficVolumeKey(String zone, String modeORvehType) {}
 
 	static TrafficVolumeKey makeTrafficVolumeKey(String zone, String modeORvehType) {
 		return new TrafficVolumeKey(zone, modeORvehType);
