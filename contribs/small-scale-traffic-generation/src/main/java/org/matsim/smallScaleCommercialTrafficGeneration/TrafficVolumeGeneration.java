@@ -51,47 +51,17 @@ public class TrafficVolumeGeneration {
 	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
 	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
-	public static class TrafficVolumeKey {
-		private final String zone;
-		private final String modeORvehType;
-
-		public TrafficVolumeKey(String zone, String modeORvehType) {
-			super();
-			this.zone = zone;
-			this.modeORvehType = modeORvehType;
-		}
-
-		public String getZone() {
-			return zone;
-		}
-
-		public String getModeORvehType() {
-			return modeORvehType;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((zone == null) ? 0 : zone.hashCode());
-			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
-			return result;
-		}
+	public record TrafficVolumeKey(String zone, String modeORvehType) {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
+			if (this == obj) return true;
+			if (obj == null) return false;
+			if (getClass() != obj.getClass()) return false;
 			TrafficVolumeKey other = (TrafficVolumeKey) obj;
 			if (zone == null) {
-				if (other.zone != null)
-					return false;
-			} else if (!zone.equals(other.zone))
-				return false;
+				if (other.zone != null) return false;
+			} else if (!zone.equals(other.zone)) return false;
 			if (modeORvehType == null) {
 				return other.modeORvehType == null;
 			} else return modeORvehType.equals(other.modeORvehType);
@@ -222,8 +192,8 @@ public class TrafficVolumeGeneration {
 			writer.write("\n");
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
 				List<String> row = new ArrayList<>();
-				row.add(trafficVolumeKey.getZone());
-				row.add(trafficVolumeKey.getModeORvehType());
+				row.add(trafficVolumeKey.zone());
+				row.add(trafficVolumeKey.modeORvehType());
 				int count = 1;
 				while (count < 6) {
 					row.add(String.valueOf((int) trafficVolume.get(trafficVolumeKey).getDouble(count)));

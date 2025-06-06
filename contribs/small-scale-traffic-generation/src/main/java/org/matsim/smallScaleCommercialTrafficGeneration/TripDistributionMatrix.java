@@ -69,36 +69,11 @@ public class TripDistributionMatrix {
 	private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 	private final String smallScaleCommercialTrafficType;
 
-	private static class TripDistributionMatrixKey {
-		private final String fromZone;
-		private final String toZone;
-		private final String modeORvehType;
-		private final int purpose;
-		private final String smallScaleCommercialTrafficType;
-
-		public TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
-			super();
-			this.fromZone = fromZone;
-			this.toZone = toZone;
-			this.modeORvehType = modeORvehType;
-			this.purpose = purpose;
-			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;
-		}
-
-		public String getFromZone() {
-			return fromZone;
-		}
-
-		public String getToZone() {
-			return toZone;
-		}
+	private record TripDistributionMatrixKey(String fromZone, String toZone, String modeORvehType, int purpose,
+											 String smallScaleCommercialTrafficType) {
 
 		public String getModesORvehType() {
 			return modeORvehType;
-		}
-
-		public int getPurpose() {
-			return purpose;
 		}
 
 		@Override
@@ -117,70 +92,37 @@ public class TripDistributionMatrix {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
+			if (this == obj) return true;
+			if (obj == null) return false;
+			if (getClass() != obj.getClass()) return false;
 			TripDistributionMatrixKey other = (TripDistributionMatrixKey) obj;
 			if (fromZone == null) {
-				if (other.fromZone != null)
-					return false;
-			} else if (!fromZone.equals(other.fromZone))
-				return false;
-			if (Double.doubleToLongBits(purpose) != Double.doubleToLongBits(other.purpose))
-				return false;
+				if (other.fromZone != null) return false;
+			} else if (!fromZone.equals(other.fromZone)) return false;
+			if (Double.doubleToLongBits(purpose) != Double.doubleToLongBits(other.purpose)) return false;
 			if (toZone == null) {
-				if (other.toZone != null)
-					return false;
-			} else if (!toZone.equals(other.toZone))
-				return false;
+				if (other.toZone != null) return false;
+			} else if (!toZone.equals(other.toZone)) return false;
 			if (modeORvehType == null) {
-				if (other.modeORvehType != null)
-					return false;
-			} else if (!modeORvehType.equals(other.modeORvehType))
-				return false;
+				if (other.modeORvehType != null) return false;
+			} else if (!modeORvehType.equals(other.modeORvehType)) return false;
 			if (smallScaleCommercialTrafficType == null) {
 				return other.smallScaleCommercialTrafficType == null;
 			} else return smallScaleCommercialTrafficType.equals(other.smallScaleCommercialTrafficType);
 		}
 	}
 
-	private static class ResistanceFunktionKey {
-		private final String fromZone;
-		private final String toZone;
-
-		public ResistanceFunktionKey(String fromZone, String toZone) {
-			super();
-			this.fromZone = fromZone;
-			this.toZone = toZone;
-
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((fromZone == null) ? 0 : fromZone.hashCode());
-			result = prime * result + ((toZone == null) ? 0 : toZone.hashCode());
-			return result;
-		}
+	private record ResistanceFunktionKey(String fromZone, String toZone) {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
+			if (this == obj) return true;
+			if (obj == null) return false;
+			if (getClass() != obj.getClass()) return false;
 			ResistanceFunktionKey other = (ResistanceFunktionKey) obj;
 			if (fromZone == null) {
-				if (other.fromZone != null)
-					return false;
-			} else if (!fromZone.equals(other.fromZone))
-				return false;
+				if (other.fromZone != null) return false;
+			} else if (!fromZone.equals(other.fromZone)) return false;
 			if (toZone == null) {
 				return other.toZone == null;
 			} else return toZone.equals(other.toZone);
@@ -462,7 +404,7 @@ public class TripDistributionMatrix {
 		if (!gravityConstantACache.containsKey(gravityKey)) {
 			double sum = 0;
 			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
-				if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)) {
+				if (trafficVolumeKey.modeORvehType().equals(modeORvehType)) {
 					double volume = trafficVolume.get(trafficVolumeKey).getDouble(purpose);
 					if (volume == 0)
 						continue;
@@ -549,8 +491,8 @@ public class TripDistributionMatrix {
 	ArrayList<Integer> getListOfPurposes() {
 		if (listOfPurposes.isEmpty()) {
 			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
-				if (!listOfPurposes.contains(key.getPurpose()))
-					listOfPurposes.add(key.getPurpose());
+				if (!listOfPurposes.contains(key.purpose()))
+					listOfPurposes.add(key.purpose());
 			}
 		}
 		return listOfPurposes;
