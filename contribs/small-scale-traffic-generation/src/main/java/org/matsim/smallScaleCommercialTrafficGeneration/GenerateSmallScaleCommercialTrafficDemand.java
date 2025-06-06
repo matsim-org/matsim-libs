@@ -565,7 +565,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			}
 		});
 
-		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 
 		return controller;
 	}
