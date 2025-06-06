@@ -4,7 +4,6 @@ import jdk.jfr.Name;
 import jdk.jfr.consumer.EventStream;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.contrib.profiling.events.IterationJfrEvent;
 
@@ -13,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,7 +27,27 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	// linked hashmap to keep insertion order but also hashmap access times
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
+
+	/**
+	 * Method names of the currently started but not ended operations
+	 */
 	private final Deque<String> ongoingOperations = new LinkedBlockingDeque<>();
+
+	/**
+	 * Keys: method names to retrieve
+	 */
+	private final Map<String, OperationSampleMethod> operationMethods = Collections.synchronizedMap(new HashMap<>());
+
+	/**
+	 * @param operationName MATSim operation as to be presented in the stopwatch png and csv
+	 * @param methodName resembling an operation to look for in stacktraces of sampling events
+	 * @param className of the class the method is implemented in
+	 */
+	public record OperationSampleMethod(
+		String operationName,
+		String methodName,
+		String className
+	) {}
 
 	record Operation(
 		String name,
@@ -85,19 +105,18 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	}
 
 	/**
-	 * Map the stopwatch operation names to their respective pairs of class and method
-	 * todo add option to expand & use proper record objects
+	 * Default assortment of MATSim stopwatch operations and the class+method they represent
 	 */
-	public static final Map<String, Pair<String, String>> OPERATION_METHODS = Map.of(
-		"fireControlerIterationStartsEvent",	Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationStartListeners"),
-		"fireControlerReplanningEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "replanning"),
-		"fireControlerBeforeMobsimEvent",		Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "beforeMobsimListeners"),
-		"notifyBeforeMobsim", 					Pair.of("org.matsim.core.controler.corelisteners.PlansDumpingImpl", "dump all plans"),
-		"prepareForMobsim",						Pair.of("org.matsim.core.controler.NewControler", "prepareForMobsim"), // needs to be actual impl and not an interface/abstract method
-		"runMobSim",								Pair.of("org.matsim.core.controler.NewControler", "mobsim"), //  needs to be actual impl and not an interface/abstract method
-		"fireControlerAfterMobsimEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "afterMobsimListeners"),
-		"fireControlerScoringEvent",			Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "scoring"),
-		"fireControlerIterationEndsEvent",		Pair.of("org.matsim.core.controler.ControlerListenerManagerImpl", "iterationEndsListeners")
+	public static final List<OperationSampleMethod> DEFAULT_OPERATION_METHODS = List.of(
+		new OperationSampleMethod("iterationStartsListeners", "fireControlerIterationStartsEvent", "org.matsim.core.controler.ControlerListenerManagerImpl"),
+		new OperationSampleMethod("replanning", "fireControlerReplanningEvent", "org.matsim.core.controler.ControlerListenerManagerImpl"),
+		new OperationSampleMethod("beforeMobsimListeners", "fireControlerBeforeMobsimEvent", "org.matsim.core.controler.ControlerListenerManagerImpl"),
+		new OperationSampleMethod("dump all plans", "notifyBeforeMobsim", "org.matsim.core.controler.corelisteners.PlansDumpingImpl"),
+		new OperationSampleMethod("prepareForMobsim", "prepareForMobsim", "org.matsim.core.controler.NewControler"), // needs to be actual impl and not an interface/abstract method
+		new OperationSampleMethod("mobsim", "runMobSim", "org.matsim.core.controler.NewControler"), // needs to be actual impl and not an interface/abstract method
+		new OperationSampleMethod("afterMobsimListeners", "fireControlerAfterMobsimEvent", "org.matsim.core.controler.ControlerListenerManagerImpl"),
+		new OperationSampleMethod("scoring", "fireControlerScoringEvent", "org.matsim.core.controler.ControlerListenerManagerImpl"),
+		new OperationSampleMethod("iterationEndsListeners", "fireControlerIterationEndsEvent", "org.matsim.core.controler.ControlerListenerManagerImpl")
 	);
 
 	public static void main(String[] args) throws IOException {
@@ -159,9 +178,9 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 				});
 				// make sure every operation ended
 				ongoingOperations
-					.forEach(operation -> {
-						System.out.println("--- Missing end time for " + operation + " - using iteration end time instead");
-						stopwatch.endOperation(OPERATION_METHODS.get(operation).getRight(), event.getEndTime().toEpochMilli());
+					.forEach(operationMethodName -> {
+						System.out.println("--- Missing end time for " + operationMethodName + " - using iteration end time instead");
+						stopwatch.endOperation(operationMethods.get(operationMethodName).operationName, event.getEndTime().toEpochMilli());
 					});
 				stages.clear();
 				ongoingOperations.clear();
@@ -227,9 +246,9 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 						var operation = ongoingOperations.getFirst();
 						// if no mention anymore in the stacktrace, the operation is assumed to be over
 						if (methodsInStackTrace.stream().noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
-							stages.put(new Operation(OPERATION_METHODS.get(operation).getRight(), operation, false), event.getEndTime().toEpochMilli());
+							stages.put(new Operation(operationMethods.get(operation).operationName, operation, false), event.getEndTime().toEpochMilli());
 							ongoingOperations.removeFirst();
-							System.out.println(OPERATION_METHODS.get(operation).getRight() + " ended with " +  statistics.interval + " ms since previous sample");
+							System.out.println(operationMethods.get(operation).operationName + " ended with " +  statistics.interval + " ms since previous sample");
 						} else {
 							// only the topmost ongoing operation can be ended
 							// assuming the nested operation has to be higher on the stacktrace and thus exited earlier
@@ -247,27 +266,38 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 					// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
 					// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
 
-					OPERATION_METHODS.entrySet().stream()
-						.filter(entry -> entry.getValue().getLeft().equals(type) && entry.getKey().equals(method))
+					operationMethods.values().stream()
+						.filter(operationMethod -> operationMethod.className.equals(type) && operationMethod.methodName.equals(method))
 						.findFirst()
-						.ifPresent(entry -> {
-							stages.putIfAbsent(new Operation(entry.getValue().getRight(), method, true), time);
-							if (!ongoingOperations.contains(entry.getKey())) {
-								ongoingOperations.addFirst(entry.getKey());
-								System.out.println(OPERATION_METHODS.get(entry.getKey()).getRight() + " started with " +  statistics.interval + " ms since previous sample");
+						.ifPresent(operationMethod -> {
+							stages.putIfAbsent(new Operation(operationMethod.operationName, method, true), time);
+							if (!ongoingOperations.contains(operationMethod.methodName)) {
+								ongoingOperations.addFirst(operationMethod.methodName);
+								System.out.println(operationMethod.operationName + " started with " +  statistics.interval + " ms since previous sample");
 							}
 						});
-
 				});
 				//System.out.println("---");
 			}
 	}
 
+	public void addOperationMethod(OperationSampleMethod operationSampleMethod) {
+		this.operationMethods.put(operationSampleMethod.methodName, operationSampleMethod);
+	}
+
+	protected void initialize() {
+		if (operationMethods.isEmpty()) {
+			DEFAULT_OPERATION_METHODS.forEach(this::addOperationMethod);
+		}
+	}
+
 	public void start() {
+		initialize();
 		this.eventStream.start();
 	}
 
 	public void startAsync() {
+		initialize();
 		this.eventStream.startAsync();
 	}
 
