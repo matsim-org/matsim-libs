@@ -1,4 +1,4 @@
-O/D	area1	area3	area2
-area1	2	0	3
+O/D	area1	area2	area3
+area1	2	3	0
+area2	8	10	1
 area3	0	0	0
-area2	8	1	10

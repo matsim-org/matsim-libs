@@ -47,10 +47,7 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -432,6 +429,7 @@ public class TripDistributionMatrix {
 	void writeODMatrices(Path output, String smallScaleCommercialTrafficType) throws UncheckedIOException, MalformedURLException {
 		ArrayList<String> usedModesORvehTypes = getListOfModesOrVehTypes();
 		ArrayList<String> usedZones = getListOfZones();
+		Collections.sort(usedZones);
 		ArrayList<Integer> usedPurposes = getListOfPurposes();
 
 		for (String modeORvehType : usedModesORvehTypes) {
