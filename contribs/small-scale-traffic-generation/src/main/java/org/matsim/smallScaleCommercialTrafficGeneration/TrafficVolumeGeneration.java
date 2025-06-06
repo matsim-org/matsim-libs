@@ -32,10 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ricardo Ewert
@@ -175,7 +172,17 @@ public class TrafficVolumeGeneration {
 			String[] header = new String[] { "zoneID", "mode/vehType", "1", "2", "3", "4", "5" };
 			JOIN.appendTo(writer, header);
 			writer.write("\n");
-			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
+			// Sort the entries by zone and mode/vehType to ensure a consistent order in the output file
+			List<Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>>> sortedEntries =
+				trafficVolume.entrySet()
+					.stream()
+					.sorted(
+						Comparator.comparing((Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>> entry) -> entry.getKey().zone())
+							.thenComparing(entry -> entry.getKey().modeORvehType())
+					)
+					.toList();
+			for (Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>> entry : sortedEntries) {
+				TrafficVolumeKey trafficVolumeKey = entry.getKey();
 				List<String> row = new ArrayList<>();
 				row.add(trafficVolumeKey.zone());
 				row.add(trafficVolumeKey.modeORvehType());
