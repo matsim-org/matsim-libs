@@ -97,7 +97,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
 				log.warn(
 					"{}-Volume of zone {} (mode '{}', purpose '{}') was reduced because the volume for the zone {}, where an existing model has a demand, has a generated demand of 0.",
-					volumeType, trafficVolumeKey.getZone(), modeORvehType, purpose, originalZone);
+					volumeType, trafficVolumeKey.zone(), modeORvehType, purpose, originalZone);
 				break;
 			}
 		}
