@@ -21,7 +21,6 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -51,13 +50,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -67,7 +59,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.*;
-import org.matsim.freight.carriers.usecases.chessboard.CarrierTravelDisutilities;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
 import org.matsim.vehicles.CostInformation;
@@ -576,8 +567,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(CarrierStrategyManager.class).toProvider(
-					new MyCarrierPlanStrategyManagerFactory(CarriersUtils.getOrAddCarrierVehicleTypes(scenario)));
 				bind(CarrierScoringFunctionFactory.class).toInstance(new MyCarrierScoringFunctionFactory());
 			}
 		});
@@ -1013,52 +1002,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	}
 
-	private static class MyCarrierPlanStrategyManagerFactory implements Provider<CarrierStrategyManager> {
-
-		@Inject
-		private Network network;
-
-		@Inject
-		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-
-		@Inject
-		private Map<String, TravelTime> modeTravelTimes;
-
-		private final CarrierVehicleTypes types;
-
-		public MyCarrierPlanStrategyManagerFactory(CarrierVehicleTypes types) {
-			this.types = types;
-		}
-
-		@Override
-		public CarrierStrategyManager get() {
-			TravelDisutility travelDisutility = CarrierTravelDisutilities.createBaseDisutility(types,
-				modeTravelTimes.get(TransportMode.car));
-			final LeastCostPathCalculator router = leastCostPathCalculatorFactory.createPathCalculator(network,
-				travelDisutility, modeTravelTimes.get(TransportMode.car));
-
-//			final GenericStrategyManager<CarrierPlan, Carrier> strategyManager = new GenericStrategyManager<>();
-			final CarrierStrategyManager strategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
-			strategyManager.setMaxPlansPerAgent(5);
-			{
-				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(
-					new ExpBetaPlanChanger.Factory<CarrierPlan, Carrier>().setBetaValue(1.0).build());
-
-				strategyManager.addStrategy(strategy, null, 1.0);
-
-			}
-			{
-				GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<>(
-					new KeepSelected<>());
-				strategy.addStrategyModule(new CarrierTimeAllocationMutator.Factory().build());
-				strategy.addStrategyModule(new
-					CarrierReRouteVehicles.Factory(router, network, modeTravelTimes.get(TransportMode.car)).build());
-				strategyManager.addStrategy(strategy, null, 0.5);
-			}
-			return strategyManager;
-		}
-	}
-
 	static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
 
@@ -1206,32 +1149,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	}
 
-	public record ServiceDurationPerCategoryKey(String employeeCategory, String vehicleType, String smallScaleCommercialTrafficType) {
+	public record ServiceDurationPerCategoryKey(String employeeCategory, String vehicleType, String smallScaleCommercialTrafficType) {}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ServiceDurationPerCategoryKey other = (ServiceDurationPerCategoryKey) obj;
-			if (employeeCategory == null) {
-				if (other.employeeCategory != null)
-					return false;
-			} else if (!employeeCategory.equals(other.employeeCategory))
-				return false;
-			if (vehicleType == null) {
-				if (other.vehicleType != null)
-					return false;
-			} else if (!vehicleType.equals(other.vehicleType))
-				return false;
-			if (smallScaleCommercialTrafficType == null) {
-				return other.smallScaleCommercialTrafficType == null;
-			} else return smallScaleCommercialTrafficType.equals(other.smallScaleCommercialTrafficType);
-		}
-	}
 	public static ServiceDurationPerCategoryKey makeServiceDurationPerCategoryKey(String employeeCategory, String vehicleType, String smallScaleCommercialTrafficType) {
 		return new ServiceDurationPerCategoryKey(employeeCategory, vehicleType, smallScaleCommercialTrafficType);
 	}
