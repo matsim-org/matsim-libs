@@ -23,12 +23,13 @@ package org.matsim.analysis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -73,7 +74,7 @@ public final class IterationStopWatch {
 	private int nextOperationPosition = 0;
 
 	/** A formatter for dates, used when writing out the data. */
-	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
 
 	/** data structures to identify nested operations */
 	private Stack<String> currentMeasuredOperations;
@@ -264,8 +265,7 @@ public final class IterationStopWatch {
 					Long endTime = data.get("END " + identifier);
 					writer.write(delimiter);
 					if (startTime != null && endTime != null) {
-						double diff = (endTime - startTime) / 1000.0;
-						writer.write(Time.writeTime(diff));
+						writer.write(formatMilliTime(endTime - startTime));
 					}
 				}
 
@@ -397,7 +397,7 @@ public final class IterationStopWatch {
 		if (millis == null) {
 			return "";
 		}
-		return this.formatter.format(new Date(millis));
+		return this.formatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.UTC));
 	}
 
 }
