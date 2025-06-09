@@ -69,6 +69,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	 private final Set<Leg> drtLegs = new HashSet<>();
 	 private WeightedRandomSelection<Integer> sampler;
+	 private final boolean generateByDefault;
  
 	 private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
  
@@ -97,6 +98,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 				 .max()
 				 .orElse(0);
 		 installSampler(drtWithExtensionsConfigGroup);
+
+		 generateByDefault = drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getGenerateCompanionsByDefault();
 	 }
  
 	 private String getCompanionPrefix(String drtMode) {
@@ -278,14 +281,13 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 		 this.addCompanionAgents();
 	 }
 
-	 static public String PERSON_ATTRIBUTE = "drt:companions";
+	 static public final String PERSON_ATTRIBUTE = "drt:companions";
 
 	 private boolean isActive(Person person) {
 		Boolean value = (Boolean) person.getAttributes().getAttribute(PERSON_ATTRIBUTE);
 
 		if (value == null) {
-			// by default active
-			return true;
+			return generateByDefault;
 		}
 
 		return value;
