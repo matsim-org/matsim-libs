@@ -90,7 +90,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static final Logger log = LogManager.getLogger(GenerateSmallScaleCommercialTrafficDemand.class);
 	private final IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial;
 	private final CommercialTourSpecifications commercialTourSpecifications;
-	private final VehicleSelection vehicleSelection;
+	protected final VehicleSelection vehicleSelection;
 	private final UnhandledServicesSolution unhandledServicesSolution;
 
 	private enum CreationOption {
@@ -159,6 +159,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private Path output;
 
 	private static Random rnd;
+	private static RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 
@@ -233,6 +234,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car)); // e.g. for vulkaneifel network
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup;
+		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
+		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
+
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
 				log.info("Existing carriers (including carrier vehicle types) should be set in the freight config group");
@@ -267,7 +271,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
-				resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 				filterFacilitiesForZones(scenario, facilitiesPerZone);
 				linksPerZone = filterLinksForZones(scenario, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
@@ -540,6 +543,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 
 		rnd = MatsimRandom.getRandom();
+		rng = new MersenneTwister(config.global().getRandomSeed());
 
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
@@ -588,8 +592,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
 
-		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
-
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
 
@@ -636,27 +638,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								vehicleTypes.add(possibleVehicleType);
 						}
 
-						Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd);
-						String selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
-						// Find a (random) start category with existing employees in this zone
-						// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
-						// Otherwise, we have to find another category.
-						for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
-							if (count < odMatrixEntry.possibleStartCategories.size())
-								selectedStartCategory = odMatrixEntry.possibleStartCategories.get(count);
-							else {
-								// if no possible start category with employees is found, take a random category of the stop categories,
-								// the reason that no start category with employees is found is that traffic volume for employees in general is created,
-								// so that it is possible that we have traffic, although we have no employees in the given start category.
-								// That's why we exclude Inhabitants as a possible start category.
-								selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
-								if (selectedStartCategory.equals("Inhabitants"))
-									selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
-								if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
-									log.warn("No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
-										startZone, selectedStartCategory, odMatrixEntry.possibleStartCategories);
-							}
-						}
+						String selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry);
 
 						// Generate carrierName
 						String carrierName = null;
@@ -694,6 +676,39 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		log.warn("The jspritIterations are now set to {} in this simulation!", jspritIterations);
 		log.info("Finished creating {} carriers including related services.", createdCarrier);
+	}
+
+	/**
+	 * Selects a start category for the given start zone, based on the possible start categories for this zone.
+	 *
+	 * @param startZone     zone where the carrier starts
+	 * @param odMatrixEntry odMatrixEntry
+	 * @return the selected start category
+	 */
+	protected String getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
+		Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd);
+		String selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
+		// Find a (random) start category with existing employees in this zone
+		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
+		// Otherwise, we have to find another category.
+		for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
+			if (count < odMatrixEntry.possibleStartCategories.size())
+				selectedStartCategory = odMatrixEntry.possibleStartCategories.get(count);
+			else {
+				// if no possible start category with employees is found, take a random category of the stop categories,
+				// the reason that no start category with employees is found is that traffic volume for employees in general is created,
+				// so that it is possible that we have traffic, although we have no employees in the given start category.
+				// That's why we exclude Inhabitants as a possible start category.
+				selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+				if (selectedStartCategory.equals("Inhabitants"))
+					selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+				if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
+					log.warn(
+						"No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
+						startZone, selectedStartCategory, odMatrixEntry.possibleStartCategories);
+			}
+		}
+		return selectedStartCategory;
 	}
 
 	/**
