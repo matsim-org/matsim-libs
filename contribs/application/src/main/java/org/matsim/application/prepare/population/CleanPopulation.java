@@ -32,8 +32,6 @@ import java.util.Set;
 public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 
 	private static final Logger log = LogManager.getLogger(CleanPopulation.class);
-	private static int facilityIdNotRemovedCount = 0;
-	private static int facilityIdRemovedCount = 0;
 
 	@CommandLine.Option(names = "--plans", description = "Input original plan file", required = true)
 	private Path plans;
@@ -97,12 +95,6 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		cleanPopulation(population);
 
 		PopulationUtils.writePopulation(population, output.toString());
-
-		if (facilityIdNotRemovedCount > 0) {
-			log.info("For {} facilities ({}% of all activities), the facility locations were not removed -- despite choosing program option --remove-activity-location.\n" +
-				"By deleting the facility locations, the activities would have ended up without any location: linkId=null, facilityId=null, coord=null.\n" +
-				"This would have produced errors when running simulations with the populations.", facilityIdNotRemovedCount, (double) facilityIdNotRemovedCount / (facilityIdRemovedCount + facilityIdNotRemovedCount) * 100);
-		}
 		return 0;
 	}
 
@@ -183,9 +175,8 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 //			otherwise the act would have no location information (linkId=null, facilityId=null, coord=null). -sm0625
 			if (act.getCoord() != null) {
 				act.setFacilityId(null);
-				facilityIdRemovedCount++;
 			} else {
-				facilityIdNotRemovedCount++;
+				log.info("Activity {}\n has no coord. Its activity facility is therefore not removed because it would have ended up without any location: linkId=null, facilityId=null, coord=null.", act);
 			}
 		}
 	}
