@@ -108,6 +108,7 @@ public class TripDistributionMatrixTest {
 		}
 		odMatrix.clearRoundingError();
 
+		odMatrix.writeODMatrices(Path.of(utils.getOutputDirectory()), usedTrafficType);
 		//tests
 		Assertions.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
 		for (String zone : resultingDataPerZone.keySet()) {
