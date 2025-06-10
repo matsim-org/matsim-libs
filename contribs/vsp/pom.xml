@@ -76,23 +76,23 @@
 			<artifactId>informed-mode-choice</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.processing</groupId>-->
-<!--			<artifactId>core</artifactId>-->
-<!--			<version>3.0.1</version>-->
-<!--		</dependency>-->
+		<!--		<dependency>-->
+		<!--			<groupId>org.processing</groupId>-->
+		<!--			<artifactId>core</artifactId>-->
+		<!--			<version>3.0.1</version>-->
+		<!--		</dependency>-->
 
-<!--		<dependency>-->
-<!--			<groupId>org.jogamp.gluegen</groupId>-->
-<!--			<artifactId>gluegen-rt-main</artifactId>-->
-<!--			<version>2.3.2</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.jogamp.jogl</groupId>-->
-<!--			<artifactId>jogl-all-main</artifactId>-->
-<!--			<version>2.3.2</version>-->
-<!--		</dependency>-->
-<!--		(Do not repeat the jogl dependencies.  They are defined in contrib/otfvis/pom.xml (and enforced from matsim-all/pom.xml).  kai, nov'23)-->
+		<!--		<dependency>-->
+		<!--			<groupId>org.jogamp.gluegen</groupId>-->
+		<!--			<artifactId>gluegen-rt-main</artifactId>-->
+		<!--			<version>2.3.2</version>-->
+		<!--		</dependency>-->
+		<!--		<dependency>-->
+		<!--			<groupId>org.jogamp.jogl</groupId>-->
+		<!--			<artifactId>jogl-all-main</artifactId>-->
+		<!--			<version>2.3.2</version>-->
+		<!--		</dependency>-->
+		<!--		(Do not repeat the jogl dependencies.  They are defined in contrib/otfvis/pom.xml (and enforced from matsim-all/pom.xml).  kai, nov'23)-->
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -150,7 +150,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.3.0</version>
+			<version>5.4.1</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -170,7 +170,7 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.55</version>
 		</dependency>
-				<!--to get ExamplesUtils:-->
+		<!--to get ExamplesUtils:-->
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
@@ -189,7 +189,7 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>graphhopper-core</artifactId>
-			<version>9.1</version>
+			<version>10.2</version>
 		</dependency>
 		<!-- Enforce version -->
 		<dependency>
