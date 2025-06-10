@@ -175,7 +175,7 @@ public class CarriersUtils {
 	public static int getJspritIterations(Carrier carrier) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute(JSPRIT_ITERATIONS);
 		if (result == null) {
-			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritIterations does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		} else {
 			return result;
@@ -750,7 +750,7 @@ public class CarriersUtils {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}
