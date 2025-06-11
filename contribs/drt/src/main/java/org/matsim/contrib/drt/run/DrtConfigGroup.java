@@ -19,24 +19,26 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
+import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
@@ -53,12 +55,11 @@ import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = LogManager.getLogger(DrtConfigGroup.class);
@@ -251,9 +252,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private DrtOptimizationConstraintsParams drtOptimizationConstraintsParams;
 
 	@Nullable
-	private DrtZoneSystemParams zonalSystemParams;
-
-	@Nullable
 	private RebalancingParams rebalancingParams;
 
 	@Nullable
@@ -273,6 +271,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
+
+	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
 		this(DrtOptimizationConstraintsSetImpl::new);
@@ -294,9 +294,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
 				params -> rebalancingParams = (RebalancingParams)params);
 
-		//zonal system (optional)
-		addDefinition(DrtZoneSystemParams.SET_NAME, DrtZoneSystemParams::new, () -> zonalSystemParams,
-				params -> zonalSystemParams = (DrtZoneSystemParams)params);
 
 		//insertion search params (one of: extensive, selective, repeated selective)
 		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
@@ -336,11 +333,35 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(DvrpLoadParams.SET_NAME, DvrpLoadParams::new,
 			() -> loadParams,
 			params -> loadParams = (DvrpLoadParams) params);
+
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams)params);
+
+		addDefinition(ZonalSystemWrapper.SET_NAME, ZonalSystemWrapper::new,
+				() -> analysisZoneSystemParams,
+				params -> {
+					ZoneSystemParams delegate = ((ZonalSystemWrapper) params).delegate;
+					super.addParameterSet(delegate);
+					params.removeParameterSet(delegate);
+                });
 	}
 
-	/**
-	 * for backwards compatibility with old drt config groups
-	 */
+		/**
+         * for backwards compatibility with old drt config groups
+         */
 	public void handleAddUnknownParam(final String paramName, final String value) {
 		switch (paramName) {
 			case "maxWaitTime":
@@ -375,7 +396,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 		List<DrtOptimizationConstraintsSet> drtOptimizationConstraintsSets = addOrGetDrtOptimizationConstraintsParams().getDrtOptimizationConstraintsSets();
 		for (DrtOptimizationConstraintsSet constraintsSet : drtOptimizationConstraintsSets) {
-			Verify.verify(constraintsSet.maxWaitTime >= getStopDuration(),
+			Verify.verify(constraintsSet.getMaxWaitTime() >= getStopDuration(),
 					"maxWaitTime must not be smaller than stopDuration");
 		}
 
@@ -429,10 +450,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			this.addParameterSet(params);
 		}
 		return drtOptimizationConstraintsParams;
-	}
-
-	public Optional<DrtZoneSystemParams> getZonalSystemParams() {
-		return Optional.ofNullable(zonalSystemParams);
 	}
 
 	public Optional<RebalancingParams> getRebalancingParams() {
@@ -541,5 +558,120 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public void setReturnToDepotEvaluationInterval(double returnToDepotEvaluationInterval) {
 		this.returnToDepotEvaluationInterval = returnToDepotEvaluationInterval;
+	}
+
+	public ZoneSystemParams addOrGetAnalysisZoneSystemParams() {
+		if (analysisZoneSystemParams == null) {
+			ZoneSystemParams params = new SquareGridZoneSystemParams();
+			this.addParameterSet(params);
+		} else if(analysisZoneSystemParams instanceof ZonalSystemWrapper zonalSystemWrapper) {
+			// for backwards compatibility
+			return zonalSystemWrapper.delegate;
+		}
+		return analysisZoneSystemParams;
+	}
+
+	/** required for backwards compatibility. Remove at some later point (introduced during code sprint March '25, nkuehnel)
+	 only works as long as empty param sets are not written out.
+	 Old config formats should automatically be written in the new format (see ReadOldConfigTest)*/
+	@Deprecated
+	private final class ZonalSystemWrapper extends ZoneSystemParams {
+
+		private final static String SET_NAME = "zonalSystem";
+		private ZoneSystemParams delegate;
+
+		public ZonalSystemWrapper() {
+			super(SET_NAME);
+			initSingletonDefs();
+		}
+
+		private void initSingletonDefs() {
+			addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (SquareGridZoneSystemParams)params);
+
+			addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (GISFileZoneSystemParams)params);
+
+			addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (H3GridZoneSystemParams)params);
+
+			addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+					() -> delegate,
+					params -> delegate = (GeometryFreeZoneSystemParams)params);
+		}
+
+
+		@Override
+		public void handleAddUnknownParam(String paramName, String value) {
+			switch (paramName) {
+				case "zoneTargetLinkSelection": {
+					log.warn("Param " + paramName + " is no longer supported as part of the deprecated zonal system params. Please set this param in the" +
+							" rebalancing params section in the future. The setting will be IGNORED in this execution.");
+					break;
+				}
+				case "zonesGeneration": {
+					if (delegate == null) {
+						switch (value) {
+							case "ShapeFile": {
+								addParameterSet(createParameterSet(GISFileZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GridFromNetwork": {
+								addParameterSet(createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "H3": {
+								addParameterSet(createParameterSet(H3GridZoneSystemParams.SET_NAME));
+								break;
+							}
+							case "GeometryFree":{
+								addParameterSet(createParameterSet(GeometryFreeZoneSystemParams.SET_NAME));
+							}
+							default:
+								super.handleAddUnknownParam(paramName, value);
+						}
+					}
+					break;
+				}
+				case "cellSize": {
+					SquareGridZoneSystemParams squareGridParams;
+					if(delegate == null) {
+						squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+						addParameterSet(squareGridParams);
+					} else {
+						squareGridParams = (SquareGridZoneSystemParams) delegate;
+					}
+					squareGridParams.setCellSize(Double.parseDouble(value));
+					break;
+				}
+				case "zonesShapeFile": {
+					GISFileZoneSystemParams gisFileParams;
+					if(delegate == null) {
+						gisFileParams = (GISFileZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(gisFileParams);
+					} else {
+						gisFileParams = (GISFileZoneSystemParams) delegate;
+					}
+					gisFileParams.setZonesShapeFile(value);
+					break;
+				}
+				case "h3Resolution": {
+					H3GridZoneSystemParams h3GridParams;
+					if(delegate == null) {
+						h3GridParams = (H3GridZoneSystemParams) createParameterSet(GISFileZoneSystemParams.SET_NAME);
+						addParameterSet(h3GridParams);
+					} else {
+						h3GridParams = (H3GridZoneSystemParams) delegate;
+					}
+					h3GridParams.setH3Resolution(Integer.parseInt(value));
+					break;
+				}
+				default:
+					super.handleAddUnknownParam(paramName, value);
+			}
+		}
 	}
 }

@@ -103,7 +103,7 @@ public class RunDrtExampleIT {
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -144,7 +144,7 @@ public class RunDrtExampleIT {
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -185,7 +185,7 @@ public class RunDrtExampleIT {
 			//disable rejections
 			drtCfg.addOrGetDrtOptimizationConstraintsParams()
 					.addOrGetDefaultDrtOptimizationConstraintsSet()
-					.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		}
 
 		config.controller().setLastIteration(3);

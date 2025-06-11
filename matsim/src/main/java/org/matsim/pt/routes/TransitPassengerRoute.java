@@ -36,5 +36,8 @@ public interface TransitPassengerRoute extends Route {
 
 	Id<TransitRoute> getRouteId();
 
+	TransitPassengerRoute getChainedRoute();
+
 	OptionalTime getBoardingTime();
+
 }

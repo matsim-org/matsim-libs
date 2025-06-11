@@ -24,10 +24,10 @@ import java.util.Set;
  * @author rakow
  */
 @CommandLine.Command(
-		name = "clean-population",
-		description = "Remove information from population, such as routes or unselected plans.",
-		mixinStandardHelpOptions = true,
-		showDefaultValues = true
+	name = "clean-population",
+	description = "Remove information from population, such as routes or unselected plans.",
+	mixinStandardHelpOptions = true,
+	showDefaultValues = true
 )
 public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 
@@ -61,8 +61,22 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	// to be able to process older population files without any routing modes!
 	private final TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new RoutingModeMainModeIdentifier());
 
+	//Needed for registration of this application in scenarios
+	@SuppressWarnings("unused")
+	public CleanPopulation() {
+	}
+
+	private CleanPopulation(boolean rmUnselected, boolean rmActivityLocations, boolean rmActivityFacilities, boolean rmRoutes, boolean tripsToLegs, Set<String> rmLegs) {
+		this.rmUnselected = rmUnselected;
+		this.rmActivityLocations = rmActivityLocations;
+		this.rmActivityFacilities = rmActivityFacilities;
+		this.rmRoutes = rmRoutes;
+		this.tripsToLegs = tripsToLegs;
+		this.rmLegs = rmLegs;
+	}
+
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new CleanPopulation()).execute(args));
+		System.exit(new CommandLine(new CleanPopulationBuilder().createCleanPopulation()).execute(args));
 	}
 
 	@Override
@@ -78,12 +92,9 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		if (output.getParent() != null)
 			Files.createDirectories(output.getParent());
 
-		for (Person person : population.getPersons().values()) {
-			run(person);
-		}
+		cleanPopulation(population);
 
 		PopulationUtils.writePopulation(population, output.toString());
-
 		return 0;
 	}
 
@@ -114,6 +125,12 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 					act.setFacilityId(null);
 				}
 			}
+		}
+	}
+
+	public void cleanPopulation(Population population) {
+		for (Person person : population.getPersons().values()) {
+			run(person);
 		}
 	}
 
@@ -153,7 +170,14 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	public static void removeActivityLocation(PlanElement el) {
 		if (el instanceof Activity act) {
 			act.setLinkId(null);
-			act.setFacilityId(null);
+
+//			only remove facility id if the act has a coord.
+//			otherwise the act would have no location information (linkId=null, facilityId=null, coord=null). -sm0625
+			if (act.getCoord() != null) {
+				act.setFacilityId(null);
+			} else {
+				log.info("Activity {}\n has no coord. Its activity facility is therefore not removed because it would have ended up without any location: linkId=null, facilityId=null, coord=null.", act);
+			}
 		}
 	}
 
@@ -177,5 +201,46 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		}
 	}
 
+	public static class CleanPopulationBuilder {
+		private boolean rmUnselected;
+		private boolean rmActivityLocations;
+		private boolean rmActivityFacilities;
+		private boolean rmRoutes;
+		private boolean tripsToLegs;
+		private Set<String> rmLegs;
 
+		public CleanPopulationBuilder setRmUnselected(boolean rmUnselected) {
+			this.rmUnselected = rmUnselected;
+			return this;
+		}
+
+		public CleanPopulationBuilder setRmActivityLocations(boolean rmActivityLocations) {
+			this.rmActivityLocations = rmActivityLocations;
+			return this;
+		}
+
+		public CleanPopulationBuilder setRmActivityFacilities(boolean rmActivityFacilities) {
+			this.rmActivityFacilities = rmActivityFacilities;
+			return this;
+		}
+
+		public CleanPopulationBuilder setRmRoutes(boolean rmRoutes) {
+			this.rmRoutes = rmRoutes;
+			return this;
+		}
+
+		public CleanPopulationBuilder setTripsToLegs(boolean tripsToLegs) {
+			this.tripsToLegs = tripsToLegs;
+			return this;
+		}
+
+		public CleanPopulationBuilder setRmLegs(Set<String> rmLegs) {
+			this.rmLegs = rmLegs;
+			return this;
+		}
+
+		public CleanPopulation createCleanPopulation() {
+			return new CleanPopulation(rmUnselected, rmActivityLocations, rmActivityFacilities, rmRoutes, tripsToLegs, rmLegs);
+		}
+	}
 }

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,6 +200,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Person> createPersonId( final String str ) {
 		return create( str, Person.class ) ;
 	}
+
 	public static Id<Link> createLinkId( final long key ) {
 		return create( key, Link.class ) ;
 	}
@@ -208,6 +210,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Link> createLinkId( final String str ) {
 		return create( str, Link.class ) ;
 	}
+
 	public static Id<Node> createNodeId( final long key ) {
 		return create( key, Node.class ) ;
 	}
@@ -217,6 +220,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Node> createNodeId( final String str ) {
 		return create( str, Node.class ) ;
 	}
+
 	public static Id<Vehicle> createVehicleId( final long key ) {
 		return create( key, Vehicle.class ) ;
 	}
@@ -225,6 +229,14 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 	public static Id<Vehicle> createVehicleId( final String str ) {
 		return create( str, Vehicle.class ) ;
+	}
+
+	public static Id<VehicleType> createVehicleTypeId( final long key ) { return create( key, VehicleType.class ); }
+	public static Id<VehicleType> createVehicleTypeId( final Id<?> id ) {
+		return create( id, VehicleType.class ) ;
+	}
+	public static Id<VehicleType> createVehicleTypeId( final String str ) {
+		return create( str, VehicleType.class ) ;
 	}
 
 }

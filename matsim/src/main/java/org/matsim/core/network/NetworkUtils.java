@@ -22,8 +22,9 @@ package org.matsim.core.network;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +44,8 @@ import org.matsim.core.network.algorithms.NetworkModeRestriction;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsNetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -193,7 +196,6 @@ public final class NetworkUtils {
 
 	/**
 	 * Splits the given string at whitespace (one or more space, tab, newline) into single pieces, which are interpreted as ids.
-	 *
 	 */
 	public static List<Id<Link>> getLinkIds(final String links) {
 		if (links == null) {
@@ -237,8 +239,8 @@ public final class NetworkUtils {
 	/**
 	 * @return formerly, the maximum of 1 and the mathematically rounded number of lanes
 	 * attribute's value at time "time" of the link given as parameter
-	 *	now, the number is truncated, but 0 is never returned.
-	 *	math.round is way, way too slow.
+	 * now, the number is truncated, but 0 is never returned.
+	 * math.round is way, way too slow.
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
 		int numberOfLanes = (int) link.getNumberOfLanes(time);
@@ -298,7 +300,7 @@ public final class NetworkUtils {
 		return null;
 	}
 
-    /**
+	/**
 	 * This method expects the nearest link to a given measure point.
 	 * It calculates the euclidean distance for both nodes of the link,
 	 * "fromNode" and "toNode" and returns the node with shorter distance
@@ -307,139 +309,135 @@ public final class NetworkUtils {
 		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
 
 		Node toNode = link.getToNode();
-		Node fromNode= link.getFromNode();
+		Node fromNode = link.getFromNode();
 
 		double distanceToNode = getEuclideanDistance(coord, toNode.getCoord());
-		double distanceFromNode= getEuclideanDistance(coord, fromNode.getCoord());
+		double distanceFromNode = getEuclideanDistance(coord, fromNode.getCoord());
 
-		if(distanceToNode < distanceFromNode)
+		if (distanceToNode < distanceFromNode)
 			return toNode;
 		return fromNode;
 	}
 
 	/**
 	 * returns the euclidean distance between two coordinates
-	 *
 	 */
-	public static double getEuclideanDistance(Coord origin, Coord destination){
+	public static double getEuclideanDistance(Coord origin, Coord destination) {
 		return CoordUtils.calcEuclideanDistance(origin, destination);
 	}
 
 	/**
 	 * returns the euclidean distance between two points (x1,y1) and (x2,y2)
 	 */
-	public static double getEuclideanDistance(double x1, double y1, double x2, double y2){
-		return getEuclideanDistance(new Coord(x1,y1), new Coord(x2, y2));
+	public static double getEuclideanDistance(double x1, double y1, double x2, double y2) {
+		return getEuclideanDistance(new Coord(x1, y1), new Coord(x2, y2));
 	}
 
-    /**
-     * Finds the (approx.) nearest link to a given point on the map,
-     * such that the point lies on the right side of the directed link,
-     * if such a link exists.
-	 *
-     * It searches first for the nearest node, and then for the nearest link
-     * originating or ending at that node and fulfilling the above constraint.
-     * <p>
-     * <b>Special cases:</b> {@code nodes:o ; links:<-- ; coord:x}
-     * <i>No right entry link exists</i>
-     * <pre>
-	 * {@code
-     * o<-1--o returning
-     * | . . ^ nearest left
-     * |2 . 4| entry link
-     * v .x. | (link.id=3)
-     * o--3->o<br>
-	 * }
-     * </pre>
-     * <i>No right entry link exists but more than one nearest left entry link exist</i>
+	/**
+	 * Finds the (approx.) nearest link to a given point on the map,
+	 * such that the point lies on the right side of the directed link,
+	 * if such a link exists.
+	 * <p>
+	 * It searches first for the nearest node, and then for the nearest link
+	 * originating or ending at that node and fulfilling the above constraint.
+	 * <p>
+	 * <b>Special cases:</b> {@code nodes:o ; links:<-- ; coord:x}
+	 * <i>No right entry link exists</i>
 	 * <pre>
 	 * {@code
 	 * o<-1--o returning
-     * | . . ^ nearest left
-     * |2 x 4| entry link with the
-     * v . . | lowest link id
-     * o--3->o (link.id=1)
+	 * | . . ^ nearest left
+	 * |2 . 4| entry link
+	 * v .x. | (link.id=3)
+	 * o--3->o<br>
 	 * }
 	 * </pre>
-     * <i>More than one nearest right entry link exist</i>
+	 * <i>No right entry link exists but more than one nearest left entry link exist</i>
 	 * <pre>
 	 * {@code
-     * o--1->o returning
-     * ^ . . | nearest right
-     * |2 x 4| entry link with the
-     * | . . v lowest link id
-     * o<-3--o (link.id=1)
-	 *
-     * o<----7&8--x->o (link.id=7)
+	 * o<-1--o returning
+	 * | . . ^ nearest left
+	 * |2 x 4| entry link with the
+	 * v . . | lowest link id
+	 * o--3->o (link.id=1)
 	 * }
 	 * </pre>
-     *
-     * @param coord
-     *          the coordinate for which the closest link should be found
-     * @return the link found closest to <code>coord</code> and oriented such that the
-     * point lies on the right of the link.
-     */
-    // TODO [balmermi] there should be only one 'getNearestLink' method
-    // which returns either the nearest 'left' or 'right' entry link, based on a global
-    // config param.
-    public static Link getNearestRightEntryLink(Network network, final Coord coord) {
-        Link nearestRightLink = null;
-        Link nearestOverallLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode((network),coord);
+	 * <i>More than one nearest right entry link exist</i>
+	 * <pre>
+	 * {@code
+	 * o--1->o returning
+	 * ^ . . | nearest right
+	 * |2 x 4| entry link with the
+	 * | . . v lowest link id
+	 * o<-3--o (link.id=1)
+	 *
+	 * o<----7&8--x->o (link.id=7)
+	 * }
+	 * </pre>
+	 *
+	 * @param coord the coordinate for which the closest link should be found
+	 * @return the link found closest to <code>coord</code> and oriented such that the
+	 * point lies on the right of the link.
+	 */
+	// TODO [balmermi] there should be only one 'getNearestLink' method
+	// which returns either the nearest 'left' or 'right' entry link, based on a global
+	// config param.
+	public static Link getNearestRightEntryLink(Network network, final Coord coord) {
+		Link nearestRightLink = null;
+		Link nearestOverallLink = null;
+		Node nearestNode = NetworkUtils.getNearestNode((network), coord);
 
-        double[] coordVector = new double[2];
-        coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
-        coordVector[1] = nearestNode.getCoord().getY() - coord.getY();
+		double[] coordVector = new double[2];
+		coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
+		coordVector[1] = nearestNode.getCoord().getY() - coord.getY();
 
-        // now find nearest link from the nearest node
-        double shortestRightDistance = Double.MAX_VALUE; // reset the value
-        double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-        List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
-        incidentLinks.addAll(nearestNode.getOutLinks().values());
-        for (Link link : incidentLinks) {
-		double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-            if (dist <= shortestRightDistance) {
-                // Generate a vector representing the link
-                double[] linkVector = new double[2];
-                linkVector[0] = link.getToNode().getCoord().getX()
-                        - link.getFromNode().getCoord().getX();
-                linkVector[1] = link.getToNode().getCoord().getY()
-                        - link.getFromNode().getCoord().getY();
+		// now find nearest link from the nearest node
+		double shortestRightDistance = Double.MAX_VALUE; // reset the value
+		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
+		List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
+		incidentLinks.addAll(nearestNode.getOutLinks().values());
+		for (Link link : incidentLinks) {
+			double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+			if (dist <= shortestRightDistance) {
+				// Generate a vector representing the link
+				double[] linkVector = new double[2];
+				linkVector[0] = link.getToNode().getCoord().getX()
+					- link.getFromNode().getCoord().getX();
+				linkVector[1] = link.getToNode().getCoord().getY()
+					- link.getFromNode().getCoord().getY();
 
-                // Calculate the z component of cross product of coordVector and the link
-                double crossProductZ = coordVector[0]*linkVector[1] - coordVector[1]*linkVector[0];
-                // If coord lies to the right of the directed link, i.e. if the z component
-                // of the cross product is negative, set it as new nearest link
-                if (crossProductZ < 0) {
-                    if (dist < shortestRightDistance) {
-                        shortestRightDistance = dist;
-                        nearestRightLink = link;
-                    }
-                    else { // dist == shortestRightDistance
-                        if (link.getId().compareTo(nearestRightLink.getId()) < 0) {
-                            shortestRightDistance = dist;
-                            nearestRightLink = link;
-                        }
-                    }
-                }
-            }
-            if (dist < shortestOverallDistance) {
-                shortestOverallDistance = dist;
-                nearestOverallLink = link;
-            }
-            else if (dist == shortestOverallDistance) {
-                if (link.getId().compareTo(nearestOverallLink.getId()) < 0) {
-                    shortestOverallDistance = dist;
-                    nearestOverallLink = link;
-                }
-            }
-        }
+				// Calculate the z component of cross product of coordVector and the link
+				double crossProductZ = coordVector[0] * linkVector[1] - coordVector[1] * linkVector[0];
+				// If coord lies to the right of the directed link, i.e. if the z component
+				// of the cross product is negative, set it as new nearest link
+				if (crossProductZ < 0) {
+					if (dist < shortestRightDistance) {
+						shortestRightDistance = dist;
+						nearestRightLink = link;
+					} else { // dist == shortestRightDistance
+						if (link.getId().compareTo(nearestRightLink.getId()) < 0) {
+							shortestRightDistance = dist;
+							nearestRightLink = link;
+						}
+					}
+				}
+			}
+			if (dist < shortestOverallDistance) {
+				shortestOverallDistance = dist;
+				nearestOverallLink = link;
+			} else if (dist == shortestOverallDistance) {
+				if (link.getId().compareTo(nearestOverallLink.getId()) < 0) {
+					shortestOverallDistance = dist;
+					nearestOverallLink = link;
+				}
+			}
+		}
 
-        // Return the nearest overall link if there is no nearest link
-        // such that the given coord is on the right side of it
-        if (nearestRightLink == null) {
-            return nearestOverallLink;
-        }
+		// Return the nearest overall link if there is no nearest link
+		// such that the given coord is on the right side of it
+		if (nearestRightLink == null) {
+			return nearestOverallLink;
+		}
 		return nearestRightLink;
 	}
 
@@ -448,43 +446,41 @@ public final class NetworkUtils {
 	 * It searches first for the nearest node, and then for the nearest link
 	 * originating or ending at that node.
 	 *
-	 * @param coord
-	 *          the coordinate for which the closest link should be found
+	 * @param coord the coordinate for which the closest link should be found
 	 * @return the link found closest to coord
-	 *
 	 * @see NetworkUtils#getNearestLinkExactly(Network, Coord)
-     */
-    public static Link getNearestLink(Network network, final Coord coord) {
-        Link nearestLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode((network),coord);
-        if ( nearestNode == null ) {
-            log.warn("nearestNode not found. Will probably crash eventually.  Maybe network for requested mode does not exist (i.e. links not annotated accordingly)?  Maybe run NetworkCleaner?  " +
-							 network) ;
-            return null ;
-        }
+	 */
+	public static Link getNearestLink(Network network, final Coord coord) {
+		Link nearestLink = null;
+		Node nearestNode = NetworkUtils.getNearestNode((network), coord);
+		if (nearestNode == null) {
+			log.warn("nearestNode not found. Will probably crash eventually.  Maybe network for requested mode does not exist (i.e. links not annotated accordingly)?  Maybe run NetworkCleaner?  " +
+				network);
+			return null;
+		}
 
-        if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]" ) ;
-        }
+		if (nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty()) {
+			log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]");
+		}
 
-        // now find nearest link from the nearest node
-        // [balmermi] it checks now ALL incident links, not only the outgoing ones.
-        // TODO [balmermi] Now it finds the first of the typically two nearest links (same nodes, other direction)
-        // It would be nicer to find the nearest link on the "right" side of the coordinate.
-        // (For Great Britain it would be the "left" side. Could be a global config param...)
-        double shortestDistance = Double.MAX_VALUE;
-        for (Link link : getIncidentLinks(nearestNode).values()) {
-		double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-            if (dist < shortestDistance) {
-                shortestDistance = dist;
-                nearestLink = link;
-            }
-        }
-        if ( nearestLink == null ) {
-            log.warn(network + "[nearestLink not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
-        }
-        return nearestLink;
-    }
+		// now find nearest link from the nearest node
+		// [balmermi] it checks now ALL incident links, not only the outgoing ones.
+		// TODO [balmermi] Now it finds the first of the typically two nearest links (same nodes, other direction)
+		// It would be nicer to find the nearest link on the "right" side of the coordinate.
+		// (For Great Britain it would be the "left" side. Could be a global config param...)
+		double shortestDistance = Double.MAX_VALUE;
+		for (Link link : getIncidentLinks(nearestNode).values()) {
+			double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+			if (dist < shortestDistance) {
+				shortestDistance = dist;
+				nearestLink = link;
+			}
+		}
+		if (nearestLink == null) {
+			log.warn(network + "[nearestLink not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]");
+		}
+		return nearestLink;
+	}
 
 	/**
 	 * Calculates the most 'left' outLink for a given inLink (oriented from north to south).
@@ -494,11 +490,11 @@ public final class NetworkUtils {
 	 * @param inLink The inLink given
 	 * @return outLink, or null if there is only one outLink back to the inLink's fromNode.
 	 */
-	public static Link getLeftmostTurnExcludingU(Link inLink){
+	public static Link getLeftmostTurnExcludingU(Link inLink) {
 
 		TreeMap<Double, Link> result = getOutLinksSortedClockwiseByAngle(inLink);
 
-		if (result.size() == 0){
+		if (result.size() == 0) {
 			return null;
 		}
 		return result.get(result.firstKey());
@@ -518,11 +514,12 @@ public final class NetworkUtils {
 	 * </ul>
 	 * If someone can confirm this, please comment out all these remarks. kai, aug'16
 	 * <br><br>
+	 *
 	 * @param inLink The inLink given
 	 * @return Collection of outLinks, or an empty collection if there are only
-	 *  outLinks back to the inLink's fromNode.
+	 * outLinks back to the inLink's fromNode.
 	 */
-	public static TreeMap<Double, Link> getOutLinksSortedClockwiseByAngle(Link inLink){
+	public static TreeMap<Double, Link> getOutLinksSortedClockwiseByAngle(Link inLink) {
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
@@ -543,7 +540,7 @@ public final class NetworkUtils {
 		return outLinksByOrientation;
 	}
 
-	private static Coord getVector(Link link){
+	private static Coord getVector(Link link) {
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
 		return new Coord(x, y);
@@ -600,40 +597,40 @@ public final class NetworkUtils {
 
 
 	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
-	public static void setOrigId( final Node node, final String id ) {
-		if ( node instanceof NodeImpl ) {
-			((NodeImpl)node).setOrigId( id ) ;
+	public static void setOrigId(final Node node, final String id) {
+		if (node instanceof NodeImpl) {
+			((NodeImpl) node).setOrigId(id);
 		} else {
-			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+			throw new RuntimeException("wrong implementation of interface Node to do this");
 		}
 	}
 
 
 	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static void setType(Node node, final String type) {
-		if ( node instanceof NodeImpl ) {
-			((NodeImpl)node).setType( type ) ;
+		if (node instanceof NodeImpl) {
+			((NodeImpl) node).setType(type);
 		} else {
-			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+			throw new RuntimeException("wrong implementation of interface Node to do this");
 		}
 	}
 
 	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
-	public static String getOrigId( Node node ) {
-		if ( node instanceof NodeImpl ) {
-			return ((NodeImpl) node).getOrigId() ;
+	public static String getOrigId(Node node) {
+		if (node instanceof NodeImpl) {
+			return ((NodeImpl) node).getOrigId();
 		} else {
-			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+			throw new RuntimeException("wrong implementation of interface Node to do this");
 		}
 	}
 
 
 	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
-	public static String getType( Node node ) {
-		if ( node instanceof NodeImpl ) {
-			return ((NodeImpl) node).getType() ;
+	public static String getType(Node node) {
+		if (node instanceof NodeImpl) {
+			return ((NodeImpl) node).getType();
 		} else {
-			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+			throw new RuntimeException("wrong implementation of interface Node to do this");
 		}
 	}
 
@@ -642,29 +639,32 @@ public final class NetworkUtils {
 	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
 	 * complicated which eventually got refactored into the current version?  kai, feb'20
 	 */
-	public static double getFreespeedTravelTime( Link link ) {
-		return link.getLength() / link.getFreespeed() ;
+	public static double getFreespeedTravelTime(Link link) {
+		return link.getLength() / link.getFreespeed();
 	}
+
 	/**
 	 * @deprecated -- I don't know why this method exists; it makes reading code harder rather than easier.  Maybe there used to be something more
 	 * complicated which eventually got refactored into the current version?  kai, feb'20
 	 */
-	public static double getFreespeedTravelTime( Link link, double time ) {
-		return link.getLength() / link.getFreespeed(time) ;
+	public static double getFreespeedTravelTime(Link link, double time) {
+		return link.getLength() / link.getFreespeed(time);
 	}
 
 	public static final String ALLOWED_SPEED = "allowed_speed";
-	public static final String TYPE="type" ;
-	public static void setType( Link link , String type ) {
+	public static final String TYPE = "type";
+
+	public static void setType(Link link, String type) {
 //		if ( link instanceof LinkImpl ) {
 //			((LinkImpl)link).setType2( type ) ;
 //		} else {
 //			throw new RuntimeException("wrong implementation of interface Link to do this") ;
 //		}
-		if ( type != null ) {
-			link.getAttributes().putAttribute(TYPE, type) ;
+		if (type != null) {
+			link.getAttributes().putAttribute(TYPE, type);
 		}
 	}
+
 	public static String getType(Link link) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getType2() ;
@@ -705,7 +705,7 @@ public final class NetworkUtils {
 		return Double.parseDouble(speed.toString());
 	}
 
-	public static String getOrigId( Link link ) {
+	public static String getOrigId(Link link) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getOrigId2() ;
 //		} else {
@@ -715,57 +715,57 @@ public final class NetworkUtils {
 		return o == null ? null : o.toString();
 	}
 
-	public static void setOrigId( Link link, String id ) {
+	public static void setOrigId(Link link, String id) {
 //		if ( link instanceof LinkImpl ) {
 //			((LinkImpl) link).setOrigId2(id);
 //		} else {
 //			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
 //		}
-		if ( id != null ) {
-			link.getAttributes().putAttribute(ORIGID, id) ;
+		if (id != null) {
+			link.getAttributes().putAttribute(ORIGID, id);
 		}
 	}
 
 
 	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double lanes) {
+								  double capacity, double lanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
-			final double capacity, final double numLanes) {
-		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null ) ;
+										final double capacity, final double numLanes) {
+		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 	}
 
 	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
-				final double capacity, final double numLanes, final String origId, final String type) {
+										final double capacity, final double numLanes, final String origId, final String type) {
 		if (network.getNodes().get(fromNode.getId()) == null) {
-			throw new IllegalArgumentException(network+"[from="+fromNode+" does not exist]");
+			throw new IllegalArgumentException(network + "[from=" + fromNode + " does not exist]");
 		}
 
 		if (network.getNodes().get(toNode.getId()) == null) {
-			throw new IllegalArgumentException(network+"[to="+toNode+" does not exist]");
+			throw new IllegalArgumentException(network + "[to=" + toNode + " does not exist]");
 		}
 
-		Link link = network.getFactory().createLink(id, fromNode, toNode) ;
+		Link link = network.getFactory().createLink(id, fromNode, toNode);
 		link.setLength(length);
 		link.setFreespeed(freespeed);
 		link.setCapacity(capacity);
 		link.setNumberOfLanes(numLanes);
-		setType( link, type);
-		setOrigId( link, origId ) ;
+		setType(link, type);
+		setOrigId(link, origId);
 
-		network.addLink( link ) ;
+		network.addLink(link);
 
 		return link;
 	}
 
 
 	public static void setNetworkChangeEvents(Network network, List<NetworkChangeEvent> events) {
-		if ( network instanceof TimeDependentNetwork ) {
-			((TimeDependentNetwork)network).setNetworkChangeEvents(events);
+		if (network instanceof TimeDependentNetwork) {
+			((TimeDependentNetwork) network).setNetworkChangeEvents(events);
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + "Network, TimeDependentNetwork" ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + "Network, TimeDependentNetwork");
 		}
 	}
 
@@ -775,65 +775,133 @@ public final class NetworkUtils {
 			throw new IllegalArgumentException(network + "[id=" + id + " already exists]");
 		}
 		Node n = network.getFactory().createNode(id, coord);
-		network.addNode(n) ;
+		network.addNode(n);
 		return n;
 	}
 
 
-	public static void addNetworkChangeEvent( Network network, NetworkChangeEvent event ) {
-		if ( network instanceof TimeDependentNetwork ) {
+	public static void addNetworkChangeEvent(Network network, NetworkChangeEvent event) {
+		if (network instanceof TimeDependentNetwork) {
 			((TimeDependentNetwork) network).addNetworkChangeEvent(event);
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork ");
 		}
 	}
 
 
-	public static Queue<NetworkChangeEvent> getNetworkChangeEvents(Network network ) {
-		if ( network instanceof TimeDependentNetwork ) {
-			return ((TimeDependentNetwork) network).getNetworkChangeEvents() ;
+	public static Queue<NetworkChangeEvent> getNetworkChangeEvents(Network network) {
+		if (network instanceof TimeDependentNetwork) {
+			return ((TimeDependentNetwork) network).getNetworkChangeEvents();
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork ");
 		}
 	}
 
 
 	public static Link getNearestLinkExactly(Network network, Coord coord) {
-		if ( network instanceof SearchableNetwork ) {
-			return ((SearchableNetwork) network).getNearestLinkExactly(coord) ;
+		if (network instanceof SearchableNetwork) {
+			return ((SearchableNetwork) network).getNearestLinkExactly(coord);
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork ");
 		}
 	}
 
 
 	public static Node getNearestNode(Network network, final Coord coord) {
-		if ( network instanceof SearchableNetwork ) {
-			return ((SearchableNetwork)network).getNearestNode(coord);
+		if (network instanceof SearchableNetwork) {
+			return ((SearchableNetwork) network).getNearestNode(coord);
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork ");
 		}
 	}
 
 
 	public static Collection<Node> getNearestNodes(Network network, final Coord coord, final double distance) {
-		if ( network instanceof SearchableNetwork ) {
-			return ((SearchableNetwork)network).getNearestNodes(coord, distance);
+		if (network instanceof SearchableNetwork) {
+			return ((SearchableNetwork) network).getNearestNodes(coord, distance);
 		} else {
-			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
+			throw new RuntimeException(Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork");
 		}
 	}
 
 	public static final String ORIGID = "origid";
 
-	public static void runNetworkCleaner( Network network ) {
-		new org.matsim.core.network.algorithms.NetworkCleaner().run( network );
+	/**
+	 * This performs all currently recommended cleaning process on a network:
+	 * * clean network for selected modes to ensure reachability during routing
+	 * * remove links without any allowed modes
+	 * * remove invalid DisallowedNextLinks
+	 * * remove nodes without links
+	 *
+	 * @param network
+	 * @param modes   set of modes to clean network (e.g. modes which are routed)
+	 */
+	public static void cleanNetwork(Network network, Set<String> modes) {
+
+		// clean network for all modes to ensure reachability during routing
+		DisallowedNextLinksUtils.clean(network); // ensure only valid turn restrictions
+		for (String mode : modes) {
+			new TurnRestrictionsNetworkCleaner().run(network, mode);
+		}
+
+		// remove links without any allowed modes
+		removeLinksWithoutModes(network);
+
+		// removing links could have made some DisallowedNextLinks invalid
+		DisallowedNextLinksUtils.clean(network);
+
+		// remove nodes without links
+		removeNodesWithoutLinks(network);
 	}
-	public static void runNetworkSimplifier( Network network ) {
-		new NetworkSimplifier().run(network) ;
+
+	/**
+	 * Removes nodes from the network that have no incoming or outgoing links
+	 * attached to them.
+	 *
+	 * @param network
+	 */
+	public static void removeNodesWithoutLinks(Network network) {
+		List<Id<Node>> nodeIdsToRemove = network.getNodes().values().stream()
+				.filter(node -> node.getInLinks().isEmpty() && node.getOutLinks().isEmpty())
+				.map(Node::getId)
+				.toList();
+		nodeIdsToRemove.forEach(network::removeNode);
 	}
+
+	/**
+	 * Removes links from the network that have no allowed modes.
+	 *
+	 * @param network
+	 */
+	public static void removeLinksWithoutModes(Network network) {
+		List<Id<Link>> linkIdsToRemove = network.getLinks().values().stream()
+				.filter(link -> link.getAllowedModes().isEmpty())
+				.map(Link::getId)
+				.toList();
+		linkIdsToRemove.forEach(network::removeLink);
+	}
+
+	public static Set<String> getModes(Network network) {
+		return network.getLinks().values().stream()
+				.flatMap(l -> l.getAllowedModes().stream())
+				.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Simplifies the network considering turn restrictions aka
+	 * {@link DisallowedNextLinks}
+	 *
+	 * @param network
+	 * @see {@link DisallowedNextLinksUtils#clean(Network)},
+	 *      {@link #cleanNetwork(Network, Set)},
+	 *      {@link NetworkSimplifier#createNetworkSimplifier(Network)}
+	 */
+	public static void simplifyNetwork(Network network) {
+		NetworkSimplifier.createNetworkSimplifier(network).run(network);
+	}
+
 	public static void writeNetwork(Network network, String string) {
-		new NetworkWriter(network).write(string) ;
+		new NetworkWriter(network).write(string);
 	}
 
 	public static Link findLinkInOppositeDirection(Link link) {
@@ -848,18 +916,17 @@ public final class NetworkUtils {
 	private static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 	private static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
 
-	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
-		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
+	public static OptionalTime getLinkAccessTime(Link link, String routingMode) {
+		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX + routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
-		if (o!=null){
+		if (o != null) {
 			return OptionalTime.defined((double) o);
-		}
-		else return OptionalTime.undefined();
+		} else return OptionalTime.undefined();
 	}
 
-	public static void setLinkAccessTime(Link link, String routingMode, double accessTime){
-		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
-		link.getAttributes().putAttribute(attribute,accessTime);
+	public static void setLinkAccessTime(Link link, String routingMode, double accessTime) {
+		String attribute = ACCESSTIMELINKATTRIBUTEPREFIX + routingMode;
+		link.getAttributes().putAttribute(attribute, accessTime);
 	}
 
 	public static OptionalTime getLinkEgressTime(Link link, String routingMode) {
@@ -891,17 +958,18 @@ public final class NetworkUtils {
 
 	/**
 	 * reads network form file and applies a coordinate transformation.
-	 * @param filename network file name
+	 *
+	 * @param filename       network file name
 	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
 	 * @return network from file transformed onto target CRS
 	 */
 	public static Network readNetwork(String filename, NetworkConfigGroup networkConfigGroup, CoordinateTransformation transformation) {
 		var network = readNetwork(filename, networkConfigGroup);
 		network.getNodes().values().parallelStream()
-				.forEach(node -> {
-					var transformedCoord = transformation.transform(node.getCoord());
-					node.setCoord(transformedCoord);
-				});
+			.forEach(node -> {
+				var transformedCoord = transformation.transform(node.getCoord());
+				node.setCoord(transformedCoord);
+			});
 		return network;
 	}
 
@@ -916,7 +984,7 @@ public final class NetworkUtils {
 	 * @param expected
 	 * @param actual
 	 * @return true if the network's links and nodes are the same incl.
-	 *         DisallowedNextLinks
+	 * DisallowedNextLinks
 	 */
 	public static boolean compare(Network expected, Network actual) {
 
@@ -966,12 +1034,12 @@ public final class NetworkUtils {
 		DisallowedNextLinks expectedDnl = getDisallowedNextLinks(expected);
 
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
-				&& expected.getCapacity() == actual.getCapacity()
-				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
-				&& expected.getFreespeed() == actual.getFreespeed()
-				&& expected.getLength() == actual.getLength()
-				&& expected.getNumberOfLanes() == actual.getNumberOfLanes()
-				&& Objects.equals(expectedDnl, actualDnl);
+			&& expected.getCapacity() == actual.getCapacity()
+			&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
+			&& expected.getFreespeed() == actual.getFreespeed()
+			&& expected.getLength() == actual.getLength()
+			&& expected.getNumberOfLanes() == actual.getNumberOfLanes()
+			&& Objects.equals(expectedDnl, actualDnl);
 	}
 
 	private static boolean testNodesAreEqual(Node expected, Node actual) {
@@ -980,21 +1048,23 @@ public final class NetworkUtils {
 
 	/**
 	 * Returns the closest point to on a link from a Point (either its orthogonal projection or the link's to and from node)
-	 * @param coord  Coord to check from
-	 * @param link the link
+	 *
+	 * @param coord Coord to check from
+	 * @param link  the link
 	 * @return the closest Point as Coord
 	 */
 	public static Coord findNearestPointOnLink(Coord coord, Link link) {
-		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 	}
 
 	public static final String ORIG_GEOM = "origgeom";
+
 	public static List<Node> getOriginalGeometry(Link link) {
 
 		// use a list since order is important
 		List<Node> result = new ArrayList<>();
 		result.add(link.getFromNode());
-		var attr = (String)link.getAttributes().getAttribute(ORIG_GEOM);
+		var attr = (String) link.getAttributes().getAttribute(ORIG_GEOM);
 
 		if (!StringUtils.isBlank(attr)) {
 			var data = attr.split(" ");
@@ -1056,13 +1126,126 @@ public final class NetworkUtils {
 		link.setAllowedModes(modes);
 	}
 
+	public static boolean hasTurnRestrictions(Network network) {
+		for (Link link : network.getLinks().values()) {
+			if (getDisallowedNextLinks(link) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Removes the given modes from the links and runs the network cleaner afterwards. Thus, some more links may be restricted to keep the network consistent.
 	 * That means, each link can be reached from each other link.
-	 * @param network the network
+	 *
+	 * @param network               the network
 	 * @param modesToRemoveByLinkId map of modes that should be removed from the links
 	 */
 	public static void restrictModesAndCleanNetwork(Network network, Function<Id<Link>, Set<String>> modesToRemoveByLinkId) {
 		new NetworkModeRestriction(modesToRemoveByLinkId).run(network);
+	}
+
+	public static Coord getRandomPointAlongLink(Random rnd, Link link) {
+		Coord fromNodeCoord = link.getFromNode().getCoord();
+		Coord toNodeCoord = link.getToNode().getCoord();
+		double r = rnd.nextDouble();
+
+		double x = (fromNodeCoord.getX() * r) + (toNodeCoord.getX() * (1 - r));
+		double y = (fromNodeCoord.getY() * r) + (toNodeCoord.getY() * (1 - r));
+
+		return new Coord(x, y);
+	}
+
+	public static List<Coord> getEvenlyDistributedCoordsAlongLink(Link link, int numberOfCoords) {
+		Coord fromNodeCoord = link.getFromNode().getCoord();
+		Coord toNodeCoord = link.getToNode().getCoord();
+		double fX = fromNodeCoord.getX();
+		double fY = fromNodeCoord.getY();
+		double tX = toNodeCoord.getX();
+		double tY = toNodeCoord.getY();
+		double nrSlots = (double) numberOfCoords;
+
+		if (fX == tX) {
+			double x;
+			double yDistance = tY - fY;
+
+			if (tY > fY) x = tX + 10;
+			else x = tX - 10;
+
+			List<Coord> points = new ArrayList<Coord>();
+			if (numberOfCoords == 1) {
+				points.add(new Coord(x, (fY + 0.5 * yDistance)));
+				return points;
+			}
+
+			if (Math.abs(yDistance) > (nrSlots + 10)) {
+				if (yDistance < -5) yDistance += 10;
+				if (yDistance > 0) yDistance -= 10;
+			}
+
+			for (int i = 1; i <= numberOfCoords; i++) {
+				double y = (fY + (i * (1 / nrSlots) * yDistance));
+				points.add(new Coord(x, y));
+			}
+			return points;
+		} else {
+			// f(x) = mx + b
+
+			// m = y2-y1/x2-x1
+			double m = (tY - fY) / (tX - fX);
+
+			//b = y-mx
+			double b = fY - m * (fX);
+
+			//displace
+			if (m > 0) {
+				if (tY > fY) b -= 10;
+				if (tY < fY) b += 10;
+			}
+			if (m < 0) {
+				if (tY > fY) b += 10;
+				if (tY < fY) b -= 10;
+			}
+			if (m == 0) {
+				if (tX > fX) b -= 10;
+				if (tX < fX) b += 10;
+			}
+
+			double xDistance = tX - fX;
+
+			//calc Coords
+			List<Coord> points = new ArrayList<Coord>();
+			if (numberOfCoords == 1) {
+				double x = (fX + 0.5 * xDistance);
+				points.add(new Coord(x, (m * x + b)));
+				return points;
+			}
+
+			//distance to nodes
+			if (Math.abs(xDistance) > (nrSlots + 10)) {
+				if (xDistance < -5) xDistance += 10;
+				if (xDistance > 5) xDistance -= 10;
+			}
+
+			for (int i = 1; i <= numberOfCoords; i++) {
+				double x = (fX + (i * (1 / nrSlots) * xDistance));
+				double y = m * x + b;
+				points.add(new Coord(x, y));
+			}
+			return points;
+		}
+	}
+
+	public static List<Link> getOutgoingLinksForMode(Link link, String mode) {
+		List<Link> outGoingModeLinks = new ArrayList();
+		for (Link outLink : link.getToNode().getOutLinks().values()) {
+			if (outLink.getAllowedModes().contains(mode)) outGoingModeLinks.add(outLink);
+		}
+		if (outGoingModeLinks.size() == 0) {
+			throw new RuntimeException("could not find an outgoing link for mode " + mode +
+				" from link " + link + ". Consequences are not checked. Please check the network. \n Aborting...");
+		}
+		return outGoingModeLinks;
 	}
 }
