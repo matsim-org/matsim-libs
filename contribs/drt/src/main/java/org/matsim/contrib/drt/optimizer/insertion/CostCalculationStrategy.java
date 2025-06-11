@@ -42,15 +42,15 @@ public interface CostCalculationStrategy {
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
 				DetourTimeInfo detourTimeInfo) {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (detourTimeInfo.pickupDetourInfo.departureTime > request.getLatestStartTime()
-					|| detourTimeInfo.dropoffDetourInfo.arrivalTime > request.getLatestArrivalTime()) {
+			if (detourTimeInfo.pickupDetourInfo.requestPickupTime > request.getLatestStartTime()
+					|| detourTimeInfo.dropoffDetourInfo.requestDropoffTime > request.getLatestArrivalTime()) {
 				//no extra time is lost => do not check if the current slack time is long enough (can be even negative)
 				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 			}
 
 			// check if the max riding time constraints is violated (with default config, the max ride duration
 			// is infinity)
-			double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
+			double rideDuration = detourTimeInfo.dropoffDetourInfo.requestDropoffTime - detourTimeInfo.pickupDetourInfo.requestPickupTime;
 			if (rideDuration > request.getMaxRideDuration()) {
 				return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 			}
@@ -92,13 +92,13 @@ public interface CostCalculationStrategy {
 			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
 			// (additional time vehicle will operate if insertion is accepted)
 
-			double waitTimeViolation = Math.max(0, detourTimeInfo.pickupDetourInfo.departureTime - request.getLatestStartTime());
+			double waitTimeViolation = Math.max(0, detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getLatestStartTime());
 			// (if drt vehicle picks up too late) (max wait time (often 600 sec) after submission)
 
-			double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.arrivalTime - request.getLatestArrivalTime());
+			double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getLatestArrivalTime());
 			// (if drt vehicle drops off too late) (submission time + alpha * directTravelTime + beta)
 
-			double detourViolation = Math.max(0, (detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime) - request.getMaxRideDuration());
+			double detourViolation = Math.max(0, (detourTimeInfo.dropoffDetourInfo.requestDropoffTime - detourTimeInfo.pickupDetourInfo.requestPickupTime) - request.getMaxRideDuration());
 
 			double lateDiversionViolation = 0;
 			if(insertion != null) {
