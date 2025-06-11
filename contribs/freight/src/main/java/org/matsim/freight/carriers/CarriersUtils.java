@@ -297,11 +297,15 @@ public class CarriersUtils {
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
 	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
+	 * <p
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it checks only one specific carrier.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
 	 *
-	 * @deprecated IMO (kmt, jun'25) this method is not needed anymore, since {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} should be used instead.
 	 * @param carrier the carrier
 	 */
-	@Deprecated(since = "jun '25", forRemoval = true)
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
 		if (carrier.getSelectedPlan() == null) {
 			log.warn("Carrier {}: No selected plan available!", carrier.getId());
@@ -330,13 +334,16 @@ public class CarriersUtils {
 
 	/**
 	 * Checks if all carriers with jobs have at least one plan.
-	 *
-	 * @deprecated IMO (kmt, jun'25) this method used currently. If needed, I suggest to put this functionality into {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * <p></p>
+	 * IMO (kmt, jun'25) this method is not used currently.
+	 * If needed, I suggest to put this functionality into {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * If it should be used, it should be decided, where to locate the method) ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
 	 *
 	 * @param carriers the carriers
 	 * @return true if all carriers with jobs have at least one plan
 	 */
-	@Deprecated(since = "jun '25")
 	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
 		for (Carrier carrier : carriers.getCarriers().values())
 			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
@@ -345,6 +352,12 @@ public class CarriersUtils {
 
 	/**
 	 * Creates a list of carriers with unhandled jobs.
+	 * <p></p>
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it returns a list of carriers with unhandled jobs instead of a boolean.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications) ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
 	 *
 	 * @param carriers the carriers
 	 * @return list of carriers with unhandled jobs
