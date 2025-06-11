@@ -11,9 +11,9 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +50,7 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
         openFile(filename);
         writeStartTag(ROOT, Collections.emptyList());
         try {
-            writeShifts(facilities);
+            writeOperationFacilities(facilities);
         } catch( IOException e ){
             e.printStackTrace();
         }
@@ -58,7 +58,7 @@ public class OperationFacilitiesWriter extends MatsimXmlWriter {
         close();
     }
 
-    private void writeShifts(Map<Id<OperationFacility>, OperationFacilitySpecification> facilities) throws UncheckedIOException, IOException {
+    private void writeOperationFacilities(Map<Id<OperationFacility>, OperationFacilitySpecification> facilities) throws UncheckedIOException, IOException {
         List<OperationFacilitySpecification> sortedFacilities = facilities.values()
                 .stream()
                 .sorted(Comparator.comparing(OperationFacilitySpecification::getId))

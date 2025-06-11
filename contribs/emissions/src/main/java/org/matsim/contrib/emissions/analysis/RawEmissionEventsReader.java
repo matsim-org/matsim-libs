@@ -55,8 +55,9 @@ class RawEmissionEventsReader extends MatsimXmlParser {
     private final HandleEmissionEvent handler;
 
     RawEmissionEventsReader(HandleEmissionEvent handler) {
+			super(ValidationType.NO_VALIDATION);
         this.handler = handler;
-        // events don't have dtd. Therefore validation is not possible
+        // events don't have dtd. Therefore, validation is not possible
         this.setValidating(false);
     }
 
@@ -102,7 +103,7 @@ class RawEmissionEventsReader extends MatsimXmlParser {
         // give some feedback about progress
         var currentCount = eventsCounter.incrementAndGet();
         if (currentCount % 500000 == 0) {
-            logger.info("Emission Event # " + numberFormat.format(currentCount));
+            logger.info("Emission Event # {}", numberFormat.format(currentCount));
         }
     }
 

@@ -22,19 +22,18 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -44,10 +43,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -65,16 +62,14 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
 
-	public static final String FILENAME_SCORESTATS = "scorestats";
+	public enum ScoreItem { worst, best, average, executed }
 
-	public static enum ScoreItem { worst, best, average, executed } ;
+	private final Population population;
+	private final OutputDirectoryHierarchy controllerIO;
+	private final String delimiter;
+	private final BufferedWriter out;
 
-	final private Population population;
-	final private BufferedWriter out;
-	final private String fileName;
-
-	private final boolean createPNG;
-	private final ControlerConfigGroup controlerConfigGroup;
+	private final ControllerConfigGroup controllerConfigGroup;
 
 	private final Map<ScoreItem, Map< Integer, Double>> scoreHistory = new HashMap<>();
 
@@ -85,14 +80,13 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	private final static Logger log = LogManager.getLogger(ScoreStatsControlerListener.class);
 
 	@Inject
-	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, Provider<TripRouter> tripRouterFactory ) {
-
-		this.controlerConfigGroup = controlerConfigGroup;
+	ScoreStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population, OutputDirectoryHierarchy controllerIO,
+															GlobalConfigGroup globalConfig ) {
+		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population;
-		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
-		this.createPNG = controlerConfigGroup.isCreateGraphs();
-		this.out = IOUtils.getBufferedWriter(this.fileName + ".txt");
+		this.controllerIO = controllerIO;
+		this.delimiter = globalConfig.getDefaultDelimiter();
+		this.out = IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats.csv"));
 
 		Set<String> subpopulations = population.getPersons().values().stream()
 			.map(PopulationUtils::getSubpopulation)
@@ -100,13 +94,15 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 			.collect(Collectors.toSet());
 
 		for (String sub : subpopulations) {
-			perSubpop.put(sub, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(this.fileName + "_" + sub + ".txt")));
+			this.perSubpop.put(sub, new ScoreHist(new HashMap<>(), IOUtils.getBufferedWriter(controllerIO.getOutputFilename("scorestats_" + sub + ".csv"))));
 		}
 
 		try {
-			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
-			for (Map.Entry<String, ScoreHist> e : perSubpop.entrySet()) {
-				e.getValue().out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+			this.out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
+				+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
+			for (Map.Entry<String, ScoreHist> e : this.perSubpop.entrySet()) {
+				e.getValue().out.write("iteration" + this.delimiter + "avg_executed" + this.delimiter
+					+ "avg_worst" + this.delimiter + "avg_average" + this.delimiter + "avg_best\n");
 			}
 
 		} catch (IOException e) {
@@ -116,23 +112,32 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.minIteration = controlerConfigGroup.getFirstIteration();
+		this.minIteration = this.controllerConfigGroup.getFirstIteration();
 		//		int maxIter = controlerConfigGroup.getLastIteration();
 		//		int iterations = maxIter - this.minIteration;
 		//		if (iterations > 5000) iterations = 5000; // limit the history size
 		for ( ScoreItem item : ScoreItem.values() ) {
-			scoreHistory.put( item, new TreeMap<>() ) ;
-			perSubpop.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));
+			this.scoreHistory.put( item, new TreeMap<>() ) ;
+			this.perSubpop.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		collectScoreInfo(event);
+		if (isWriteGraph(event)) {
+			writePng();
+		}
+	}
+
+	private boolean isWriteGraph(IterationEndsEvent event) {
+		// create chart when data of more than one iteration is available.
+		return this.controllerConfigGroup.getCreateGraphsInterval() > 0 &&
+			event.getIteration() % this.controllerConfigGroup.getCreateGraphsInterval() == 0 &&
+			event.getIteration() > this.minIteration;
 	}
 
 	private void collectScoreInfo(final IterationEndsEvent event) {
-
 		ScoreInfo info = new ScoreInfo();
 
 		Map<String, ScoreInfo> perSubpop = new HashMap<>();
@@ -152,9 +157,9 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		log.info("-- avg. score of the best plan of each agent: " + (info.sumScoreBest / info.nofScoreBest));
 
 		try {
-			info.write(event.getIteration(), this.out);
+			info.write(event.getIteration(), this.out, this.delimiter);
 			for (Map.Entry<String, ScoreHist> e : this.perSubpop.entrySet()) {
-				perSubpop.get(e.getKey()).write(event.getIteration(), e.getValue().out);
+				perSubpop.get(e.getKey()).write(event.getIteration(), e.getValue().out, this.delimiter);
 			}
 
 		} catch (IOException e) {
@@ -167,34 +172,28 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.scoreHistory.get( ScoreItem.best ).put( event.getIteration(), info.sumScoreBest / info.nofScoreBest ) ;
 		this.scoreHistory.get( ScoreItem.average ).put( event.getIteration(), info.sumAvgScores / info.nofAvgScores ) ;
 		this.scoreHistory.get( ScoreItem.executed ).put( event.getIteration(), info.sumExecutedScores / info.nofExecutedScores ) ;
+	}
 
-		if (this.createPNG && event.getIteration() > this.minIteration) {
-			// create chart when data of more than one iteration is available.
-			XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
-//			double[] iterations = new double[index + 1];
-//			for (int i = 0; i <= index; i++) {
-//				iterations[i] = i + this.minIteration;
-//			}
-			chart.addSeries("avg. worst score", this.scoreHistory.get( ScoreItem.worst ) ) ;
-			chart.addSeries("avg. best score", this.scoreHistory.get( ScoreItem.best) );
-			chart.addSeries("avg. of plans' average score", this.scoreHistory.get( ScoreItem.average) );
-			chart.addSeries("avg. executed score", this.scoreHistory.get( ScoreItem.executed ) );
-			chart.addMatsimLogo();
-			chart.saveAsPng(this.fileName + ".png", 800, 600);
-		}
+	private void writePng() {
+		XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
+		chart.addSeries("avg. worst score", this.scoreHistory.get( ScoreItem.worst ) ) ;
+		chart.addSeries("avg. best score", this.scoreHistory.get( ScoreItem.best) );
+		chart.addSeries("avg. of plans' average score", this.scoreHistory.get( ScoreItem.average) );
+		chart.addSeries("avg. executed score", this.scoreHistory.get( ScoreItem.executed ) );
+		chart.addMatsimLogo();
+		chart.saveAsPng(this.controllerIO.getOutputFilename("scorestats.png"), 800, 600);
 	}
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.out.close();
-			for (ScoreHist data : perSubpop.values()) {
+			for (ScoreHist data : this.perSubpop.values()) {
 				data.out.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-
 	}
 
 	@Override
@@ -252,28 +251,31 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 				// executed plan?
 				if (PersonUtils.isSelected(plan)) {
-					sumExecutedScores += score;
-					nofExecutedScores++;
+					this.sumExecutedScores += score;
+					this.nofExecutedScores++;
 				}
 			}
 
 			if (worstPlan != null) {
-				nofScoreWorst++;
-				sumScoreWorst += worstScore;
+				this.nofScoreWorst++;
+				this.sumScoreWorst += worstScore;
 			}
 			if (bestPlan != null) {
-				nofScoreBest++;
-				sumScoreBest += bestScore;
+				this.nofScoreBest++;
+				this.sumScoreBest += bestScore;
 			}
 			if (cntScores > 0) {
-				sumAvgScores += (sumScores / cntScores);
-				nofAvgScores++;
+				this.sumAvgScores += (sumScores / cntScores);
+				this.nofAvgScores++;
 			}
 		}
 
-		private void write(int iteration, BufferedWriter out) throws IOException {
-			out.write(iteration + "\t" + (sumExecutedScores / nofExecutedScores) + "\t" +
-				(sumScoreWorst / nofScoreWorst) + "\t" + (sumAvgScores / nofAvgScores) + "\t" + (sumScoreBest / nofScoreBest) + "\n");
+		private void write(int iteration, BufferedWriter out, String delimiter) throws IOException {
+			out.write(iteration + delimiter
+				+ (this.sumExecutedScores / this.nofExecutedScores) + delimiter
+				+ (this.sumScoreWorst / this.nofScoreWorst) + delimiter
+				+ (this.sumAvgScores / this.nofAvgScores) + delimiter
+				+ (this.sumScoreBest / this.nofScoreBest) + "\n");
 			out.flush();
 		}
 

@@ -63,10 +63,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private int detailedFallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
 
-	// The following was tested to slow down significantly, therefore counters were commented out:
-//	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
-//	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
-
 	private int freeFlowCounter = 0;
 	private int saturatedCounter = 0;
 	private int heavyFlowCounter = 0;
@@ -104,7 +100,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
 					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
 					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
-					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
+					// Eventually vehicle category and vehicle attribute should be aligned in order to make the allCombinations setting useful
 					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
 					Set<String> roadCategories = new HashSet<>();
 					Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
@@ -149,7 +145,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
 					// where some detailed values exist and others don't.  So the thing to check would be if for each existing
 					//   roadCategory x vehicleCategory x vehicleAttribute x pollutant
-					// there is a freeflow and a stopgo entry.  Maybe something like this here:
+					// there is a freeflow and a stop-go entry.  Maybe something like this here:
 					Set<String> freeflowSet = new HashSet<>();
 					Set<String> stopgoSet = new HashSet<>();
 					for (HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet()) {
@@ -275,7 +271,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 		if ((averageSpeed_kmh - freeVelocity_ms * 3.6) > 1.0){
 			if (ecg.getHandleHighAverageSpeeds()) {
-				logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeVelocity_ms * 3.6 );
+				logger.warn("averageSpeed was capped from {} to{}", averageSpeed_kmh, freeVelocity_ms * 3.6);
 				averageSpeed_kmh = freeVelocity_ms * 3.6;
 			} else {
 				throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
@@ -307,7 +303,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions from stop-go fraction:
 					efkey.setTrafficSituation(STOPANDGO);
 					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.debug("pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm);
+					logger.debug("pollutant={}; efStopGo={}", warmPollutant, efStopGo_gpkm);
 
 				}
 
@@ -316,7 +312,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions for free-flow fraction:
 					efkey.setTrafficSituation(FREEFLOW);
 					efFreeFlow_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-					logger.debug("pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm);
+					logger.debug("pollutant={}; efFreeFlow={}", warmPollutant, efFreeFlow_gpkm);
 				}
 
 				// sum them up:
@@ -334,7 +330,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// update counters:
-		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20
+		// yy I don't know what this is good for; I would base downstream analysis rather on events.  kai, jan'20
 		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
@@ -379,7 +375,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -395,7 +391,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 				}
@@ -410,7 +406,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -426,7 +422,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -435,8 +431,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						attribs2.setHbefaSizeClass( "average" );
 						attribs2.setHbefaEmConcept( "average" );
 						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn( "did not find emission factor for efkey=" + efkey );
-							logger.warn( " re-written to " + efkey2 );
+							logger.warn("Did not find emission factor in the detailed-table for efkey={}", efkey);
+							logger.warn("We are now trying to search in the detailed-table, but with an technology-averaged-key : efkey was re-written to {}", efkey2);
 							logger.warn( "will try it with '<technology>; average; average'" );
 							logger.warn( Gbl.ONLYONCE );
 							logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -444,11 +440,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-						logger.error( "That also did not worked " );
+						logger.error( "Could not find an entry in the technology-averaged-table for <technology>; average; average. " );
 					}
 				}
 			}
@@ -462,7 +458,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					return ef;
 				} else {
 					if ( detailedTransformToHbefa4Cnt <= 1 ) {
@@ -478,7 +474,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 						return ef2;
 					}
 
@@ -487,8 +483,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						attribs2.setHbefaSizeClass( "average" );
 						attribs2.setHbefaEmConcept( "average" );
 						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn( "did not find emission factor for efkey=" + efkey );
-							logger.warn( " re-written to " + efkey2 );
+							logger.warn("Did not find emission factor in the detailed-table for efkey={}", efkey);
+							logger.warn("We are now trying to search in the detailed-table, but with an technology-averaged-key : efkey was re-written to {}", efkey2);
 							logger.warn( "will try it with '<technology>; average; average'" );
 							logger.warn( Gbl.ONLYONCE );
 							logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -496,14 +492,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug( "Lookup result for " + efkey + " is " + ef2.toString() );
+							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
 					}
 				}
 				if ( detailedFallbackAverageTableWarnCnt <= 1 ) {
-					logger.warn( "That also did not work." );
+					logger.error( "Could not find an technology-averaged entry for <technology>; average; average. " );
 					logger.warn( "Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table" );
 					logger.warn( Gbl.ONLYONCE );
 					logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -513,7 +509,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey3.setVehicleAttributes( new HbefaVehicleAttributes() );
 				if ( this.avgHbefaWarmTable.get( efkey3 ) != null ) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey3 );
-					logger.debug( "Lookup result for " + efkey3 + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey3, ef.toString());
 					Gbl.assertNotNull( ef );
 					return ef;
 				}
@@ -528,11 +524,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
 				if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-					logger.debug( "Lookup result for " + efkey + " is " + ef.toString() );
+					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
 					Gbl.assertNotNull( ef );
 					return ef;
 				} else {
-					logger.warn( "did not find average emission factor for efkey=" + efkey );
+					logger.warn("Did not find average emission factor in average-table for efkey={}", efkey);
 					List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
 					list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
 					for ( HbefaWarmEmissionFactorKey key : list ) {
@@ -556,7 +552,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaRoadVehicleCategoryKey hbefaRoadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(efkey);
 		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(hbefaRoadVehicleCategoryKey);
 
-		//TODO: Hier die Berechunung einfügen, die die trafficSpeedTabelle entsprechend aus den Werten erstellt?
+		//TODO: Hier die Berechnung einfügen, die die trafficSpeedTabelle entsprechend aus den Werten erstellt?
 		//Frage Laufzeit: Einmal berechnen ha
 
 		if (trafficSpeeds == null || !trafficSpeeds.containsKey(FREEFLOW)) {
@@ -576,7 +572,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				trafficSituation = STOPANDGO;
 			}
 		}
-		/*FIXME The following lines should be added to account for the HBEFA 4.1's additiona traffic situation,
+		/*FIXME The following lines should be added to account for the HBEFA 4.1's additional traffic situation,
 		   but it currently causes a test failure (jwj, Nov'20) */
 //		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
 //			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
@@ -593,8 +589,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		freeFlowKmCounter += linkLength_km * (1-fractionStopGo);
 		stopGoKmCounter += linkLength_km * fractionStopGo;
 
-		freeFlowCounter += 1-fractionStopGo;
-		stopGoCounter += fractionStopGo;
+		freeFlowCounter += (int) (1-fractionStopGo);
+		stopGoCounter += (int) fractionStopGo;
 		fractionCounter += (fractionStopGo < 1.0 && fractionStopGo > 0.0) ? 1 : 0;
 	}
 
@@ -626,7 +622,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 	}
 
-	//------ These (occurrences) seem do be used only for logging statements and tests. KMT/GR Jul'20
+	//------ These (occurrences) seem to be used only for logging statements and tests. KMT/GR Jul'20
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}

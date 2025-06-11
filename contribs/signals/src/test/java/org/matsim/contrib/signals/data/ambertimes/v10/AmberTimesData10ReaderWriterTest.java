@@ -21,9 +21,9 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * @author jbischoff
  * @author dgrether
- * 
+ *
  */
 public class AmberTimesData10ReaderWriterTest {
 
@@ -45,11 +45,11 @@ public class AmberTimesData10ReaderWriterTest {
 
 	private static final String TESTXML = "testAmberTimes_v1.0.xml";
 
-	@Rule
-	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public void testParser() throws IOException, JAXBException, SAXException,
+	void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		AmberTimesData atd = new AmberTimesDataImpl();
 		AmberTimesReader10 reader = new AmberTimesReader10(atd);
@@ -59,7 +59,7 @@ public class AmberTimesData10ReaderWriterTest {
 	}
 
 	@Test
-	public void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
+	void testWriter() throws JAXBException, SAXException, ParserConfigurationException,
 			IOException {
 		String testoutput = this.testUtils.getOutputDirectory() + "testAtdOutput.xml";
 		log.debug("reading file...");
@@ -82,21 +82,21 @@ public class AmberTimesData10ReaderWriterTest {
 
 	private void checkContent(AmberTimesData ats) {
 		// global defaults
-		Assert.assertNotNull(ats);
-		Assert.assertEquals(0.3, ats.getDefaultAmberTimeGreen(), 1e-7);
-		Assert.assertEquals(1, ats.getDefaultRedAmber().intValue());
-		Assert.assertEquals(4, ats.getDefaultAmber().intValue());
+		Assertions.assertNotNull(ats);
+		Assertions.assertEquals(0.3, ats.getDefaultAmberTimeGreen(), 1e-7);
+		Assertions.assertEquals(1, ats.getDefaultRedAmber().intValue());
+		Assertions.assertEquals(4, ats.getDefaultAmber().intValue());
 		// system id1 defaults
 		AmberTimeData atdata = ats.getAmberTimeDataBySystemId().get(Id.create(1, SignalSystem.class));
-		Assert.assertNotNull(atdata);
-		Assert.assertEquals(1, atdata.getDefaultRedAmber().intValue());
-		Assert.assertEquals(4, atdata.getDefaultAmber().intValue());
+		Assertions.assertNotNull(atdata);
+		Assertions.assertEquals(1, atdata.getDefaultRedAmber().intValue());
+		Assertions.assertEquals(4, atdata.getDefaultAmber().intValue());
 		// Signal 1 defaults
-		Assert.assertNotNull(atdata.getAmberOfSignal(Id.create(1, Signal.class)));
-		Assert.assertNotNull(atdata.getSignalAmberMap());
-		Assert.assertNotNull(atdata.getSignalRedAmberMap());
-		Assert.assertEquals(4, atdata.getAmberOfSignal(Id.create(1, Signal.class)).intValue());
-		Assert.assertEquals(2, atdata.getRedAmberOfSignal(Id.create(1, Signal.class)).intValue());
+		Assertions.assertNotNull(atdata.getAmberOfSignal(Id.create(1, Signal.class)));
+		Assertions.assertNotNull(atdata.getSignalAmberMap());
+		Assertions.assertNotNull(atdata.getSignalRedAmberMap());
+		Assertions.assertEquals(4, atdata.getAmberOfSignal(Id.create(1, Signal.class)).intValue());
+		Assertions.assertEquals(2, atdata.getRedAmberOfSignal(Id.create(1, Signal.class)).intValue());
 
 	}
 

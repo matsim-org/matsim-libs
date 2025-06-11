@@ -8,12 +8,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 
 /**
  * Class to calculate the traffic congestion index based on the paper
- * "A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index" by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
+ * "A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index" by Feifei He, Xuedong Yan, Yang Liu, Lu Ma.
  */
 public final class TrafficStatsCalculator {
 
@@ -94,13 +94,13 @@ public final class TrafficStatsCalculator {
 		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
 			Link link = entry.getValue();
 
+			String type = NetworkUtils.getHighwayType(link);
+			if (roadType != null && !type.equals(roadType))
+				continue;
+
 			double linkCongestionIndex = getLinkCongestionIndex(link, startTime, endTime);
 
-			double length = link.getLength();
-			String type = NetworkUtils.getHighwayType(link);
-
-			if (type.equals(roadType))
-				continue;
+			double length = link.getLength() * link.getNumberOfLanes();
 
 			sumOfLinkLengthMultipiesLinkCongestionIndex += length * linkCongestionIndex;
 			sumLinkLength += length;

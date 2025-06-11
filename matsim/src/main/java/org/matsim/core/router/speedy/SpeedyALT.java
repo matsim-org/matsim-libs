@@ -1,20 +1,18 @@
 package org.matsim.core.router.speedy;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A very fast implementation of the ALT algorithm (A*-search with Landmarks and Triangle Inequality).
@@ -23,7 +21,7 @@ import java.util.List;
  *
  * This implementation always looks at all landmarks and does not filter them, as performance measurements
  * suggest that selecting and re-selecting landmarks regularly actually results in an overhead compared
- * to to just calculate the values for each landmark in each step (using a typical value of 16 landmarks).
+ * to just calculate the values for each landmark in each step (using a typical value of 16 landmarks).
  * This might be due to the fact that all values for each landmark are just next to each other in the memory,
  * so when accessing the travelcosts to/from one landmark basically already loads the values of all landmarks in
  * the CPU cache, making the calculation for the remaining landmarks very fast.
@@ -84,16 +82,50 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		this.iterationIds[nodeIndex] = this.currentIteration;
 	}
 
+	public Path calcLeastCostPath(Link fromLink, Link toLink, double starttime, final Person person, final Vehicle vehicle) {
+
+		int startNodeIndex = fromLink.getToNode().getId().index();
+		int endNodeIndex = toLink.getFromNode().getId().index();
+
+		if(graph.getTurnRestrictions().isPresent()) {
+			Map<Id<Link>, TurnRestrictionsContext.ColoredLink> replacedLinks = graph.getTurnRestrictions().get().replacedLinks;
+			if(replacedLinks.containsKey(fromLink.getId())) {
+				startNodeIndex = replacedLinks.get(fromLink.getId()).toColoredNode.index();
+			}
+		}
+
+		Path path = calcLeastCostPathImpl(startNodeIndex, endNodeIndex, starttime, person, vehicle);
+		if(path == null) {
+			LOG.warn("No route was found from link " + fromLink.getId() + " to link " + toLink.getId() + ". Some possible reasons:");
+		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
+			LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+			LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+			LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
+		}
+		return path;
+	}
+
 	@Override
 	public Path calcLeastCostPath(Node startNode, Node endNode, double startTime, Person person, Vehicle vehicle) {
+		Path path = calcLeastCostPathImpl(startNode.getId().index(), endNode.getId().index(), startTime, person, vehicle);
+		if(path == null) {
+      LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
+		  LOG.warn("  * Network is not connected.  Run NetworkUtils.cleanNetwork(Network network, Set<String> modes).") ;
+		  LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+		  LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+		  LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
+		}
+		return path;
+	}
+
+	private Path calcLeastCostPathImpl(int startNodeIndex, int endNodeIndex, double startTime, Person person, Vehicle vehicle) {
 		this.currentIteration++;
 		if (this.currentIteration == Integer.MAX_VALUE) {
 			// reset iteration as we overflow
 			Arrays.fill(this.iterationIds, this.currentIteration);
 			this.currentIteration = Integer.MIN_VALUE;
 		}
-		int startNodeIndex = startNode.getId().index();
-		int endNodeIndex = endNode.getId().index();
+		boolean hasTurnRestrictions = this.graph.getTurnRestrictions().isPresent();
 
 		int startDeadend = this.astarData.getNodeDeadend(startNodeIndex);
 		int endDeadend = this.astarData.getNodeDeadend(endNodeIndex);
@@ -110,6 +142,12 @@ public class SpeedyALT implements LeastCostPathCalculator {
 			final int nodeIdx = this.pq.poll();
 			if (nodeIdx == endNodeIndex) {
 				foundEndNode = true;
+				break;
+			}
+			// if turn restrictions are used, we might be on a colored node, so check for the original node
+			if (hasTurnRestrictions && this.graph.getNode(nodeIdx).getId().index() == endNodeIndex) {
+				foundEndNode = true;
+				endNodeIndex = nodeIdx;
 				break;
 			}
 
@@ -157,13 +195,9 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		if (foundEndNode) {
 			return constructPath(endNodeIndex, startTime);
 		}
-		LOG.warn("No route was found from node " + startNode.getId() + " to node " + endNode.getId() + ". Some possible reasons:");
-		LOG.warn("  * Network is not connected.  Run NetworkCleaner().") ;
-		LOG.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
-		LOG.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
-		LOG.warn("This will now return null, but it may fail later with a NullPointerException.");
 		return null;
 	}
+
 
 	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx) {
 		/* The ALT algorithm uses two lower bounds for each Landmark:

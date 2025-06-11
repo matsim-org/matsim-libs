@@ -2,7 +2,10 @@ package playground.vsp.openberlinscenario.planmodification;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
@@ -19,8 +22,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class PlanFileModifierTest {
     private final static Logger LOG = LogManager.getLogger(PlanFileModifierTest.class);
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
     private final static double SELECTION_PROBABILITY = 0.70;
     private final CoordinateTransformation ct = new IdentityTransformation();
@@ -29,7 +32,7 @@ public class PlanFileModifierTest {
     private Population modifiedPopulationCase1;
     private Population modifiedPopulationCase2;
 
-    @Before
+    @BeforeEach
     public void initializeTestPopulations() {
 
         String formatedInputPlansFile = utils.getClassInputDirectory() + "testPlansFormated.xml";
@@ -56,47 +59,46 @@ public class PlanFileModifierTest {
         modifiedPopulationCase2 = readPopulationFromFile(outputPlansFile2);
     }
 
-    @Test
-    public void testSelectionProbability() {
+	@Test
+	void testSelectionProbability() {
 
         LOG.info("OriginalPopulationCase1 size: " + originalPopulationCase.getPersons().size());
         LOG.info("ModifiedPopulationCase1 size: " + modifiedPopulationCase1.getPersons().size());
         LOG.info("selection probability: " + SELECTION_PROBABILITY);
         LOG.info("real selection probability: " +
                 ((double)modifiedPopulationCase1.getPersons().size()/ originalPopulationCase.getPersons().size()));
-        Assert.assertEquals("Selection probability was not correctly applied",
-                11, modifiedPopulationCase1.getPersons().size(),
-                MatsimTestUtils.EPSILON);
+        Assertions.assertEquals(11, modifiedPopulationCase1.getPersons().size(),
+                MatsimTestUtils.EPSILON,
+                "Selection probability was not correctly applied");
     }
 
-    @Test
-    public void testEveryPersonCopiedExistsInOriginal() {
+	@Test
+	void testEveryPersonCopiedExistsInOriginal() {
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
             Person original = originalPopulationCase.getPersons().get(copy.getId());
-            Assert.assertTrue("Person " + copy.getId() + " does not exist in the original file",
-                    original != null);
+            Assertions.assertTrue(original != null,
+                    "Person " + copy.getId() + " does not exist in the original file");
         }
     }
 
-    @Test
-    public void testOnlyTransferSelectedPlan() {
+	@Test
+	void testOnlyTransferSelectedPlan() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             Person original = originalPopulationCase.getPersons().get(copy.getId());
-            Assert.assertEquals("More than 1 plan", 1, copy.getPlans().size());
+            Assertions.assertEquals(1, copy.getPlans().size(), "More than 1 plan");
             comparePlansWithoutRoutes(original.getSelectedPlan(), copy.getSelectedPlan());
         }
     }
 
-    @Test
-    public void testNotOnlyTransferSelectedPlan() {
+	@Test
+	void testNotOnlyTransferSelectedPlan() {
         //also tests if all plans were copied correctly
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
             Person original = originalPopulationCase.getPersons().get(copy.getId());
-            Assert.assertEquals("Not the same amount of plans",
-                    original.getPlans().size(), copy.getPlans().size());
+            Assertions.assertEquals(original.getPlans().size(), copy.getPlans().size(), "Not the same amount of plans");
             comparePlans(original.getSelectedPlan(), copy.getSelectedPlan());
             for (int i = 0; i < original.getPlans().size(); i++) {
                 Plan originalPlan = original.getPlans().get(i);
@@ -106,28 +108,28 @@ public class PlanFileModifierTest {
         }
     }
 
-    @Test
-    public void testConsiderHomeStayingAgents() {
+	@Test
+	void testConsiderHomeStayingAgents() {
 
         boolean atLeastOneHomeStayingPerson = false;
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             if (copy.getSelectedPlan().getPlanElements().size() == 1)
                 atLeastOneHomeStayingPerson = true;
         }
-        Assert.assertTrue("No home staying person found", atLeastOneHomeStayingPerson);
+        Assertions.assertTrue(atLeastOneHomeStayingPerson, "No home staying person found");
     }
 
-    @Test
-    public void testNotConsiderHomeStayingAgents() {
+	@Test
+	void testNotConsiderHomeStayingAgents() {
 
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
-            Assert.assertTrue("No home staying agents allowed",
-                    copy.getSelectedPlan().getPlanElements().size() > 1);
+            Assertions.assertTrue(copy.getSelectedPlan().getPlanElements().size() > 1,
+                    "No home staying agents allowed");
         }
     }
 
-    @Test
-    public void testIncludeStayHomePlans() {
+	@Test
+	void testIncludeStayHomePlans() {
 
         boolean atLeastOneHomeStayingPlan = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -135,36 +137,36 @@ public class PlanFileModifierTest {
                 if (plan.getPlanElements().size() <= 1)
                     atLeastOneHomeStayingPlan = true;
         }
-        Assert.assertTrue("No home staying plan found", atLeastOneHomeStayingPlan);
+        Assertions.assertTrue(atLeastOneHomeStayingPlan, "No home staying plan found");
     }
 
-    @Test
-    public void testNotIncludeStayHomePlans() {
+	@Test
+	void testNotIncludeStayHomePlans() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
                 if (!plan.equals(copy.getSelectedPlan()))
-                Assert.assertTrue("No home staying plans allowed",
-                        plan.getPlanElements().size() > 1);
+                Assertions.assertTrue(plan.getPlanElements().size() > 1,
+                        "No home staying plans allowed");
         }
     }
 
-    @Test
-    public void testOnlyConsiderPeopleAlwaysGoingByCar() {
+	@Test
+	void testOnlyConsiderPeopleAlwaysGoingByCar() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Leg) {
-                        Assert.assertTrue("No other mode than car allowed",
-                                (((Leg) planElement).getMode().equals(TransportMode.car)));
+                        Assertions.assertTrue((((Leg) planElement).getMode().equals(TransportMode.car)),
+                                "No other mode than car allowed");
                     }
                 }
         }
     }
 
-    @Test
-    public void testNotOnlyConsiderPeopleAlwaysGoingByCar() {
+	@Test
+	void testNotOnlyConsiderPeopleAlwaysGoingByCar() {
 
         boolean otherModeThanCarConsidered = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -175,25 +177,25 @@ public class PlanFileModifierTest {
                     }
                 }
         }
-        Assert.assertTrue("There should be other modes than car", otherModeThanCarConsidered);
+        Assertions.assertTrue(otherModeThanCarConsidered, "There should be other modes than car");
     }
 
-    @Test
-    public void testRemoveLinksAndRoutes() {
+	@Test
+	void testRemoveLinksAndRoutes() {
 
         for (Person copy : modifiedPopulationCase2.getPersons().values()) {
             for (Plan plan : copy.getPlans())
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Leg) {
-                        Assert.assertTrue("There should not be a route left",
-                                (((Leg) planElement).getRoute() == null));
+                        Assertions.assertTrue((((Leg) planElement).getRoute() == null),
+                                "There should not be a route left");
                     }
                 }
         }
     }
 
-    @Test
-    public void testNotRemoveLinksAndRoutes() {
+	@Test
+	void testNotRemoveLinksAndRoutes() {
 
         boolean routeFound = false;
         for (Person copy : modifiedPopulationCase1.getPersons().values()) {
@@ -204,21 +206,22 @@ public class PlanFileModifierTest {
                     }
                 }
         }
-        Assert.assertTrue("There should be at minimum one route left", routeFound);
+        Assertions.assertTrue(routeFound, "There should be at minimum one route left");
     }
 
     private void comparePlans(Plan original, Plan copy) {
 
-        Assert.assertEquals("Plans are not the same", original.toString(), copy.toString());
+        Assertions.assertEquals(original.toString(), copy.toString(), "Plans are not the same");
         for (int i = 0; i < original.getPlanElements().size(); i++) {
-            Assert.assertEquals("PlanElements are not the same", original.getPlanElements().get(i).toString(),
-                    copy.getPlanElements().get(i).toString());
+            Assertions.assertEquals(original.getPlanElements().get(i).toString(),
+                    copy.getPlanElements().get(i).toString(),
+                    "PlanElements are not the same");
         }
     }
 
     private void comparePlansWithoutRoutes(Plan original, Plan copy) {
 
-        Assert.assertEquals("Plans are not the same", original.toString(), copy.toString());
+        Assertions.assertEquals(original.toString(), copy.toString(), "Plans are not the same");
     }
 
     private static Population readPopulationFromFile(String populationFile) {

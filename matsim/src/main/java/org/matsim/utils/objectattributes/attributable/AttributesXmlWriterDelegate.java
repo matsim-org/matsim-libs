@@ -21,13 +21,13 @@
 
 package org.matsim.utils.objectattributes.attributable;
 
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 /**
@@ -37,6 +37,10 @@ public class AttributesXmlWriterDelegate {
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes) {
+		writeAttributes(indentation, writer, attributes, true);
+	}
+
+	public final void writeAttributes(final String indentation, final StringBuilder writer, final Attributes attributes) {
 		writeAttributes(indentation, writer, attributes, true);
 	}
 
@@ -71,6 +75,36 @@ public class AttributesXmlWriterDelegate {
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		}
+	}
+
+	public final void writeAttributes(final String indentation, final StringBuilder writer, final Attributes attributes, boolean emptyLineAfter) {
+		if (attributes.size() == 0) {
+			return;
+		}
+
+		writer.append(indentation);
+		writer.append("<attributes>");
+		writer.append("\n");
+
+		// write attributes
+		for (Map.Entry<String, Object> objAttribute : attributes.getAsMap().entrySet()) {
+			Class<?> clazz = objAttribute.getValue().getClass(); // TODO: Does not work if value is null. Shall we allow for the value being null? - gl-oct'19
+			String converted = converter.convertToString(objAttribute.getValue());
+			if (converted != null) {
+				writer.append(indentation + "\t");
+				writer.append("<attribute name=\"" + XmlUtils.encodeAttributeValue(objAttribute.getKey()) + "\" ");
+				writer.append("class=\"" + clazz.getName() + "\">");
+				writer.append(XmlUtils.encodeContent(converted));
+				writer.append("</attribute>");
+				writer.append("\n");
+			}
+		}
+
+		writer.append(indentation);
+		writer.append("</attributes>");
+		if (emptyLineAfter) {
+			writer.append("\n");
 		}
 	}
 

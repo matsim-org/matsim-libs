@@ -23,31 +23,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.core.utils.gis.GeoFileReader;
 
 
 public class Verschmierer {
-	
+
 	private String filename;
-	
+
 	private Map<Integer, Geometry> zones = new HashMap<Integer, Geometry>();
 
 	private Random random = new Random();
-	
+
 	public Verschmierer(String filename) {
 		this.filename = filename;
 		readShape();
 	}
 
 	private void readShape() {
-		for (SimpleFeature landkreis : ShapeFileReader.getAllFeatures(filename)) {
+		for (SimpleFeature landkreis : GeoFileReader.getAllFeatures(filename)) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			zones.put(gemeindeschluessel, (Geometry) landkreis.getDefaultGeometry());
 		}
@@ -72,7 +72,7 @@ public class Verschmierer {
 			return coord;
 		}
 	}
-	
+
 	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
 		Point p = null;
 		double x, y;
@@ -83,13 +83,13 @@ public class Verschmierer {
 		} while (!g.contains(p));
 		return p;
 	}
-	
+
 	private Coord doShoot(Geometry zone) {
 		Coord coord;
 		Point point = getRandomPointInFeature(this.random , zone);
 		coord = new Coord(point.getX(), point.getY());
 		return coord;
 	}
-	
-	
+
+
 }

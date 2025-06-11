@@ -42,7 +42,6 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 	private final static Object[] EMPTY = new Object[0];
 
-	@SuppressWarnings("unchecked")
 	private Object[] data = EMPTY;
 
 	public ArrayMap() {
@@ -198,7 +197,6 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		m.forEach(this::put);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
 		this.data = EMPTY;

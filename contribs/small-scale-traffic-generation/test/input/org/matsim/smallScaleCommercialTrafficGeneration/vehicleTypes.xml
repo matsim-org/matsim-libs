@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="golf1.4">
+
+		<description>Golf 1.4 Trendline</description>
+		<capacity seats="4" standingRoomInPersons="0" other="0"/>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="38.89"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">petrol</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="31.07" costsPerMeter="1.5E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="vwCaddy">
+
+		<description>VW Caddy 2.0 Maxi TDI</description>
+		<capacity seats="4" standingRoomInPersons="0" other="0"/>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="38.89"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="27.27" costsPerMeter="1.7E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="mercedes313">
+
+		<description>Mercedes 313 CDI</description>
+		<capacity seats="1" standingRoomInPersons="0" other="0"/>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="38.89"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">LIGHT_COMMERCIAL_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="36.42" costsPerMeter="2.6E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="mercedes313_parcel">
+
+		<description>Mercedes 313 CDI</description>
+		<capacity seats="1" standingRoomInPersons="0" other="200"/> <!--this assumption for max. 200 parcels in the vehicle-->
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="38.89"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">LIGHT_COMMERCIAL_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="36.42" costsPerMeter="2.6E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="light8t">
+
+		<description>Light Vehicle 7.5t</description>
+		<capacity seats="1" standingRoomInPersons="0" other="3000.0"/>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="22.22"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">LIGHT_COMMERCIAL_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="63.49" costsPerMeter="4.0E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="2.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="medium18t_parcel">
+
+		<description>Medium Vehicle 18t</description>
+		<capacity seats="1" standingRoomInPersons="0" other="600.0"/> <!--this assumption for max. 600 parcels in the vehicle-->
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="22.22"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="80.47" costsPerMeter="5.3E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="3.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="medium18t">
+
+		<description>Medium Vehicle 18t</description>
+		<capacity seats="1" standingRoomInPersons="0" other="9000.0"/>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="22.22"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="80.47" costsPerMeter="5.3E-4" costsPerSecond="0.0049">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0049</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0049</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="3.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="heavy40t">
+
+		<description>Heavy Vehicle 40t</description>
+		<capacity seats="1" standingRoomInPersons="0" other="24500.0"/>
+		<length meter="15"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="22.22"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="126.58" costsPerMeter="6.9E-4" costsPerSecond="0.00559">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.00559</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.00559</attribute>
+			</attributes>
+		</costInformation>
+		<passengerCarEquivalents pce="4.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="waste_collection_diesel">
+		<description>Waste collection vehicle</description>
+		<capacity seats="1" standingRoomInPersons="0" other="11500.0">
+		</capacity>
+		<maximumVelocity meterPerSecond="22.22"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
+				<attribute name="fuelConsumptionPerTonnePickupWaste" class="java.lang.Double">0.5</attribute>
+				<attribute name="fuelConsumptionLitersPerMeter" class="java.lang.Double">0.0006</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="982.98" costsPerMeter="8.46E-4" costsPerSecond="0.0">
+			<attributes>
+				<attribute name="costsPerSecondInService" class="java.lang.Double">0.0</attribute>
+				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.0</attribute>
+			</attributes>
+		</costInformation>
+		<networkMode networkMode="car"/>
+	</vehicleType>
+</vehicleDefinitions>

@@ -11,9 +11,9 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecifi
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,13 +28,18 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
     private final static String BREAK_NAME = "break";
 
     public static final String ID = "id";
+
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
+
     public static final String OPERATION_FACILITY_ID = "operationFacilityId";
+    public static final String DESIGNATED_VEHICLE_ID = "designatedVehicleId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
     public static final String BREAK_DURATION = "duration";
+
+    public static final String TYPE = "type";
 
     private static final Logger log = LogManager.getLogger(DrtShiftsWriter.class);
 
@@ -63,7 +68,7 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
         List<DrtShiftSpecification> sortedShifts = shifts.values()
                 .stream()
                 .sorted(Comparator.comparing(Identifiable::getId))
-                .collect(Collectors.toList());
+                .toList();
         for (DrtShiftSpecification shift : sortedShifts) {
             atts.clear();
             atts.add(createTuple(ID, shift.getId().toString()));
@@ -71,6 +76,10 @@ public class DrtShiftsWriter extends MatsimXmlWriter {
             atts.add(createTuple(END_TIME, shift.getEndTime()));
 			shift.getOperationFacilityId().ifPresent(operationFacilityId ->
 					atts.add(createTuple(OPERATION_FACILITY_ID, operationFacilityId.toString())));
+            shift.getDesignatedVehicleId().ifPresent(designatedVehicleId ->
+                    atts.add(createTuple(DESIGNATED_VEHICLE_ID, designatedVehicleId.toString())));
+            shift.getShiftType().ifPresent(shiftType ->
+                    atts.add(createTuple(TYPE, shiftType)));
             this.writeStartTag(SHIFT_NAME, atts);
 
             //Write break, if present

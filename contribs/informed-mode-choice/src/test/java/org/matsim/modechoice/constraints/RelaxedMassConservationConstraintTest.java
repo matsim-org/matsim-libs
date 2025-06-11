@@ -1,7 +1,7 @@
 package org.matsim.modechoice.constraints;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -18,7 +18,7 @@ public class RelaxedMassConservationConstraintTest {
 
 	private RelaxedMassConservationConstraint constraint;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		SubtourModeChoiceConfigGroup config = new SubtourModeChoiceConfigGroup();
@@ -30,7 +30,7 @@ public class RelaxedMassConservationConstraintTest {
 
 
 	@Test
-	public void cycle() {
+	void cycle() {
 
 		Person person = f.createPerson(Id.createPersonId(0));
 
@@ -75,7 +75,7 @@ public class RelaxedMassConservationConstraintTest {
 	}
 
 	@Test
-	public void open() {
+	void open() {
 
 		Person person = f.createPerson(Id.createPersonId(0));
 
@@ -101,7 +101,7 @@ public class RelaxedMassConservationConstraintTest {
 	}
 
 	@Test
-	public void openEnd() {
+	void openEnd() {
 
 		Person person = f.createPerson(Id.createPersonId(0));
 

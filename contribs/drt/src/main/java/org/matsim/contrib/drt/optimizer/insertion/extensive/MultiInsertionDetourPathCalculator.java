@@ -43,6 +43,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -63,15 +64,12 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 
 	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
-		SpeedyGraph graph = new SpeedyGraph(network);
-		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
-		nodeMap.putAll(network.getNodes());
-
-		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
-		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.numberOfThreads, MAX_THREADS));
+		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
+		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
 	@VisibleForTesting

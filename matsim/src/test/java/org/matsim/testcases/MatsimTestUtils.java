@@ -21,74 +21,63 @@ package org.matsim.testcases;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import org.matsim.api.core.v01.population.Population;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.Permission;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
 
 /**
- * Some helper methods for writing JUnit 4 tests in MATSim.
- * Inspired by JUnit's rule TestName
+ * Some helper methods for writing JUnit 5 tests in MATSim.
  *
  * @author mrieser
  */
-public final class MatsimTestUtils extends TestWatcher {
+public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallback {
 	private static final Logger log = LogManager.getLogger(MatsimTestUtils.class);
+
+	//used for copying files from output to input. Don't delete even if they are unused in production
+	public static final String FILE_NAME_PLANS = "output_plans.xml.gz";
+	public static final String FILE_NAME_NETWORK = "output_network.xml.gz";
+	public static final String FILE_NAME_EVENTS = "output_events.xml.gz";
+
+	public enum TestMethodType {
+		Normal, Parameterized
+	}
 
 	/**
 	 * A constant for the exactness when comparing doubles.
 	 */
 	public static final double EPSILON = 1e-10;
 
-	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
-		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
-				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
-
-			String lineInput;
-			String lineOutput;
-
-			while( ((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null) ){
-				if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ){
-					log.info( "Reading line...  " );
-					log.info( lineInput );
-					log.info( lineOutput );
-					log.info( "" );
-				}
-				assertEquals( "Lines have different content: ", lineInput.trim(), lineOutput.trim() );
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	/** The default output directory, where files of this test should be written to.
-	 * Includes the trailing '/' to denote a directory. */
+	/**
+	 * The default output directory, where files of this test should be written to.
+	 * Includes the trailing '/' to denote a directory.
+	 */
 	private String outputDirectory = null;
 
-	/** The default input directory, where files of this test should be read from.
-	 * Includes the trailing '/' to denote a directory. */
+	/**
+	 * The default input directory, where files of this test should be read from.
+	 * Includes the trailing '/' to denote a directory.
+	 */
 	private String inputDirectory = null;
 
 	/**
@@ -106,17 +95,30 @@ public final class MatsimTestUtils extends TestWatcher {
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
-	private String testParameterSetIndex = null;
+	private String testDisplayName = null;
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
+	}
+
+	@Override
+	public void beforeEach(ExtensionContext extensionContext) {
+		this.testClass = extensionContext.getTestClass().orElseThrow();
+		this.testMethodName = extensionContext.getRequiredTestMethod().getName();
+		this.testDisplayName = extensionContext.getDisplayName();
+	}
+
+	@Override
+	public void afterEach(ExtensionContext extensionContext) {
+		this.testClass = null;
+		this.testMethodName = null;
 	}
 
 	public Config createConfigWithInputResourcePathAsContext() {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(inputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -124,7 +126,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(classInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -132,7 +134,7 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(packageInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -154,7 +156,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	private URL getResourceNotNull(String pathString) {
 		URL resource = this.testClass.getResource(pathString);
 		if (resource == null) {
-			throw new UncheckedIOException("Not found: "+pathString);
+			throw new UncheckedIOException(new IOException("Not found: " + pathString));
 		}
 		return resource;
 	}
@@ -164,7 +166,7 @@ public final class MatsimTestUtils extends TestWatcher {
 			Config config = ConfigUtils.createConfig();
 			config.setContext(new File(this.getInputDirectory()).toURI().toURL());
 			this.outputDirectory = getOutputDirectory();
-			config.controler().setOutputDirectory(this.outputDirectory);
+			config.controller().setOutputDirectory(this.outputDirectory);
 			return config;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -175,45 +177,71 @@ public final class MatsimTestUtils extends TestWatcher {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(context);
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
-
 	/**
-	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).
+	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>)
+	 * and sets the output directory to {classPath}/{methodName}/. For parameterized tests, the output directory is {classPath}/{methodName}/{
+	 * parameters}/.
 	 *
 	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
 	 * @return The loaded configuration.
 	 */
-	public Config loadConfig(final String configfile, final ConfigGroup... customGroups) {
+	public Config loadConfig(final String configfile, TestMethodType testMethodType, final ConfigGroup... customGroups) {
 		Config config;
 		if (configfile != null) {
 			config = ConfigUtils.loadConfig(configfile, customGroups);
 		} else {
-			config = ConfigUtils.createConfig( customGroups );
+			config = ConfigUtils.createConfig(customGroups);
 		}
-		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
-		return config;
+		return setOutputDirectory(config, testMethodType);
+	}
+
+	public Config loadConfig(final String configfile, final ConfigGroup... customGroups) {
+		return loadConfig(configfile, TestMethodType.Normal, customGroups);
+	}
+
+	public Config loadConfig(final URL configfile, TestMethodType testMethodType, final ConfigGroup... customGroups) {
+		Config config;
+		if (configfile != null) {
+			config = ConfigUtils.loadConfig(configfile, customGroups);
+		} else {
+			config = ConfigUtils.createConfig(customGroups);
+		}
+		return setOutputDirectory(config, testMethodType);
 	}
 
 	public Config loadConfig(final URL configfile, final ConfigGroup... customGroups) {
-		Config config;
-		if (configfile != null) {
-			config = ConfigUtils.loadConfig(configfile, customGroups);
-		} else {
-			config = ConfigUtils.createConfig( customGroups );
-		}
-		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		return loadConfig(configfile, TestMethodType.Normal, customGroups);
+	}
+
+	/**
+	 * Sets the output directory to {classPath}/{methodName}/{subDir}. For normal tests, there is no {subDir}.
+	 * For parameterized tests, {subDir} is a slightly adapted test input parameter string (aka display name of JUnit 5).
+	 * E.g.: "[1] car, 6" will be transformed to "car_6".
+	 */
+	private Config setOutputDirectory(Config config, TestMethodType testMethodType) {
+		String subDirectory = switch (testMethodType) {
+			case Normal -> "";
+			case Parameterized -> getParameterizedTestInputString();
+		};
+		this.outputDirectory = getOutputDirectory(subDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
+	public String getParameterizedTestInputString() {
+		String parameters = this.testDisplayName.replaceFirst("^.*?\\]", "").trim();
+		parameters = parameters.replaceAll(" ", "").replaceAll("[^a-zA-Z0-9]", "_");
+		return parameters;
+	}
+
 	public Config createConfig(final ConfigGroup... customGroups) {
-		Config config = ConfigUtils.createConfig( customGroups );
+		Config config = ConfigUtils.createConfig(customGroups);
 		this.outputDirectory = getOutputDirectory();
-		config.controler().setOutputDirectory(this.outputDirectory);
+		config.controller().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
@@ -224,7 +252,7 @@ public final class MatsimTestUtils extends TestWatcher {
 				IOUtils.deleteDirectoryRecursively(directory.toPath());
 			}
 			this.outputDirCreated = directory.mkdirs();
-			Assert.assertTrue("Could not create the output directory " + this.outputDirectory, this.outputDirCreated);
+			Assertions.assertTrue(this.outputDirCreated, "Could not create the output directory " + this.outputDirectory);
 		}
 	}
 
@@ -234,10 +262,12 @@ public final class MatsimTestUtils extends TestWatcher {
 	 * @return path to the output directory for this test
 	 */
 	public String getOutputDirectory() {
+		return getOutputDirectory("");
+	}
+
+	public String getOutputDirectory(String subDir) {
 		if (this.outputDirectory == null) {
-			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
-					+ subDirectoryForParametrisedTests;
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/" + subDir;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -254,18 +284,20 @@ public final class MatsimTestUtils extends TestWatcher {
 		}
 		return this.inputDirectory;
 	}
+
 	/**
-	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory delimiter.
+	 * Returns the path to the input directory one level above the default input directory for this test including a trailing slash as directory
+	 * delimiter.
 	 *
 	 * @return path to the input directory for this test
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
 
-			LogManager.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
+			LogManager.getLogger(this.getClass()).info("user.dir = " + System.getProperty("user.dir"));
 
 			this.classInputDirectory = "test/input/" +
-											   this.testClass.getCanonicalName().replace('.', '/') + "/";
+				this.testClass.getCanonicalName().replace('.', '/') + "/";
 //			this.classInputDirectory = System.getProperty("user.dir") + "/test/input/" +
 //											   this.testClass.getCanonicalName().replace('.', '/') + "/";
 			// (this used to be relative, i.e. ... = "test/input/" + ... .  Started failing when
@@ -275,8 +307,10 @@ public final class MatsimTestUtils extends TestWatcher {
 		}
 		return this.classInputDirectory;
 	}
+
 	/**
-	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory delimiter.
+	 * Returns the path to the input directory two levels above the default input directory for this test including a trailing slash as directory
+	 * delimiter.
 	 *
 	 * @return path to the input directory for this test
 	 */
@@ -304,46 +338,74 @@ public final class MatsimTestUtils extends TestWatcher {
 	 * This should be used for "fixtures" only that provide a scenario common to several
 	 * test cases.
 	 */
-	public void initWithoutJUnitForFixture(Class fixture, Method method){
+	public void initWithoutJUnitForFixture(Class fixture, Method method) {
 		this.testClass = fixture;
 		this.testMethodName = method.getName();
 	}
 
-	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
-	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
-	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
-			"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
+	public static void assertEqualFilesLineByLine(String inputFilename, String outputFilename) {
+		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
+			 BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename)) {
 
-	/* inspired by
-	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
-	 */
-	@Override
-	public void starting(Description description) {
-		super.starting(description);
-		this.testClass = description.getTestClass();
+			String lineInput;
+			String lineOutput;
 
-		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(description.getMethodName());
-		if (!matcher.matches()) {
-			throw new RuntimeException("The name of the test parameter set must start with {index}");
+			while (((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null)) {
+				if (!Objects.equals(lineInput.trim(), lineOutput.trim())) {
+					log.info("Reading line...  ");
+					log.info(lineInput);
+					log.info(lineOutput);
+					log.info("");
+				}
+				Assertions.assertEquals(lineInput.trim(), lineOutput.trim(), "Lines have different content: ");
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		this.testMethodName = matcher.group(1);
-		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
 	}
 
-	@Override
-	public void finished(Description description) {
-		super.finished(description);
-		this.testClass = null;
-		this.testMethodName = null;
+	public static void assertEqualEventsFiles(String filename1, String filename2) {
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, EventsFileComparator.compare(filename1, filename2));
 	}
 
-  public static void assertEqualEventsFiles( String filename1, String filename2 ) {
-		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL ,EventsFileComparator.compare(filename1, filename2) );
+	public static void assertEqualFilesBasedOnCRC(String filename1, String filename2) {
+		long checksum1 = CRCChecksum.getCRCFromFile(filename1);
+		long checksum2 = CRCChecksum.getCRCFromFile(filename2);
+		Assertions.assertEquals(checksum1, checksum2, "different file checksums");
 	}
 
-  public static void assertEqualFilesBasedOnCRC( String filename1, String filename2 ) {
-	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
-	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
-	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
-  }
+	/**
+	 * Creates the input directory for this test.
+	 */
+	public void createInputDirectory() {
+		try {
+			Files.createDirectories(Path.of(getInputDirectory()));
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assertions.fail();
+		}
+	}
+
+	/**
+	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
+	 * manually.
+	 */
+	public void copyFileFromOutputToInput(String fileName) {
+		createInputDirectory();
+		copyFileFromOutputToInput(fileName, fileName);
+	}
+
+	/**
+	 * Copies a file from the output directory to the input directory. This is normally only needed during development, if one would not do it
+	 * manually.
+	 */
+	public void copyFileFromOutputToInput(String outputFile, String inputFile) {
+		createInputDirectory();
+		try {
+			Files.copy(Path.of(getOutputDirectory() + outputFile), Path.of(getInputDirectory() + inputFile), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assertions.fail();
+		}
+	}
 }

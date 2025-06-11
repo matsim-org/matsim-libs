@@ -14,9 +14,9 @@ import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.estimators.DefaultLegScoreEstimator;
 import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
+import org.matsim.contrib.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.util.List;
 
@@ -45,8 +45,8 @@ public class TestScenario extends MATSimApplication {
 
 		URL context = ExamplesUtils.getTestScenarioURL("kelheim");
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		return config;
 	}
 

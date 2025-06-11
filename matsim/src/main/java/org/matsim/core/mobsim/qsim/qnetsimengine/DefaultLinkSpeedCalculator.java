@@ -24,10 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
-import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,33 +32,41 @@ import java.util.Collection;
 /**
  * A simple link speed calculator taking the vehicle's max speed and the link's
  * free speed into account;
- * 
+ *
  * @author mrieser / Senozon AG
  */
-public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator{
+public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
 	// I have moved this into the qnetsimengine package so that it can be used without injection inside that package.  kai, jun'23
-	private static final Logger log = LogManager.getLogger(DefaultLinkSpeedCalculator.class );
+	private static final Logger log = LogManager.getLogger(DefaultLinkSpeedCalculator.class);
 	private final Collection<LinkSpeedCalculator> calculators = new ArrayList<>();
 
-	@Inject DefaultLinkSpeedCalculator(){} // so it has to be instantiated by injection from outside package.  kai, jun'23
+	@Inject
+	DefaultLinkSpeedCalculator() {
+	} // so it has to be instantiated by injection from outside package.  kai, jun'23
 
-	@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
+	@Override
+	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		double speed = Double.NaN;
-		for ( LinkSpeedCalculator calculator : calculators ) {
-			double tmp = calculator.getMaximumVelocity( vehicle, link, time ) ;
-			if ( !Double.isNaN( tmp ) ) {
-				if ( Double.isNaN( speed ) ){
+
+		//go through all calculators and store the speed
+		for (LinkSpeedCalculator calculator : calculators) {
+			double tmp = calculator.getMaximumVelocity(vehicle, link, time);
+			if (!Double.isNaN(tmp)) {
+				if (Double.isNaN(speed)) {
 					speed = tmp;
 				} else {
-					throw new RuntimeException( "two vehicle speed calculators feel responsible for vehicle; don't know what to do." );
+					throw new RuntimeException("two vehicle speed calculators feel responsible for vehicle; don't know what to do.");
 					// would be possible to have the calculators sorted, i.e. as List, but don't see how this could be configured in an easy way.  kai, jun'23
 				}
 			}
 		}
-		if ( !Double.isNaN( speed ) ) {
+
+		if (!Double.isNaN(speed)) {
+			//if there was one LinkSpeedCalculator that could calculate the speed, return it
 			return speed;
-		} else{
-			return Math.min( vehicle.getMaximumVelocity(), link.getFreespeed( time ) );
+		} else {
+			//as fallback use the default calculation
+			return Math.min(vehicle.getMaximumVelocity(), link.getFreespeed(time));
 		}
 	}
 
@@ -71,8 +76,8 @@ public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator{
 	 * functionality can clearly be used.  kai, jun'23
 	 */
 	@SuppressWarnings("UnusedReturnValue")
-	public final DefaultLinkSpeedCalculator addLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ){
-		this.calculators.add( linkSpeedCalculator );
+	public final DefaultLinkSpeedCalculator addLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
+		this.calculators.add(linkSpeedCalculator);
 		return this;
 	}
 

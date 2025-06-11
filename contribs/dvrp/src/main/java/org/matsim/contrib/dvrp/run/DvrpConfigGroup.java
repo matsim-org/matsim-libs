@@ -19,25 +19,22 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
-import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
-import org.matsim.core.config.Config;
-
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
+import org.matsim.core.config.Config;
 
-public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
+import jakarta.annotation.Nullable;
+import java.util.Set;
+
+public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = LogManager.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
@@ -57,24 +54,25 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 			+ "the original scenario.network is used")
 	// used for building route; empty ==> no filtering (routing network equals scenario.network)
 	@NotNull
-	public Set<String> networkModes = Set.of(TransportMode.car);
+	private Set<String> networkModes = Set.of(TransportMode.car);
 
 	@Parameter
 	@Comment("Mode of which the network will be used for throwing events and hence calculating travel times. "
 			+ "Default is car.")
 	@NotBlank
-	public String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
+	private String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
 
 	@Parameter
 	@Comment("Used for OFFLINE estimation of travel times for VrpOptimizer"
 			+ " by means of the exponential moving average."
-			+ " The weighting decrease, alpha, must be in (0,1]."
+			+ " The weighting decrease, alpha, must be in [0,1]."
 			+ " We suggest small values of alpha, e.g. 0.05."
 			+ " The averaging starts from the initial travel time estimates. If not provided,"
-			+ " the free-speed TTs is used as the initial estimates")
-	@Positive
+			+ " the free-speed TTs is used as the initial estimates. If alpha is set to 0, the initial"
+			+ " travel times stay fixed.")
+	@PositiveOrZero
 	@DecimalMax("1.0")
-	public double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only
+	private double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only, 0 ==> initial TTs only
 
 	@Parameter
 	@Comment(""
@@ -101,12 +99,12 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 	@PositiveOrZero
-	public double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
+	private double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
 
 	@Parameter
 	@Comment("File containing the initial link travel time estimates. Ignored if null")
 	@Nullable
-	public String initialTravelTimesFile = null;
+	private String initialTravelTimesFile = null;
 
 	@Nullable
 	private DvrpTravelTimeMatrixParams travelTimeMatrixParams;
@@ -143,8 +141,14 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
 		}
-		if (!config.parallelEventHandling().getSynchronizeOnSimSteps()) {
+		if (!config.eventsManager().getSynchronizeOnSimSteps()) {
 			throw new RuntimeException("Synchronization on sim steps is required");
+		}
+		if(getInitialTravelTimesFile() == null && getTravelTimeEstimationAlpha() == 0.0) {
+			throw new RuntimeException("Initial travel times file is required if travel times should not be updated.");
+		}
+		if(getTravelTimeEstimationAlpha() == 0.0 && getTravelTimeEstimationBeta() > 0) {
+			throw new RuntimeException("Online estimation beta should be 0 if travel time should not be updated.");
 		}
 	}
 
@@ -153,5 +157,49 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 			addParameterSet(new DvrpTravelTimeMatrixParams());
 		}
 		return travelTimeMatrixParams;
+	}
+
+	public @NotNull Set<String> getNetworkModes() {
+		return networkModes;
+	}
+
+	public void setNetworkModes(@NotNull Set<String> networkModes) {
+		this.networkModes = networkModes;
+	}
+
+	public @NotBlank String getMobsimMode() {
+		return mobsimMode;
+	}
+
+	public void setMobsimMode(@NotBlank String mobsimMode) {
+		this.mobsimMode = mobsimMode;
+	}
+
+	@PositiveOrZero
+	@DecimalMax("1.0")
+	public double getTravelTimeEstimationAlpha() {
+		return travelTimeEstimationAlpha;
+	}
+
+	public void setTravelTimeEstimationAlpha(@PositiveOrZero @DecimalMax("1.0") double travelTimeEstimationAlpha) {
+		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
+	}
+
+	@PositiveOrZero
+	public double getTravelTimeEstimationBeta() {
+		return travelTimeEstimationBeta;
+	}
+
+	public void setTravelTimeEstimationBeta(@PositiveOrZero double travelTimeEstimationBeta) {
+		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
+	}
+
+	@Nullable
+	public String getInitialTravelTimesFile() {
+		return initialTravelTimesFile;
+	}
+
+	public void setInitialTravelTimesFile(@Nullable String initialTravelTimesFile) {
+		this.initialTravelTimesFile = initialTravelTimesFile;
 	}
 }

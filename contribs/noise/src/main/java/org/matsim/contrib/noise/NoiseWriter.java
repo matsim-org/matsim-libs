@@ -78,17 +78,17 @@ final class NoiseWriter {
 //		.addAttribute("Id", String.class)
 //		.create();
 //		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-//		
+//
 //		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-//					
+//
 //			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
 //			features.add(feature);
 //		}
-//		
+//
 //		String filePath = outputPath;
 //		File file = new File(filePath);
 //		file.mkdirs();
-//		
+//
 //		log.info("Writing receiver points to shapefile... ");
 //		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
 //		log.info("Writing receiver points to shapefile... Done. ");
@@ -318,13 +318,11 @@ final class NoiseWriter {
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
 			bw.newLine();
 
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-
-				bw.write(rp.getId() + ";" + rp.getDamageCosts());
+				bw.write(rp.getId() + ";" + rp.getDamageCosts() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 

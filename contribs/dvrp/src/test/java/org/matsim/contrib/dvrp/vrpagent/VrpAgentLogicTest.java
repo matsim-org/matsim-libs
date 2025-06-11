@@ -24,18 +24,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE;
 import static org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dynagent.DynAction;
@@ -81,12 +84,12 @@ public class VrpAgentLogicTest {
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, startLink);
 
 	private final DynAgentLogic dynAgentLogic = new VrpAgentLogic(optimizer, VrpAgentLogicTest::createAction, vehicle,
-			DVRP_MODE, eventsManager);
+			DVRP_MODE, eventsManager, new IntegerLoadType("passengers"));
 	private final DynAgent dynAgent = new DynAgent(Id.createPersonId(vehicleSpecification.getId()), startLink.getId(),
 			null, dynAgentLogic);
 
 	@Test
-	public void testInitialActivity_unplanned() {
+	void testInitialActivity_unplanned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
@@ -95,7 +98,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testInitialActivity_planned() {
+	void testInitialActivity_planned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
@@ -107,7 +110,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testInitialActivity_started_failure() {
+	void testInitialActivity_started_failure() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, 90, startLink);
@@ -121,7 +124,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_unplanned_completed() {
+	void testNextAction_unplanned_completed() {
 		IdleDynActivity nextAction = (IdleDynActivity)dynAgentLogic.computeNextAction(null,
 				vehicle.getServiceEndTime());
 
@@ -131,7 +134,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_planned_started() {
+	void testNextAction_planned_started() {
 		double time = 10;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -142,7 +145,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_started_started() {
+	void testNextAction_started_started() {
 		double time = 50;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -156,7 +159,7 @@ public class VrpAgentLogicTest {
 	}
 
 	@Test
-	public void testNextAction_started_completed() {
+	void testNextAction_started_completed() {
 		double time = 90;
 		StayTask task0 = new DefaultStayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);

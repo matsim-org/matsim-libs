@@ -36,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.config.groups.EventsManagerConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
@@ -45,6 +45,9 @@ import org.matsim.core.gbl.Gbl;
  * When a Time Step of the QSim ends, all Events that have been created
  * in that Time Step are processed before the simulation can go on.
  * This is necessary e.g. when using Within-day Replanning.
+ *
+ * In parallel mode, each thread has its own EventsManager instance. Each EventsHandler is added to exactly one thread.
+ * An Event is passed to the first thread. The first thread passes it to the next thread and then processes them.
  *
  * @author cdobler
  */
@@ -67,7 +70,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
 
 	@Inject
-	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
+	SimStepParallelEventsManagerImpl(EventsManagerConfigGroup config) {
 		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
 	}
 
@@ -291,7 +294,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 					if (event.getTime() < this.lastEventTime) {
 						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
 								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
-								"as a MobsimAfterSimStepListener?");
+								"as a MobsimAfterSimStepListener? LastEventTime = " + this.lastEventTime +
+							  " currentEvent.time = " + event.getTime() + " currentEvent.type = " + event.getEventType() +
+							  " full event: " + event.toString());
 					} else {
 						this.lastEventTime = event.getTime();
 					}

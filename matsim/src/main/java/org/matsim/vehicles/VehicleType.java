@@ -26,6 +26,8 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
+import java.util.Objects;
+
 /**
  * @author dgrether
  */
@@ -46,13 +48,24 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	private final CostInformation costInformation = new CostInformation() ;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
-	private String networkMode = TransportMode.car ;
+	private String networkMode;
 	private Id<VehicleType> id;
 	private final Attributes attributes = new AttributesImpl();
 
 	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
+		// For car typ default network mode is assumed, for others it needs to be set explicitly.
+		if (typeId != null && Objects.equals(typeId.toString(), TransportMode.car))
+			this.networkMode = TransportMode.car;
+		else if (typeId != null && Objects.equals(typeId.toString(), TransportMode.bike))
+			this.networkMode = TransportMode.bike;
 	}
+
+	VehicleType(Id<VehicleType> typeId, String networkMode) {
+		this.id = typeId;
+		this.networkMode = networkMode;
+	}
+
 	public final String getDescription() {
 		return description;
 	}
@@ -113,8 +126,16 @@ public final class VehicleType implements Attributable, Identifiable<VehicleType
 	public final CostInformation getCostInformation() {
 		return costInformation;
 	}
+
+	/**
+	 * Check whether network mode is set. If not, calling {@link #getNetworkMode()} will throw an exception.
+	 */
+	public final boolean hasNetworkMode() {
+		return networkMode != null;
+	}
+
 	public final String getNetworkMode() {
-		return networkMode;
+		return Objects.requireNonNull(networkMode, () -> "Network mode not set for vehicle type %s. Network mode needs to be set explicitly for non car modes. You can do this in XML by adding \t<networkMode networkMode=\"%s\"/>\n".formatted(id, id));
 	}
 	public final VehicleType setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;

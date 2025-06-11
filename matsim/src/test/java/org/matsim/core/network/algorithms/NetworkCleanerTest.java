@@ -20,15 +20,20 @@
 
 package org.matsim.core.network.algorithms;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 /**
  * A very simple test for the NetworkCleaner, it doesn't test by far all possible cases.
@@ -39,7 +44,8 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class NetworkCleanerTest {
 
-	@Test public void testSink() {
+	@Test
+	void testSink() {
 		// create a simple network
 		Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -64,17 +70,18 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a sink / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 5, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(5, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
-	@Test public void testDoubleSink() {
+	@Test
+	void testDoubleSink() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -102,17 +109,18 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode5, toNode5, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a sink / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 6, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(6, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
-	@Test public void testSource() {
+	@Test
+	void testSource() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -137,17 +145,18 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a source / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 5, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(5, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
 	}
 
-	@Test public void testDoubleSource() {
+	@Test
+	void testDoubleSource() {
 		// create a simple network
         Network network = NetworkUtils.createNetwork();
         Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -175,14 +184,33 @@ public class NetworkCleanerTest {
 		NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode5, toNode5, (double) 100, (double) 100, (double) 100, (double) 1 );
 		// link 5 is a source / dead end!
 
-		assertEquals("# nodes", 5, network.getNodes().size());
-		assertEquals("# links", 6, network.getLinks().size());
+		assertEquals(5, network.getNodes().size(), "# nodes");
+		assertEquals(6, network.getLinks().size(), "# links");
 
 		NetworkCleaner cleaner = new NetworkCleaner();
 		cleaner.run(network);
 
-		assertEquals("# nodes", 4, network.getNodes().size());
-		assertEquals("# links", 4, network.getLinks().size());
+		assertEquals(4, network.getNodes().size(), "# nodes");
+		assertEquals(4, network.getLinks().size(), "# links");
+	}
+
+	/**
+	 * This test essentially does the same by modifying the equil scenario.
+	 * Visualization:
+	 *		  /...                  ...\
+	 * ------o------------o------------o-----------
+	 * l1  (n2)   l6    (n7)   l15  (n12)   l20
+	 */
+	@ParameterizedTest
+	@CsvSource({"6,15", "15,6"})
+	void testNetworkCleaner(String removedBefore, String expectedRemovedAfter){
+		Network net = NetworkUtils.readNetwork(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml").toString());
+		net.removeLink(Id.createLinkId(removedBefore));
+		int size = net.getLinks().size();
+
+		new NetworkCleaner().run(net);
+		Assertions.assertFalse(net.getLinks().containsKey(Id.createLinkId(expectedRemovedAfter)));
+		assertEquals(net.getLinks().size(), size - 1);
 	}
 
 }

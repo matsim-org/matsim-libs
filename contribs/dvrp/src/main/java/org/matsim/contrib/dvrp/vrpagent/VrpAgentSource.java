@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -41,15 +42,17 @@ public class VrpAgentSource implements AgentSource {
 	private final String dvrpMode;
 	private final QSim qSim;
 	private final VehicleType vehicleType;
+	private final DvrpLoadType dvrpLoadType;
 
 	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, String dvrpMode,
-			QSim qSim, VehicleType vehicleType) {
+			QSim qSim, VehicleType vehicleType, DvrpLoadType dvrpLoadType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
 		this.dvrpMode = dvrpMode;
 		this.qSim = qSim;
 		this.vehicleType = vehicleType;
+		this.dvrpLoadType = dvrpLoadType;
 	}
 
 	@Override
@@ -61,7 +64,7 @@ public class VrpAgentSource implements AgentSource {
 			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
 
 			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
-					qSim.getEventsManager());
+					qSim.getEventsManager(), dvrpLoadType);
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);
 			Vehicle matsimVehicle = dvrpVehicle.getSpecification()

@@ -19,16 +19,16 @@
 
 package org.matsim.vehicles;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,8 +38,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class VehicleWriterV1Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger log = LogManager.getLogger(VehicleWriterV1Test.class);
 
@@ -49,7 +49,7 @@ public class VehicleWriterV1Test {
 	private Id<Vehicle> id42;
 	private Id<Vehicle> id42_23;
 
-	@Before public void setUp() {
+	@BeforeEach public void setUp() {
 
 		id23 = Id.create("23", Vehicle.class);
 		id42 = Id.create("42", Vehicle.class);
@@ -59,7 +59,8 @@ public class VehicleWriterV1Test {
 		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
-	@Test public void testWriter() {
+	@Test
+	void testWriter() {
 
 		String outfileName = utils.getOutputDirectory() + "testOutputVehicles.xml";
 

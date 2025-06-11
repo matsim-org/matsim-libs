@@ -10,7 +10,7 @@ import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.ModeChoiceWeightScheduler;
 import org.matsim.modechoice.PlanCandidate;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,7 +34,6 @@ import java.util.*;
 public class MultinomialLogitSelector implements PlanSelector {
 
 
-	private final static Logger log = LogManager.getLogger(MultinomialLogitSelector.class);
 	private final double scale;
 	private final Random rnd;
 
@@ -56,42 +55,37 @@ public class MultinomialLogitSelector implements PlanSelector {
 		if (candidates.size() == 1)
 			return candidates.iterator().next();
 
-		// if two option are exactly the same this will be incorrect
-		// for very small scales, exp overflows, this function needs to return best solution at this point
-		if (scale <= 1 / 700d) {
+		// Short-path to do completely random selection
+		if (scale == Double.POSITIVE_INFINITY) {
+			return candidates.stream().skip(rnd.nextInt(candidates.size())).findFirst().orElse(null);
+		}
+
+		// for very small scales, avoid numerical issues by using the best candidate
+		if (scale <= 1e-8) {
 			return candidates.stream().sorted().findFirst().orElse(null);
 		}
 
-		// III) Create a probability distribution over candidates
-		DoubleList density = new DoubleArrayList(candidates.size());
-		List<PlanCandidate> pcs = new ArrayList<>(candidates);
+		// Subtract the maximum utility to avoid overflow
+		double max = candidates.stream().mapToDouble(PlanCandidate::getUtility).max().orElseThrow() / scale;
 
-		double min = candidates.stream().mapToDouble(PlanCandidate::getUtility).min().orElseThrow();
-		double scale = candidates.stream().mapToDouble(PlanCandidate::getUtility).max().orElseThrow() - min;
-
-		// For very small differences the small is ignored
-		if (scale < 1e-6)
-			scale = 1;
-
-		for (PlanCandidate candidate : pcs) {
-			double utility = (candidate.getUtility() - min) / scale;
-			density.add(Math.exp(utility / this.scale));
-		}
-
-		// IV) Build a cumulative density of the distribution
-		DoubleList cumulativeDensity = new DoubleArrayList(density.size());
+		// III) Build a cumulative density of the distribution
+		double[] cumulativeDensity = new double[candidates.size()];
+		int i = 0;
 		double totalDensity = 0.0;
 
-		for (int i = 0; i < density.size(); i++) {
-			totalDensity += density.getDouble(i);
-			cumulativeDensity.add(totalDensity);
+		for (PlanCandidate candidate : candidates) {
+			double utility = (candidate.getUtility() / scale) - max;
+			double exp = Math.exp(utility);
+
+			totalDensity += exp;
+			cumulativeDensity[i++] = totalDensity;
 		}
 
 		// V) Perform a selection using the CDF
 		double pointer = rnd.nextDouble() * totalDensity;
 
-		int selection = (int) cumulativeDensity.doubleStream().filter(f -> f < pointer).count();
-		return pcs.get(selection);
+		int selection = (int) Arrays.stream(cumulativeDensity).filter(f -> f < pointer).count();
+		return candidates.stream().skip(selection).findFirst().orElse(null);
 	}
 
 
@@ -127,7 +121,7 @@ public class MultinomialLogitSelector implements PlanSelector {
 
 			printer.println();
 
-			double start = 2.5;
+			double start = 10;
 			int n = 100;
 
 			for (int i = 0; i <= n; i++) {

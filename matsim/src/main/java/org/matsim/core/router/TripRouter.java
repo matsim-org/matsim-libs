@@ -40,11 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -61,12 +58,11 @@ import com.google.common.base.Preconditions;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
-	private static final Logger log = LogManager.getLogger(TripRouter.class );
 
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	private final FallbackRoutingModule fallbackRoutingModule;
 
-	private Config config;
+	private final Config config;
 	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
 	// injected, I cannot get it there directly.  kai, oct'17)
 
@@ -80,9 +76,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 		public Builder setRoutingModule(String mainMode, RoutingModule routingModule ) {
 			// the initial API accepted routing modules.  injection, however, takes routing module providers.  (why?)
 			// trying to bring these two into line here.  maybe some other approach would be preferred, don't know.  kai, jun'18
-			this.routingModuleProviders.put( mainMode, new Provider<RoutingModule>(){
-				@Override public RoutingModule get() {
-					return routingModule ;
+			this.routingModuleProviders.put( mainMode, new Provider<>() {
+				@Override
+				public RoutingModule get() {
+					return routingModule;
 				}
 			} ) ;
 			return this ;
@@ -91,14 +88,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return new TripRouter( routingModuleProviders, config, fallbackRoutingModule ) ;
 		}
 	}
-
-//	@Deprecated // use the Builder instead.  kai, oct'17
-//	public TripRouter() {}
-//	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
-//	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
-//	// way to get around that again, and even to change the injected material later.
-//	// I would expect a Builder instead.
-//	// kai, sep'16
 
 	@Inject
 	TripRouter( Map<String, Provider<RoutingModule>> routingModuleProviders, Config config,
@@ -124,13 +113,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @param module the module to use with this mode
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
-	@Deprecated // use the Builder instead.  kai, oct'17
-	/* package-private */ RoutingModule setRoutingModule(
+	private RoutingModule setRoutingModule(
 			final String mainMode,
 			final RoutingModule module) {
-		RoutingModule old = routingModules.put( mainMode , module );
-
-		return old;
+		return routingModules.put( mainMode , module );
 	}
 
 	public RoutingModule getRoutingModule(final String mainMode) {
@@ -172,26 +158,25 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		RoutingModule module = routingModules.get( mainMode );
 
-		if (module != null) {
-			RoutingRequest request = DefaultRoutingRequest.of(
-					fromFacility,
-					toFacility,
-					departureTime,
-					person,
-					routingAttributes);
-
-			List<? extends PlanElement> trip = module.calcRoute(request);
-
-			if ( trip == null ) {
-				trip = fallbackRoutingModule.calcRoute(request) ;
-			}
-			for (Leg leg: TripStructureUtils.getLegs(trip)) {
-				TripStructureUtils.setRoutingMode(leg, mainMode);
-			}
-			return trip;
+		if (module == null) {
+			throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 		}
+		RoutingRequest request = DefaultRoutingRequest.of(
+				fromFacility,
+				toFacility,
+				departureTime,
+				person,
+				routingAttributes);
 
-		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
+		List<? extends PlanElement> trip = module.calcRoute(request);
+
+		if ( trip == null ) {
+			trip = fallbackRoutingModule.calcRoute(request) ;
+		}
+		for (Leg leg: TripStructureUtils.getLegs(trip)) {
+			TripStructureUtils.setRoutingMode(leg, mainMode);
+		}
+		return trip;
 	}
 
 	public static class UnknownModeException extends RuntimeException {

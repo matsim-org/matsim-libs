@@ -1,135 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-		   targetNamespace="http://www.matsim.org/files/dtd"
-		   xmlns="http://www.matsim.org/files/dtd"
-		   elementFormDefault="qualified"
-		   xml:lang="en">
+           targetNamespace="http://www.matsim.org/files/dtd"
+           xmlns="http://www.matsim.org/files/dtd"
+           elementFormDefault="qualified"
+           xml:lang="en">
 
-	<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+    <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
-	<xs:element name="lspsDefinitions">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="LSPs">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="lsp" maxOccurs="unbounded">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="resources" type="ResourceType" minOccurs="0" />
-										<xs:element name="shipments" type="ShipmentType" minOccurs="0" />
-										<xs:element name="LspPlans" type="LSPPlanType" minOccurs="0" />
-									</xs:sequence>
-									<xs:attribute name="id" type="xs:string"/>
-								</xs:complexType>
-							</xs:element>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:complexType name="ResourceType">
-		<xs:choice maxOccurs="unbounded" minOccurs="0">
-			<xs:element name="carrier" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:attribute name="id" type="xs:string" use="required"/>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="hub">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="scheduler">
-							<xs:complexType>
-								<xs:attribute name="capacityNeedFixed" type="xs:string"/>
-								<xs:attribute name="capacityNeedLinear" type="xs:string"/>
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-					<xs:attribute name="id" type="xs:string" use="required"/>
-					<xs:attribute name="location" type="xs:string" use="required"/>
-					<xs:attribute name="fixedCost" type="xs:string"  use="required"/>
-				</xs:complexType>
-			</xs:element>
-		</xs:choice>
-	</xs:complexType>
+    <xs:element name="lsps">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="lsp" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="resources" type="ResourceType" minOccurs="0" />
+                            <xs:element name="shipments" type="ShipmentType" minOccurs="0" />
+                            <xs:element name="LspPlans" type="LSPPlanType" minOccurs="0" />
+                        </xs:sequence>
+                        <xs:attribute name="id" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
 
-	<xs:complexType name="ShipmentType">
-		<xs:sequence>
-			<xs:element name="shipment" maxOccurs="unbounded" >
-				<xs:complexType>
-					<xs:attribute name="id" type="xs:string" use="required"/>
-					<xs:attribute name="from" type="xs:string" use="required"/>
-					<xs:attribute name="to" type="xs:string" use="required"/>
-					<xs:attribute name="size" type="xs:string" use="required"/>
-					<xs:attribute name="startPickup" />
-					<xs:attribute name="endPickup"/>
-					<xs:attribute name="pickupServiceTime" />
-					<xs:attribute name="startDelivery" />
-					<xs:attribute name="endDelivery" />
-					<xs:attribute name="deliveryServiceTime" />
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="ResourceType">
+        <xs:choice maxOccurs="unbounded" minOccurs="0">
+            <xs:element name="carrier" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:attribute name="id" type="xs:string" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="hub">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="scheduler">
+                            <xs:complexType>
+                                <xs:attribute name="capacityNeedFixed" type="xs:string"/>
+                                <xs:attribute name="capacityNeedLinear" type="xs:string"/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="id" type="xs:string" use="required"/>
+                    <xs:attribute name="location" type="xs:string" use="required"/>
+                    <xs:attribute name="fixedCost" type="xs:string"  use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
 
 
-	<xs:complexType name="LSPPlanType">
-		<xs:sequence>
-			<xs:element name="LspPlan" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="logisticChains" minOccurs="0">
-							<xs:complexType>
-								<xs:sequence>
-									<xs:element name="logisticChain" minOccurs="0" maxOccurs="unbounded">
-										<xs:complexType>
-											<xs:sequence>
-												<xs:element name="logisticChainElement" minOccurs="0" maxOccurs="unbounded">
-													<xs:complexType>
-														<xs:attribute name="id" type="xs:string" />
-														<xs:attribute name="resourceId" type="xs:string" />
-													</xs:complexType>
-												</xs:element>
-											</xs:sequence>
-											<xs:attribute name="id"/>
-										</xs:complexType>
-									</xs:element>
-								</xs:sequence>
-							</xs:complexType>
-						</xs:element>
+    <xs:complexType name="ShipmentType">
+        <xs:sequence>
+            <xs:element name="shipment" maxOccurs="unbounded" >
+                <xs:complexType>
+                    <xs:attribute name="id" type="xs:string" use="required"/>
+                    <xs:attribute name="from" type="xs:string" use="required"/>
+                    <xs:attribute name="to" type="xs:string" use="required"/>
+                    <xs:attribute name="size" type="xs:string" use="required"/>
+                    <xs:attribute name="startPickup" />
+                    <xs:attribute name="endPickup"/>
+                    <xs:attribute name="pickupServiceTime" />
+                    <xs:attribute name="startDelivery" />
+                    <xs:attribute name="endDelivery" />
+                    <xs:attribute name="deliveryServiceTime" />
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
 
-						<xs:element name="shipmentPlans" minOccurs="0">
-							<xs:complexType>
-								<xs:sequence>
-									<xs:element name="shipmentPlan" minOccurs="0" maxOccurs="unbounded">
-										<xs:complexType>
-											<xs:sequence>
-												<xs:element name="element" minOccurs="0" maxOccurs="unbounded">
-													<xs:complexType>
-														<xs:attribute name="id" type="xs:string" />
-														<xs:attribute name="type" type="xs:string" />
-														<xs:attribute name="startTime" type="xs:string" />
-														<xs:attribute name="endTime"/>
-														<xs:attribute name="resourceId"/>
-													</xs:complexType>
-												</xs:element>
-											</xs:sequence>
-											<xs:attribute name="shipmentId" type="xs:string"/>
-											<xs:attribute name="chainId" type="xs:string"/>
-										</xs:complexType>
-									</xs:element>
-								</xs:sequence>
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-					<xs:attribute name="score" type="xs:double" />
-					<xs:attribute name="selected" type="xs:boolean" />
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
+
+    <xs:complexType name="LSPPlanType">
+        <xs:sequence>
+            <xs:element name="LspPlan" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="logisticChains" minOccurs="0">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="logisticChain" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="logisticChainElement" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:complexType>
+                                                        <xs:attribute name="id" type="xs:string" />
+                                                        <xs:attribute name="resourceId" type="xs:string" />
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute name="id"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+
+                        <xs:element name="shipmentPlans" minOccurs="0">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="shipmentPlan" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="element" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:complexType>
+                                                        <xs:attribute name="id" type="xs:string" />
+                                                        <xs:attribute name="type" type="xs:string" />
+                                                        <xs:attribute name="startTime" type="xs:string" />
+                                                        <xs:attribute name="endTime"/>
+                                                        <xs:attribute name="resourceId"/>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute name="shipmentId" type="xs:string"/>
+                                            <xs:attribute name="chainId" type="xs:string"/>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="score" type="xs:double" />
+                    <xs:attribute name="selected" type="xs:boolean" />
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>

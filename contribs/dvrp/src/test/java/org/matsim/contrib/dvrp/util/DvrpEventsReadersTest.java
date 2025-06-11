@@ -21,14 +21,13 @@
 package org.matsim.contrib.dvrp.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -51,6 +50,7 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
@@ -71,16 +71,16 @@ public class DvrpEventsReadersTest {
 	}
 
 	private final List<Event> dvrpEvents = List.of(
-			new PassengerRequestSubmittedEvent(0, mode, request, person, fromLink, toLink),
-			new PassengerRequestScheduledEvent(1, mode, request, person, vehicle, 100, 200),
-			new PassengerRequestRejectedEvent(2, mode, request, person, "cause_1"),
+			new PassengerRequestSubmittedEvent(0, mode, request, List.of(person), fromLink, toLink, null, "1"),
+			new PassengerRequestScheduledEvent(1, mode, request, List.of(person), vehicle, 100, 200),
+			new PassengerRequestRejectedEvent(2, mode, request, List.of(person), "cause_1"),
 			new PassengerPickedUpEvent(111, mode, request, person, vehicle),
 			new PassengerDroppedOffEvent(222, mode, request, person, vehicle),
 			new TaskStartedEvent(300, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, fromLink),
 			new TaskEndedEvent(333, mode, vehicle, driver, TestTaskType.DRIVE_TASK, 0, toLink));
 
 	@Test
-	public void testReader() {
+	void testReader() {
 		var outputStream = new ByteArrayOutputStream();
 		EventWriterXML writer = new EventWriterXML(outputStream);
 		dvrpEvents.forEach(writer::handleEvent);

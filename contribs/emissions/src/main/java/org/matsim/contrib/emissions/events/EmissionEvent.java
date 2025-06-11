@@ -23,9 +23,9 @@ package org.matsim.contrib.emissions.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -68,4 +68,20 @@ public abstract class EmissionEvent extends Event {
         }
         return attributes;
     }
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		// Writes common attributes
+		writeXMLStart(out);
+
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_LINK_ID, this.linkId.toString());
+		XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+
+		for (Map.Entry<Pollutant, Double> entry : emissions.entrySet()) {
+			out.append(entry.getKey().name()).append("=\"");
+			out.append((double) entry.getValue()).append("\" ");
+		}
+
+		writeXMLEnd(out);
+	}
 }

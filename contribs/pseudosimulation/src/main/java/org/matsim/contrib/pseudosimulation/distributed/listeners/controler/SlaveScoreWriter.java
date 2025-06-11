@@ -9,10 +9,10 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 public class SlaveScoreWriter implements IterationEndsListener,
 		ShutdownListener, StartupListener {
@@ -32,7 +32,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		double[][] history = controler.getSlaveScoreHistory();
-		int idx = event.getIteration() - controler.getConfig().controler().getFirstIteration();
+		int idx = event.getIteration() - controler.getConfig().controller().getFirstIteration();
 		try {
 			out.write(event.getIteration() + "\t"
 					+ history[INDEX_EXECUTED][idx] + "\t"
@@ -52,7 +52,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 				"iteration", "score");
 		double[] iterations = new double[idx];
 		for (int i = 0; i < idx; i++) {
-			iterations[i] = i + controler.getConfig().controler().getFirstIteration()+1;
+			iterations[i] = i + controler.getConfig().controller().getFirstIteration()+1;
 		}
 		double[] values = new double[idx];
 		double[] fullhist = new double[idx];

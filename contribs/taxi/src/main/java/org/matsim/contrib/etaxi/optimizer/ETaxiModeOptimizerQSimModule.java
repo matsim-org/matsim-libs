@@ -29,13 +29,15 @@ import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
+import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureUtils;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -86,13 +88,13 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
 						var scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
 						return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
-								travelDisutility, eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure).get();
+								travelDisutility, eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure, getConfig()).get();
 					}
 				});
 
 		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
-				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
-						getter.getModal(Network.class), getMode()))).asEagerSingleton();
+				getter -> ChargingInfrastructureUtils.createModalNetworkChargers(getter.get(ChargingInfrastructure.class ),
+						getter.getModal(Network.class), getMode() ))).asEagerSingleton();
 
 		addModalComponent(ETaxiScheduler.class,
 				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {
@@ -113,14 +115,15 @@ public class ETaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						var speedyALTFactory = new SpeedyALTFactory();
 						Supplier<LeastCostPathCalculator> routerCreator = () -> speedyALTFactory.createPathCalculator(
 								network, travelDisutility, travelTime);
+						ChargingStrategy.Factory chargingStrategyFactory = getModalInstance(ChargingStrategy.Factory.class);
 						return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator,
-								events, timer);
+								events, timer, chargingStrategyFactory);
 					}
 				});
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new ETaxiStayTaskEndTimeCalculator(taxiCfg)))).asEagerSingleton();
+						new ETaxiStayTaskEndTimeCalculator(taxiCfg), DriveTaskUpdater.NOOP))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<>(taxiCfg.getMode(), DvrpModes::mode) {

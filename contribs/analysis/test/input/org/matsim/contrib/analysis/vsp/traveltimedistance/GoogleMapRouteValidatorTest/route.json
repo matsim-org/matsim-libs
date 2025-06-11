@@ -1,0 +1,30 @@
+{
+  "destination_addresses": [
+    "Kaiserin-Augusta-Allee 104, 10553 Berlin, Germany"
+  ],
+  "origin_addresses": [
+    "B2 135, 10623 Berlin, Germany"
+  ],
+  "rows": [
+    {
+      "elements": [
+        {
+          "distance": {
+            "text": "2.5 km",
+            "value": 2464
+          },
+          "duration": {
+            "text": "7 mins",
+            "value": 400
+          },
+          "duration_in_traffic": {
+            "text": "7 mins",
+            "value": 413
+          },
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+}

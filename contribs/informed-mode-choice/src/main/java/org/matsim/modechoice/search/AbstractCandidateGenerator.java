@@ -19,12 +19,6 @@ import static org.matsim.modechoice.PlanModelService.ConstraintHolder;
 abstract class AbstractCandidateGenerator implements CandidateGenerator {
 
 	@Inject
-	protected Map<String, TripEstimator<?>> tripEstimator;
-
-	@Inject
-	protected Map<String, FixedCostsEstimator<?>> fixedCosts;
-
-	@Inject
 	protected ScoringParametersForPerson params;
 
 	@Inject
@@ -37,6 +31,9 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 	protected PlanModelService service;
 
 	@Inject
+	protected EstimateCalculator calculator;
+
+	@Inject
 	protected Provider<CandidatePruner> pruner;
 
 	protected final InformedModeChoiceConfigGroup config;
@@ -45,20 +42,6 @@ abstract class AbstractCandidateGenerator implements CandidateGenerator {
 	protected AbstractCandidateGenerator(InformedModeChoiceConfigGroup config) {
 		this.config = config;
 		this.allModes = new HashSet<>(config.getModes());
-	}
-
-	@SuppressWarnings("unchecked")
-	protected final List<ConstraintHolder<?>> buildConstraints(EstimatorContext context, PlanModel planModel) {
-
-		List<ConstraintHolder<?>> constraints = new ArrayList<>();
-		for (TripConstraint<?> c : this.constraints) {
-			constraints.add(new ConstraintHolder<>(
-					(TripConstraint<Object>) c,
-					c.getContext(context, planModel)
-			));
-		}
-
-		return constraints;
 	}
 
 }

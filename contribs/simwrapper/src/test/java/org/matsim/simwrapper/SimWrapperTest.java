@@ -1,8 +1,8 @@
 package org.matsim.simwrapper;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.matsim.simwrapper.viz.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -14,11 +14,11 @@ import java.util.List;
 
 public class SimWrapperTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void vizElementsTest() throws IOException {
+	void vizElementsTest() throws IOException {
 
 		SimWrapper simWrapper = SimWrapper.create();
 
@@ -27,6 +27,7 @@ public class SimWrapperTest {
 			header.title = "Simwrapper Test Dashboard";
 			header.description = "Test All Simwrapper Plug-Ins Dashboard";
 			header.tab = "Header Tab";
+			header.triggerPattern = "*example.csv";
 
 			layout.row("first")
 					.el(Area.class, (viz, data) -> {
@@ -111,14 +112,63 @@ public class SimWrapperTest {
 						viz.projection = "EPSG:31468";
 						viz.addAggregation("O/D Summary", "Origins", "fromX", "fromY", "Destinations", "toX", "toY");
 					}));
+
+			layout.row("thirteenth")
+				.el(FlowMap.class, ((viz, data) -> {
+					viz.metrics = new FlowMap.Metrics();
+					viz.title = "Flow Map";
+					viz.description = "this viz is a flow map";
+					viz.zoom = 9.5;
+					viz.metrics.setLabel("headway per Stop");
+					viz.metrics.setDataset("analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv");
+					viz.metrics.setOrigin("stopAreaOrStop");
+					viz.metrics.setDestination("stopAreaOrStopNext");
+					viz.metrics.setFlow("meanHeadway");
+					viz.metrics.setColorScheme("BurgYl");
+					viz.metrics.setValueTransform(FlowMap.Metrics.ValueTransform.NORMAL);
+				}));
 		});
 
 		String outputDirectory = utils.getOutputDirectory();
 
 		simWrapper.generate(Path.of(outputDirectory));
 
-		Assertions.assertThat(new File(outputDirectory, "dashboard-0.yaml"))
+		Assertions.assertThat(new File(outputDirectory, "dashboard-1.yaml"))
 				.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-0.yaml"));
+
+	}
+
+	@Test
+	public void subTabs() throws IOException {
+
+		SimWrapper simWrapper = SimWrapper.create();
+
+		simWrapper.addDashboard((header, layout) -> {
+
+			header.title = "Simwrapper Test Dashboard";
+			header.fullScreen = true;
+
+			layout.row("first", "Tab #1").el(TextBlock.class, (viz, data) -> {
+				viz.title = "TextBlock";
+				viz.file = "example.csv";
+			});
+
+			layout.row("second").el(TextBlock.class, (viz, data) -> {
+				viz.title = "TextBlock";
+				viz.file = "example.csv";
+			});
+
+			layout.tab("Tab #2", "Zweiter Tab")
+				.add("second");
+
+		});
+
+		String outputDirectory = utils.getOutputDirectory();
+
+		simWrapper.generate(Path.of(outputDirectory));
+
+		Assertions.assertThat(new File(outputDirectory, "dashboard-1.yaml"))
+			.hasSameTextualContentAs(new File(utils.getPackageInputDirectory(), "dashboard-1.yaml"));
 
 	}
 }

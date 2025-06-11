@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="trainType1">
+		<attributes>
+			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+			<attribute name="doorOperationMode" class="org.matsim.vehicles.VehicleType$DoorOperationMode">serial</attribute>
+			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">5.0</attribute>
+		</attributes>
+		<capacity seats="40" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="100.0"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="50"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="train1" type="trainType1"/>
+	<vehicle id="train2" type="trainType1"/>
+	<vehicle id="train3" type="trainType1"/>
+	<vehicle id="train4" type="trainType1"/>
+	<vehicle id="train5" type="trainType1"/>
+	<vehicle id="train6" type="trainType1"/>
+	<vehicle id="train7" type="trainType1"/>
+	<vehicle id="train8" type="trainType1"/>
+	<vehicle id="train9" type="trainType1"/>
+	<vehicle id="train10" type="trainType1"/>
+
+</vehicleDefinitions>

@@ -20,6 +20,7 @@ package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.XmlUtils;
 
 import java.util.Map;
 
@@ -74,5 +75,15 @@ public class PersonScoreEvent extends Event implements HasPersonId {
 			attr.put(ATTRIBUTE_KIND, this.kind);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		writeXMLStart(out);
+		out.append("amount=\"").append(this.amount).append("\" ");
+		if (this.kind != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_KIND, this.kind);
+		}
+		writeXMLEnd(out);
 	}
 }

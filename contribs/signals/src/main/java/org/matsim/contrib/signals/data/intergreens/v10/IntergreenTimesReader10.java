@@ -29,24 +29,26 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 /**
  * @author dgrether
  */
 public final class IntergreenTimesReader10 extends AbstractSignalsReader{
-	
+
 	private IntergreenTimesData intergreensData;
 
 	public IntergreenTimesReader10(IntergreenTimesData intergreenTimesData) {
 		this.intergreensData = intergreenTimesData;
 	}
-	
+
 		public void read(InputSource stream) throws UncheckedIOException {
 		try {
 			Unmarshaller u = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class).createUnmarshaller();
@@ -66,7 +68,7 @@ public final class IntergreenTimesReader10 extends AbstractSignalsReader{
 				}
 			}
 		} catch (JAXBException | SAXException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 }

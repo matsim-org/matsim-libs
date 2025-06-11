@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -53,8 +54,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class QLinkLanesTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
   private static void initNetwork(Network network) {
@@ -134,8 +135,10 @@ public class QLinkLanesTest {
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 	}
 
-	@Test public void testCapacityWoLanes() {
+	@Test
+	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 
@@ -151,8 +154,10 @@ public class QLinkLanesTest {
 		assertEquals(268.0, ql.getSpaceCap(), 0);
 	}
 
-	@Test public void testCapacityWithOneLaneOneLane() {
+	@Test
+	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 1);
@@ -186,8 +191,10 @@ public class QLinkLanesTest {
 		assertEquals(14.0, qlane.getStorageCapacity(), 0);
 	}
 
-	@Test public void testCapacityWithOneLaneTwoLanes() {
+	@Test
+	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 2);
@@ -222,9 +229,10 @@ public class QLinkLanesTest {
 	}
 
 
-
-	@Test public void testCapacityWithLanes() {
+	@Test
+	void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
+		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createThreeLanes(scenario);

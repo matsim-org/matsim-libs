@@ -97,7 +97,7 @@ public abstract class EmissionUtils {
 				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
-			} else { // person in map, but some emissions are not set; setting these to 0.0 
+			} else { // person in map, but some emissions are not set; setting these to 0.0
 				emissionType2Value = totalEmissions.get(personId);
 				for (Pollutant pollutant : emissionType2Value.keySet()) {
 					// else do nothing
@@ -180,9 +180,9 @@ public abstract class EmissionUtils {
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 
-		Gbl.assertNotNull(vehicleType);
-		Gbl.assertNotNull(vehicleType.getEngineInformation());
-		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()));
+		Objects.requireNonNull(vehicleType);
+		Objects.requireNonNull(vehicleType.getEngineInformation(), () -> "VehicleType " + vehicleType.getId() + " does not have an engine information set.");
+		Objects.requireNonNull(VehicleUtils.getHbefaVehicleCategory(vehicleType.getEngineInformation()), () -> "VehicleType " + vehicleType.getId() + " does not have a HBEFA vehicle category set.");
 
 		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
@@ -225,7 +225,7 @@ public abstract class EmissionUtils {
 
 		EngineInformation engineInformation;
 		// get information from where it used to be in previous versions and move to where it should be now:
-		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource=" + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
+		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource={}", emissionsConfigGroup.getHbefaVehicleDescriptionSource());
 		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)
@@ -320,7 +320,7 @@ public abstract class EmissionUtils {
 			try{
 				hbefaVehicleCategory = HbefaVehicleCategory.valueOf(string);
 			} catch (IllegalArgumentException e) {
-				logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
+				logger.warn("Could not map String {} to any HbefaVehicleCategory; please check syntax in hbefa input file.", string);
 				throw new RuntimeException();
 			}
 		}
@@ -329,22 +329,15 @@ public abstract class EmissionUtils {
 
 	public static String mapHbefaVehicleCategory2String(HbefaVehicleCategory category) {
 
-		switch (category) {
-			case COACH:
-				return "coach";
-			case HEAVY_GOODS_VEHICLE:
-					return "HGV";
-			case LIGHT_COMMERCIAL_VEHICLE:
-				return "LCV";
-			case MOTORCYCLE:
-				return "motorcycle";
-			case PASSENGER_CAR:
-				return "pass. car";
-			case URBAN_BUS:
-				return "urban bus";
-			default:
-				throw new RuntimeException("Could not transform category to string: " + category);
-		}
+		return switch (category) {
+			case COACH -> "coach";
+			case HEAVY_GOODS_VEHICLE -> "HGV";
+			case LIGHT_COMMERCIAL_VEHICLE -> "LCV";
+			case MOTORCYCLE -> "motorcycle";
+			case PASSENGER_CAR -> "pass. car";
+			case URBAN_BUS -> "urban bus";
+			default -> throw new RuntimeException("Could not transform category to string: " + category);
+		};
 	}
 
         static Pollutant getPollutant( String pollutantString ){
@@ -353,37 +346,20 @@ public abstract class EmissionUtils {
 		//    setCo2TotalKeys( Set<String> keys )
 		// as we have it, e.g., with network modes.  kai, feb'20
 
-		Pollutant pollutant;
-		switch( pollutantString ){
-			case "CO2(total)":
-				pollutant = Pollutant.CO2_TOTAL;
-				break;
-			case "CO2(rep)":
-				pollutant = Pollutant.CO2_rep;
-				break;
-			case "PM2.5 (non-exhaust)":
-				pollutant = Pollutant.PM2_5_non_exhaust;
-				break;
-			case "PM2.5":
-				pollutant = Pollutant.PM2_5;
-				break;
-			case "PM (non-exhaust)":
-				pollutant = Pollutant.PM_non_exhaust;
-				break;
-			case "BC (exhaust)":
-				pollutant = Pollutant.BC_exhaust;
-				break;
-			case "BC (non-exhaust)":
-				pollutant = Pollutant.BC_non_exhaust;
-				break;
-			default:
-				pollutant = Pollutant.valueOf( pollutantString );
-				// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
-				// (1) it is a new pollutant.  In that case, just add to the enum.
-				// (2) It is a different spelling of an already existing pollutant.  In that case, see above.
-				// kai, jan'20
-		}
-		return pollutant;
+		return switch (pollutantString) {
+			case "CO2(total)" -> Pollutant.CO2_TOTAL;
+			case "CO2(rep)" -> Pollutant.CO2_rep;
+			case "PM2.5 (non-exhaust)" -> Pollutant.PM2_5_non_exhaust;
+			case "PM2.5" -> Pollutant.PM2_5;
+			case "PM (non-exhaust)" -> Pollutant.PM_non_exhaust;
+			case "BC (exhaust)" -> Pollutant.BC_exhaust;
+			case "BC (non-exhaust)" -> Pollutant.BC_non_exhaust;
+			default -> Pollutant.valueOf(pollutantString);
+			// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
+			// (1) it is a new pollutant.  In that case, just add to the enum.
+			// (2) It is a different spelling of an already existing pollutant.  In that case, see above.
+			// kai, jan'20
+		};
 	}
 
 	/**

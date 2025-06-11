@@ -18,6 +18,7 @@ public class LinkProperties {
 	public static final int LEVEL_UNCLASSIFIED = 6;
 	public static final int LEVEL_RESIDENTIAL = 7;
 	public static final int LEVEL_LIVING_STREET = 8;
+	public static final int LEVEL_PATH = 9;
 
 	/**
 	 * Assume for links with max speed lower than 51km/h to be in urban areas.

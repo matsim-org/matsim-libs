@@ -20,8 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,7 +43,7 @@ import java.util.Map;
 public class ChangeLegModeTest {
 
 	@Test
-	public void testDefaultModes() {
+	void testDefaultModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 
@@ -53,10 +53,10 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void testWithConfig() {
+	void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
@@ -64,11 +64,11 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void test_behavior_allowSwitchFromListedModesOnly() {
+	void test_behavior_allowSwitchFromListedModesOnly() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromSpecifiedModesToSpecifiedModes");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.changeMode().addParam(ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromSpecifiedModesToSpecifiedModes");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car};
@@ -76,11 +76,11 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void test_behavior_fromAllModesToSpecifiedModes() {
+	void test_behavior_fromAllModesToSpecifiedModes() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromAllModesToSpecifiedModes");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "pt,bike,walk"); // do not include car
+		config.changeMode().addParam(ChangeModeConfigGroup.MODE_SWITCH_BEHAVIOR, "fromAllModesToSpecifiedModes");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.pt, TransportMode.bike, TransportMode.walk};
@@ -88,18 +88,18 @@ public class ChangeLegModeTest {
 	}
 
 	@Test
-	public void testWithConstructor() {
+	void testWithConstructor() {
 		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true, false);
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
 
 	@Test
-	public void testWithConfig_withoutIgnoreCarAvailability() {
+	void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
-		config.setParam(ChangeModeConfigGroup.CONFIG_MODULE, ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
+		config.changeMode().addParam(ChangeModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
 
 		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
@@ -122,7 +122,7 @@ public class ChangeLegModeTest {
 			Integer count = counter.get(leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
-		Assert.assertEquals(0, counter.get("car").intValue());
+		Assertions.assertEquals(0, counter.get("car").intValue());
 	}
 
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
@@ -141,13 +141,13 @@ public class ChangeLegModeTest {
 		for (int i = 0; i < 50; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
-			Assert.assertNotNull("unexpected mode: " + leg.getMode(), count);
+			Assertions.assertNotNull(count, "unexpected mode: " + leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
 		for (Map.Entry<String, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
-			Assert.assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
+			Assertions.assertTrue(count > 0, "mode " + entry.getKey() + " was never chosen.");
 		}
 	}
 }

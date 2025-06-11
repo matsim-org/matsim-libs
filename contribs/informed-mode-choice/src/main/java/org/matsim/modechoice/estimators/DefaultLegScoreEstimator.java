@@ -8,7 +8,7 @@ import org.matsim.modechoice.ModeAvailability;
 /**
  * Default estimator using MATSim scoring config.
  */
-public class DefaultLegScoreEstimator implements LegEstimator<ModeAvailability> {
+public class DefaultLegScoreEstimator implements LegEstimator {
 
 
 	@Override

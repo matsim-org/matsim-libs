@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.api.experimental.events;
 
 import java.util.Map;
@@ -35,16 +32,16 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public final class BoardingDeniedEvent extends Event implements HasPersonId 
+public final class BoardingDeniedEvent extends Event implements HasPersonId
 {
 	public static final String EVENT_TYPE="BoardingDeniedEvent";
-	
+
 	public static final String ATTRIBUTE_PERSON_ID = "person";
 	public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
 	private Id<Person> personId;
 	private Id<Vehicle> vehicleId;
-	
+
 	public BoardingDeniedEvent(final double time, Id<Person> personId, Id<Vehicle> vehicleId) {
 		super(time);
 		this.personId = personId;
@@ -54,11 +51,11 @@ public final class BoardingDeniedEvent extends Event implements HasPersonId
 	public Id<Person> getPersonId() {
 		return personId;
 	}
-	
+
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
-	
+
 	@Override
 	public Map<String,String> getAttributes() {
 		Map<String,String> atts = super.getAttributes();
@@ -66,7 +63,7 @@ public final class BoardingDeniedEvent extends Event implements HasPersonId
 		atts.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
 		return atts;
 	}
-	
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;

@@ -20,8 +20,8 @@
 package org.matsim.contrib.parking.parkingcost.eventhandling;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,7 +52,7 @@ import org.matsim.vehicles.Vehicle;
 public class ParkingCostVehicleTrackerTest {
 
 	@Test
-	public void testParkingCostEvents() {
+	void testParkingCostEvents() {
 		Fixture f = new Fixture();
 
 		f.events.addHandler(new EventsLogger());
@@ -78,53 +78,53 @@ public class ParkingCostVehicleTrackerTest {
 		f.events.processEvent(new VehicleEntersTrafficEvent(7.00 * 3600, personId, linkHome, vehicleId, "car", 1.0));
 		f.events.processEvent(new VehicleLeavesTrafficEvent(7.25 * 3600, personId, linkWork, vehicleId, "car", 1.0));
 		f.events.processEvent(new ActivityStartEvent(7.25 * 3600, personId, linkWork, null, "work", null));
-		Assert.assertEquals(3, collector.getEvents().size());
+		Assertions.assertEquals(3, collector.getEvents().size());
 
 		f.events.processEvent(new VehicleEntersTrafficEvent(12.00 * 3600, personId, linkWork, vehicleId, "car", 1.0));
-		Assert.assertEquals(5, collector.getEvents().size());
+		Assertions.assertEquals(5, collector.getEvents().size());
 
-		Assert.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(3).getClass());
+		Assertions.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(3).getClass());
 		PersonMoneyEvent parkingEvent1 = (PersonMoneyEvent) collector.getEvents().get(3);
-		Assert.assertEquals(personId, parkingEvent1.getPersonId());
-		Assert.assertEquals(12.00 * 3600, parkingEvent1.getTime(), 1e-8);
-		Assert.assertEquals((12 - 7.25) * hourlyParkingCostWork, -parkingEvent1.getAmount(), 1e-8);
+		Assertions.assertEquals(personId, parkingEvent1.getPersonId());
+		Assertions.assertEquals(12.00 * 3600, parkingEvent1.getTime(), 1e-8);
+		Assertions.assertEquals((12 - 7.25) * hourlyParkingCostWork, -parkingEvent1.getAmount(), 1e-8);
 
 		f.events.processEvent(new VehicleLeavesTrafficEvent(12.25 * 3600, personId, linkShop, vehicleId, "car", 1.0));
 		f.events.processEvent(new ActivityStartEvent(12.25 * 3600, personId, linkShop, null, "shop", null));
-		Assert.assertEquals(7, collector.getEvents().size());
+		Assertions.assertEquals(7, collector.getEvents().size());
 
 		f.events.processEvent(new VehicleEntersTrafficEvent(13.00 * 3600, personId, linkShop, vehicleId, "car", 1.0));
-		Assert.assertEquals(9, collector.getEvents().size());
+		Assertions.assertEquals(9, collector.getEvents().size());
 
-		Assert.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(7).getClass());
+		Assertions.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(7).getClass());
 		PersonMoneyEvent parkingEvent2 = (PersonMoneyEvent) collector.getEvents().get(7);
-		Assert.assertEquals(personId, parkingEvent2.getPersonId());
-		Assert.assertEquals(13.00 * 3600, parkingEvent2.getTime(), 1e-8);
-		Assert.assertEquals((13 - 12.25) * hourlyParkingCostShop, -parkingEvent2.getAmount(), 1e-8);
+		Assertions.assertEquals(personId, parkingEvent2.getPersonId());
+		Assertions.assertEquals(13.00 * 3600, parkingEvent2.getTime(), 1e-8);
+		Assertions.assertEquals((13 - 12.25) * hourlyParkingCostShop, -parkingEvent2.getAmount(), 1e-8);
 
 		f.events.processEvent(new VehicleLeavesTrafficEvent(13.25 * 3600, personId, linkHome, vehicleId, "car", 1.0));
 		f.events.processEvent(new ActivityStartEvent(13.25 * 3600, personId, linkHome, null, "home", null));
-		Assert.assertEquals(11, collector.getEvents().size());
+		Assertions.assertEquals(11, collector.getEvents().size());
 
 		f.events.processEvent(new VehicleEntersTrafficEvent(15.00 * 3600, personId, linkShop, vehicleId, "car", 1.0));
-		Assert.assertEquals(12, collector.getEvents().size()); // there should be no parking cost event at home
+		Assertions.assertEquals(12, collector.getEvents().size()); // there should be no parking cost event at home
 
 		f.events.processEvent(new VehicleLeavesTrafficEvent(15.25 * 3600, personId, linkWork, vehicleId, "car", 1.0));
 		f.events.processEvent(new ActivityStartEvent(13.25 * 3600, personId, linkWork, null, "shop", null));
-		Assert.assertEquals(14, collector.getEvents().size());
+		Assertions.assertEquals(14, collector.getEvents().size());
 
 		f.events.processEvent(new VehicleEntersTrafficEvent(18.00 * 3600, personId, linkWork, vehicleId, "car", 1.0));
-		Assert.assertEquals(16, collector.getEvents().size());
+		Assertions.assertEquals(16, collector.getEvents().size());
 
-		Assert.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(14).getClass());
+		Assertions.assertEquals(PersonMoneyEvent.class, collector.getEvents().get(14).getClass());
 		PersonMoneyEvent parkingEvent3 = (PersonMoneyEvent) collector.getEvents().get(14);
-		Assert.assertEquals(personId, parkingEvent3.getPersonId());
-		Assert.assertEquals(18.00 * 3600, parkingEvent3.getTime(), 1e-8);
-		Assert.assertEquals((18 - 15.25) * hourlyParkingCostWork, -parkingEvent3.getAmount(), 1e-8);
+		Assertions.assertEquals(personId, parkingEvent3.getPersonId());
+		Assertions.assertEquals(18.00 * 3600, parkingEvent3.getTime(), 1e-8);
+		Assertions.assertEquals((18 - 15.25) * hourlyParkingCostWork, -parkingEvent3.getAmount(), 1e-8);
 
 		f.events.processEvent(new VehicleLeavesTrafficEvent(18.50 * 3600, personId, linkHome, vehicleId, "car", 1.0));
 		f.events.processEvent(new ActivityStartEvent(18.00 * 3600, personId, linkHome, null, "shop", null));
-		Assert.assertEquals(18, collector.getEvents().size());
+		Assertions.assertEquals(18, collector.getEvents().size());
 	}
 
 	/**

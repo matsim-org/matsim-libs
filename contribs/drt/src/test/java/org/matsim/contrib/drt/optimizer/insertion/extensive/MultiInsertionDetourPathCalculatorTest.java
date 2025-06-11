@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -31,16 +30,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 import org.mockito.ArgumentMatchers;
@@ -57,6 +58,8 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final Link dropoffLink = link("dropoff");
 	private final Link afterDropoffLink = link("after_dropoff");
 
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
+
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
@@ -70,13 +73,13 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final MultiInsertionDetourPathCalculator detourPathCalculator = new MultiInsertionDetourPathCalculator(
 			pathSearch, pathSearch, pathSearch, pathSearch, 1);
 
-	@After
+	@AfterEach
 	public void after() {
 		detourPathCalculator.notifyMobsimBeforeCleanup(null);
 	}
 
 	@Test
-	public void calculatePaths() {
+	void calculatePaths() {
 		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
 		var pathFromPickup = mockCalcPathData(pickupLink, afterPickupLink, request.getEarliestStartTime(), true, 22);
 		var pathToDropoff = mockCalcPathData(dropoffLink, beforeDropoffLink, request.getLatestArrivalTime(), false, 33);
@@ -84,7 +87,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -96,7 +99,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
+	void calculatePaths_dropoffAfterPickup_dropoffAtEnd() {
 		//compute only 2 paths (instead of 4)
 		var pathToPickup = mockCalcPathData(pickupLink, beforePickupLink, request.getEarliestStartTime(), false, 11);
 		var pathFromPickup = mockCalcPathData(pickupLink, dropoffLink, request.getEarliestStartTime(), true, 22);
@@ -105,7 +108,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Waypoint.Dropoff.class));
 		var dropoff = insertionPoint(waypoint(pickupLink, Waypoint.Pickup.class),
 				waypoint(dropoffLink, Waypoint.End.class));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -117,7 +120,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 	}
 
 	@Test
-	public void calculatePaths_noDetours() {
+	void calculatePaths_noDetours() {
 		// OneToManyPathSearch.calcPathDataMap() returns a map that contains entries for all toLinks
 		// (unless the stop criterion terminates computations earlier)
 		// If fromLink is in toLinks than PathData.EMPTY is mapped for such a link
@@ -128,7 +131,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);

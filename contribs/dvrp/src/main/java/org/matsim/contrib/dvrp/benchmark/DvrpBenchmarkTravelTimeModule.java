@@ -43,11 +43,12 @@ public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		if (dvrpCfg.initialTravelTimesFile != null) {
+		if (dvrpCfg.getInitialTravelTimesFile() != null) {
 			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toProvider(() -> {
-				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.initialTravelTimesFile);
+				URL url = ConfigGroup.getInputFileURL(getConfig().getContext(), dvrpCfg.getInitialTravelTimesFile());
 				var timeDiscretizer = new TimeDiscretizer(getConfig().travelTimeCalculator());
-				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url);
+				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url,
+						getConfig().global().getDefaultDelimiter());
 				return DvrpOfflineTravelTimes.asTravelTime(timeDiscretizer, linkTravelTimes);
 			}).asEagerSingleton();
 		} else {

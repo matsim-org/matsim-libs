@@ -23,7 +23,12 @@ public final class Hexagons extends Viz {
 	@JsonProperty(required = true)
 	public String projection;
 
-	public double[] center = new double[2];
+	public double[] center;
+
+	public Double zoom;
+
+	public Double radius;
+	public Double maxHeight;
 
 	/**
 	 * List of all shown aggregations
@@ -34,12 +39,21 @@ public final class Hexagons extends Viz {
 		super("hexagons");
 	}
 
+	// TODO DOCs
 	public Hexagons addAggregation(String aggregationTitle, String fromTitle, String fromX, String fromY, String toTitle, String toX, String toY) {
 
 		this.aggregations.put(aggregationTitle, List.of(new Aggregations.FromToObject(fromTitle, fromX, fromY), new Aggregations.FromToObject(toTitle, toX, toY)));
 
 		return this;
 	}
+
+	// TODO docs
+	public Hexagons addAggregation(String aggregationTitle, String fromTitle, String fromX, String fromY) {
+		this.aggregations.put(aggregationTitle, List.of(new Aggregations.FromToObject(fromTitle, fromX, fromY)));
+
+		return this;
+	}
+
 
 	/**
 	 * Defines an aggregation element.

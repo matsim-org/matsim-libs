@@ -44,6 +44,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -61,39 +62,39 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  * This class provides helper methods for input/output in MATSim.
- * 
+ *
  * The whole I/O infrastructure is based on URLs, which allows more flexibility
  * than String-based paths or URLs. The structure follows three levels: Stream
  * level, writer/reader level, and convenience methods.
- * 
+ *
  * <h2>Stream level</h2>
- * 
+ *
  * The two main methods on the stream level are {@link #getInputStream(URL)} and
  * {@link #getOutputStream(URL, boolean)}. Their use is rather obvious, the
  * boolean argument of the output stream is whether it is an appending output
  * stream. Depending on the extension of the reference file of the URL,
  * compression will be detected automatically. See below for a list of active
  * compression algorithms.
- * 
+ *
  * <h2>Reader/Writer level</h2>
- * 
+ *
  * Use {@link #getBufferedWriter(URL, Charset, boolean)} and its simplified
  * versions to obtained a BufferedWriter object. Use
  * {@link #getBufferedReader(URL)} to obtain a BufferedReader. These functions
  * should be used preferredly, because they allow for future movements of files
  * to servers etc.
- * 
+ *
  * <h2>Convenience methods</h2>
- * 
+ *
  * Two convenience methods exist: {@link #getBufferedReader(String)} and
  * {@link #getBufferedReader(String)}, which take a String-based path as input.
  * They intentionally do not allow for much flexibility (e.g. choosing the
  * character set of the files). If this is needed, please use the reader/writer
  * level methods and construct the URL via the helper functions that are
  * documented below.
- * 
+ *
  * <h2>URL handling</h2>
- * 
+ *
  * To convert a file name to a URL, use {@link #getFileUrl(String)}. This is
  * mostly useful to determine the URL for an output file. If you are working
  * with input files, the best is to make use of
@@ -101,13 +102,13 @@ import java.util.zip.GZIPOutputStream;
  * certain file in the file system and then in the class path (i.e. in the Java
  * resources). This makes it easy to write versatile code that can work with
  * local files and resources at the same time.
- * 
+ *
  * <h2>Compression</h2>
- * 
+ *
  * Compressed files are automatically assumed if certain file types are
  * encountered. Currently, the following patterns match certain compression
  * algorithms:
- * 
+ *
  * <ul>
  * <li><code>*.gz</code>: GZIP compression</li>
  * <li><code>*.lz4</code>: LZ4 compression</li>
@@ -167,6 +168,16 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
+	private static int zstdCompressionLevel = 6;
+
+	public static void setZstdCompressionLevel(int level) {
+		if (level >= 1) {
+			zstdCompressionLevel = level;
+		} else {
+			logger.error("Invalid ZSTD compression level.");
+		}
+	}
+
 	// Define a number of charsets that are / have been used.
 	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
@@ -180,7 +191,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	/**
 	 * This function takes a path and tries to find the file in the file system or
 	 * in the resource path. The order of resolution is as follows:
-	 * 
+	 *
 	 * <ol>
 	 * <li>Find path in file system</li>
 	 * <li>Find path in file system with compression extension (e.g. *.gz)</li>
@@ -190,13 +201,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 *
 	 * In case the filename is a URL (i.e. starting with "file:" or "jar:file:"),
 	 * then no resolution is done but the provided filename returned as URL.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
 			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" )) {
+			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" ) || filename.startsWith( "http:" )) {
 				// looks like an URI
 				return new URL(filename);
 			}
@@ -264,7 +275,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * Opens an input stream for a given URL. If the URL has a compression
 	 * extension, the method will try to open the compressed file using the proper
 	 * decompression algorithm.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static InputStream getInputStream(URL url) throws UncheckedIOException {
@@ -293,8 +304,10 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
-		} catch (IOException | CompressorException | GeneralSecurityException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (CompressorException | GeneralSecurityException e) {
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 
@@ -302,7 +315,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * Creates a reader for an input URL. If the URL has a compression extension,
 	 * the method will try to open the compressed file using the proper
 	 * decompression algorithm. A given character set is used for the reader.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static BufferedReader getBufferedReader(URL url, Charset charset) throws UncheckedIOException {
@@ -313,7 +326,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	/**
 	 * See {@link #getBufferedReader(URL, Charset)}. UTF-8 is assumed as the
 	 * character set.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static BufferedReader getBufferedReader(URL url) throws UncheckedIOException {
@@ -325,21 +338,20 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * extension, the method will try to open the compressed file using the proper
 	 * decompression algorithm. Note that compressed files cannot be appended and
 	 * that it is only possible to write to the file system (i.e. file:// protocol).
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
-	@SuppressWarnings("resource")
 	public static OutputStream getOutputStream(URL url, boolean append) throws UncheckedIOException {
 		try {
 			if (!url.getProtocol().equals("file")) {
-				throw new UncheckedIOException("Can only write to file:// protocol URLs");
+				throw new UncheckedIOException(new IOException("Can only write to file:// protocol URLs"));
 			}
 
 			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
 			if ((compression != null && compression != CompressionType.ZSTD) && append && file.exists()) {
-				throw new UncheckedIOException("Cannot append to compressed files.");
+				throw new UncheckedIOException(new IOException("Cannot append to compressed files."));
 			}
 
 			OutputStream outputStream = new FileOutputStream(file, append);
@@ -356,14 +368,16 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
 						break;
 					case ZSTD:
-						outputStream = new ZstdOutputStream(outputStream, 6);
+						outputStream = new ZstdOutputStream(outputStream, zstdCompressionLevel);
 						break;
 				}
 			}
 
 			return new BufferedOutputStream(outputStream);
-		} catch (IOException | CompressorException | URISyntaxException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (CompressorException | URISyntaxException e) {
+			throw new UncheckedIOException(new IOException(e));
 		}
 	}
 
@@ -372,8 +386,6 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * the method will try to open the compressed file using the proper
 	 * decompression algorithm. Note that compressed files cannot be appended and
 	 * that it is only possible to write to the file system (i.e. file:// protocol).
-	 * 
-	 * @throws UncheckedIOException
 	 */
 	public static BufferedWriter getBufferedWriter(URL url, Charset charset, boolean append)
 			throws UncheckedIOException {
@@ -384,7 +396,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	/**
 	 * See {@link #getBufferedWriter(URL, Charset, boolean)}. UTF-8 is assumed as
 	 * the character set and non-appending mode is used.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static BufferedWriter getBufferedWriter(URL url) throws UncheckedIOException {
@@ -394,7 +406,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	/**
 	 * Wrapper function for {@link #getBufferedWriter(URL)} that creates a
 	 * PrintStream.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static PrintStream getPrintStream(URL url) throws UncheckedIOException {
@@ -406,7 +418,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 *
 	 * @param fromStream The stream containing the data to be copied
 	 * @param toStream   The stream the data should be written to
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static void copyStream(final InputStream fromStream, final OutputStream toStream)
@@ -428,7 +440,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * should not be any accidents like following symbolic links.
 	 *
 	 * @param path The directory to be deleted
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static void deleteDirectoryRecursively(Path path) throws UncheckedIOException {
@@ -453,10 +465,10 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 
 	/**
 	 * Compares two InputStreams.
-	 * 
+	 *
 	 * Source:
 	 * http://stackoverflow.com/questions/4245863/fast-way-to-compare-inputstreams
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static boolean isEqual(InputStream first, InputStream second) throws UncheckedIOException {
@@ -481,9 +493,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 
 	/**
 	 * Returns a URL for a (not necessarily existing) file path.
-	 * 
+	 *
 	 * @param filename File name.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static URL getFileUrl(String filename) throws UncheckedIOException {
@@ -496,10 +508,10 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 
 	/**
 	 * Given a base URL, returns the extended URL.
-	 * 
+	 *
 	 * @param context   Base URL, e.g. from the Config object.
 	 * @param extension Extended path specification.
-	 * 
+	 *
 	 * @throws UncheckedIOException
 	 */
 	public static URL extendUrl(URL context, String extension) throws UncheckedIOException {
@@ -517,7 +529,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 
 	/**
 	 * Convenience wrapper, see {@link #getBufferedReader(URL, Charset)}.
-	 * 
+	 *
 	 * Note, that in general you should rather use URLs and the respective
 	 * {@link #getBufferedReader(URL)} function. You can obtain URLs for your file
 	 * paths either using {@link #resolveFileOrResource(String)} for an existing

@@ -22,7 +22,10 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
+
+import java.util.List;
 
 public interface PassengerRequest extends Request {
 	/**
@@ -41,7 +44,9 @@ public interface PassengerRequest extends Request {
 
 	Link getToLink();
 
-	Id<Person> getPassengerId();
+	List<Id<Person>> getPassengerIds();
 
 	String getMode();
+
+	DvrpLoad getLoad();
 }

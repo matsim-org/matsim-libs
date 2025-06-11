@@ -8,11 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
+import org.geotools.api.data.SimpleFeatureSource;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -26,13 +27,12 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.TripConstraintFactory;
 import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.TripCandidate;
-import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * This constraint decides whether a mode is allowed for a certain trip by
  * checking whether the origin and/or destination location are within a feature
  * of a given shape file.
- * 
+ *
  * @author sebhoerl
  */
 public class ShapeFileConstraint implements TripConstraint {
@@ -43,7 +43,7 @@ public class ShapeFileConstraint implements TripConstraint {
 	private final Set<Geometry> shapes;
 
 	public enum Requirement {
-		ORIGIN, DESTINATION, BOTH, ANY, NONE;
+		ORIGIN, DESTINATION, BOTH, ANY, NONE
 	}
 
 	private final Requirement requirement;
@@ -77,18 +77,13 @@ public class ShapeFileConstraint implements TripConstraint {
 			boolean originValid = checkLinkId(trip.getOriginActivity().getLinkId());
 			boolean destinationValid = checkLinkId(trip.getDestinationActivity().getLinkId());
 
-			switch (requirement) {
-			case ANY:
-				return originValid || destinationValid;
-			case BOTH:
-				return originValid && destinationValid;
-			case DESTINATION:
-				return destinationValid;
-			case ORIGIN:
-				return originValid;
-			case NONE:
-				return !(originValid || destinationValid);
-			}
+			return switch (requirement) {
+				case ANY -> originValid || destinationValid;
+				case BOTH -> originValid && destinationValid;
+				case DESTINATION -> destinationValid;
+				case ORIGIN -> originValid;
+				case NONE -> !(originValid || destinationValid);
+			};
 		}
 
 		return true;
@@ -131,7 +126,7 @@ public class ShapeFileConstraint implements TripConstraint {
 		}
 
 		@Override
-		public TripConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
+		public ShapeFileConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
 				Collection<String> availableModes) {
 			return new ShapeFileConstraint(network, restrictedModes, requirement, shapes);
 		}

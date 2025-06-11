@@ -24,28 +24,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
- class ReadOrCreateKVals {
-	
+import java.io.UncheckedIOException;
+
+class ReadOrCreateKVals {
+
 	private static final Logger log = LogManager.getLogger(ReadOrCreateKVals.class);
-	
+
 	private Scenario scenario;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
 	private RandomFromVarDistr rnd;
-	
+
 	public ReadOrCreateKVals(long seed, Scenario scenario) {
 		this.scenario = scenario;
 		this.rnd = new RandomFromVarDistr();
 		this.rnd.setSeed(seed);
 	}
-	
+
 	/*
-	 * return 0 if files are read and 1 if k values are created. 
+	 * return 0 if files are read and 1 if k values are created.
 	 * This is important to know for reading (case 0) or computation of maxDCScore (case 1)
 	 */
 	public int run() {
@@ -58,7 +59,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 			return 1;
 		}
 		log.info("at least one facility kValue or person kValue is missing, start crating all values");
-		if (pkValuesFileName != null && fkValuesFileName != null && maxEpsValuesFileName != null) {			
+		if (pkValuesFileName != null && fkValuesFileName != null && maxEpsValuesFileName != null) {
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
 			try {
@@ -108,7 +109,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 		this.assignKValuesPersons();
 		this.assignKValuesAlternatives();
 	}
-		
+
 	// does not matter which distribution is chosen here
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
@@ -120,5 +121,5 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
 		}
 	}
-	
+
 }

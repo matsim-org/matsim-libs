@@ -11,13 +11,11 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.StreamSupport;
 
 /**
@@ -26,14 +24,31 @@ import java.util.stream.StreamSupport;
 public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 	private static final Logger log = LogManager.getLogger(SimWrapper.class);
-
+	/**
+	 * Run priority of SimWrapper. Generally, it should run after alls other listeners.
+	 */
+	public static double PRIORITY = -1000;
 	private final SimWrapper simWrapper;
+	private final Set<Dashboard> bindings;
 	private final Config config;
 
 	@Inject
-	public SimWrapperListener(SimWrapper simWrapper, Config config) {
+	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config) {
 		this.simWrapper = simWrapper;
+		this.bindings = bindings;
 		this.config = config;
+	}
+
+	/**
+	 * Create a new listener with no default bindings.
+	 */
+	public SimWrapperListener(SimWrapper simWrapper, Config config) {
+		this(simWrapper, Collections.emptySet(), config);
+	}
+
+	@Override
+	public double priority() {
+		return PRIORITY;
 	}
 
 	@Override
@@ -46,7 +61,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		SimWrapperConfigGroup config = simWrapper.getConfigGroup();
 
 		// Load provider from packages
-		for (String pack : config.packages) {
+		for (String pack : config.getPackages()) {
 
 			log.info("Scanning package {}", pack);
 
@@ -61,8 +76,11 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 			}
 		}
 
+		// Lambda provider which uses dashboards from bindings
+		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));
+
 		// Dashboard provider services
-		if (config.defaultDashboards != SimWrapperConfigGroup.Mode.disabled) {
+		if (config.getDefaultDashboards() != SimWrapperConfigGroup.Mode.disabled) {
 			ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
 			addFromProvider(config, loader);
 		}
@@ -85,7 +103,10 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
 
-				if (config.exclude.contains(d.getClass().getSimpleName()) || config.exclude.contains(d.getClass().getName()))
+				if (config.getExclude().contains(d.getClass().getSimpleName()) || config.getExclude().contains(d.getClass().getName()))
+					continue;
+
+				if (!config.getInclude().isEmpty() && (!config.getInclude().contains(d.getClass().getSimpleName()) && !config.getInclude().contains(d.getClass().getName())))
 					continue;
 
 				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {
@@ -101,7 +122,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		List<DashboardProvider> result = new ArrayList<>();
 		for (ClassPath.ClassInfo info : classes) {
 			Class<?> clazz = info.load();
-			if (clazz.isAssignableFrom(DashboardProvider.class)) {
+			if (DashboardProvider.class.isAssignableFrom(clazz)) {
 				try {
 					Constructor<?> c = clazz.getDeclaredConstructor();
 					DashboardProvider o = (DashboardProvider) c.newInstance();
@@ -126,8 +147,12 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 * Run dashboard creation and execution. This method is useful when used outside MATSim.
 	 */
 	public void run(Path output) throws IOException {
-		simWrapper.generate(output);
-		simWrapper.run(output);
+		run(output, null);
+	}
+
+	void run(Path output, @Nullable String configPath) throws IOException {
+		generate(output);
+		simWrapper.run(output, configPath);
 	}
 
 }

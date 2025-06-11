@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -40,14 +40,14 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 
 	private final Network network;
 	private final LeastCostPathCalculator routeAlgo;
-	private final ModeRoutingParams params;
+	private final TeleportedModeParams params;
 
 	FreespeedFactorRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
             final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			ModeRoutingParams params) {
+			TeleportedModeParams params ) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.params = params;
@@ -61,7 +61,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 
@@ -90,28 +90,26 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 		if (fromLink == null) throw new RuntimeException("fromLink missing.");
 		if (toLink == null) throw new RuntimeException("toLink missing.");
 		if (toLink != fromLink) {
-			Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
 			// do not drive/walk around, if we stay on the same link
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
-			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, depTime, person, null);
+			if (path == null) throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + ".");
 
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
 			double speed = toLink.getFreespeed(depTime + path.travelTime);
-			
+
 			// correct by speed limit:
 			if ( speed > params.getTeleportedModeFreespeedLimit() ) {
 				speed = params.getTeleportedModeFreespeedLimit() ;
 			}
-			
+
 			// now correct the travel time:
 			double travelTimeLastLink = toLink.getLength() / speed;
-			
+
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.params.getTeleportedModeFreespeedFactor());
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
-			
+
 			// yyyyyy the following should actually rather come from the route!  There is a RouteUtils.calcDistance( route ) .  kai, nov'16
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {

@@ -29,10 +29,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -41,7 +40,6 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,13 +47,13 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
 
 	private final String routingMode;
+	private boolean alreadyCheckedConsistency = false;
 
 	@Inject Map<String, TravelTime> travelTimes;
 	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	@Inject SingleModeNetworksCache singleModeNetworksCache;
-	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network;
-	@Inject NetworkConfigGroup networkConfigGroup;
+	@Inject
+	RoutingConfigGroup routingConfigGroup;
 	@Inject PopulationFactory populationFactory;
 	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Inject Scenario scenario ;
@@ -98,20 +96,9 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						   + routingMode + ";\tmode=" + mode) ;
 
 		// the network refers to the (transport)mode:
-		Network filteredNetwork = null;
+		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
 
-		// Ensure this is not performed concurrently by multiple threads!
-		synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
-			filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
-			if (filteredNetwork == null) {
-				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-				Set<String> modes = new HashSet<>();
-				modes.add(mode);
-				filteredNetwork = NetworkUtils.createNetwork(networkConfigGroup);
-				filter.filter(filteredNetwork, modes);
-				this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
-			}
-		}
+		checkNetwork(filteredNetwork);
 
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
@@ -129,7 +116,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 						travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( !plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+		if ( !routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
 			/*
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
@@ -147,7 +134,40 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			}
 
 		} else {
+			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
+			log.warn( "This can be achieved by something like" );
+			log.warn("\t\tconfig.routing().setAccessEgressType( AccessEgressType.accessEgressModeToLink );");
+			log.warn( "in code or" );
+			log.warn( "\t<module name=\"routing\" >" );
+			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
+			log.warn( "in the config xml.");
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}
+	}
+
+	private void checkNetwork(Network filteredNetwork) {
+		if(routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+			return;
+		}
+
+		if(alreadyCheckedConsistency){
+			return;
+		}
+
+		log.info("Checking network for mode '{}' for consistency...", mode);
+
+		int nLinks = filteredNetwork.getLinks().size();
+		int nNodes = filteredNetwork.getNodes().size();
+		NetworkUtils.cleanNetwork(filteredNetwork, Set.of(this.routingMode));
+		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
+
+		if(changed) {
+			String errorMessage = "Network for mode '" + mode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.";
+			log.error(errorMessage + "\n If you restricted modes on some links, consider doing that with NetworkUtils.restrictModesAndCleanNetwork(). This makes sure, that the network is consistent for each mode." +
+				"\n If this network topology is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
+			throw new RuntimeException(errorMessage);
+		}
+
+		alreadyCheckedConsistency = true;
 	}
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "https://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="AB" x="300.0" y="0" linkRefId="ab" isBlocking="false"/>
+		<stopFacility id="CD" x="5700.0" y="50" linkRefId="cd" stopAreaId="CDEF" isBlocking="false"/>
+		<stopFacility id="CE" x="5700.0" y="0" linkRefId="ce" stopAreaId="CDEF" isBlocking="false"/>
+		<stopFacility id="CF" x="5700.0" y="-50" linkRefId="cf" stopAreaId="CDEF" isBlocking="false"/>
+		<stopFacility id="JK" x="9300.0" y="50" linkRefId="jk" stopAreaId="JK" isBlocking="false"/>
+		<stopFacility id="LM" x="9300.0" y="-50" linkRefId="lm" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="AB_CE_JK">
+		<transitRoute id="ab_ce_jk">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="AB" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="CE" departureOffset="00:30:00" awaitDeparture="true"/>
+				<stop refId="JK" arrivalOffset="00:35:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="ab"/>
+				<link refId="bc"/>
+				<link refId="ce"/>
+				<link refId="eg"/>
+				<link refId="gj"/>
+				<link refId="jk"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:00:00" vehicleRefId="train1"/>
+				<departure id="2" departureTime="08:02:00" vehicleRefId="train3"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="AB_CE_JLM">
+		<transitRoute id="ab_ce_lm">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="AB" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="CE" departureOffset="00:30:00" awaitDeparture="true"/>
+				<stop refId="LM" arrivalOffset="00:35:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="ab"/>
+				<link refId="bc"/>
+				<link refId="ce"/>
+				<link refId="eh"/>
+				<link refId="hl"/>
+				<link refId="lm"/>
+			</route>
+			<departures>
+				<departure id="1" departureTime="08:01:00" vehicleRefId="train2"/>
+				<departure id="3" departureTime="08:03:00" vehicleRefId="train4"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

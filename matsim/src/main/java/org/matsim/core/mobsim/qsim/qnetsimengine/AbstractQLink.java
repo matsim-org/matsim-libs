@@ -19,27 +19,10 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -53,22 +36,26 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link QLinkI} is the interface; this here is an abstract class that contains implementation
  * of non-traffic-dynamics "infrastructure" provided by the link, such as parking or the logic for transit.
  *
  * @author nagel
- *
  */
 abstract class AbstractQLink implements QLinkI {
-	// yy The way forward might be to separate the "service link/network" from the "movement link/network".  The 
+	// yy The way forward might be to separate the "service link/network" from the "movement link/network".  The
 	// service link would do things like park agents, accept additional agents on link, accept passengers or drivers waiting for
 	// cars, etc.  Both the thread-based parallelization and the visualization then would have to treat those service links
-	// separately, which feels fairly messy.  Maybe better leave things as they are.  kai, mar'16  
+	// separately, which feels fairly messy.  Maybe better leave things as they are.  kai, mar'16
 
 	public enum HandleTransitStopResult {
 		continue_driving, rehandle, accepted
@@ -79,7 +66,7 @@ abstract class AbstractQLink implements QLinkI {
 
 	private final Link link;
 
-//	private final QNetwork qnetwork ;
+	//	private final QNetwork qnetwork ;
 	private NetElementActivationRegistry netElementActivationRegistry;
 	// (NOTE: via the qnetwork you reach the QNetsimEngine.  That is the "global" thing.  In contrast, via the netElementActivator,
 	// you reach the QNetsimEngineRunner.  That is the thread that runs the QLink.  Kai, mar'16
@@ -87,11 +74,11 @@ abstract class AbstractQLink implements QLinkI {
 	// joint implementation for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
 
-//	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
+	//	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
 	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new ConcurrentHashMap<>(10);
 
-//	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
-	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new ConcurrentHashMap<>( ) ;
+	//	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new ConcurrentHashMap<>();
 
 	private final Map<Id<Vehicle>, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<>();
 
@@ -106,33 +93,38 @@ abstract class AbstractQLink implements QLinkI {
 	 */
 	private final Queue<QVehicle> waitingList = new LinkedList<>();
 
+	private final PassingVehicleQ parkingSearchQueue = new PassingVehicleQ();
+
 	private boolean active = false;
 
 	private TransitQLink transitQLink;
-	
-	private final QNodeI toQNode ;
+
+	private final QNodeI toQNode;
 
 	private final NetsimEngineContext context;
 
 	private final NetsimInternalInterface netsimEngine;
 	private final LinkSpeedCalculator linkSpeedCalculator;
+
+	private final ParkingSearchTimeCalculator parkingSearchTimeCalculator;
 	private final VehicleHandler vehicleHandler;
-	
-	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
-		this.link = link ;
-		this.toQNode = toNode ;
+
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+		this.link = link;
+		this.toQNode = toNode;
 		this.context = context;
 		this.netsimEngine = netsimEngine2;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehicleHandler = vehicleHandler;
+		this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
 	}
 
 	@Override
 	public QNodeI getToNode() {
-		return toQNode ;
+		return toQNode;
 	}
 
-	/** 
+	/**
 	 * Links are active while (see checkForActivity()): () vehicles move on it; () vehicles wait to enter; () vehicles wait at the transit stop.
 	 * Once all of those have left the link, the link is no longer active.  It then needs to be activated from the outside, which is done by
 	 * this method.
@@ -146,43 +138,66 @@ abstract class AbstractQLink implements QLinkI {
 		}
 		// This is a bit involved since we do not want to ask the registry in every time step if the link is already active.
 	}
-	private static int wrnCnt = 0 ;
-	
+
+	private static int wrnCnt = 0;
+
 	public final void addParkedVehicle(MobsimVehicle vehicle, boolean isInitial) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
 
-		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
-			if ( wrnCnt < 1 ) {
-				wrnCnt++ ;
-				log.warn( "existing vehicle on link was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
-				log.warn( Gbl.ONLYONCE ) ;
+		if (this.parkedVehicles.put(qveh.getId(), qveh) != null) {
+			if (wrnCnt < 1) {
+				wrnCnt++;
+				log.warn("existing vehicle on link was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...");
+				log.warn(Gbl.ONLYONCE);
 			}
 		}
 		qveh.setCurrentLink(this.link);
-		
+
 		if (isInitial) {
 			vehicleHandler.handleInitialVehicleArrival(qveh, link);
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public final void addParkedVehicle(MobsimVehicle vehicle) {
 		addParkedVehicle(vehicle, true);
 	}
-	
-	/* package */ final boolean letVehicleArrive(QVehicle qveh) {
-		if (vehicleHandler.handleVehicleArrival(qveh, this.getLink())) {
-			addParkedVehicle(qveh, false);
-			double now = context.getSimTimer().getTimeOfDay();;
-			context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
-					this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
-			
-			this.netsimEngine.letVehicleArrive(qveh);
-			makeVehicleAvailableToNextDriver(qveh);
-			return true;
+
+	/* package */
+	final boolean letVehicleArrive(QVehicle qveh) {
+		VehicleHandler.VehicleArrival vehicleArrival = vehicleHandler.handleVehicleArrival(qveh, this.getLink());
+		if (vehicleArrival == VehicleHandler.VehicleArrival.BLOCKED) {
+			return false;
 		}
-		
-		return false;
+
+		double now = context.getSimTimer().getTimeOfDay();
+		context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now, qveh.getDriver().getId(),
+			this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0));
+
+		if (vehicleArrival == VehicleHandler.VehicleArrival.PARKING) {
+			// parking search events are created in any case, even if parking search time is 0
+			context.getEventsManager().processEvent(
+				new VehicleStartsParkingSearch(now, qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
+
+			double parkingSearchTime = parkingSearchTimeCalculator.calculateParkingSearchTime(now, qveh, this.link);
+			qveh.setEarliestLinkExitTime(now + parkingSearchTime);
+			parkingSearchQueue.add(qveh);
+		} else if (vehicleArrival == VehicleHandler.VehicleArrival.ALLOWED) {
+			// in this case no parking search events are created
+			arriveAndPark(qveh, false);
+		}
+
+		return true;
+	}
+
+	final void arriveAndPark(QVehicle qveh, boolean fromParkingSearch) {
+		if (fromParkingSearch) {
+			context.getEventsManager().processEvent(
+				new VehicleEndsParkingSearch(context.getSimTimer().getTimeOfDay(), qveh.getDriver().getId(), this.link.getId(), qveh.getId(), qveh.getDriver().getMode()));
+		}
+		addParkedVehicle(qveh, false);
+		this.netsimEngine.letVehicleArrive(qveh);
+		makeVehicleAvailableToNextDriver(qveh);
 	}
 
 	@Override
@@ -215,7 +230,7 @@ abstract class AbstractQLink implements QLinkI {
 
 	@Override
 	public Collection<MobsimAgent> getAdditionalAgentsOnLink() {
-		return Collections.unmodifiableCollection( this.additionalAgentsOnLink.values());
+		return Collections.unmodifiableCollection(this.additionalAgentsOnLink.values());
 	}
 
 	@Override
@@ -237,10 +252,10 @@ abstract class AbstractQLink implements QLinkI {
 				else stuckAgents.add(veh.getDriver().getId());
 
 				context.getEventsManager().processEvent(
-						new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-				
+					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+
 				context.getEventsManager().processEvent(
-						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 				context.getAgentCounter().incLost();
 				context.getAgentCounter().decLiving();
 			}
@@ -252,7 +267,7 @@ abstract class AbstractQLink implements QLinkI {
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
 
 				context.getEventsManager().processEvent(
-						new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
+					new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
 				context.getAgentCounter().incLost();
 				context.getAgentCounter().decLiving();
 			}
@@ -263,7 +278,7 @@ abstract class AbstractQLink implements QLinkI {
 			else stuckAgents.add(driver.getId());
 
 			context.getEventsManager().processEvent(
-					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+				new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 			context.getAgentCounter().incLost();
 			context.getAgentCounter().decLiving();
 		}
@@ -276,7 +291,7 @@ abstract class AbstractQLink implements QLinkI {
 				stuckAgents.add(driver.getId());
 
 				context.getEventsManager().processEvent(
-						new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 				context.getAgentCounter().incLost();
 				context.getAgentCounter().decLiving();
 			}
@@ -288,7 +303,7 @@ abstract class AbstractQLink implements QLinkI {
 				else stuckAgents.add(passenger.getId());
 
 				context.getEventsManager().processEvent(
-						new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
+					new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
 				this.context.getAgentCounter().incLost();
 				this.context.getAgentCounter().decLiving();
 			}
@@ -296,14 +311,16 @@ abstract class AbstractQLink implements QLinkI {
 		this.passengersWaitingForCars.clear();
 
 		for (QVehicle veh : this.waitingList) {
-			if (stuckAgents.contains(veh.getDriver().getId())) continue;
-			else stuckAgents.add(veh.getDriver().getId());
-			
+			if (stuckAgents.contains(veh.getDriver().getId())) {
+				continue;
+			} else {
+				stuckAgents.add(veh.getDriver().getId());
+			}
+
+			this.context.getEventsManager().processEvent(new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+
 			this.context.getEventsManager().processEvent(
-					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			
-			this.context.getEventsManager().processEvent(
-					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+				new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.context.getAgentCounter().incLost();
 			this.context.getAgentCounter().decLiving();
 		}
@@ -311,7 +328,7 @@ abstract class AbstractQLink implements QLinkI {
 	}
 
 	void makeVehicleAvailableToNextDriver(QVehicle veh) {
-		
+
 		// this would (presumably) be the place where the "nature" of a vehicle could be changed (in the sense of PAVE), e.g. to
 		// a freight vehicle, or to an autonomous vehicle that can be sent around the block or home.  However, this would
 		// necessitate some agent-like logic also for the vehicle: vehicle behavior given by driver as long as driver in
@@ -339,10 +356,9 @@ abstract class AbstractQLink implements QLinkI {
 		 */
 		final Queue<MobsimDriverAgent> driversWaitingForCar = driversWaitingForCars.get(veh.getId());
 		final boolean thereIsDriverWaiting = driversWaitingForCar != null && !driversWaitingForCar.isEmpty();
-		if ( thereIsDriverWaiting ) {
+		if (thereIsDriverWaiting) {
 			MobsimDriverAgent driverWaitingForPassengers =
-				driversWaitingForPassengers.get(
-						driversWaitingForCar.element().getId());
+				driversWaitingForPassengers.get(driversWaitingForCar.element().getId());
 			if (driverWaitingForPassengers != null) return;
 		}
 
@@ -357,7 +373,7 @@ abstract class AbstractQLink implements QLinkI {
 				final Queue<MobsimDriverAgent> r = driversWaitingForCars.remove(veh.getId());
 				assert r == driversWaitingForCar;
 			}
-			removeParkedVehicle( veh.getId() );
+			removeParkedVehicle(veh.getId());
 			this.letVehicleDepart(veh);
 		}
 	}
@@ -365,7 +381,7 @@ abstract class AbstractQLink implements QLinkI {
 	@Override
 	public final void letVehicleDepart(QVehicle vehicle) {
 		double now = context.getSimTimer().getTimeOfDay();
-		
+
 		MobsimDriverAgent driver = vehicle.getDriver();
 		if (driver == null) throw new RuntimeException("Vehicle cannot depart without a driver!");
 
@@ -382,7 +398,7 @@ abstract class AbstractQLink implements QLinkI {
 	@Override
 	public final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId) {
 		double now = context.getSimTimer().getTimeOfDay();
-		
+
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
 
 		// if the vehicle is not parked at the link, mark the agent as passenger waiting for vehicle
@@ -393,8 +409,8 @@ abstract class AbstractQLink implements QLinkI {
 			boolean added = vehicle.addPassenger((PassengerAgent) passenger);
 			if (!added) {
 				log.warn("Passenger " + passenger.getId().toString() +
-				" could not be inserted into vehicle " + vehicleId.toString() +
-				" since there is no free seat available!");
+					" could not be inserted into vehicle " + vehicleId.toString() +
+					" since there is no free seat available!");
 				return false;
 			}
 
@@ -410,7 +426,7 @@ abstract class AbstractQLink implements QLinkI {
 	@Override
 	public QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		// yyyy ?? does same as getParkedVehicle(...) ??  kai, mar'16
-		
+
 		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		return ret;
 	}
@@ -433,15 +449,15 @@ abstract class AbstractQLink implements QLinkI {
 
 	@Override
 	public void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
-		final Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
-		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
+		final Id<Vehicle> vehicleId = agent.getPlannedVehicleId();
+		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get(vehicleId);
 
-		if ( queue == null ) {
+		if (queue == null) {
 			queue = new LinkedList<>();
-			driversWaitingForCars.put( vehicleId , queue );
+			driversWaitingForCars.put(vehicleId, queue);
 		}
 
-		queue.add( agent );
+		queue.add(agent);
 	}
 
 	@Override
@@ -495,6 +511,10 @@ abstract class AbstractQLink implements QLinkI {
 		return waitingList;
 	}
 
+	public PassingVehicleQ getParkingSearchQueue() {
+		return parkingSearchQueue;
+	}
+
 	TransitQLink getTransitQLink() {
 		return transitQLink;
 	}
@@ -502,88 +522,91 @@ abstract class AbstractQLink implements QLinkI {
 	void setTransitQLink(TransitQLink transitQLink) {
 		this.transitQLink = transitQLink;
 	}
-	
+
 	/**
 	 * The idea here is to keep some control over what the implementations of QLaneI have access to.  And maybe reduce
 	 * it over time, so that they become more encapsulated.  kai, feb'18
 	 */
 	public final class QLinkInternalInterface {
-		
+
 		public QNodeI getToNodeQ() {
-			return AbstractQLink.this.toQNode ;
+			return AbstractQLink.this.toQNode;
 		}
+
 		public Node getToNode() {
-			return AbstractQLink.this.link.getToNode() ;
+			return AbstractQLink.this.link.getToNode();
 		}
-		
+
 		public double getFreespeed() {
 			// yyyy does it make sense to provide the method without time?  kai, feb'18
-			return AbstractQLink.this.link.getFreespeed() ;
+			return AbstractQLink.this.link.getFreespeed();
 		}
-		
+
 		public Id<Link> getId() {
-			return AbstractQLink.this.link.getId() ;
+			return AbstractQLink.this.link.getId();
 		}
-		
+
 		public HandleTransitStopResult handleTransitStop(double now, QVehicle veh, TransitDriverAgent driver, Id<Link> linkId) {
 			// yy now would not be needed as an argument. kai, feb'18
 			// yy linkId would not be needed as an argument. kai, feb'18
-			return AbstractQLink.this.transitQLink.handleTransitStop(now, veh, driver, linkId) ;
+			return AbstractQLink.this.transitQLink.handleTransitStop(now, veh, driver, linkId);
 		}
-		
+
 		public void addParkedVehicle(QVehicle veh) {
 			AbstractQLink.this.addParkedVehicle(veh);
 		}
-		
+
 		public boolean letVehicleArrive(QVehicle veh) {
 			return AbstractQLink.this.letVehicleArrive(veh);
 		}
-		
+
 		public void makeVehicleAvailableToNextDriver(QVehicle veh) {
 			AbstractQLink.this.makeVehicleAvailableToNextDriver(veh);
 		}
-		
+
 		public void activateLink() {
 			AbstractQLink.this.activateLink();
 		}
-		
+
 		public double getMaximumVelocityFromLinkSpeedCalculator(QVehicle veh, double now) {
 			final LinkSpeedCalculator linkSpeedCalculator = AbstractQLink.this.linkSpeedCalculator;
 			Gbl.assertNotNull(linkSpeedCalculator);
-			return linkSpeedCalculator.getMaximumVelocity(veh, AbstractQLink.this.link, now) ;
+			return linkSpeedCalculator.getMaximumVelocity(veh, AbstractQLink.this.link, now);
 		}
-		
+
 		public void setCurrentLinkToVehicle(QVehicle veh) {
-			veh.setCurrentLink( AbstractQLink.this.link );
+			veh.setCurrentLink(AbstractQLink.this.link);
 		}
-		
+
 		public QLaneI getAcceptingQLane() {
-			return AbstractQLink.this.getAcceptingQLane() ;
+			return AbstractQLink.this.getAcceptingQLane();
 		}
-		
+
 		public List<QLaneI> getOfferingQLanes() {
-			return AbstractQLink.this.getOfferingQLanes() ;
+			return AbstractQLink.this.getOfferingQLanes();
 		}
-		
+
 		public Node getFromNode() {
-			return AbstractQLink.this.link.getFromNode() ;
+			return AbstractQLink.this.link.getFromNode();
 		}
-		
+
 		public double getFreespeed(double now) {
-			return AbstractQLink.this.link.getFreespeed(now) ;
+			return AbstractQLink.this.link.getFreespeed(now);
 		}
-		
+
 		public int getNumberOfLanesAsInt(double now) {
-			return NetworkUtils.getNumberOfLanesAsInt(now,AbstractQLink.this.link) ;
+			return NetworkUtils.getNumberOfLanesAsInt(now, AbstractQLink.this.link);
 		}
-		
+
 		public Link getLink() {
 			return AbstractQLink.this.link;
 		}
 	}
-	private final QLinkInternalInterface qLinkInternalInterface = new QLinkInternalInterface() ;
+
+	private final QLinkInternalInterface qLinkInternalInterface = new QLinkInternalInterface();
+
 	public final QLinkInternalInterface getInternalInterface() {
-		return qLinkInternalInterface ;
+		return qLinkInternalInterface;
 	}
 
 }

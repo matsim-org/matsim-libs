@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<!-- Network that mixes moving, and fix block of different lengths and speeds	-->
+	<!--
+	1  ==>  2 ====> 3 ======> 4 =========== ... ====================> 19 ===> 20 ==> 21
+	 -->
+
+
+	<nodes>
+		<node id="1" x="100" y="0">
+		</node>
+		<node id="2" x="1000" y="0">
+		</node>
+		<node id="3" x="1500" y="0">
+		</node>
+		<node id="4" x="2000" y="0">
+		</node>
+		<node id="5" x="2200" y="0">
+		</node>
+		<node id="6" x="2300" y="0">
+		</node>
+		<node id="7" x="2400" y="0">
+		</node>
+		<node id="8" x="2600" y="0">
+		</node>
+		<node id="9" x="2900" y="0">
+		</node>
+		<node id="10" x="3200" y="0">
+		</node>
+		<node id="11" x="3300" y="0">
+		</node>
+		<node id="12" x="3400" y="0">
+		</node>
+		<node id="13" x="3600" y="0">
+		</node>
+		<node id="14" x="3700" y="0">
+		</node>
+		<node id="15" x="4000" y="0">
+		</node>
+		<node id="16" x="4200" y="0">
+		</node>
+		<node id="17" x="4300" y="0">
+		</node>
+		<node id="18" x="4400" y="0">
+		</node>
+		<node id="19" x="4500" y="0">
+		</node>
+		<node id="20" x="4600" y="0">
+		</node>
+		<node id="21" x="5600" y="0">
+		</node>
+
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+
+		<link id="1-2" from="1" to="2" length="1000" freespeed="1.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+			</attributes>
+		</link>
+		<link id="2-3" from="2" to="3" length="500" freespeed="50.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l23</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="3-4" from="3" to="4" length="500" freespeed="50.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l23</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="4-5" from="4" to="5" length="200" freespeed="30.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l45</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="5-6" from="5" to="6" length="100" freespeed="30.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l45</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="6-7" from="6" to="7" length="100" freespeed="5.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l67</attribute>
+			</attributes>
+		</link>
+		<link id="7-8" from="7" to="8" length="200" freespeed="5." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l67</attribute>
+			</attributes>
+		</link>
+		<link id="8-9" from="8" to="9" length="300" freespeed="100.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l89</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+
+			</attributes>
+		</link>
+		<link id="9-10" from="9" to="10" length="300" freespeed="100.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l89</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="10-11" from="10" to="11" length="100" freespeed="100.0" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l89</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="11-12" from="11" to="12" length="100" freespeed="100" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">l89</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="12-13" from="12" to="13" length="200" freespeed="44.44444444444444" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="13-14" from="13" to="14" length="100" freespeed="10." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="14-15" from="14" to="15" length="300" freespeed="10." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+			</attributes>
+		</link>
+		<link id="15-16" from="15" to="16" length="200" freespeed="10." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+
+			</attributes>
+		</link>
+		<link id="16-17" from="16" to="17" length="100" freespeed="10." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="17-18" from="17" to="18" length="100" freespeed="20." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="18-19" from="18" to="19" length="100" freespeed="20." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+
+			</attributes>
+		</link>
+		<link id="19-20" from="19" to="20" length="100" freespeed="20." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceType" class="java.lang.String">movingBlock</attribute>
+
+			</attributes>
+		</link>
+		<link id="20-21" from="20" to="21" length="1000" freespeed="20." capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+			</attributes>
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

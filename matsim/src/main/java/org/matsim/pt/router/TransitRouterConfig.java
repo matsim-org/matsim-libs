@@ -25,12 +25,14 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Design decisions:<ul>
@@ -41,6 +43,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  */
 public class TransitRouterConfig implements MatsimParameters {
 	private static final Logger log = LogManager.getLogger( TransitRouterConfig.class ) ;
+	private static final CountedLog subPopulationWarning = new CountedLog(log, 10) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -91,48 +94,59 @@ public class TransitRouterConfig implements MatsimParameters {
 	private double marginalUtilityOfWaitingPt_utl_s;
 
 	private double marginalUtilityOfTravelDistanceWalk_utl_m;
-	
+
 	private double marginalUtilityOfTravelDistanceTransit_utl_m;
 
 	private double utilityOfLineSwitch_utl;
 
-	private Double beelineDistanceFactor;
+	private final Double beelineDistanceFactor;
 
 	private final double directWalkFactor ;
-	
+
 	private boolean cacheTree;
 
 	public TransitRouterConfig(final Config config) {
-		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+		this(config.scoring(), config.routing(), config.transitRouter(), config.vspExperimental());
 	}
-	
-	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, 
-			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
+
+	public TransitRouterConfig(final ScoringConfigGroup pcsConfig, final RoutingConfigGroup routingConfig,
+														 final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig )
 	{
-		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
-		
+		pcsConfig.setLocked(); routingConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
+
 		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
-			LogManager.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
-					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
-					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
+			subPopulationWarning.warn("More than one subpopulation is used in plansCalcScore. "
+				+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
+				+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
 		}
-		
+
 		// walk:
 		{
-			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
+			TeleportedModeParams params = routingConfig.getTeleportedModeParams().get( TransportMode.transit_walk );
+			if ( params==null ) {
+				params = routingConfig.getTeleportedModeParams().get( TransportMode.non_network_walk );
+			}
+			if ( params==null ) {
+				params = routingConfig.getTeleportedModeParams().get( TransportMode.walk) ;
+			}
+			if ( params==null ) {
+				log.error( "teleported mode params do not exist for " + TransportMode.transit_walk + ", " + TransportMode.non_network_walk + ", nor "
+				+ TransportMode.walk + ".  At least one of them needs to be defined for TransitRouterConfig.  Aborting ...");
+				// yyyy I do not know which of this is conceptually the correct one.  It should _not_ be walk since that may be routed on the network, see below.  kai, mar'25
+			}
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
 			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;
 		}
 		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
 		// apr'19
-		
+
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
-		
+
 		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
 				pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate() +
 				pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		
+
 		// pt:
 		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
@@ -177,11 +191,11 @@ public class TransitRouterConfig implements MatsimParameters {
 	public void setMarginalUtilityOfTravelTimePt_utl_s(final double marginalUtilityOfTravelTimeTransit_utl_s) {
 		this.marginalUtilityOfTravelTimeTransit_utl_s = marginalUtilityOfTravelTimeTransit_utl_s;
 	}
-	
+
 	public void setMarginalUtilityOfTravelDistanceWalk_utl_m(final double marginalUtilityOfTravelDistanceWalk_utl_m) {
 		this.marginalUtilityOfTravelDistanceWalk_utl_m = marginalUtilityOfTravelDistanceWalk_utl_m;
 	}
-	
+
 	/**
 	 * @return the marginal utility of travel time by public transit.
 	 */
@@ -212,7 +226,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	public double getMarginalUtilityOfTravelDistanceWalk_utl_m() {
 		return this.marginalUtilityOfTravelDistanceWalk_utl_m;
 	}
-	
+
 	public void setBeelineWalkSpeed(final double beelineWalkSpeed) {
 		this.beelineWalkSpeed = beelineWalkSpeed;
 	}
@@ -270,5 +284,23 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public void setCacheTree(boolean cacheTree) {
 		this.cacheTree = cacheTree;
+	}
+
+	private static class CountedLog {
+
+		private final Logger log;
+		private final int maxCount;
+		private final AtomicInteger count = new AtomicInteger(0);
+
+		private CountedLog(Logger log, int maxCount) {
+			this.log = log;
+			this.maxCount = maxCount;
+		}
+
+		private void warn(String msg) {
+			if (count.incrementAndGet() <= maxCount) {
+				log.warn(msg);
+			}
+		}
 	}
 }

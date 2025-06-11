@@ -35,30 +35,27 @@ import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.config.groups.EventsManagerConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PtCountsConfigGroup;
+import org.matsim.core.config.groups.PlanInheritanceConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -67,7 +64,7 @@ import org.matsim.run.CreateFullConfig;
 /**
  * Stores all configuration settings specified in a configuration file and
  * provides access to the settings at runtime.
- * 
+ *
  * @see CreateFullConfig
  *
  * @author mrieser
@@ -119,13 +116,12 @@ public final class Config implements MatsimExtensionPoint {
 	public void addCoreModules() {
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
 
-		this.modules.put(ControlerConfigGroup.GROUP_NAME, new ControlerConfigGroup());
+		this.modules.put(ControllerConfigGroup.GROUP_NAME, new ControllerConfigGroup());
 
 		this.modules.put(QSimConfigGroup.GROUP_NAME, new QSimConfigGroup());
 
 		this.modules.put(CountsConfigGroup.GROUP_NAME, new CountsConfigGroup());
-
-		this.modules.put(PlanCalcScoreConfigGroup.GROUP_NAME, new PlanCalcScoreConfigGroup());
+		this.modules.put(ScoringConfigGroup.GROUP_NAME, new ScoringConfigGroup());
 
 		this.modules.put(NetworkConfigGroup.GROUP_NAME, new NetworkConfigGroup());
 
@@ -133,44 +129,39 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, new HouseholdsConfigGroup());
 
-		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, new ParallelEventHandlingConfigGroup() );
+		this.modules.put(EventsManagerConfigGroup.GROUP_NAME, new EventsManagerConfigGroup() );
 
 		this.modules.put(FacilitiesConfigGroup.GROUP_NAME, new FacilitiesConfigGroup());
 
-		this.modules.put(StrategyConfigGroup.GROUP_NAME, new StrategyConfigGroup());
+		this.modules.put(ReplanningConfigGroup.GROUP_NAME, new ReplanningConfigGroup());
 
 		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, new TravelTimeCalculatorConfigGroup());
 
 		this.modules.put(ScenarioConfigGroup.GROUP_NAME, new ScenarioConfigGroup());
 
-		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, new PlansCalcRouteConfigGroup());
+		this.modules.put(RoutingConfigGroup.GROUP_NAME, new RoutingConfigGroup());
 
 		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, new TimeAllocationMutatorConfigGroup());
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
-		
-		this.modules.put(PtCountsConfigGroup.GROUP_NAME, new PtCountsConfigGroup());
 
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());
 
 		this.modules.put(TransitRouterConfigGroup.GROUP_NAME, new TransitRouterConfigGroup());
-		
+
 		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , new SubtourModeChoiceConfigGroup() );
-		
+
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , new VehiclesConfigGroup() ) ;
 
 		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
 
-		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
-		// only to provide error messages. kai, may'16
-
-		this.modules.put(JDEQSimConfigGroup.NAME, new JDEQSimConfigGroup());
-
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
+
+		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
@@ -306,60 +297,6 @@ public final class Config implements MatsimExtensionPoint {
 		return this.modules.get(moduleName);
 	}
 
-	/**
-	 * Returns the requested parameter. If the module or parameter is not known,
-	 * an error is logged and an IllegalArgumentException is thrown.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @return the requested parameter
-	 *
-	 * @throws IllegalArgumentException
-	 *             if the module or parameter does not exist
-	 * @see #findParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String getParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			log.error("Module \"" + moduleName + "\" is not known.");
-			throw new IllegalArgumentException("Module \"" + moduleName + "\" is not known.");
-		}
-		String str = m.getValue(paramName);
-		if (str == null) {
-			String message = "Parameter \"" + paramName + "\" of module \"" + moduleName + "\" is not known";
-			log.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return str;
-	}
-
-	/**
-	 * Returns the value of the specified parameter if it exists, or
-	 * <code>null</code> otherwise.
-	 *
-	 * @param moduleName
-	 *            name of the config-module
-	 * @param paramName
-	 *            name of parameter in the specified module
-	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 *
-	 * @see #getParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String findParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			return null;
-		}
-		try {
-			String str = m.getValue(paramName);
-			return str;
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
-
 	// ////////////////////////////////////////////////////////////////////
 	// print methods
 	// ////////////////////////////////////////////////////////////////////
@@ -370,29 +307,6 @@ public final class Config implements MatsimExtensionPoint {
 	}
 
 	// ////////////////////////////////////////////////////////////////////
-	// is used for using Config without a config-file given
-	// ////////////////////////////////////////////////////////////////////
-	/**
-	 * Sets the parameter <code>paramName</code> in the module/config-group
-	 * <code>moduleName</code> to the specified value. If there is no
-	 * config-group with the specified name, a new group will be created.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @param value
-	 */
-	@Deprecated // use "typed" config group instead
-	public final void setParam(final String moduleName, final String paramName, final String value) {
-		checkIfLocked();
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			m = createModule(moduleName);
-			log.info("module \"" + moduleName + "\" added.");
-		}
-		m.addParam(paramName, value);
-	}
-
-	// ////////////////////////////////////////////////////////////////////
 	// direct access to modules / groups
 	// ////////////////////////////////////////////////////////////////////
 
@@ -400,16 +314,16 @@ public final class Config implements MatsimExtensionPoint {
 		return (GlobalConfigGroup) this.getModule(GlobalConfigGroup.GROUP_NAME);
 	}
 
-	public final ControlerConfigGroup controler() {
-		return (ControlerConfigGroup) this.getModule(ControlerConfigGroup.GROUP_NAME);
+	public final ControllerConfigGroup controller() {
+		return (ControllerConfigGroup) this.getModule(ControllerConfigGroup.GROUP_NAME);
 	}
 
 	public final CountsConfigGroup counts() {
 		return (CountsConfigGroup) this.getModule(CountsConfigGroup.GROUP_NAME);
 	}
 
-	public final PlanCalcScoreConfigGroup planCalcScore() {
-		return (PlanCalcScoreConfigGroup) this.getModule(PlanCalcScoreConfigGroup.GROUP_NAME);
+	public final ScoringConfigGroup scoring() {
+		return (ScoringConfigGroup) this.getModule(ScoringConfigGroup.GROUP_NAME);
 	}
 
 	public final NetworkConfigGroup network() {
@@ -428,8 +342,8 @@ public final class Config implements MatsimExtensionPoint {
 		return (FacilitiesConfigGroup) this.getModule(FacilitiesConfigGroup.GROUP_NAME);
 	}
 
-    public final StrategyConfigGroup strategy() {
-		return (StrategyConfigGroup) this.getModule(StrategyConfigGroup.GROUP_NAME);
+    public final ReplanningConfigGroup replanning() {
+		return (ReplanningConfigGroup) this.getModule(ReplanningConfigGroup.GROUP_NAME);
 	}
 
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator() {
@@ -440,8 +354,8 @@ public final class Config implements MatsimExtensionPoint {
 		return (ScenarioConfigGroup) this.getModule(ScenarioConfigGroup.GROUP_NAME);
 	}
 
-	public PlansCalcRouteConfigGroup plansCalcRoute() {
-		return (PlansCalcRouteConfigGroup) this.getModule(PlansCalcRouteConfigGroup.GROUP_NAME);
+	public RoutingConfigGroup routing() {
+		return (RoutingConfigGroup) this.getModule(RoutingConfigGroup.GROUP_NAME);
 	}
 
 	public VspExperimentalConfigGroup vspExperimental() {
@@ -450,10 +364,6 @@ public final class Config implements MatsimExtensionPoint {
 
 	public QSimConfigGroup qsim() {
 		return (QSimConfigGroup) this.getModule(QSimConfigGroup.GROUP_NAME);
-	}
-
-	public PtCountsConfigGroup ptCounts() {
-		return (PtCountsConfigGroup) this.getModule(PtCountsConfigGroup.GROUP_NAME);
 	}
 
 	public TransitConfigGroup transit() {
@@ -472,8 +382,8 @@ public final class Config implements MatsimExtensionPoint {
 		return (TimeAllocationMutatorConfigGroup) this.getModule(TimeAllocationMutatorConfigGroup.GROUP_NAME);
 	}
 
-	public ParallelEventHandlingConfigGroup parallelEventHandling() {
-		return (ParallelEventHandlingConfigGroup) this.getModule(ParallelEventHandlingConfigGroup.GROUP_NAME);
+	public EventsManagerConfigGroup eventsManager() {
+		return (EventsManagerConfigGroup) this.getModule(EventsManagerConfigGroup.GROUP_NAME);
 	}
 
 	public SubtourModeChoiceConfigGroup subtourModeChoice() {
@@ -484,16 +394,16 @@ public final class Config implements MatsimExtensionPoint {
 		return (ChangeModeConfigGroup) this.getModule(ChangeModeConfigGroup.CONFIG_MODULE);
 	}
 
-	public JDEQSimConfigGroup jdeqSim() {
-		return (JDEQSimConfigGroup) this.getModule(JDEQSimConfigGroup.NAME);
-	}
-
 	public HermesConfigGroup hermes() {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
+	}
+
+	public PlanInheritanceConfigGroup planInheritance() {
+		return (PlanInheritanceConfigGroup) this.getModule(PlanInheritanceConfigGroup.GROUP_NAME);
 	}
 
 	// other:
@@ -545,7 +455,7 @@ public final class Config implements MatsimExtensionPoint {
 	public final VehiclesConfigGroup vehicles() {
 		return (VehiclesConfigGroup) this.getModule(VehiclesConfigGroup.GROUP_NAME);
 	}
-	
+
 	public void setContext(URL context) {
 		if ( this.context==null  ||  !(context.toString().equals( this.context.toString() ) ) ) {
 			log.info("setting context to [" + context + "]");

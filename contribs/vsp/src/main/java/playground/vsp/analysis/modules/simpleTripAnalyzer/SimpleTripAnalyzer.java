@@ -55,17 +55,17 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * A simple analysis-class for a very basic MATSim-Scenario, i.e it should be used 
+ * A simple analysis-class for a very basic MATSim-Scenario, i.e it should be used
  * with physical simulation of car-trips only. All other modes must be teleported. Thus,
- * this class will throw a runtime-exception when {@link ScenarioConfigGroup#isUseTransit()} is true. 
- * 
+ * this class will throw a runtime-exception when {@link ScenarioConfigGroup#isUseTransit()} is true.
+ *
  * @author droeder
  *
  */
-public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm 
+public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 								implements LinkLeaveEventHandler,
 										PersonArrivalEventHandler,
-										PersonDepartureEventHandler, 
+										PersonDepartureEventHandler,
 										PersonStuckEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
@@ -74,15 +74,15 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	private Network net;
 	private Set<Id<Person>> pIds;
 	private Map<String, Double> distFactors;
-	
+
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	
+
 	public  SimpleTripAnalyzer(Config c, Network net, Set<Id<Person>> pIds) throws RuntimeException{
 		if(c.transit().isUseTransit() ){
 			throw new RuntimeException("This analysis is structured very simple. " +
 					"Thus, it does not allow physically simulated transit!");
 		}
-		this.distFactors = c.plansCalcRoute().getBeelineDistanceFactors() ;
+		this.distFactors = c.routing().getBeelineDistanceFactors() ;
 		this.net = net;
 		this.pIds = pIds;
 	}
@@ -106,9 +106,9 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		mode = (mode == TransportMode.transit_walk) ? TransportMode.walk : mode;
 		// cars start at the end of a link, thus we subtract the link-length for car-trips.
 		//the distance for other modes is Double.NaN as they are teleported.
-		t.startTrip(event.getTime(), mode, 
+		t.startTrip(event.getTime(), mode,
 				(mode == TransportMode.car) ? (-calcLinkDistance(event.getLinkId())) : Double.NaN);
-		
+
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		t.passLink(calcLinkDistance(event.getLinkId()));
 	}
 
-	
+
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Traveller t = this.traveller.get(event.getPersonId());
@@ -129,7 +129,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		}
 		t.endTrip(event.getTime(), calcLinkDistance(event.getLinkId()));
 	}
-	
+
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		Traveller t = this.traveller.get(event.getPersonId());
@@ -138,7 +138,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		}
 		t.setStuck();
 	}
-	
+
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
@@ -169,7 +169,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 			trip.beeline = calcBeelineDistance(trip.from, trip.to);
 			// dist for non-car-modes is calculated with a factor
 			if(!trip.mode.equals(TransportMode.car)){
-				trip.dist = this.distFactors.get( trip.mode ) * trip.beeline; 
+				trip.dist = this.distFactors.get( trip.mode ) * trip.beeline;
 			}
 			// there will be no more trips
 			if(trip.stuck) return;
@@ -177,7 +177,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	}
 
 //	##################helper methods #######################
-	
+
 	/**
 	 * @param linkId
 	 * @return
@@ -200,7 +200,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	 * @param outputPath
 	 */
 	public void dumpData(String outputPath, String fileprefix) {
-		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + System.getProperty("file.separator") + 
+		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + System.getProperty("file.separator") +
 				((fileprefix == null) ? "" : (fileprefix.endsWith(".") ? fileprefix : (fileprefix + "."))) + "trips.csv.gz");
 		try {
 			w.write(Traveller.HEADER + "\n");
@@ -216,10 +216,10 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	}
 
 //##################getter/setter###############################
-	
+
 	public final Map<Id<Person>, Traveller> getTraveller(){
 		return traveller;
 	}
-	
+
 }
 

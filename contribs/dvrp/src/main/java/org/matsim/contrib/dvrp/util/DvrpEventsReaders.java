@@ -28,9 +28,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestSubmittedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerWaitingEvent;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
+import org.matsim.contrib.dvrp.vrpagent.VehicleCapacityChangedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 
@@ -41,10 +43,12 @@ public class DvrpEventsReaders {
 		return Map.of(PassengerRequestSubmittedEvent.EVENT_TYPE, PassengerRequestSubmittedEvent::convert,//
 				PassengerRequestScheduledEvent.EVENT_TYPE, PassengerRequestScheduledEvent::convert,//
 				PassengerRequestRejectedEvent.EVENT_TYPE, PassengerRequestRejectedEvent::convert,//
+				PassengerWaitingEvent.EVENT_TYPE, PassengerWaitingEvent::convert,//
 				PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
 				PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert,//
 				TaskStartedEvent.EVENT_TYPE, e -> TaskStartedEvent.convert(e, stringToTaskTypeConverter),
-				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter));
+				TaskEndedEvent.EVENT_TYPE, e -> TaskEndedEvent.convert(e, stringToTaskTypeConverter),
+				VehicleCapacityChangedEvent.EVENT_TYPE, VehicleCapacityChangedEvent::convert);
 	}
 
 	public static MatsimEventsReader createEventsReader(EventsManager eventsManager,

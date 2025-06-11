@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.drt.extension;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.companions.DrtCompanionParams;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -45,10 +46,8 @@ public class DrtWithExtensionsConfigGroupTest {
 	private final static double WEIGHT_2 = 1337.;
 	private final static double WEIGHT_3 = 911.;
 
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
+    @TempDir
+    public File tempFolder;
 
     private static Config createConfig(List<Double> values) {
         Config config = ConfigUtils.createConfig();
@@ -70,25 +69,25 @@ public class DrtWithExtensionsConfigGroupTest {
         return config;
     }
 
-    private static Path writeConfig(final TemporaryFolder tempFolder, List<Double> weights) throws IOException {
+    private static Path writeConfig(final File tempFolder, List<Double> weights) throws IOException {
         Config config = createConfig(weights);
-        Path configFile = tempFolder.newFile("config.xml").toPath();
+        Path configFile = new File(tempFolder, "config.xml").toPath();
         ConfigUtils.writeConfig(config, configFile.toString());
         return configFile;
     }
 
-    @Test
-    public void loadConfigGroupTest() throws IOException {
+	@Test
+	void loadConfigGroupTest() throws IOException {
 
 		/* Test that exported values are correct imported again */
 		Path configFile = writeConfig(tempFolder, List.of(WEIGHT_1,WEIGHT_2,WEIGHT_3));
         Config config = ConfigUtils.createConfig();
         ConfigUtils.loadConfig(config, configFile.toString());
         DrtWithExtensionsConfigGroup loadedCfg = ConfigUtils.addOrGetModule(config, DrtWithExtensionsConfigGroup.class);
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().isPresent());
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(0).equals(WEIGHT_1));
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(1).equals(WEIGHT_2));
-		Assert.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(2).equals(WEIGHT_3));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().isPresent());
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(0).equals(WEIGHT_1));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(1).equals(WEIGHT_2));
+		Assertions.assertTrue(loadedCfg.getDrtCompanionParams().get().getDrtCompanionSamplingWeights().get(2).equals(WEIGHT_3));
     }
 
 }

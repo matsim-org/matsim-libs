@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="test network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="t1_IN" x="-1000.0" y="-8000.0">
+		</node>
+		<node id="t1_OUT" x="0.0" y="-8000.0">
+		</node>
+		<node id="t2_IN" x="49500.0" y="0.0">
+		</node>
+		<node id="t2_OUT" x="50500.0" y="0.0">
+		</node>
+		<node id="t3_IN" x="100000" y="-8000.0">
+		</node>
+		<node id="t3_OUT" x="101000.0" y="-8000.0">
+		</node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="t1_OUT-t2_IN" from="t1_OUT" to="t2_IN" length="50000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t2_OUT-t3_IN" from="t2_OUT" to="t3_IN" length="50000" freespeed="13.8889" capacity="3600" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="t1_IN-t1_OUT" from="t1_IN" to="t1_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="t2_IN-t2_OUT" from="t2_IN" to="t2_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">5</attribute>
+			</attributes>
+		</link>
+		<link id="t3_IN-t3_OUT" from="t3_IN" to="t3_OUT" length="200.0" freespeed="2.7777777777777777" capacity="3600.0" permlanes="1" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>

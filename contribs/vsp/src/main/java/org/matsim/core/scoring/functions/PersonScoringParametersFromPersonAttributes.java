@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * which is an adoption of {@link org.matsim.core.scoring.functions.SubpopulationScoringParameters}.
  * This class additionaly allows for person-specific mode scoring parameters (for now ASC only) and marginalUtilityOfMoney.
  * In order to use this, you need to provide the respective attributes (otherwise default values for the subpopulation
- * are used). For mode scoring parameters use .... TODO
+ * are used). The person specific mode parameters are interpreted as offset added to the subpopulation's parameters.
  * For marginalUtilityOfMoney an attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} for persons that have a specific
  * income is used. Persons in the population, that have no attribute {@link org.matsim.core.population.PersonUtils#getIncome(Person)} will use the
  * default marginal utility set in their subpopulation's scoring parameters.
@@ -60,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PersonScoringParametersFromPersonAttributes implements ScoringParametersForPerson {
     Logger log = LogManager.getLogger(PersonScoringParametersFromPersonAttributes.class);
 
-    private final PlanCalcScoreConfigGroup config;
+    private final ScoringConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
     private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
@@ -68,8 +68,8 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
     private final Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new ConcurrentHashMap<>();
 
     @Inject
-    PersonScoringParametersFromPersonAttributes(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
-        this.config = planCalcScoreConfigGroup;
+    PersonScoringParametersFromPersonAttributes(Population population, ScoringConfigGroup scoringConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
+        this.config = scoringConfigGroup;
         this.scConfig = scenarioConfigGroup;
         this.transitConfigGroup = transitConfigGroup;
         this.globalAvgIncome = computeAvgIncome(population);
@@ -114,13 +114,13 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
              * point of view than giving each ScoringFunction its own copy of the params.
              */
 
-            PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+            ScoringConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
             // (we can set scoring params per subpopulation, so retrieve them as starting point.  kai, apr'22)
 
             // save the activityParams of the subpopulation so we need to build them only once.
             this.activityParamsPerSubpopulation.computeIfAbsent(subpopulation, k -> {
                 Map<String, ActivityUtilityParameters> activityParams = new TreeMap<>();
-                for (PlanCalcScoreConfigGroup.ActivityParams params : subpopulationScoringParams.getActivityParams()) {
+                for (ScoringConfigGroup.ActivityParams params : subpopulationScoringParams.getActivityParams()) {
                     ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params);
                     activityParams.put(params.getActivityType(), factory.build());
                 }
@@ -134,7 +134,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
 
             if (transitConfigGroup.isUseTransit()) {
                 // this is the PT stage activity:
-                PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+                ScoringConfigGroup.ActivityParams transitActivityParams = new ScoringConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
                 transitActivityParams.setTypicalDuration(120.0);
                 transitActivityParams.setOpeningTime(0.);
                 transitActivityParams.setClosingTime(0.);
@@ -160,9 +160,11 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
             Map<String, String> personalScoringModeConstants = PersonUtils.getModeConstants(person);
             if (personalScoringModeConstants != null) {
                 for (Map.Entry<String, String> entry: personalScoringModeConstants.entrySet()) {
-                    ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
+					ScoringConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
+					ModeUtilityParameters.Builder modeUtilityParamsBuilder = new ModeUtilityParameters.Builder();
                     try {
-                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()));
+                        modeUtilityParamsBuilder.setConstant(Double.parseDouble(entry.getValue()) +
+							subpopulationModeParams.getConstant());
                     } catch (NumberFormatException e) {
                         log.error("PersonalScoringModeConstants from person attribute could not be parsed for person " +
                                 person.getId().toString() + ".");
@@ -170,7 +172,6 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                     }
 
                     // copy other params from subpopulation config
-                    PlanCalcScoreConfigGroup.ModeParams subpopulationModeParams = subpopulationScoringParams.getModes().get(entry.getKey());
                     modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
                     modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
                     modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());

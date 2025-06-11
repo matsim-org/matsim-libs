@@ -19,19 +19,22 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
 
 /**
  * @author mrieser
@@ -39,96 +42,109 @@ import org.matsim.testcases.MatsimTestUtils;
 public class NetworkMergeDoubleLinksTest {
 
 	@Test
-	public void testRun_remove() {
+	void testRun_remove() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.REMOVE);
 		merger.run(f.network);
 
-		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[10]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[11]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[12]));
+		Assertions.assertEquals(3, f.network.getLinks().size(), "wrong number of links.");
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[10]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[11]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[12]));
 
 		// attributes should be unchanged
-		Assert.assertEquals(100.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(200.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(30.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(100.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(200.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(30.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(50.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(50.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
-	public void testRun_additive() {
+	void testRun_additive() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.ADDITIVE);
 		merger.run(f.network);
 
-		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[10]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[11]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[12]));
+		Assertions.assertEquals(3, f.network.getLinks().size(), "wrong number of links.");
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[10]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[11]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[12]));
 
 		// additive merge (sum cap, max freespeed, sum lanes, max length)
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2200.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2200.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2200.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2200.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1500.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(3, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1500.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(3, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+
+		// no restriction, as one of the duplicates allowed transition
+		Assertions.assertNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[0])));
+
+		// restriction remains, as both links have it
+		Assertions.assertNotNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[1])));
 	}
 
 	@Test
-	public void testRun_maximum() {
+	void testRun_maximum() {
 		Fixture f = new Fixture();
 		NetworkMergeDoubleLinks merger = new NetworkMergeDoubleLinks(NetworkMergeDoubleLinks.MergeType.MAXIMUM);
 		merger.run(f.network);
 
-		Assert.assertEquals("wrong number of links.", 3, f.network.getLinks().size());
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[10]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[11]));
-		Assert.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
-		Assert.assertNull(f.network.getLinks().get(f.linkIds[12]));
+		Assertions.assertEquals(3, f.network.getLinks().size(), "wrong number of links.");
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[0]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[10]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[1]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[11]));
+		Assertions.assertNotNull(f.network.getLinks().get(f.linkIds[2]));
+		Assertions.assertNull(f.network.getLinks().get(f.linkIds[12]));
 
 		// max merge (max cap, max freespeed, max langes, max length
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[0]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[0]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[0]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[0]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(500.0, f.network.getLinks().get(f.linkIds[1]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2000.0, f.network.getLinks().get(f.linkIds[1]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[1]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(70.0/3.6, f.network.getLinks().get(f.linkIds[1]).getFreespeed(), MatsimTestUtils.EPSILON);
 
-		Assert.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1000.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(2, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(700.0, f.network.getLinks().get(f.linkIds[2]).getLength(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(1000.0, f.network.getLinks().get(f.linkIds[2]).getCapacity(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(2, f.network.getLinks().get(f.linkIds[2]).getNumberOfLanes(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(80.0/3.6, f.network.getLinks().get(f.linkIds[2]).getFreespeed(), MatsimTestUtils.EPSILON);
+
+		// no restriction, as one of the duplicates allowed transition
+		Assertions.assertNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[0])));
+
+		// restriction remains, as both links have it
+		Assertions.assertNotNull(NetworkUtils.getDisallowedNextLinks(f.network.getLinks().get(f.linkIds[1])));
+
 	}
 
 	private static class Fixture {
@@ -175,6 +191,12 @@ public class NetworkMergeDoubleLinksTest {
 			l12.setLength(300); l12.setCapacity(1000.0); l12.setNumberOfLanes(1); l12.setFreespeed(80.0/3.6);
 			this.network.addLink(l2);
 			this.network.addLink(l12);
+
+			NetworkUtils.getOrCreateDisallowedNextLinks(l0).addDisallowedLinkSequence(TransportMode.car, List.of(l1.getId()));
+
+			NetworkUtils.getOrCreateDisallowedNextLinks(l1).addDisallowedLinkSequence(TransportMode.car, List.of(l12.getId()));
+			NetworkUtils.getOrCreateDisallowedNextLinks(l11).addDisallowedLinkSequence(TransportMode.car, List.of(l12.getId()));
+
 		}
 	}
 

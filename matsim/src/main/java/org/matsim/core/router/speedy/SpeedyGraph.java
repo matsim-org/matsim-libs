@@ -1,11 +1,10 @@
 package org.matsim.core.router.speedy;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Implements a highly optimized data structure for representing a MATSim network. Optimized to use as little memory as possible, and thus to fit as much memory as possible into CPU caches for high
@@ -45,8 +44,8 @@ public class SpeedyGraph {
      *   So, a network-graph with 1 Mio nodes and 2 Mio links should consume between 64 and 72 MB RAM only.
      */
 
-    private final static int NODE_SIZE = 2;
-    private final static int LINK_SIZE = 6;
+    final static int NODE_SIZE = 2;
+    final static int LINK_SIZE = 6;
 
     final int nodeCount;
     final int linkCount;
@@ -54,73 +53,17 @@ public class SpeedyGraph {
     private final int[] linkData;
     private final Link[] links;
     private final Node[] nodes;
+    private final TurnRestrictionsContext turnRestrictions;
 
-    public SpeedyGraph(Network network) {
-        this.nodeCount = Id.getNumberOfIds(Node.class);
-        this.linkCount = Id.getNumberOfIds(Link.class);
-
-        this.nodeData = new int[nodeCount * NODE_SIZE];
-        this.linkData = new int[linkCount * LINK_SIZE];
-        this.links = new Link[linkCount];
-        this.nodes = new Node[nodeCount];
-
-        Arrays.fill(this.nodeData, -1);
-        Arrays.fill(this.linkData, -1);
-
-        for (Node node : network.getNodes().values()) {
-            this.nodes[node.getId().index()] = node;
-        }
-        for (Link link : network.getLinks().values()) {
-            addLink(link);
-        }
-    }
-
-    private void addLink(Link link) {
-        int fromNodeIdx = link.getFromNode().getId().index();
-        int toNodeIdx = link.getToNode().getId().index();
-        int linkIdx = link.getId().index();
-
-        int base = linkIdx * LINK_SIZE;
-        this.linkData[base + 2] = fromNodeIdx;
-        this.linkData[base + 3] = toNodeIdx;
-        this.linkData[base + 4] = (int) Math.round(link.getLength() * 100.0);
-        this.linkData[base + 5] = (int) Math.round(link.getLength() / link.getFreespeed() * 100.0);
-
-        setOutLink(fromNodeIdx, linkIdx);
-        setInLink(toNodeIdx, linkIdx);
-
-        this.links[linkIdx] = link;
-    }
-
-    private void setOutLink(int fromNodeIdx, int linkIdx) {
-        final int nodeI = fromNodeIdx * NODE_SIZE;
-        int outLinkIdx = this.nodeData[nodeI];
-        if (outLinkIdx < 0) {
-            this.nodeData[nodeI] = linkIdx;
-            return;
-        }
-        int lastLinkIdx;
-        do {
-            lastLinkIdx = outLinkIdx;
-            outLinkIdx = this.linkData[lastLinkIdx * LINK_SIZE];
-        } while (outLinkIdx >= 0);
-        this.linkData[lastLinkIdx * LINK_SIZE] = linkIdx;
-    }
-
-    private void setInLink(int toNodeIdx, int linkIdx) {
-        final int nodeI = toNodeIdx * NODE_SIZE + 1;
-        int inLinkIdx = this.nodeData[nodeI];
-        if (inLinkIdx < 0) {
-            this.nodeData[nodeI] = linkIdx;
-            return;
-        }
-        int lastLinkIdx;
-        do {
-            lastLinkIdx = inLinkIdx;
-            inLinkIdx = this.linkData[lastLinkIdx * LINK_SIZE + 1];
-        } while (inLinkIdx >= 0);
-        this.linkData[lastLinkIdx * LINK_SIZE + 1] = linkIdx;
-    }
+	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links, TurnRestrictionsContext turnRestrictions) {
+		this.nodeData = nodeData;
+		this.linkData = linkData;
+		this.nodes = nodes;
+		this.links = links;
+		this.nodeCount = this.nodes.length;
+		this.linkCount = this.links.length;
+		this.turnRestrictions = turnRestrictions;
+	}
 
     public LinkIterator getOutLinkIterator() {
         return new OutLinkIterator(this);
@@ -137,6 +80,10 @@ public class SpeedyGraph {
     Node getNode(int index) {
         return this.nodes[index];
     }
+
+    Optional<TurnRestrictionsContext> getTurnRestrictions() {
+			return Optional.ofNullable(this.turnRestrictions);
+		}
 
     public interface LinkIterator {
 

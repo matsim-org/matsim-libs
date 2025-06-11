@@ -20,17 +20,12 @@
 package org.matsim.pt.utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,18 +34,14 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.GeometryUtils;
+import org.matsim.pt.transitSchedule.api.*;
 import org.xml.sax.SAXException;
 
 /**
  * An abstract class offering a number of static methods to validate several aspects of transit schedules.
- * 
+ *
  * @author mrieser
  */
 public abstract class TransitScheduleValidator {
@@ -58,7 +49,7 @@ public abstract class TransitScheduleValidator {
 	private TransitScheduleValidator() {
 		// this class should not be instantiated
 	}
-	
+
 	/**
 	 * Checks that the links specified for a network route really builds a complete route that can be driven along.
 	 *
@@ -177,7 +168,7 @@ public abstract class TransitScheduleValidator {
 		}
 		return result;
 	}
-	
+
 	public static ValidationResult validateOffsets(final TransitSchedule schedule) {
 		ValidationResult result = new ValidationResult();
 
@@ -185,20 +176,20 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(route.getStops());
 				int stopCount = stops.size();
-				
+
 				if (stopCount > 0) {
 					TransitRouteStop stop = stops.get(0);
 					if (stop.getDepartureOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
 					}
-					
+
 					for (int i = 1; i < stopCount - 1; i++) {
 						stop = stops.get(i);
 						if (stop.getDepartureOffset().isUndefined()) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
 						}
 					}
-					
+
 					stop = stops.get(stopCount - 1);
 					if (stop.getArrivalOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
@@ -206,10 +197,10 @@ public abstract class TransitScheduleValidator {
 				} else {
 					result.addWarning("Transit line " + line.getId() + ", route " + route.getId() + ": The route has not stops assigned, looks suspicious.");
 				}
-				
+
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -248,6 +239,211 @@ public abstract class TransitScheduleValidator {
 		return result;
 	}
 
+	public static ValidationResult validateDepartures(TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				if (route.getDepartures().isEmpty())
+					result.addError("No departures defined for line %s, route %s".formatted(line.getId(), route.getId()));
+
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Validate if coordinates of stops and given travel times are plausible.
+	 */
+	public static ValidationResult validateStopCoordinates(final TransitSchedule schedule) {
+
+		ValidationResult result = new ValidationResult();
+
+		// List of stops to the collected suspicious stops
+		Map<TransitStopFacility, DoubleList> suspiciousStops = new TreeMap<>(Comparator.comparing(TransitStopFacility::getName));
+
+		for (TransitLine line : schedule.getTransitLines().values()) {
+
+			for (TransitRoute route : line.getRoutes().values()) {
+
+				List<TransitRouteStop> routeStops = route.getStops();
+
+				// For too short routes, we can not detect outliers
+				if (routeStops.size() <= 4)
+					continue;
+
+				double lastDepartureOffset = routeStops.getFirst().getDepartureOffset().or(routeStops.getFirst().getArrivalOffset()).seconds();
+
+				DoubleList speeds = new DoubleArrayList();
+				DoubleList dists = new DoubleArrayList();
+
+				for (int i = 1; i < routeStops.size(); i++) {
+					TransitRouteStop routeStop = routeStops.get(i);
+
+					if (routeStop.getStopFacility().getCoord() == null)
+						break;
+
+					double departureOffset = routeStop.getArrivalOffset().or(routeStop.getDepartureOffset()).orElse(0);
+					double travelTime = departureOffset - lastDepartureOffset;
+					double length = CoordUtils.calcEuclideanDistance(routeStop.getStopFacility().getCoord(),
+						routeStops.get(i - 1).getStopFacility().getCoord());
+
+					dists.add(length);
+
+					// Short distances are not checked, because here high speeds are not so problematic and arise from few seconds difference
+					if (length <= 20) {
+						speeds.add(-1);
+						continue;
+					}
+
+					if (travelTime == 0) {
+						speeds.add(Double.POSITIVE_INFINITY);
+						continue;
+					}
+
+					double speed = length / travelTime;
+					speeds.add(speed);
+					lastDepartureOffset = departureOffset;
+				}
+
+				// If all speeds are valid, the stops and speeds can be checked
+				if (speeds.size() == routeStops.size() - 1) {
+
+					// First check for suspicious stops
+					// These are stops with very high speed, and also high distance between stops
+					for (int i = 0; i < speeds.size() - 1; i++) {
+						TransitRouteStop stop = routeStops.get(i + 1);
+						double toStop = speeds.getDouble(i);
+						double fromStop = speeds.getDouble(i + 1);
+
+						double both = (toStop + fromStop) / 2;
+
+						double dist = (dists.getDouble(i) + dists.getDouble(i + 1)) / 2;
+
+						// Only if the distance is large, we assume a mapping error might have occurred
+						if (dist < 5_000)
+							continue;
+
+						// Remove the considered speeds from the calculation
+						DoubleList copy = new DoubleArrayList(speeds);
+						copy.removeDouble(i);
+						copy.removeDouble(i);
+						copy.removeIf(s -> s == -1 || s == Double.POSITIVE_INFINITY);
+
+						double mean = copy.doubleStream().average().orElse(-1);
+
+						// If no mean is known, use a high value to avoid false positives
+						if (mean == -1) {
+							mean = 70;
+						}
+
+						// Some hard coded rules to detect suspicious stops, these are speed m/s, so quite high values
+						if (((toStop > 3 * mean && both > 50) || toStop > 120) && (((fromStop > 3 * mean && both > 50) || fromStop > 120))) {
+							DoubleList suspiciousSpeeds = suspiciousStops.computeIfAbsent(stop.getStopFacility(), (k) -> new DoubleArrayList());
+							suspiciousSpeeds.add(toStop);
+							suspiciousSpeeds.add(fromStop);
+						}
+					}
+
+					// Then check for implausible travel times
+					for (int i = 0; i < speeds.size(); i++) {
+						double speed = speeds.getDouble(i);
+						TransitStopFacility from = routeStops.get(i).getStopFacility();
+						TransitStopFacility to = routeStops.get(i + 1).getStopFacility();
+						if (speed > 230) {
+							result.addWarning("Suspicious high speed from stop %s (%s) to %s (%s) on line %s, route %s, index: %d: %.2f m/s, %.2fm"
+								.formatted(from.getName(), from.getId(), to.getName(), to.getId(), line.getId(), route.getId(), i, speed, dists.getDouble(i)));
+						}
+					}
+				}
+			}
+		}
+
+		for (Map.Entry<TransitStopFacility, DoubleList> e : suspiciousStops.entrySet()) {
+			TransitStopFacility stop = e.getKey();
+			double speed = e.getValue().doubleStream().average().orElse(-1);
+			result.addWarning("Suspicious location for stop %s (%s) at stop area %s: %s, avg. speed: %.2f m/s".formatted(stop.getName(), stop.getId(), stop.getStopAreaId(), stop.getCoord(), speed));
+		}
+
+		return result;
+	}
+
+	/**
+	 * Validate that all chained departures reference existing departures in the schedule.
+	 */
+	public static ValidationResult validateChainedDepartures(final TransitSchedule schedule) {
+		ValidationResult result = new ValidationResult();
+		
+		// Track all available departures in the schedule
+		Map<Id<TransitLine>, TransitLine> allLines = schedule.getTransitLines();
+		
+		for (TransitLine line : allLines.values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					if (!departure.getChainedDepartures().isEmpty()) {
+						for (ChainedDeparture chainedDep : departure.getChainedDepartures()) {
+							Id<TransitLine> transitLineId = chainedDep.getChainedTransitLineId();
+							Id<TransitRoute> transitRouteId = chainedDep.getChainedRouteId();
+							Id<Departure> departureId = chainedDep.getChainedDepartureId();
+							
+							// Check if the referenced transit line exists
+							TransitLine targetLine = allLines.get(transitLineId);
+							if (targetLine == null) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to line " + 
+									transitLineId + " which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+							
+							// Check if the referenced transit route exists
+							TransitRoute targetRoute = targetLine.getRoutes().get(transitRouteId);
+							if (targetRoute == null) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to route " + 
+									transitRouteId + " in line " + transitLineId +
+									" which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+							
+							// Check if the referenced departure exists
+							if (!targetRoute.getDepartures().containsKey(departureId)) {
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, 
+									"Transit line " + line.getId() + ", route " + route.getId() + 
+									", departure " + departure.getId() + " has a chained departure reference to departure " + 
+									departureId + " in route " + targetRoute.getId() + ", line " + transitLineId +
+									" which does not exist in the schedule.", 
+									ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								continue;
+							}
+
+							// Check if the last stop of the route matches the first stop of the chained route
+							if (!route.getStops().isEmpty() && !targetRoute.getStops().isEmpty()) {
+								TransitRouteStop lastStop = route.getStops().get(route.getStops().size() - 1);
+								TransitRouteStop firstStop = targetRoute.getStops().get(0);
+								
+								if (!lastStop.getStopFacility().getId().equals(firstStop.getStopFacility().getId())) {
+									result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR,
+										"Transit line " + line.getId() + ", route " + route.getId() +
+										", departure " + departure.getId() + " has a chained departure where the last stop (" +
+										lastStop.getStopFacility().getId() + ") does not match the first stop (" +
+										firstStop.getStopFacility().getId() + ") of the chained route " + targetRoute.getId() +
+										" in line " + transitLineId,
+										ValidationResult.Type.OTHER, Collections.singleton(departure.getId())));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+
 	public static ValidationResult validateAll(final TransitSchedule schedule, final Network network) {
 		ValidationResult v = validateUsedStopsHaveLinkId(schedule);
 		v.add(validateNetworkRoutes(schedule, network));
@@ -259,9 +455,12 @@ public abstract class TransitScheduleValidator {
 		v.add(validateAllStopsExist(schedule));
 		v.add(validateOffsets(schedule));
 		v.add(validateTransfers(schedule));
+		v.add(validateStopCoordinates(schedule));
+		v.add(validateDepartures(schedule));
+		v.add(validateChainedDepartures(schedule));
 		return v;
 	}
-	
+
 	public static void printResult(final ValidationResult result) {
 		if (result.isValid()) {
 			System.out.println("Schedule appears valid!");
@@ -293,7 +492,7 @@ public abstract class TransitScheduleValidator {
 			System.err.println("Usage: TransitScheduleValidator transitSchedule.xml [network.xml]");
 			return;
 		}
-		
+
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().transit().setUseTransit(true);
 		TransitSchedule ts = s.getTransitSchedule();
@@ -311,11 +510,11 @@ public abstract class TransitScheduleValidator {
 	public static class ValidationResult {
 
 		public enum Severity {
-			WARNING, ERROR;
+			WARNING, ERROR
 		}
 
 		public enum Type {
-			HAS_MISSING_STOP_FACILITY, HAS_NO_LINK_REF, ROUTE_HAS_UNREACHABLE_STOP, OTHER;
+			HAS_MISSING_STOP_FACILITY, HAS_NO_LINK_REF, ROUTE_HAS_UNREACHABLE_STOP, OTHER
 		}
 
 		public static class ValidationIssue<T> {

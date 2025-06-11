@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.noise;
 
@@ -35,24 +35,24 @@ import com.google.inject.Inject;
 
 
 /**
- * 
+ *
  * @author ikaddoura
  *
  */
 final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
 	private static final Logger log = LogManager.getLogger(NoiseCalculationOnline.class);
-	
+
 	@Inject
 	private NoiseContext noiseContext;
-	
+
 	@Inject
 	private NoiseTimeTracker timeTracker;
-			
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);	
+		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controller().getOutputDirectory() + "/receiverPoints/", false);
 	}
-	
+
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
@@ -60,12 +60,12 @@ final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimL
 
 		this.noiseContext.getNoiseLinks().clear();
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
-		
+
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.reset();
 		}
 	}
-	
+
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		timeTracker.computeFinalTimeIntervals();
@@ -75,5 +75,5 @@ final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimL
 	NoiseContext getNoiseContext() {
 		return noiseContext;
 	}
-	
+
 }

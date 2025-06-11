@@ -21,8 +21,8 @@ package org.matsim.core.events;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
@@ -38,21 +38,21 @@ public class EventsManagerImplTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testProcessEvent_CustomEventHandler() {
+	void testProcessEvent_CustomEventHandler() {
 		EventsManager manager = EventsUtils.createEventsManager();
 		CountingMyEventHandler handler = new CountingMyEventHandler();
 		manager.addHandler(handler);
 		manager.initProcessing();
 		manager.processEvent(new MyEvent(123.45));
 		manager.finishProcessing();
-		Assert.assertEquals("EventHandler was not called.", 1, handler.counter);
+		Assertions.assertEquals(1, handler.counter, "EventHandler was not called.");
 	}
 
 	/**
 	 * @author mrieser
 	 */
 	@Test
-	public void testProcessEvent_ExceptionInEventHandler() {
+	void testProcessEvent_ExceptionInEventHandler() {
 		EventsManager manager = EventsUtils.createEventsManager();
 		CrashingMyEventHandler handler = new CrashingMyEventHandler();
 		manager.addHandler(handler);
@@ -60,12 +60,12 @@ public class EventsManagerImplTest {
 		try {
 			manager.processEvent(new MyEvent(123.45));
 			manager.finishProcessing();
-			Assert.fail("expected exception, but got none.");
+			Assertions.fail("expected exception, but got none.");
 		} catch (final RuntimeException e) {
 			log.info("Catched expected exception.", e);
 
-			Assert.assertEquals(1, handler.counter);
-			Assert.assertTrue(e.getCause() instanceof ArithmeticException);
+			Assertions.assertEquals(1, handler.counter);
+			Assertions.assertTrue(e.getCause() instanceof ArithmeticException);
 		}
 	}
 
@@ -104,6 +104,7 @@ public class EventsManagerImplTest {
 		@Override
 		public void handleEvent(final MyEvent e) {
 			this.counter++;
+			//noinspection divzero
 			int i = 1 / 0; // produce ArithmeticException
 			System.out.println(i);
 		}

@@ -19,13 +19,14 @@
 package org.matsim.core.network;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -36,12 +37,10 @@ import java.net.URL;
 public class ReadFromURLIT {
 
 	@Test
-	public void testReadingFromURLWorks() throws MalformedURLException {
+	void testReadingFromURLWorks() throws MalformedURLException {
 		Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork() ;
 		MatsimNetworkReader reader = new MatsimNetworkReader(network) ;
-//		reader.parse(new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/matsim/examples/equil/network.xml"));
-		reader.parse( new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/equil/network.xml") ) ;
+		reader.parse(URI.create("https://raw.githubusercontent.com/matsim-org/matsim/main/examples/scenarios/equil/network.xml").toURL());
 		Assertions.assertThat(network.getLinks().size()).isEqualTo(23);
 	}
-
 }

@@ -1,6 +1,6 @@
 package org.matsim.application.analysis.traffic;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

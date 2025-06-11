@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.FreightConstants;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.CarrierService;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarrierConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;
@@ -93,7 +93,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
 
 
     private void handleFreightActivityStart(ActivityStartEvent event) {
-        if (event.getActType().equals(FreightConstants.END)) {
+        if (event.getActType().equals(CarrierConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
 
@@ -112,9 +112,9 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
     }
 
     private double calcDifference(CarrierService service, double time) {
-        if (time < service.getServiceStartTimeWindow().getStart()) return (service.getServiceStartTimeWindow().getStart() - time);
-        else if (time >= service.getServiceStartTimeWindow().getStart() && time <= service.getServiceStartTimeWindow().getEnd()) return 0;
-        else return (time - service.getServiceStartTimeWindow().getEnd());
+        if (time < service.getServiceStaringTimeWindow().getStart()) return (service.getServiceStaringTimeWindow().getStart() - time);
+        else if (time >= service.getServiceStaringTimeWindow().getStart() && time <= service.getServiceStaringTimeWindow().getEnd()) return 0;
+        else return (time - service.getServiceStaringTimeWindow().getEnd());
     }
 
     @Override
@@ -126,7 +126,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        if (event.getActType().equals(FreightConstants.START)) {
+        if (event.getActType().equals(CarrierConstants.START)) {
             activeDeliveryAgents.add(event.getPersonId());
         }
     }

@@ -15,6 +15,7 @@ import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -35,7 +36,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             defaultValue = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/german-wide-freight/v2/germany-europe-network.xml.gz")
     private String networkPath;
 
-    @CommandLine.Option(names = "--nuts", description = "Path to desired network file", required = true)
+    @CommandLine.Option(names = "--nuts", description = "Path to NUTS file (available on SVN: )", required = true)
     // TODO Change this to URL pointing to SVN--> need to update the Location calculator
     private Path shpPath;
 
@@ -48,8 +49,8 @@ public class GenerateFreightPlans implements MATSimAppCommand {
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year")
     private int workingDays;
 
-    @CommandLine.Option(names = "--sample", defaultValue = "1", description = "Scaling factor of the freight traffic (0, 1)")
-    private double sample;
+    @CommandLine.Option(names = "--sample", defaultValue = "100", description = "Sample size of the freight plans (0, 100]")
+    private double pct;
 
     @CommandLine.Mixin
     private LanduseOptions landuse = new LanduseOptions();
@@ -60,12 +61,12 @@ public class GenerateFreightPlans implements MATSimAppCommand {
         log.info("Network successfully loaded!");
 
         log.info("preparing freight agent generator...");
-        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, landuse, averageTruckLoad, workingDays, sample);
+        FreightAgentGenerator freightAgentGenerator = new FreightAgentGenerator(network, shpPath, landuse, averageTruckLoad, workingDays, pct / 100);
         log.info("Freight agent generator successfully created!");
 
         log.info("Reading trip relations...");
         List<TripRelation> tripRelations = TripRelation.readTripRelations(dataPath);
-        log.info("Trip relations successfully loaded. There are " + tripRelations.size() + " trip relations");
+		log.info("Trip relations successfully loaded. There are {} trip relations", tripRelations.size());
 
         log.info("Start generating population...");
         Population outputPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
@@ -76,7 +77,7 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             }
 
             if (i % 500000 == 0) {
-                log.info("Processing: " + i + " out of " + tripRelations.size() + " entries have been processed");
+				log.info("Processing: {} out of {} entries have been processed", i, tripRelations.size());
             }
         }
 
@@ -84,28 +85,33 @@ public class GenerateFreightPlans implements MATSimAppCommand {
             Files.createDirectory(output);
         }
 
-        String outputPlansPath = output.toString() + "/german_freight.25pct.plans.xml.gz";
+        String outputPlansPath = output.toString() + "/german_freight." + pct + "pct.plans.xml.gz";
         PopulationWriter populationWriter = new PopulationWriter(outputPopulation);
         populationWriter.write(outputPlansPath);
 
         // Write down tsv file for visualisation and analysis
         String freightTripTsvPath = output.toString() + "/freight_trips_data.tsv";
-        CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
-        tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
-        for (Person person : outputPopulation.getPersons().values()) {
-            List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-            Activity act0 = (Activity) planElements.get(0);
-            Activity act1 = (Activity) planElements.get(2);
-            Coord fromCoord = act0.getCoord();
-            Coord toCoord = act1.getCoord();
-            tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
-        }
-        tsvWriter.close();
 
-        return 0;
+		createOutput_tripOD_relations(freightTripTsvPath, outputPopulation);
+
+		return 0;
     }
 
-    public static void main(String[] args) {
+	public static void createOutput_tripOD_relations(String freightTripTsvPath, Population outputPopulation) throws IOException {
+		CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
+		tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+		for (Person person : outputPopulation.getPersons().values()) {
+			List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+			Activity act0 = (Activity) planElements.get(0);
+			Activity act1 = (Activity) planElements.get(2);
+			Coord fromCoord = act0.getCoord();
+			Coord toCoord = act1.getCoord();
+			tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+		}
+		tsvWriter.close();
+	}
+
+	public static void main(String[] args) {
         new GenerateFreightPlans().execute(args);
     }
 }

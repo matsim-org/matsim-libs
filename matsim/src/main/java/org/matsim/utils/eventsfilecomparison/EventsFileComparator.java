@@ -21,6 +21,7 @@ package org.matsim.utils.eventsfilecomparison;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,8 +36,6 @@ import java.util.concurrent.CyclicBarrier;
  */
 public final class EventsFileComparator {
 	private static final Logger log = LogManager.getLogger(EventsFileComparator.class);
-
-	public enum Result { FILES_ARE_EQUAL, DIFFERENT_NUMBER_OF_TIMESTEPS, DIFFERENT_TIMESTEPS, MISSING_EVENT, WRONG_EVENT_COUNT }
 
 	private boolean ignoringCoordinates = false;
 	public EventsFileComparator setIgnoringCoordinates( boolean ignoringCoordinates ){
@@ -61,13 +60,13 @@ public final class EventsFileComparator {
 	 *
 	 * @param filename1 name of the first event file
 	 * @param filename2 name of the second event file
-	 * @return <code>Result.FILES_ARE_EQUAL</code> if the events files are equal, or some error code (see {@link Result}) if not.
+	 * @return <code>Result.FILES_ARE_EQUAL</code> if the events files are equal, or some error code (see {@link ComparisonResult}) if not.
 	 */
-	public static Result compare(final String filename1, final String filename2) {
+	public static ComparisonResult compare(final String filename1, final String filename2) {
 		return new EventsFileComparator().runComparison( filename1, filename2 );
 	}
 
-	public Result runComparison( final String filename1, final String filename2 ) {
+	public ComparisonResult runComparison(final String filename1, final String filename2 ) {
 		// (need method name different from pre-existing static method.  kai, feb'20)
 
 		EventsComparator comparator = new EventsComparator( );
@@ -89,8 +88,8 @@ public final class EventsFileComparator {
 			e.printStackTrace();
 		}
 
-		Result retCode = comparator.retCode;
-		if (retCode == Result.FILES_ARE_EQUAL) {
+		ComparisonResult retCode = comparator.retCode;
+		if (retCode == ComparisonResult.FILES_ARE_EQUAL) {
 			log.info("Event files are semantically equivalent.");
 		} else {
 			log.warn("Event files differ.");
@@ -102,7 +101,7 @@ public final class EventsFileComparator {
 
 		private Worker worker1 = null;
 		private Worker worker2 = null;
-		private volatile Result retCode = null ;
+		private volatile ComparisonResult retCode = null ;
 
 		/*package*/ void setWorkers(final Worker w1, final Worker w2) {
 			this.worker1 = w1;
@@ -113,13 +112,13 @@ public final class EventsFileComparator {
 		public void run() {
 			if (this.worker1.getCurrentTime() != this.worker2.getCurrentTime()) {
 				log.warn("Differnt time steps in event files!");
-				setExitCode(Result.DIFFERENT_TIMESTEPS);
+				setExitCode(ComparisonResult.DIFFERENT_TIMESTEPS);
 				return;
 			}
 
 			if (this.worker1.isFinished() != this.worker2.isFinished()) {
 				log.warn("Events files have different number of time steps!");
-				setExitCode(Result.DIFFERENT_NUMBER_OF_TIMESTEPS);
+				setExitCode(ComparisonResult.DIFFERENT_NUMBER_OF_TIMESTEPS);
 				return;
 			}
 
@@ -128,36 +127,51 @@ public final class EventsFileComparator {
 
 			boolean problem = false ;
 
+			int logCounter = 0;
+
 			// check that map2 contains all keys of map1, with the same values
 			for (Entry<String, Counter> entry : map1.entrySet()) {
 
 				Counter counter = map2.get(entry.getKey());
 				if (counter == null) {
-					log.warn("The event:" ) ;
-					log.warn( entry.getKey() );
-					log.warn("is missing in events file:" + worker2.getEventsFile());
-					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
+					if (logCounter < 50) {
+						logCounter++;
+						log.warn("The event:");
+						log.warn(entry.getKey());
+						log.warn("is missing in events file:" + worker2.getEventsFile());
+						setExitCode(ComparisonResult.MISSING_EVENT);
+						problem = true;
+						if (logCounter == 50) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+					}
 				} else{
 					if( counter.getCount() != entry.getValue().getCount() ){
 						log.warn(
 							  "Wrong event count for: " + entry.getKey() + "\n" + entry.getValue().getCount() + " times in file:" + worker1.getEventsFile()
 								    + "\n" + counter.getCount() + " times in file:" + worker2.getEventsFile() );
-						setExitCode( Result.WRONG_EVENT_COUNT );
+						setExitCode( ComparisonResult.WRONG_EVENT_COUNT );
 						problem = true;
 					}
 				}
 			}
 
+			logCounter = 0;
 			// also check that map1 contains all keys of map2
 			for (Entry<String, Counter> e : map2.entrySet()) {
 				Counter counter = map1.get(e.getKey());
 				if (counter == null) {
-					log.warn("The event:");
-					log.warn(e.getKey());
-					log.warn("is missing in events file:" + worker1.getEventsFile());
-					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
+					if (logCounter < 50) {
+						logCounter++;
+						log.warn("The event:");
+						log.warn(e.getKey());
+						log.warn("is missing in events file:" + worker1.getEventsFile());
+						setExitCode(ComparisonResult.MISSING_EVENT);
+						problem = true;
+						if (logCounter == 50) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+					}
 				}
 			}
 
@@ -166,17 +180,25 @@ public final class EventsFileComparator {
 			}
 
 			if (this.worker1.isFinished()) {
-				setExitCode(Result.FILES_ARE_EQUAL);
+				setExitCode(ComparisonResult.FILES_ARE_EQUAL);
 			}
 		}
 
-		private void setExitCode(final Result errCode) {
+		private void setExitCode(final ComparisonResult errCode) {
 			this.retCode= errCode;
-			if (errCode != Result.FILES_ARE_EQUAL) {
+			if (errCode != ComparisonResult.FILES_ARE_EQUAL) {
 				this.worker1.interrupt();
 				this.worker2.interrupt();
 			}
 		}
+	}
+
+	/**
+	 * Don't use this enum. See deprecation message.
+	 * @deprecated Use {@link ComparisonResult} instead. This enum is not used anymore and empty now.
+	 */
+	@Deprecated
+	public enum Result {
 	}
 
 }

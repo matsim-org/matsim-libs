@@ -32,7 +32,7 @@ import com.google.inject.grapher.Alias;
 import com.google.inject.grapher.NodeId;
 import com.google.inject.spi.ProviderBinding;
 import com.google.inject.util.Types;
-import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -68,33 +68,35 @@ class DependencyGraphControlerListener implements StartupListener {
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		if (event.getServices().getConfig().controler().isCreateGraphs()) {
-			try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
-				MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
-						.setAliasCreator(bindings -> {
-									List<Alias> allAliases = Lists.newArrayList();
-									for (Binding<?> binding : bindings) {
-										if (binding instanceof ProviderBinding) {
-											allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
-													NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
-										}
+		if (event.getServices().getConfig().controller().getCreateGraphsInterval() <= 0) {
+			return;
+		}
+
+		try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
+			MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
+					.setAliasCreator(bindings -> {
+								List<Alias> allAliases = Lists.newArrayList();
+								for (Binding<?> binding : bindings) {
+									if (binding instanceof ProviderBinding) {
+										allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
+												NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
 									}
-									allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
-									allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
-									allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
-									allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
-									allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
-									allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
-									allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
-									allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
-									allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
-									return allAliases;
 								}
-						), out);
-				grapher.graph(injector);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+								allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
+								allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
+								allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
+								allAliases.addAll(getMapBinderAliases(ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
+								allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
+								allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
+								allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
+								allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
+								allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
+								return allAliases;
+							}
+					), out);
+			grapher.graph(injector);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

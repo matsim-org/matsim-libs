@@ -1,7 +1,22 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import ch.sbb.matsim.config.SBBTransitConfigGroup;
@@ -79,18 +94,22 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     private InternalInterface internalInterface;
     private TransitDriverAgentFactory deterministicDriverFactory;
     private TransitDriverAgentFactory networkDriverFactory;
-    private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
+    @Inject private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
     private boolean createLinkEvents = false;
 
     @Inject
-    public SBBTransitQSimEngine(QSim qSim, ReplanningContext context) {
-        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()));
+    SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TransitDriverAgentFactory networkDriverFactory) {
+        // ( https://github.com/google/guice/wiki/KeepConstructorsHidden )
+
+        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, networkDriverFactory);
+        // (it feels a bit odd to inject TransitStopHandlerFactory, but to put the simple version here as an argument.  kai, feb '25)
+
         this.qSim = qSim;
         this.context = context;
         this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
         this.ptConfig = qSim.getScenario().getConfig().transit();
         this.schedule = qSim.getScenario().getTransitSchedule();
-        this.agentTracker = new TransitStopAgentTracker(qSim.getEventsManager());
+        this.agentTracker = agentTracker;
         if (this.config.getCreateLinkEventsInterval() > 0) {
             this.linkEventQueue = new PriorityQueue<>();
             this.linksCache = new ConcurrentHashMap<>();
@@ -108,16 +127,10 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     }
 
     @Override
-    @Inject
-    public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
-        this.stopHandlerFactory = stopHandlerFactory;
-    }
-
-    @Override
     public void setInternalInterface(InternalInterface internalInterface) {
         this.internalInterface = internalInterface;
-        this.deterministicDriverFactory = new SBBTransitDriverAgentFactory(internalInterface, this.agentTracker, this.config.getDeterministicServiceModes());
-        this.networkDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, this.agentTracker);
+        this.deterministicDriverFactory = new SBBTransitDriverAgentFactory(this.config.getDeterministicServiceModes());
+        this.networkDriverFactory = new DefaultTransitDriverAgentFactory();
     }
 
     @Override
@@ -230,9 +243,9 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     private void createAndScheduleDriver(Vehicle veh, Umlauf umlauf, boolean isDeterministic) {
         AbstractTransitDriverAgent driver;
         if (isDeterministic) {
-            driver = this.deterministicDriverFactory.createTransitDriver(umlauf);
+            driver = this.deterministicDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
         } else {
-            driver = this.networkDriverFactory.createTransitDriver(umlauf);
+            driver = this.networkDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
         }
         TransitQVehicle qVeh = new TransitQVehicle(veh);
         qVeh.setDriver(driver);

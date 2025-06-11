@@ -20,20 +20,27 @@
 
 package org.matsim.contrib.drt.run;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.prebooking.PrebookingManager;
+import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
+import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRouteCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+
+import com.google.inject.Singleton;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,30 +61,49 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
-				drtCfg.getDrtSpeedUpParams().get(), getConfig().controler(), getIterationNumber());
-		if (teleportDrtUsers) {
+		boolean teleportSpeedup = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
+				drtCfg.getDrtSpeedUpParams().get(), getConfig().controller(), getIterationNumber());
+
+		boolean teleportEstimate = drtCfg.getDrtEstimatorParams().isPresent() && drtCfg.getSimulationType() == DrtConfigGroup.SimulationType.estimateAndTeleport;
+
+		if (teleportSpeedup) {
 			install(new PassengerEngineQSimModule(getMode(),
-					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
+					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING_SPEED_UP));
 			bindModal(TeleportedRouteCalculator.class).toProvider(
 					modalProvider(getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
 					.asEagerSingleton();
+		} else if (teleportEstimate) {
+
+			install(new PassengerEngineQSimModule(getMode(), PassengerEngineQSimModule.PassengerEngineType.TELEPORTING_ESTIMATION));
+
 		} else {
 			install(new VrpAgentSourceQSimModule(getMode()));
 			install(new PassengerEngineQSimModule(getMode()));
 			install(optimizerQSimModule);
 		}
 
+		if (drtCfg.getPrebookingParams().isPresent()) {
+			install(new PrebookingModeQSimModule(getMode(), drtCfg.getPrebookingParams().get()));
+			bindModal(AdvanceRequestProvider.class).to(modalKey(PrebookingManager.class));
+		} else {
+			bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
+		}
+
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
-		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
-			@Inject
-			private EventsManager events;
+		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(getter -> {
+			EventsManager eventsManager = getter.get(EventsManager.class);
+			DvrpLoadType dvrpLoadType = getter.getModal(DvrpLoadType.class);
+			return new DrtRequestCreator(getMode(), eventsManager, dvrpLoadType);
+		})).asEagerSingleton();
 
-			@Override
-			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events);
-			}
-		}).asEagerSingleton();
+		// this is not the actual selection which DynActionCreator is used, see
+		// DrtModeOptimizerQSimModule
+		bindModal(DrtActionCreator.class)
+				.toProvider(modalProvider(getter -> new DrtActionCreator(getter.getModal(PassengerHandler.class),
+						getter.getModal(VrpLegFactory.class))))
+				.in(Singleton.class); // Not an eager binding, as taxi contrib doesn't need this implementation, but
+										// would search for VrpLegFactory which is provided in the
+										// DrtModeOptimizerModule if bound eagerly
 	}
 }

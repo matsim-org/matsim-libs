@@ -21,7 +21,6 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,15 +35,14 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
  * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
- * 
+ *
  * @author thibautd
  */
+@Deprecated // use NetworkRoutingInclAccessEgressModule instead
 public final class NetworkRoutingModule implements RoutingModule {
 	// I think it makes sense to NOT add the bushwhacking mode directly into here ...
 	// ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId(). kai, dec'15
@@ -63,7 +61,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final LeastCostPathCalculator routeAlgo) {
 		 Gbl.assertNotNull(network);
 //		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
-		 // makes many tests fail.  
+		 // makes many tests fail.
 		 this.network = network;
 		 this.routeAlgo = routeAlgo;
 		 this.mode = mode;
@@ -76,7 +74,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
-		
+
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 
 		Gbl.assertNotNull(fromFacility);
@@ -84,30 +82,30 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		if ( fromLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( fromFacility.getCoord() ) ;
 			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
 		}
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
 		if ( toLink==null ) {
+			//if an activity takes place on a link which is not part of the modal network, use coord as fallback
 			Gbl.assertNotNull( toFacility.getCoord() ) ;
 			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
 		}
 		Gbl.assertNotNull(fromLink);
 		Gbl.assertNotNull(toLink);
-		
+
 		if (toLink != fromLink) {
 			// (a "true" route)
-			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
-			Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
 			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
 			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
 			 * ts, june '21
 			 */
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
+			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, departureTime, person, null);
 			if (path == null)
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " by mode " + this.mode + ".");
+				throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + " by mode " + this.mode + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime(path.travelTime);

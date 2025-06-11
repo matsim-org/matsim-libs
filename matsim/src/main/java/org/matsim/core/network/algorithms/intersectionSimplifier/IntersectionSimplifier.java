@@ -18,19 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.network.algorithms.intersectionSimplifier;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,15 +27,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.Cluster;
 import org.matsim.core.network.algorithms.intersectionSimplifier.containers.ClusterActivity;
 import org.matsim.core.utils.collections.QuadTree;
 
+import java.util.*;
+
 /**
  * Class to simplify a given network's intersections.
- * 
+ *
  * @author jwjoubert
  */
 public class IntersectionSimplifier {
@@ -56,8 +45,7 @@ public class IntersectionSimplifier {
 	final private int epsilon;
 
 	private DensityCluster djc = null;
-	private QuadTree<Node> clusteredNodes = null;
-	private Map<Id<Node>, Node> mergedNodeId2clusterNode = new HashMap<>();
+	private final Map<Id<Node>, Node> mergedNodeId2clusterNode = new HashMap<>();
 
 	public IntersectionSimplifier(double pmin, int epsilon) {
 		this.pmin = pmin;
@@ -65,7 +53,7 @@ public class IntersectionSimplifier {
 	}
 
 	public Network simplify(Network network) {
-		if(this.djc != null) {
+		if (this.djc != null) {
 			LOG.error("This NetworkSimplifier has already been used to simplify a network!");
 			throw new RuntimeException("Should instantiate a new NetworkSimplifier");
 		}
@@ -76,8 +64,8 @@ public class IntersectionSimplifier {
 
 		/* Get all the network's node coordinates that must be clustered. */
 		List<Node> nodes = new ArrayList<>();
-		for(Node node : network.getNodes().values()) {
-			/* Create new Node instances in order to assure that the original network can not be 
+		for (Node node : network.getNodes().values()) {
+			/* Create new Node instances in order to assure that the original network can not be
 			 * changed by accident */
 			nodes.add(NetworkUtils.createNode(node.getId(), node.getCoord()));
 		}
@@ -91,16 +79,16 @@ public class IntersectionSimplifier {
 		/* Do the mapping of clustered points. */
 		List<Cluster> clusters = djc.getClusterList();
 
-		/* Populate a QuadTree with all the clustered nodes, each with a 
+		/* Populate a QuadTree with all the clustered nodes, each with a
 		 * reference to the cluster they belong to. */
 		LOG.info("Populating QuadTree with clustered points.");
-		this.clusteredNodes = new QuadTree<>(
-				djc.getClusteredPoints().getMinEasting(), 
-				djc.getClusteredPoints().getMinNorthing(), 
-				djc.getClusteredPoints().getMaxEasting(), 
-				djc.getClusteredPoints().getMaxNorthing());
-		for(Cluster cluster : clusters) {
-			/* Add up node ids of all nodes merged into this clustered node 
+		QuadTree<Node> clusteredNodes = new QuadTree<>(
+			djc.getClusteredPoints().getMinEasting(),
+			djc.getClusteredPoints().getMinNorthing(),
+			djc.getClusteredPoints().getMaxEasting(),
+			djc.getClusteredPoints().getMaxNorthing());
+		for (Cluster cluster : clusters) {
+			/* Add up node ids of all nodes merged into this clustered node
 			 * and use it as id for the clustered node */
 			SortedSet<String> nodeIdsInCluster = new TreeSet<>();
 			for (ClusterActivity nodeInCluster : cluster.getPoints()) {
@@ -109,28 +97,26 @@ public class IntersectionSimplifier {
 			StringBuilder clusteredNodeName = new StringBuilder();
 			for (String nodeInCluster : nodeIdsInCluster) {
 				/* Don't add "-" if no node id is in the clusteredNodeName yet */
-				if (clusteredNodeName.length() > 0) {
+				if (!clusteredNodeName.isEmpty()) {
 					clusteredNodeName.append('-');
 				}
 				clusteredNodeName.append(nodeInCluster);
 			}
 			Id<Node> newId = Id.createNodeId(clusteredNodeName.toString());
-			
+
 			Node newNode = network.getFactory().createNode(newId, cluster.getCenterOfGravity());
-			Set<Id<Node>> includedNodes = new HashSet<>();
-			for(ClusterActivity clusterPoint : cluster.getPoints()) {
+			for (ClusterActivity clusterPoint : cluster.getPoints()) {
 				Coord clusterPointCoord = clusterPoint.getCoord();
 				clusteredNodes.put(clusterPointCoord.getX(), clusterPointCoord.getY(), newNode);
-				includedNodes.add(clusterPoint.getNode().getId());
 				mergedNodeId2clusterNode.put(clusterPoint.getNode().getId(), newNode);
 			}
 		}
 		LOG.info("Done populating QuadTree. Number of nodes affected: " + clusteredNodes.size());
 
 		/* Go through each network link, in given network, and evaluate it's nodes. */
-		for(Link link : network.getLinks().values()) {
-			
- 			Node fromNode = NetworkUtils.createNode(link.getFromNode().getId(), link.getFromNode().getCoord());
+		for (Link link : network.getLinks().values()) {
+
+			Node fromNode = NetworkUtils.createNode(link.getFromNode().getId(), link.getFromNode().getCoord());
 			Node fromCentroid = getClusteredNode(fromNode);
 
 			Node toNode = NetworkUtils.createNode(link.getToNode().getId(), link.getToNode().getCoord());
@@ -138,26 +124,24 @@ public class IntersectionSimplifier {
 
 			Node newFromNode = fromCentroid != null ? fromCentroid : fromNode;
 			Node newToNode = toCentroid != null ? toCentroid : toNode;
-			
-			/* FIXME currently the new link carries no additional information 
+
+			/* FIXME currently the new link carries no additional information
 			 * from the original network. */
 			Link newLink = NetworkUtils.createLink(
-					link.getId(), newFromNode, newToNode, newNetwork, 
-					link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
+				link.getId(), newFromNode, newToNode, newNetwork,
+				link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 			newLink.setAllowedModes(link.getAllowedModes());
-			
-			if(newLink.getFromNode().getCoord().equals(newLink.getToNode().getCoord())) {
-				/* If both link nodes are part of the same cluster, their node
-				 * Coords will now be the same. The link can be completely ignored, 
-				 * so we do not need to process it here any further. */
-			} else {
 
-				if(!newNetwork.getNodes().containsKey(newLink.getFromNode().getId())) {
-					/* FIXME currently the new node carries no additional 
+			/* If both link nodes are part of the same cluster, their node
+			 * Coords will now be the same. The link can be completely ignored,
+			 * so we do not need to process it here any further. */
+			if (!newLink.getFromNode().getCoord().equals(newLink.getToNode().getCoord())) {
+				if (!newNetwork.getNodes().containsKey(newLink.getFromNode().getId())) {
+					/* FIXME currently the new node carries no additional
 					 * information from the original network. */
 					NetworkUtils.createAndAddNode(newNetwork, newLink.getFromNode().getId(), newLink.getFromNode().getCoord());
 				}
-				if(!newNetwork.getNodes().containsKey(newLink.getToNode().getId())) {
+				if (!newNetwork.getNodes().containsKey(newLink.getToNode().getId())) {
 					NetworkUtils.createAndAddNode(newNetwork, newLink.getToNode().getId(), newLink.getToNode().getCoord());
 				}
 				newLink.setFromNode(newNetwork.getNodes().get(newFromNode.getId()));
@@ -168,7 +152,7 @@ public class IntersectionSimplifier {
 
 		/* Update the network name. */
 		String oldName = network.getName();
-		if(oldName != null) {
+		if (oldName != null) {
 			oldName += oldName.endsWith(".") ? " Simplified." : ". Simplified.";
 			newNetwork.setName(oldName);
 		} else {
@@ -179,27 +163,23 @@ public class IntersectionSimplifier {
 		reportNetworkStatistics(newNetwork);
 		return newNetwork;
 	}
-	
+
 
 	/**
 	 * Look up the {@link Cluster} node of the provided {@link Node}.
-	 * @param node
-	 * @return
 	 */
 	protected Node getClusteredNode(Node node) {
 		// returns null if node was not merged into a clustered node
-		Node n = mergedNodeId2clusterNode.get(node.getId());
-		return n;
+        return mergedNodeId2clusterNode.get(node.getId());
 	}
-	
-	
+
+
 	/**
-	 * Checking that clustering has been done, and then writes the clusters to 
+	 * Checking that clustering has been done, and then writes the clusters to
 	 * file using {@link DensityCluster#writeClustersToFile(String)}.
-	 * @param file
 	 */
 	public void writeClustersToFile(String file) {
-		if(this.djc == null) {
+		if (this.djc == null) {
 			LOG.info("Density-based clustering has not been run yet. Cannot write to file.");
 		} else {
 			this.djc.writeClustersToFile(file);
@@ -209,20 +189,17 @@ public class IntersectionSimplifier {
 
 	/**
 	 * Returns all the {@link Cluster}s.
-	 * 
-	 * @return
 	 */
 	public List<Cluster> getClusters() {
-		if(this.djc == null) {
+		if (this.djc == null) {
 			LOG.warn("The network has not been simplified yet. Returning 0 clusters");
-			return new ArrayList<Cluster>(0);
+			return new ArrayList<>(0);
 		}
 		return this.djc.getClusterList();
 	}
 
 	/**
-	 * Provides basic statistics of a given {@link Network}.  
-	 * @param network
+	 * Provides basic statistics of a given {@link Network}.
 	 */
 	public static void reportNetworkStatistics(Network network) {
 		LOG.info("--- Network statistics: ------------------------------------------------------");

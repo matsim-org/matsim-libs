@@ -66,7 +66,8 @@ public final class MatsimVehicleReader implements MatsimReader{
 		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 		public VehicleReader( Vehicles vehicles ) {
-			this.vehicles = vehicles ;
+			super(ValidationType.XSD_ONLY);
+			this.vehicles = vehicles;
 		}
 
 		@Override
@@ -82,6 +83,11 @@ public final class MatsimVehicleReader implements MatsimReader{
 					throw new RuntimeException("no reader found for " + str ) ;
 				}
 			} else{
+				if (this.delegate == null) {
+					log.error("found no valid. vehicle definition file. this may happen if you try to parse a dvrp vehicles file for example or if no vehicle definition file is provided.\n" +
+						"Valid vehicle definitions are at http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd and http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd\n" +
+						"The code will crash with a NullPointerException.");
+				}
 				this.delegate.startTag( name, atts, context );
 			}
 		}

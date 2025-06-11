@@ -31,6 +31,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,9 +99,8 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
             }
             this.attributesWriter.writeAttributes("\t\t", this.writer, f.getAttributes(), false);
             this.endFacility();
-            this.writer.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -110,7 +110,7 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
             this.writer.flush();
             this.writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -128,7 +128,7 @@ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
             try {
                 this.writer.write(NL);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new UncheckedIOException(e);
             }
         }
         this.attributesWriter.writeAttributes("\t", out, facilities.getAttributes());

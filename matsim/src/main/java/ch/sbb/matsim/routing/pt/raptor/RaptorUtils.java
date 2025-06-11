@@ -1,13 +1,30 @@
-/*
- * Copyright (C) Schweizerische Bundesbahnen SBB, 2018.
- */
-
+/* *********************************************************************** *
+ * project: org.matsim.* 												   *
+ *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package ch.sbb.matsim.routing.pt.raptor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -17,8 +34,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -30,24 +48,42 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
  * @author mrieser / SBB
  */
 public final class RaptorUtils {
-
+    private static final Logger log = LogManager.getLogger( RaptorUtils.class );
 
     private RaptorUtils() {
     }
 
     public static RaptorStaticConfig createStaticConfig(Config config) {
-        PlansCalcRouteConfigGroup pcrConfig = config.plansCalcRoute();
+        RoutingConfigGroup routingConfig = config.routing();
         SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 
         RaptorStaticConfig staticConfig = new RaptorStaticConfig();
 
-        staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
+		staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
+//		RoutingConfigGroup.TeleportedModeParams walk = routingConfig.getModeRoutingParams().get(TransportMode.walk );
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk);
+        // the code below also exists in TransitRouterConfig.  kai, mar'25
+        RoutingConfigGroup.TeleportedModeParams params = routingConfig.getTeleportedModeParams().get( TransportMode.transit_walk );
+        if ( params==null ) {
+            params = routingConfig.getTeleportedModeParams().get( TransportMode.non_network_walk );
+        }
+        if ( params==null ) {
+            params = routingConfig.getTeleportedModeParams().get( TransportMode.walk) ;
+        }
+        if ( params==null ) {
+            log.error( "teleported mode params do not exist for " + TransportMode.transit_walk + ", " + TransportMode.non_network_walk + ", nor "
+                               + TransportMode.walk + ".  At least one of them needs to be defined for TransitRouterConfig.  Aborting ...");
+            // yyyy I do not know which of this is conceptually the correct one.  It should _not_ be walk since that may be routed on the network, see TransitRouterConfig.  kai, mar'25
+        }
+        Gbl.assertNotNull( params );
+        RoutingConfigGroup.TeleportedModeParams walk = params;
+
         staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
-        staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
-        staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
-        staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
+		staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
+		staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
+		staticConfig.setIntermodalLegOnlyHandling(srrConfig.getIntermodalLegOnlyHandling());
+		staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
+		staticConfig.setTransferCalculation(srrConfig.getTransferCalculation());
 
         staticConfig.setUseModeMappingForPassengers(srrConfig.isUseModeMappingForPassengers());
         if (srrConfig.isUseModeMappingForPassengers()) {
@@ -55,6 +91,10 @@ public final class RaptorUtils {
                 staticConfig.addModeMappingForPassengers(mapping.getRouteMode(), mapping.getPassengerMode());
             }
         }
+
+		for (SwissRailRaptorConfigGroup.ModeToModeTransferPenalty penalty : srrConfig.getModeToModeTransferPenaltyParameterSets()){
+			staticConfig.addModeToModeTransferPenalty(penalty.fromMode,penalty.toMode,penalty.transferPenalty);
+		}
         staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
 
         return staticConfig;
@@ -73,15 +113,15 @@ public final class RaptorUtils {
 
         raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getMarginalUtilityOfWaitingPt_utl_s());
 
-        PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore();
+        ScoringConfigGroup pcsConfig = config.scoring();
         double marginalUtilityPerforming = pcsConfig.getPerforming_utils_hr() / 3600.0;
-        for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+        for (Map.Entry<String, ScoringConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
             String mode = e.getKey();
-            PlanCalcScoreConfigGroup.ModeParams modeParams = e.getValue();
+            ScoringConfigGroup.ModeParams modeParams = e.getValue();
             double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling()/3600.0 - marginalUtilityPerforming;
             raptorParams.setMarginalUtilityOfTravelTime_utl_s(mode, marginalUtility_utl_s);
         }
-        
+
         double costPerHour = advancedConfig.getTransferPenaltyCostPerTravelTimeHour();
         if (costPerHour == 0.0) {
             // for backwards compatibility, use the default utility of line switch.
@@ -104,9 +144,8 @@ public final class RaptorUtils {
         for (RaptorRoute.RoutePart part : route.parts) {
             if (part.planElements != null) {
                 for (PlanElement pe : part.planElements) {
-                    if (pe instanceof Leg) {
-                        Leg leg = (Leg) pe;
-                        legs.add(leg);
+                    if (pe instanceof Leg leg) {
+						legs.add(leg);
                         if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
@@ -121,14 +160,12 @@ public final class RaptorUtils {
                 // a pt leg
                 Leg ptLeg = PopulationUtils.createLeg(part.mode);
                 ptLeg.setDepartureTime(part.depTime);
-                ptLeg.setTravelTime(part.arrivalTime - part.depTime);
-                DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop);
-                ptRoute.setBoardingTime(part.boardingTime);
-                ptRoute.setTravelTime(part.arrivalTime - part.depTime);
-                ptRoute.setDistance(part.distance);
-                ptLeg.setRoute(ptRoute);
-                legs.add(ptLeg);
-                lastArrivalTime = part.arrivalTime;
+                ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
+
+                ptLeg.setRoute(convertRoutePart(part));
+
+				legs.add(ptLeg);
+                lastArrivalTime = part.getChainedArrivalTime();
                 firstPtLegProcessed = true;
                 if (previousTransferWalkleg != null) {
                     //adds the margin only to legs in between pt legs
@@ -159,4 +196,21 @@ public final class RaptorUtils {
 
         return legs;
     }
+
+
+	/**
+	 * Create passenger routes recursively.
+	 */
+	private static DefaultTransitPassengerRoute convertRoutePart(RaptorRoute.RoutePart part) {
+
+		if (part == null)
+			return null;
+
+		DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop, convertRoutePart(part.chainedPart));
+		ptRoute.setBoardingTime(part.boardingTime);
+		ptRoute.setTravelTime(part.arrivalTime - part.depTime);
+		ptRoute.setDistance(part.distance);
+
+		return ptRoute;
+	}
 }

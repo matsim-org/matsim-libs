@@ -1,10 +1,5 @@
 package org.matsim.modechoice;
 
-import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,10 +8,17 @@ import java.util.Objects;
 public final class ModeEstimate {
 
 	private final String mode;
-	private final Enum<?> option;
+	private final ModeAvailability option;
 
-	private final double[] est;
+	private final double[] legEst;
 	private final double[] tripEst;
+	private final double[] actEst;
+
+	/**
+	 * Mark trips with no real usage. E.g pt trips that consist only of walk legs.
+	 * These trips will not be considered during estimation.
+	 */
+	private final boolean[] noRealUsage;
 
 	/**
 	 * Whether this should be for a minimum estimate. Otherwise, maximum is assumed.
@@ -35,20 +37,22 @@ public final class ModeEstimate {
 	 * @param isMin        whether these are minimum estimates
 	 * @param storeTripEst whether trip est needs to be stored
 	 */
-	ModeEstimate(String mode, Enum<?> option, int n, boolean isUsable, boolean storeTripEst, boolean isMin) {
+	ModeEstimate(String mode, ModeAvailability option, int n, boolean isUsable, boolean storeTripEst, boolean isMin) {
 		this.mode = mode;
 		this.option = option;
 		this.min = isMin;
 		this.usable = isUsable;
-		this.est = usable ? new double[n] : null;
+		this.legEst = usable ? new double[n] : null;
 		this.tripEst = storeTripEst ? new double[n] : null;
+		this.actEst = usable ? new double[n] : null;
+		this.noRealUsage = usable ? new boolean[n] : null;
 	}
 
 	public String getMode() {
 		return mode;
 	}
 
-	public Enum<?> getOption() {
+	public ModeAvailability getOption() {
 		return option;
 	}
 
@@ -60,12 +64,20 @@ public final class ModeEstimate {
 		return min;
 	}
 
-	public double[] getEstimates() {
-		return est;
+	public double[] getLegEstimates() {
+		return legEst;
+	}
+
+	public double[] getActEst() {
+		return actEst;
 	}
 
 	public double[] getTripEstimates() {
 		return tripEst;
+	}
+
+	public boolean[] getNoRealUsage() {
+		return noRealUsage;
 	}
 
 	@Override

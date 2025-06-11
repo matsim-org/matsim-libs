@@ -20,10 +20,10 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link Time}.
@@ -32,7 +32,8 @@ import org.junit.Test;
  */
 public class TimeTest {
 
-	@Test public void testFormats() {
+	@Test
+	void testFormats() {
 		double time = 12*3600 + 34*60 + 56.789;
 		assertEquals("12:34:56", Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
 		assertEquals("12:34", Time.writeTime(time, Time.TIMEFORMAT_HHMM));
@@ -83,7 +84,8 @@ public class TimeTest {
 		} catch (IllegalArgumentException expected) {}
 	}
 
-	@Test public void testSeparators() {
+	@Test
+	void testSeparators() {
 		// test writing
 		double dTime = 12*3600 + 34*60 + 56.789;
 		assertEquals("12:34:56", Time.writeTime(dTime, ':'));
@@ -102,7 +104,8 @@ public class TimeTest {
 		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-').seconds(), 0.0);
 	}
 
-	@Test public void testUndefined() {
+	@Test
+	void testUndefined() {
 		// test writing
 		assertEquals("undefined", Time.writeTime(OptionalTime.undefined()));
 
@@ -112,7 +115,8 @@ public class TimeTest {
 		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(null));
 	}
 
-	@Test public void testSetDefault() {
+	@Test
+	void testSetDefault() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals("12:34:56", Time.writeTime(12*3600 + 34*60 + 56.789));
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
@@ -127,7 +131,8 @@ public class TimeTest {
 		//  kai/gregor, nov'11)
 }
 
-	@Test public void testWriting() {
+	@Test
+	void testWriting() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
 		assertEquals( "12:34:56", Time.writeTime( 12*3600 + 34*60 + 56.789));// positive
 		assertEquals( "01:02:03", Time.writeTime(  1*3600 +  2*60 +  3.4)); // positive with leading zero
@@ -142,7 +147,8 @@ public class TimeTest {
 		assertEquals("-596523:14:08", Time.writeTime(Integer.MIN_VALUE));
 	}
 
-	@Test public void testParsing() {
+	@Test
+	void testParsing() {
 		assertEquals( 12*3600.0 + 34*60.0 + 56.0, Time.parseTime( "12:34:56"), 0.0);
 		assertEquals( 12*3600.0 + 34*60.0 + 56.7, Time.parseTime( "12:34:56.7"), 0.0);
 		assertEquals(  1*3600.0 +  2*60.0 +  3.0, Time.parseTime( "01:02:03"), 0.0);
@@ -155,7 +161,8 @@ public class TimeTest {
 		assertEquals(Long.MAX_VALUE, Time.parseTime("2562047788015215:28:07"), 0.0);
 	}
 
-	@Test public void testConvertHHMMInteger() {
+	@Test
+	void testConvertHHMMInteger() {
 		assertEquals( 12*3600.0 + 34*60.0, Time.convertHHMMInteger(Integer.valueOf("1234")), 0.0);
 		assertEquals(  1*3600.0 +  2*60.0, Time.convertHHMMInteger(Integer.valueOf("0102")), 0.0);
 	}

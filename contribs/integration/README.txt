@@ -15,7 +15,7 @@ To add an integration test:
   Sub-packages (e.g. org.matsim.integration.daily.mycode.MyTest.java) are supported.
 - make sure the class name ends in "Test".
 - annotate your test methods with "@Test" (import org.junit.Test).
-- write your test functionality, including assert statements from JUnit (import org.junit.Assert).
+- write your test functionality, including assert statements from JUnit (import org.junit.jupiter.api.assertions).
 
 
 To run the daily/weekly tests locally:

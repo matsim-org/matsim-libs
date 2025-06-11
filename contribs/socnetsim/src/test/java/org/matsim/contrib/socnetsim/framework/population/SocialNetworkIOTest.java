@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -39,16 +39,16 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class SocialNetworkIOTest {
-	@Rule
+	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReinputReflective() {
+	void testReinputReflective() {
 		testReinput( true );
 	}
 
 	@Test
-	public void testReinputNonReflective() {
+	void testReinputNonReflective() {
 		testReinput( false );
 	}
 
@@ -64,20 +64,20 @@ public class SocialNetworkIOTest {
 		final SocialNetwork input = (SocialNetwork)
 			sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 
-		Assert.assertEquals(
-				"unexpected reflectiveness",
+		Assertions.assertEquals(
 				output.isReflective(),
-				input.isReflective() );
+				input.isReflective(),
+				"unexpected reflectiveness" );
 
-		Assert.assertEquals(
-				"unexpected number of egos",
+		Assertions.assertEquals(
 				output.getEgos().size(),
-				input.getEgos().size() );
+				input.getEgos().size(),
+				"unexpected number of egos" );
 
-		Assert.assertEquals(
-				"different ego ids",
+		Assertions.assertEquals(
 				output.getEgos(),
-				input.getEgos() );
+				input.getEgos(),
+				"different ego ids" );
 
 		final Counter c = new Counter( "Test alters of ego # " );
 		for ( Id ego : output.getEgos() ) {
@@ -85,21 +85,21 @@ public class SocialNetworkIOTest {
 			final Set<Id<Person>> expectedAlters = output.getAlters( ego );
 			final Set<Id<Person>> actualAlters = input.getAlters( ego );
 
-			Assert.assertEquals(
-					"unexpected number of alters for ego "+ego,
+			Assertions.assertEquals(
 					expectedAlters.size(),
-					actualAlters.size() );
+					actualAlters.size(),
+					"unexpected number of alters for ego "+ego );
 
-			Assert.assertEquals(
-					"unexpected alters for ego "+ego,
+			Assertions.assertEquals(
 					expectedAlters,
-					actualAlters );
+					actualAlters,
+					"unexpected alters for ego "+ego );
 		}
 
-		Assert.assertEquals(
-				"different metadata",
+		Assertions.assertEquals(
 				output.getMetadata(),
-				input.getMetadata() );
+				input.getMetadata(),
+				"different metadata" );
 
 		c.printCounter();
 	}

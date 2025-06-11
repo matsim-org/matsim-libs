@@ -26,11 +26,12 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
@@ -44,17 +45,17 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class TestAvFlowFactor {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAvFlowFactor() throws MalformedURLException {
+	void testAvFlowFactor() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
 		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		RunAvExample.addPopulation(scenario);
 
-		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) );
+		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ), TransportMode.car );
 		avType.setFlowEfficiencyFactor(2.0);
 		scenario.getVehicles().addVehicleType(avType);
 
@@ -70,8 +71,8 @@ public class TestAvFlowFactor {
 		controler.getEvents().addHandler(vehicleTimeCounter);
 		controler.run();
 
-		Assert.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
-		Assert.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
+		Assertions.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
+		Assertions.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
 
 	}
 

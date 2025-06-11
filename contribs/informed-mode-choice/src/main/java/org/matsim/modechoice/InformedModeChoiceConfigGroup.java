@@ -2,6 +2,7 @@ package org.matsim.modechoice;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -15,10 +16,8 @@ import java.util.stream.StreamSupport;
  */
 public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
-	private static final String NAME = "informedModeChoice";
-
 	public final static String CONFIG_PARAM_MODES = "modes";
-
+	private static final String NAME = "informedModeChoice";
 	/**
 	 * The setter ensures, that this class always contains internal string representations.
 	 */
@@ -29,8 +28,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	private int topK = 5;
 
 	@Parameter
-	@Comment("1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice.")
-	private double invBeta = 2.5;
+	@PositiveOrZero
+	@Comment("1/beta parameter (or temperature tau) to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice." +
+		" POSITIVE_INFINITY will select randomly.")
+	private double invBeta = Double.POSITIVE_INFINITY;
+
+	@Parameter
+	@Comment("Normalize utility values when selecting")
+	private boolean normalizeUtility = false;
 
 	@Parameter
 	@Comment("Name of the candidate pruner to apply, needs to be bound with guice.")
@@ -38,27 +43,23 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Annealing for the invBeta parameter.")
-	private Schedule anneal = Schedule.quadratic;
+	private Schedule anneal = Schedule.off;
 
 	@Parameter
 	@Comment("Require that new plan modes are always different from the current one.")
-	private boolean requireDifferentModes = true;
+	private boolean requireDifferentModes = false;
 
 	@Parameter
 	@Comment("Defines how constraint violations are handled.")
 	private ConstraintCheck constraintCheck = ConstraintCheck.abort;
 
 	@Parameter
-	@Comment("Probability to re-estimate an existing plan model.")
-	private double probaEstimate = 0.1;
+	@PositiveOrZero
+	@Comment("Probability to drop all estimates for a plan.")
+	private double probaEstimate = 0;
 
 	public InformedModeChoiceConfigGroup() {
 		super(NAME);
-	}
-
-	@StringSetter(CONFIG_PARAM_MODES)
-	private void setModes(final String value) {
-		setModes(Splitter.on(",").split(value));
 	}
 
 	@StringGetter(CONFIG_PARAM_MODES)
@@ -66,19 +67,12 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return Joiner.on(",").join(modes);
 	}
 
-	public void setModes(Iterable<String> modes) {
-		this.modes = StreamSupport.stream(modes.spliterator(), false)
-				.map(String::intern)
-				.distinct()
-				.collect(Collectors.toList());
+	public int getTopK() {
+		return topK;
 	}
 
 	public void setTopK(int topK) {
 		this.topK = topK;
-	}
-
-	public int getTopK() {
-		return topK;
 	}
 
 	public double getInvBeta() {
@@ -88,7 +82,6 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 	public void setInvBeta(double invBeta) {
 		this.invBeta = invBeta;
 	}
-
 
 	public String getPruning() {
 		return pruning;
@@ -126,12 +119,24 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return modes;
 	}
 
-	public void setRequireDifferentModes(boolean requireDifferentModes) {
-		this.requireDifferentModes = requireDifferentModes;
+	@StringSetter(CONFIG_PARAM_MODES)
+	private void setModes(final String value) {
+		setModes(Splitter.on(",").split(value));
+	}
+
+	public void setModes(Iterable<String> modes) {
+		this.modes = StreamSupport.stream(modes.spliterator(), false)
+			.map(String::intern)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
 	public boolean isRequireDifferentModes() {
 		return requireDifferentModes;
+	}
+
+	public void setRequireDifferentModes(boolean requireDifferentModes) {
+		this.requireDifferentModes = requireDifferentModes;
 	}
 
 	@Override
@@ -139,6 +144,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		return comments;
+	}
+
+	public boolean isNormalizeUtility() {
+		return normalizeUtility;
+	}
+
+	public void setNormalizeUtility(boolean normalizeUtility) {
+		this.normalizeUtility = normalizeUtility;
 	}
 
 	public enum Schedule {

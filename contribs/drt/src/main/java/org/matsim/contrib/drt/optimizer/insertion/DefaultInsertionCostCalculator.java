@@ -19,19 +19,25 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 /**
  * @author michalm
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
+	private final DrtOptimizationConstraintsSet constraintsSet;
 
-	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy) {
+	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
+										  DrtOptimizationConstraintsSet constraintsSet) {
 		this.costCalculationStrategy = costCalculationStrategy;
+		this.constraintsSet = constraintsSet;
 	}
 
 	/**
@@ -48,10 +54,17 @@ public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	 */
 	@Override
 	public double calculate(DrtRequest drtRequest, Insertion insertion, DetourTimeInfo detourTimeInfo) {
+
 		var vEntry = insertion.vehicleEntry;
 
+		// in case of prebooking, we may have intermediate stay times after pickup
+		// insertion that may reduce the effective pickup delay that remains that the
+		// dropoff insertion point
+		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
+				insertion, detourTimeInfo.pickupDetourInfo) + detourTimeInfo.dropoffDetourInfo.dropoffTimeLoss;
+
 		if (vEntry.getSlackTime(insertion.pickup.index) < detourTimeInfo.pickupDetourInfo.pickupTimeLoss
-				|| vEntry.getSlackTime(insertion.dropoff.index) < detourTimeInfo.getTotalTimeLoss()) {
+				|| vEntry.getSlackTime(insertion.dropoff.index) < effectiveDropoffTimeLoss) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 

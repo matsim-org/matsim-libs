@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
@@ -42,10 +40,15 @@ public class AttributesXmlReaderDelegate {
 	private String currentAttribute = null;
 	private String currentAttributeClass = null;
 
-	/*package*/ final static String TAG_ATTRIBUTES = "attributes";
-	/*package*/ final static String TAG_ATTRIBUTE = "attribute";
+	/*package*/ public final static String TAG_ATTRIBUTES = "attributes";
+	/*package*/ public final static String TAG_ATTRIBUTE = "attribute";
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
+
+	public ObjectAttributesConverter getObjectAttributesConverter()
+	{
+		return this.converter;
+	}
 
 	public void startTag(String name,
 						 org.xml.sax.Attributes atts,

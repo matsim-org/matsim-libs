@@ -69,7 +69,7 @@ public class QuadTree<T> implements Serializable {
 	 * @param maxY The largest y coordinate (northing, latitude) expected
 	 */
 	public QuadTree(final double minX, final double minY, final double maxX, final double maxY) {
-		this.top = new Node<T>(minX, minY, maxX, maxY);
+		this.top = new Node<>(minX, minY, maxX, maxY);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class QuadTree<T> implements Serializable {
 	 * @return the objects found within distance to x/y
 	 */
 	public Collection<T> getDisk(final double x, final double y, final double distance) {
-		return this.top.get(x, y, distance, new ArrayList<>());
+		return this.top.get(x, y, distance * distance, new ArrayList<>());
 	}
 
 	/**
@@ -152,12 +152,12 @@ public class QuadTree<T> implements Serializable {
 	 *
 	 * @param x left-right location, longitude
 	 * @param y up-down location, latitude
-	 * @param r_min inner ring radius
-	 * @param r_max outer rind radius
+	 * @param rMin inner ring radius
+	 * @param rMax outer rind radius
 	 * @return objects within the ring
 	 */
-	public Collection<T> getRing(final double x, final double y, final double r_min, final double r_max) {
-		return this.top.get(x, y, r_min, r_max, new ArrayList<>());
+	public Collection<T> getRing(final double x, final double y, final double rMin, final double rMax) {
+		return this.top.get(x, y, rMin * rMin, rMax * rMax, new ArrayList<>());
 	}
 
 	/**
@@ -284,10 +284,10 @@ public class QuadTree<T> implements Serializable {
 	 */
 	public Collection<T> values() {
 		if (this.values == null) {
-			this.values = new AbstractCollection<T>() {
+			this.values = new AbstractCollection<>() {
 				@Override
 				public Iterator<T> iterator() {
-					Iterator<T> iterator = new Iterator<T>() {
+					return new Iterator<>() {
 						private final int expectedModCount = QuadTree.this.modCount;
 						private Leaf<T> currentLeaf = firstLeaf();
 						private int nextIndex = 0;
@@ -346,7 +346,6 @@ public class QuadTree<T> implements Serializable {
 						}
 
 					};
-					return iterator;
 				}
 
 				@Override
@@ -440,17 +439,44 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		/**
-		 * Calculates the distance from the given point to the furthest corner of the rectangle
-		 * 
+		 * Calculates the square of the (minimum) distance of a given point to the border of the
+		 * rectangle. If the point lies within the rectangle, the distance
+		 * is zero.
+		 *
 		 * @param x left-right location
 		 * @param y up-down location
-		 * @return distance to furthest corner of the rectangle
+		 * @return square of distance to border, 0 if inside rectangle or on border
 		 */
-		public double calcMaxDistance(final double x, final double y) {
+		public double calcDistanceSqr(final double x, final double y) {
+			double distanceX;
+			double distanceY;
+
+			if (this.minX <= x && x <= this.maxX) {
+				distanceX = 0;
+			} else {
+				distanceX = Math.min(Math.abs(this.minX - x), Math.abs(this.maxX - x));
+			}
+			if (this.minY <= y && y <= this.maxY) {
+				distanceY = 0;
+			} else {
+				distanceY = Math.min(Math.abs(this.minY - y), Math.abs(this.maxY - y));
+			}
+
+			return distanceX * distanceX + distanceY * distanceY;
+		}
+
+		/**
+		 * Calculates the square of the distance from the given point to the furthest corner of the rectangle
+		 *
+		 * @param x left-right location
+		 * @param y up-down location
+		 * @return square of distance to the furthest corner of the rectangle
+		 */
+		public double calcMaxDistanceSqr(final double x, final double y) {
 			double distanceX = Math.max(Math.abs(this.minX - x), Math.abs(this.maxX - x));
 			double distanceY = Math.max(Math.abs(this.minY - y), Math.abs(this.maxY - y));
 
-			return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+			return distanceX * distanceX + distanceY * distanceY;
 		}
 
 
@@ -550,25 +576,25 @@ public class QuadTree<T> implements Serializable {
 
 		/**
 		 * Increases the size of the rectangle by scaleX and scaleY.
-		 * 
+		 *
 		 * (and "increase by" means:
 		 *   1.0: increase it by 100% (scale it by 2.0)
 		 *   -0.5: decrease it by 50% (scale it by 0.5)
 		 *   0.0: do nothing)   michaz
-		 * 
+		 *
 		 */
-		
+
 		public Rect scale(double scaleX, double scaleY) {
 			scaleY *= this.centerY - this.minY;
 			scaleX *= this.centerX - this.minX;
 			return new Rect(this.minX - scaleX, this.minY-scaleY, this.maxX + scaleX, this.maxY + scaleY);
 		}
-		
+
 		@Override
 		public String toString() {
 			return "topLeft: ("+minX+","+minY+") bottomRight: ("+maxX+","+maxY+")";
 		}
-		
+
 	}
 
 	protected static class Leaf<T> implements Serializable {
@@ -652,7 +678,7 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		public boolean put(final double x, final double y, final T value) {
-			return put(new Leaf<T>(x, y, value));
+			return put(new Leaf<>(x, y, value));
 		}
 
 		public boolean remove(final double x, final double y, final T value) {
@@ -667,7 +693,7 @@ public class QuadTree<T> implements Serializable {
 						}
 						if (leaf.values != null) {
 							if (leaf.values.remove(value)) {
-								if (leaf.values.size() == 0) {
+								if (leaf.values.isEmpty()) {
 									this.leaves.remove(leaf);
 								}
 								return true;
@@ -699,27 +725,27 @@ public class QuadTree<T> implements Serializable {
 			}
 		}
 
-		/* default */ T get(final double x, final double y, final MutableDouble bestDistance) {
+		/* default */ T get(final double x, final double y, final MutableDouble bestDistanceSqr) {
 			if (this.hasChilds) {
 				T closest = null;
 				Node<T> bestChild = this.getChild(x, y);
 				if (bestChild != null) {
-					closest = bestChild.get(x, y, bestDistance);
+					closest = bestChild.get(x, y, bestDistanceSqr);
 				}
-				if (bestChild != this.northwest && this.northwest.bounds.calcDistance(x, y) < bestDistance.value) {
-					T value = this.northwest.get(x, y, bestDistance);
+				if (bestChild != this.northwest && this.northwest.bounds.calcDistanceSqr(x, y) < bestDistanceSqr.value) {
+					T value = this.northwest.get(x, y, bestDistanceSqr);
 					if (value != null) { closest = value; }
 				}
-				if (bestChild != this.northeast && this.northeast.bounds.calcDistance(x, y) < bestDistance.value) {
-					T value = this.northeast.get(x, y, bestDistance);
+				if (bestChild != this.northeast && this.northeast.bounds.calcDistanceSqr(x, y) < bestDistanceSqr.value) {
+					T value = this.northeast.get(x, y, bestDistanceSqr);
 					if (value != null) { closest = value; }
 				}
-				if (bestChild != this.southeast && this.southeast.bounds.calcDistance(x, y) < bestDistance.value) {
-					T value = this.southeast.get(x, y, bestDistance);
+				if (bestChild != this.southeast && this.southeast.bounds.calcDistanceSqr(x, y) < bestDistanceSqr.value) {
+					T value = this.southeast.get(x, y, bestDistanceSqr);
 					if (value != null) { closest = value; }
 				}
-				if (bestChild != this.southwest && this.southwest.bounds.calcDistance(x, y) < bestDistance.value) {
-					T value = this.southwest.get(x, y, bestDistance);
+				if (bestChild != this.southwest && this.southwest.bounds.calcDistanceSqr(x, y) < bestDistanceSqr.value) {
+					T value = this.southwest.get(x, y, bestDistanceSqr);
 					if (value != null) { closest = value; }
 				}
 				return closest;
@@ -728,11 +754,11 @@ public class QuadTree<T> implements Serializable {
 			T closest = null;
 			if (this.leaves != null) {
 				for (Leaf<T> leaf : this.leaves) {
-					double distance = Math.sqrt(
-							(leaf.x - x) * (leaf.x - x)
-									+ (leaf.y - y) * (leaf.y - y));
-					if (distance < bestDistance.value) {
-						bestDistance.value = distance;
+					double deltaX = leaf.x - x;
+					double deltaY = leaf.y - y;
+					double distanceSqr = deltaX * deltaX + deltaY * deltaY;
+					if (distanceSqr < bestDistanceSqr.value) {
+						bestDistanceSqr.value = distanceSqr;
 						closest = leaf.value != null ? leaf.value : leaf.values.get(0);
 					}
 				}
@@ -751,7 +777,7 @@ public class QuadTree<T> implements Serializable {
 			if (this.hasChilds) {
 				// note: this could probably be improved. The idea here
 				// is NOT to dive in quadrants which we know do not contain points
-				// in the ellipse. 
+				// in the ellipse.
 				// This is done, but we will also dive in some quadrants not intersecting
 				// the ellipse, which is just a loss of time (the sum of the minimum distances
 				// to an area is always lower than the munimum of the sum of the distances,
@@ -807,29 +833,27 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		/* default */ Collection<T> get(final double x, final double y, final double maxDistance, final Collection<T> values) {
+		/* default */ Collection<T> get(final double x, final double y, final double maxDistanceSqr, final Collection<T> values) {
 			if (this.hasChilds) {
-				if (this.northwest.bounds.calcDistance(x, y) <= maxDistance) {
-					this.northwest.get(x, y, maxDistance, values);
+				if (this.northwest.bounds.calcDistanceSqr(x, y) <= maxDistanceSqr) {
+					this.northwest.get(x, y, maxDistanceSqr, values);
 				}
-				if (this.northeast.bounds.calcDistance(x, y) <= maxDistance) {
-					this.northeast.get(x, y, maxDistance, values);
+				if (this.northeast.bounds.calcDistanceSqr(x, y) <= maxDistanceSqr) {
+					this.northeast.get(x, y, maxDistanceSqr, values);
 				}
-				if (this.southeast.bounds.calcDistance(x, y) <= maxDistance) {
-					this.southeast.get(x, y, maxDistance, values);
+				if (this.southeast.bounds.calcDistanceSqr(x, y) <= maxDistanceSqr) {
+					this.southeast.get(x, y, maxDistanceSqr, values);
 				}
-				if (this.southwest.bounds.calcDistance(x, y) <= maxDistance) {
-					this.southwest.get(x, y, maxDistance, values);
+				if (this.southwest.bounds.calcDistanceSqr(x, y) <= maxDistanceSqr) {
+					this.southwest.get(x, y, maxDistanceSqr, values);
 				}
 				return values;
 			}
 			// no more childs, so we must contain the closest object
 			if (this.leaves != null) {
 				for (Leaf<T> leaf : this.leaves) {
-					double distance = Math.sqrt(
-							(leaf.x - x) * (leaf.x - x)
-									+ (leaf.y - y) * (leaf.y - y));
-					if (distance <= maxDistance) {
+					double distanceSqr = (leaf.x - x) * (leaf.x - x) + (leaf.y - y) * (leaf.y - y);
+					if (distanceSqr <= maxDistanceSqr) {
 						if (leaf.value != null) {
 							values.add(leaf.value);
 						} else {
@@ -841,22 +865,20 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		/* default */ Collection<T> get(final double x, final double y, final double r_min, final double r_max,
-										Collection<T> values) {
+		/* default */ Collection<T> get(final double x, final double y, final double rMinSqr, final double rMaxSqr,
+																		Collection<T> values) {
 			if (this.hasChilds) {
-				stepInto(this.northwest, x, y, r_min, r_max, values);
-				stepInto(this.northeast, x, y, r_min, r_max, values);
-				stepInto(this.southeast, x, y, r_min, r_max, values);
-				stepInto(this.southwest, x, y, r_min, r_max, values);
+				stepIntoSqr(this.northwest, x, y, rMinSqr, rMaxSqr, values);
+				stepIntoSqr(this.northeast, x, y, rMinSqr, rMaxSqr, values);
+				stepIntoSqr(this.southeast, x, y, rMinSqr, rMaxSqr, values);
+				stepIntoSqr(this.southwest, x, y, rMinSqr, rMaxSqr, values);
 				return values;
 			}
 			// no more childs, so we must contain the closest object
 			if (this.leaves != null) {
 				for (Leaf<T> leaf : this.leaves) {
-					double distance = Math.sqrt(
-							(leaf.x - x) * (leaf.x - x)
-									+ (leaf.y - y) * (leaf.y - y));
-					if (distance <= r_max && distance >= r_min) {
+					double distanceSqr = (leaf.x - x) * (leaf.x - x) + (leaf.y - y) * (leaf.y - y);
+					if (distanceSqr <= rMaxSqr && distanceSqr >= rMinSqr) {
 						if (leaf.value != null) {
 							values.add(leaf.value);
 						} else {
@@ -868,12 +890,12 @@ public class QuadTree<T> implements Serializable {
 			return values;
 		}
 
-		private void stepInto(Node node, double x, double y, double r_min, double r_max, Collection<T> values) {
-			double minDistance = node.bounds.calcDistance(x, y);
-			double maxDistance = node.bounds.calcMaxDistance(x, y);
+		private void stepIntoSqr(Node<T> node, double x, double y, double rMinSqr, double rMaxSqr, Collection<T> values) {
+			double minDistanceSqr = node.bounds.calcDistanceSqr(x, y);
+			double maxDistanceSqr = node.bounds.calcMaxDistanceSqr(x, y);
 
-			if(minDistance <= r_max && maxDistance >= r_min) {
-				node.get(x, y, r_min, r_max, values);
+			if (minDistanceSqr <= rMaxSqr && maxDistanceSqr >= rMinSqr) {
+				node.get(x, y, rMinSqr, rMaxSqr, values);
 			}
 		}
 
@@ -983,9 +1005,8 @@ public class QuadTree<T> implements Serializable {
 
 		/* default */ boolean nextLeaf(final Leaf<T> currentLeaf, final MutableLeaf<T> nextLeaf) {
 			if (this.hasChilds) {
-				boolean found = false;
 				if (currentLeaf.x <= this.bounds.centerX && currentLeaf.y <= this.bounds.centerY) {
-					found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
+					boolean found = this.southwest.nextLeaf(currentLeaf, nextLeaf);
 					if (found) {
 						if (nextLeaf.value == null) { nextLeaf.value = this.northwest.firstLeaf(); }
 						if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
@@ -994,7 +1015,7 @@ public class QuadTree<T> implements Serializable {
 					}
 				}
 				if (currentLeaf.x <= this.bounds.centerX && currentLeaf.y >= this.bounds.centerY) {
-					found = this.northwest.nextLeaf(currentLeaf, nextLeaf);
+					boolean found = this.northwest.nextLeaf(currentLeaf, nextLeaf);
 					if (found) {
 						if (nextLeaf.value == null) { nextLeaf.value = this.southeast.firstLeaf(); }
 						if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
@@ -1002,7 +1023,7 @@ public class QuadTree<T> implements Serializable {
 					}
 				}
 				if (currentLeaf.x >= this.bounds.centerX && currentLeaf.y <= this.bounds.centerY) {
-					found = this.southeast.nextLeaf(currentLeaf, nextLeaf);
+					boolean found = this.southeast.nextLeaf(currentLeaf, nextLeaf);
 					if (found) {
 						if (nextLeaf.value == null) { nextLeaf.value = this.northeast.firstLeaf(); }
 						return true;

@@ -20,22 +20,20 @@
 
 package org.matsim.contrib.zone.skims;
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
+public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String SET_NAME = "travelTimeMatrix";
-
-	@Parameter
-	@Comment("size of square cells (meters) used for computing travel time matrix." + " Default value is 200 m")
-	@Positive
-	public double cellSize = 200; //[m]
 
 	// Satisfying only one criterion (max distance or travel time) is enough to be considered a neighbour.
 
@@ -47,7 +45,7 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
 			+ " The unit is meters. Default value is 1000 m.")
 	@PositiveOrZero
-	public double maxNeighborDistance = 1000; //[m]
+	private double maxNeighborDistance = 1000; //[m]
 
 	@Parameter
 	@Comment("Max network travel time from node A to node B for B to be considered a neighbor of A."
@@ -57,14 +55,88 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 			+ " On the other, a too big value will result in large neighborhoods, which may slow down queries."
 			+ " The unit is seconds. Default value is 0 s (for backward compatibility).")
 	@PositiveOrZero
-	public double maxNeighborTravelTime = 0; //[s]
+	private double maxNeighborTravelTime = 0; //[s]
+
+	@NotNull
+	private ZoneSystemParams zoneSystemParams;
+
+	@Parameter
+	@Comment("Caches the travel time matrix data into a binary file. If the file exists, the matrix will be read from the file, if not, the file will be created.")
+	private String cachePath = null;
 
 	public DvrpTravelTimeMatrixParams() {
 		super(SET_NAME);
+		initSingletonParameterSets();
+	}
+
+	private void initSingletonParameterSets() {
+
+		//insertion search params (one of: extensive, selective, repeated selective)
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+			() -> zoneSystemParams,
+			params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return super.createParameterSet(type);
+	public void handleAddUnknownParam(String paramName, String value) {
+		if ("cellSize".equals(paramName)) {
+			SquareGridZoneSystemParams squareGridParams;
+			if(getZoneSystemParams() == null) {
+				squareGridParams = (SquareGridZoneSystemParams) createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+				addParameterSet(squareGridParams);
+			} else {
+				squareGridParams = (SquareGridZoneSystemParams) getZoneSystemParams();
+			}
+			squareGridParams.setCellSize(Double.parseDouble(value));
+		} else {
+			super.handleAddUnknownParam(paramName, value);
+		}
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		if(this.zoneSystemParams == null) {
+			SquareGridZoneSystemParams squareGridZoneSystemParams = new SquareGridZoneSystemParams();
+			squareGridZoneSystemParams.setCellSize(200);
+			this.zoneSystemParams = squareGridZoneSystemParams;
+		}
+		return zoneSystemParams;
+	}
+
+	@PositiveOrZero
+	public double getMaxNeighborDistance() {
+		return maxNeighborDistance;
+	}
+
+	public void setMaxNeighborDistance(@PositiveOrZero double maxNeighborDistance) {
+		this.maxNeighborDistance = maxNeighborDistance;
+	}
+
+	@PositiveOrZero
+	public double getMaxNeighborTravelTime() {
+		return maxNeighborTravelTime;
+	}
+
+	public void setMaxNeighborTravelTime(@PositiveOrZero double maxNeighborTravelTime) {
+		this.maxNeighborTravelTime = maxNeighborTravelTime;
+	}
+
+	public String getCachePath() {
+		return cachePath;
+	}
+
+	public void setCachePath(String cachePath) {
+		this.cachePath = cachePath;
 	}
 }

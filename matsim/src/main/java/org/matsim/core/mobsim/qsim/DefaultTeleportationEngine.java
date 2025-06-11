@@ -90,13 +90,13 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (agent.getExpectedTravelTime().isUndefined()) {
 			LogManager.getLogger(this.getClass()).info("mode: " + agent.getMode());
-			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
+			throw new RuntimeException("teleportation does not work for mode=" + agent.getMode() + " since travel time is undefined.  There is also really no magic fix for this,"
 					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
 		}
 
 		double travelTime = agent.getExpectedTravelTime().seconds() ;
 		if ( withTravelTimeCheck ) {
-			Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
+			Double speed = scenario.getConfig().routing().getTeleportedModeSpeeds().get( agent.getMode() ) ;
 			Facility dpfac = agent.getCurrentFacility() ;
 			Facility arfac = agent.getDestinationFacility() ;
 			travelTime = DefaultTeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);

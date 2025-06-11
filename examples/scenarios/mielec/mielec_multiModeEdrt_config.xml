@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="dvrp">
+		<parameterset type="travelTimeMatrix">
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="100"/>
+			</parameterset>
+		</parameterset>
+	</module>
+
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
+			<param name="mode" value="drt1"/>
+			<param name="stopDuration" value="60"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+			</parameterset>
+
+			<param name="idleVehiclesReturnToDepots" value="true"/>
+			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
+			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
+
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="500"/>
+			</parameterset>
+
+			<parameterset type="rebalancing">
+				<parameterset type="minCostFlowRebalancingStrategy">
+					<param name="targetAlpha" value="0.5"/>
+					<param name="targetBeta" value="0.5"/>
+				</parameterset>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
+			</parameterset>
+		</parameterset>
+
+		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
+			<param name="mode" value="drt2"/>
+			<param name="stopDuration" value="60"/>
+			<parameterset type="drtOptimizationConstraints">
+				<param name="maxWaitTime" value="600"/>
+				<param name="maxTravelTimeAlpha" value="1.3"/>
+				<param name="maxTravelTimeBeta" value="400"/>
+			</parameterset>
+
+			<param name="idleVehiclesReturnToDepots" value="true"/>
+			<param name="vehiclesFile" value="vehicles-10-cap-4_drt2.xml"/>
+			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
+
+			<parameterset type="SquareGridZoneSystem" >
+				<param name="cellSize" value="500"/>
+			</parameterset>
+
+			<parameterset type="rebalancing">
+				<parameterset type="minCostFlowRebalancingStrategy">
+					<param name="targetAlpha" value="0.5"/>
+					<param name="targetBeta" value="0.5"/>
+				</parameterset>
+				<parameterset type="SquareGridZoneSystem" >
+					<param name="cellSize" value="500"/>
+				</parameterset>
+			</parameterset>
+		</parameterset>
+	</module>
+
+	<module name="ev">
+		<param name="chargeTimeStep" value="5"/>
+		<param name="auxDischargeTimeStep" value="10"/>
+
+		<param name="chargersFile" value="chargers-2-plugs-2.xml"/>
+
+		<param name="analysisOutputs" value="TimeProfiles"/>
+	</module>
+
+	<module name="vehicles">
+		<param name="vehiclesFile" value="evehicles-multiModeEdrt.xml"/>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml"/>
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="plans_only_multiModeEdrt.xml.gz"/>
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+		<param name="endTime" value="30:00:00"/>
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
+		<param name="snapshotStyle" value="queue"/>
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab"/>
+		<param name="drawNonMovingItems" value="true"/>
+	</module>
+
+	<module name="controller">
+		<param name="outputDirectory" value="test/output/mielec_edrt"/>
+		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
+		<param name="firstIteration" value="0"/>
+		<param name="lastIteration" value="0"/>
+	</module>
+
+	<module name="scoring">
+		<param name="activityType_0" value="dummy"/>
+		<param name="activityTypicalDuration_0" value="24:00:00"/>
+		<param name="traveling_drt1" value="-6"/>
+		<param name="traveling_drt2" value="-6"/>
+	</module>
+
+	<module name="replanning">
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<param name="maxAgentPlanMemorySize" value="1"/>
+		<param name="ModuleProbability_1" value="1.0"/>
+		<param name="Module_1" value="KeepLastSelected"/>
+	</module>
+</config>

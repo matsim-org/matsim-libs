@@ -25,8 +25,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.XmlUtils;
 
-public class PersonDepartureEvent extends Event implements HasPersonId {
+public class PersonDepartureEvent extends Event implements HasPersonId, HasLinkId {
 
 	public static final String EVENT_TYPE = "departure";
 
@@ -47,24 +48,24 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 		this.personId = agentId;
 		this.routingMode = routingMode;
 	}
-	
+
 	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
 	}
-	
+
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
-	
+
 	public String getLegMode() {
 		return this.legMode;
 	}
-	
+
 	public String getRoutingMode() {
 		return routingMode;
 	}
-	
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -73,8 +74,7 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
+		// linkId, personId handled by superclass
 		if (this.legMode != null) {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
@@ -82,5 +82,17 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 			attr.put(ATTRIBUTE_ROUTING_MODE, this.routingMode);
 		}
 		return attr;
+	}
+
+	@Override
+	public void writeAsXML(StringBuilder out) {
+		writeXMLStart(out);
+		if (this.legMode != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_LEGMODE, this.legMode);
+		}
+		if (this.routingMode != null) {
+			XmlUtils.writeEncodedAttributeKeyValue(out, ATTRIBUTE_ROUTING_MODE, this.routingMode);
+		}
+		writeXMLEnd(out);
 	}
 }

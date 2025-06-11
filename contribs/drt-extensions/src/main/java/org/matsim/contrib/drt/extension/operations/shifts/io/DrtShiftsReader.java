@@ -8,6 +8,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreakSpecificationImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftSpecificationImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -24,13 +25,18 @@ public class DrtShiftsReader extends MatsimXmlParser {
     private final static String BREAK_NAME = "break";
 
     public static final String ID = "id";
+
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
+
     public static final String OPERATION_FACILITY_ID = "operationFacilityId";
+    public static final String DESIGNATED_VEHICLE_ID = "designatedVehicleId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
     public static final String BREAK_DURATION = "duration";
+
+    public static final String TYPE = "type";
 
     private static final Logger log = LogManager.getLogger( DrtShiftsReader.class ) ;
 
@@ -39,6 +45,7 @@ public class DrtShiftsReader extends MatsimXmlParser {
     private DrtShiftSpecificationImpl.Builder currentBuilder;
 
     public DrtShiftsReader( final DrtShiftsSpecification shiftsSpecification){
+			super(ValidationType.NO_VALIDATION);
         log.info("Using " + this.getClass().getName());
 		this.shiftsSpecification = shiftsSpecification;
         this.setValidating(false);
@@ -54,8 +61,16 @@ public class DrtShiftsReader extends MatsimXmlParser {
 				builder.end(Double.parseDouble(atts.getValue(END_TIME)));
 				String operationFacilityId = atts.getValue(OPERATION_FACILITY_ID);
 				if(operationFacilityId != null) {
-					builder.operationFacility(Id.create(operationFacilityId, OperationFacility.class));
-				}
+                    builder.operationFacility(Id.create(operationFacilityId, OperationFacility.class));
+                }
+                String designatedVehicleId = atts.getValue(DESIGNATED_VEHICLE_ID);
+                if(designatedVehicleId != null) {
+                    builder.designatedVehicle(Id.create(designatedVehicleId, DvrpVehicle.class));
+                }
+                String type = atts.getValue(TYPE);
+                if(type != null) {
+                    builder.type(type);
+                }
                 currentBuilder = builder;
                 break;
             case BREAK_NAME:

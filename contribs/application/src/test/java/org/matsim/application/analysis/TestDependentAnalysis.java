@@ -1,6 +1,7 @@
 package org.matsim.application.analysis;
 
 import org.matsim.application.CommandSpec;
+import org.matsim.application.Dependency;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -9,7 +10,10 @@ import picocli.CommandLine;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@CommandSpec(requires = {"out.xml"}, produces = "processed.csv", dependsOn = {TestAnalysis.class})
+@CommandSpec(
+	produces = "processed.csv",
+	dependsOn = {@Dependency(value = TestAnalysis.class, files = {"out.xml"}, required = true)}
+)
 public class TestDependentAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin

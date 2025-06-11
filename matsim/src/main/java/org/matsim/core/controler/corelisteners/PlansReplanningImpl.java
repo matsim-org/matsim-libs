@@ -25,6 +25,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.conflicts.ConflictManager;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -41,21 +42,24 @@ import jakarta.inject.Provider;
  */
 @Singleton
 final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
-
 	private final Provider<ReplanningContext> replanningContextProvider;
 	private final Population population;
 	private final StrategyManager strategyManager;
+	private final ConflictManager conflictManager;
 
 	@Inject
-	PlansReplanningImpl(StrategyManager strategyManager, Population pop, Provider<ReplanningContext> replanningContextProvider) {
+	PlansReplanningImpl(StrategyManager strategyManager, ConflictManager conflictManager, Population pop,
+			Provider<ReplanningContext> replanningContextProvider) {
 		this.population = pop;
 		this.strategyManager = strategyManager;
+		this.conflictManager = conflictManager;
 		this.replanningContextProvider = replanningContextProvider;
 	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
+		conflictManager.initializeReplanning(population);
 		strategyManager.run(population, event.getIteration(), replanningContextProvider.get());
+		conflictManager.run(population, event.getIteration());
 	}
-
 }

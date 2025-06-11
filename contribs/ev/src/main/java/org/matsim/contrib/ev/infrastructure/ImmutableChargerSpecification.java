@@ -24,6 +24,8 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -39,24 +41,26 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	private final String chargerType;
 	private final double plugPower;
 	private final int plugCount;
+	private final Attributes attributes;
 
-	private ImmutableChargerSpecification(Builder builder) {
+	private ImmutableChargerSpecification( ChargerSpecificationBuilder builder ) {
 		id = Objects.requireNonNull(builder.id);
 		linkId = Objects.requireNonNull(builder.linkId);
 		chargerType = Objects.requireNonNull(builder.chargerType);
 		plugPower = Objects.requireNonNull(builder.plugPower);
 		plugCount = Objects.requireNonNull(builder.plugCount);
+		attributes = builder.attributes != null ? builder.attributes : new AttributesImpl();
 
 		Preconditions.checkArgument(plugPower >= 0, "Negative plugPower of charger: %s", id);
 		Preconditions.checkArgument(plugCount >= 0, "Negative plugCount of charger: %s", id);
 	}
 
-	public static Builder newBuilder() {
-		return new Builder();
+	public static ChargerSpecificationBuilder newBuilder() {
+		return new ChargerSpecificationBuilder();
 	}
 
-	public static Builder newBuilder(ChargerSpecification copy) {
-		Builder builder = new Builder();
+	public static ChargerSpecificationBuilder newBuilder( ChargerSpecification copy ) {
+		ChargerSpecificationBuilder builder = new ChargerSpecificationBuilder();
 		builder.id = copy.getId();
 		builder.linkId = copy.getLinkId();
 		builder.chargerType = copy.getChargerType();
@@ -91,6 +95,11 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	}
 
 	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
@@ -101,38 +110,44 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 				.toString();
 	}
 
-	public static final class Builder {
+	public static final class ChargerSpecificationBuilder{
 		private Id<Charger> id;
 		private Id<Link> linkId;
 		private String chargerType;
 		private Double plugPower;
 		private Integer plugCount;
+		private Attributes attributes;
 
-		private Builder() {
+		private ChargerSpecificationBuilder() {
 		}
 
-		public Builder id(Id<Charger> val) {
+		public ChargerSpecificationBuilder id( Id<Charger> val ) {
 			id = val;
 			return this;
 		}
 
-		public Builder linkId(Id<Link> val) {
+		public ChargerSpecificationBuilder linkId( Id<Link> val ) {
 			linkId = val;
 			return this;
 		}
 
-		public Builder chargerType(String val) {
+		public ChargerSpecificationBuilder chargerType( String val ) {
 			chargerType = val;
 			return this;
 		}
 
-		public Builder plugPower(double val) {
+		public ChargerSpecificationBuilder plugPower( double val ) {
 			plugPower = val;
 			return this;
 		}
 
-		public Builder plugCount(int val) {
+		public ChargerSpecificationBuilder plugCount( int val ) {
 			plugCount = val;
+			return this;
+		}
+
+		public ChargerSpecificationBuilder attributes( Attributes val ) {
+			attributes = val;
 			return this;
 		}
 

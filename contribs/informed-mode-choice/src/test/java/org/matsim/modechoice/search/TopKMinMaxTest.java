@@ -5,10 +5,10 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.data.Offset;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -18,7 +18,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -31,7 +33,7 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
@@ -44,11 +46,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopKMinMaxTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private TopKChoicesGenerator generator;
 	private Injector injector;
@@ -62,7 +64,7 @@ public class TopKMinMaxTest {
 	@Mock
 	private EventsManager em;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		TestModule testModule = new TestModule();
@@ -78,7 +80,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void minmax() {
+	void minmax() {
 
 		Person person = create();
 
@@ -115,7 +117,7 @@ public class TopKMinMaxTest {
 	}
 
 	@Test
-	public void subset() {
+	void subset() {
 
 		Person person = create();
 
@@ -179,37 +181,36 @@ public class TopKMinMaxTest {
 		protected void configure() {
 
 			PopulationFactory f = PopulationUtils.getFactory();
-
+			bind(Config.class).toInstance(config);
 			bind(EventsManager.class).toInstance(em);
 			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
-			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then(new Answer<List<PlanElement>>() {
-				@Override
-				public List<PlanElement> answer(InvocationOnMock invocationOnMock) throws Throwable {
+			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then((Answer<List<PlanElement>>) invocationOnMock -> {
 
-					Leg walk = f.createLeg(TransportMode.walk);
-					Leg car = f.createLeg(TransportMode.car);
+                Leg walk = f.createLeg(TransportMode.walk);
+                Leg car = f.createLeg(TransportMode.car);
 
-					walk.setTravelTime(1);
-					car.setTravelTime(10);
+                walk.setTravelTime(1);
+                car.setTravelTime(10);
 
-					if (invocationOnMock.getArgument(0).equals(TransportMode.car))
-						return List.of(walk, car);
-					else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
-						walk.setTravelTime(100);
-						return List.of(walk);
-					} else
-						throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
-				}
-			});
+                if (invocationOnMock.getArgument(0).equals(TransportMode.car))
+                    return List.of(walk, car);
+                else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
+                    walk.setTravelTime(100);
+                    return List.of(walk);
+                } else
+                    throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
+            });
 
 			bind(EstimateRouter.class).toInstance(new EstimateRouter(router,
 					FacilitiesUtils.createActivityFacilities(),
-					TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes)));
+					new DefaultAnalysisMainModeIdentifier()
+			));
 
-			MapBinder<String, ModeOptions<?>> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
+			MapBinder<String, ModeOptions> optionBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>(){});
 			optionBinder.addBinding(TransportMode.car).toInstance(new ModeOptions.AlwaysAvailable());
 			optionBinder.addBinding(TransportMode.walk).toInstance(new ModeOptions.AlwaysAvailable());
 
@@ -217,26 +218,29 @@ public class TopKMinMaxTest {
 			Multibinder<TripConstraint<?>> tcBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
 			});
 
-			MapBinder<String, FixedCostsEstimator<?>> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			Multibinder<TripScoreEstimator> tEstBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<>() {
+			});
+
+			MapBinder<String, FixedCostsEstimator> fcBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			fcBinder.addBinding(TransportMode.car).toInstance((context, mode, option) -> -1);
 
-			MapBinder<String, LegEstimator<?>> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, LegEstimator> legBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			legBinder.addBinding(TransportMode.walk).toInstance((context, mode, leg, option) -> -0.5);
 
 
-			MapBinder<String, TripEstimator<?>> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
+			MapBinder<String, TripEstimator> tripBinder = MapBinder.newMapBinder(binder(), new TypeLiteral<>() {
 			}, new TypeLiteral<>() {
 			});
 
 			tripBinder.addBinding(TransportMode.car).toInstance(new CarTripEstimator());
 
-			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters("person"), Map.of(), config.scenario());
+			ScoringParameters.Builder scoring = new ScoringParameters.Builder(config.scoring(), config.scoring().getScoringParameters("person"), Map.of(), config.scenario());
 
 			bind(ScoringParametersForPerson.class).toInstance(person -> scoring.build());
 			bind(InformedModeChoiceConfigGroup.class).toInstance(ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class));
@@ -251,7 +255,7 @@ public class TopKMinMaxTest {
 	}
 
 	// Provides fixed estimates for testing
-	private class CarTripEstimator implements TripEstimator<ModeAvailability> {
+	private class CarTripEstimator implements TripEstimator {
 
 		@Override
 		public MinMaxEstimate estimate(EstimatorContext context, String mode, PlanModel plan, List<Leg> trip, ModeAvailability option) {
@@ -259,7 +263,7 @@ public class TopKMinMaxTest {
 		}
 
 		@Override
-		public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+		public double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 
 			double est = 0;
 			for (String m : modes) {

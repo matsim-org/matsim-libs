@@ -1,6 +1,6 @@
 package org.matsim.modechoice.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.modechoice.PlanCandidate;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 	@Test
-	public void choices() {
+	void choices() {
 
 		SingleTripChoicesGenerator generator = injector.getInstance(SingleTripChoicesGenerator.class);
 
@@ -28,16 +28,16 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 		Collection<PlanCandidate> candidates = generator.generate(model, null, new boolean[]{true, false, false, false});
 
 		assertThat(candidates)
-				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
+				.first().matches(c -> c.getMode(0).equals(TransportMode.bike));
 
 		assertThat(candidates)
-				.last().matches(c -> c.getMode(0).equals(TransportMode.ride));
+				.last().matches(c -> c.getMode(0).equals(TransportMode.car));
 
 	}
 
 
 	@Test
-	public void unavailable() {
+	void unavailable() {
 
 		SingleTripChoicesGenerator generator = injector.getInstance(SingleTripChoicesGenerator.class);
 
@@ -55,7 +55,7 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 	}
 
 	@Test
-	public void subset() {
+	void subset() {
 
 		SingleTripChoicesGenerator generator = injector.getInstance(SingleTripChoicesGenerator.class);
 
@@ -67,7 +67,7 @@ public class SingleTripChoicesGeneratorTest extends ScenarioTest {
 
 		assertThat(candidates)
 				.hasSize(2)
-				.first().matches(c -> c.getMode(0).equals(TransportMode.car));
+				.first().matches(c -> c.getMode(0).equals(TransportMode.walk));
 
 	}
 }

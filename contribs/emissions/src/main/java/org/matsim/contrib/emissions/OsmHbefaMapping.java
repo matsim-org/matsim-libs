@@ -22,24 +22,22 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Provides;
-import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by molloyj on 01.12.2017.
- *
+ * <p>
  *
  * handled OSM road types:
  *    motorway,trunk,primary,secondary, tertiary, unclassified,residential,service
  *    motorway_link, trunk_link,primary_link, secondary_link
  *    tertiary_link, living_street, pedestrian,track,road
- *
+ * <p>
  * Hbefa categories and respective speeds
  *    URB/MW-Nat./80 - 130
  *    URB/MW-City/60 - 110
@@ -48,7 +46,7 @@ import java.util.Map;
  *    URB/Distr/50 - 80
  *    URB/Local/50 - 60
  *    URB/Access/30 - 50
- *
+ * <p>
  * Conversions from OSM to hbefa types
  *    motorway;MW
  *    primary;Trunk
@@ -63,14 +61,14 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
     private final Map<String, Hbefa> hbfeaMap = new HashMap<>();
 
     static class Hbefa {
-        String name;
-        int min;
-        int max;
+        final String name;
+        final int min_speed;
+        final int max_speed;
 
-        Hbefa(String name, int min, int max) {
+        Hbefa(String name, int min_speed, int max) {
             this.name = name;
-            this.min = min;
-            this.max = max;
+            this.min_speed = min_speed;
+            this.max_speed = max;
         }
     }
 
@@ -87,6 +85,8 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         mapping.put("residential", new Hbefa("Access",30,50));
         mapping.put("service", new Hbefa("Access",30,50));
         mapping.put("living", new Hbefa("Access",30,50));
+        mapping.put("cycleway", new Hbefa("Access",30,50));
+        mapping.put("path", new Hbefa("Access",30,50));
 
         return mapping;
     }
@@ -96,12 +96,9 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
     }
 
     @Override
-    public String determineHebfaType(Link link) {
-        String roadTypeAttribute = (String) link.getAttributes().getAttribute(NetworkUtils.TYPE);
-        Object allowedSpeedAttribute = link.getAttributes().getAttribute(NetworkUtils.ALLOWED_SPEED);
-
-        String roadType = StringUtils.isBlank(roadTypeAttribute) ? "unclassified" : roadTypeAttribute;
-        double allowedSpeed = allowedSpeedAttribute != null ? (double) allowedSpeedAttribute : link.getFreespeed();
+    public String determineHbefaType(Link link) {
+        String roadType = NetworkUtils.getHighwayType(link);
+        double allowedSpeed = NetworkUtils.getAllowedSpeed(link);
 
         return getHEBFAtype(roadType, allowedSpeed);
     }
@@ -113,7 +110,7 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
         /*
          * speed attributes are sometimes rounded beforehand.
-         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are and otherwise we get problems later...
+         * make sure the speed is a multiple of 10, as the HBEFA emission key factors are, and otherwise we get problems later...
          */
 		freeVelocity_kmh = Math.round(freeVelocity_kmh/10.0) * 10;
 
@@ -128,8 +125,7 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
 
 
         //sometimes link type is smth like 'motorway_link' or 'living_street' or 'primary|railway.tram'. We only care about the first part, here
-		int idx = Arrays.asList(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
-				.stream()
+		int idx = Stream.of(type.indexOf('.'), type.indexOf('|'), type.indexOf('_'), type.indexOf(','))
 				.filter(i -> i>= 0) //if chrc is not in String indexOf returns -1
 				.min(Integer::compare)
 				.orElse(type.length());
@@ -142,8 +138,8 @@ public class OsmHbefaMapping extends HbefaRoadTypeMapping {
         if (!hbfeaMap.containsKey(type)) {
             throw new RuntimeException("'" + type + "' not in hbefa map");
         }
-        int min_speed = hbfeaMap.get(type).min;
-        int max_speed = hbfeaMap.get(type).max;
+        int min_speed = hbfeaMap.get(type).min_speed;
+        int max_speed = hbfeaMap.get(type).max_speed;
         int clamped_speed = (int) Math.min(Math.max(min_speed, freeVelocity_kmh), max_speed);
 
         return "URB/" + hbfeaMap.get(type).name + "/" + clamped_speed;

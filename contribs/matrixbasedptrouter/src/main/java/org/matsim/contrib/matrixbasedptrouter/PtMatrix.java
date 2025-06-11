@@ -20,6 +20,7 @@
 package org.matsim.contrib.matrixbasedptrouter;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -35,8 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,7 +50,7 @@ import org.matsim.vehicles.Vehicle;
  * Calculates travel times and distances from Coord to Coord based on a file containing transit stops with coordinates,
  * and, optionally, two files containing travel times and distances between each pair of stops. If files for travel times and distances are not provided,
  * they are calculated based on the teleportedModeSpeed of the pt mode, and the beelineDistanceFactor.
- * 
+ *
  * @author thomas
  */
 public final class PtMatrix {
@@ -60,20 +61,20 @@ public final class PtMatrix {
 	/**
 	 * Creates an instance of this class. The config group contains the input file names, and whether speed/distance matrices are provided or not.
 	 * Speed and beeline distance factors are taken from the router configuration.
-	 * 
-	 * A bounding box must be provided, which is used to filter the transit stop file while reading it. It is mandatory. If you just want to read the file, 
+	 *
+	 * A bounding box must be provided, which is used to filter the transit stop file while reading it. It is mandatory. If you just want to read the file,
 	 * take the bounding box of your study area.
-	 * 
+	 *
 	 * The transit stop file must always be provided, although it technically should not be necessary when you provide
-	 * distance and speed matrices. It seems to be used only to give out warnings if transit stops are encountered which are not in the 
+	 * distance and speed matrices. It seems to be used only to give out warnings if transit stops are encountered which are not in the
 	 * transit stop file.
-	 * 
+	 *
 	 * The calculated access/egress times are used without beeline distance correction, even though the pt travel times and distances are.
-	 * 
-	 * Even though the parameters are taken from the teleportation router config, the teleportation router is not actually used to calculate 
+	 *
+	 * Even though the parameters are taken from the teleportation router config, the teleportation router is not actually used to calculate
 	 * times and distances. I think this would be the more correct thing to do.
 	 */
-	public static PtMatrix createPtMatrix(PlansCalcRouteConfigGroup plansCalcRoute, BoundingBox bb,	MatrixBasedPtRouterConfigGroup ippcm) {
+	public static PtMatrix createPtMatrix(RoutingConfigGroup plansCalcRoute, BoundingBox bb, MatrixBasedPtRouterConfigGroup ippcm) {
 
 		String ptStopInputFile = ippcm.getPtStopsInputFile();
 		QuadTree<PtStop> ptStops = FileUtils.readPtStops(ptStopInputFile, bb);
@@ -84,16 +85,19 @@ public final class PtMatrix {
 			String ptTravelTimeInputFile = ippcm.getPtTravelTimesInputFile();
 			String ptTravelDistanceInputFile = ippcm.getPtTravelDistancesInputFile();
 
-			BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
-			log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
-			final Map<Id<PtStop>, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
-			FileUtils.fillODMatrix(originDestinationTravelTimeMatrix, ptStopsMap, brTravelTimes, true);
-			log.info("Done creating travel time OD matrix. " + originDestinationTravelTimeMatrix.toString());
-
-			log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
-			BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
-			FileUtils.fillODMatrix(originDestinationTravelDistanceMatrix, ptStopsMap, brTravelDistances, false);
-			log.info("Done creating travel distance OD matrix. " + originDestinationTravelDistanceMatrix.toString());
+			try (BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
+				BufferedReader brTravelDistances = IOUtils.getBufferedReader(ptTravelDistanceInputFile);
+			) {
+				log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
+				final Map<Id<PtStop>, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
+				FileUtils.fillODMatrix(originDestinationTravelTimeMatrix, ptStopsMap, brTravelTimes, true);
+				log.info("Done creating travel time OD matrix. " + originDestinationTravelTimeMatrix.toString());
+				log.info("Creating travel distance OD matrix from VISUM pt stop 2 pt stop travel distance file: " + ptTravelDistanceInputFile);
+				FileUtils.fillODMatrix(originDestinationTravelDistanceMatrix, ptStopsMap, brTravelDistances, false);
+				log.info("Done creating travel distance OD matrix. " + originDestinationTravelDistanceMatrix.toString());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 
 			log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");
 
@@ -138,26 +142,26 @@ public final class PtMatrix {
 	private final QuadTree<PtStop> ptStops;
 	private final double meterPerSecWalkSpeed;
 
-	private PtMatrix(PlansCalcRouteConfigGroup plansCalcRoute, QuadTree<PtStop> ptStops, Matrix originDestinationTravelTimeMatrix, Matrix originDestinationTravelDistanceMatrix){
+	private PtMatrix(RoutingConfigGroup plansCalcRoute, QuadTree<PtStop> ptStops, Matrix originDestinationTravelTimeMatrix, Matrix originDestinationTravelDistanceMatrix){
 		this.meterPerSecWalkSpeed = plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk) ;
-		this.ptStops = ptStops;		
+		this.ptStops = ptStops;
 		this.originDestinationTravelTimeMatrix = originDestinationTravelTimeMatrix;
 		this.originDestinationTravelDistanceMatrix = originDestinationTravelDistanceMatrix;
 	}
 
 	/**
 	 * total travel times (origin location > pt > destination location) in seconds. the travel times are composed as follows:
-	 * 
+	 *
 	 * (O)-------(PT)===========(PT)--------(D)
-	 * 
+	 *
 	 * O = origin location
 	 * D = destination location
-	 * PT= next pt station 
-	 * 
+	 * PT= next pt station
+	 *
 	 * total travel times = walk travel time from origin O to next pt stop +
 	 *                      pt travel time +
 	 *                      walk travel time from destination pt stop to destination D
-	 * 
+	 *
 	 * @param fromFacilityCoord
 	 * @param toFacilityCoord
 	 * @return
@@ -178,12 +182,12 @@ public final class PtMatrix {
 	 * returns the total walk travel times in seconds including
 	 * - walk travel time from given coordinate to next pt stop
 	 * - walk travel time from destination pt stop to given destination coordinate
-	 * 
+	 *
 	 * @param fromFacilityCoord
 	 * @param toFacilityCoord
 	 * @return
 	 */
-	public double getTotalWalkTravelTime_seconds(Coord fromFacilityCoord, Coord toFacilityCoord){	
+	public double getTotalWalkTravelTime_seconds(Coord fromFacilityCoord, Coord toFacilityCoord){
 		PtStop fromPtStop = this.ptStops.getClosest(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.ptStops.getClosest(toFacilityCoord.getX(), toFacilityCoord.getY());
 
@@ -219,17 +223,17 @@ public final class PtMatrix {
 
 	/**
 	 * total travel distance (origin location > pt > destination location) in seconds. the travel distances are composed as follows:
-	 * 
+	 *
 	 * (O)-------(PT)===========(PT)--------(D)
-	 * 
+	 *
 	 * O = origin location
 	 * D = destination location
-	 * PT= next pt station 
-	 * 
+	 * PT= next pt station
+	 *
 	 * total travel distance = walk travel distance from origin O to next pt stop +
 	 *                         pt travel distance +
 	 *                         walk travel distance from destination pt stop to destination D
-	 * 
+	 *
 	 * travel distances in meter
 	 * @param fromFacilityCoord
 	 * @param toFacilityCoord
@@ -238,7 +242,7 @@ public final class PtMatrix {
 	public double getTotalTravelDistance_meter(Coord fromFacilityCoord, Coord toFacilityCoord){
 
 		double totalWalkTravelDistance = getTotalWalkTravelDistance_meter(fromFacilityCoord, toFacilityCoord);
-		double ptTravelDistance = getPtTravelDistance_meter(fromFacilityCoord, toFacilityCoord); 
+		double ptTravelDistance = getPtTravelDistance_meter(fromFacilityCoord, toFacilityCoord);
 
 		double totalTravelDistance = totalWalkTravelDistance + ptTravelDistance;
 		return totalTravelDistance;
@@ -288,12 +292,12 @@ public final class PtMatrix {
 		return ptStopHashMap;
 	}
 
-	public LeastCostPathCalculator asPathCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
-		final double betaWalkTT	= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		final double betaWalkTD	= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		final double betaPtTT = planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		final double betaPtTD = planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
-		final double constPt = planCalcScoreConfigGroup.getModes().get(TransportMode.pt).getConstant();
+	public LeastCostPathCalculator asPathCalculator(ScoringConfigGroup scoringConfigGroup) {
+		final double betaWalkTT	= scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final double betaWalkTD	= scoringConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		final double betaPtTT = scoringConfigGroup.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
+		final double betaPtTD = scoringConfigGroup.getMarginalUtilityOfMoney() * scoringConfigGroup.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
+		final double constPt = scoringConfigGroup.getModes().get(TransportMode.pt).getConstant();
 
 		return new LeastCostPathCalculator() {
 			@Override

@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
@@ -11,7 +11,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftStayTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -42,15 +42,23 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
 	private final Fleet fleet;
 
+	private final ChargingStrategy.Factory chargingStrategyFactory;
+
 	public EDrtShiftDispatcherImpl(EShiftTaskScheduler shiftTaskScheduler, ChargingInfrastructure chargingInfrastructure,
 								   ShiftsParams drtShiftParams, OperationFacilities operationFacilities,
-								   DrtShiftDispatcher delegate, Fleet fleet) {
+								   DrtShiftDispatcher delegate, Fleet fleet, ChargingStrategy.Factory chargingStrategyFactory) {
 		this.shiftTaskScheduler = shiftTaskScheduler;
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.drtShiftParams = drtShiftParams;
 		this.operationFacilities = operationFacilities;
 		this.delegate = delegate;
 		this.fleet = fleet;
+		this.chargingStrategyFactory = chargingStrategyFactory;
+	}
+
+	@Override
+	public void initialize() {
+		delegate.initialize();
 	}
 
 	@Override
@@ -89,14 +97,14 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 							continue;
 						}
 						final ElectricVehicle electricVehicle = eShiftVehicle.getElectricVehicle();
-						if (electricVehicle.getBattery().getCharge() / electricVehicle.getBattery().getCapacity() < drtShiftParams.chargeAtHubThreshold) {
+						if (electricVehicle.getBattery().getCharge() / electricVehicle.getBattery().getCapacity() < drtShiftParams.getChargeAtHubThreshold()) {
 							final Task currentTask = eShiftVehicle.getSchedule().getCurrentTask();
-							if (currentTask instanceof EDrtWaitForShiftStayTask
-									&& ((EDrtWaitForShiftStayTask) currentTask).getChargingTask() == null) {
+							if (currentTask instanceof EDrtWaitForShiftTask
+									&& ((EDrtWaitForShiftTask) currentTask).getChargingTask() == null) {
 								Optional<Charger> selectedCharger = chargerIds
 										.stream()
 										.map(id -> chargingInfrastructure.getChargers().get(id))
-										.filter(charger -> drtShiftParams.outOfShiftChargerType.equals(charger.getChargerType()))
+										.filter(charger -> drtShiftParams.getOutOfShiftChargerType().equals(charger.getChargerType()))
 										.min((c1, c2) -> {
 											final double waitTime = ChargingEstimations
 													.estimateMaxWaitTimeForNextVehicle(c1);
@@ -107,18 +115,18 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
 								if (selectedCharger.isPresent()) {
 									Charger selectedChargerImpl = selectedCharger.get();
-									ChargingStrategy chargingStrategy = selectedChargerImpl.getLogic().getChargingStrategy();
-									if (!chargingStrategy.isChargingCompleted(electricVehicle)) {
+									ChargingStrategy chargingStrategy = chargingStrategyFactory.createStrategy(selectedChargerImpl.getSpecification(), electricVehicle);
+									if (!chargingStrategy.isChargingCompleted()) {
 										final double waitTime = ChargingEstimations
 												.estimateMaxWaitTimeForNextVehicle(selectedChargerImpl);
 										final double chargingTime = chargingStrategy
-												.calcRemainingTimeToCharge(electricVehicle);
+												.calcRemainingTimeToCharge();
 										double energy = -chargingStrategy
-												.calcRemainingEnergyToCharge(electricVehicle);
+												.calcRemainingEnergyToCharge();
 										final double endTime = timeStep + waitTime + chargingTime;
 										if (endTime < currentTask.getEndTime()) {
-											shiftTaskScheduler.chargeAtHub((WaitForShiftStayTask) currentTask, eShiftVehicle,
-													electricVehicle, selectedChargerImpl, timeStep, endTime, energy);
+											shiftTaskScheduler.chargeAtHub((WaitForShiftTask) currentTask, eShiftVehicle,
+													electricVehicle, selectedChargerImpl, timeStep, endTime, energy, chargingStrategy);
 										}
 									}
 								}

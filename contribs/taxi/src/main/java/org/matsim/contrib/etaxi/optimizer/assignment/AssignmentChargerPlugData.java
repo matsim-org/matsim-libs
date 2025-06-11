@@ -71,7 +71,7 @@ class AssignmentChargerPlugData {
 			}
 
 			// does not include AUX+driving for assigned vehs
-			double assignedWorkload = ChargingEstimations.estimateTotalTimeToCharge(logic.getChargingStrategy(),
+			double assignedWorkload = ChargingEstimations.estimateTotalTimeToCharge(
 					Streams.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream(),
 							logic.getAssignedVehicles().stream()));
 

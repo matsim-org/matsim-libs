@@ -34,52 +34,50 @@ import org.matsim.vehicles.VehicleType;
  * @author smetzler, dziemke
  */
 public final class BicycleModule extends AbstractModule {
-
 	private static final Logger LOG = LogManager.getLogger(BicycleModule.class);
 
-	@Inject
-	private BicycleConfigGroup bicycleConfigGroup;
+	@Inject private BicycleConfigGroup bicycleConfigGroup;
 
-	@Override
-	public void install() {
+	@Override public void install() {
+//		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( this.getConfig(), BicycleConfigGroup.class );
+//		this.bind( BicycleConfigGroup.class ).toInstance( bicycleConfigGroup );
+		// the above feels odd.  But it seems to work.  I actually have no idea where the config groups are bound, neither for the core config
+		// groups nor for the added config groups.  In general, the original idea was that AbstractModule provides the config from
+		// getConfig(), not from injection.  kai, jun'24
+
+		// It actually does not work in general.  The ExplodedConfigModule injects all config groups that are materialized by then.  Which
+		// means that it needs to be materialized "quite early", and in particular before this install method is called.  For the time being,
+		// a run script using the contrib thus needs to materialize the config group.  kai, jul'24
+
+
 		// The idea here is the following:
 		// * scores are just added as score events.  no scoring function is replaced.
 
 		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
 		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
 
-
+		// this gives the typical things to the router:
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
+		// (the BicycleTravelTime uses the BicycleLinkSpeed Calculator bound below)
+		// (the BicycleDisutility uses a BicycleTravelDisutility)
 
-		switch ( bicycleConfigGroup.getBicycleScoringType() ) {
-			case legBased -> {
-				this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
-			}
-			case linkBased -> {
-				// yyyy the leg based scoring was moved to score events, so that it does not change the scoring function.  For the
-				// link based scoring, this has not yet been done.  It seems to me that the link based scoring is needed for the
-				// motorized interaction.  However, from a technical point of vew it should be possible to use the score events as
-				// well, since they are computed link-by-link.  That is, optimally the link based scoring would go away completely,
-				// and only motorized interaction would be switched on or off.  kai, jun'23
+		// compute and throw the additional score events:
+		this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+		// (this uses the AdditionalBicycleLinkScore to compute and throw corresponding scoring events)
+		// (it also computes and throws the motorized interaction events, if they are switched on)
 
-				bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
-			}
-			default -> throw new IllegalStateException( "Unexpected value: " + bicycleConfigGroup.getBicycleScoringType() );
-		}
-
-		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
-		// this is still needed because the bicycle travel time calculator needs to use the same bicycle speed as the mobsim.  kai, jun'23
-
-		if (bicycleConfigGroup.isMotorizedInteraction()) {
-			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
-		}
+		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
+		// (this computes the value of the per-link scoring event.  yyyy Very unfortunately, it is a re-implementation of the BicycleTravelDisutility (mentioned above).)
 
 		this.installOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
-				this.addLinkSpeedCalculator().to( BicycleLinkSpeedCalculator.class );
+				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
 			}
 		} );
+
+		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
+		// (both the router and the mobsim need this)
 
 		addControlerListenerBinding().to(ConsistencyCheck.class);
 	}
@@ -89,7 +87,6 @@ public final class BicycleModule extends AbstractModule {
 		@Inject private Scenario scenario;
 
 		@Override public void notifyStartup(StartupEvent event) {
-
 			Id<VehicleType> bicycleVehTypeId = Id.create(bicycleConfigGroup.getBicycleMode(), VehicleType.class);
 			if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId) == null) {
 				LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types. "
@@ -102,7 +99,7 @@ public final class BicycleModule extends AbstractModule {
 					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
 							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
 							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
-					if (scenario.getConfig().plansCalcRoute().getRoutingRandomness() == 0.) {
+					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
 						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
 					}
 				}

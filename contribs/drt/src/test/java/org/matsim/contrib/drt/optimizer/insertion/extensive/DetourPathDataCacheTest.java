@@ -25,16 +25,16 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
-import org.matsim.contrib.drt.optimizer.insertion.extensive.DetourPathDataCache;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.testcases.fakes.FakeLink;
 
@@ -85,33 +85,35 @@ public class DetourPathDataCacheTest {
 	private final DetourPathDataCache detourPathDataCache = new DetourPathDataCache(pathToPickupMap, pathFromPickupMap,
 			pathToDropoffMap, pathFromDropoffMap, ZERO_DETOUR);
 
+	private static final IntegerLoadType LOAD_TYPE = new IntegerLoadType("passengers");
+
 	@Test
-	public void insertion_0_0() {
+	void insertion_0_0() {
 		assertInsertion(0, 0, start_pickup, pickup_dropoff, null, dropoff_stop0);
 	}
 
 	@Test
-	public void insertion_0_1() {
+	void insertion_0_1() {
 		assertInsertion(0, 1, start_pickup, pickup_stop0, stop0_dropoff, dropoff_stop1);
 	}
 
 	@Test
-	public void insertion_0_2() {
+	void insertion_0_2() {
 		assertInsertion(0, 2, start_pickup, pickup_stop0, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
-	public void insertion_1_1() {
+	void insertion_1_1() {
 		assertInsertion(1, 1, stop0_pickup, pickup_dropoff, null, dropoff_stop1);
 	}
 
 	@Test
-	public void insertion_1_2() {
+	void insertion_1_2() {
 		assertInsertion(1, 2, stop0_pickup, pickup_stop1, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
-	public void insertion_2_2() {
+	void insertion_2_2() {
 		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, ZERO_DETOUR);
 	}
 
@@ -131,11 +133,11 @@ public class DetourPathDataCacheTest {
 	}
 
 	private VehicleEntry entry(Link startLink, Link... stopLinks) {
-		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0),
-				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null);
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, LOAD_TYPE.fromInt(0)),
+				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()), null, null, 0);
 	}
 
 	private Waypoint.Stop stop(Link link) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), 0);
+		return new Waypoint.Stop(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE);
 	}
 }

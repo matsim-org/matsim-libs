@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.fleet;
 
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.EvConfigGroup.InitialSocBehavior;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -37,7 +38,7 @@ import com.google.inject.Provider;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class ElectricFleetModule extends AbstractModule {
+public final class ElectricFleetModule extends AbstractModule {
 	@Inject
 	private EvConfigGroup evCfg;
 
@@ -46,9 +47,9 @@ public class ElectricFleetModule extends AbstractModule {
 		bind(ElectricFleetSpecification.class).toProvider(new Provider<>() {
 			@Inject private Vehicles vehicles;
 			@Override public ElectricFleetSpecification get() {
-				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationImpl();
-				ElectricVehicleSpecificationImpl.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
-						vehicles.getVehicles().values());
+				ElectricFleetSpecification fleetSpecification = new ElectricFleetSpecificationDefaultImpl();
+				ElectricFleetUtils.createAndAddVehicleSpecificationsFromMatsimVehicles(fleetSpecification,
+						vehicles.getVehicles().values() );
 				return fleetSpecification;
 			}
 		}).asEagerSingleton();
@@ -64,12 +65,12 @@ public class ElectricFleetModule extends AbstractModule {
 
 					@Override
 					public ElectricFleet get() {
-						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
-								chargingPowerFactory);
+						return ElectricFleetUtils.createDefaultFleet(fleetSpecification, driveConsumptionFactory, auxConsumptionFactory,
+								chargingPowerFactory );
 					}
 				}).asEagerSingleton();
 
-				if (evCfg.transferFinalSoCToNextIteration) {
+				if (evCfg.getInitialSocBehavior().equals(InitialSocBehavior.UpdateAfterIteration)) {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toInstance(new MobsimBeforeCleanupListener() {
 						@Inject private ElectricFleetSpecification electricFleetSpecification;
 						@Inject private ElectricFleet electricFleet;
@@ -77,7 +78,7 @@ public class ElectricFleetModule extends AbstractModule {
 							for (var oldSpec : electricFleetSpecification.getVehicleSpecifications().values()) {
 								var matsimVehicle = oldSpec.getMatsimVehicle();
 								double socAtEndOfCurrentIteration = electricFleet.getElectricVehicles().get(oldSpec.getId()).getBattery().getSoc();
-								ElectricVehicleSpecifications.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration);
+								ElectricFleetUtils.setInitialSoc(matsimVehicle, socAtEndOfCurrentIteration );
 							}
 						}
 					});

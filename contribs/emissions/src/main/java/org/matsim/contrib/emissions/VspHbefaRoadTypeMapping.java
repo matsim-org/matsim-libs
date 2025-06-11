@@ -13,7 +13,7 @@ public class VspHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     }
 
     @Override
-    protected String determineHebfaType(Link link) {
+    protected String determineHbefaType(Link link) {
 
         var freespeed = link.getFreespeed() <= 13.888889 ? link.getFreespeed() * 2 : link.getFreespeed();
 

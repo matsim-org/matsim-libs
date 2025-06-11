@@ -20,11 +20,15 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.END_ACTIVITY;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.MODE;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.START_ACTIVITY;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -41,6 +45,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadModule;
+import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
@@ -60,7 +66,6 @@ import org.matsim.vehicles.VehicleUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -79,9 +84,9 @@ public class DefaultPassengerEngineTest {
 	private final Fleet fleet = () -> ImmutableMap.of(oneTaxi.getId(), oneTaxi);
 
 	@Test
-	public void test_valid_served() {
+	void test_valid_served() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of();//valid
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
@@ -98,9 +103,11 @@ public class DefaultPassengerEngineTest {
 
 		var requestId = Id.create("taxi_0", Request.class);
 		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
 				new ActivityEndEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(departureTime, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID, 0,
+				new PassengerWaitingEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID)),
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID), VEHICLE_ID, 0,
 						scheduledDropoffTime),
 				new PersonEntersVehicleEvent(pickupStartTime, fixture.PERSON_ID, Id.createVehicleId(VEHICLE_ID)),
 				new PassengerPickedUpEvent(pickupStartTime, MODE, requestId, fixture.PERSON_ID, VEHICLE_ID),
@@ -111,33 +118,39 @@ public class DefaultPassengerEngineTest {
 	}
 
 	@Test
-	public void test_invalid_rejected() {
+	void test_invalid_rejected() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of("invalid");
 		createQSim(requestValidator, OneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
+				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "invalid"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PassengerWaitingEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID)),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "invalid"),
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	@Test
-	public void test_valid_rejected() {
+	void test_valid_rejected() {
 		double departureTime = 0;
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime, fixture.PERSON_ID);
 
 		PassengerRequestValidator requestValidator = request -> Set.of();
 		createQSim(requestValidator, RejectingOneTaxiOptimizer.class).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+		fixture.assertPassengerEvents(
+				Collections.singleton(fixture.PERSON_ID),
+				new ActivityEndEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
 				new PersonDepartureEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE, MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, fixture.PERSON_ID, "rejecting_all_requests"),
-				new PersonStuckEvent(0, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
+				new PassengerWaitingEvent(departureTime, MODE, requestId, List.of(fixture.PERSON_ID)),
+				new PassengerRequestRejectedEvent(0, MODE, requestId, List.of(fixture.PERSON_ID), "rejecting_all_requests"),
+				new PersonStuckEvent(1, fixture.PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private static class RejectingOneTaxiOptimizer implements VrpOptimizer {
@@ -151,7 +164,7 @@ public class DefaultPassengerEngineTest {
 		public void requestSubmitted(Request request) {
 			PassengerRequest passengerRequest = (PassengerRequest)request;
 			eventsManager.processEvent(new PassengerRequestRejectedEvent(timer.getTimeOfDay(), MODE, request.getId(),
-					passengerRequest.getPassengerId(), "rejecting_all_requests"));
+					passengerRequest.getPassengerIds(), "rejecting_all_requests"));
 		}
 
 		@Override
@@ -163,6 +176,7 @@ public class DefaultPassengerEngineTest {
 	private QSim createQSim(PassengerRequestValidator requestValidator, Class<? extends VrpOptimizer> optimizerClass) {
 		return new QSimBuilder(fixture.config).useDefaults()
 				.addOverridingModule(new MobsimScopeEventHandlingModule())
+				.addOverridingModule(new DvrpLoadModule(MODE, new DvrpLoadParams()))
 				.addQSimModule(new PassengerEngineQSimModule(MODE, PassengerEngineType.DEFAULT))
 				.addQSimModule(new VrpAgentSourceQSimModule(MODE))
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {
@@ -175,11 +189,12 @@ public class DefaultPassengerEngineTest {
 						bindModal(PassengerRequestCreator.class).to(OneTaxiRequest.OneTaxiRequestCreator.class)
 								.asEagerSingleton();
 						bindModal(PassengerRequestValidator.class).toInstance(requestValidator);
+						bindModal(AdvanceRequestProvider.class).toInstance(AdvanceRequestProvider.NONE);
 
 						//supply
 						addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 						bindModal(Fleet.class).toInstance(fleet);
-						bindModal(VehicleType.class).toInstance(VehicleUtils.getDefaultVehicleType());
+						bindModal(VehicleType.class).toInstance(VehicleUtils.createDefaultVehicleType());
 						bindModal(VrpOptimizer.class).to(optimizerClass).asEagerSingleton();
 						bindModal(VrpAgentLogic.DynActionCreator.class).to(OneTaxiActionCreator.class)
 								.asEagerSingleton();

@@ -20,21 +20,23 @@ package org.matsim.contrib.drt.extension.edrt.optimizer;
 
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.tracker.ETaskTracker;
-import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.core.modal.ModalProviders;
 
-import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 /**
  * @author michalm
@@ -52,17 +54,13 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 	private final double minimumRelativeSoc;
 	private final VehicleDataEntryFactoryImpl entryFactory;
 
-	public EDrtVehicleDataEntryFactory(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc, DvrpLoadType loadType) {
 		this.minimumRelativeSoc = minimumRelativeSoc;
-		entryFactory = new VehicleDataEntryFactoryImpl(drtCfg);
+		entryFactory = new VehicleDataEntryFactoryImpl(loadType);
 	}
 
 	@Override
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
-		if (entryFactory.isNotEligibleForRequestInsertion(vehicle, currentTime)) {
-			return null;
-		}
-
 		Schedule schedule = vehicle.getSchedule();
 		int taskCount = schedule.getTaskCount();
 		if (taskCount > 1) {
@@ -76,15 +74,22 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		Battery battery = ((EvDvrpVehicle)vehicle).getElectricVehicle().getBattery();
 		int nextTaskIdx;
 		double chargeBeforeNextTask;
-		if (schedule.getStatus() == ScheduleStatus.PLANNED) {
-			nextTaskIdx = 0;
-			chargeBeforeNextTask = battery.getCharge();
-		} else { // STARTED
-			Task currentTask = schedule.getCurrentTask();
-			ETaskTracker eTracker = (ETaskTracker)currentTask.getTaskTracker();
-			chargeBeforeNextTask = eTracker.predictChargeAtEnd();
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
+
+		switch (schedule.getStatus()) {
+			case PLANNED:
+				nextTaskIdx = 0;
+				chargeBeforeNextTask = battery.getCharge();
+				break;
+			case STARTED:
+				Task currentTask = schedule.getCurrentTask();
+				ETaskTracker eTracker = (ETaskTracker) currentTask.getTaskTracker();
+				chargeBeforeNextTask = eTracker.predictChargeAtEnd();
+				nextTaskIdx = currentTask.getTaskIdx() + 1;
+				break;
+			default:
+				return null;
 		}
+
 
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
@@ -99,18 +104,18 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		return entry == null ? null : new EVehicleEntry(entry, chargeBeforeNextTask);
 	}
 
-	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<VehicleEntry.EntryFactory> {
-		private final DrtConfigGroup drtCfg;
+	@Singleton
+	public static class EDrtVehicleDataEntryFactoryProvider extends ModalProviders.AbstractProvider<DvrpMode, EDrtVehicleDataEntryFactory> {
 		private final double minimumRelativeSoc;
 
-		public EDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
-			this.drtCfg = drtCfg;
+		public EDrtVehicleDataEntryFactoryProvider(String mode, double minimumRelativeSoc) {
+			super(mode, DvrpModes::mode);
 			this.minimumRelativeSoc = minimumRelativeSoc;
 		}
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc, getModalInstance(DvrpLoadType.class));
 		}
 	}
 }

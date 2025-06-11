@@ -20,14 +20,13 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.inject.Inject;
-
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -45,12 +44,12 @@ import org.matsim.withinday.controller.WithinDayModule;
  */
 public class LinkReplanningMapTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-
-	@Test public void testScenarioRun() {
+	@Test
+	void testScenarioRun() {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
@@ -58,9 +57,9 @@ public class LinkReplanningMapTest {
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
-		config.controler().setMobsim("qsim");
-		config.controler().setLastIteration(0);
-		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setMobsim("qsim");
+		config.controller().setLastIteration(0);
+		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());

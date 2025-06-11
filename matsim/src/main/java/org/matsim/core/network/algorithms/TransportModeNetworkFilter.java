@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.TimeDependentNetwork;
@@ -102,6 +103,11 @@ public final class TransportModeNetworkFilter {
 				NetworkUtils.setType(link2, NetworkUtils.getType(link));
 				AttributesUtils.copyAttributesFromTo(link, link2);
 				subNetwork.addLink(link2);
+
+                DisallowedNextLinks disallowedNextLinks = NetworkUtils.getDisallowedNextLinks(link);
+                if (disallowedNextLinks != null) {
+                    NetworkUtils.setDisallowedNextLinks(link2, disallowedNextLinks.copyOnlyModes(extractModes));
+                }
 			}
 		}
 		

@@ -21,13 +21,13 @@ package org.matsim.contrib.socnetsim.usage.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
@@ -51,6 +51,7 @@ public class ExtractDriverBeeflyDetours {
 		private final Counter counter = new Counter( "reading person # " );
 
 		public PlansParser(final String outFile) {
+			super(ValidationType.DTD_OR_XSD);
 			writer = IOUtils.getBufferedWriter( outFile );
 			try {
 				writer.write( "driverId\tdirectDistance\taccessDistance\tjointDistance\tegressDistance" );

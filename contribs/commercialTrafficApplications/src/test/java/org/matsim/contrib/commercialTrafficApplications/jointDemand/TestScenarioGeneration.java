@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.freight.carriers.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -53,19 +53,19 @@ public class TestScenarioGeneration {
     public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
 
-        Carrier italianPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_italian", Carrier.class));
-        CarrierUtils.setCarrierMode(italianPizzaPlace, TransportMode.car);
-        CarrierUtils.setJspritIterations(italianPizzaPlace, 20);
+		Carrier italianPizzaPlace = CarriersUtils.createCarrier(Id.create("pizza_italian", Carrier.class));
+        CarriersUtils.setCarrierMode(italianPizzaPlace, TransportMode.car);
+        CarriersUtils.setJspritIterations(italianPizzaPlace, 20);
         italianPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
-        Carrier americanPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_american", Carrier.class));
-        CarrierUtils.setCarrierMode(americanPizzaPlace, TransportMode.car);
-        CarrierUtils.setJspritIterations(americanPizzaPlace, 20);
+		Carrier americanPizzaPlace = CarriersUtils.createCarrier(Id.create("pizza_american", Carrier.class));
+        CarriersUtils.setCarrierMode(americanPizzaPlace, TransportMode.car);
+        CarriersUtils.setJspritIterations(americanPizzaPlace, 20);
         americanPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
-        Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
-        CarrierUtils.setCarrierMode(shopping_1, TransportMode.car);
-        CarrierUtils.setJspritIterations(shopping_1, 20);
+		Carrier shopping_1 = CarriersUtils.createCarrier(Id.create("shopping_1", Carrier.class));
+        CarriersUtils.setCarrierMode(shopping_1, TransportMode.car);
+        CarriersUtils.setJspritIterations(shopping_1, 20);
         shopping_1.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "shopping");
 
         VehicleType type = createLightType();
@@ -126,8 +126,6 @@ public class TestScenarioGeneration {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create((id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId, type );
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
-        vBuilder.setType(type);
-        vBuilder.setTypeId(type.getId());
         return vBuilder.build();
     }
 

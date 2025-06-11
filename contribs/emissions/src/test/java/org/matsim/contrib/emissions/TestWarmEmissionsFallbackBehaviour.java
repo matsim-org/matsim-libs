@@ -21,8 +21,10 @@
 
 package org.matsim.contrib.emissions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -58,23 +60,23 @@ public class TestWarmEmissionsFallbackBehaviour {
 	private final Vehicle vehicleFallbackToAverageTable = generateVehicleForFallbackToAverageTable();
 
 
-// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------	
+// ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------
 	/**
 	 * vehicles information is complete
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should calculate value
 	 */
 	@Test
-	public void testWarmDetailedValueOnlyDetailed() {
+	void testWarmDetailedValueOnlyDetailed() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -82,150 +84,156 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 *
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedElseAbort_ShouldAbort1() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedElseAbort_ShouldAbort1() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
+		});
 	}
 
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedElseAbort_ShouldAbort2() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedElseAbort_ShouldAbort2() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+		});
 	}
 
-	
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------	
+
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
+	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
+	void testWarm_DetailedThenTechnologyAverageElseAbort_FallbackToTechnologyAverage() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: onlyTryDetailedElseAbort
-	 *
+	 * <p>
 	 * -> should abort --> RuntimeException
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testWarm_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
-		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
+	@Test
+	void testWarm_DetailedThenTechnologyAverageElseAbort_ShouldAbort() {
+		assertThrows(RuntimeException.class, () -> {
+			EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
-		emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+			double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
+			emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
+		});
 	}
 
-// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------	
+// ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
 	/**
 	 * vehicles information is complete
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do NOT fall back to technology average or average table
 	 * ---> should calculate value from detailed value
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * LookupBehavior: tryDetailedThenTechnologyAverageElseAbort
-	 *
+	 * <p>
 	 * -> do fall back to technology average; do NOT fall back to average table
 	 * ---> should calculate value from technology average
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToTechnology() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
 		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
 	 * vehicles information is complete but fully specified entry is NOT available in detailed table
 	 * HbefaTechnology is also not in detailed table -> fall back to technology average is NOT possible as well.
-	 *
+	 * <p>
 	 * LookupBehavior: tryDetailedThenTechnologyAverageThenAverageTable
-	 *
+	 * <p>
 	 * -> do fall back to average table
 	 * ---> should calculate value from average table
 	 */
 	@Test
-	public void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
+	void testWarm_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
+		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72... m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
 		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assertions.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
 
 
-// ---------- setup and helper methods -------------	
+// ---------- setup and helper methods -------------
 
 	/**
 	 * load and prepare the scenario, create the emissionsModule

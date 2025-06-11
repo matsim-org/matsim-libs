@@ -51,13 +51,13 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
+		this.firstIteration = event.getServices().getConfig().controller().getFirstIteration();
 		this.events.addHandler(this.modalShareHandler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
+		String outputDir = event.getServices().getConfig().controller().getOutputDirectory();
 
 		SortedMap<String, Integer > mode2legs = this.modalShareHandler.getMode2numberOflegs();
 		modeHistory.addAll(mode2legs.keySet());

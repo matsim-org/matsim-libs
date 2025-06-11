@@ -7,7 +7,7 @@ import org.matsim.modechoice.ModeOptions;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -26,14 +26,14 @@ public class BestChoiceGenerator extends TopKChoicesGenerator {
 
 
 	@Override
-	public Collection<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask) {
+	public List<PlanCandidate> generate(PlanModel planModel, @Nullable Set<String> consideredModes, @Nullable boolean[] mask) {
 
 		List<PlanCandidate> candidates = new ArrayList<>(generate(planModel, consideredModes, mask, 10, 0, Double.NaN));
 
 		if (candidates.isEmpty())
-			return Set.of();
+			return candidates;
 
-		return List.of(candidates.stream().max(Comparator.comparingDouble(PlanCandidate::getUtility)).orElseThrow());
+		return candidates.subList(0, 1);
 	}
 
 }

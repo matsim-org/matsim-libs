@@ -10,14 +10,23 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Binder;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandRunner;
+import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.simwrapper.viz.Viz;
 import tech.tablesaw.plotly.components.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,30 +44,39 @@ public final class SimWrapper {
 
 	private final Config config = new Config();
 
+	private final org.matsim.core.config.Config matsimConfig;
 	private final SimWrapperConfigGroup configGroup;
 
 	private final List<Dashboard> dashboards = new ArrayList<>();
 
 	/**
-	 * Use {@link #create(SimWrapperConfigGroup)}.
+	 * Use {@link #create(org.matsim.core.config.Config)}.
 	 */
-	private SimWrapper(SimWrapperConfigGroup configGroup) {
-		this.configGroup = configGroup;
-		this.data = new Data(configGroup);
+	private SimWrapper(org.matsim.core.config.Config config) {
+		this.matsimConfig = config;
+		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
+		this.data = new Data(config.getContext(), configGroup);
 	}
 
 	/**
 	 * Create a new {@link SimWrapper} instance with default config.
 	 */
 	public static SimWrapper create() {
-		return new SimWrapper(new SimWrapperConfigGroup());
+		return new SimWrapper(ConfigUtils.createConfig());
 	}
 
 	/**
 	 * * Create a new {@link SimWrapper} instance with given config.
 	 */
-	public static SimWrapper create(SimWrapperConfigGroup configGroup) {
-		return new SimWrapper(configGroup);
+	public static SimWrapper create(org.matsim.core.config.Config config) {
+		return new SimWrapper(config);
+	}
+
+	/**
+	 * Utility method to define a binding for a dashboard. These will be picked up if the MATSim integration is used.
+	 */
+	public static LinkedBindingBuilder<Dashboard> addDashboardBinding(Binder binder) {
+		return Multibinder.newSetBinder(binder, Dashboard.class).addBinding();
 	}
 
 	/**
@@ -102,6 +120,15 @@ public final class SimWrapper {
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
 	 */
 	public void generate(Path dir) throws IOException {
+		generate(dir, false);
+	}
+
+	/**
+	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
+	 * @param dir target directory
+	 * @param append if true, existing dashboards will not be overwritten
+	 */
+	public void generate(Path dir, boolean append) throws IOException {
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 			.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
@@ -128,7 +155,7 @@ public final class SimWrapper {
 
 		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
+		int i = 1;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
@@ -136,8 +163,14 @@ public final class SimWrapper {
 
 			d.configure(yaml.header, layout);
 			yaml.layout = layout.create(data);
+			yaml.subtabs = layout.getTabs();
 
 			Path out = dir.resolve("dashboard-" + i + ".yaml");
+
+			while (append && Files.exists(out)) {
+				out = dir.resolve("dashboard-" + ++i + ".yaml");
+			}
+
 			writer.writeValue(out.toFile(), yaml);
 
 			i++;
@@ -155,6 +188,12 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+		run(dir, null);
+	}
+	/**
+	 * Run the pipeline, and pass a different config file. This functionality is only available via {@link SimWrapperRunner}.
+	 */
+	void run(Path dir, String configPath) {
 
 		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
 			try {
@@ -172,10 +211,29 @@ public final class SimWrapper {
 
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(ctx.sampleSize);
+			runner.setSampleSize(configGroup.getSampleSize());
 
-			if (ctx.shp != null) {
-				runner.setShp(ctx.shp);
+			if (configPath != null)
+				runner.setConfigPath(configPath);
+
+			if (ctx.getShp() != null) {
+
+				try {
+					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.getShp()).toURI();
+
+					if (path.getScheme().equals("file"))
+						runner.setShp(new File(path).getAbsoluteFile().toString());
+					else
+						runner.setShp(path.toString());
+
+				} catch (URISyntaxException e) {
+					log.warn("Could not set shp file", e);
+				}
+			}
+
+			// Insert the globally defined arguments
+			for (Map.Entry<Class<? extends MATSimAppCommand>, String[]> e : data.getGlobalArgs().entrySet()) {
+				runner.insertArgs(e.getKey(), e.getValue());
 			}
 
 			runner.run(dir);
@@ -188,6 +246,7 @@ public final class SimWrapper {
 	private static final class YAML {
 
 		private final Header header = new Header();
+		private Collection<Layout.Tab> subtabs;
 		private Map<String, List<Viz>> layout;
 
 	}
@@ -198,12 +257,15 @@ public final class SimWrapper {
 	public static final class Config {
 
 		public boolean hideLeftBar = false;
+		public boolean hideBreadcrumbs = false;
+		public boolean hideFiles = false;
 		public boolean fullWidth = true;
 
 		public String header;
 		public String footer_en;
 		public String footer_de;
 		public String css;
+		public String theme;
 
 	}
 }

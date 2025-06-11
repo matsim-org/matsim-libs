@@ -171,7 +171,6 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		} else {
 
 			Map<String, List<Warning>> grouped = warnings.stream().collect(Collectors.groupingBy(w -> w.module, Collectors.toList()));
-			writer.write(String.format("<h3 class=\"found-warnings\">Warnings found in %d module%s ❌</h3>\n\n", grouped.size(), grouped.size() > 1 ? "s" : ""));
 
 			for (Map.Entry<String, List<Warning>> e : grouped.entrySet()) {
 
@@ -188,9 +187,7 @@ public class LogFileAnalysis implements MATSimAppCommand {
 		writer.write("""
 			<style>
 			.dash-row.row-warnings .dash-card-frame {
-				margin-top: 0;
-				margin-bottom: 0;
-				padding: 0 0.4em;
+			    background: none;
 			}
 			.dash-row.row-warnings .no-warnings {
 				color: #4BB543;

@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="railsim">
+		<!-- Global acceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (railsimAcceleration); used to compute the train velocity per link. -->
+		<param name="accelerationDefault" value="0.5"/>
+		<!-- Maximum Global deceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (railsimMaxDeceleration); used to compute the reserved train path and the train velocity per link. -->
+		<param name="decelerationDefault" value="0.5"/>
+		<!-- Time interval in seconds a train has to wait until trying again to request a track reservation if the track was blocked by another train. -->
+		<param name="pollInterval" value="10.0"/>
+		<!-- Comma separated set of modes that are handled by the rail simulation. Defaults to 'rail'. -->
+		<param name="networkModes" value="rail"/>
+		<!-- Maximum time interval in seconds which is used to update the train position update events. -->
+		<param name="updateInterval" value="1.0"/>
+	</module>
+
+	<module name="global">
+		<param name="randomSeed" value="4711"/>
+		<param name="coordinateSystem" value="Atlantis"/>
+	</module>
+
+	<module name="controler">
+		<param name="runId" value="test"/>
+		<param name="firstIteration" value="0"/>
+	</module>
+
+	<module name="qsim">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00"/>
+		<param name="endTime" value="24:00:00"/>
+
+		<param name="snapshotperiod" value="00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name="mainMode" value="car"/>
+
+		<!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+		<param name="stuckTime" value="999999."/>
+	</module>
+
+	<module name="transit">
+		<param name="routingAlgorithmType" value="SwissRailRaptor"/>
+		<param name="transitScheduleFile" value="transitSchedule.xml"/>
+		<param name="useTransit" value="true"/>
+		<param name="usingTransitInMobsim" value="true"/>
+		<param name="vehiclesFile" value="transitVehicles.xml"/>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="trainNetwork.xml"/>
+	</module>
+
+</config>

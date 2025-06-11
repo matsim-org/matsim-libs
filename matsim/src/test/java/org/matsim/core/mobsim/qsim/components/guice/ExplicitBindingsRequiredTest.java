@@ -20,17 +20,15 @@
  * *********************************************************************** */
 
  package org.matsim.core.mobsim.qsim.components.guice;
-
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-/**
+	/**
  * This test shows how Guice works with child injectors and explicit bindings.
  * In the test there is a ParentScopeObject in a parent injector. Then a child
  * injector is created which contains a ChildScopeObject, which has the
@@ -60,8 +58,8 @@ public class ExplicitBindingsRequiredTest {
 
 	}
 
-	@Test
-	public void testExplicitBindings() {
+	 @Test
+	 void testExplicitBindings() {
 		Injector injector = Guice.createInjector(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -84,6 +82,6 @@ public class ExplicitBindingsRequiredTest {
 			exceptionOccured = true;
 		}
 
-		Assert.assertTrue(exceptionOccured);
+		Assertions.assertTrue(exceptionOccured);
 	}
 }

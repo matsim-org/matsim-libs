@@ -19,9 +19,8 @@
 
 package org.matsim.core.network.algorithms;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +35,7 @@ import org.matsim.core.network.NetworkUtils;
 public class CalcBoundingBoxTest {
 
 	@Test
-	public void testRun() {
+	void testRun() {
 		Network net = NetworkUtils.createNetwork();
         NetworkFactory nf = net.getFactory();
 
@@ -65,14 +64,14 @@ public class CalcBoundingBoxTest {
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);
-		Assert.assertEquals(100, bbox.getMinX(), 1e-9);
-		Assert.assertEquals(600, bbox.getMaxX(), 1e-9);
-		Assert.assertEquals(200, bbox.getMinY(), 1e-9);
-		Assert.assertEquals(700, bbox.getMaxY(), 1e-9);
+		Assertions.assertEquals(100, bbox.getMinX(), 1e-9);
+		Assertions.assertEquals(600, bbox.getMaxX(), 1e-9);
+		Assertions.assertEquals(200, bbox.getMinY(), 1e-9);
+		Assertions.assertEquals(700, bbox.getMaxY(), 1e-9);
 	}
 
 	@Test
-	public void testRun_allNegative() {
+	void testRun_allNegative() {
         Network net = NetworkUtils.createNetwork();
         NetworkFactory nf = net.getFactory();
 
@@ -111,9 +110,9 @@ public class CalcBoundingBoxTest {
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);
-		Assert.assertEquals(-600, bbox.getMinX(), 1e-9);
-		Assert.assertEquals(-100, bbox.getMaxX(), 1e-9);
-		Assert.assertEquals(-700, bbox.getMinY(), 1e-9);
-		Assert.assertEquals(-200, bbox.getMaxY(), 1e-9);
+		Assertions.assertEquals(-600, bbox.getMinX(), 1e-9);
+		Assertions.assertEquals(-100, bbox.getMaxX(), 1e-9);
+		Assertions.assertEquals(-700, bbox.getMinY(), 1e-9);
+		Assertions.assertEquals(-200, bbox.getMaxY(), 1e-9);
 	}
 }

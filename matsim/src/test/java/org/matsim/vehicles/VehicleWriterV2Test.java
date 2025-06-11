@@ -19,7 +19,7 @@
 
 package org.matsim.vehicles;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +27,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,8 +38,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class VehicleWriterV2Test {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger log = LogManager.getLogger(VehicleWriterV2Test.class);
 
@@ -52,7 +52,7 @@ public class VehicleWriterV2Test {
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@Before public void setUp() throws IOException {
+	@BeforeEach public void setUp() throws IOException {
 		String outfileName = utils.getOutputDirectory() + "../testOutputVehicles.xml";
 
 		// read it
@@ -81,13 +81,15 @@ public class VehicleWriterV2Test {
 	}
 
 
-	@Test public void test_NumberOfVehicleTypeisReadCorrectly() {
+	@Test
+	void test_NumberOfVehicleTypeisReadCorrectly() {
 		assertNotNull(vehicleTypes);
 		assertEquals(3, vehicleTypes.size());
 	}
 
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		VehicleType vehTypeNormalCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeNormalCar);
 		assertEquals(9.5, vehTypeNormalCar.getLength(), MatsimTestUtils.EPSILON);
@@ -109,7 +111,6 @@ public class VehicleWriterV2Test {
 
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();
-		;
 		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(engineInformation));
 		assertEquals("petrol", VehicleUtils.getHbefaTechnology(engineInformation));
 		assertEquals("< 1,4L", VehicleUtils.getHbefaSizeClass(engineInformation));
@@ -128,7 +129,8 @@ public class VehicleWriterV2Test {
 	}
 
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_defaultCar() {
 		VehicleType vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehTypeDefaultCar);
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), MatsimTestUtils.EPSILON);
@@ -147,7 +149,8 @@ public class VehicleWriterV2Test {
 	}
 
 
-	@Test public void test_VehicleTypeValuesAreReadCorrectly_smallTruck() {
+	@Test
+	void test_VehicleTypeValuesAreReadCorrectly_smallTruck() {
 		VehicleType vehTypeSmallTruck = vehicleTypes.get(Id.create("smallTruck", VehicleType.class));
 		assertNotNull(vehTypeSmallTruck);
 		assertEquals("This is a small truck", vehTypeSmallTruck.getDescription());
@@ -163,13 +166,15 @@ public class VehicleWriterV2Test {
 	}
 
 
-	@Test public void test_NumberOfVehiclesIsReadCorrectly() {
+	@Test
+	void test_NumberOfVehiclesIsReadCorrectly() {
 		assertNotNull(vehicles);
 		assertEquals(3, vehicles.size());
 	}
 
 
-	@Test public void test_VehicleAttributesReadCorrectly(){
+	@Test
+	void test_VehicleAttributesReadCorrectly(){
 		assertNotNull(vehicleTypes);
 		/* First vehicle has an attribute. */
 		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
@@ -191,8 +196,8 @@ public class VehicleWriterV2Test {
 	}
 
 
-
-	@Test public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
+	@Test
+	void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
 		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());

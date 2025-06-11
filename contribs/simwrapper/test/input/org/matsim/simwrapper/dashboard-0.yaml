@@ -2,6 +2,7 @@ header:
   tab: Header Tab
   title: Simwrapper Test Dashboard
   description: Test All Simwrapper Plug-Ins Dashboard
+  triggerPattern: '*example.csv'
 layout:
   first:
   - type: area
@@ -72,9 +73,6 @@ layout:
     title: Hexagon
     file: drt_trips_drt.csv.gz
     projection: EPSG:31468
-    center:
-    - 0.0
-    - 0.0
     aggregations:
       O/D Summary:
       - title: Origins
@@ -83,3 +81,16 @@ layout:
       - title: Destinations
         x: toX
         "y": toY
+  thirteenth:
+  - type: flowmap
+    title: Flow Map
+    description: this viz is a flow map
+    metrics:
+      label: headway per Stop
+      dataset: analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv
+      origin: stopAreaOrStop
+      destination: stopAreaOrStopNext
+      flow: meanHeadway
+      colorScheme: BurgYl
+      valueTransform: normal
+    zoom: 9.5
