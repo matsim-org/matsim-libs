@@ -102,7 +102,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		// I Removed this line since it created lots of problems with many tests. Since this is now the default RoutingModule, we are instead throwing a warning
+		//Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		if(scenario.getNetwork().getLinks().isEmpty()) log.warn("Using NetworkRoutingInclAccessEgressModule with empty network, network for mode probably not defined!");
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
