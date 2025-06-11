@@ -318,7 +318,7 @@ public class LanduseBuildingAnalysis {
 		log.info("Analyzing buildings types. This may take some time...");
 		for (SimpleFeature singleBuildingFeature : buildingsFeatures) {
 			countOSMObjects++;
-			if (countOSMObjects % 10000 == 0)
+			if ((countOSMObjects % (int) (buildingsFeatures.size() * 0.05)) == 0)
 				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
 					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
 
