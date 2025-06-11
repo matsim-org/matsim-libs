@@ -35,10 +35,10 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 
 	static class StartListener implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener {
 
-		private ReplanningJfrEvent replanningJfrEvent = null;
-		private ScoringJfrEvent scoringJfrEvent = null;
-		private MatsimStartupJfrEvent startupJfrEvent = null;
-		private MatsimShutdownJfrEvent shutdownJfrEvent = null;
+		private ReplanningListenersJfrEvent replanningListenersJfrEvent = null;
+		private ScoringListenersJfrEvent scoringListenersJfrEvent = null;
+		private MatsimStartupListenersJfrEvent startupJfrEvent = null;
+		private MatsimShutdownListenersJfrEvent shutdownJfrEvent = null;
 
 		/**
 		 * @return Highest possible priority to start before most other listeners.
@@ -50,20 +50,20 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 
 		@Override
 		public void notifyReplanning(ReplanningEvent replanningEvent) {
-			if (replanningJfrEvent != null) {
+			if (replanningListenersJfrEvent != null) {
 				throw new IllegalStateException("Another replanning started, while still waiting for the end of a previous one. Are the listeners registered properly?");
 			}
-			replanningJfrEvent = new ReplanningJfrEvent();
-			replanningJfrEvent.begin();
+			replanningListenersJfrEvent = new ReplanningListenersJfrEvent();
+			replanningListenersJfrEvent.begin();
 		}
 
 		@Override
 		public void notifyScoring(ScoringEvent scoringEvent) {
-			if (scoringJfrEvent != null) {
+			if (scoringListenersJfrEvent != null) {
 				throw new IllegalStateException("Another scoring started, while still waiting for the end of a previous one. Are the listeners registered properly?");
 			}
-			scoringJfrEvent = new ScoringJfrEvent();
-			scoringJfrEvent.begin();
+			scoringListenersJfrEvent = new ScoringListenersJfrEvent();
+			scoringListenersJfrEvent.begin();
 		}
 
 		@Override
@@ -71,7 +71,7 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 			if (shutdownJfrEvent != null) {
 				throw new IllegalStateException("Another shutdown started, shouldn't there only be one?");
 			}
-			shutdownJfrEvent = new MatsimShutdownJfrEvent();
+			shutdownJfrEvent = new MatsimShutdownListenersJfrEvent();
 			shutdownJfrEvent.begin();
 		}
 
@@ -80,7 +80,7 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 			if (startupJfrEvent != null) {
 				throw new IllegalStateException("Another startup started, shouldn't there only be one?");
 			}
-			startupJfrEvent = new MatsimStartupJfrEvent();
+			startupJfrEvent = new MatsimStartupListenersJfrEvent();
 			startupJfrEvent.begin();
 		}
 	}
@@ -95,20 +95,20 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 
 	@Override
 	public void notifyReplanning(ReplanningEvent replanningEvent) {
-		if (startListener.replanningJfrEvent == null) {
+		if (startListener.replanningListenersJfrEvent == null) {
 			throw new IllegalStateException("Replanning ended, before its start was noticed. Are the listeners registered properly?");
 		}
-		startListener.replanningJfrEvent.commit();
-		startListener.replanningJfrEvent = null;
+		startListener.replanningListenersJfrEvent.commit();
+		startListener.replanningListenersJfrEvent = null;
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent scoringEvent) {
-		if (startListener.scoringJfrEvent == null) {
+		if (startListener.scoringListenersJfrEvent == null) {
 			throw new IllegalStateException("Scoring ended, before its start was noticed. Are the listeners registered properly?");
 		}
-		startListener.scoringJfrEvent.commit();
-		startListener.scoringJfrEvent = null;
+		startListener.scoringListenersJfrEvent.commit();
+		startListener.scoringListenersJfrEvent = null;
 	}
 
 	@Override

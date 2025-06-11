@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * ScoringJfrEvent.java
+ * ReplanningListenersJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -26,9 +26,9 @@ import jdk.jfr.Label;
 import jdk.jfr.Name;
 
 /**
- * Record scoring duration as a JFR profiling {@link Event}.
+ * Record {@link org.matsim.core.controler.listener.ReplanningListener replanning listeners} duration as a JFR profiling {@link Event}.
  */
-@Name("matsim.Scoring")
-@Label("Scoring")
-@Description("Duration of MATSim scoring operation")
-public class ScoringJfrEvent extends MatsimOperationJfrEvent {}
+@Name("matsim.ReplanningListeners")
+@Label("Replanning Listeners")
+@Description("Duration of MATSim replanning operations")
+public class ReplanningListenersJfrEvent extends MatsimOperationJfrEvent {}

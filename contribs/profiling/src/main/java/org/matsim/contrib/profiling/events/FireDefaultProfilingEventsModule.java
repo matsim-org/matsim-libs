@@ -26,14 +26,14 @@ import org.matsim.core.controler.AbstractModule;
  * Hook into MATSim Listeners to create JFR profiling events at different phases within MATSim.
  * <p>Events to be recorded:
  * <ul>
- *     <li>{@link MatsimStartupJfrEvent}</li>
+ *     <li>{@link MatsimStartupListenersJfrEvent}</li>
  *     <li>{@link IterationJfrEvent}</li>
  *     <li>{@link IterationStartsListenersJfrEvent}</li>
- *     <li>{@link ReplanningJfrEvent}</li>
+ *     <li>{@link ReplanningListenersJfrEvent}</li>
  *     <li>{@link MobsimJfrEvent}</li>
- *     <li>{@link ScoringJfrEvent}</li>
+ *     <li>{@link ScoringListenersJfrEvent}</li>
  *     <li>{@link IterationEndsListenersJfrEvent}</li>
- *     <li>{@link MatsimShutdownJfrEvent}</li>
+ *     <li>{@link MatsimShutdownListenersJfrEvent}</li>
  * </ul>
  */
 public class FireDefaultProfilingEventsModule extends AbstractModule {

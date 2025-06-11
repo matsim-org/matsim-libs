@@ -1,6 +1,6 @@
 /* ********************************************************************** *
  * project: org.matsim.*
- * MatsimShutdownJfrEvent.java
+ * MatsimShutdownListenersJfrEvent.java
  *                                                                        *
  * ********************************************************************** *
  *                                                                        *
@@ -26,9 +26,9 @@ import jdk.jfr.Label;
 import jdk.jfr.Name;
 
 /**
- * Record shutdown duration as a JFR profiling {@link Event}.
+ * Record {@link org.matsim.core.controler.listener.ShutdownListener ShutdownListeners} duration as a JFR profiling {@link Event}.
  */
 @Name("matsim.Shutdown")
-@Label("Shutdown")
-@Description("Duration of MATSim shutdown")
-public class MatsimShutdownJfrEvent extends MatsimOperationJfrEvent {}
+@Label("Shutdown Listeners")
+@Description("Duration of MATSim shutdown listeners")
+public class MatsimShutdownListenersJfrEvent extends MatsimOperationJfrEvent {}

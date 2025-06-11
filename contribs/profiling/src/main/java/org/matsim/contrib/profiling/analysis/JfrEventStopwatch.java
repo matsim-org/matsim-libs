@@ -50,10 +50,10 @@ public class JfrEventStopwatch implements AutoCloseable {
 	 */
 	public static final Map<String, String> LISTENER_EVENT_OPERATIONS = Map.of(
 		"iterationStartsListeners", IterationStartsListenersJfrEvent.class.getAnnotation(Name.class).value(),
-		"replanning", ReplanningJfrEvent.class.getAnnotation(Name.class).value(),
+		"replanning", ReplanningListenersJfrEvent.class.getAnnotation(Name.class).value(),
 		// missing: dump all plans, prepareForMobsim & afterMobsimListeners
 		"mobsim", MobsimJfrEvent.class.getAnnotation(Name.class).value(),
-		"scoring", ScoringJfrEvent.class.getAnnotation(Name.class).value(),
+		"scoring", ScoringListenersJfrEvent.class.getAnnotation(Name.class).value(),
 		"iterationEndsListeners", IterationEndsListenersJfrEvent.class.getAnnotation(Name.class).value()
 	);
 
