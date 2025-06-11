@@ -79,8 +79,9 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 
 		Reservation other = conflictPoints.get(link.getResource());
 
+		// TODO: for resource topologies with multiple links, the direction of the approaching train may need to be calculated differently
 		// not reserved or reserved by same direction
-		return other == null || other.direction == null || other.direction == link;
+		return other == null || other.direction == null || other.direction == link || other.trains.contains(position.getDriver());
 	}
 
 	@Override
