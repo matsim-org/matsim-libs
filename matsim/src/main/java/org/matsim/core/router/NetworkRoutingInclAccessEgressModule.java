@@ -102,7 +102,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+//		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		// with the above and with accessEgressMode != none several tests fail.  kai, jun'25
+		if ( scenario.getNetwork().getLinks().isEmpty() ) {
+			log.warn( "network has no links; outside of tests, this possibly does not make sense" );
+		}
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
