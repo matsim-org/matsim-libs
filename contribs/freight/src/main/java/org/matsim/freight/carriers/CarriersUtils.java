@@ -333,24 +333,6 @@ public class CarriersUtils {
 	}
 
 	/**
-	 * Checks if all carriers with jobs have at least one plan.
-	 * <p></p>
-	 * IMO (kmt, jun'25) this method is not used currently.
-	 * If needed, I suggest to put this functionality into {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
-	 * If it should be used, it should be decided, where to locate the method) ->
-	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
-	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
-	 *
-	 * @param carriers the carriers
-	 * @return true if all carriers with jobs have at least one plan
-	 */
-	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
-		for (Carrier carrier : carriers.getCarriers().values())
-			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
-		return true;
-	}
-
-	/**
 	 * Creates a list of carriers with unhandled jobs.
 	 * <p></p>
 	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
