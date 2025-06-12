@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -73,6 +74,9 @@ public class PlanRouterTest {
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
             }
         });
+
+        injector.getInstance( PrepareForSim.class ).run();
+
         TripRouter tripRouter = injector.getInstance(TripRouter.class);
         PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();

@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -30,6 +31,9 @@ import com.google.inject.Singleton;
  * TerminationCriterion.
  */
 public class TerminationTest {
+	// All these tests have a tendency to fail with AccessEgressRouting.  In consequence, I switched it off.  The tests could be adapted to
+	// AccessEgressRouting, but given what they test this may not have a high priority.  kai, jun'25
+
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -87,6 +91,8 @@ public class TerminationTest {
 		config.controller().setWriteEventsInterval(interval);
 		config.controller().setLastIteration(criterion);
 
+		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink );
+
 		return new Controler(config);
 	}
 
@@ -131,9 +137,18 @@ public class TerminationTest {
 		 * stop the simulation once there are more car legs than walk legs.
 		 */
 
+		/* yyyy This test evidently fails after switching the default to accessEgressWalkToLink, since then every car leg induces two walk
+		/* legs, and the termination is never fulfilled. I did not want to adapt the test since it also checks events files at specific
+		/* iterations, and both would have changed.  Feel free to do this yourself if you feel like it. kai, jun'25
+		* */
+
+		// yyyy The test is consuming a lot of time.  kai, jun'25
+
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
+
+		config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.none );
 
 		{ // Set up mode choice
 			config.changeMode().setModes(new String[] { "car", "walk" });
