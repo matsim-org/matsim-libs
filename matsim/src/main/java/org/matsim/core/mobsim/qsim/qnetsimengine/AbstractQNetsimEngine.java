@@ -117,10 +117,8 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 			}
 		}
 
-		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-
-		qNetwork.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
-		// yyyy this now looks like the initialize could be integrated into the constructor?!  kai, jan'25
+		qNetwork = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory, this, sim.getAgentCounter(), sim.getSimTimer() );
+		// yy the above constructor came out of a refactoring and it not very beautiful.  Since it is package-private, it could be improved.  kai, jun'25
 
 		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}

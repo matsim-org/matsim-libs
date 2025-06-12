@@ -53,14 +53,11 @@ public class QNetwork implements NetsimNetwork {
 
 	QNetsimEngineI simEngine; // only for tests...
 
-	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
+	/* package-private */ QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory, QNetsimEngineI simEngine, AgentCounter agentCounter, MobsimTimer simTimer ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
 		this.links = new IdMap<>(Link.class);
 		this.nodes = new IdMap<>(Node.class);
-	}
-
-	public void initialize(QNetsimEngineI simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
 		this.simEngine = simEngine;
 		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.getNetsimInternalInterface());
 		for (Node n : this.network.getNodes().values()) {
