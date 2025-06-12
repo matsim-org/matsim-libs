@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="singleCarrier">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="directTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="shipmentSouth" to="i(9,0)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="shipmentNorth" to="i(9,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+		</services>
+		<plans>
+			<plan score="-549.2" selected="true">
+				<tour tourId="dist_1" vehicleId="directTruck">
+					<act type="start" end_time="00:02:00"/>
+					<leg expected_dep_time="00:02:00" expected_transp_time="00:32:00">
+						<route>j(1,1) j(1,2) j(1,3) j(1,4) j(1,5) j(1,6) j(1,7) j(1,8) i(2,8) i(3,8) i(4,8) i(5,8) i(6,8) i(7,8) i(8,8)</route>
+					</leg>
+					<act type="service" serviceId="shipmentNorth"/>
+					<leg expected_dep_time="00:35:00" expected_transp_time="00:24:00">
+						<route>j(9,9) i(9,9)R j(8,9)R j(8,8)R j(8,7)R j(8,6)R j(8,5)R j(8,4)R j(8,3)R j(8,2)R j(8,1)R</route>
+					</leg>
+					<act type="service" serviceId="shipmentSouth"/>
+					<leg expected_dep_time="01:00:00" expected_transp_time="00:24:00">
+						<route>j(9,1) i(9,1)R i(8,1)R i(7,1)R i(6,1)R i(5,1)R i(4,1)R i(3,1)R i(2,1)R i(1,1)R j(0,1)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</plans>
+	</carrier>
+	<carrier id="carrierSouth">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="directTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<plans>
+			<plan score="0.0" selected="true">
+			</plan>
+		</plans>
+	</carrier>
+	<carrier id="CarrierNorth">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="directTruck" depotLinkId="i(1,8)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<plans>
+			<plan score="0.0" selected="true">
+			</plan>
+		</plans>
+	</carrier>
+	<carrier id="mainCarrier">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">mainRunCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="mainTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="Shipment_1" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_2" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_3" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_4" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_5" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_6" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_7" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_8" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_9" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_10" to="i(5,8)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+		</services>
+		<plans>
+			<plan score="-419.6" selected="true">
+				<tour tourId="3" vehicleId="mainTruck">
+					<act type="start" end_time="00:10:00"/>
+					<leg expected_dep_time="00:10:00" expected_transp_time="00:24:00">
+						<route>j(1,1) j(1,2) j(1,3) j(1,4) j(1,5) j(1,6) j(1,7) j(1,8) i(2,8) i(3,8) i(4,8)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_1"/>
+					<leg expected_dep_time="00:35:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_2"/>
+					<leg expected_dep_time="00:36:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_3"/>
+					<leg expected_dep_time="00:37:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_4"/>
+					<leg expected_dep_time="00:38:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_5"/>
+					<leg expected_dep_time="00:39:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_6"/>
+					<leg expected_dep_time="00:40:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_7"/>
+					<leg expected_dep_time="00:41:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_8"/>
+					<leg expected_dep_time="00:42:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_9"/>
+					<leg expected_dep_time="00:43:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_10"/>
+					<leg expected_dep_time="00:44:00" expected_transp_time="00:32:00">
+						<route>i(6,8) j(6,8)R j(6,7)R j(6,6)R j(6,5)R j(6,4)R j(6,3)R j(6,2)R i(6,1)R i(5,1)R i(4,1)R i(3,1)R i(2,1)R i(1,1)R j(0,1)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</plans>
+	</carrier>
+	<carrier id="distributionCarrier">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="distributionTruck" depotLinkId="i(5,8)" typeId="small05" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="Shipment_1" to="i(5,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_2" to="i(5,7)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_3" to="i(4,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_4" to="j(3,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_5" to="j(4,7)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_6" to="i(6,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_7" to="i(4,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_8" to="j(5,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_9" to="j(6,6)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_10" to="j(3,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+		</services>
+		<plans>
+			<plan score="-98.415" selected="true">
+				<tour tourId="dist_1" vehicleId="distributionTruck">
+					<act type="start" end_time="00:49:11"/>
+					<leg expected_dep_time="00:49:11" expected_transp_time="00:08:00">
+						<route>i(6,8) j(6,8)R i(6,7)R</route>
+					</leg>
+					<act type="service" serviceId="Shipment_2"/>
+					<leg expected_dep_time="00:58:11" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_5"/>
+					<leg expected_dep_time="01:01:11" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_1"/>
+					<leg expected_dep_time="01:04:11" expected_transp_time="00:14:00">
+						<route>j(5,7) i(5,7)R i(4,7)R i(3,7)R j(2,7)R i(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_3"/>
+					<leg expected_dep_time="01:19:11" expected_transp_time="00:08:00">
+						<route>j(4,6)R i(4,5)R j(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_4"/>
+					<leg expected_dep_time="01:28:11" expected_transp_time="00:06:00">
+						<route>j(3,8) i(4,8)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour tourId="dist_2" vehicleId="distributionTruck">
+					<act type="start" end_time="00:49:11"/>
+					<leg expected_dep_time="00:49:11" expected_transp_time="00:14:00">
+						<route>i(6,8) j(6,8)R i(6,7)R i(5,7)R j(4,7)R i(5,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_6"/>
+					<leg expected_dep_time="01:04:11" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_9"/>
+					<leg expected_dep_time="01:07:11" expected_transp_time="00:06:00">
+						<route>i(6,5)R j(5,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_8"/>
+					<leg expected_dep_time="01:14:11" expected_transp_time="00:12:00">
+						<route>i(5,7)R i(4,7)R i(3,7)R j(2,7)R i(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_7"/>
+					<leg expected_dep_time="01:27:11" expected_transp_time="00:08:00">
+						<route>j(4,6)R i(4,5)R j(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_10"/>
+					<leg expected_dep_time="01:36:11" expected_transp_time="00:06:00">
+						<route>j(3,8) i(4,8)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</plans>
+	</carrier>
+	<carrier id="directCarrier">
+		<attributes>
+			<attribute name="carrierType" class="org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils$CARRIER_TYPE">distributionCarrier</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="directTruck" depotLinkId="i(1,0)" typeId="large50" earliestStart="00:00:00" latestEnd="596523:14:07"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="Shipment_1" to="i(5,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_2" to="i(5,7)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_3" to="i(4,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_4" to="j(3,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_5" to="j(4,7)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_6" to="i(6,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_7" to="i(4,6)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_8" to="j(5,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_9" to="j(6,6)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+			<service id="Shipment_10" to="j(3,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="596523:14:07" serviceDuration="00:01:00"/>
+		</services>
+		<plans>
+			<plan score="-509.2" selected="true">
+				<tour tourId="dist_1" vehicleId="directTruck">
+					<act type="start" end_time="00:10:00"/>
+					<leg expected_dep_time="00:10:00" expected_transp_time="00:18:00">
+						<route>j(1,1) j(1,2) j(1,3) j(1,4) j(1,5) j(1,6) i(2,6) i(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_4"/>
+					<leg expected_dep_time="00:29:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_10"/>
+					<leg expected_dep_time="00:30:00" expected_transp_time="00:08:00">
+						<route>i(3,7)R j(2,7)R i(3,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_7"/>
+					<leg expected_dep_time="00:39:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_3"/>
+					<leg expected_dep_time="00:40:00" expected_transp_time="00:08:00">
+						<route>i(5,6) j(5,7) i(5,7)R</route>
+					</leg>
+					<act type="service" serviceId="Shipment_5"/>
+					<leg expected_dep_time="00:49:00" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_1"/>
+					<leg expected_dep_time="00:52:00" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_6"/>
+					<leg expected_dep_time="00:55:00" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_9"/>
+					<leg expected_dep_time="00:58:00" expected_transp_time="00:06:00">
+						<route>i(6,5)R j(5,6)</route>
+					</leg>
+					<act type="service" serviceId="Shipment_8"/>
+					<leg expected_dep_time="01:05:00" expected_transp_time="00:01:59">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="Shipment_2"/>
+					<leg expected_dep_time="01:08:00" expected_transp_time="00:24:00">
+						<route>j(4,7)R j(4,6)R j(4,5)R j(4,4)R j(4,3)R j(4,2)R i(4,1)R i(3,1)R i(2,1)R i(1,1)R j(0,1)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+		</plans>
+	</carrier>
+</carriers>

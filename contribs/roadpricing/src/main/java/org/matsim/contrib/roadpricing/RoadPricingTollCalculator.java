@@ -21,9 +21,6 @@
 package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
-import java.util.stream.Collector;
-
-import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -218,7 +215,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
+				events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -newToll, "toll", null, null));
 
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += newToll;
@@ -241,7 +238,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+				events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -cost.amount, "toll", null, null));
 
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += cost.amount;
@@ -285,7 +282,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 					/* The toll amount comes from the current link, but should
 					 * be the same for all links. */
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+					events.processEvent(new PersonMoneyEvent(event.getTime(), driverId, -cost.amount, "toll", null, null));
 
 					info.toll = cost.amount;
 				}

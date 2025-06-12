@@ -6,7 +6,7 @@ import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.modechoice.search.SingleTripChoicesGenerator;
 import org.matsim.modechoice.search.TopKChoicesGenerator;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 

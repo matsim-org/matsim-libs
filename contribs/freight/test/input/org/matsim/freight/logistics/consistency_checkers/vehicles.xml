@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="large50">
+
+		<capacity seats="0" standingRoomInPersons="0" other="50.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="10.0"/>
+		<costInformation fixedCostsPerDay="150.0" costsPerMeter="0.01" costsPerSecond="0.01">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="small05">
+
+		<capacity seats="0" standingRoomInPersons="0" other="5.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="10.0"/>
+		<costInformation fixedCostsPerDay="25.0" costsPerMeter="0.001" costsPerSecond="0.005">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+		
+
+</vehicleDefinitions>

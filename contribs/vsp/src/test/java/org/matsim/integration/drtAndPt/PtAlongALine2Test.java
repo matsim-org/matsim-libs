@@ -233,11 +233,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 2.0;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(2.0);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -250,11 +250,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
@@ -266,11 +266,11 @@ public class PtAlongALine2Test {
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                         drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                                 .addOrGetDefaultDrtOptimizationConstraintsSet();
-				defaultConstraintsSet.maxTravelTimeAlpha = 1.3;
-				defaultConstraintsSet.maxTravelTimeBeta = 5. * 60.;
+				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
+				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
-				defaultConstraintsSet.maxWaitTime = Double.MAX_VALUE;
-				defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = false;
+				defaultConstraintsSet.setMaxWaitTime(Double.MAX_VALUE);
+				defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 				drtConfigGroup.setUseModeFilteredSubnetwork(true);
 
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());

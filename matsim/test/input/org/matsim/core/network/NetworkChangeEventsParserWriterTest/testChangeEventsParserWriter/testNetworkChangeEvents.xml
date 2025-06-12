@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+
+	<networkChangeEvent startTime="08:00:00">
+		<link refId="1"/>
+		<link refId="2"/>
+		<flowCapacity type="scaleFactor" value="0.5"/>
+		<freespeed type="absolute" value="13.88"/>
+		<lanes type="absolute" value="1.0"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="14:00:00">
+		<link refId="2"/>
+		<link refId="1"/>
+		<flowCapacity type="absolute" value="1.5"/>
+		<freespeed type="scaleFactor" value="36.11"/>
+		<lanes type="scaleFactor" value="3.0"/>
+	</networkChangeEvent>
+
+	<networkChangeEvent startTime="25:00:00">
+		<link refId="2"/>
+		<link refId="1"/>
+		<flowCapacity type="absolute" value="1.5"/>
+		<freespeed type="scaleFactor" value="36.11"/>
+		<lanes type="scaleFactor" value="3.0"/>
+	</networkChangeEvent>
+
+</networkChangeEvents>

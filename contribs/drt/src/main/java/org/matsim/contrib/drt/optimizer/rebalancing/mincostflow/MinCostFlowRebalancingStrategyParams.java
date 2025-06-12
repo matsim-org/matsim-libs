@@ -45,13 +45,13 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	private double targetBeta = Double.NaN;
 
 	public enum RebalancingTargetCalculatorType {
-		EstimatedDemand, EqualRebalancableVehicleDistribution, EqualVehicleDensity, EqualVehiclesToPopulationRatio
+		EstimatedDemand, EstimatedRelativeDemand, EqualRebalancableVehicleDistribution, EqualVehicleDensity, EqualVehiclesToPopulationRatio
 	}
 
 	@Parameter
 	@Comment("Defines the calculator used for computing rebalancing targets per each zone"
 			+ " (i.e. number of the desired vehicles)."
-			+ " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
+			+ " Can be one of [EstimatedDemand, EstimatedRelativeDemand, EqualRebalancableVehicleDistribution,"
 			+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
 			+ " Current default is EstimatedDemand")
 	@NotNull

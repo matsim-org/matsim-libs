@@ -238,6 +238,7 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
         elementIdResourceIdMap.put(logisticChainElementId, resourceId);
       }
+
       case SHIPMENT_PLAN -> {
         shipmentPlanId = atts.getValue(SHIPMENT_ID);
         Gbl.assertNotNull(shipmentPlanId);

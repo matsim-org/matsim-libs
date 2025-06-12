@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -76,12 +77,12 @@ public class MultimodalLinkChooserDefaultImplTest {
         MultimodalLinkChooser linkChooser = new MultimodalLinkChooserDefaultImpl();
 
         RoutingRequest request = DefaultRoutingRequest.of(facilityLinkIdNotNull, facilityLinkIdNull, 0, null, null);
-        
-        Link linkFromFacLinkId = linkChooser.decideAccessLink(request, network);
+
+        Link linkFromFacLinkId = linkChooser.decideAccessLink(request, TransportMode.car, network);
 
         Assertions.assertEquals(networkLink, linkFromFacLinkId);
 
-        Link linkFromFacCoord = linkChooser.decideEgressLink(request, network);
+        Link linkFromFacCoord = linkChooser.decideEgressLink(request, TransportMode.car, network);
 
         Assertions.assertEquals(networkLink, linkFromFacCoord);
 

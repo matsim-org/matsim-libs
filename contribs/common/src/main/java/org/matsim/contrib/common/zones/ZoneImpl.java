@@ -7,7 +7,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 public class ZoneImpl implements Zone {
 

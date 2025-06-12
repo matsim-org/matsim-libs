@@ -85,8 +85,8 @@ import java.io.UncheckedIOException;
             }
 
             @Override
-            public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
+            public void shutdown(boolean unexpected, Throwable exception) {
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exception);
             }
         };
         MatsimRuntimeModifications.run(runnable);
@@ -179,7 +179,7 @@ import java.io.UncheckedIOException;
             log.error("Could not write stopwatch file.", e);
         }
         if (config.controller().getCreateGraphsInterval() > 0 && iteration % config.controller().getCreateGraphsInterval() == 0) {
-            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch.png", ControllerConfigGroup.CompressionType.none));
+            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch", ControllerConfigGroup.CompressionType.none));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
         log.info(Controler.DIVIDER);

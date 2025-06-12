@@ -100,6 +100,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 		final String filename;
 
+		public String getFilename() {
+			return filename;
+		}
+
 		DefaultFiles(String filename) {
 			this.filename = filename;
 		}

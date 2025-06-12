@@ -105,7 +105,7 @@ public class DefaultLocationCalculator implements FreightAgentGenerator.Location
 				CoordinateTransformation ct = new GeotoolsTransformation("EPSG:4326", "EPSG:25832");
 				Coord transformedCoord = ct.transform(backupCoord);
 				Link backupLink = NetworkUtils.getNearestLink(network, transformedCoord);
-				assert backupLink != null;
+				assert backupLink != null : "link closest to " + transformedCoord + "is null";
 				mapping.put(verkehrszelle, List.of(backupLink.getId()));
 			}
 		}

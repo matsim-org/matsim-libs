@@ -3,8 +3,8 @@ package org.matsim.contrib.parking.parkingsearch.evaluation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
@@ -17,7 +17,7 @@ public class ParkingSlotManager {
 	private final Id<Link> linkID;
 
 	public ParkingSlotManager(Link link, int numberOfSlotsOnLink) {
-		for (Coord c : ParkingUtils.getEvenlyDistributedCoordsAlongLink(link, numberOfSlotsOnLink)) {
+		for (Coord c : NetworkUtils.getEvenlyDistributedCoordsAlongLink(link, numberOfSlotsOnLink)) {
 			this.freeSlots.add(new Tuple<Coord, Double>(c, 0.0));
 		}
 		this.linkID = link.getId();

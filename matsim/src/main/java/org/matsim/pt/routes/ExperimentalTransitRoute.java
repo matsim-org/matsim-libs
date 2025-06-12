@@ -56,7 +56,7 @@ public class ExperimentalTransitRoute extends AbstractRoute implements TransitPa
 	}
 
 	/**
-	 * Why do we need this constructor, if we only keep the id of the line/route? 
+	 * Why do we need this constructor, if we only keep the id of the line/route?
 	 */
 	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitLine line, final TransitRoute route, final TransitStopFacility egressFacility) {
 		this(accessFacility, egressFacility, (line == null ? null : line.getId()), (route == null ? null : route.getId()));
@@ -122,6 +122,12 @@ public class ExperimentalTransitRoute extends AbstractRoute implements TransitPa
 	@Override
 	public String getRouteType() {
 		return ROUTE_TYPE;
+	}
+
+	@Override
+	public TransitPassengerRoute getChainedRoute() {
+		// Not supported
+		return null;
 	}
 
 	@Override

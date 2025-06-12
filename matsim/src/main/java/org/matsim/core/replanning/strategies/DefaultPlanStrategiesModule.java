@@ -45,7 +45,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
-    private static final Logger log = LogManager.getLogger( DefaultPlanStrategiesModule.class );
 
     public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }
@@ -123,18 +122,6 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode)) {
             addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode).toProvider(ChangeSingleTripMode.class);
         }
-
-        // td, 15 feb 16: removed the "Leg" versions of strategies. Notify the users that they should switch to the
-        // "Trip" versions. Should be left in 0.8.XXX releases, and then deleted, along with their name in the enum.
-        if ( usedStrategyNames.contains(DefaultStrategy.ChangeLegMode) ) {
-            log.error( DefaultStrategy.ChangeLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeTripMode+" instead." );
-        }
-        if ( usedStrategyNames.contains(DefaultStrategy.ChangeSingleLegMode) ) {
-            log.error( DefaultStrategy.ChangeSingleLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
-        }
-        if ( usedStrategyNames.contains(DefaultStrategy.TripSubtourModeChoice) ) {
-            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.SubtourModeChoice+" instead." );
-        }
     }
 
     public interface DefaultSelector {
@@ -150,13 +137,10 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     public interface DefaultStrategy {
         String ReRoute="ReRoute";
         String TimeAllocationMutator="TimeAllocationMutator";
-        @Deprecated String ChangeLegMode="ChangeLegMode";
         String TimeAllocationMutator_ReRoute="TimeAllocationMutator_ReRoute" ;
-    	@Deprecated String ChangeSingleLegMode = "ChangeSingleLegMode" ;
     	String ChangeSingleTripMode="ChangeSingleTripMode" ;
     	String SubtourModeChoice = "SubtourModeChoice" ;
     	String ChangeTripMode = "ChangeTripMode" ;
-    	@Deprecated String TripSubtourModeChoice = "TripSubtourModeChoice" ;
     }
 
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface
@@ -178,7 +162,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         @Override
         public ExpBetaPlanChanger<Plan, Person> get() {
-            return new ExpBetaPlanChanger<>( - config.getBrainExpBeta());
+            return new ExpBetaPlanChanger.Factory<Plan, Person>().setBetaValue(-config.getBrainExpBeta()).build();
         }
     }
 

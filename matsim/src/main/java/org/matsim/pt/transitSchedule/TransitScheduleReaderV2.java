@@ -19,11 +19,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +36,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.ChainedDeparture;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -58,7 +55,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  */
 public class TransitScheduleReaderV2 extends MatsimXmlParser {
-	private static final  Logger log = LogManager.getLogger(TransitScheduleReaderV2.class);
+	private static final Logger log = LogManager.getLogger(TransitScheduleReaderV2.class);
 
 	private final String externalInputCRS;
 	private final String targetCRS;
@@ -68,6 +65,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
+	private List<ChainedDeparture> currentChainedDepartures = null;
 	private Departure currentDeparture = null;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
@@ -77,21 +75,21 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 	private final StringCache cache = new StringCache();
 
 	public TransitScheduleReaderV2(final TransitSchedule schedule, final RouteFactories routeFactory) {
-		this( null, null , schedule , routeFactory );
+		this(null, null, schedule, routeFactory);
 	}
 
 	public TransitScheduleReaderV2(
-			final String externalInputCRS,
-			final String targetCRS,
-			final Scenario scenario) {
-		this( externalInputCRS, targetCRS , scenario.getTransitSchedule() , scenario.getPopulation().getFactory().getRouteFactories() );
+		final String externalInputCRS,
+		final String targetCRS,
+		final Scenario scenario) {
+		this(externalInputCRS, targetCRS, scenario.getTransitSchedule(), scenario.getPopulation().getFactory().getRouteFactories());
 	}
 
 	private TransitScheduleReaderV2(
-	        String externalInputCRS,
-			String targetCRS,
-			TransitSchedule schedule,
-			RouteFactories routeFactory) {
+		String externalInputCRS,
+		String targetCRS,
+		TransitSchedule schedule,
+		RouteFactories routeFactory) {
 		super(ValidationType.DTD_ONLY);
 		this.externalInputCRS = externalInputCRS;
 		this.targetCRS = targetCRS;
@@ -108,13 +106,13 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
 			Coord coord = atts.getValue(Constants.Z) == null ?
-					new Coord(Double.parseDouble(atts.getValue(Constants.X)), Double.parseDouble(atts.getValue(Constants.Y))) :
-					new Coord(Double.parseDouble(atts.getValue(Constants.X)), Double.parseDouble(atts.getValue(Constants.Y)), Double.parseDouble(atts.getValue(Constants.Z)));
+				new Coord(Double.parseDouble(atts.getValue(Constants.X)), Double.parseDouble(atts.getValue(Constants.Y))) :
+				new Coord(Double.parseDouble(atts.getValue(Constants.X)), Double.parseDouble(atts.getValue(Constants.Y)), Double.parseDouble(atts.getValue(Constants.Z)));
 			TransitStopFacility stop =
-					this.schedule.getFactory().createTransitStopFacility(
-							Id.create(atts.getValue(Constants.ID), TransitStopFacility.class),
-							this.coordinateTransformation.transform(coord),
-							isBlocking);
+				this.schedule.getFactory().createTransitStopFacility(
+					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class),
+					this.coordinateTransformation.transform(coord),
+					isBlocking);
 			this.currentAttributes = stop.getAttributes();
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
 				Id<Link> linkId = Id.create(atts.getValue(Constants.LINK_REF_ID), Link.class);
@@ -184,6 +182,29 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			Id<TransitStopFacility> toStop = Id.create(atts.getValue(Constants.TO_STOP), TransitStopFacility.class);
 			double transferTime = Time.parseTime(atts.getValue(Constants.TRANSFER_TIME));
 			this.schedule.getMinimalTransferTimes().set(fromStop, toStop, transferTime);
+		} else if (Constants.CHAINED_DEPARTURE.equals(name)) {
+
+			Id<Departure> departureId = Id.create(atts.getValue(Constants.TO_DEPARTURE), Departure.class);
+			Id<TransitLine> transitLineId = this.currentTransitLine.getId();
+			Id<TransitRoute> transitRouteId = this.currentTransitRoute.id;
+
+			if (atts.getValue(Constants.TO_TRANSIT_LINE) != null) {
+				transitLineId = Id.create(atts.getValue(Constants.TO_TRANSIT_LINE), TransitLine.class);
+			}
+
+			if (atts.getValue(Constants.TO_TRANSIT_ROUTE) != null) {
+				transitRouteId = Id.create(atts.getValue(Constants.TO_TRANSIT_ROUTE), TransitRoute.class);
+			}
+
+			ChainedDeparture chainedDeparture = new ChainedDepartureImpl(transitLineId, transitRouteId, departureId);
+
+			// Only create new list of necessary
+			if (this.currentChainedDepartures == null) {
+				this.currentChainedDepartures = new ArrayList<>();
+			}
+
+			this.currentChainedDepartures.add(chainedDeparture);
+
 		} else if (Constants.ATTRIBUTE.equals(name)) {
 			this.attributesDelegate.startTag(name, atts, context, this.currentAttributes);
 		} else if (Constants.ATTRIBUTES.equals(name)) {
@@ -196,14 +217,15 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (Constants.DEPARTURE.equals(name)) {
+			if (this.currentChainedDepartures != null) {
+				this.currentDeparture.setChainedDepartures(Collections.unmodifiableList(this.currentChainedDepartures));
+				this.currentChainedDepartures = null;
+			}
 			this.currentDeparture = null;
-		}
-		if (Constants.DESCRIPTION.equals(name) && Constants.TRANSIT_ROUTE.equals(context.peek())) {
+		} else if (Constants.DESCRIPTION.equals(name) && Constants.TRANSIT_ROUTE.equals(context.peek())) {
 			this.currentTransitRoute.description = content;
 		} else if (Constants.TRANSPORT_MODE.equals(name)) {
 			this.currentTransitRoute.mode = content.intern();
-		} else if (Constants.DEPARTURE.equals(name)) {
-			this.currentDeparture = null;
 		} else if (Constants.TRANSIT_ROUTE.equals(name)) {
 			List<TransitRouteStop> stops = new ArrayList<>(this.currentTransitRoute.stopBuilders.size());
 			this.currentTransitRoute.stopBuilders.forEach(stopBuilder -> stops.add(stopBuilder.build()));

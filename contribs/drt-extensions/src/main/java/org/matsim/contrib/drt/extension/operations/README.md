@@ -58,13 +58,13 @@ Shifts have a start and end time and can optionally have a break which is define
 by earliest start and latest end as well as a duration. Optionally, as operation 
 facility id may be defined to control the location of the start/end of the shift.
 
-Shifts may be described in an xml file likes this:
+Shifts may be described in an xml file likes this (breaks and types are optional):
 ```
 <shifts>
-    <shift id="0" start="14400" end="45000" operationFacilityId="1">
+    <shift id="0" start="14400" end="45000" operationFacilityId="1", type="Regular">
         <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
     </shift>
-    <shift id="1" start="14400" end="45000" operationFacilityId="1">
+    <shift id="1" start="14400" end="45000" operationFacilityId="1", type="WAV">
         <break earliestStart="28800.0" latestEnd="32400.0" duration="1800.0"/>
     </shift>
 </shifts>

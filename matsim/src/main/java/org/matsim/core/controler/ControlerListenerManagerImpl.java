@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler;
 
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.controler.events.*;
@@ -120,7 +121,15 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
 	public void fireControlerShutdownEvent(final boolean unexpected, int iteration) {
-		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration);
+		fireControlerShutdownEvent(unexpected, iteration, null);
+	}
+
+	/**
+	 * Notifies all ControlerListeners
+	 * @param unexpected Whether the shutdown is unexpected or not.
+	 */
+	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable Throwable exception) {
+		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration, exception);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
 

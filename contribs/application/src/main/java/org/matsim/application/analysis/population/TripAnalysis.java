@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.population;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -372,14 +374,22 @@ public class TripAnalysis implements MATSimAppCommand {
 		Object2LongMap<String> travelTime = new Object2LongOpenHashMap<>();
 		Object2LongMap<String> travelDistance = new Object2LongOpenHashMap<>();
 		Object2LongMap<String> beelineDistance = new Object2LongOpenHashMap<>();
+		Map<String, DoubleList> speeds = new HashMap<>();
 
 		for (Row trip : trips) {
 			String mainMode = trip.getString("main_mode");
 
 			n.mergeInt(mainMode, 1, Integer::sum);
-			travelTime.mergeLong(mainMode, durationToSeconds(trip.getString("trav_time")), Long::sum);
-			travelDistance.mergeLong(mainMode, trip.getLong("traveled_distance"), Long::sum);
+			int travTime = durationToSeconds(trip.getString("trav_time"));
+			long traveledDistance = trip.getLong("traveled_distance");
+
+			travelTime.mergeLong(mainMode, travTime, Long::sum);
+			travelDistance.mergeLong(mainMode, traveledDistance, Long::sum);
 			beelineDistance.mergeLong(mainMode, trip.getLong("euclidean_distance"), Long::sum);
+
+			double speed = 3.6d * traveledDistance / (double) travTime;
+			if (Double.isFinite(speed) && !Double.isNaN(speed))
+				speeds.computeIfAbsent(mainMode, s -> new DoubleArrayList()).add(speed);
 		}
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats.csv")), CSVFormat.DEFAULT)) {
@@ -429,8 +439,15 @@ public class TripAnalysis implements MATSimAppCommand {
 			for (String m : modeOrder) {
 				double avg = (travelDistance.getLong(m) / 1000d) / (n.getInt(m));
 				printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
-
 			}
+			printer.println();
+
+			printer.print("Avg. speed per trip [km]");
+			for (String m : modeOrder) {
+				double avg = speeds.get(m).doubleStream().average().orElse(0);
+				printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
+			}
+
 			printer.println();
 		}
 	}

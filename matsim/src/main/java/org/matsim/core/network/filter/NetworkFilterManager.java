@@ -21,7 +21,6 @@ package org.matsim.core.network.filter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +30,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinksUtils;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
  * Add several filter instances to this class and create a new
@@ -103,8 +105,10 @@ public final class NetworkFilterManager {
 		ll.setFreespeed(l.getFreespeed());
 		ll.setLength(l.getLength());
 		ll.setNumberOfLanes(l.getNumberOfLanes());
-		for(Entry<String, Object> entry : l.getAttributes().getAsMap().entrySet()) {
-			ll.getAttributes().putAttribute(entry.getKey(), entry.getValue());
+		AttributesUtils.copyAttributesFromTo(l, ll);
+		DisallowedNextLinks disallowedNextLinks = NetworkUtils.getDisallowedNextLinks(l);
+		if (disallowedNextLinks != null) {
+			NetworkUtils.setDisallowedNextLinks(ll, disallowedNextLinks.copy());
 		}
 		net.addLink(ll);
 	}
@@ -130,6 +134,8 @@ public final class NetworkFilterManager {
 					this.addLink(net, l);
 				}
 			}
+			// if not all links are copied, ensure DisallowedNextLinks are valid
+			DisallowedNextLinksUtils.clean(net);
 		}
 		log.info("filtered network contains " + net.getNodes().size() + " nodes and " + net.getLinks().size() + " links.");
 		return net;

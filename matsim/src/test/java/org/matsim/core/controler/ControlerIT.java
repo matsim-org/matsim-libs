@@ -119,13 +119,19 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		MatsimServices controler = new Controler(config);
 		try {
-			controler.getConfig().setParam("eventsManager", "numberOfThreads", "2");
+			controler.getConfig().eventsManager().setNumberOfThreads(2);// setParam("eventsManager", "numberOfThreads", "2");
 			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
 		try {
-			controler.getConfig().setParam("eventsManager", "estimatedNumberOfEvents", "200000");
+			controler.getConfig().eventsManager().addParam("numberOfThreads", "2");
+			Assertions.fail("Expected exception");
+		} catch (Exception e) {
+			log.info("catched expected exception", e);
+		}
+		try {
+			controler.getConfig().eventsManager().setEstimatedNumberOfEvents(200000L);
 			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);

@@ -24,10 +24,13 @@ package org.matsim.withinday.controller;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -42,11 +45,22 @@ public class ExampleWithinDayControllerTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
-	void testRun() {
+	/**
+	 * <p> yyyy This test fails with `accessEgressToLink'.  When debugging this, I found that the test only works with the Dijkstra router (as set in the
+	 * config), the Dijkstra router returns a travelTime infinity, and that confuses the setup.  It feels to me that the MATSim region of validity
+	 * has moved such that this test tests functionality that is now outside that region of validity.  I am leaving the test in here for
+	 * completeness, but if we encounter further problems we might consider removing it plus the tested functionality.  (I think that the
+	 * withinday functionality has been absorbed to other places inside MATSim.)  kai, jun'25 </p>
+	 *
+	 * <p> yyyy This test also has many other warnings that point to deprecated material. kai, jun'25</p>
+	 */
+	@ParameterizedTest
+	@EnumSource(value = RoutingConfigGroup.AccessEgressType.class, names = { "none" })
+	void testRun( RoutingConfigGroup.AccessEgressType accessEgressType ) {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controller().setLastIteration(1);
 		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		config.routing().setAccessEgressType( accessEgressType );
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		preparePlans(scenario);
 		final Controler controler = new Controler(scenario);

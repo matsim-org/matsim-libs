@@ -69,11 +69,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 			"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
 	private static final String FILTER_SNAPSHOTS = "filterSnapshots";
 	private static final String LINK_DYNAMICS = "linkDynamics";
+	private static final String PERSON_INITIALIZED_EVENTS = "personInitializedEvents";
 	private InflowCapacitySetting inflowCapacitySetting = InflowCapacitySetting.INFLOW_FROM_FDIAG;
 
 	public enum StarttimeInterpretation {maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime}
-
 	public enum EndtimeInterpretation {minOfEndtimeAndMobsimFinished, onlyUseEndtime}
+	public enum PersonInitializedEventsSetting {none, singleActAgentsOnly, all}
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
@@ -160,6 +161,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle;
 	private Collection<String> seepModes = Collections.singletonList(TransportMode.bike);
 	// ---
+	private PersonInitializedEventsSetting personInitializedEventsSetting = PersonInitializedEventsSetting.none;
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -233,7 +235,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(FILTER_SNAPSHOTS, "If set to " + FilterSnapshots.withLinkAttributes + " snapshots will only be generated for links which include " + SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY + " as attribute key. Default is no filtering.");
 //		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
 //				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
-
+		{
+			StringBuilder options = new StringBuilder(60);
+			for (PersonInitializedEventsSetting ii : PersonInitializedEventsSetting.values()) {
+				options.append(ii).append(' ');
+			}
+			map.put(PERSON_INITIALIZED_EVENTS, "Which agents should throw a PersonInitializedEvent on creation. Options: " + options);
+		}
 		return map;
 	}
 
@@ -511,6 +519,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(SIM_ENDTIME_INTERPRETATION)
 	public EndtimeInterpretation getSimEndtimeInterpretation() {
 		return simEndtimeInterpretation;
+	}
+
+	@StringSetter(PERSON_INITIALIZED_EVENTS)
+	public void setPersonInitializedEventsSetting(PersonInitializedEventsSetting setting) {
+		this.personInitializedEventsSetting = setting;
+	}
+	
+	@StringGetter(PERSON_INITIALIZED_EVENTS)
+	public PersonInitializedEventsSetting getPersonInitializedEventsSetting() {
+		return personInitializedEventsSetting;
 	}
 
 	@StringSetter(SIM_ENDTIME_INTERPRETATION)

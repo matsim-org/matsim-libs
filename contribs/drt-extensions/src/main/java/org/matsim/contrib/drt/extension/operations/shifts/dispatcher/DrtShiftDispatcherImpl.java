@@ -175,12 +175,12 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                     if (breakFacility.isPresent()) {
                         OperationFacility facility = breakFacility.get();
                         if (facility.register(activeShift.vehicle().getId())) {
-                            eventsManager.processEvent(new ShiftFacilityRegistrationEvent(
+                            eventsManager.processEvent(new OperationFacilityRegistrationEvent(
                                     timer.getTimeOfDay(), mode, activeShift.vehicle().getId(), facility.getId()));
                             shiftTaskScheduler.relocateForBreak(activeShift.vehicle(), facility, shift);
                             eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), mode, shift.getId(),
                                     activeShift.vehicle().getId(), facility.getLinkId(),
-                                    shift.getBreak().orElseThrow().getScheduledLatestArrival()));
+                                    shift.getBreak().orElseThrow().getScheduledLatestArrival(), activeShift.shift().getShiftType().orElse(null)));
                             return;
                         }
                     }
@@ -218,8 +218,9 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                 iterator.remove();
                 logger.debug("Started shift " + assignedShiftEntry.shift());
                 StayTask currentTask = (StayTask) assignedShiftEntry.vehicle().getSchedule().getCurrentTask();
-                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, mode, assignedShiftEntry.shift().getId(), assignedShiftEntry.vehicle().getId(),
-                        currentTask.getLink().getId()));
+                eventsManager.processEvent(new DrtShiftStartedEvent(timeStep, mode,
+                        assignedShiftEntry.shift().getId(), assignedShiftEntry.vehicle().getId(),
+                        currentTask.getLink().getId(), assignedShiftEntry.shift().getShiftType().orElse(null)));
             } else {
                 shiftTaskScheduler.planAssignedShift(assignedShiftEntry.vehicle(), timeStep, assignedShiftEntry.shift());
             }
@@ -336,7 +337,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         vehicle.addShift(shift);
         shiftTaskScheduler.planAssignedShift(vehicle, timer.getTimeOfDay(), shift);
         assignedShifts.add(new ShiftEntry(shift, vehicle));
-        eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), mode, shift.getId(), vehicle.getId()));
+        eventsManager.processEvent(new DrtShiftAssignedEvent(timer.getTimeOfDay(), mode, shift.getId(),
+                vehicle.getId(), shift.getShiftType().orElse(null)));
     }
 
     private void endShifts(double timeStep) {
@@ -444,7 +446,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                             shiftChangeFacility, lastTask)) {
                         shiftChangeFacility.register(next.vehicle().getId());
                         changeOverTask.getFacility().deregisterVehicle(next.vehicle().getId());
-                        eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(),
+                        eventsManager.processEvent(new OperationFacilityRegistrationEvent(timer.getTimeOfDay(),
                                 mode, next.vehicle().getId(), shiftChangeFacility.getId()));
                     }
                 }
@@ -503,7 +505,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
         shiftTaskScheduler.relocateForShiftChange(endingShift.vehicle(),
                 network.getLinks().get(shiftChangeoverFacility.getLinkId()), endingShift.shift(), shiftChangeoverFacility);
-        eventsManager.processEvent(new ShiftFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
+        eventsManager.processEvent(new OperationFacilityRegistrationEvent(timer.getTimeOfDay(), mode, endingShift.vehicle().getId(),
                 shiftChangeoverFacility.getId()));
     }
 
@@ -532,7 +534,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final DrtShift shift = vehicle.getShifts().poll();
         logger.debug("Ended shift " + shift.getId());
         shift.end();
-        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(),mode,  shift.getId(), vehicle.getId(), id, operationFacilityId));
+        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(),mode,  shift.getId(), vehicle.getId(), id, operationFacilityId, null));
         if (vehicle.getShifts().isEmpty()) {
             idleVehiclesQueues.get(operationFacilityId).add(vehicle);
         }
@@ -543,17 +545,21 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final OperationFacility facility = previousTask.getFacility();
         facility.deregisterVehicle(vehicle.getId());
         eventsManager.processEvent(
-                new VehicleLeftShiftFacilityEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
+                new VehicleLeftOperationFacilityEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
+        DrtShift shift = vehicle.getShifts().peek();
+        Gbl.assertNotNull(shift, "Shift may not be null!");
         eventsManager.processEvent(
-                new DrtShiftBreakEndedEvent(timer.getTimeOfDay(), mode, vehicle.getShifts().peek().getId(),
-                        vehicle.getId(), previousTask.getFacility().getLinkId())
+                new DrtShiftBreakEndedEvent(timer.getTimeOfDay(), mode, shift.getId(),
+                        vehicle.getId(), previousTask.getFacility().getLinkId(), shift.getShiftType().orElse(null))
         );
     }
 
     public void startBreak(ShiftDvrpVehicle vehicle, Id<Link> linkId) {
+        DrtShift shift = vehicle.getShifts().peek();
+        Gbl.assertNotNull(shift, "Shift must not be null!");
         eventsManager.processEvent(
                 new DrtShiftBreakStartedEvent(timer.getTimeOfDay(), mode,
-                        vehicle.getShifts().peek().getId(), vehicle.getId(), linkId)
+                        shift.getId(), vehicle.getId(), linkId, shift.getShiftType().orElse(null))
         );
     }
 

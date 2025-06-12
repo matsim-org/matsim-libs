@@ -144,13 +144,13 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 			}};
 		((Dijkstra) routingAlgo).setModeRestriction(modes);
 		
-		Node startNode = this.net.getLinks().get(startStop.getLinkId()).getToNode();
-		Node endNode = this.net.getLinks().get(endStop.getLinkId()).getFromNode();
+		Link startLink = this.net.getLinks().get(startStop.getLinkId());
+		Link endLink = this.net.getLinks().get(endStop.getLinkId());
 		
 		int startTime = 0 * 3600;
 		
 		// get Route
-		Path path = routingAlgo.calcLeastCostPath(startNode, endNode, startTime, null, null);
+		Path path = routingAlgo.calcLeastCostPath(startLink, endLink, startTime, null, null);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(startStop.getLinkId(), endStop.getLinkId());
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(path.links), endStop.getLinkId());		
 		

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -34,7 +34,7 @@ import com.google.common.base.Verify;
  * This is the ChargingAlternativeProvider of the strategic charging package.
  * Whenever an agent tries to find a new charger, the ChargingProvider logic is
  * used to find and select viable locations.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class StrategicChargingAlternativeProvider implements ChargingAlternativeProvider {

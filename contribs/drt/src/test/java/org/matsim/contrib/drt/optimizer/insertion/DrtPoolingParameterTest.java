@@ -229,9 +229,9 @@ public class DrtPoolingParameterTest {
 			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                     x.addOrGetDrtOptimizationConstraintsParams()
                             .addOrGetDefaultDrtOptimizationConstraintsSet();
-			defaultConstraintsSet.maxWaitTime = maxWaitTime;
-			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
-			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
+			defaultConstraintsSet.setMaxWaitTime(maxWaitTime);
+			defaultConstraintsSet.setMaxTravelTimeAlpha(maxTravelTimeAlpha);
+			defaultConstraintsSet.setMaxTravelTimeBeta(maxTravelTimeBeta);
 			x.setStopDuration(1.);
 		});
 

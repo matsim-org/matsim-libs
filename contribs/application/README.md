@@ -2,7 +2,7 @@
 # Application Scenarios
 
 This contrib allows building user-friendly MATSim scenarios, as well as preprocessing and analysis pipelines.
-
+Most of the API, interfaces and util classes have been moved to the matsim core into the `org.matsim.application` package.
 
 ## Defining an Application
 

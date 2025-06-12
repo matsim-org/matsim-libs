@@ -22,6 +22,8 @@ package org.matsim.core.controler.events;
 
 import org.matsim.core.controler.MatsimServices;
 
+import java.util.Optional;
+
 /**
  * ControlerEvent class to notify all observers of the Controler that it is shutdown
  *
@@ -34,11 +36,13 @@ public final class ShutdownEvent extends ControlerEvent {
 	 */
 	private final boolean unexpected;
 	private final int iteration;
+	private final Throwable exception;
 	
-	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration) {
+	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration, Throwable exception) {
 		super(controler);
 		this.unexpected = unexpected;
 		this.iteration = iteration;
+		this.exception = exception;
 	}
 
 	/**
@@ -50,5 +54,9 @@ public final class ShutdownEvent extends ControlerEvent {
 	
 	public int getIteration() {
 		return iteration;
+	}
+
+	public Optional<Throwable> getException() {
+		return Optional.ofNullable(this.exception);
 	}
 }

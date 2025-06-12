@@ -293,7 +293,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
     }
 
 	private static InputSource findDtdInRemoteLocation(final String fullSystemId) {
-		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
+		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a while.");
 		try {
 			URL url = new URL(fullSystemId);
 			URLConnection urlConn = url.openConnection();

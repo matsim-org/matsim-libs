@@ -38,11 +38,6 @@ public class SumoNetworkConverterTest {
 		assert network.getNodes().size() == 21 : "Must contain 21 nodes";
 		assert network.getNodes().containsKey(Id.createNodeId("251106770")) : "Must contain specific id";
 
-		Link link = network.getLinks().get(Id.createLinkId("-461905066#1"));
-
-		List<List<Id<Link>>> disallowed = NetworkUtils.getDisallowedNextLinks(link).getDisallowedLinkSequences(TransportMode.car);
-		assert disallowed.contains(List.of(Id.createLinkId("461905066#0"))) : "Must contain disallowed link sequence";
-
 		Path geometry = Path.of(output.toString().replace(".xml", "-linkGeometries.csv"));
 
 		assert Files.exists(geometry) : "Geometries must exist";

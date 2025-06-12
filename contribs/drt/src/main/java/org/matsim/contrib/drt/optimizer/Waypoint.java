@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.DoubleStream;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -161,7 +161,7 @@ public interface Waypoint {
 			latestArrivalTime = calcLatestArrivalTime();
 
 			// essentially the min of the latest possible pickup times at this stop
-			latestDepartureTime = calcLatestDepartureTime();	
+			latestDepartureTime = calcLatestDepartureTime();
 		}
 
 		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, DvrpLoad outgoingOccupancy, DvrpLoadType loadType) {
@@ -215,7 +215,7 @@ public interface Waypoint {
 				return pickedUp.subtract(droppedOff);
 			}
 		}
-		
+
 		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
 				task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),

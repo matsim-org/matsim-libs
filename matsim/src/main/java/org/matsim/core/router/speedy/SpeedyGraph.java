@@ -1,11 +1,10 @@
 package org.matsim.core.router.speedy;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Implements a highly optimized data structure for representing a MATSim network. Optimized to use as little memory as possible, and thus to fit as much memory as possible into CPU caches for high
@@ -54,16 +53,16 @@ public class SpeedyGraph {
     private final int[] linkData;
     private final Link[] links;
     private final Node[] nodes;
-		private final boolean hasTurnRestrictions;
+    private final TurnRestrictionsContext turnRestrictions;
 
-	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links, boolean hasTurnRestrictions) {
+	SpeedyGraph(int[] nodeData, int[] linkData, Node[] nodes, Link[] links, TurnRestrictionsContext turnRestrictions) {
 		this.nodeData = nodeData;
 		this.linkData = linkData;
 		this.nodes = nodes;
 		this.links = links;
 		this.nodeCount = this.nodes.length;
 		this.linkCount = this.links.length;
-		this.hasTurnRestrictions = hasTurnRestrictions;
+		this.turnRestrictions = turnRestrictions;
 	}
 
     public LinkIterator getOutLinkIterator() {
@@ -82,8 +81,8 @@ public class SpeedyGraph {
         return this.nodes[index];
     }
 
-		boolean hasTurnRestrictions() {
-			return this.hasTurnRestrictions;
+    Optional<TurnRestrictionsContext> getTurnRestrictions() {
+			return Optional.ofNullable(this.turnRestrictions);
 		}
 
     public interface LinkIterator {

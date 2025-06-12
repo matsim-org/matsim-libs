@@ -4,7 +4,7 @@ import com.google.common.base.Verify;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.core.config.Config;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author nkuehnel / MOIA
@@ -18,7 +18,7 @@ public class GISFileZoneSystemParams extends ZoneSystemParams {
 	}
 
 	@Parameter
-	@Comment("allows to configure zones. Used with zonesGeneration=ShapeFile")
+	@Comment("allows to configure zones based on a GIS file")
 	@Nullable
 	private String zonesShapeFile = null;
 

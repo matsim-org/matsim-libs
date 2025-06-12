@@ -27,7 +27,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSe
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 

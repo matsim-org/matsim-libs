@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.extension.insertion;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;

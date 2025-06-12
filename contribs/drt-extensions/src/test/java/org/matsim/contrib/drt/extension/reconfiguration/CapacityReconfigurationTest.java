@@ -171,7 +171,7 @@ public class CapacityReconfigurationTest {
 
 		// rejections?
 		drtConfig.addOrGetDrtOptimizationConstraintsParams()
-				.addOrGetDefaultDrtOptimizationConstraintsSet().rejectRequestIfMaxWaitOrTravelTimeViolated = useRejections;
+				.addOrGetDefaultDrtOptimizationConstraintsSet().setRejectRequestIfMaxWaitOrTravelTimeViolated(useRejections);
 
 		DvrpLoadParams loadParams = drtConfig.addOrGetLoadParams();
 

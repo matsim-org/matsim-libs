@@ -1,7 +1,10 @@
 package org.matsim.contrib.carsharing.replanning;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
+import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
+import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -33,12 +36,14 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 		// try to get the modes from the "changeLegMode" module of the config file
 
 
-		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
+		OneWayCarsharingConfigGroup oneWayCarsharingConfigGroup = (OneWayCarsharingConfigGroup) this.scenario.getConfig().getModule("OneWayCarsharing");
+		FreeFloatingConfigGroup freeFloatingConfigGroup = (FreeFloatingConfigGroup) this.scenario.getConfig().getModule("FreeFloating");
 
+		if (oneWayCarsharingConfigGroup != null && oneWayCarsharingConfigGroup.useOneWayCarsharing()) {
 			this.availableModes = new String[1];
 			this.availableModes[0] = "oneway";
 		}
-		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") )) {
+		if (freeFloatingConfigGroup != null && freeFloatingConfigGroup.useFeeFreeFloating()) {
 			if (this.availableModes == null) {
 				this.availableModes = new String[1];
 				this.availableModes[0] = "freefloating";
@@ -50,19 +55,14 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 			}
 		}
 
-		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") ) && !Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
+		if (freeFloatingConfigGroup != null && !freeFloatingConfigGroup.useFeeFreeFloating()) {
 			this.availableModes = new String[1];
 		}
-
-
-
-
 	}
 
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = tripRouterProvider.get();
 		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.scenario, this.availableModes,
 				MatsimRandom.getLocalInstance(), this.memberships);
 		return algo;

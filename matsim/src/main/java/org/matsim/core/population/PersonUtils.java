@@ -21,23 +21,19 @@
 
 package org.matsim.core.population;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-public final class PersonUtils {
-	private PersonUtils() {
-	} // do not instantiate
+import java.util.*;
 
+public final class PersonUtils {
 	private final static String SEX_ATTRIBUTE = "sex";
 	private final static String HAS_LICENSE = "hasLicense";
 	private static final String CAR_AVAIL = "carAvail";
@@ -46,7 +42,11 @@ public final class PersonUtils {
 	private static final String TRAVEL_CARDS = "travelcards";
 	private static final String PERSONAL_INCOME_ATTRIBUTE_NAME = "income";
 	private static final String PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME = "modeConstants";
+	private static final String MODE_TASTE_VARIATIONS = "modeTasteVariations";
 	private final static Logger log = LogManager.getLogger(Person.class);
+
+	private PersonUtils() {
+	} // do not instantiate
 
 	@Deprecated // use methods of interface Person
 	//yyy there is no such method in the Person interface.  paul, feb'25
@@ -114,6 +114,89 @@ public final class PersonUtils {
 			log.error(e.getMessage());
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Method to retrieve the taste variations of a person. Returns null if the attribute is not set.
+	 * Returns mapping of modes to utility parameter variations. These are not absolute values but relative to the base config.
+	 */
+	public static Map<String, Map<ModeUtilityParameters.Type, Double>> getModeTasteVariations(Person person) {
+
+		Object attr = person.getAttributes().getAttribute(MODE_TASTE_VARIATIONS);
+		if (attr == null) {
+			return null;
+		}
+
+		String variationsStr = (String) attr;
+		Map<String, Map<ModeUtilityParameters.Type, Double>> result = new HashMap<>();
+
+		// Split by semicolon to get each mode-parameter pair
+		String[] pairs = variationsStr.split(";");
+
+		for (String pair : pairs) {
+			pair = pair.trim();
+			if (pair.isEmpty()) continue;
+
+			// Each pair should be in format "mode_parameter=value"
+			String[] parts = pair.split("=");
+			if (parts.length != 2) {
+				log.warn("Invalid taste variation format: {}", pair);
+				continue;
+			}
+
+			String modeAndParam = parts[0].trim();
+			String valueStr = parts[1].trim();
+
+			// Split mode and parameter which are separated by underscore
+			int lastUnderscore = modeAndParam.lastIndexOf('-');
+			if (lastUnderscore == -1) {
+				log.warn("Invalid mode_parameter format: {}", modeAndParam);
+				continue;
+			}
+
+			String mode = modeAndParam.substring(0, lastUnderscore);
+			String paramStr = modeAndParam.substring(lastUnderscore + 1);
+
+			ModeUtilityParameters.Type param = ModeUtilityParameters.Type.valueOf(paramStr);
+			double value = Double.parseDouble(valueStr);
+
+			result.computeIfAbsent(mode, k -> new EnumMap<>(ModeUtilityParameters.Type.class)).put(param, value);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Set the taste variations of a persons. The map contains the mode as key and a map of utility parameters and their variation for the person.
+	 */
+	public static void setModeTasteVariations(Person person, Map<String, Map<ModeUtilityParameters.Type, Double>> modeTasteVariations) {
+
+		if (modeTasteVariations == null) {
+			person.getAttributes().removeAttribute(MODE_TASTE_VARIATIONS);
+			return;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+
+		for (Map.Entry<String, Map<ModeUtilityParameters.Type, Double>> modeEntry : modeTasteVariations.entrySet()) {
+			String mode = modeEntry.getKey();
+			Map<ModeUtilityParameters.Type, Double> paramMap = modeEntry.getValue();
+
+			for (Map.Entry<ModeUtilityParameters.Type, Double> paramEntry : paramMap.entrySet()) {
+				if (!first) {
+					sb.append(";");
+				}
+				first = false;
+
+				ModeUtilityParameters.Type param = paramEntry.getKey();
+				Double value = paramEntry.getValue();
+
+				sb.append(mode).append("-").append(param.name()).append("=").append(value);
+			}
+		}
+
+		person.getAttributes().putAttribute(MODE_TASTE_VARIATIONS, sb.toString());
 	}
 
 	/**

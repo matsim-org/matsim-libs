@@ -7,7 +7,7 @@ import jakarta.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 
 /**

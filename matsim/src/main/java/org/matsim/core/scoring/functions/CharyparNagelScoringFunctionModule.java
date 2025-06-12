@@ -22,19 +22,37 @@
 
 package org.matsim.core.scoring.functions;
 
+import com.google.inject.Singleton;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.PlansScoringModule;
 import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+
+import java.util.Map;
 
 
 /**
  * Needs {@link PlansScoringModule} or {@link StandaloneExperiencedPlansModule} (or something that binds the same interfaces) as pre-requisite.
  */
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
+
     @Override
     public void install() {
         bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
-        bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
+
+		Map<String, ScoringConfigGroup.ScoringParameterSet> scoringParameter = getConfig().scoring().getScoringParametersPerSubpopulation();
+
+		boolean tasteVariations = scoringParameter.values().stream().anyMatch(s -> s.getTasteVariationsParams() != null);
+
+		// If there are taste variations, the individual scoring parameters are used
+		if (tasteVariations) {
+			bind(ScoringParametersForPerson.class).to(IndividualPersonScoringParameters.class).in(Singleton.class);
+			addControlerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(jakarta.inject.Singleton.class);
+
+		} else {
+			bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
+		}
     }
+
 }

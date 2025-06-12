@@ -35,7 +35,6 @@ import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -146,7 +145,6 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
 
-
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());
@@ -158,9 +156,6 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , new VehiclesConfigGroup() ) ;
 
 		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
-
-		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
-		// only to provide error messages. kai, may'16
 
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
@@ -302,60 +297,6 @@ public final class Config implements MatsimExtensionPoint {
 		return this.modules.get(moduleName);
 	}
 
-	/**
-	 * Returns the requested parameter. If the module or parameter is not known,
-	 * an error is logged and an IllegalArgumentException is thrown.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @return the requested parameter
-	 *
-	 * @throws IllegalArgumentException
-	 *             if the module or parameter does not exist
-	 * @see #findParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String getParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			log.error("Module \"" + moduleName + "\" is not known.");
-			throw new IllegalArgumentException("Module \"" + moduleName + "\" is not known.");
-		}
-		String str = m.getValue(paramName);
-		if (str == null) {
-			String message = "Parameter \"" + paramName + "\" of module \"" + moduleName + "\" is not known";
-			log.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return str;
-	}
-
-	/**
-	 * Returns the value of the specified parameter if it exists, or
-	 * <code>null</code> otherwise.
-	 *
-	 * @param moduleName
-	 *            name of the config-module
-	 * @param paramName
-	 *            name of parameter in the specified module
-	 * @return value of the parameter if it exists, <code>null</code> otherwise
-	 *
-	 * @see #getParam(String, String)
-	 */
-	@Deprecated // use "typed" config group instead
-	public final String findParam(final String moduleName, final String paramName) {
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			return null;
-		}
-		try {
-			String str = m.getValue(paramName);
-			return str;
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
-
 	// ////////////////////////////////////////////////////////////////////
 	// print methods
 	// ////////////////////////////////////////////////////////////////////
@@ -363,29 +304,6 @@ public final class Config implements MatsimExtensionPoint {
 	@Override
 	public final String toString() {
 		return "[nof_modules=" + this.modules.size() + "]";
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// is used for using Config without a config-file given
-	// ////////////////////////////////////////////////////////////////////
-	/**
-	 * Sets the parameter <code>paramName</code> in the module/config-group
-	 * <code>moduleName</code> to the specified value. If there is no
-	 * config-group with the specified name, a new group will be created.
-	 *
-	 * @param moduleName
-	 * @param paramName
-	 * @param value
-	 */
-	@Deprecated // use "typed" config group instead
-	public final void setParam(final String moduleName, final String paramName, final String value) {
-		checkIfLocked();
-		ConfigGroup m = this.modules.get(moduleName);
-		if (m == null) {
-			m = createModule(moduleName);
-			log.info("module \"" + moduleName + "\" added.");
-		}
-		m.addParam(paramName, value);
 	}
 
 	// ////////////////////////////////////////////////////////////////////
