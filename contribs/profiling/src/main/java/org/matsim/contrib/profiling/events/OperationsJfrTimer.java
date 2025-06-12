@@ -20,25 +20,21 @@
 
 package org.matsim.contrib.profiling.events;
 
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 
-class OperationsJfrTimer implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener {
+class OperationsJfrTimer implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener, BeforeMobsimListener, AfterMobsimListener {
 
 	final StartListener startListener = new StartListener();
 
-	static class StartListener implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener {
+	static class StartListener implements StartupListener, ShutdownListener, ReplanningListener, ScoringListener, BeforeMobsimListener, AfterMobsimListener {
 
 		private ReplanningListenersJfrEvent replanningListenersJfrEvent = null;
 		private ScoringListenersJfrEvent scoringListenersJfrEvent = null;
 		private MatsimStartupListenersJfrEvent startupJfrEvent = null;
 		private MatsimShutdownListenersJfrEvent shutdownJfrEvent = null;
+		private BeforeMobsimListenersJfrEvent beforeMobsimListenersJfrEvent = null;
+		private AfterMobsimListenersJfrEvent afterMobsimListenersJfrEvent = null;
 
 		/**
 		 * @return Highest possible priority to start before most other listeners.
@@ -82,6 +78,24 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 			}
 			startupJfrEvent = new MatsimStartupListenersJfrEvent();
 			startupJfrEvent.begin();
+		}
+
+		@Override
+		public void notifyBeforeMobsim(BeforeMobsimEvent  beforeMobsimEvent) {
+			if (beforeMobsimListenersJfrEvent != null) {
+				throw new IllegalStateException("Another BeforeMobsim started, while still waiting for the end of a previous one. Are the listeners registered properly?");
+			}
+			beforeMobsimListenersJfrEvent = new BeforeMobsimListenersJfrEvent();
+			beforeMobsimListenersJfrEvent.begin();
+		}
+
+		@Override
+		public void notifyAfterMobsim(AfterMobsimEvent  afterMobsimEvent) {
+			if (afterMobsimListenersJfrEvent != null) {
+				throw new IllegalStateException("Another AfterMobsim started, while still waiting for the end of a previous one. Are the listeners registered properly?");
+			}
+			afterMobsimListenersJfrEvent = new AfterMobsimListenersJfrEvent();
+			afterMobsimListenersJfrEvent.begin();
 		}
 	}
 
@@ -129,4 +143,21 @@ class OperationsJfrTimer implements StartupListener, ShutdownListener, Replannin
 		startListener.startupJfrEvent = null;
 	}
 
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent beforeMobsimEvent) {
+		if (startListener.beforeMobsimListenersJfrEvent == null) {
+			throw new IllegalStateException("BeforeMobsimListeners ended, before its start was noticed. Are the listeners registered properly?");
+		}
+		startListener.beforeMobsimListenersJfrEvent.commit();
+		startListener.beforeMobsimListenersJfrEvent = null;
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent afterMobsimEvent) {
+		if (startListener.afterMobsimListenersJfrEvent == null) {
+			throw new IllegalStateException("AfterMobsimListeners ended, before its start was noticed. Are the listeners registered properly?");
+		}
+		startListener.afterMobsimListenersJfrEvent.commit();
+		startListener.afterMobsimListenersJfrEvent = null;
+	}
 }

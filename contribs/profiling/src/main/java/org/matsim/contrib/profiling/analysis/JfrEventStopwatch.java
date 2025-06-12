@@ -50,24 +50,26 @@ public class JfrEventStopwatch implements AutoCloseable {
 	 */
 	public static final Map<String, String> LISTENER_EVENT_OPERATIONS = Map.of(
 		"iterationStartsListeners", IterationStartsListenersJfrEvent.class.getAnnotation(Name.class).value(),
-		"replanning", ReplanningListenersJfrEvent.class.getAnnotation(Name.class).value(),
-		// missing: dump all plans, prepareForMobsim & afterMobsimListeners
-		"mobsim", MobsimJfrEvent.class.getAnnotation(Name.class).value(),
-		"scoring", ScoringListenersJfrEvent.class.getAnnotation(Name.class).value(),
-		"iterationEndsListeners", IterationEndsListenersJfrEvent.class.getAnnotation(Name.class).value()
+		"replanning", 				ReplanningListenersJfrEvent		.class.getAnnotation(Name.class).value(),
+		"beforeMobsimListeners", 	BeforeMobsimListenersJfrEvent	.class.getAnnotation(Name.class).value(),
+		// missing: dump all plans & prepareForMobsim
+		"mobsim", 						MobsimJfrEvent					.class.getAnnotation(Name.class).value(),
+		"afterMobsimListeners", 	AfterMobsimListenersJfrEvent	.class.getAnnotation(Name.class).value(),
+		"scoring", 					ScoringListenersJfrEvent		.class.getAnnotation(Name.class).value(),
+		"iterationEndsListeners", 	IterationEndsListenersJfrEvent	.class.getAnnotation(Name.class).value()
 	);
 
 
 	public static final Map<String, Class<? extends Event>> AOP_EVENT_OPERATIONS = Map.of(
 		"iterationStartsListeners", AopStopwatchIterationStartsJfrEvent.class,
-		"replanning", AopStopwatchReplanningJfrEvent.class,
-		"beforeMobsimListeners", AopStopwatchBeforeMobsimJfrEvent.class,
-		"dump all plans", AopStopwatchDumpAllPlansJfrEvent.class,
-		"prepareForMobsim", AopStopwatchPrepareForMobsimJfrEvent.class,
-		"mobsim", AopStopwatchRunMobsimJfrEvent.class,
-		"afterMobsimListeners", AopStopwatchAfterMobsimJfrEvent.class,
-		"scoring", AopStopwatchScoringJfrEvent.class,
-		"iterationEndsListeners", AopStopwatchIterationEndsJfrEvent.class
+		"replanning", 				AopStopwatchReplanningJfrEvent.class,
+		"beforeMobsimListeners", 	AopStopwatchBeforeMobsimJfrEvent.class,
+		"dump all plans", 			AopStopwatchDumpAllPlansJfrEvent.class,
+		"prepareForMobsim", 		AopStopwatchPrepareForMobsimJfrEvent.class,
+		"mobsim", 					AopStopwatchRunMobsimJfrEvent.class,
+		"afterMobsimListeners", 	AopStopwatchAfterMobsimJfrEvent.class,
+		"scoring", 					AopStopwatchScoringJfrEvent.class,
+		"iterationEndsListeners", 	AopStopwatchIterationEndsJfrEvent.class
 	);
 
 	public static String getEventName(Class<? extends Event> event) {
