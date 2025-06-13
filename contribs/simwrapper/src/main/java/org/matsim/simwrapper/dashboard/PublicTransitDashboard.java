@@ -59,7 +59,7 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.title = "Number of scheduled pt services per mode";
 			viz.description = "Stops without field stopAreaId are handled as 1 additional stop area.";
 			viz.showAllRows = true;
-			viz.dataset = data.compute(PtSupplyStatistics.class, "pt_count_unique_ids_per_mode.csv");
+			viz.dataset = data.compute(PublicTransitAnalysis.class, "pt_count_unique_ids_per_mode.csv");
 			viz.width = 1d;
 		}).el(Plotly.class, (viz, data) -> {
 
@@ -72,7 +72,7 @@ public class PublicTransitDashboard implements Dashboard {
 				.build();
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_departures_at_stops_per_hour_per_mode.csv")).mapping()
+				viz.addDataset(data.compute(PublicTransitAnalysis.class, "pt_departures_at_stops_per_hour_per_mode.csv")).mapping()
 					.name("transportMode", ColorScheme.Spectral)
 					.x("departureHour")
 					.y("Count")
@@ -85,7 +85,7 @@ public class PublicTransitDashboard implements Dashboard {
 				viz.title = "Share of active transit lines per mode and hour";
 				viz.description = "transit lines with >= 1 departure at any stop inside the shape file per hour";
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_lines_per_hour_per_mode_per_area.csv"));
+				Plotly.DataSet ds = viz.addDataset(data.compute(PublicTransitAnalysis.class, "pt_active_transit_lines_per_hour_per_mode_per_area.csv"));
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.yAxis(Axis.builder().title("Share").build())
@@ -103,7 +103,7 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.title = "Share of active transit stop areas per mode and hour";
 			viz.description = "Stop areas with >= 1 departure in hour / stop areas in shape file with >= 1 departure per day.";
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_active_transit_stops_per_hour_per_mode_per_area.csv"));
+			Plotly.DataSet ds = viz.addDataset(data.compute(PublicTransitAnalysis.class, "pt_active_transit_stops_per_hour_per_mode_per_area.csv"));
 
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.yAxis(Axis.builder().title("Share").build())
@@ -131,7 +131,7 @@ public class PublicTransitDashboard implements Dashboard {
 //			viz.interactive = Plotly.Interactive.dropdown;
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_headway_group_per_mode_and_hour.csv")).mapping()
+				viz.addDataset(data.compute(PublicTransitAnalysis.class, "pt_headway_group_per_mode_and_hour.csv")).mapping()
 					.name("headwayGroup", ColorScheme.Spectral)
 					.x("departureHour")
 					.y("count")
@@ -142,7 +142,7 @@ public class PublicTransitDashboard implements Dashboard {
 			viz.title = "Share of active transit stop areas per mode and hour";
 			viz.description = "Stop areas with >= 1 departure in hour / stop areas in shape file with >= 1 departure per day.";
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(PtSupplyStatistics.class, "pt_headway_per_mode_and_hour.csv"));
+			Plotly.DataSet ds = viz.addDataset(data.compute(PublicTransitAnalysis.class, "pt_headway_per_mode_and_hour.csv"));
 
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.yAxis(Axis.builder().title("Share").build())

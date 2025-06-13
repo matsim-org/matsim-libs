@@ -239,7 +239,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 	 *
 	 * @param transitLineId for aggregation -> set null or leave out and use Map lineId -> Stop2StopEntry?
 	 */
-	record Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Departure> departureId, Id<TransitStopFacility> stopId,
+	public record Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Departure> departureId, Id<TransitStopFacility> stopId,
 							  int stopSequence, Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
 							  double departureTimeScheduled, double departureDelay, double passengersAtArrival, double totalVehicleCapacity,
 							  double passengersAlighting, double passengersBoarding, List<Id<Link>> linkIdsSincePreviousStop) {}
@@ -300,7 +300,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         }
     }
 
-    List<Stop2StopEntry> getStop2StopEntriesByDeparture () {
+	public List<Stop2StopEntry> getStop2StopEntriesByDeparture () {
         return List.copyOf(stop2StopEntriesForEachDeparture);
     }
 }
