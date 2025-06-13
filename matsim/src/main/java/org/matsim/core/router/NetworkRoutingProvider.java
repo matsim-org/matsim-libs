@@ -132,7 +132,6 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			} else {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
 			}
-
 		} else {
 			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
 			log.warn( "This can be achieved by something like" );
@@ -142,8 +141,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
 			log.warn( "in the config xml.");
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
-		}
-	}
+		}	}
 
 	private void checkNetwork(Network filteredNetwork) {
 		if(routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {

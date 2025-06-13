@@ -23,7 +23,8 @@ public class RunEvExampleWithLTHConsumptionModelTest{
 	void runTest(){
 		try {
 			String [] args = { RunEvExampleWithLTHConsumptionModel.DEFAULT_CONFIG_FILE
-					,"--config:controler.outputDirectory", utils.getOutputDirectory()
+					,"--config:controler.outputDirectory", utils.getOutputDirectory(),
+					"--config:routing.accessEgressType=none"
 			};
 
 			new RunEvExampleWithLTHConsumptionModel().run( args );
