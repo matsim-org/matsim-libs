@@ -47,6 +47,7 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 
 		// Collect relevant agents, modes amd types
 		Set<String> subpopulations = new LinkedHashSet<>();
+		Set<String> excludeSubpopulations = new LinkedHashSet<>();
 		Set<String> modes = new LinkedHashSet<>();
 		Set<ModeUtilityParameters.Type> paramsTypes = new LinkedHashSet<>();
 
@@ -55,10 +56,14 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 			TasteVariationsConfigParameterSet tasteVariationsParams = e.getValue().getTasteVariationsParams();
 			if (tasteVariationsParams != null) {
 				subpopulations.add(e.getKey());
+				excludeSubpopulations.addAll(tasteVariationsParams.getExcludeSubpopulations());
 				paramsTypes.addAll(tasteVariationsParams.getVariationsOf());
 				modes.addAll(e.getValue().getModes().keySet());
 			}
 		}
+
+		// Special case when null is present as subpopulation
+		boolean allRelevant = subpopulations.contains(null);
 
 		// Write scoring information for each person
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(output), CSVFormat.DEFAULT)) {
@@ -77,7 +82,12 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 				ScoringParameters scoringParameters = params.getScoringParameters(person);
 				Map<String, ModeUtilityParameters> modeParams = scoringParameters.modeParams;
 
-				if (!subpopulations.contains(PopulationUtils.getSubpopulation(person)))
+				String subpopulation = PopulationUtils.getSubpopulation(person);
+
+				if (excludeSubpopulations.contains(subpopulation))
+					continue;
+
+				if (!allRelevant && !subpopulations.contains(subpopulation))
 					continue;
 
 				csv.print(person.getId());

@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Design decisions:
@@ -1631,7 +1631,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		private double brainExpBeta = 1.0;
 		private double pathSizeLogitBeta = 1.0;
 
-		private boolean writeExperiencedPlans = false;
+		private boolean writeExperiencedPlans = true;
 
 		private Double fractionOfIterationsToStartScoreMSA = null;
 

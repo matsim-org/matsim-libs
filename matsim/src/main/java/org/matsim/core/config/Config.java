@@ -145,7 +145,6 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, new VspExperimentalConfigGroup());
 
-
 		this.modules.put(TransitConfigGroup.GROUP_NAME, new TransitConfigGroup());
 
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, new LinkStatsConfigGroup());

@@ -19,8 +19,8 @@ public class DrtShiftAssignedEvent extends AbstractShiftEvent {
 
     public static final String EVENT_TYPE = "DRT shift assigned";
 
-    public DrtShiftAssignedEvent(double timeOfDay, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId) {
-        super(timeOfDay, mode, shiftId);
+    public DrtShiftAssignedEvent(double timeOfDay, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, String shiftType) {
+        super(timeOfDay, mode, shiftId, shiftType);
         this.vehicleId = vehicleId;
     }
 

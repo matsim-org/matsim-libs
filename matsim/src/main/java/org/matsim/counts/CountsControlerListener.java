@@ -99,7 +99,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if (counts != null && this.config.getWriteCountsInterval() > 0) {
+		if (counts != null && !counts.getMeasureLocations().isEmpty() && this.config.getWriteCountsInterval() > 0) {
             if (useVolumesOfIteration(event.getIteration(), controllerConfigGroup.getFirstIteration())) {
                 addVolumes(volumesAnalyzer);
             }
