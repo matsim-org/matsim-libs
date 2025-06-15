@@ -90,10 +90,6 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		problem = checkLocationChoiceConfigGroup( config, problem );
 
-		// === planCalcScore:
-
-		problem = checkPlanCalcScoreConfigGroup( config, lvl, problem );
-
 		// === plans:
 
 		problem = checkPlansConfigGroup( config, lvl, problem );
@@ -105,6 +101,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// === qsim:
 
 		problem = checkQsimConfigGroup( config, lvl, problem );
+
+		// === scoring:
+
+		problem = checkScoringConfigGroup( config, lvl, problem );
 
 		// === strategy:
 
@@ -337,7 +337,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		return problem;
 	}
-	private static boolean checkPlanCalcScoreConfigGroup( Config config, Level lvl, boolean problem ){
+	private static boolean checkScoringConfigGroup( Config config, Level lvl, boolean problem ){
 		// use beta_brain=1 // added as of nov'12
 		if ( config.scoring().getBrainExpBeta() != 1. ) {
 			problem = true ;
@@ -438,6 +438,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				log.log( lvl, "You are setting the alternative-specific constant for the walk mode to " + params.getConstant()
 							      + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
 			}
+		}
+		// added jun'25:
+		if ( !config.scoring().isWriteExperiencedPlans() ) {
+			log.log( lvl, "You are not writing experienced plans.  Vsp default is to do so." );
 		}
 		return problem;
 	}

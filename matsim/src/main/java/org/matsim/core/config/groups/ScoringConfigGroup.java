@@ -571,22 +571,18 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public enum TypicalDurationScoreComputation {
-		uniform, relative
+		@Deprecated uniform, relative
 	}
 
 	/* parameter set handling */
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
-		switch (type) {
-		case ActivityParams.SET_TYPE:
-			return new ActivityParams();
-		case ModeParams.SET_TYPE:
-			return new ModeParams();
-		case ScoringParameterSet.SET_TYPE:
-			return new ScoringParameterSet();
-		default:
-			throw new IllegalArgumentException(type);
-		}
+		return switch( type ){
+			case ActivityParams.SET_TYPE -> new ActivityParams();
+			case ModeParams.SET_TYPE -> new ModeParams();
+			case ScoringParameterSet.SET_TYPE -> new ScoringParameterSet();
+			default -> throw new IllegalArgumentException( type );
+		};
 	}
 
 	@Override
@@ -779,6 +775,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
 	}
 
+	@Deprecated
 	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
 	}
@@ -940,6 +937,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		@Deprecated
 		public ActivityParams setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
 			testForLocked();
 			this.typicalDurationScoreComputation = str;
