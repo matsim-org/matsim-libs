@@ -55,8 +55,6 @@ public class ModuleTest {
 	@Test
 	void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-		// AccessEgressModule wants a network
-		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml");
         Controler controler = new Controler(config);
 //        controler.setModules(new RoadPricingModuleDefaults());
         controler.addOverridingModule(new RoadPricingModule());
@@ -66,8 +64,6 @@ public class ModuleTest {
 	@Test
 	void testControlerWithRoadPricingByScenarioWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-		// AccessEgressModule wants a network
-		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
 	    controler.addOverridingModule( new RoadPricingModule() );
@@ -79,8 +75,6 @@ public class ModuleTest {
 	@Test
 	void testControlerWithRoadPricingByScenarioWorksTwice() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-		// AccessEgressModule wants a network
-		config.network().setInputFile(ExamplesUtils.getTestScenarioURL("chessboard") + "network.xml");
         config.controller().setOutputDirectory(utils.getOutputDirectory()+"/1");
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
