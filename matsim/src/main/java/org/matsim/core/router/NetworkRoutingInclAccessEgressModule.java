@@ -104,7 +104,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(scenario.getNetwork());
 		// I Removed this line since it created lots of problems with many tests. Since this is now the default RoutingModule, we are instead throwing a warning
 		//Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
-		if(scenario.getNetwork().getLinks().isEmpty()) log.warn("Using NetworkRoutingInclAccessEgressModule with empty network, network for mode probably not defined!");
+		if(scenario.getNetwork().getLinks().isEmpty()) {
+			log.warn("Using NetworkRoutingInclAccessEgressModule with empty network, network for mode probably not defined!");
+		}
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
@@ -116,7 +118,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
 		this.accessEgressType = config.routing().getAccessEgressType();
 		this.timeInterpretation = timeInterpretation;
-		if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
+		if (accessEgressType.equals(AccessEgressType.none)) {
+			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
+				+ "currently not supported; there are too many other problems");
+		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
 			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
 					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress ");
