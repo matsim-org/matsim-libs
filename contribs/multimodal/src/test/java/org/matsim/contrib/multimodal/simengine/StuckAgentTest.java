@@ -74,6 +74,7 @@ public class StuckAgentTest {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.qsim().setEndTime(24*3600);
 
 		config.controller().setLastIteration(0);
@@ -156,20 +157,6 @@ public class StuckAgentTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
-
-		controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
