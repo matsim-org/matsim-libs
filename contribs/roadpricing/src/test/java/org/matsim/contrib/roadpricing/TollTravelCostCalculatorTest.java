@@ -132,6 +132,7 @@ public class TollTravelCostCalculatorTest {
 	void testDistanceTollRouter() {
 		Config config = utils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
@@ -142,19 +143,6 @@ public class TollTravelCostCalculatorTest {
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		for (Person p : population.getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
-
 		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.scoring());
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped,
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
