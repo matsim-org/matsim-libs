@@ -157,35 +157,6 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
 
-		System.out.println("===");
-
-		System.out.println(data.counts.get("car"));
-		System.out.println(data.counts.get("walk"));
-		System.out.println(data.counts.get("bike"));
-		System.out.println(data.counts.get("pt"));
-
-		System.out.println(data.pickupCounts.get("wheels"));
-		System.out.println(data.pickupCounts.get("mobility"));
-		System.out.println(data.pickupCounts.get("velib"));
-
-		System.out.println(data.dropoffCounts.get("wheels"));
-		System.out.println(data.dropoffCounts.getOrDefault("mobility", 0L));
-		System.out.println(data.dropoffCounts.get("velib"));
-
-		System.out.println(data.failedDropoffCounts.getOrDefault("wheels",0L));
-		System.out.println(data.failedDropoffCounts.getOrDefault("mobility", 0L));
-		System.out.println(data.failedDropoffCounts.getOrDefault("velib", 0L));
-
-		System.out.println(data.failedPickupCounts.getOrDefault("velib", 0L));
-		System.out.println(data.failedPickupCounts.getOrDefault("velib", 0L));
-		System.out.println(data.failedPickupCounts.getOrDefault("velib", 0L));
-
-		System.out.println(data.vehicleCounts.get("wheels"));
-		System.out.println(data.vehicleCounts.get("mobility"));
-		System.out.println(data.vehicleCounts.get("velib"));
-
-		System.out.println("===");
-
 		Assertions.assertEquals(86254, (long) data.counts.get("car"));
 		Assertions.assertEquals(138432, (long) data.counts.get("walk"));
 		Assertions.assertEquals(31, (long) data.counts.get("bike"));
