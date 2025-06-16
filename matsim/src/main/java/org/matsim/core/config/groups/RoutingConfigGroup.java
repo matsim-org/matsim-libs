@@ -72,6 +72,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	private Double beelineDistanceFactor = 1.3 ;
 
 	public enum AccessEgressType {
+		@Deprecated
 		none,
 
 		/**
@@ -289,7 +290,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		public Double getBeelineDistanceFactor() {
 			return this.beelineDistanceFactorForMode ;
 		}
-		
+
 		@StringSetter(PERSON_SPEED_ATTRIBUTE)
 		public TeleportedModeParams setPersonSpeedAttribute(String val) {
 			testForLocked();
