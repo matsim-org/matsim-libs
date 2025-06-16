@@ -49,16 +49,16 @@ public class ScoreStatsModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	public static Stream<Arguments> arguments () {
-		return Stream.of(Arguments.of(false), Arguments.of(true));
+		return Stream.of(Arguments.of(false, false), Arguments.of(true, false));
 	}
 
 	@ParameterizedTest
 	@MethodSource("arguments")
-	void testScoreStats(boolean isUsingFastCapacityUpdate) {
+	void testScoreStats(boolean isUsingFastCapacityUpdate, boolean isInsertingAccessEgressWalk) {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.routing().setAccessEgressType(isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
 
 		config.controller().setLastIteration(1);
 		Controler controler = new Controler(config);
