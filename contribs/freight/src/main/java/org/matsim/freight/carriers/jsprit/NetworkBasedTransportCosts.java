@@ -28,6 +28,9 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +45,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.freight.carriers.CarrierVehicle;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.VehicleType;
@@ -83,6 +87,8 @@ import org.matsim.vehicles.VehicleUtils;
  *
  */
 public class NetworkBasedTransportCosts implements VRPTransportCosts {
+
+	private static final Logger log = LogManager.getLogger(NetworkBasedTransportCosts.class);
 
 	public interface InternalLeastCostPathCalculatorListener {
 
