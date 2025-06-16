@@ -89,6 +89,7 @@ public class MultiModalPTCombinationTest {
 		Config config = scenario.getConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
@@ -121,20 +122,6 @@ public class MultiModalPTCombinationTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
-
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
 
 		controler.addOverridingModule(new MultiModalModule());
 
