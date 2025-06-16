@@ -37,8 +37,7 @@ import org.matsim.vehicles.VehicleType;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction;
+import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
 
 /**
  * @author benjamin
@@ -286,6 +285,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		double fractionStopGo = 0;
+		double fractionLow = 0;
 
 		// for each pollutant, compute and memorize emissions:
 		for ( Pollutant warmPollutant : warmPollutants) {
@@ -321,7 +321,40 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
 				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
-			} else {
+			} else if (ecg.getEmissionsComputationMethod() == InterpolationFraction) {
+
+				// Determine higher speed class
+				HbefaTrafficSituation higher = getTrafficSituation(efkey, averageSpeed_kmh, freeVelocity_ms * 3.6);
+
+				// Determine the lower speed class
+				HbefaTrafficSituation lower = getLowerTrafficSituation(efkey, higher);
+
+				// compute faction.
+				fractionLow = getFractionInterpolation(higher, lower, averageSpeed_kmh, vehicleInformationTuple, efkey);
+
+				double efLow_gpkm = 0.;
+				if (fractionLow > 0) {
+					// compute emissions from lower fraction:
+					efkey.setTrafficSituation(lower);
+					efLow_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
+					logger.debug("pollutant={}; efStopGo={}", warmPollutant, efLow_gpkm);
+
+				}
+
+				double efHigh_gpkm = 0. ;
+				if ( fractionLow<1.) {
+					// compute emissions for higher fraction:
+					efkey.setTrafficSituation(higher);
+					efHigh_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
+					logger.debug("pollutant={}; efFreeFlow={}", warmPollutant, efHigh_gpkm);
+				}
+
+				// sum them up:
+				double fractionHigh = 1 - fractionLow;
+				ef_gpkm = (fractionHigh * efHigh_gpkm) + (fractionLow * efLow_gpkm);
+
+			}
+			else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}
 
@@ -331,7 +364,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// update counters:
 		// yy I don't know what this is good for; I would base downstream analysis rather on events.  kai, jan'20
-		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction || ecg.getEmissionsComputationMethod() == InterpolationFraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
 		else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
@@ -341,6 +374,31 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		return warmEmissionsOfEvent;
+	}
+
+	private HbefaTrafficSituation getLowerTrafficSituation(HbefaWarmEmissionFactorKey efkey, HbefaTrafficSituation higher) {
+		HbefaRoadVehicleCategoryKey hbefaRoadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(efkey);
+		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(hbefaRoadVehicleCategoryKey);
+
+		int situation = -1;
+		switch (higher){
+			case FREEFLOW -> situation=5;
+			case HEAVY -> situation=4;
+			case SATURATED -> situation=3;
+			case STOPANDGO -> situation=2;
+			case STOPANDGO_HEAVY -> situation=1;
+		}
+
+		if (situation > 4 && trafficSpeeds.containsKey(HEAVY)) {
+			return HEAVY;
+		} if (situation > 3 && trafficSpeeds.containsKey(SATURATED)) {
+			return SATURATED;
+		} if (situation > 2 && trafficSpeeds.containsKey(STOPANDGO)) {
+			return STOPANDGO;
+		} if (situation >= 1 && trafficSpeeds.containsKey(STOPANDGO_HEAVY)) {
+			return STOPANDGO_HEAVY;
+		}
+		throw new IllegalArgumentException("HbefaTrafficSituation " + higher + " seems to be unknown");
 	}
 
 	private double getFractionStopAndGo(double freeFlowSpeed_kmh, double averageSpeed_kmh,
@@ -361,6 +419,29 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		return fractionStopGo;
+	}
+
+	private double getFractionInterpolation(HbefaTrafficSituation higher, HbefaTrafficSituation lower, double averageSpeed_kmh,
+										Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
+										HbefaWarmEmissionFactorKey efkey) {
+
+		efkey.setTrafficSituation(higher);
+		double highSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
+
+		efkey.setTrafficSituation(lower);
+		double lowSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
+
+		double fractionInterpolation;
+
+		if ((averageSpeed_kmh - highSpeedFromTable_kmh) >= -1.0) { // both speeds are assumed to be not very different > only highSpeed on link
+			fractionInterpolation = 0.0;
+		} else if ((averageSpeed_kmh - lowSpeedFromTable_kmh) <= 0.0) { // averageSpeed is less than lowSpeed > only lowSpeed on link
+			fractionInterpolation = 1.0;
+		} else {
+			fractionInterpolation = lowSpeedFromTable_kmh * (highSpeedFromTable_kmh - averageSpeed_kmh) / (averageSpeed_kmh * (highSpeedFromTable_kmh - lowSpeedFromTable_kmh));
+		}
+
+		return fractionInterpolation;
 	}
 
 	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
@@ -574,11 +655,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 		/*FIXME The following lines should be added to account for the HBEFA 4.1's additional traffic situation,
 		   but it currently causes a test failure (jwj, Nov'20) */
-//		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
-//			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
-//				trafficSituation = STOPANDGO_HEAVY;
-//			}
-//		}
+		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
+			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+				trafficSituation = STOPANDGO_HEAVY;
+			}
+		}
 		return trafficSituation;
 	}
 
