@@ -399,7 +399,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush() ;
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
-
+		// added feb'16
+		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
+				"some other value or talk to Kai." ) ;
+		}
 		// added oct'17:
 		if ( config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
