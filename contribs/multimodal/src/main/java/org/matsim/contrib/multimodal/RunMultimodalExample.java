@@ -28,6 +28,7 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.PersonVehicles;
@@ -45,23 +46,10 @@ public class RunMultimodalExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig( args, new MultiModalConfigGroup() ) ;
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
 		Controler controler = new Controler(scenario);
-
-		// After changing to the AccessEgressRouter, we need to make sure, that each person has a vehicle id for each mode:
-		// We need to add a dummy vehicle, it however does not affect the results
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
-		}
-
 		controler.addOverridingModule(new MultiModalModule());
 		controler.run();
 	}
