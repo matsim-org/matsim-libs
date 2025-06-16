@@ -94,6 +94,19 @@ final class NoiseWriter {
 //		log.info("Writing receiver points to shapefile... Done. ");
 	}
 
+	/*
+	 * Returns the dB threshold for the given time (in seconds since midnight).
+	 */
+	private static double getThreshold(double timeSec) {
+		// Day 06:00–18:00 → 55 dB
+		if (timeSec >= 6 * 3600 && timeSec < 18 * 3600) return 55.0;
+		// Evening 18:00–22:00 → 50 dB
+		else if (timeSec >= 18 * 3600 && timeSec < 22 * 3600) return 50.0;
+		// Night 22:00–06:00 → 45 dB
+		else return 45.0;
+	}
+
+
 	public static void write (String fileName , int columns , List<String> headers , List<Map<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
 
 		File file = new File(fileName);
@@ -227,11 +240,19 @@ final class NoiseWriter {
 			bw.write("Receiver Point Id;Immission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
 			bw.newLine();
 
-			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+//			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+//				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+//				bw.newLine();
+//			}
 
-				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+			double threshold = getThreshold(timeInterval);
+			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+				double imm = rp.getCurrentImmission();
+				if (imm <= threshold) continue;
+				bw.write(rp.getId() + ";" + imm + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
+
 
 			bw.close();
 			log.info("Output written to " + fileName);
@@ -321,10 +342,19 @@ final class NoiseWriter {
 			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
 			bw.newLine();
 
+//			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+//				bw.write(rp.getId() + ";" + rp.getDamageCosts() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+//				bw.newLine();
+//			}
+
+			double threshold = getThreshold(timeInterval);
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+				double imm = rp.getCurrentImmission();
+				if (imm <= threshold) continue;
 				bw.write(rp.getId() + ";" + rp.getDamageCosts() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
+
 
 			bw.close();
 			log.info("Output written to " + fileName);

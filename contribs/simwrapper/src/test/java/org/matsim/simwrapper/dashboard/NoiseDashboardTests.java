@@ -15,7 +15,6 @@ import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
-
 import java.io.FileReader;
 import java.net.URL;
 import java.nio.file.Path;
@@ -24,7 +23,7 @@ public class NoiseDashboardTests {
 
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void generate() {
@@ -46,7 +45,7 @@ public class NoiseDashboardTests {
 		controler.run();
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**emission_per_day.csv")
+			.isDirectoryContaining("glob:**emissions.csv")
 			.isDirectoryContaining("glob:**immission_per_day.avro")
 			.isDirectoryContaining("glob:**immission_per_hour.avro")
 			.isDirectoryContaining("glob:**damages_receiverPoint_per_hour.avro")
@@ -65,7 +64,7 @@ public class NoiseDashboardTests {
 		}
 
 		Assertions.assertThat(totalDamages == 3573114.25);
-		Assertions.assertThat( totalImmissions == 2.688);
+		Assertions.assertThat(totalImmissions == 2.688);
 
 	}
 }
