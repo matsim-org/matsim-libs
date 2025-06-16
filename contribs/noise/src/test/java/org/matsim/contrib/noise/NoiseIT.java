@@ -151,6 +151,17 @@ public class NoiseIT {
 	// tests the noise emissions, immissions, considered agent units, damages (receiver points), damages (per link), damages (per vehicle) based on the generated *.csv output
 	// tests the noise events applying the average cost allocation approach
 	@Test
+	final void test2a(){
+		// start a simple MATSim run with a single iteration
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
+		Config config = ConfigUtils.loadConfig(configFile ) ;
+		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		runTest2a( config ) ;
+	}
+
+
+	@Test
 	final void test2aWAccessEgress(){
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
