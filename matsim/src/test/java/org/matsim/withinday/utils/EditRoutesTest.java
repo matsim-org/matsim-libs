@@ -501,6 +501,7 @@ private void createSampleNetwork() {
  */
 private void createSamplePlan() {
 	// We need to add a vehicle, it however does not affect the results
+	// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
 	Id<VehicleType> typeId = Id.create(1, VehicleType.class);
 	scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
 	scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));

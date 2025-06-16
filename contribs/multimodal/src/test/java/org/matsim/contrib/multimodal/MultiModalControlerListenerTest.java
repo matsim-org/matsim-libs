@@ -176,6 +176,7 @@ public class MultiModalControlerListenerTest {
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// We need to add a vehicle, it however does not affect the results
+		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
 		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
 		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
 		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
