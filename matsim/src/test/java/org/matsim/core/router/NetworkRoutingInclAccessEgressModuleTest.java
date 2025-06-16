@@ -412,11 +412,6 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
     }
 
-	/*
-
-	This test was removed, since AccesEgressType.none is not a valid config-setting anymore. aleks Nov'24
-	TODO Check if this is okay #aleks
-
 	@Test
 	void noBushwackingLegs() {
 
@@ -438,7 +433,6 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(TransportMode.car,legs.get(0).getMode());
 
     }
-    */
 
     /**
      * returns the mode of the first leg in a plan, which is not a walk (walk is now used as access/egress mode to network modes,
