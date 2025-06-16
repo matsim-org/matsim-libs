@@ -435,8 +435,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		public Builder setRoadPricingScheme( RoadPricingScheme roadPricingScheme) {
-			withToll = true;
-			this.roadPricingScheme = roadPricingScheme;
+			if (roadPricingScheme != null) {
+				withToll = true;
+				this.roadPricingScheme = roadPricingScheme;
+			} else {
+				log.debug("RoadPricingScheme is null. Tolls cannot be considered.");
+			}
 			return this;
 		}
 
