@@ -157,6 +157,7 @@ public class StuckAgentTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
+		controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
