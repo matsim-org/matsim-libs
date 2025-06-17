@@ -147,7 +147,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	// ---
 
-	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration";
+	@Deprecated private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration";
 
 	/**
 	 * can't set this from outside java since for the time being it is not
@@ -432,7 +432,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			Set<String> activities = new HashSet<>();
 			getScoringParametersPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
 			return activities;
-	}
+		}
 	}
 
 	/*
@@ -876,7 +876,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		public static final String ACVITITY_TYPE_CMT = "all activity types that occur in the plans file need to be defined by their own sections here";
 
 		/**
-		 * {@value -- ACVITITY_TYPE_CMT}
+		 * {@value ACVITITY_TYPE_CMT}
 		 */
 		@StringGetter(ACTIVITY_TYPE)
 		public String getActivityType() {
@@ -884,7 +884,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		/**
-		 * {@value -- ACVITITY_TYPE_CMT}
+		 * {@value ACVITITY_TYPE_CMT}
 		 */
 		@StringSetter(ACTIVITY_TYPE)
 		public void setActivityType(final String type) {
@@ -932,6 +932,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		@StringGetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		@Deprecated
 		public TypicalDurationScoreComputation getTypicalDurationScoreComputation() {
 			return this.typicalDurationScoreComputation;
 		}
@@ -1254,6 +1255,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 
 	}
+
+	public enum ScoringConfigInterpretation { fromLogit }
 
 	public static class ScoringParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_TYPE = "scoringParameters";

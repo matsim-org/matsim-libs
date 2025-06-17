@@ -94,13 +94,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		problem = checkPlansConfigGroup( config, lvl, problem );
 
-		// === plansCalcRoute:
-
-		checkPlansCalcScoreConfigGroup( config, lvl );
-
 		// === qsim:
 
 		problem = checkQsimConfigGroup( config, lvl, problem );
+
+		// === routing:
+
+		problem = checkRoutingConfigGroup( config, lvl, problem );
 
 		// === scoring:
 
@@ -300,8 +300,6 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		return problem;
 	}
-	private static void checkPlansCalcScoreConfigGroup( Config config, Level lvl ){
-	}
 	private static boolean checkPlansConfigGroup( Config config, Level lvl, boolean problem ){
 		// added before nov'12
 		if ( !config.plans().isRemovingUnneccessaryPlanAttributes() ) {
@@ -334,6 +332,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 					"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
 			log.log( lvl,  "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
 			log.log( lvl, "Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested)." ) ;
+		}
+		return problem;
+	}
+	private static boolean checkRoutingConfigGroup( Config config, Level lvl, boolean problem ) {
+		// added feb'16
+		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
+					      "some other value or talk to Kai." ) ;
 		}
 		return problem;
 	}
@@ -400,11 +406,6 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
 
-		// added feb'16
-		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
-			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
-						      "some other value or talk to Kai." ) ;
-		}
 		// added oct'17:
 		if ( config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
