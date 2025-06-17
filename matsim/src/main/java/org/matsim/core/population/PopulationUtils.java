@@ -767,8 +767,8 @@ public final class PopulationUtils {
 
 	public static boolean hasCarLeg(Plan plan) {
 		List<PlanElement> planElements = plan.getPlanElements();
-		for (int i = 0; i < planElements.size(); i++) {
-			if (planElements.get(i) instanceof Leg leg) {
+		for (PlanElement planElement : planElements) {
+			if (planElement instanceof Leg leg) {
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return true;
 				}
@@ -881,7 +881,7 @@ public final class PopulationUtils {
 	}
 
 	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-		if (plan.getPlanElements().size() == 0) {
+		if (plan.getPlanElements().isEmpty()) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
@@ -1007,11 +1007,11 @@ public final class PopulationUtils {
 	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(0);
+		return (Activity) plan.getPlanElements().getFirst();
 	}
 
 	public static Activity getLastActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		return (Activity) plan.getPlanElements().getLast();
 	}
 
 	public static Activity getNextActivity(Plan plan, Leg leg) {
