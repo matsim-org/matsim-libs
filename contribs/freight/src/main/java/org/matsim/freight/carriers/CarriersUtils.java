@@ -235,7 +235,7 @@ public class CarriersUtils {
 		}
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
-				.setRoadPricingScheme(roadPricingScheme != null ? roadPricingScheme : null)
+				.setRoadPricingScheme(roadPricingScheme)
 				.build();
 
 
