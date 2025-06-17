@@ -26,7 +26,10 @@ public class RunTestingScenario {
 	enum ExpBetaChanger {ChangeExpBeta, SelectExpBeta}
 
 	public static void main(String[] args) {
-		Config config = createTestingConfig(0., args[0], ExpBetaChanger.SelectExpBeta);
+		Config config = createTestingConfig(0., args[0], ExpBetaChanger.ChangeExpBeta);
+		config.controller().setLastIteration(1000);
+		config.replanning().setFractionOfIterationsToDisableInnovation(0.75);
+		config.scoring().setFractionOfIterationsToStartScoreMSA(0.75);
 		Scenario scenario = prepareScenario(config);
 		Controler controler = new Controler(scenario);
 		// binding for score stochastic
@@ -45,7 +48,6 @@ public class RunTestingScenario {
 		config.controller().setOutputDirectory(output);
 		config.controller().setLastIteration(500);
 		config.replanning().setFractionOfIterationsToDisableInnovation(0.9);
-
 		// specify modes
 		config.changeMode().setModes(new String[]{modeA, modeB});
 
