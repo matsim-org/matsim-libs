@@ -180,6 +180,24 @@ public class PopulationUtilsTest {
 	}
 
 	@Test
+	void testPopulationSampling() {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String netFileName = "test/scenarios/berlin/network.xml";
+		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
+		new PopulationReader(scenario).readFile(popFileName);
+
+		Population population = scenario.getPopulation();
+		int originalPopulationSize = population.getPersons().size();
+
+		Assertions.assertEquals(15931, originalPopulationSize);
+
+		PopulationUtils.sampleDown(population, 0.1);
+		// because the population sampling is random, we cannot assert the exact size, but we can check if the size is within an error of 1%
+		Assertions.assertEquals(Math.round(originalPopulationSize * 0.1), population.getPersons().size(), originalPopulationSize * 0.01);
+	}
+
+	@Test
 	void testPlanAttributesCopy() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 

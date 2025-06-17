@@ -1195,19 +1195,27 @@ public final class PopulationUtils {
 		return new Coord(fromCoord.getX() + rel * (toCoord.getX() - fromCoord.getX()), fromCoord.getY() + rel * (toCoord.getY() - fromCoord.getY()));
 	}
 
-	public static void sampleDown(Population pop, double sample) {
+	/**
+	 * Method samples down the population separately for each subpopulation.
+	 * The group of persons with no subpopulation is handled as a separate subpopulation.
+	 *
+	 * @param pop    population to be downsampled
+	 * @param sampleTo sample rate, e.g. 0.1 for 10% of the population
+	 */
+	public static void sampleDown(Population pop, double sampleTo) {
 		final Random rnd = MatsimRandom.getLocalInstance();
+		log.info("population size before downsampling={}", pop.getPersons().size());
+
 		List<String> subpopulations = new ArrayList<>(pop.getPersons().values().stream()
 				.map(PopulationUtils::getSubpopulation)
-				.filter(Objects::nonNull)
 				.distinct()
 				.toList());
-		subpopulations.forEach(subpopulation ->	pop.getPersons().values().removeIf(
-			person -> PopulationUtils.getSubpopulation(person).equals(subpopulation)
-				&& rnd.nextDouble() >= sample
-		));
-		log.info("population size before downsampling={}", pop.getPersons().size());
-		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
+		subpopulations.forEach(subpopulation ->
+			pop.getPersons().values().removeIf(
+				person -> Objects.equals(PopulationUtils.getSubpopulation(person), subpopulation)
+					&& rnd.nextDouble() >= sampleTo
+			)
+		);
 		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 
