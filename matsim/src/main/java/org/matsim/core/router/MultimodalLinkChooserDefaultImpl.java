@@ -1,5 +1,6 @@
 package org.matsim.core.router;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -10,9 +11,13 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
+public final class MultimodalLinkChooserDefaultImpl implements MultimodalLinkChooser {
+    // the class is public so it can be used as a delegate ...
 
     private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
+
+    @Inject MultimodalLinkChooserDefaultImpl(){}
+    // ... but the constructor is non-public so one is forced to use it via injection.  kai, may'25
 
     @Override
     public Link decideAccessLink(RoutingRequest request, String networkMode, Network network) {
