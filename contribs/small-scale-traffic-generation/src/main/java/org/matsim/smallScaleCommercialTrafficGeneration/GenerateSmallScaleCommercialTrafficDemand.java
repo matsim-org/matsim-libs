@@ -236,6 +236,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		FreightCarriersConfigGroup freightCarriersConfigGroup;
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
+		tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
 
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
@@ -589,8 +590,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			* odMatrix.getListOfModesOrVehTypes().size();
 		int createdCarrier = 0;
 		int fixedNumberOfVehiclePerTypeAndLocation = 1; //TODO possible improvement, perhaps check KiD
-
-		tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
 
 		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
 		Map<Id<VehicleType>, VehicleType> additionalCarrierVehicleTypes = scenario.getVehicles().getVehicleTypes();
