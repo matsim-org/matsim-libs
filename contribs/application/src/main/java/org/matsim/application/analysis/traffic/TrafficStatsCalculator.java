@@ -35,13 +35,11 @@ public final class TrafficStatsCalculator {
 
 		double length = link.getLength();
 
-		double allowedSpeed = NetworkUtils.getAllowedSpeed(link);
-
 		double actualTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
 
 		double actualSpeed = length / actualTravelTime;
 
-		double ratio = actualSpeed / allowedSpeed;
+		double ratio = actualSpeed / link.getFreespeed();
 
 		return ratio > 1 ? 1 : ratio;
 	}
