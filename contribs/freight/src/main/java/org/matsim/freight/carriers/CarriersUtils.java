@@ -231,7 +231,7 @@ public class CarriersUtils {
 		try {
 			roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
 		} catch (Exception e) {
-			log.debug("Was not able to get a RoadPricingScheme from sceanrio. Tolls cannot be considered.", e);
+			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
 		}
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
