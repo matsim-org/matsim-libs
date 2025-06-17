@@ -66,6 +66,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	// Well, I guess it can be injected as well?!
 	// bind( PrepareForSimImpl.class ) ;
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
+	// yes!!
 
 	private static Logger log = LogManager.getLogger(PrepareForSim.class);
 
@@ -262,7 +263,12 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType)) {
 			if (!hasWarned) {
-				log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
+				log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon. Use");
+				log.warn("\t\tconfig.qsim().setUsePersonIdForMissingVehicleId( false );");
+				log.warn( "in code, and ");
+				log.warn("\t<module name=\"qsim\" >");
+				log.warn("\t\t<param name=\"usePersonIdForMissingVehicleId\" value=\"true\" />");
+				log.warn("in the config xml.");
 				hasWarned = true;
 			}
 
