@@ -148,6 +148,7 @@ public class LinkStats implements MATSimAppCommand {
         // calculate congestion index according to
         // A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index
         // Feifei He, Xuedong Yan*, Yang Liu, Lu Ma
+		// https://doi.org/10.1016/j.proeng.2016.01.277
 
         try (CSVPrinter writer = csv.createPrinter(outputCongestion)) {
 
