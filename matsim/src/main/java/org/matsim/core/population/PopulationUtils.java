@@ -1206,9 +1206,9 @@ public final class PopulationUtils {
 			person -> PopulationUtils.getSubpopulation(person).equals(subpopulation)
 				&& rnd.nextDouble() >= sample
 		));
-		log.info("population size before downsampling=" + pop.getPersons().size());
+		log.info("population size before downsampling={}", pop.getPersons().size());
 		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
-		log.info("population size after downsampling=" + pop.getPersons().size());
+		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 
 	public static void readPopulation(Population population, String filename) {
@@ -1312,7 +1312,7 @@ public final class PopulationUtils {
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;
-				log.info("personId=" + personId + " not in allPersons; trying standard population container ...");
+				log.info("personId={} not in allPersons; trying standard population container ...", personId);
 				if (tryStdCnt == 0) {
 					log.info(Gbl.FUTURE_SUPPRESSED);
 				}
@@ -1320,7 +1320,7 @@ public final class PopulationUtils {
 			person = scenario.getPopulation().getPersons().get(personId);
 		}
 		if (person == null) {
-			log.info("unable to find person for personId=" + personId + "; will return null");
+			log.info("unable to find person for personId={}; will return null", personId);
 		}
 		return person;
 	}
