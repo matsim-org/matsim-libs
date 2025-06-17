@@ -583,8 +583,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	public void createCarriers(Scenario scenario,
 							   String smallScaleCommercialTrafficType) {
-		//Save the given data
-		RandomGenerator rng = new MersenneTwister(scenario.getConfig().global().getRandomSeed());
 
 		int maxNumberOfCarrier = odMatrix.getListOfPurposes().size() * odMatrix.getListOfZones().size()
 			* odMatrix.getListOfModesOrVehTypes().size();
