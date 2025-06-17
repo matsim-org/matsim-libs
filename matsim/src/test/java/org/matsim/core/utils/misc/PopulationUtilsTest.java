@@ -38,6 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -155,7 +156,7 @@ public class PopulationUtilsTest {
 	void testEmptyPopulation() {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assertions.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
+		Assertions.assertEquals(PopulationComparison.Result.equal, PopulationComparison.compare(s1.getPopulation(), s2.getPopulation()));
 	}
 
 	@Test
@@ -164,8 +165,8 @@ public class PopulationUtilsTest {
 		Scenario s2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Person person = s2.getPopulation().getFactory().createPerson(Id.create("1", Person.class));
 		s2.getPopulation().addPerson(person);
-		Assertions.assertFalse(PopulationUtils.equalPopulation(s1.getPopulation(), s2.getPopulation()));
-		Assertions.assertFalse(PopulationUtils.equalPopulation(s2.getPopulation(), s1.getPopulation()));
+		Assertions.assertEquals(PopulationComparison.Result.notEqual, PopulationComparison.compare(s1.getPopulation(), s2.getPopulation()));
+		Assertions.assertEquals(PopulationComparison.Result.notEqual, PopulationComparison.compare(s2.getPopulation(), s1.getPopulation()));
 	}
 
 	@Test
@@ -175,7 +176,7 @@ public class PopulationUtilsTest {
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		new MatsimNetworkReader(s1.getNetwork()).readFile(netFileName);
 		new PopulationReader(s1).readFile(popFileName);
-		Assertions.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
+		Assertions.assertEquals(PopulationComparison.Result.equal, PopulationComparison.compare(s1.getPopulation(), s1.getPopulation()));
 	}
 
 	@Test
