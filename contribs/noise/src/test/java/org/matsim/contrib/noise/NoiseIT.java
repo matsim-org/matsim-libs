@@ -914,16 +914,31 @@ public class NoiseIT {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
-				Assertions.assertEquals(0.02062821077070937,
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+					Assertions.assertEquals(0.020745817449213576,
 						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				} else {
+					Assertions.assertEquals(0.02062821077070937,
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
-				Assertions.assertEquals(0.017327383429596242,
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+					Assertions.assertEquals(0.017444990107520864,
 						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				} else {
+					Assertions.assertEquals(0.017327383429596242,
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
-				Assertions.assertEquals(0.028225601971719153,
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+					Assertions.assertEquals(0.028225601971719153,
 						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				} else {
+					Assertions.assertEquals(0.028225601971719153,
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				}
 				counter2++;
 			} else {
 				Assertions.assertEquals(0., event.getAmount(), MatsimTestUtils.EPSILON, "There should either be no further events, or the amount should be zero.");
