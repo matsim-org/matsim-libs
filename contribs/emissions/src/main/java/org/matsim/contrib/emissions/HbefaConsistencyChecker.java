@@ -2,9 +2,9 @@ package org.matsim.contrib.emissions;
 
 
 import com.google.common.collect.Iterables;
+import jakarta.annotation.Nullable;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class HbefaConsistencyChecker {
