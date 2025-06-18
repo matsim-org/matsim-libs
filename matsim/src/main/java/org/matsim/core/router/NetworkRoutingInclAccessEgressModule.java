@@ -181,12 +181,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 																final Link egressActLink, double departureTime, PlanElement previousPlanElement,
 																final PopulationFactory populationFactory, final String stageActivityType,
 																Config config, Attributes routingAttributes) {
-
-		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
-
 		if (isNotNeedingBushwhackingLeg(toFacility, egressActLink.getId())) {
 			return Collections.emptyList();
 		}
+
+		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
 		Coord startCoord = NetworkUtils.findNearestPointOnLink(toFacility.getCoord(),egressActLink);
 		Gbl.assertNotNull(startCoord);
@@ -216,6 +215,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			egressTrip.add(egressLeg);
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
+			// Use non_network_walk as mode because in this case we do not want to route on the network as the travel time is constant.
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
@@ -283,6 +283,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			accessTrip.add(accessLeg);
 		} else if (accessEgressType.equals(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
+			// Use non_network_walk as mode because in this case we do not want to route on the network as the travel time is constant.
 			Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			accessLeg.setDepartureTime(departureTime);
 			Id<Link> startLinkId = fromFacility.getLinkId();
