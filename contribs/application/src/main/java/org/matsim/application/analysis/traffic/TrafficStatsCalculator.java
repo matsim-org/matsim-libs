@@ -57,7 +57,11 @@ public final class TrafficStatsCalculator {
 
 	/**
 	 * Calculates the congestion index based on the ratio of actual travel time and free speed travel time.
+	 *
+	 * @deprecated -- // kai does not like this quantity.  In particular, he finds the re-weighting by the fraction of non-congested time arbitrary;
+	 * //	this is consistent with the fact that it cannot be interpreted in ecomics terms (other than, say, the TomTom congestion index).
 	 */
+	@Deprecated
 	public double getLinkCongestionIndex(Link link, int startTime, int endTime) {
 
 		DoubleList speedPerformance = new DoubleArrayList();
@@ -80,6 +84,18 @@ public final class TrafficStatsCalculator {
 
 		return averageSpeedPerformance * (1 - (double) congestedPeriodCounter / totalObservedPeriods);
 	}
+
+	public double getExcessTravelTimePerLink( Link link, int timeBin ) {
+		excessTravelTime = ( congestedTravelTime(timeBin) - freeSpeedTravelTime ) * volume(timeBin);
+	}
+
+	public double getTomTomIndex() {
+		for all links and times (
+			average (excessTravelTime) ; // somehow normalise
+			)
+	}
+
+
 
 	/**
 	 * Calculates the network congestion index for a given time period. Can be done for a certain road type.
