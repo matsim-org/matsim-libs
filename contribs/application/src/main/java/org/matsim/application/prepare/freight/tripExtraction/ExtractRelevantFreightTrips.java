@@ -237,7 +237,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			double timeSpent = 0;
 			boolean vehicleIsInside = false;
 			LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-					network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(), 0,
+					network.getLinks().get(startLink), network.getLinks().get(endLink), 0,
 					null, null);
 			if (route.links.isEmpty()) {
 				return;
@@ -283,7 +283,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			if (cutOnBoundary) {
 				boolean isCoordSet = false;
 				LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-						network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
+						network.getLinks().get(startLink), network.getLinks().get(endLink),
 						0, null, null);
 				if (route.links.isEmpty()) {
 					return;
@@ -327,7 +327,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 			if (cutOnBoundary) {
 				boolean isCoordSet = false;
 				LeastCostPathCalculator.Path route = router.calcLeastCostPath(
-					network.getLinks().get(startLink).getToNode(), network.getLinks().get(endLink).getToNode(),
+					network.getLinks().get(startLink), network.getLinks().get(endLink),
 					0, null, null);
 				if (route.links.isEmpty()) {
 					return;

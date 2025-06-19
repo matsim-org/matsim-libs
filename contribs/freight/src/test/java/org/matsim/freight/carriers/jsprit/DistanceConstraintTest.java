@@ -219,6 +219,7 @@ public class DistanceConstraintTest {
 			MatsimTestUtils.EPSILON,
 			"Wrong maximum distance of the tour of this vehicleType");
 
+
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 			.getTourElements();

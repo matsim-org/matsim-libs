@@ -268,6 +268,10 @@ public final class OutputDirectoryHierarchy {
 								+ " configure the services via setOverwriteFileSetting()"
 								+ " or the \"overwriteFiles\" parameter of the \"services\" config group.");
 					case overwriteExistingFiles:
+						// log a warning, even if at the time the user sees it,
+						// it is too late to change his mind...
+						// I still have problems understanding why people want such a setting.
+						// (the above comment is from Thibaut; it was erronously (I am nearly certain) under "deleteDirectoryIfItExists".  kai, may'25)
 						System.out.flush();
 						log.warn("###########################################################");
 						log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
@@ -277,14 +281,11 @@ public final class OutputDirectoryHierarchy {
 						System.err.flush();
 						break;
 					case deleteDirectoryIfExists:
-						// log a warning, even if at the time the user sees it,
-						// it is too late to change his mind...
-						// I still have problems understanding why people want such a setting.
 						System.out.flush();
 						log.info("###########################################################");
 						log.info("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
 						log.info("### " + outputPath);
-						log.warn("### full path: " + outputDir.getAbsolutePath());
+						log.info("### full path: " + outputDir.getAbsolutePath());
 						log.info("###########################################################");
 						System.out.flush();
 						IOUtils.deleteDirectoryRecursively(outputDir.toPath());

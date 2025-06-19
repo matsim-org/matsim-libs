@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="ccCarrierWithShipments1">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="cargo_bike_1" depotLinkId="1" typeId="cargo_bike" earliestStart="06:00:00" latestEnd="12:00:00"/>
+				<vehicle id="heavy_truck_1" depotLinkId="1" typeId="heavy_truck" earliestStart="15:30:00" latestEnd="23:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="small_shipment_1" from="1" to="2" size="1" startPickup="08:00:00" endPickup="10:30:00" startDelivery="13:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="large_shipment_1" from="1" to="2" size="33" startPickup="00:00:00" endPickup="14:30:00" startDelivery="00:00:00" endDelivery="23:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+		</shipments>
+	</carrier>
+	<carrier id="ccCarrierWithShipments2">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="medium_van_2" depotLinkId="1" typeId="medium_van" earliestStart="16:00:00" latestEnd="18:00:00"/>
+				<vehicle id="medium_truck_2" depotLinkId="1" typeId="medium_truck" earliestStart="12:00:00" latestEnd="15:00:00"/>
+			</vehicles>
+		</capabilities>
+		<shipments>
+			<shipment id="small_shipment_2" from="1" to="2" size="4" startPickup="08:00:00" endPickup="10:30:00" startDelivery="16:00:00" endDelivery="18:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+			<shipment id="large_shipment_2" from="1" to="2" size="16" startPickup="00:00:00" endPickup="15:30:00" startDelivery="00:00:00" endDelivery="15:00:00" pickupServiceTime="00:01:00" deliveryServiceTime="00:02:00"/>
+		</shipments>
+	</carrier>
+</carriers>

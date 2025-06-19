@@ -9,6 +9,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
+import java.util.Map;
+
 /**
  * @author nkuehnel / MOIA
  */
@@ -16,15 +18,15 @@ public class ShiftHistogramListener implements IterationEndsListener, IterationS
 
     static private final Logger log = LogManager.getLogger(ShiftHistogramListener.class);
 
-	private DrtConfigGroup drtConfigGroup;
-	private MatsimServices matsimServices;
-    private ShiftHistogram shiftHistogram;
+    private DrtConfigGroup drtConfigGroup;
+    private MatsimServices matsimServices;
+    private MultiTypeShiftHistogram shiftHistogram;
 
-	public ShiftHistogramListener(DrtConfigGroup drtConfigGroup, MatsimServices matsimServices, ShiftHistogram shiftHistogram) {
-		this.drtConfigGroup = drtConfigGroup;
-		this.matsimServices = matsimServices;
-		this.shiftHistogram = shiftHistogram;
-	}
+    public ShiftHistogramListener(DrtConfigGroup drtConfigGroup, MatsimServices matsimServices, MultiTypeShiftHistogram shiftHistogram) {
+        this.drtConfigGroup = drtConfigGroup;
+        this.matsimServices = matsimServices;
+        this.shiftHistogram = shiftHistogram;
+    }
 
     @Override
     public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -33,21 +35,36 @@ public class ShiftHistogramListener implements IterationEndsListener, IterationS
 
     @Override
     public void notifyIterationEnds(final IterationEndsEvent event) {
-        this.shiftHistogram.write(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), drtConfigGroup.getMode() + "_" + "shiftHistogram.txt"));
-        this.printStats();
-		int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
-		boolean createGraphs = createGraphsInterval >0 && event.getIteration() % createGraphsInterval == 0;
+        this.shiftHistogram.applyToAll((type, shiftHistogram) -> {
+            String filename = matsimServices.getControlerIO()
+                    .getIterationFilename(event.getIteration(),
+                            drtConfigGroup.getMode() +  (type == null? "": "_" + type) + "_shiftHistogram.txt");
+            shiftHistogram.write(filename);
+            return null;
+        });
 
-		if (createGraphs) {
-            ShiftHistogramChart.writeGraphic(this.shiftHistogram, matsimServices.getControlerIO().getIterationFilename(event.getIteration(),drtConfigGroup.getMode() + "_" + "shiftHistogram.png"));
+        int createGraphsInterval = event.getServices().getConfig().controller().getCreateGraphsInterval();
+        boolean createGraphs = createGraphsInterval > 0 && event.getIteration() % createGraphsInterval == 0;
+
+        if (createGraphs) {
+            this.shiftHistogram.applyToAll((type, shiftHistogram) -> {
+                String filename = matsimServices.getControlerIO()
+                        .getIterationFilename(event.getIteration(),
+                                drtConfigGroup.getMode() +  (type == null? "": "_" + type) + "_shiftHistogram.png");
+                ShiftHistogramChart.writeGraphic(shiftHistogram, filename);
+                return null;
+            });
         }
+        this.printStatsByType();
     }
 
-    private void printStats() {
-        int nofShifts = 0;
-        for (int nofShiftStarts : this.shiftHistogram.getShiftStarts()) {
-            nofShifts += nofShiftStarts;
+    private void printStatsByType() {
+        for (Map.Entry<String, int[]> shiftStartsByType : shiftHistogram.getShiftStarts().entrySet()) {
+            int nofShifts = 0;
+            for (int nofShiftStarts : shiftStartsByType.getValue()) {
+                nofShifts += nofShiftStarts;
+            }
+            log.info(String.format("number of shifts for type %s: %d", shiftStartsByType.getKey(), nofShifts));
         }
-        log.info("number of shifts:\t"  + nofShifts);
     }
 }
