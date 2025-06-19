@@ -501,7 +501,7 @@ public final class Plotly extends Viz {
 		 * Mapping for text (label) column.
 		 */
 		public DataMapping text(String columnName) {
-			columns.put(ColumnType.TEXT, columnName);
+			columns.put(ColumnType.STRING, columnName);
 			return this;
 		}
 
@@ -571,9 +571,9 @@ public final class Plotly extends Viz {
 		private void normalizePieTrace() {
 
 			// Swap text and label column
-			if (columns.containsKey(ColumnType.TEXT) && !columns.containsKey(ColumnType.LABELS)) {
-				columns.put(ColumnType.LABELS, columns.get(ColumnType.TEXT));
-				columns.remove(ColumnType.TEXT);
+			if (columns.containsKey(ColumnType.STRING) && !columns.containsKey(ColumnType.LABELS)) {
+				columns.put(ColumnType.LABELS, columns.get(ColumnType.STRING));
+				columns.remove(ColumnType.STRING);
 			}
 
 			if (columns.containsKey(ColumnType.X))
