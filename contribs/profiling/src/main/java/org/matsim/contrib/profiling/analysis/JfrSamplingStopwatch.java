@@ -49,7 +49,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		String className
 	) {}
 
-	record Operation(
+	protected record Operation(
 		String name,
 		String methodName,
 		boolean isBegin
@@ -285,20 +285,20 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		this.operationMethods.put(operationSampleMethod.methodName, operationSampleMethod);
 	}
 
-	protected void initialize() {
+	protected void beforeStart() {
 		if (operationMethods.isEmpty()) {
 			DEFAULT_OPERATION_METHODS.forEach(this::addOperationMethod);
 		}
 	}
 
 	public SamplingStatistics start() {
-		initialize();
+		beforeStart();
 		this.eventStream.start();
 		return getStatistics();
 	}
 
 	public void startAsync() {
-		initialize();
+		beforeStart();
 		this.eventStream.startAsync();
 	}
 

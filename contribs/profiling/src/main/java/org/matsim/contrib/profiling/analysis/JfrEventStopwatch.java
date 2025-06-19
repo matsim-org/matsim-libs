@@ -37,7 +37,7 @@ public class JfrEventStopwatch implements AutoCloseable {
 	 */
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new HashMap<>());
 
-	record Operation(
+	protected record Operation(
 		int id, // to be able to sort, if timestamps are equal
 		String name,
 		boolean isBegin
@@ -155,7 +155,7 @@ public class JfrEventStopwatch implements AutoCloseable {
 		stages.put(new Operation(operationCount++, name, false), event.getEndTime().toEpochMilli());
 	}
 
-	protected void initialize() {
+	protected void beforeStart() {
 		// if no explicit events configured to listen for, use any encountered event with the category MATSim Stopwatch
 		if (operationEvents.isEmpty()) {
 			eventStream.onEvent(event -> {
@@ -217,12 +217,12 @@ public class JfrEventStopwatch implements AutoCloseable {
 	}
 
 	public void start() {
-		initialize();
+		beforeStart();
 		this.eventStream.start();
 	}
 
 	public void startAsync() {
-		initialize();
+		beforeStart();
 		this.eventStream.startAsync();
 	}
 
