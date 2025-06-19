@@ -23,7 +23,7 @@
 				<attributes>
 					<attribute name="jspritScore" class="java.lang.Double">-215.4666666666667</attribute>
 				</attributes>
-				<tour tourId="1" vehicleId="freight_carrier1_veh_heavyVehicle_1">
+				<tour tourId="1" vehicleId="carrier_19_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg expected_dep_time="06:00:00" expected_transp_time="00:00:00">
 						<route></route>
