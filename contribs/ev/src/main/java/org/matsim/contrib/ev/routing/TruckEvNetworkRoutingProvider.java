@@ -28,8 +28,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class TruckNetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = LogManager.getLogger(TruckNetworkRoutingProvider.class);
+public class TruckEvNetworkRoutingProvider implements Provider<RoutingModule> {
+	private static final Logger log = LogManager.getLogger(TruckEvNetworkRoutingProvider.class);
 
 	private final String routingMode;
 	@Inject
@@ -74,7 +74,7 @@ public class TruckNetworkRoutingProvider implements Provider<RoutingModule> {
 	 *
 	 * @param mode
 	 */
-	public TruckNetworkRoutingProvider(String mode) {
+	public TruckEvNetworkRoutingProvider(String mode) {
 		this(mode, mode);
 	}
 
@@ -86,7 +86,7 @@ public class TruckNetworkRoutingProvider implements Provider<RoutingModule> {
 	 * @param mode
 	 * @param routingMode
 	 */
-	public TruckNetworkRoutingProvider(String mode, String routingMode) {
+	public TruckEvNetworkRoutingProvider(String mode, String routingMode) {
 		this.mode = mode;
 		this.routingMode = routingMode;
 	}

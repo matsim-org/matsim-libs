@@ -11,9 +11,8 @@ import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.discharging.VehicleTypeSpecificDriveEnergyConsumptionFactory;
 import org.matsim.contrib.ev.infrastructure.LTHConsumptionModelReader;
-import org.matsim.contrib.ev.routing.TruckNetworkRoutingProvider;
+import org.matsim.contrib.ev.routing.TruckEvNetworkRoutingProvider;
 import org.matsim.contrib.ev.util.EvLowSocPenaltyHandler;
-import org.matsim.contrib.ev.util.LowEnergyEventChargerPlacer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -85,8 +84,8 @@ public class RunEvExampleTruckLTH {
 					bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> (beginTime, duration, linkId) -> 0.0);
 
 					// Use your dynamic charging-aware truck router
-					addRoutingModuleBinding(TransportMode.car).toProvider(new TruckNetworkRoutingProvider(TransportMode.car));
-					addRoutingModuleBinding(TransportMode.truck).toProvider(new TruckNetworkRoutingProvider(TransportMode.truck));
+					addRoutingModuleBinding(TransportMode.car).toProvider(new TruckEvNetworkRoutingProvider(TransportMode.car));
+					addRoutingModuleBinding(TransportMode.truck).toProvider(new TruckEvNetworkRoutingProvider(TransportMode.truck));
 
 				}
 			});
