@@ -22,12 +22,13 @@
 
 package org.matsim.analysis;
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public final class LegHistogramModule extends AbstractModule {
 	@Override
 	public void install() {
-		bind(LegHistogram.class);
+		bind(LegHistogram.class).in(Singleton.class);
 		addControlerListenerBinding().to(LegHistogramListener.class);
 	}
 }

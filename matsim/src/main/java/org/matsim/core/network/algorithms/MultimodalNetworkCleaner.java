@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 
 /**
  * Variant of {@link org.matsim.core.network.algorithms.NetworkCleaner NetworkCleaner} that supports
@@ -44,6 +45,7 @@ import org.matsim.api.core.v01.network.Node;
  * from the set of allowed modes for this link. If a link has no allowed mode anymore, it is removed
  * from the network, along with nodes that lose all their in- and out-links by that way.
  *
+ * @deprecated not deprecated, but you should really use {@link NetworkUtils#cleanNetwork(Network, Set)}
  * @author mrieser
  */
 public final class MultimodalNetworkCleaner {
@@ -51,27 +53,12 @@ public final class MultimodalNetworkCleaner {
 	private final static Logger log = LogManager.getLogger(MultimodalNetworkCleaner.class);
 
 	private final Network network;
-	
+
 	private final Set<Id<Link>> removedLinks = new HashSet<>();
 	private final Set<Id<Link>> modifiedLinks = new HashSet<>();
 
 	public MultimodalNetworkCleaner(final Network network) {
 		this.network = network;
-	}
-
-	/**
-	 * Removes nodes from the network that have no incoming or outgoing links attached to them.
-	 */
-	public void removeNodesWithoutLinks() {
-		List<Node> toBeRemoved = new ArrayList<>();
-		for (Node node : this.network.getNodes().values()) {
-			if ((node.getInLinks().size() == 0) && (node.getOutLinks().size() == 0)) {
-				toBeRemoved.add(node);
-			}
-		}
-		for (Node node : toBeRemoved) {
-			this.network.removeNode(node.getId());
-		}
 	}
 
 	/**
