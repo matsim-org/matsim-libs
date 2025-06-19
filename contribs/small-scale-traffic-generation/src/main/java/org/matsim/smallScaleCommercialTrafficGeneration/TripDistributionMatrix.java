@@ -409,10 +409,12 @@ public class TripDistributionMatrix {
 	}
 
 	/**
-	 * @param stopZone      stop zone
-	 * @param modeORvehType selected mode or vehicle type
-	 * @param purpose       selected purpose
-	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
+	 * Gets the sum of services for a stop zone based on the trip distribution matrix.
+	 *
+	 * @param stopZone                        stop zone
+	 * @param modeORvehType                   selected mode or vehicle type
+	 * @param purpose                         selected purpose
+	 * @param smallScaleCommercialTrafficType goodsTraffic or commercialPersonTraffic
 	 * @return numberOfTrips
 	 */
 	int getSumOfServicesForStopZone(String stopZone, String modeORvehType, int purpose, String smallScaleCommercialTrafficType) {
