@@ -2,8 +2,11 @@ package org.matsim.contrib.ev.routing;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -17,12 +20,14 @@ import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.MultimodalLinkChooser;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.SingleModeNetworksCache;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -33,40 +38,53 @@ public class TruckEvNetworkRoutingProvider implements Provider<RoutingModule> {
 
 	private final String routingMode;
 	@Inject
-	private Map<String, TravelTime> travelTimes;
+	Map<String, TravelTime> travelTimes;
 
 	@Inject
-	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
 	@Inject
-	private SingleModeNetworksCache singleModeNetworksCache;
+	SingleModeNetworksCache singleModeNetworksCache;
 
 	@Inject
-	private Config config;
+	Config config;
 
 	@Inject
-	private RoutingConfigGroup routingConfigGroup;
+	RoutingConfigGroup routingConfigGroup;
 
 	@Inject
-	private Network network;
+	Network network;
 
 	@Inject
-	private PopulationFactory populationFactory;
+	PopulationFactory populationFactory;
 
 	@Inject
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 	@Inject
-	private ElectricFleetSpecification electricFleetSpecification;
+	ElectricFleetSpecification electricFleetSpecification;
 
 	@Inject
-	private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
+	ChargingInfrastructureSpecification chargingInfrastructureSpecification;
 
 	@Inject
-	private DriveEnergyConsumption.Factory driveConsumptionFactory;
+	DriveEnergyConsumption.Factory driveConsumptionFactory;
 
 	@Inject
-	private AuxEnergyConsumption.Factory auxConsumptionFactory;
+	AuxEnergyConsumption.Factory auxConsumptionFactory;
+
+	@Inject
+	Scenario scenario;
+
+	@Inject
+	TimeInterpretation timeInterpretation;
+
+	@Inject
+	MultimodalLinkChooser multimodalLinkChooser;
+
+	@Inject
+	@Named(TransportMode.walk)
+	RoutingModule walkRouter;
 
 	/**
 	 * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
@@ -128,11 +146,12 @@ public class TruckEvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (!routingConfigGroup.getAccessEgressType().equals(AccessEgressType.none)) {
+		if (!routingConfigGroup.getAccessEgressType().equals(AccessEgressType.accessEgressModeToLink)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new TruckEvNetworkRoutingModule(mode, filteredNetwork,
-					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
+					DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork,
+						walkRouter, timeInterpretation, multimodalLinkChooser),
 					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
 					driveConsumptionFactory, auxConsumptionFactory, EvConfigGroup.get(config));
 		}

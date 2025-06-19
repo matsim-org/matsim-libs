@@ -92,7 +92,10 @@
 
 
 	<module name="routing">
+
 		<param name="networkModes" value="car,truck" />
+		<param name="accessEgressType" value="accessEgressModeToLink"/>
+
 	</module>
 
 </config>

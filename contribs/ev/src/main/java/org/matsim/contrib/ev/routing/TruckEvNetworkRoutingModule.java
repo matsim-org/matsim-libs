@@ -15,6 +15,7 @@
 package org.matsim.contrib.ev.routing;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -95,7 +96,11 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         // Get basic route (no EV logic)
         List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
         Id<Vehicle> evId = Id.create(request.getPerson().getId() + vehicleSuffix, Vehicle.class);
-
+		Leg basicLeg = (Leg)basicRoute.get(0);
+		// Skip if the main leg is not truck mode (e.g. access/egress walk)
+		if (TransportMode.walk.equals(basicLeg.getMode())) {
+			return basicRoute;
+		}
         // If person has no EV, return default route
         if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
             return basicRoute;
