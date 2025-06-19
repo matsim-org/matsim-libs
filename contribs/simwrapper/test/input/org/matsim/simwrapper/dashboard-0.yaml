@@ -94,3 +94,14 @@ layout:
       colorScheme: BurgYl
       valueTransform: normal
     zoom: 9.5
+  fourteenth:
+  - type: vehicles
+    title: DRT Vehicle Animation
+    description: drt animation
+    drtTrips: drt-vehicles.json
+    projection: EPSG:25832
+    center:
+    - 13.45
+    - 52.5
+    zoom: 11.0
+    mapIsIndependent: true
