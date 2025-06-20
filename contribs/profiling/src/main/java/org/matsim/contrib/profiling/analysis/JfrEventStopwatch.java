@@ -32,13 +32,12 @@ public class JfrEventStopwatch implements AutoCloseable {
 	private int operationCount = 0;
 
 	/**
-	 * Long: timestamp
-	 * Sort after all insertions, by operation timestamp, then operation id
+	 * Hold all encountered operation starts and ends, and their timestamps.
+	 * {@link LinkedHashMap} to keep insertion order, in case the timestamps equal
 	 */
-	private final Map<Operation, Long> stages = Collections.synchronizedMap(new HashMap<>());
+	private final Map<Operation, Instant> stages = Collections.synchronizedMap(new LinkedHashMap<>());
 
 	protected record Operation(
-		int id, // to be able to sort, if timestamps are equal
 		String name,
 		boolean isBegin
 	) {}
@@ -151,8 +150,8 @@ public class JfrEventStopwatch implements AutoCloseable {
 	}
 
 	protected void handleEvent(String name, RecordedEvent event) {
-		stages.put(new Operation(operationCount, name, true), event.getStartTime().toEpochMilli());
-		stages.put(new Operation(operationCount++, name, false), event.getEndTime().toEpochMilli());
+		stages.put(new Operation(name, true), event.getStartTime());
+		stages.put(new Operation(name, false), event.getEndTime());
 	}
 
 	protected void beforeStart() {
@@ -184,28 +183,16 @@ public class JfrEventStopwatch implements AutoCloseable {
 			synchronized (stages) {
 				stages.entrySet()
 					.stream()
-					.sorted((e1, e2) -> {
-						// sort by timestamp
-						var l = Long.compare(e1.getValue(), e2.getValue());
-						if (l == 0) {
-							// sort by order of event occurrence if timestamp is equal
-							var id = Integer.compare(e1.getKey().id, e2.getKey().id);
-							if (id == 0) {
-								// if same operation, then begin before end
-								return e1.getKey().isBegin ? -1 : 1;
-							}
-							return id;
-						}
-						return l;
-					}).forEach(entry -> {
+					.sorted(Map.Entry.comparingByValue()) // sort by timestamp
+					.forEach(entry -> {
 						Operation operation = entry.getKey();
-						long timestamp = entry.getValue();
+						Instant timestamp = entry.getValue();
 						if (operation.isBegin) {
-							System.out.println(Instant.ofEpochMilli(timestamp) + " BEGIN " + operation.name);
-							stopwatch.beginOperation(operation.name, timestamp);
+							System.out.println(timestamp + " BEGIN " + operation.name);
+							stopwatch.beginOperation(operation.name, timestamp.toEpochMilli());
 						} else {
-							System.out.println(Instant.ofEpochMilli(timestamp) + " END   " + operation.name);
-							stopwatch.endOperation(operation.name, timestamp);
+							System.out.println(timestamp + " END   " + operation.name);
+							stopwatch.endOperation(operation.name, timestamp.toEpochMilli());
 						}
 					});
 				stages.clear();
