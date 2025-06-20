@@ -113,7 +113,7 @@ public class KNearestInsertionsAtEndFilterTest {
 		return new InsertionWithDetourData(new Insertion(vehicleEntry,
 				new InsertionPoint(pickupIdx, vehicleEntry.getWaypoint(pickupIdx), null,
 						vehicleEntry.getWaypoint(pickupIdx + 1)), null, loadType.fromInt(1)), null,
-				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, Double.NaN), null));
+				new DetourTimeInfo(new PickupDetourInfo(pickupDepartureTime, pickupDepartureTime, Double.NaN), null));
 	}
 
 	private Waypoint.Start start(double endTime) {

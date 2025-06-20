@@ -218,7 +218,7 @@ public interface Waypoint {
 
 		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
-				task.getDropoffRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestArrivalTime),
+				task.getDropoffRequests().values().stream().mapToDouble(request -> request.getLatestArrivalTime() - request.getDropoffDuration()),
 				task.getBeginTime());
 		}
 
