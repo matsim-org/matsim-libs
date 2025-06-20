@@ -65,7 +65,7 @@ public class RelativeDemandEstimatorAsTargetCalculator implements RebalancingTar
 			if (totalDemand > 0) {
 				double demand = demandPerZone.applyAsDouble(zone);
 				double relativeDemand = demand / totalDemand;
-				double targetVehicles = relativeDemand * remainingVehicles;
+				double targetVehicles = Math.ceil(relativeDemand * remainingVehicles);
 				return Math.min(demand, targetVehicles); // do not send more vehicles than demanded trips
 			} else {
 				return 0;
