@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.controller.CarrierModule;
 
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
