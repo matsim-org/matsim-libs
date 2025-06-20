@@ -29,14 +29,15 @@ public class RunWithWalkAsNetworkMode {
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.controller().setLastIteration(1);
 
-        config.qsim().setMainModes(Set.of(TransportMode.car, TransportMode.walk));
+        final String walkOnNetwork = "walkOnNetwork";
+        config.qsim().setMainModes(Set.of(TransportMode.car, walkOnNetwork ) );
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-        config.routing().setNetworkModes(Set.of(TransportMode.car, TransportMode.walk));
+        config.routing().setNetworkModes(Set.of(TransportMode.car, walkOnNetwork));
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
         config.routing().clearTeleportedModeParams();
         config.routing().addTeleportedModeParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.non_network_walk).setTeleportedModeSpeed(1.4));
 
-        config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.walk).setConstant(0).setMarginalUtilityOfTraveling(0));
+        config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(walkOnNetwork).setConstant(0).setMarginalUtilityOfTraveling(0));
         config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.non_network_walk).setConstant(0).setMarginalUtilityOfTraveling(0));
 
         config.global().setNumberOfThreads(1);
@@ -49,7 +50,7 @@ public class RunWithWalkAsNetworkMode {
 
         PopulationUtils.copyFromTo(scenario.getPopulation().getPersons().get(Id.createPersonId("1")).getSelectedPlan(), plan);
         for (Leg leg : TripStructureUtils.getLegs(plan)) {
-            leg.setMode(TransportMode.walk);
+            leg.setMode(walkOnNetwork);
             leg.setRoute(null);
         }
 
