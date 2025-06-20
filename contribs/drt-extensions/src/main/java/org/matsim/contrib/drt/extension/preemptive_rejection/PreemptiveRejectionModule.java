@@ -32,12 +32,9 @@ public class PreemptiveRejectionModule extends AbstractModule {
                         public void install() {
                             bindModal(PreemptiveRejectionHandler.class).toProvider(modalProvider(getter -> {
                                 Population population = getter.get(Population.class);
+                                OutputDirectoryHierarchy outputHierarchy = getter.get(OutputDirectoryHierarchy.class);
 
-                                OutputDirectoryHierarchy output = getter.get(OutputDirectoryHierarchy.class);
-                                String outputPath = output
-                                        .getOutputFilename("drt_preemptive_rejection." + getMode() + ".csv");
-
-                                return new PreemptiveRejectionHandler(getMode(), population, outputPath);
+                                return new PreemptiveRejectionHandler(getMode(), population, outputHierarchy);
                             })).in(Singleton.class);
 
                             addControlerListenerBinding().to(modalKey(PreemptiveRejectionHandler.class));
