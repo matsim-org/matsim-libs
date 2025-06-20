@@ -194,9 +194,9 @@ public class TripDistributionMatrix {
 		//if false the calculation is faster; e.g. for debugging
 		boolean useNetworkRoutesForResistanceFunction = true;
 		double resistanceFunktionResult;
-		if (netBasedCosts == null) {
+		if (netBasedCosts == null && useNetworkRoutesForResistanceFunction) {
 			VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("vwCaddy", VehicleType.class));
-			vehicleType.getCostInformation().setCostsPerMeter(0.00017).setCostsPerSecond(0.00948).setFixedCost(22.73);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00017).setCostsPerSecond(0.0049).setFixedCost(22.73);
 			NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, List.of(vehicleType));
 			netBasedCosts = netBuilder.build();
 		}
