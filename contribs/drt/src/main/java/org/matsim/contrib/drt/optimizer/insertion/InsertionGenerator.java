@@ -421,8 +421,4 @@ public class InsertionGenerator {
 
 		return new InsertionWithDetourData(insertion, null, new DetourTimeInfo(pickupDetourInfo, dropoffDetourInfo));
 	}
-
-	public static interface Constraint {
-		boolean isValid(Insertion insertion);
-	}
 }
