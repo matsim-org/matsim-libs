@@ -801,11 +801,9 @@ public class SwissRailRaptorCore {
 			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
 		}
 
-		if (hasChains) {
+		if (hasChains && lastPE != null) {
 
 			MutableInt tmp = new MutableInt(-1);
-
-			assert lastPE != null : "Path element should not be null if we have chains";
 
 			for (SwissRailRaptorData.RChained chain : chains) {
 

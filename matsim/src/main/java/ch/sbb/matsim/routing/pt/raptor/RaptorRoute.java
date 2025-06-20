@@ -151,5 +151,15 @@ public class RaptorRoute {
 			}
 			return this.chainedPart.getChainedArrivalTime();
 		}
+
+		/**
+		 * Return the total distance of the route, including any chained parts.
+		 */
+		public double getChainedDistance() {
+			if (this.chainedPart == null) {
+				return this.distance;
+			}
+			return this.distance + this.chainedPart.getChainedDistance();
+		}
     }
 }

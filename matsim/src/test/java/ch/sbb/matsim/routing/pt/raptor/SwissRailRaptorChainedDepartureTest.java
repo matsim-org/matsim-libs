@@ -219,7 +219,7 @@ public class SwissRailRaptorChainedDepartureTest {
 
 	}
 
-	private record Result(double departureTime, double arrivalTime, int transferCount) {
+	record Result(double departureTime, double arrivalTime, int transferCount) {
 	}
 
 }

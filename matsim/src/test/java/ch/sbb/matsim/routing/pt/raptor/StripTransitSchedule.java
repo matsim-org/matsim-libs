@@ -21,16 +21,37 @@ import java.util.*;
  */
 class StripTransitSchedule {
 
+	/**
+	 * Usage: StripTransitSchedule <network-file> <transit-schedule-file> <output-schedule-file> [output-network-file] [--keep-lines=ID1,ID2,...]
+	 *
+	 * If --keep-lines is specified, all routes and departures for those line IDs will be kept, regardless of chained departures.
+	 */
 	public static void main(String[] args) {
 		if (args.length < 3) {
-			System.err.println("Usage: StripTransitSchedule <network-file> <transit-schedule-file> <output-schedule-file> [output-network-file]");
+			System.err.println("Usage: StripTransitSchedule <network-file> <transit-schedule-file> <output-schedule-file> [output-network-file] [--keep-lines=ID1,ID2,...]");
 			System.exit(1);
 		}
 
 		String networkFile = args[0];
 		String transitScheduleFile = args[1];
 		String outputScheduleFile = args[2];
-		String outputNetworkFile = args.length > 3 ? args[3] : null;
+		String outputNetworkFile = null;
+
+		// Keep this specific line, needed for the test
+		Set<Id<TransitLine>> linesToKeep = new HashSet<>(Set.of(Id.create("005-D-15301", TransitLine.class)));
+
+		for (int i = 3; i < args.length; i++) {
+			if (args[i].startsWith("--keep-lines=")) {
+				String[] ids = args[i].substring("--keep-lines=".length()).split(",");
+				for (String id : ids) {
+					if (!id.isBlank()) {
+						linesToKeep.add(Id.create(id.trim(), TransitLine.class));
+					}
+				}
+			} else {
+				outputNetworkFile = args[i];
+			}
+		}
 
 		// Read scenario with network and transit schedule
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -42,8 +63,8 @@ class StripTransitSchedule {
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 
-		// Process the schedule to keep only routes/lines with chained departures
-		stripTransitSchedule(schedule);
+		// Process the schedule to keep only routes/lines with chained departures or specified lines
+		stripTransitSchedule(schedule, linesToKeep);
 
 		cleanNetwork(scenario.getNetwork(), schedule);
 
@@ -60,20 +81,20 @@ class StripTransitSchedule {
 	}
 
 	/**
-	 * Removes transit routes and lines that do not use chained departures.
+	 * Removes transit routes and lines that do not use chained departures, unless their line id is in linesToKeep.
 	 * A route is kept if:
 	 * 1. It has at least one departure with a chained departure, or
-	 * 2. It is referenced by a chained departure from another route
+	 * 2. It is referenced by a chained departure from another route, or
+	 * 3. Its line id is in linesToKeep (in which case all routes and departures for that line are kept)
+	 *
+	 * @param schedule the transit schedule to strip
+	 * @param linesToKeep additional line ids to keep (all routes and departures for these lines will be kept)
 	 */
-	private static void stripTransitSchedule(TransitSchedule schedule) {
+	private static void stripTransitSchedule(TransitSchedule schedule, Set<Id<TransitLine>> linesToKeep) {
 		// Step 1: First identify all routes that have or are referenced by chained departures
-
 		Set<Id<TransitRoute>> routesToKeep = new HashSet<>();
 
-		// Keep this specific line, needed for the test
-		Set<Id<TransitLine>> linesToKeep = Set.of(Id.create("005-D-15301", TransitLine.class));
-
-		// Find routes with chained departures
+		// Find routes with chained departures or in lines to keep
 		for (TransitLine line : schedule.getTransitLines().values()) {
 
 			// Clear all custom attributes
@@ -128,7 +149,6 @@ class StripTransitSchedule {
 		for (TransitLine line : linesToRemove) {
 			schedule.removeTransitLine(line);
 		}
-
 
 		// Remove stop facilities that are not used by any route
 		Set<Id<TransitStopFacility>> usedStopFacilityIds = new HashSet<>();
