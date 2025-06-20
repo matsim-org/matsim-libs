@@ -41,6 +41,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
@@ -223,8 +225,19 @@ public class CarriersUtils {
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
+		// Create the NetBasedCosts based on the network and the vehicle types
+		//Consider tolls if a RoadPricingScheme is available in the scenario.
+		RoadPricingScheme roadPricingScheme = null;
+		try {
+			roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
+		} catch (Exception e) {
+			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
+		}
+
+		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
+				.setRoadPricingScheme(roadPricingScheme)
+				.build();
+
 
 		Carriers carriers = getCarriers(scenario);
 
