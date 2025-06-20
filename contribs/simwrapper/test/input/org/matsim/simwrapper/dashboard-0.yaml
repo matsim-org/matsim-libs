@@ -84,16 +84,16 @@ layout:
   thirteenth:
   - type: flowmap
     title: Flow Map
-    description: this viz is a flow map
+    description: Visualize the flows of different metrics
     metrics:
-      label: headway per Stop
+    - label: headway metric
       dataset: analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv
       origin: stopAreaOrStop
+      zoom: 9.5
       destination: stopAreaOrStopNext
       flow: meanHeadway
       colorScheme: BurgYl
-      valueTransform: normal
-    zoom: 9.5
+      valueTransform: inverse
   fourteenth:
   - type: vehicles
     title: DRT Vehicle Animation
