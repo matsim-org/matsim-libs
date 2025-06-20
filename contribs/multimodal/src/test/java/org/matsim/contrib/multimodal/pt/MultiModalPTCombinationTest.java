@@ -55,6 +55,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MultiModalPTCombinationTest {
 
@@ -86,6 +89,7 @@ public class MultiModalPTCombinationTest {
 		Config config = scenario.getConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
@@ -119,7 +123,7 @@ public class MultiModalPTCombinationTest {
 		controler.getConfig().controller().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 
-        controler.addOverridingModule(new MultiModalModule());
+		controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);

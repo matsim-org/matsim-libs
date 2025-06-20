@@ -58,6 +58,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class StuckAgentTest {
 
@@ -71,6 +74,7 @@ public class StuckAgentTest {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.qsim().setEndTime(24*3600);
 
 		config.controller().setLastIteration(0);
@@ -153,7 +157,6 @@ public class StuckAgentTest {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
-        controler.addOverridingModule(new MultiModalModule());
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);

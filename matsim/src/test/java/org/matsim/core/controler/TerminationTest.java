@@ -125,7 +125,7 @@ public class TerminationTest {
 	}
 
 	@Test
-	void testCustomConverenceCriterion() {
+	void testCustomConvergenceCriterion() {
 		/**
 		 * In this test, we set all legs to walk and let agents change them to car. We
 		 * stop the simulation once there are more car legs than walk legs.
@@ -203,12 +203,12 @@ public class TerminationTest {
 
 		@Override
 		public boolean mayTerminateAfterIteration(int iteration) {
-			return countCar > countWalk; // Check before the iteration!
+			return countCar > countWalk-2*countCar; // Check before the iteration!
 		}
 
 		@Override
 		public boolean doTerminate(int iteration) {
-			return countCar > countWalk; // Verify after the iteration!
+			return countCar > countWalk-2*countCar; // Verify after the iteration!
 		}
 	}
 }

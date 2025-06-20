@@ -66,7 +66,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class MultiModalControlerListenerTest {
 
@@ -90,6 +93,7 @@ public class MultiModalControlerListenerTest {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.qsim().setEndTime(24 * 3600);
 
 		config.controller().setLastIteration(0);
