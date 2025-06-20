@@ -78,11 +78,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
 		CarrierSchedulerUtils.solveVrpWithJsprit(carrier, scenario);
+		updateShipments();
 	}
 
 	private CarrierService convertToCarrierService(LspShipment lspShipment) {
 		Id<CarrierService> serviceId = Id.create(lspShipment.getId().toString(), CarrierService.class);
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom(),lspShipment.getSize());
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, lspShipment.getFrom(), lspShipment.getSize());
 		CarrierService carrierService = builder.setServiceStartingTimeWindow(TimeWindow.newInstance(lspShipment.getPickupTimeWindow().getStart(), lspShipment.getPickupTimeWindow().getEnd()))
 			.setServiceDuration(lspShipment.getDeliveryServiceTime())
 			.build();
@@ -166,7 +167,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, lspShipment, element, resource);
+				CollectionJobEventHandler endHandler = new CollectionJobEventHandler(carrierService, lspShipment, element, resource);
 				lspShipment.addSimulationTracker(endHandler);
 				break;
 			}
