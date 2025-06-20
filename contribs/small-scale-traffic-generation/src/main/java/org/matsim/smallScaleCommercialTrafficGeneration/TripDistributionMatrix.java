@@ -49,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author Ricardo Ewert
@@ -160,6 +161,9 @@ public class TripDistributionMatrix {
 		} else
 			roundedVolume = 0;
 		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
+		if (matrixCache.containsKey(matrixKey)) {
+			log.warn("Key {} existiert bereits im matrixCache und wird überschrieben.", matrixKey);
+		}
 		matrixCache.put(matrixKey, roundedVolume);
 	}
 
@@ -225,6 +229,8 @@ public class TripDistributionMatrix {
 				resistanceFunktionResult = Math.exp(-resistanceFactor * travelCosts);
 			else
 				resistanceFunktionResult = Math.exp(-resistanceFactor * distance);
+			if (startZone.equals("051005") || startZone.equals("051084"))
+				log.info("StartZone: {}; StopZone: {}; Distance: {}; TravelCosts: {}; ResistanceFunktionResult: {}", startZone, stopZone, distance, travelCosts, resistanceFunktionResult);
 			resistanceFunktionCache.put(makeResistanceFunktionKey(startZone, stopZone), resistanceFunktionResult);
 			resistanceFunktionCache.put(makeResistanceFunktionKey(stopZone, startZone), resistanceFunktionResult);
 		}
