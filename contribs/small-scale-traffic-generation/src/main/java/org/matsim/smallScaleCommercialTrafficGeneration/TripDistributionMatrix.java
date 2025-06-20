@@ -61,7 +61,7 @@ public class TripDistributionMatrix {
 	private final ArrayList<String> listOfZones;
 	private final ArrayList<String> listOfModesORvehTypes = new ArrayList<>();
 	private final ArrayList<Integer> listOfPurposes = new ArrayList<>();
-	private final List<SimpleFeature> zonesFeatures;
+	private final Map<String, SimpleFeature> zoneFeatureMap;
 	private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
 	private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 	private final String smallScaleCommercialTrafficType;
@@ -75,25 +75,29 @@ public class TripDistributionMatrix {
 
 	public static class Builder {
 
-		private final List<SimpleFeature> zonesFeatures;
 		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start;
 		private final Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop;
 		private final String smallScaleCommercialTrafficType;
 		private final ArrayList<String> listOfZones;
+		private final Map<String, SimpleFeature> zoneFeatureMap;
 
 		public static Builder newInstance(Index indexZones,
-										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
+										  String shapeFileZoneNameColumn, Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 										  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 										  String smallScaleCommercialTrafficType, ArrayList<String> listOfZones) {
-			return new Builder(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones);
+			return new Builder(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones);
 		}
 
-		private Builder(Index indexZones,
+		private Builder(Index indexZones, String shapeFileZoneNameColumn,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start,
 						Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop,
 						String smallScaleCommercialTrafficType, ArrayList<String> listOfZones) {
 			super();
-			this.zonesFeatures = indexZones.getAllFeatures();
+			this.zoneFeatureMap = indexZones.getAllFeatures().stream()
+				.collect(Collectors.toMap(
+					f -> String.valueOf(f.getAttribute(shapeFileZoneNameColumn)),
+					f -> f
+				));
 			this.trafficVolume_start = trafficVolume_start;
 			this.trafficVolume_stop = trafficVolume_stop;
 			this.smallScaleCommercialTrafficType = smallScaleCommercialTrafficType;
@@ -106,7 +110,7 @@ public class TripDistributionMatrix {
 	}
 
 	private TripDistributionMatrix(Builder builder) {
-		zonesFeatures = builder.zonesFeatures;
+		zoneFeatureMap = builder.zoneFeatureMap;
 		trafficVolume_start = builder.trafficVolume_start;
 		trafficVolume_stop = builder.trafficVolume_stop;
 		smallScaleCommercialTrafficType = builder.smallScaleCommercialTrafficType;
@@ -130,18 +134,17 @@ public class TripDistributionMatrix {
 	 * @param purpose                         selected purpose
 	 * @param smallScaleCommercialTrafficType goodsTraffic or commercialPersonTraffic
 	 * @param linksPerZone                    links in each zone
-	 * @param shapeFileZoneNameColumn         Name of the unique column of the name/Id of each zone in the zones shape file
 	 */
 	void setTripDistributionValue(String startZone, String stopZone, String modeORvehType, Integer purpose, String smallScaleCommercialTrafficType, Network network,
-								  Map<String, Map<Id<Link>, Link>> linksPerZone, double resistanceFactor, String shapeFileZoneNameColumn) {
+								  Map<String, Map<Id<Link>, Link>> linksPerZone, double resistanceFactor) {
 		double volumeStart = trafficVolume_start.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).getDouble(purpose);
 		double volumeStop = trafficVolume_stop.get(TrafficVolumeGeneration.makeTrafficVolumeKey(stopZone, modeORvehType)).getDouble(purpose);
 		int roundedVolume;
 		if (volumeStart != 0 && volumeStop != 0) {
 
-			double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, linksPerZone, resistanceFactor, shapeFileZoneNameColumn);
+			double resistanceValue = getResistanceFunktionValue(startZone, stopZone, network, linksPerZone, resistanceFactor);
 			double gravityConstantA = getGravityConstant(stopZone, trafficVolume_start, modeORvehType, purpose, network, linksPerZone,
-				resistanceFactor, shapeFileZoneNameColumn);
+				resistanceFactor);
 			roundingError.computeIfAbsent(stopZone, (k) -> new Object2DoubleOpenHashMap<>());
 
 			//Bisher: Gravity model mit fixem Zielverkehr
@@ -180,10 +183,9 @@ public class TripDistributionMatrix {
 	 * @param startZone               start zone
 	 * @param stopZone                stop zone
 	 * @param linksPerZone          links for each zone
-	 * @param shapeFileZoneNameColumn Name of the unique column of the name/Id of each zone in the zones shape file
 	 */
 	private Double getResistanceFunktionValue(String startZone, String stopZone, Network network, Map<String, Map<Id<Link>, Link>> linksPerZone,
-											  double resistanceFactor, String shapeFileZoneNameColumn) {
+											  double resistanceFactor) {
 
 		//if false the calculation is faster; e.g. for debugging
 		boolean useNetworkRoutesForResistanceFunction = true;
@@ -194,45 +196,38 @@ public class TripDistributionMatrix {
 			NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, List.of(vehicleType));
 			netBasedCosts = netBuilder.build();
 		}
-		if (!resistanceFunktionCache.containsKey(makeResistanceFunktionKey(startZone, stopZone)))
-			for (SimpleFeature startZoneFeature : zonesFeatures) {
-				String zone1 = String.valueOf(startZoneFeature.getAttribute(shapeFileZoneNameColumn));
-				if (!startZone.equals(zone1))
-					continue;
-				for (SimpleFeature stopZoneFeature : zonesFeatures) {
-					String zone2 = String.valueOf(stopZoneFeature.getAttribute(shapeFileZoneNameColumn));
-					if (!stopZone.equals(zone2))
-						continue;
-					double distance = Double.MAX_VALUE;
-					double travelCosts = Double.MAX_VALUE;
-					if (zone1.equals(zone2)) {
-						travelCosts = 0;
-						distance = 0;
-					} else {
+		if (!resistanceFunktionCache.containsKey(makeResistanceFunktionKey(startZone, stopZone))) {
+			SimpleFeature startZoneFeature = zoneFeatureMap.get(startZone);
+			SimpleFeature stopZoneFeature = zoneFeatureMap.get(stopZone);
+			double distance = Double.MAX_VALUE;
+			double travelCosts = Double.MAX_VALUE;
+			if (startZone.equals(stopZone)) {
+				travelCosts = 0.0;
+				distance = 0.0;
+			} else {
 
-						if (useNetworkRoutesForResistanceFunction) {
-							Location startLocation = Location.newInstance(linksPerZone.get(startZone).keySet().iterator().next().toString());
-							Location stopLocation = Location.newInstance(linksPerZone.get(stopZone).keySet().iterator().next().toString());
-							Vehicle exampleVehicle = getExampleVehicle(startLocation);
+				if (useNetworkRoutesForResistanceFunction) {
+					//TODO: possible optimization: use a center link of the zone instead of a random link
+					Location startLocation = Location.newInstance(linksPerZone.get(startZone).keySet().iterator().next().toString());
+					Location stopLocation = Location.newInstance(linksPerZone.get(stopZone).keySet().iterator().next().toString());
+					Vehicle exampleVehicle = getExampleVehicle(startLocation);
 //							distance = netBasedCosts.getDistance(startLocation, stopLocation, 21600., exampleVehicle);
-							travelCosts = netBasedCosts.getTransportCost(startLocation, stopLocation, 21600., null, exampleVehicle);
-						}
-						else {
-							Point geometryStartZone = ((Geometry) startZoneFeature.getDefaultGeometry()).getCentroid();
-							Point geometryStopZone = ((Geometry) stopZoneFeature.getDefaultGeometry()).getCentroid();
+					travelCosts = netBasedCosts.getTransportCost(startLocation, stopLocation, 21600., null, exampleVehicle);
 
-							distance = geometryStartZone.distance(geometryStopZone);
+				} else {
+					Point geometryStartZone = ((Geometry) startZoneFeature.getDefaultGeometry()).getCentroid();
+					Point geometryStopZone = ((Geometry) stopZoneFeature.getDefaultGeometry()).getCentroid();
 
-						}
-					}
-					if (useNetworkRoutesForResistanceFunction)
-						resistanceFunktionResult = Math.exp(-resistanceFactor*travelCosts);
-					else
-						resistanceFunktionResult = Math.exp(-distance);
-					resistanceFunktionCache.put(makeResistanceFunktionKey(zone1, zone2), resistanceFunktionResult);
-					resistanceFunktionCache.put(makeResistanceFunktionKey(zone2, zone1), resistanceFunktionResult);
+					distance = geometryStartZone.distance(geometryStopZone);
 				}
 			}
+			if (useNetworkRoutesForResistanceFunction)
+				resistanceFunktionResult = Math.exp(-resistanceFactor * travelCosts);
+			else
+				resistanceFunktionResult = Math.exp(-resistanceFactor * distance);
+			resistanceFunktionCache.put(makeResistanceFunktionKey(startZone, stopZone), resistanceFunktionResult);
+			resistanceFunktionCache.put(makeResistanceFunktionKey(stopZone, startZone), resistanceFunktionResult);
+		}
 		return resistanceFunktionCache.get(makeResistanceFunktionKey(startZone, stopZone));
 	}
 
@@ -290,12 +285,11 @@ public class TripDistributionMatrix {
 	 * @param modeORvehType           selected mode or vehicle type
 	 * @param purpose                 selected purpose
 	 * @param linksPerZone          links for each zone
-	 * @param shapeFileZoneNameColumn Name of the unique column of the name/Id of each zone in the zones shape file
 	 * @return gravity constant
 	 */
 	private double getGravityConstant(String baseZone,
 									  Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume, String modeORvehType,
-									  Integer purpose, Network network, Map<String, Map<Id<Link>, Link>> linksPerZone, double resistanceFactor, String shapeFileZoneNameColumn) {
+									  Integer purpose, Network network, Map<String, Map<Id<Link>, Link>> linksPerZone, double resistanceFactor) {
 
 		GravityConstantKey gravityKey = makeGravityKey(baseZone, modeORvehType, purpose);
 		if (!gravityConstantACache.containsKey(gravityKey)) {
@@ -305,7 +299,7 @@ public class TripDistributionMatrix {
 					double volume = trafficVolume.get(trafficVolumeKey).getDouble(purpose);
 					if (volume != 0) {
 						double resistanceValue = getResistanceFunktionValue(baseZone, trafficVolumeKey.zone(), network,
-							linksPerZone, resistanceFactor, shapeFileZoneNameColumn);
+							linksPerZone, resistanceFactor);
 						sum = sum + (volume * resistanceValue);
 					}
 				}

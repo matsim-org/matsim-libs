@@ -945,7 +945,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				listOfZones.add(k.zone());
 		});
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-			.newInstance(indexZones, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
+			.newInstance(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
 		Network network = scenario.getNetwork();
 		int count = 0;
 
@@ -960,7 +960,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, linksPerZone, resistanceFactor, shapeFileZoneNameColumn);
+						network, linksPerZone, resistanceFactor);
 				}
 			}
 		}
