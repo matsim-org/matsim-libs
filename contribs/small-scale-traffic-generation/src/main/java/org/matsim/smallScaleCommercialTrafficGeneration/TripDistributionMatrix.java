@@ -161,6 +161,9 @@ public class TripDistributionMatrix {
 		} else
 			roundedVolume = 0;
 		TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
+		if (matrixCache.containsKey(matrixKey)) {
+			log.warn("Key {} existiert bereits im matrixCache und wird überschrieben.", matrixKey);
+		}
 		matrixCache.put(matrixKey, roundedVolume);
 	}
 
