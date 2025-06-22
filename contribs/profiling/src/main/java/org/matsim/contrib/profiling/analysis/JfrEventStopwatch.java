@@ -168,7 +168,7 @@ public class JfrEventStopwatch implements AutoCloseable {
 			});
 		}
 
-		// JFRIterationEvents will occur *after* all the operations happening within them
+		// IterationJfrEvents will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
 		eventStream.onEvent(iterationEventName, event -> {
 			// start iteration in stopwatch
