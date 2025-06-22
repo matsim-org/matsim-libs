@@ -77,8 +77,8 @@ class RunDrtExample{
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			drtConfig.setDrtInsertionSearchParams( new ExtensiveInsertionSearchParams() );
+			multiModeDrtCfg.addParameterSet(drtConfig); // replaced by typed method once available
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -90,8 +90,8 @@ class RunDrtExample{
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			drtConfig.setDrtInsertionSearchParams( new ExtensiveInsertionSearchParams() );
+			multiModeDrtCfg.addParameterSet(drtConfig); // replaced by typed method once available
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
@@ -103,8 +103,8 @@ class RunDrtExample{
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
-			multiModeDrtCfg.addParameterSet(drtConfig);
+			drtConfig.setDrtInsertionSearchParams( new ExtensiveInsertionSearchParams() );
+			multiModeDrtCfg.addParameterSet(drtConfig); // replaced by typed method once available
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
