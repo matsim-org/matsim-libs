@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+//import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
 import org.matsim.freight.carriers.controller.CarrierModule;
 
 import java.io.IOException;
@@ -102,12 +102,13 @@ public class RunFreightFoodRetailingBerlinExample {
 		// ## Start of the MATSim-Run: ##
 		controler.run();
 
-		var analysis = new RunFreightAnalysisEventBased(config.controller().getOutputDirectory()+"/", config.controller().getOutputDirectory()+"/analysis", "EPSG:31468");
-		try {
-			analysis.runAnalysis();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+//		var analysis = new RunFreightAnalysisEventBased(config.controller().getOutputDirectory()+"/", config.controller().getOutputDirectory()+"/analysis", "EPSG:31468");
+//		try {
+//			analysis.runAnalysis();
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		// the above analysis class was removed around jun'25.  kai, jun'25
 	}
 
 }
