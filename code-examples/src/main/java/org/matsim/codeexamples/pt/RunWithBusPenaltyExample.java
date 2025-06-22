@@ -1,6 +1,5 @@
-package org.matsim.codeexamples.integration;
+package org.matsim.codeexamples.pt;
 
-import ch.sbb.matsim.routing.pt.raptor.CapacityDependentInVehicleCostCalculator;
 import ch.sbb.matsim.routing.pt.raptor.DefaultRaptorInVehicleCostCalculator;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator;
 import ch.sbb.matsim.routing.pt.raptor.RaptorParameters;
