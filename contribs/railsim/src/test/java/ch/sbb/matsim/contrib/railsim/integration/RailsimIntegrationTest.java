@@ -275,6 +275,33 @@ public class RailsimIntegrationTest {
 	@Test
 	void testMicroJunctionCross() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
+		// check if the train arrives at the stop
+		boolean vehicleArrivesAtFacilityEventFound1 = false;
+		boolean vehicleArrivesAtFacilityEventFound2 = false;
+
+		for (Event event : collector.getEvents()) {
+			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
+
+				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
+
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") && vehicleArrivesEvent.getFacilityId().toString()
+					.equals("stop_A5")) {
+					vehicleArrivesAtFacilityEventFound1 = true;
+					// TODO: also test the arrival time
+//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
+				}
+
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train2") && vehicleArrivesEvent.getFacilityId().toString()
+						.equals("stop_B5")) {
+						vehicleArrivesAtFacilityEventFound2 = true;
+					// TODO: also test the arrival time
+//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
+				}
+			}
+		}
+		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound1, "VehicleArrivesAtFacilityEvent for train1 at stop_A5 not found.");
+		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound2, "VehicleArrivesAtFacilityEvent for train2 at stop_B5 not found.");
+
 	}
 
 	@Test

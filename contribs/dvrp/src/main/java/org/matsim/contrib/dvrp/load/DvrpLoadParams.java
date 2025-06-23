@@ -70,14 +70,6 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
         this.mapVehicleTypeOther = mapVehicleTypeOther;
     }
 
-    public String getMapFleetCapacity() {
-        return mapFleetCapacity;
-    }
-
-    public void setMapFleetCapacity(String mapFleetCapacity) {
-        this.mapFleetCapacity = mapFleetCapacity;
-    }
-
     public String getDefaultRequestDimension() {
         return defaultRequestDimension;
     }
@@ -125,10 +117,6 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
     private String mapVehicleTypeOther = null;
 
     @Parameter
-    @Comment("maps the vehicle capacity when loading from dvrp fleet format to a specific dimension")
-    private String mapFleetCapacity = "passengers";
-
-    @Parameter
     @Comment("if no other load information is given, each request obtains a unit load for the given dimension")
     private String defaultRequestDimension = "passengers";
 
@@ -155,8 +143,5 @@ public class DvrpLoadParams extends ReflectiveConfigGroup {
 
         Preconditions.checkState(getMapVehicleTypeOther() == null || getDimensions().contains(getMapVehicleTypeOther()),
                 "the dimension configured for the vehicle type other capacity does not exist");
-
-        Preconditions.checkState(getMapFleetCapacity() == null || getDimensions().contains(getMapFleetCapacity()),
-                "the dimension configured for the dvrp fleet vehicle capacity does not exist");
     }
 }
