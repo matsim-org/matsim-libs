@@ -63,7 +63,7 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 	 * would want to add is to take into account the duration of the stop. 
 	 */
 	private double calculateStopEnd(DropoffDetourInfo info) {
-		return info.vehicleArrivalTime + info.requestDropoffTime;
+		return info.requestDropoffTime;
 	}
 
 	private double calculateStopEnd(PickupDetourInfo info) {
