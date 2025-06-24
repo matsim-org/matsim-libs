@@ -189,7 +189,6 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 				observedTrafficVolumeByDay = countVolume.get(24);
 				simulatedTrafficVolumeByDay = Arrays.stream(volumesForLink).sum() / this.sample.getSample();
 			}
-
 			Row row = dailyTrafficVolume.appendRow();
 			row.setString("link_id", key.toString());
 			row.setString("name", name);
@@ -199,6 +198,31 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
 		}
 
+		// calculate regression line for observed / simulated traffic
+		DoubleColumn x = dailyTrafficVolume.doubleColumn("observed_traffic_volume");
+		DoubleColumn y = dailyTrafficVolume.doubleColumn("simulated_traffic_volume");
+
+		// Calculate best fit line: y = a + b * x
+		double xMean = x.mean();
+		double yMean = y.mean();
+		double numerator = 0;
+		double denominator = 0;
+
+		for (int i = 0; i < x.size(); i++) {
+			numerator += (x.getDouble(i) - xMean) * (y.getDouble(i) - yMean);
+			denominator += (x.getDouble(i) - xMean) * (x.getDouble(i) - xMean);
+		}
+
+		double b = numerator / denominator;      // slope
+		double a = yMean - b * xMean;            // intercept
+
+		// Compute predicted y values (best fit line)
+		DoubleColumn yFit = DoubleColumn.create("yFit");
+		for (int i = 0; i < x.size(); i++) {
+			yFit.append(a + b * x.getDouble(i));
+		}
+
+
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
 			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
 			.setName("rel_error");
@@ -207,7 +231,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
 			.setName("quality");
 
-		dailyTrafficVolume.addColumns(relError, qualityLabel);
+		dailyTrafficVolume.addColumns(relError, qualityLabel, yFit);
 
 
 		dailyTrafficVolume = dailyTrafficVolume.sortOn("road_type", "link_id");
