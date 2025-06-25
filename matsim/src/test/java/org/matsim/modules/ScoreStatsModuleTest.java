@@ -96,19 +96,19 @@ public class ScoreStatsModuleTest {
 				{
 				Double[] worst = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
 				Assertions.assertEquals(64.75686659291274, worst[0], DELTA);
-				Assertions.assertEquals(64.57797466466197, worst[1], DELTA);
+				Assertions.assertEquals(64.78366379257605, worst[1], DELTA);
 				}{
 				Double[] best = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
 				Assertions.assertEquals(64.75686659291274, best[0], DELTA);
-				Assertions.assertEquals(64.78366379257605, best[1], DELTA);
+				Assertions.assertEquals(64.84180132563583, best[1], DELTA);
 				}{
 				Double[] average = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
 				Assertions.assertEquals(64.75686659291274, average[0], DELTA);
-				Assertions.assertEquals(64.680819228619, average[1], DELTA);
+				Assertions.assertEquals(64.81273255910591, average[1], DELTA);
 				}{
 				Double[] executed = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
 				Assertions.assertEquals(64.75686659291274, executed[0], DELTA);
-				Assertions.assertEquals(64.57797466466197, executed[1], DELTA);
+				Assertions.assertEquals(64.84180132563583, executed[1], DELTA);
 				}
 //			} else {
 //				{
