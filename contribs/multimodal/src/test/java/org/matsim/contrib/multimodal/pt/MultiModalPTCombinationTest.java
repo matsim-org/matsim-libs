@@ -86,6 +86,7 @@ public class MultiModalPTCombinationTest {
 		Config config = scenario.getConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
@@ -119,7 +120,7 @@ public class MultiModalPTCombinationTest {
 		controler.getConfig().controller().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 
-        controler.addOverridingModule(new MultiModalModule());
+		controler.addOverridingModule(new MultiModalModule());
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);

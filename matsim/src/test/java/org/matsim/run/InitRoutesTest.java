@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -64,6 +65,7 @@ public class InitRoutesTest {
 	@Test
 	void testMain() throws Exception {
 		Config config = utils.loadConfig((String)null);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		final String NETWORK_FILE = "test/scenarios/equil/network.xml";
 		final String PLANS_FILE_TESTINPUT = utils.getOutputDirectory() + "plans.in.xml";
 		final String PLANS_FILE_TESTOUTPUT = utils.getOutputDirectory() + "plans.out.xml";
