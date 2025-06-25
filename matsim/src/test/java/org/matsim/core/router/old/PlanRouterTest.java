@@ -22,6 +22,7 @@
 
 package org.matsim.core.router.old;
 
+import com.google.inject.multibindings.Multibinder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -34,8 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -80,23 +80,18 @@ public class PlanRouterTest {
                 install(new TimeInterpretationModule());
                 addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+
+				Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class );
+				bind( PrepareForSim.class ).to( PrepareForSimImpl.class );
             }
         });
+		injector.getInstance( PrepareForSim.class ).run();
+
         TripRouter tripRouter = injector.getInstance(TripRouter.class);
         PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
         Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
-
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		VehicleUtils.insertVehicleIdsIntoPersonAttributes(plan.getPerson(), vehicles.getModeVehicles());
 
         testee.run(plan);
 
@@ -118,19 +113,10 @@ public class PlanRouterTest {
         Id<Vehicle> oldVehicleId = Id.create(1, Vehicle.class);
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(oldVehicleId);
 
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
-
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		VehicleUtils.insertVehicleIdsIntoPersonAttributes(plan.getPerson(), vehicles.getModeVehicles());
 
 		// A trip router which provides vehicle ids by itself.
-        final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        final RoutingModule routingModule = new RoutingModule() {
+		final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
+		final RoutingModule routingModule = new RoutingModule() {
               @Override
               public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 				  final Facility fromFacility = request.getFromFacility();
@@ -167,7 +153,7 @@ public class PlanRouterTest {
               }
 
           };
-        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
             public void install() {
                 install(new ScenarioByInstanceModule(scenario));
@@ -179,17 +165,23 @@ public class PlanRouterTest {
                         addRoutingModuleBinding("car").toInstance( routingModule );
                     }
                 }));
+
+				install(new TimeInterpretationModule());
+				Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class );
+				bind( PrepareForSim.class ).to( PrepareForSimImpl.class );
             }
         });
-        TripRouter tripRouter = injector.getInstance(TripRouter.class);
+		injector.getInstance( PrepareForSim.class ).run();
 
-        PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
-        testee.run(plan);
+		TripRouter tripRouter = injector.getInstance(TripRouter.class);
+
+		PlanRouter testee = new PlanRouter(tripRouter, TimeInterpretation.create(config));
+		testee.run(plan);
 
 		Assertions.assertEquals(newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId(), "Vehicle Id from TripRouter used");
 		// yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
 
 
-    }
+	}
 
 }
