@@ -22,13 +22,11 @@
 
 package org.matsim.core.router.old;
 
-import com.google.inject.multibindings.Multibinder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -53,10 +51,7 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.PersonVehicles;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -81,8 +76,7 @@ public class PlanRouterTest {
                 addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 
-				Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class );
-				bind( PrepareForSim.class ).to( PrepareForSimImpl.class );
+				install(new DefaultPrepareForSimModule());
             }
         });
 		injector.getInstance( PrepareForSim.class ).run();
@@ -167,8 +161,7 @@ public class PlanRouterTest {
                 }));
 
 				install(new TimeInterpretationModule());
-				Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class );
-				bind( PrepareForSim.class ).to( PrepareForSimImpl.class );
+				install(new DefaultPrepareForSimModule());
             }
         });
 		injector.getInstance( PrepareForSim.class ).run();

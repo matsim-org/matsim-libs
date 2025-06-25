@@ -81,13 +81,13 @@ public class PtTripFareEstimatorTest {
 
 		// We need to add a vehicle, it however does not affect the results
 		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
+		// Cannot be solved via PrepareForSim because it freight network is empty
 		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
 		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
 		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
 
 		PersonVehicles vehicles = new PersonVehicles();
 		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
 		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
 		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());

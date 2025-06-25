@@ -34,7 +34,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.DefaultPrepareForSimModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -46,9 +48,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 import jakarta.inject.Provider;
-import org.matsim.vehicles.PersonVehicles;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,16 +104,8 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2pt );
 		net.addLink( l3 );
 
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
-
 		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		scenario.getPopulation().addPerson(p);
 
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
@@ -126,10 +117,12 @@ public class TripRouterFactoryImplTest {
 						install(new TimeInterpretationModule());
 						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+						install(new DefaultPrepareForSimModule());
 					}
 				}));
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		// create the factory, get a router, route.
 		Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
@@ -193,16 +186,8 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2short );
 		net.addLink( l3 );
 
-		// We need to add a vehicle, it however does not affect the results
-		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
-		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
-		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
-		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
-
 		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
-		PersonVehicles vehicles = new PersonVehicles();
-		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
-		VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		scenario.getPopulation().addPerson(p);
 
 		// create the factory, get a router, route.
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
@@ -217,8 +202,10 @@ public class TripRouterFactoryImplTest {
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
+				install(new DefaultPrepareForSimModule());
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		TripRouter router = injector.getInstance(TripRouter.class);
 
