@@ -25,10 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.bicycle.AdditionalBicycleLinkScore;
-import org.matsim.contrib.bicycle.BicycleConfigGroup;
-import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.bicycle.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
@@ -88,7 +85,7 @@ public class RunBicycleExample {
 		bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
 		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
 
-		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
+//		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
 
 		List<String> mainModeList = new ArrayList<>();
@@ -160,6 +157,7 @@ public class RunBicycleExample {
 		controler.addOverridingModule(new BicycleModule() );
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
+				this.bind( AdditionalBicycleLinkScoreDefaultImpl.class ); // so it can be used as delegate
 				this.bind( AdditionalBicycleLinkScore.class ).to( MyAdditionalBicycleLinkScore.class );
 			}
 		} );
@@ -169,10 +167,8 @@ public class RunBicycleExample {
 
 	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
 
-		private final AdditionalBicycleLinkScore delegate;
-		@Inject MyAdditionalBicycleLinkScore( Scenario scenario ) {
-			this.delegate = BicycleUtils.createDefaultBicycleLinkScore( scenario );
-		}
+		@Inject private AdditionalBicycleLinkScoreDefaultImpl delegate;
+
 		@Override public double computeLinkBasedScore( Link link ){
 			double result = (double) link.getAttributes().getAttribute( "carFreeStatus" );  // from zero to one
 
