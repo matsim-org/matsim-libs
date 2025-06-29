@@ -523,7 +523,7 @@ import org.matsim.vehicles.VehicleUtils;
   }
 
   private static VehicleType createCarrierVehicleType(String vehicleTypeId) {
-    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeId, VehicleType.class), TransportMode.car);
+    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.createVehicleTypeId(vehicleTypeId), TransportMode.car);
     vehicleType.getCapacity().setOther(10);
     vehicleType.getCostInformation().setCostsPerMeter(0.0004);
     vehicleType.getCostInformation().setCostsPerSecond(0.38);

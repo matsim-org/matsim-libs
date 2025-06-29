@@ -88,6 +88,9 @@ import org.matsim.vehicles.VehicleType;
 			CarrierService carrierService = convertToCarrierService(lspShipment);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 
+			//TODO: Include all vehicle(types) here and perform a jsprit run for tour planning.
+			// Maybe only, of the the vehicleType collection fo the carrier has more than one vehicleType.
+			//kmt may'25
 			VehicleType vehicleType =
 				ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + lspShipment.getSize())
@@ -114,6 +117,8 @@ import org.matsim.vehicles.VehicleType;
 		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.addPlan(plan);
 		carrier.setSelectedPlan(plan);
+
+		updateShipments();
 	}
 
 	private CarrierPlan createCarrierPlan(Carrier carrier, List<LspShipment> lspShipments) {
@@ -238,9 +243,7 @@ import org.matsim.vehicles.VehicleType;
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
 					if (element instanceof Tour.ServiceActivity serviceActivity) {
-						LSPShipmentCarrierServicePair carrierPair =
-							new LSPShipmentCarrierServicePair(
-								LspShipment, serviceActivity.getService());
+						LSPShipmentCarrierServicePair carrierPair = new LSPShipmentCarrierServicePair(LspShipment, serviceActivity.getService());
 						for (LSPShipmentCarrierServicePair pair : pairs) {
 							if (pair.lspShipment == carrierPair.lspShipment
 								&& pair.carrierService.getId() == carrierPair.carrierService.getId()) {
@@ -332,7 +335,7 @@ import org.matsim.vehicles.VehicleType;
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
 				LSPTourStartEventHandler handler =
-					new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour, null);
+            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
 				lspShipment.addSimulationTracker(handler);
 				break;
 			}
