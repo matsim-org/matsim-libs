@@ -1,10 +1,12 @@
 package org.matsim.contrib.drt.extension.preemptive_rejection;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
+import org.matsim.contrib.drt.extension.preemptive_rejection.PreemptiveRejectionOptimizer.RejectionEntryContainer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -24,8 +26,8 @@ public class PreemptiveRejectionModule extends AbstractModule {
                 Optional<PreemptiveRejectionParams> params = extendedConfig.getPreemptiveRejectionParams();
 
                 if (params.isPresent()) {
-                    URL source = ConfigGroup.getInputFileURL(getConfig().getContext(), params.get().getInputPath());
-                    installOverridingQSimModule(new PreemptiveRejectionModeQSimModule(drtConfig.getMode(), source));
+
+                    installOverridingQSimModule(new PreemptiveRejectionModeQSimModule(drtConfig.getMode()));
 
                     install(new AbstractDvrpModeModule(drtConfig.getMode()) {
                         @Override
@@ -35,6 +37,17 @@ public class PreemptiveRejectionModule extends AbstractModule {
                                 OutputDirectoryHierarchy outputHierarchy = getter.get(OutputDirectoryHierarchy.class);
 
                                 return new PreemptiveRejectionHandler(getMode(), population, outputHierarchy);
+                            })).in(Singleton.class);
+
+                            bindModal(RejectionEntryContainer.class).toProvider(modalProvider(getter -> {
+                                URL source = ConfigGroup.getInputFileURL(getConfig().getContext(),
+                                        params.get().getInputPath());
+
+                                try {
+                                    return RejectionEntryContainer.read(source);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             })).in(Singleton.class);
 
                             addControlerListenerBinding().to(modalKey(PreemptiveRejectionHandler.class));

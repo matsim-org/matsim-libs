@@ -21,8 +21,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
@@ -43,15 +41,13 @@ public class PreemptiveRejectionOptimizer implements DrtOptimizer {
     private double now;
 
     public PreemptiveRejectionOptimizer(String mode, DrtOptimizer delegate, EventsManager eventsManager,
-            Population population, URL source) throws StreamReadException, DatabindException, IOException {
+            Population population, RejectionEntryContainer container) {
         this.mode = mode;
         this.delegate = delegate;
         this.eventsManager = eventsManager;
         this.population = population;
         this.random = MatsimRandom.getLocalInstance();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        container = objectMapper.readValue(source, RejectionEntryContainer.class);
+        this.container = container;
     }
 
     @Override
@@ -145,5 +141,10 @@ public class PreemptiveRejectionOptimizer implements DrtOptimizer {
 
     static public class RejectionEntryContainer {
         public List<RejectionEntry> rejections = new LinkedList<>();
+
+        static public RejectionEntryContainer read(URL source) throws IOException {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(source, RejectionEntryContainer.class);
+        }
     }
 }
