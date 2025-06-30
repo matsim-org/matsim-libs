@@ -104,9 +104,12 @@ public final class BicycleModule extends AbstractModule {
 					}
 				}
 			}
+
 			if (!scenario.getConfig().qsim().getMainModes().contains(bicycleConfigGroup.getBicycleMode())) {
 				LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
 			}
+			// (yy should move into the config consistency checker)
+
 		}
 	}
 }
