@@ -131,6 +131,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeSmall));
+
+		LSPUtils.scheduleLsps(lsps);
+
 		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
 
@@ -308,9 +311,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		for (LspShipment lspShipment : lspShipments) {
 			lsp.assignShipmentToLSP(lspShipment);
 		}
-
-		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleLogisticChains();
 
 		return lsp;
 	}

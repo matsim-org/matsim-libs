@@ -81,6 +81,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 
   @Override
   public void scheduleLogisticChains() {
+
     logisticChainScheduler.scheduleLogisticChain();
   }
 

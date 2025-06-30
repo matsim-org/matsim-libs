@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -35,7 +37,11 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
+
 public final class LSPUtils {
+
+	static final Logger log = LogManager.getLogger(LSPUtils.class);
+
 	private static final String lspsString = "lsps";
 
 	private LSPUtils() {} // do not instantiate
@@ -165,6 +171,13 @@ public final class LSPUtils {
 			}
 		}
 		return null;
+	}
+
+	public static void scheduleLsps(Collection<LSP> lsps) {
+		for (LSP lsp : lsps) {
+			log.info("schedule the LSP: {} with the shipments and according to the scheduler of the Resource", lsp.getId());
+			lsp.scheduleLogisticChains();
+		}
 	}
 
 	public enum LogicOfVrp {serviceBased, shipmentBased}

@@ -56,9 +56,7 @@ class MultipleChainsUtils {
 		List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream().toList();
 
 		for (CarrierShipment shipment : carrierShipments) {
-			LspShipmentUtils.LspShipmentBuilder builder =
-				LspShipmentUtils.LspShipmentBuilder.newInstance(
-					Id.create(shipment.getId().toString(), LspShipment.class));
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(Id.create(shipment.getId().toString(), LspShipment.class));
 			builder.setCapacityDemand(shipment.getCapacityDemand());
 			builder.setFromLinkId(shipment.getPickupLinkId());
 			builder.setToLinkId(shipment.getDeliveryLinkId());
