@@ -61,7 +61,7 @@ final class TripChoiceAnalysis {
 
 		for (Row trip : trips) {
 
-			String person = trip.getText("person");
+			String person = trip.getString("person");
 			int n = trip.getInt("trip_number") - 1;
 			double weight = hasWeight ? trip.getDouble(TripAnalysis.ATTR_REF_WEIGHT) : 1;
 

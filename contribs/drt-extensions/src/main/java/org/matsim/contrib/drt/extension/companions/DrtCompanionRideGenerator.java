@@ -23,7 +23,8 @@
  
  import java.util.ArrayList;
  import java.util.Collection;
- import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashMap;
  import java.util.HashSet;
  import java.util.List;
  import java.util.Map;
@@ -68,6 +69,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	 private final Set<Leg> drtLegs = new HashSet<>();
 	 private WeightedRandomSelection<Integer> sampler;
+	 private final boolean generateByDefault;
  
 	 private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
  
@@ -96,6 +98,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 				 .max()
 				 .orElse(0);
 		 installSampler(drtWithExtensionsConfigGroup);
+
+		 generateByDefault = drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getGenerateCompanionsByDefault();
 	 }
  
 	 private String getCompanionPrefix(String drtMode) {
@@ -124,7 +128,13 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 private void addCompanionAgents() {
 		 Collection<Person> companions = new ArrayList<>();
 		 for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			 for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+			 
+			if (!isActive(person)) {
+				// skip if mode is configured to generate companions for this agent
+				continue;
+			}
+			
+			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				 int additionalCompanions = sampler.select();
  
 				 for (Leg leg : trip.getLegsOnly()) {
@@ -270,6 +280,17 @@ import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
 	 public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		 this.addCompanionAgents();
 	 }
- 
+
+	 static public final String PERSON_ATTRIBUTE = "drt:companions";
+
+	 private boolean isActive(Person person) {
+		Boolean value = (Boolean) person.getAttributes().getAttribute(PERSON_ATTRIBUTE);
+
+		if (value == null) {
+			return generateByDefault;
+		}
+
+		return value;
+	 }
  }
  
