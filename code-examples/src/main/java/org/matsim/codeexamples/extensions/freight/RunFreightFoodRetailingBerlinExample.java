@@ -20,6 +20,7 @@ package org.matsim.codeexamples.extensions.freight;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.CommandLine;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarrierPlanWriter;
@@ -31,7 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-//import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.CarrierModule;
 
 import java.io.IOException;
@@ -43,16 +44,16 @@ import java.util.concurrent.ExecutionException;
  */
 public class RunFreightFoodRetailingBerlinExample {
 
-	public static void main(String[] args) throws ExecutionException, InterruptedException{
+	public static void main(String[] args) throws ExecutionException, InterruptedException, CommandLine.ConfigurationException {
 		run(args, false);
 	}
-	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException{
+	public static void run( String[] args, boolean runWithOTFVis ) throws ExecutionException, InterruptedException, CommandLine.ConfigurationException {
 
 		// Path to public repo:
 		String pathToInput = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/";
 		// ### config stuff: ###
 		Config config;
-		if ( args==null || args.length==0 || args[0]==null ){
+		if ( args==null || args.length==0  ){
 			config = ConfigUtils.createConfig();
 			config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/output-berlinv5.5/berlin-v5.5.3-10pct.output_network.xml.gz");
 			config.controller().setOutputDirectory( "./output/freight3" );
@@ -64,7 +65,12 @@ public class RunFreightFoodRetailingBerlinExample {
 			freightConfigGroup.setCarriersFile(  pathToInput + "CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEV.xml" );
 			freightConfigGroup.setCarriersVehicleTypesFile( pathToInput + "vehicleTypesBVWP100_DC_noTax.xml" );
 		} else {
-			config = ConfigUtils.loadConfig( args, new FreightCarriersConfigGroup() );
+			CommandLine cmd = new CommandLine.Builder(args) //
+					.allowPositionalArguments(false)//
+					.build();
+
+			config = ConfigUtils.createConfig( new FreightCarriersConfigGroup() );
+			cmd.applyConfiguration(config);
 		}
 
 		// load scenario (this is not loading the freight material):
@@ -102,13 +108,12 @@ public class RunFreightFoodRetailingBerlinExample {
 		// ## Start of the MATSim-Run: ##
 		controler.run();
 
-//		var analysis = new RunFreightAnalysisEventBased(config.controller().getOutputDirectory()+"/", config.controller().getOutputDirectory()+"/analysis", "EPSG:31468");
-//		try {
-//			analysis.runAnalysis();
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-		// the above analysis class was removed around jun'25.  kai, jun'25
+		var analysis = new CarriersAnalysis(config.controller().getOutputDirectory());
+				try {
+			analysis.runCarrierAnalysis();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
