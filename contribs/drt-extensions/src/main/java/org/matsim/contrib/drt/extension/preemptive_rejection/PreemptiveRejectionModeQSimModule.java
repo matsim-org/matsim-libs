@@ -26,7 +26,7 @@ public class PreemptiveRejectionModeQSimModule extends AbstractDvrpModeQSimModul
 
             EventsManager eventsManager = getter.get(EventsManager.class);
             Population population = getter.get(Population.class);
-            RejectionEntryContainer container = getter.get(RejectionEntryContainer.class);
+            RejectionEntryContainer container = getter.getModal(RejectionEntryContainer.class);
 
             return new PreemptiveRejectionOptimizer(getMode(), delegate, eventsManager, population, container);
         }));
