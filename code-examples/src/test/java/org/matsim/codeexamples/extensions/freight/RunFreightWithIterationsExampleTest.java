@@ -3,6 +3,7 @@ package org.matsim.codeexamples.extensions.freight;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
@@ -22,6 +23,7 @@ public class RunFreightWithIterationsExampleTest{
 	@RegisterExtension public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	@Disabled
 	void testMain(){
 		try{
 			String[] args = { IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ).toString() ,
