@@ -132,9 +132,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeSmall));
 
-		LSPUtils.scheduleLsps(lsps);
-
 		LSPUtils.loadLspsIntoScenario(scenario, lsps);
+		LSPUtils.scheduleLsps(LSPUtils.getLSPs(scenario));
 
 
 		Controller controller = prepareController(scenario, rpScheme);

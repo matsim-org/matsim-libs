@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker;
 import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
@@ -173,8 +175,9 @@ public final class LSPUtils {
 		return null;
 	}
 
-	public static void scheduleLsps(Collection<LSP> lsps) {
-		for (LSP lsp : lsps) {
+	public static void scheduleLsps(LSPs lsps) {
+		LogisticsConsistencyChecker.checkBeforePlanning(lsps, Level.ERROR);
+		for (LSP lsp : lsps.getLSPs().values()) {
 			log.info("schedule the LSP: {} with the shipments and according to the scheduler of the Resource", lsp.getId());
 			lsp.scheduleLogisticChains();
 		}
