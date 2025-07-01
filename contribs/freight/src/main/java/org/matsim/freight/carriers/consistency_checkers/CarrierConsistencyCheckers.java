@@ -156,7 +156,7 @@ public class CarrierConsistencyCheckers {
 
 			//if map is empty, there is a sufficient vehicle for every job
 			if (jobTooBigForVehicle.isEmpty()) {
-				log.log(level, "Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity);
+//				log.debug(level, "Carrier '{}': At least one vehicle has sufficient capacity ({}) for all jobs.", carrier.getId().toString(), maxVehicleCapacity);
 				isCarrierCapable.put(carrier.getId(), true);
 			} else {
 				//if map is not empty, at least one job's capacity demand is too high for the largest vehicle.
@@ -176,7 +176,7 @@ public class CarrierConsistencyCheckers {
 	}
 
 	/**
-	 * this method will check if all existing carriers have vehicles with enough capacity in operation to handle all given jobs.
+	 * this method will check if all existing carriers have vehicles with feasible operation times to handle all given jobs.
 	 * CHECK_SUCCESSFUL if all jobs can be handled
 	 * CHECK_FAILED if at least one job can not be handled
 	 * <p>
@@ -184,7 +184,6 @@ public class CarrierConsistencyCheckers {
 	 * @param lvl level of log messages / errors
 	 * @return CheckResult 'CHECK_SUCCESSFUL' or 'CHECK_FAILED'
 	 */
-
 	/*package-private*/ static CheckResult vehicleScheduleCheck(Carriers carriers, Level lvl) {
 		Level level = setInternalLogLevel(lvl);
 		//isCarrierCapable saves carrierIDs and check result (true/false)
@@ -250,6 +249,7 @@ public class CarrierConsistencyCheckers {
 						isTransportable = true;
 					}
 				}
+
 				//if shipment is transportable => job is feasible
 				if (!isTransportable) {
 					log.log(level,"Job '{}' can not be handled by carrier '{}'.", shipmentID, carrier.getId().toString());
@@ -284,18 +284,22 @@ public class CarrierConsistencyCheckers {
 					nonFeasibleJob.put(serviceID, "No sufficient vehicle for service.");
 				}
 			}
+
+
 			if (nonFeasibleJob.isEmpty()) {
+				log.debug("Carrier '{}' has feasible vehicle(s) for all its job(s)", carrier.getId().toString());
 				isCarrierCapable.put(carrier.getId(), true);
 			} else {
+				//if map is not empty, at least one job cannot be executed.
 				isCarrierCapable.put(carrier.getId(), false);
+				log.log(level,"Carrier '{}': there is at least one job without feasible vehicle available (operation time of the vehicle does not fit to the time-windows of the job)", carrier.getId().toString());
+				nonFeasibleJob.forEach((jobId, reason) -> {
+					log.log(level,"Job '{}' can not be handled by carrier '{}'. Reason: {}", jobId.toString(), carrier.getId().toString(), reason);
+				});
 			}
 		}
+
 		//if every carrier has at least one vehicle in operation with sufficient capacity for all jobs, allCarriersCapable will be true
-		isCarrierCapable.forEach((carrierId, value) -> {
-			if (!value) {
-				log.log(level,"Carrier {} can not handle all jobs.", carrierId);
-			}
-		});
 		if (isCarrierCapable.values().stream().allMatch(v -> v)) {
 			return CheckResult.CHECK_SUCCESSFUL;
 		} else {
@@ -403,7 +407,7 @@ public class CarrierConsistencyCheckers {
 				//TODO KMT: Fehlt hier noch ein Ast? Prüfen.
 				//if serviceList or shipmentList is empty, all existing jobs (services or shipments) are scheduled only once.
 			} else {
-				log.log(level,"Carrier '{}': All jobs are scheduled once.", carrier.getId());
+				log.debug("Carrier '{}': All jobs are scheduled exactly once.", carrier.getId());
 				isCarrierCapable.put(carrier.getId(), AllJobsInToursDetailedCheckResult.ALL_JOBS_IN_TOURS);
 			}
 		}

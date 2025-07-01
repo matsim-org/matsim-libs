@@ -29,7 +29,6 @@ public class SimWrapperTest {
 			header.description = "Test All Simwrapper Plug-Ins Dashboard";
 			header.tab = "Header Tab";
 			header.triggerPattern = "*example.csv";
-
 			layout.row("first")
 					.el(Area.class, (viz, data) -> {
 						viz.title = "Area";
@@ -136,6 +135,30 @@ public class SimWrapperTest {
 					viz.carriers = data.output("output_carriers.xml.gz");
 					viz.lsps = data.output("output_lsps.xml.gz");
 				});
+			layout.row("thirteenth")
+				.el(FlowMap.class, ((viz, data) -> {
+					viz.metrics = new FlowMap.Metrics();
+					viz.title = "Flow Map";
+					viz.description = "this viz is a flow map";
+					viz.zoom = 9.5;
+					viz.metrics.setLabel("headway per Stop");
+					viz.metrics.setDataset("analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv");
+					viz.metrics.setOrigin("stopAreaOrStop");
+					viz.metrics.setDestination("stopAreaOrStopNext");
+					viz.metrics.setFlow("meanHeadway");
+					viz.metrics.setColorScheme("BurgYl");
+					viz.metrics.setValueTransform(FlowMap.Metrics.ValueTransform.NORMAL);
+				}));
+			layout.row("fourteenth")
+				.el(Vehicles.class, ((viz, data) -> {
+					viz.title = "DRT Vehicle Animation";
+					viz.description = "drt animation";
+					viz.center = new double[]{13.45, 52.5};
+					viz.zoom = 11.0;
+					viz.drtTrips = "drt-vehicles.json";
+					viz.projection = "EPSG:25832";
+					viz.mapIsIndependent = true;
+				}));
 		});
 
 		String outputDirectory = utils.getOutputDirectory();

@@ -24,10 +24,8 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.analysis.ExecutedScheduleCollector;
-import org.matsim.contrib.dvrp.load.DefaultDvrpLoadFromFleet;
 import org.matsim.contrib.dvrp.load.DefaultDvrpLoadFromVehicle;
 import org.matsim.contrib.dvrp.load.DefaultDvrpLoadFromVehicle.CapacityMapping;
-import org.matsim.contrib.dvrp.load.DvrpLoadFromFleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadFromVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoadModule;
 import org.matsim.contrib.dvrp.load.DvrpLoadParams;
@@ -81,13 +79,6 @@ public class FleetModule extends AbstractDvrpModeModule {
 
 		install(new DvrpLoadModule(getMode(), loadParams));
 
-		bindModal(DefaultDvrpLoadFromFleet.class).toProvider(modalProvider(getter -> {
-			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new DefaultDvrpLoadFromFleet(loadType, loadParams.getMapFleetCapacity());
-		})).in(Singleton.class);
-
-		bindModal(DvrpLoadFromFleet.class).to(modalKey(DefaultDvrpLoadFromFleet.class));
-
 		bindModal(DvrpLoadFromVehicle.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
 			return new DefaultDvrpLoadFromVehicle(loadType, CapacityMapping.build(loadParams));
@@ -96,8 +87,8 @@ public class FleetModule extends AbstractDvrpModeModule {
 		if (fleetSpecificationUrl != null) {
 			bindModal(FleetSpecification.class).toProvider(modalProvider((getter) -> {
 				FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-				DvrpLoadFromFleet dvrpLoadFromFleet = getter.getModal(DvrpLoadFromFleet.class);
-				new FleetReader(fleetSpecification, dvrpLoadFromFleet).parse(fleetSpecificationUrl);
+				DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+				new FleetReader(fleetSpecification, loadType).parse(fleetSpecificationUrl);
 				return fleetSpecification;
 			})).asEagerSingleton();
 		} else {
