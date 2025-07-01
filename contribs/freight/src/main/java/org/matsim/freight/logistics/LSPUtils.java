@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChecker;
@@ -192,21 +193,30 @@ public final class LSPUtils {
 	 * @param lsp the lsp for which the shipments should be split if needed
 	 */
 	private static void splitShipmentsIfNeeded(LSP lsp) {
-		double lowestCapacity = 0.0;
+		double lowestCapacity = Double.MAX_VALUE;
 		for (LSPResource lspResource : lsp.getResources()) {
 			if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
-				lowestCapacity = lspCarrierResource.getCarrier().getCarrierCapabilities().getVehicleTypes().stream()
-					.mapToDouble(vt -> vt.getCapacity().getOther()).min().orElse(0.0);
+				for (CarrierVehicle carrierVehicle : lspCarrierResource.getCarrier().getCarrierCapabilities().getCarrierVehicles().values()) {
+					var vehCapacity= carrierVehicle.getType().getCapacity().getOther();
+					if (vehCapacity < lowestCapacity) {
+						lowestCapacity = vehCapacity;
+					}
+				}
 			}
 		}
 
-		lowestCapacity = (int) lowestCapacity; // ensure that the capacity is an integer value
+		if (lowestCapacity == Double.MAX_VALUE) {
+			log.error("LSP: {}: Did not find the capacities of the vehicles from the CarrierRessources. Aborting", lsp.getId());
+			throw new IllegalStateException();
+		} else {
+			lowestCapacity = (int) lowestCapacity; // ensure that the capacity is an integer value
+		}
 
 		List<LspShipment> newShipments = new LinkedList<>();
 		for (LspShipment lspShipment : lsp.getLspShipments()) {
 			int sizeOfShipment = lspShipment.getSize();
 			int sizeOfNewShipments =0;
-			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0) {
+			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0 && lowestCapacity < Integer.MAX_VALUE) {
 				log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling. Will split it into smaller parts.",
 					lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
 				int fullParts = (int) (lspShipment.getSize() / lowestCapacity);
@@ -214,6 +224,7 @@ public final class LSPUtils {
 				char suffix = 'a';
 				for (int i = 0; i < fullParts; i++) {
 					LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) lowestCapacity);
+					//Todo: Durantion proportional anpassen.
 					newShipments.add(part);
 					sizeOfNewShipments = sizeOfNewShipments + part.getSize();
 					suffix++;

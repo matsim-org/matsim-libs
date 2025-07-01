@@ -70,7 +70,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final double HUBCOSTS_FIX = 100;
 
 	private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS;
-	private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
+	private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t", "heavy40t_electro"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 	private static final double TOLL_VALUE = 1000;
 
 //	private static final String CARRIER_PLAN_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
@@ -122,11 +122,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			vehTypeLargeBEV.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
 		);
 
+		CarrierVehicleTypes vehTypeSmallBEV = new CarrierVehicleTypes();
+		List.of("light8t_electro").forEach(type ->
+			vehTypeSmallBEV.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
+		);
+
 
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
 //		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeLarge));
-		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLargeBEV, vehTypeLarge));
+		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
