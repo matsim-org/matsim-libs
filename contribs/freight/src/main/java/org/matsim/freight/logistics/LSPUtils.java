@@ -20,9 +20,7 @@
 
 package org.matsim.freight.logistics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +35,7 @@ import org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChe
 import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
+import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
 
@@ -46,7 +45,8 @@ public final class LSPUtils {
 
 	private static final String lspsString = "lsps";
 
-	private LSPUtils() {} // do not instantiate
+	private LSPUtils() {
+	} // do not instantiate
 
 	public static LSPPlan createLSPPlan() {
 		return new LSPPlanImpl();
@@ -54,8 +54,9 @@ public final class LSPUtils {
 
 
 	/**
-	 * Checks, is the plan the selcted plan.
+	 * Checks, is the plan the selected plan.
 	 * (This is adapted copy from PersonUtils.isSelected(plan) )
+	 *
 	 * @param lspPlan the plan to check
 	 * @return true if the plan is the selected plan. false, if not.
 	 */
@@ -78,7 +79,7 @@ public final class LSPUtils {
 	 * @param scenario The scenario where the LSPs should be added.
 	 * @return the lsps container
 	 */
-	public static LSPs addOrGetLsps( Scenario scenario ) {
+	public static LSPs addOrGetLsps(Scenario scenario) {
 		LSPs lsps = (LSPs) scenario.getScenarioElement(lspsString);
 		if (lsps == null) {
 			lsps = new LSPs(Collections.emptyList());
@@ -138,7 +139,6 @@ public final class LSPUtils {
 	}
 
 
-
 	public static void setFixedCost(Attributable attributable, Double fixedCost) {
 		attributable.getAttributes().putAttribute("fixedCost", fixedCost);
 	}
@@ -146,7 +146,7 @@ public final class LSPUtils {
 	/**
 	 * Gives back the {@link LspShipment} object of the {@link LSP}, which matches to the shipmentId
 	 *
-	 * @param lsp In this LSP this method tries to find the shipment.
+	 * @param lsp        In this LSP this method tries to find the shipment.
 	 * @param shipmentId Id of the shipment that should be found.
 	 * @return the lspShipment object or null, if it is not found.
 	 */
@@ -162,7 +162,7 @@ public final class LSPUtils {
 	/**
 	 * Returns the {@link LspShipmentPlan} of an {@link LspShipment}.
 	 *
-	 * @param lspPlan the lspPlan: It contains the information of its shipmentPlans
+	 * @param lspPlan    the lspPlan: It contains the information of its shipmentPlans
 	 * @param shipmentId Id of the shipment that should be found.
 	 * @return the shipmentPlan object or null, if it is not found.
 	 */
@@ -178,9 +178,61 @@ public final class LSPUtils {
 	public static void scheduleLsps(LSPs lsps) {
 		LogisticsConsistencyChecker.checkBeforePlanning(lsps, Level.ERROR);
 		for (LSP lsp : lsps.getLSPs().values()) {
+
+			double lowestCapacity = 0.0;
+			for (LSPResource lspResource : lsp.getResources()) {
+				if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
+					lowestCapacity = lspCarrierResource.getCarrier().getCarrierCapabilities().getVehicleTypes().stream()
+						.mapToDouble(vt -> vt.getCapacity().getOther()).min().orElse(0.0);
+				}
+			}
+
+			List<LspShipment> newShipments = new LinkedList<>();
+			for (LspShipment lspShipment : lsp.getLspShipments()) {
+				if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0) {
+					log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling.",
+						lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
+					int fullParts = (int) (lspShipment.getSize() / lowestCapacity);
+					double rest = lspShipment.getSize() % lowestCapacity;
+					char suffix = 'a';
+					for (int i = 0; i < fullParts; i++) {
+						//Todo: Aufpassen mit dem int!!!
+						LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) lowestCapacity);
+						newShipments.add(part);
+						suffix++;
+					}
+					if (rest > 0) {
+						LspShipment part = lspShipment.copyWithNewId(
+							Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class),
+							rest
+						);
+						newShipments.add(part);
+					}
+					log.info("Shipment {} of LSP {} was split into {} parts due to capacity limit {}.",
+						lspShipment.getId(), lsp.getId(), newShipments.size(), lowestCapacity);
+
+					//Todo: Prüfung einbauenb, dass Summern der Demand noch stimmmen.
+				} else { //keep the shipment as it is
+					newShipments.add(lspShipment);
+				}
+			}
+			lsp.getLspShipments().clear();
+			lsp.getLspShipments().addAll(newShipments);
+
 			log.info("schedule the LSP: {} with the shipments and according to the scheduler of the Resource", lsp.getId());
 			lsp.scheduleLogisticChains();
 		}
+		LogisticsConsistencyChecker.checkAfterPlanning(lsps, Level.ERROR);
+	}
+
+	LspShipment createLspShipmentWithNewIdAndSize(LspShipment lspShipment, Id<LspShipment> newId, int size) {
+		var builder = LspShipmentUtils.LspShipmentBuilder.newInstance(newId));
+			builder.setCapacityDemand((size)
+			.setFrom(lspShipment.getFrom())
+			.setTo(lspShipment.getTo())
+			.setLspId(lspShipment.getLspId())
+			.setLspPlanId(lspShipment.getLspPlanId());
+		return builder.build();
 	}
 
 	public enum LogicOfVrp {serviceBased, shipmentBased}
