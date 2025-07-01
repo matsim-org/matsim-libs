@@ -417,7 +417,7 @@ final class ExampleMultipleMixedEchelonChains {
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : createInitialLSPShipments(network)) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");

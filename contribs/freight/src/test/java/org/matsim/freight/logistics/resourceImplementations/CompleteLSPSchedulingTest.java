@@ -274,7 +274,7 @@ public class CompleteLSPSchedulingTest {
 			builder.setStartTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 		lsp.scheduleLogisticChains();
 

@@ -73,10 +73,10 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   private void insertShipmentsAtBeginning() {
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-      LogisticChainElement firstElement = getFirstElement(solution);
+    for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+      LogisticChainElement firstElement = getFirstElement(logisticChain);
       assert firstElement != null;
-      for (Id<LspShipment> lspShipmentId : solution.getLspShipmentIds()) {
+      for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         assert shipment != null;
         firstElement

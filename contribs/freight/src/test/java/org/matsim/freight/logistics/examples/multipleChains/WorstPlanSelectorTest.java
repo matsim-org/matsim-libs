@@ -184,7 +184,7 @@ public class WorstPlanSelectorTest {
 		lsp.addPlan(lspPlan_twoChains);
 
 		for (LspShipment shipment : createInitialLSPShipments(network)) {
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 
 		lsp.scheduleLogisticChains();

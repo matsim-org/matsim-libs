@@ -147,7 +147,7 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   @Override
-  public void assignShipmentToLSP(LspShipment lspShipment) {
+  public void assignShipmentToLspPlan(LspShipment lspShipment) {
     //		shipment.setLspId(this.getId()); // und rückweg dann auch darüber und dann
     // lsp.getselectedPlan.getShipment...
     lspShipments.add(lspShipment);

@@ -180,8 +180,6 @@ public final class LSPUtils {
 		LogisticsConsistencyChecker.checkBeforePlanning(lsps, Level.ERROR);
 		for (LSP lsp : lsps.getLSPs().values()) {
 
-			splitShipmentsIfNeeded(lsp);
-
 			log.info("schedule the LSP: {} with the shipments and according to the scheduler of the Resource", lsp.getId());
 			lsp.scheduleLogisticChains();
 		}
@@ -192,7 +190,7 @@ public final class LSPUtils {
 	 * Splits the shipments of the given LSP if they are larger than the smallest vehicle capacity of the LSP's resources.
 	 * @param lsp the lsp for which the shipments should be split if needed
 	 */
-	private static void splitShipmentsIfNeeded(LSP lsp) {
+	public static void splitShipmentsIfNeeded(LSP lsp) {
 		double lowestCapacity = Double.MAX_VALUE;
 		for (LSPResource lspResource : lsp.getResources()) {
 			if (lspResource instanceof LSPCarrierResource lspCarrierResource) {

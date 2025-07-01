@@ -313,7 +313,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		log.info("assign the shipments to the LSP");
 		for (LspShipment lspShipment : lspShipments) {
-			lsp.assignShipmentToLSP(lspShipment);
+			lsp.assignShipmentToLspPlan(lspShipment);
 		}
 
 		return lsp;
@@ -459,7 +459,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		log.info("assign the shipments to the LSP");
 		for (LspShipment lspShipment : lspShipments) {
-			lsp.assignShipmentToLSP(lspShipment);
+			lsp.assignShipmentToLspPlan(lspShipment);
 		}
 
 		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
