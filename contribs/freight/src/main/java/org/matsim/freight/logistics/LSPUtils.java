@@ -179,45 +179,7 @@ public final class LSPUtils {
 		LogisticsConsistencyChecker.checkBeforePlanning(lsps, Level.ERROR);
 		for (LSP lsp : lsps.getLSPs().values()) {
 
-			double lowestCapacity = 0.0;
-			for (LSPResource lspResource : lsp.getResources()) {
-				if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
-					lowestCapacity = lspCarrierResource.getCarrier().getCarrierCapabilities().getVehicleTypes().stream()
-						.mapToDouble(vt -> vt.getCapacity().getOther()).min().orElse(0.0);
-				}
-			}
-
-			List<LspShipment> newShipments = new LinkedList<>();
-			for (LspShipment lspShipment : lsp.getLspShipments()) {
-				if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0) {
-					log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling.",
-						lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
-					int fullParts = (int) (lspShipment.getSize() / lowestCapacity);
-					double rest = lspShipment.getSize() % lowestCapacity;
-					char suffix = 'a';
-					for (int i = 0; i < fullParts; i++) {
-						//Todo: Aufpassen mit dem int!!!
-						LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) lowestCapacity);
-						newShipments.add(part);
-						suffix++;
-					}
-					if (rest > 0) {
-						LspShipment part = lspShipment.copyWithNewId(
-							Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class),
-							rest
-						);
-						newShipments.add(part);
-					}
-					log.info("Shipment {} of LSP {} was split into {} parts due to capacity limit {}.",
-						lspShipment.getId(), lsp.getId(), newShipments.size(), lowestCapacity);
-
-					//Todo: Prüfung einbauenb, dass Summern der Demand noch stimmmen.
-				} else { //keep the shipment as it is
-					newShipments.add(lspShipment);
-				}
-			}
-			lsp.getLspShipments().clear();
-			lsp.getLspShipments().addAll(newShipments);
+			splitShipmentsIfNeeded(lsp);
 
 			log.info("schedule the LSP: {} with the shipments and according to the scheduler of the Resource", lsp.getId());
 			lsp.scheduleLogisticChains();
@@ -225,13 +187,75 @@ public final class LSPUtils {
 		LogisticsConsistencyChecker.checkAfterPlanning(lsps, Level.ERROR);
 	}
 
-	LspShipment createLspShipmentWithNewIdAndSize(LspShipment lspShipment, Id<LspShipment> newId, int size) {
-		var builder = LspShipmentUtils.LspShipmentBuilder.newInstance(newId));
-			builder.setCapacityDemand((size)
-			.setFrom(lspShipment.getFrom())
-			.setTo(lspShipment.getTo())
-			.setLspId(lspShipment.getLspId())
-			.setLspPlanId(lspShipment.getLspPlanId());
+	/**
+	 * Splits the shipments of the given LSP if they are larger than the smallest vehicle capacity of the LSP's resources.
+	 * @param lsp the lsp for which the shipments should be split if needed
+	 */
+	private static void splitShipmentsIfNeeded(LSP lsp) {
+		double lowestCapacity = 0.0;
+		for (LSPResource lspResource : lsp.getResources()) {
+			if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
+				lowestCapacity = lspCarrierResource.getCarrier().getCarrierCapabilities().getVehicleTypes().stream()
+					.mapToDouble(vt -> vt.getCapacity().getOther()).min().orElse(0.0);
+			}
+		}
+
+		lowestCapacity = (int) lowestCapacity; // ensure that the capacity is an integer value
+
+		List<LspShipment> newShipments = new LinkedList<>();
+		for (LspShipment lspShipment : lsp.getLspShipments()) {
+			int sizeOfShipment = lspShipment.getSize();
+			int sizeOfNewShipments =0;
+			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0) {
+				log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling. Will split it into smaller parts.",
+					lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
+				int fullParts = (int) (lspShipment.getSize() / lowestCapacity);
+				double rest = lspShipment.getSize() % lowestCapacity;
+				char suffix = 'a';
+				for (int i = 0; i < fullParts; i++) {
+					LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) lowestCapacity);
+					newShipments.add(part);
+					sizeOfNewShipments = sizeOfNewShipments + part.getSize();
+					suffix++;
+				}
+				if (rest > 0) {
+					LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) rest);
+					newShipments.add(part);
+					sizeOfNewShipments = sizeOfNewShipments + part.getSize();
+				}
+				log.info("Shipment {} of LSP {} was split into {} parts due to capacity limit {}.", lspShipment.getId(), lsp.getId(), newShipments.size(), lowestCapacity);
+
+				//Assert that the size of the new shipments matches the original shipment size
+				if (sizeOfNewShipments != sizeOfShipment) {
+					log.error("The size of the new shipments {} ({}) does not match the original shipment size ({}). This may lead to problems during scheduling.", lspShipment.getId(), sizeOfNewShipments, sizeOfShipment);
+					throw new IllegalStateException("Sum of split shipments does not match original shipment size.");
+				}
+
+			} else { //keep the shipment as it is
+				newShipments.add(lspShipment);
+			}
+		}
+		lsp.getLspShipments().clear();
+		lsp.getLspShipments().addAll(newShipments);
+	}
+
+	/**
+	 * Creates a new {@link LspShipment} with a new Id and size.
+	 * All other parameters are copied from the given {@link LspShipment}.
+	 * @param lspShipment the original LspShipment to copy parameters from
+	 * @param newId the new Id for the LspShipment
+	 * @param size	the new size for the LspShipment
+	 * @return the new LspShipment with the given Id and size
+	 */
+	static LspShipment createLspShipmentWithNewIdAndSize(LspShipment lspShipment, Id<LspShipment> newId, int size) {
+		var builder = LspShipmentUtils.LspShipmentBuilder.newInstance(newId);
+			builder.setCapacityDemand(size);
+			builder.setFromLinkId(lspShipment.getFrom());
+			builder.setToLinkId(lspShipment.getTo());
+			builder.setPickupServiceTime(lspShipment.getPickupServiceTime());
+			builder.setStartTimeWindow(lspShipment.getPickupTimeWindow());
+			builder.setDeliveryServiceTime(lspShipment.getDeliveryServiceTime());
+			builder.setEndTimeWindow(lspShipment.getDeliveryTimeWindow());
 		return builder.build();
 	}
 
