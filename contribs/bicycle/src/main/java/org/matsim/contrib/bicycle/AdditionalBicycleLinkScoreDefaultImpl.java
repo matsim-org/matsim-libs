@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 
 public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBicycleLinkScore {
 
@@ -24,9 +25,9 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 	}
 	@Override public double computeLinkBasedScore( Link link ){
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE );
-		String type = (String) link.getAttributes().getAttribute("type" );
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY );
+		String surface = BicycleUtils.getSurface(link);
+		String type = NetworkUtils.getType( link );
+		String cyclewaytype = BicycleUtils.getCyclewaytype( link );
 
 		double distance = link.getLength();
 
@@ -39,6 +40,7 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		double gradient = BicycleUtils.getGradient( link );
 		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
 
+		// I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
 		String userDefinedNetworkAttributeString;
 		double userDefinedNetworkAttributeScore = 0.;
 		if ( nameOfUserDefinedNetworkAttribute != null) {

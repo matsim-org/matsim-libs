@@ -36,18 +36,6 @@
 		<dependency>
 			<groupId>tech.tablesaw</groupId>
 			<artifactId>tablesaw-jsplot</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>io.pebbletemplates</groupId>
-					<artifactId>pebble</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- Pinned this version, as older one is not compatible with java 21, newer ones might be incompatible	-->
-		<dependency>
-			<groupId>io.pebbletemplates</groupId>
-			<artifactId>pebble</artifactId>
-			<version>3.1.6</version>
 		</dependency>
 
 		<dependency>
