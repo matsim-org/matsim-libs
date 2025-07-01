@@ -311,6 +311,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 					createResourcesListFromLSPPlans(List.of(lspPlan))))
 			.build();
 
+		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
+		LSPUtils.splitShipmentsIfNeeded(lsp);
+
 		log.info("assign the shipments to the LSP");
 		for (LspShipment lspShipment : lspShipments) {
 			lsp.assignShipmentToLspPlan(lspShipment);
@@ -457,13 +460,12 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 						createResourcesListFromLSPPlans(List.of(lspPlan))))
 				.build();
 
+		LSPUtils.splitShipmentsIfNeeded(lsp);
+
 		log.info("assign the shipments to the LSP");
 		for (LspShipment lspShipment : lspShipments) {
 			lsp.assignShipmentToLspPlan(lspShipment);
 		}
-
-		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
-		lsp.scheduleLogisticChains();
 
 		return lsp;
 	}
