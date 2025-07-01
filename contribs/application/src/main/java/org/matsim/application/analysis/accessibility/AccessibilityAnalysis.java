@@ -18,6 +18,7 @@ import picocli.CommandLine;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.LongColumn;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.io.csv.CsvWriteOptions;
 
@@ -74,9 +75,6 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 			e.printStackTrace();
 		}
 
-
-
-
 		for (String activityOption : activityOptions) {
 
 			String folderNameForActivityOption = input.getRunDirectory() + "/analysis/accessibility/" + activityOption;
@@ -84,7 +82,6 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 			List<File> files = Arrays.stream(Objects.requireNonNull(folder.listFiles((dir, name) -> name.endsWith("accessibilities.csv")))).toList();
 
 			for(File file : files) {
-
 
 				String filePath = file.getAbsolutePath();
 
@@ -102,7 +99,6 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 					System.err.println("Failed to delete file: " + e.getMessage());
 				}
 
-
 				try {
 					// Use CsvReadOptions to configure the CSV reading options
 					CsvReadOptions options = CsvReadOptions.builder(filePath)
@@ -114,11 +110,75 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 					// Read the CSV file into a Table object
 					Table table = Table.read().csv(options);
 
-					table.removeColumns("id");
+//					table.removeColumns("id");
 					DoubleColumn xCol = table.doubleColumn("xcoord");
 					DoubleColumn yCol = table.doubleColumn("ycoord");
 					xCol.setName("x");
 					yCol.setName("y");
+
+
+					// COPY VALUES FOR OTHER MODES INTO ALL TIME SLICES
+
+					table.sortOn("time", "id");
+					Table filledTable = Table.create(table.name());
+
+					for (Column<?> col : table.columns()) {
+						filledTable.addColumns(col.emptyCopy());
+					}
+
+
+					table.addColumns(
+						table.column("time").asStringColumn().setName("time_cat"),
+						table.intColumn("id").asStringColumn().setName("id_cat")
+					);
+
+					// Group keys
+					String[] groupCols = {"id_cat"};
+
+					table.sortOn(groupCols);
+
+					List<String> colNames = table.columnNames();
+
+					table.splitOn(groupCols).forEach(slice -> {
+
+						Table group = slice.asTable();
+
+						for(String accessColName : colNames) {
+							if (!accessColName.endsWith("accessibility")) {
+								continue;
+							}
+
+							DoubleColumn accessCol = group.doubleColumn(accessColName);
+							int nonMissingCount = (int) accessCol.asList().stream()
+								.filter(d -> d != null && !d.isNaN())
+								.count();
+
+							if (nonMissingCount == 0) {
+								throw new RuntimeException("Group with time/x/y has no accessibility value at all: " +
+									group.getString(0, "time") + ", " +
+									group.getString(0, "id"));
+							} else if (nonMissingCount == 1) {
+								double fillValue = accessCol.asList().stream()
+									.filter(d -> d != null && !d.isNaN())
+									.findFirst().get();  // safe because count == 1
+
+								for (int i = 0; i < group.rowCount(); i++) {
+									Double val = accessCol.getDouble(i);
+									if (val == null || val.isNaN()) {
+										accessCol.set(i, fillValue);
+									}
+								}
+							}
+						}
+						// else: all values present, do nothing
+
+						filledTable.append(group);
+					});
+
+
+
+					table = filledTable;
+
 
 					// Count Population per Pixel
 
@@ -158,7 +218,7 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 
 						// Find the closest pixel in the table
 						double closestDistance = Double.MAX_VALUE;
-						int closestRow = -1;
+						List<Integer> closestRows = new ArrayList<>();
 						for (int i = 0; i < table.rowCount(); i++) {
 							double pixelX = xCol.getDouble(i);
 							double pixelY = yCol.getDouble(i);
@@ -166,13 +226,18 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 
 							if (distance < closestDistance) {
 								closestDistance = distance;
-								closestRow = i;
+								closestRows.clear();
+								closestRows.add(i);
+							} else if (distance == closestDistance) {
+								closestRows.add(i);
 							}
 						}
-						popCol.set(closestRow, popCol.getLong(closestRow) + 1);
-						incomeCol.set(closestRow, incomeCol.getDouble(closestRow) + income);
-						ageCol.set(closestRow, ageCol.getLong(closestRow) + age);
 
+						for (int closestRow : closestRows) {
+							popCol.set(closestRow, popCol.getLong(closestRow) + 1);
+							incomeCol.set(closestRow, incomeCol.getDouble(closestRow) + income);
+							ageCol.set(closestRow, ageCol.getLong(closestRow) + age);
+						}
 
 					}
 

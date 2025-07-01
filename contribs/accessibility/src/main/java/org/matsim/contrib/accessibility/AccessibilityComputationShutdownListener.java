@@ -146,7 +146,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	}
 
 
-	public final void computeAccessibilities(List<Double> departureTimes, ActivityFacilities opportunities) {
+	public void computeAccessibilities(List<Double> departureTimes, ActivityFacilities opportunities) {
 		for (String mode : calculators.keySet()) {
 
 			for (Double departureTime : departureTimes) {
@@ -201,6 +201,10 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 					LOG.info("Performing the computation without parallelization.");
 					ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 					compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);
+				}
+
+				if (!mode.equals(Modes4Accessibility.pt.toString())) {
+					break;
 				}
 			}
 			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
@@ -289,11 +293,12 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 			writer.writeField(tuple.getSecond());
 
 			for (String mode : getModes() ) {
-				final double value = accessibilitiesMap.get(tuple).get(mode);
+				// Defaulting to NaN allows accessibility calculations to be skipped for certain time slices for certain modes
+				final double value = accessibilitiesMap.get(tuple).getOrDefault(mode, Double.NaN);
 				if (!Double.isNaN(value)) {
-					writer.writeField(value) ;
+					writer.writeField(value);
 				} else {
-					writer.writeField(Double.NaN) ;
+					writer.writeField(Double.NaN);
 				}
 			}
 			for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Again: Iterate over all additional data collections
