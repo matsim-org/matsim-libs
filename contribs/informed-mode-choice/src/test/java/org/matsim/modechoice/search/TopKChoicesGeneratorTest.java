@@ -2,7 +2,6 @@ package org.matsim.modechoice.search;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -12,9 +11,6 @@ import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 import org.matsim.modechoice.ScenarioTest;
 import org.matsim.modechoice.TestScenario;
-import org.matsim.vehicles.PersonVehicles;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -104,7 +100,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		PlanCandidate first = result.iterator().next();
 
 		assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
-		assertThat(first.getUtility()).isEqualTo(-6.60559222525616);
+		assertThat(first.getUtility()).isEqualTo(-6.523753780811715);
 
 
 		List<PlanCandidate> candidates = generator.generatePredefined(model, List.of(

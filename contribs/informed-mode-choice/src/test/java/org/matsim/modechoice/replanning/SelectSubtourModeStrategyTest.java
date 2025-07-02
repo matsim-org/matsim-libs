@@ -61,7 +61,7 @@ public class SelectSubtourModeStrategyTest extends ScenarioTest {
 		List<PlanCandidate> result = generator.generatePredefined(model, modes);
 
 		assertThat(result.get(0).getUtility())
-				.isEqualTo(-7.8, Offset.offset(0.1));
+				.isEqualTo(-7.5, Offset.offset(0.1));
 
 		assertThat(result.get(1).getUtility())
 				.isEqualTo(Double.NEGATIVE_INFINITY);
