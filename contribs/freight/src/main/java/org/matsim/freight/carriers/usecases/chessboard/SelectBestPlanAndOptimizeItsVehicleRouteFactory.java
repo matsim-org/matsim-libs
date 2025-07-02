@@ -30,6 +30,8 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
+import java.net.URL;
+import java.util.Collection;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
@@ -45,9 +47,6 @@ import org.matsim.freight.carriers.CarrierVehicleTypes;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
-
-import java.net.URL;
-import java.util.Collection;
 
 final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
@@ -144,7 +143,7 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 //				SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 
 				//create carrierPlan from solution
-				CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, solution);
+				CarrierPlan plan = MatsimJspritFactory.createPlan(solution);
 
 				//route plan (currently jsprit does not memorize the routes, thus route the plan)
 				NetworkRouter.routePlan(plan, netbasedTransportcosts);

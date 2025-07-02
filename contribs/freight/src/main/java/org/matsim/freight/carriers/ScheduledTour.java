@@ -37,9 +37,9 @@ public class ScheduledTour {
 	 * <p>Look at the builder. It might be easier to build a scheduled tour.
 	 * You get the builder this way: ScheduledTour.Builder.newInstance(carrierVehicle).
 	 *
-	 * @param tour
-	 * @param vehicle
-	 * @param departureTime
+	 * @param tour				The scheduled tour.
+	 * @param vehicle			The vehicle for the tour.
+	 * @param departureTime 	The time when the vehicle starts the tour.
 	 * @return a scheduledTour
 	 * @see ScheduledTour
 	 */

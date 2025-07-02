@@ -30,16 +30,15 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 
 /**
  * Default implementation of {@link TransitSchedule}.
- * 
+ *
  * {@inheritDoc}
- * 
+ *
  * @author mrieser
  */
 public class TransitScheduleImpl implements TransitSchedule {
@@ -62,7 +61,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 		}
 		this.transitLines.put(id, line);
 	}
-	
+
 	@Override
 	public boolean removeTransitLine(TransitLine line) {
 		TransitLine oldLine = this.transitLines.remove(line.getId());
@@ -75,7 +74,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
 		final Id<TransitStopFacility> id = stop.getId();
@@ -89,12 +88,12 @@ public class TransitScheduleImpl implements TransitSchedule {
 	public Map<Id<TransitLine>, TransitLine> getTransitLines() {
 		return Collections.unmodifiableMap(this.transitLines);
 	}
-	
+
 	@Override
 	public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
 	}
-	
+
 	@Override
 	public boolean removeStopFacility(TransitStopFacility stop) {
 		TransitStopFacility oldStop = this.stopFacilities.remove(stop.getId());
@@ -107,20 +106,10 @@ public class TransitScheduleImpl implements TransitSchedule {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public TransitScheduleFactory getFactory() {
 		return this.factory;
-	}
-
-	@Override
-	public FailingObjectAttributes getTransitLinesAttributes() {
-		return FailingObjectAttributes.createTransitLinesAttributes();
-	}
-	
-	@Override
-	public FailingObjectAttributes getTransitStopsAttributes() {
-		return FailingObjectAttributes.createTransitStopsAttributes();
 	}
 
 	@Override

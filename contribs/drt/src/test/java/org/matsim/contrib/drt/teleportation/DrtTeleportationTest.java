@@ -8,9 +8,10 @@ import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.estimator.impl.PessimisticDrtEstimator;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -46,24 +47,25 @@ class DrtTeleportationTest {
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = (DefaultDrtOptimizationConstraintsSet) drtConfigGroup
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = drtConfigGroup
 				.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.2;
-		defaultConstraintsSet.maxTravelTimeBeta = 600;
-		defaultConstraintsSet.maxWaitTime = 300;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.2);
+		defaultConstraintsSet.setMaxTravelTimeBeta(600);
+		defaultConstraintsSet.setMaxWaitTime(300);
 		DrtFareParams fareParams = new DrtFareParams();
-		fareParams.baseFare = 1.0;
-		fareParams.distanceFare_m = 0.001;
+		fareParams.setBaseFare(1.0);
+		fareParams.setDistanceFare_m(0.001);
 		drtConfigGroup.addParameterSet(fareParams);
 
 		// Setup to enable estimator and teleportation
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.setSimulationType(DrtConfigGroup.SimulationType.estimateAndTeleport);
+		drtConfigGroup.addParameterSet(new DrtEstimatorParams());
 
 		// This uses the helper method to bind an estimator. Alternatively a separate modal module could also be created.
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.mode).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
+				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.getMode()).toInstance(new PessimisticDrtEstimator(drtConfigGroup));
 			}
 		});
 
@@ -78,12 +80,12 @@ class DrtTeleportationTest {
 
 			double waitAvg = Double.parseDouble(row.get("wait_average"));
 
-			assertThat(waitAvg).isEqualTo(defaultConstraintsSet.maxWaitTime);
+			assertThat(waitAvg).isEqualTo(defaultConstraintsSet.getMaxWaitTime());
 
 			double distMean = Double.parseDouble(row.get("distance_m_mean"));
 			double directDistMean = Double.parseDouble(row.get("directDistance_m_mean"));
 
-			assertThat(distMean / directDistMean).isCloseTo(defaultConstraintsSet.maxTravelTimeAlpha, Offset.offset(0.0001));
+			assertThat(distMean / directDistMean).isCloseTo(defaultConstraintsSet.getMaxTravelTimeAlpha(), Offset.offset(0.0001));
 
 		}
 

@@ -22,11 +22,15 @@ import java.util.List;
 /**
  * Creates the population from the original input data.
  *
+ * "activity split by duration" refers to our convention to have activity types work_3600, work_7200 etc.
+ *
+ * "trajectory-to-plans"  seems a bit mis-named because everything are plans.  What it seems to do is to remove routes and modes.
+ *
  * @author rakow
  */
 @CommandLine.Command(
         name = "trajectory-to-plans",
-        description = "Create population including, down-sampling, and activity split by duration",
+        description = "Create population including down-sampling, and activity split by duration",
         showDefaultValues = true
 )
 public class TrajectoryToPlans implements MATSimAppCommand {
@@ -55,7 +59,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     @CommandLine.Option(names = {"--activity-bin-size", "--abs"}, description = "Activity types are extended so that they belong to a typical duration. This parameter influences the number of typical duration classes. The default is 600s")
     private int activityBinSize = 600;
 
-    @CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h)")
+    @CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h). if set to 0, activities are not split.")
     private int maxTypicalDuration = 86400;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
@@ -95,20 +99,23 @@ public class TrajectoryToPlans implements MATSimAppCommand {
                 v.getAttributes().putAttribute("subpopulation", "person");
 
         });
+        // (if a <person/> does not yet have a subpopulation attribute, tag it as a "person".  kai, feb'2024)
 
         if (crs.getTargetCRS() != null) {
             ProjectionUtils.putCRS(scenario.getPopulation(), crs.getTargetCRS());
             log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
         }
+        // (if set by command line)
 
         if (crs.getInputCRS() != null) {
             ProjectionUtils.putCRS(scenario.getPopulation(), crs.getInputCRS());
             log.info("Setting crs to: {}", ProjectionUtils.getCRS(scenario.getPopulation()));
         }
+        // (if set by command line, this will overwrite the above targetCRS.  How is this to be interpreted?  kai, feb'2024)
 
-		if (maxTypicalDuration > 0) {
-			splitActivityTypesBasedOnDuration(scenario.getPopulation());
-		}
+        if (maxTypicalDuration > 0) {
+            splitActivityTypesBasedOnDuration(scenario.getPopulation());
+        }
 
         PopulationUtils.writePopulation(scenario.getPopulation(),
                 output.resolve(String.format("%s-%dpct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
@@ -136,6 +143,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
 
 	@Deprecated
     /**
+     * Deprecated, use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
      * Split activities into typical durations to improve value of travel time savings calculation.
      */
     private void splitActivityTypesBasedOnDuration(Population population) {

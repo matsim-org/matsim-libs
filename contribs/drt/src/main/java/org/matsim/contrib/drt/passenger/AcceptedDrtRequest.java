@@ -24,6 +24,7 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 import java.util.List;
@@ -32,14 +33,19 @@ import java.util.List;
  * @author Michal Maciejewski (michalm)
  */
 public class AcceptedDrtRequest {
-	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request) {
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request, double dropoffDuration) {
 		return AcceptedDrtRequest.newBuilder()
 				.request(request)
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
 				.maxRideDuration(request.getMaxRideDuration())
+				.dropoffDuration(dropoffDuration)
 				.build();
+	}
+
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request) {
+		return createFromOriginalRequest(request, 0.0);
 	}
 
 	private final DrtRequest request;
@@ -48,6 +54,7 @@ public class AcceptedDrtRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
+	private final double dropoffDuration;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
@@ -55,6 +62,7 @@ public class AcceptedDrtRequest {
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
 		maxRideDuration = builder.maxRideDuration;
+		dropoffDuration = builder.dropoffDuration;
 	}
 
 	public static Builder newBuilder() {
@@ -90,6 +98,10 @@ public class AcceptedDrtRequest {
 		return maxRideDuration;
 	}
 
+	public double getDropoffDuration() {
+		return dropoffDuration;
+	}
+
 	public Id<Request> getId() {
 		return request.getId();
 	}
@@ -110,8 +122,8 @@ public class AcceptedDrtRequest {
 		return request.getPassengerIds();
 	}
 
-	public int getPassengerCount() {
-		return request.getPassengerCount();
+	public DvrpLoad getLoad() {
+		return request.getLoad();
 	}
 
 	public String getMode() {
@@ -134,6 +146,7 @@ public class AcceptedDrtRequest {
 		private double latestStartTime;
 		private double latestArrivalTime;
 		private double maxRideDuration;
+		private double dropoffDuration;
 
 		private Builder() {
 		}
@@ -160,6 +173,11 @@ public class AcceptedDrtRequest {
 
 		public Builder maxRideDuration(double val) {
 			this.maxRideDuration = val;
+			return this;
+		}
+
+		public Builder dropoffDuration(double val) {
+			this.dropoffDuration = val;
 			return this;
 		}
 

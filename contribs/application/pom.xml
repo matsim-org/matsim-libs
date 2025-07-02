@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>2025.0-SNAPSHOT</version>
+		<version>2026.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -40,37 +39,37 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>osm</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>sumo</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>freight</artifactId>
-			<version>2025.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<exclusions>
 				<!-- Logging levels are all messed up without this exclusion -->
 				<exclusion>
@@ -87,7 +86,7 @@
 		<dependency>
 			<groupId>com.github.matsim-org</groupId>
 			<artifactId>gtfs2matsim</artifactId>
-			<version>47b0802a29</version>
+			<version>19f1676fc6</version>
 			<exclusions>
 				<!-- Exclude unneeded dependencies and these with known CVE -->
 				<exclusion>
@@ -113,12 +112,6 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Command line parser -->
-		<dependency>
-			<groupId>info.picocli</groupId>
-			<artifactId>picocli</artifactId>
-			<version>4.7.6</version>
-		</dependency>
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil</artifactId>
@@ -129,10 +122,6 @@
 			<artifactId>commons-text</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
@@ -151,7 +140,7 @@
         <dependency>
             <groupId>org.matsim.contrib</groupId>
             <artifactId>dvrp</artifactId>
-            <version>2025.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
 

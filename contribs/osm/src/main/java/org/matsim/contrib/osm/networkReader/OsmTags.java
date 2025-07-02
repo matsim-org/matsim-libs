@@ -21,7 +21,8 @@ public class OsmTags {
 	public static final String FOOTWAY = "footway";
 	public static final String PEDESTRIAN = "pedestrian";
 	public static final String PATH = "path";
-	public static final String STEPS = "steps";
+	public static final String STEPS_RAMP = "ramp";
+	public static final String STEPS_RAMP_BICYCLE = "ramp:bicycle";
 
 	public static final String HIGHWAY = "highway";
 	public static final String MAXSPEED = "maxspeed";
@@ -42,7 +43,7 @@ public class OsmTags {
 	public static final String CROSSING = "crossing";
 	public static final String TYPE = "type";
 	public static final String RESTRICTION = "restriction";
-	
+
 	public static final String RAILWAY = "railway";
 	public static final String RAIL = "rail";
 	public static final String NARROW_GAUGE = "narrow_gauge";
@@ -54,6 +55,7 @@ public class OsmTags {
 	public static final String USAGE = "usage";
 	public static final String GAUGE = "gauge";
 	public static final String ELECTRIFIED = "electrified";
+	public static final String VOLTAGE = "voltage";
 	public static final String ETCS = "etcs";
 	public static final String OPERATOR = "operator";
 

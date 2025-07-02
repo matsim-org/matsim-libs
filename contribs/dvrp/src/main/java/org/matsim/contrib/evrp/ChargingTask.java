@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.evrp;
 
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
@@ -28,6 +29,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  */
 public interface ChargingTask extends ETask {
 	ChargingWithAssignmentLogic getChargingLogic();
+
+	ChargingStrategy getChargingStrategy();
 
 	ElectricVehicle getElectricVehicle();
 

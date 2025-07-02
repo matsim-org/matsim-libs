@@ -160,7 +160,7 @@ final class EvNetworkRoutingModule implements RoutingModule {
 					// assume that the battery is compatible with a power that allows for full charge within one hour (cf. FixedSpeedCharging)
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3600);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
-					chargeAct.setMaximumDuration(Math.max(evConfigGroup.minimumChargeTime, estimatedChargingTime));
+					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;

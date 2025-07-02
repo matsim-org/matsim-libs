@@ -22,7 +22,7 @@ package org.matsim.freight.carriers.jsprit;
 
 import org.matsim.freight.carriers.CarrierPlan;
 import org.matsim.freight.carriers.ScheduledTour;
-import org.matsim.freight.carriers.controler.CarrierTimeAndSpaceTourRouter;
+import org.matsim.freight.carriers.controller.CarrierTimeAndSpaceTourRouter;
 
 /**
  * Router that routes {@link CarrierPlan}.
@@ -37,8 +37,8 @@ public class NetworkRouter {
 	 *
 	 * <p>Note that this changes the plan, i.e. it adds routes to the input-plan.
 	 *
-	 * @param {@link CarrierPlan}
-	 * @param {@link NetworkBasedTransportCosts}
+	 * @param plan {@link CarrierPlan}
+	 * @param freightTransportCosts {@link NetworkBasedTransportCosts}
 	 */
 	public static void routePlan(CarrierPlan plan, VRPTransportCosts freightTransportCosts){
 		if( plan == null) throw new IllegalStateException("plan is missing.");

@@ -21,14 +21,13 @@
 
 package org.matsim.freight.carriers.events;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Map;
 
 /**
  *  An event, that informs that a Freight {@link CarrierShipment} pickup-activity has started.
@@ -45,10 +44,10 @@ public class CarrierShipmentPickupStartEvent extends AbstractCarrierEvent {
 
 
 	public CarrierShipmentPickupStartEvent(double time, Id<Carrier> carrierId, CarrierShipment shipment, Id<Vehicle> vehicleId) {
-		super(time, carrierId, shipment.getFrom(), vehicleId);
+		super(time, carrierId, shipment.getPickupLinkId(), vehicleId);
 		this.shipmentId = shipment.getId();
-		this.pickupDuration = shipment.getPickupServiceTime();
-		this.capacityDemand = shipment.getSize();
+		this.pickupDuration = shipment.getPickupDuration();
+        this.capacityDemand = shipment.getCapacityDemand();
 	}
 
 
@@ -78,7 +77,7 @@ public class CarrierShipmentPickupStartEvent extends AbstractCarrierEvent {
 		Id<Link> shipmentFrom = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
 		int shipmentSize = Integer.parseInt(attributes.get(CarrierEventAttributes.ATTRIBUTE_CAPACITYDEMAND));
 		CarrierShipment shipment = CarrierShipment.Builder.newInstance(shipmentId, shipmentFrom, null, shipmentSize)
-				.setPickupServiceTime(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_PICKUP_DURATION)))
+				.setPickupDuration(Double.parseDouble(attributes.get(CarrierEventAttributes.ATTRIBUTE_PICKUP_DURATION)))
 				.build();
 		Id<Vehicle> vehicleId = Id.createVehicleId(attributes.get(ATTRIBUTE_VEHICLE));
 		return new CarrierShipmentPickupStartEvent(time, carrierId, shipment, vehicleId);

@@ -22,6 +22,7 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
@@ -35,8 +36,7 @@ final class RunPassengerPlansFromScratch {
 	public static void main(String[] args) {
 		String NETWORK_FILENAME = "input/usecases/chessboard/network/grid9x9.xml";
 		String PLANS_FILENAME = "input/usecases/chessboard/passenger/passengerPlans.xml";
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		ActivityParams workParams = new ActivityParams("work");
 		workParams.setTypicalDuration(60 * 60 * 8);

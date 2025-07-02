@@ -22,11 +22,10 @@
 package org.matsim.freight.carriers;
 
 import jakarta.validation.constraints.Positive;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.net.URL;
 import java.util.Map;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
 
@@ -76,7 +75,7 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #CARRIERS_FILE_DESC}
+     * @param carriersFile {@value #CARRIERS_FILE_DESC}
      */
     @StringSetter(CARRIERS_FILE)
     public void setCarriersFile(String carriersFile) {
@@ -98,7 +97,7 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #CARRIERS_VEHICLE_TYPE_DESC}
+     * @param carriersVehicleTypesFile {@value #CARRIERS_VEHICLE_TYPE_DESC}
      */
     @StringSetter(CARRIERS_VEHICLE_TYPE)
     public void setCarriersVehicleTypesFile(String carriersVehicleTypesFile) {
@@ -119,7 +118,7 @@ public class FreightCarriersConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #VEHICLE_ROUTING_ALGORITHM_DESC}
+     * @param vehicleRoutingAlgorithmFile {@value #VEHICLE_ROUTING_ALGORITHM_DESC}
      */
     @StringSetter(VEHICLE_ROUTING_ALGORITHM)
     public void setVehicleRoutingAlgorithmFileFile(String vehicleRoutingAlgorithmFile) {

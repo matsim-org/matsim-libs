@@ -23,7 +23,8 @@
  
  import java.util.ArrayList;
  import java.util.Collection;
- import java.util.HashMap;
+import java.util.Collections;
+import java.util.HashMap;
  import java.util.HashSet;
  import java.util.List;
  import java.util.Map;
@@ -43,7 +44,8 @@
  import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
  import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
  import org.matsim.contrib.dvrp.fleet.FleetSpecification;
- import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
+import org.matsim.contrib.dvrp.load.IntegerLoad;
+import org.matsim.contrib.dvrp.passenger.PassengerGroupIdentifier;
  import org.matsim.core.controler.events.AfterMobsimEvent;
  import org.matsim.core.controler.events.BeforeMobsimEvent;
  import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -67,6 +69,7 @@
 	 private final Set<Id<Person>> companionAgentIds = new HashSet<>();
 	 private final Set<Leg> drtLegs = new HashSet<>();
 	 private WeightedRandomSelection<Integer> sampler;
+	 private final boolean generateByDefault;
  
 	 private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<GroupLeg>> passengerGroups = new HashMap<>();
  
@@ -80,13 +83,23 @@
 			 final DrtWithExtensionsConfigGroup drtWithExtensionsConfigGroup) {
 		 this.scenario = scenario;
 		 this.drtMode = drtMode;
+
+		 for (var vehicle : fleet.getVehicleSpecifications().values()) {
+			// need IntegerType to determine the maxCapacity, but this could also be a config option /sh, januar 2025
+			Preconditions.checkArgument(vehicle.getCapacity() instanceof IntegerLoad, "Companions require a IntegerLoadType in the current implementation.");
+		 }
+
 		 this.maxCapacity = fleet.getVehicleSpecifications()
 				 .values()
 				 .stream()
-				 .mapToInt(DvrpVehicleSpecification::getCapacity)
+				 .map(DvrpVehicleSpecification::getCapacity)
+				 .map(IntegerLoad.class::cast)
+			     .mapToInt(IntegerLoad::getValue)
 				 .max()
 				 .orElse(0);
 		 installSampler(drtWithExtensionsConfigGroup);
+
+		 generateByDefault = drtWithExtensionsConfigGroup.getDrtCompanionParams().orElseThrow().getGenerateCompanionsByDefault();
 	 }
  
 	 private String getCompanionPrefix(String drtMode) {
@@ -115,7 +128,13 @@
 	 private void addCompanionAgents() {
 		 Collection<Person> companions = new ArrayList<>();
 		 for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			 for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
+			 
+			if (!isActive(person)) {
+				// skip if mode is configured to generate companions for this agent
+				continue;
+			}
+			
+			for (TripStructureUtils.Trip trip : TripStructureUtils.getTrips(person.getSelectedPlan())) {
 				 int additionalCompanions = sampler.select();
  
 				 for (Leg leg : trip.getLegsOnly()) {
@@ -261,6 +280,17 @@
 	 public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		 this.addCompanionAgents();
 	 }
- 
+
+	 static public final String PERSON_ATTRIBUTE = "drt:companions";
+
+	 private boolean isActive(Person person) {
+		Boolean value = (Boolean) person.getAttributes().getAttribute(PERSON_ATTRIBUTE);
+
+		if (value == null) {
+			return generateByDefault;
+		}
+
+		return value;
+	 }
  }
  

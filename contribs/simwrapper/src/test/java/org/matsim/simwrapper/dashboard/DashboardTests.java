@@ -20,11 +20,12 @@ import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 public class DashboardTests {
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	private void run(Dashboard... dashboards) {
 
@@ -32,7 +33,7 @@ public class DashboardTests {
 		config.controller().setLastIteration(1);
 
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
+		group.setSampleSize(0.001);
 
 		SimWrapper sw = SimWrapper.create(config);
 		for (Dashboard d : dashboards) {
@@ -151,6 +152,23 @@ public class DashboardTests {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "pt");
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz");
+			.isDirectoryContaining("glob:**pt_pax_volumes.csv.gz")
+			.isDirectoryContaining("glob:**pt_pax_per_hour_and_vehicle_type_and_agency.csv");
 	}
+
+	@Test
+	void activity() {
+		ActivityDashboard ad = new ActivityDashboard("kehlheim_shape.shp");
+
+		ad.addActivityType(
+			"work",
+			List.of("work"),
+			List.of(ActivityDashboard.Indicator.COUNTS, ActivityDashboard.Indicator.RELATIVE_DENSITY, ActivityDashboard.Indicator.DENSITY), true,
+			"kehlheim_ref.csv"
+		);
+
+		run(ad);
+	}
+
+
 }

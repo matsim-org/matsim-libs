@@ -19,15 +19,10 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
-import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-import org.matsim.core.config.ConfigGroup;
-
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Positive;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "RuleBasedETaxiOptimizer";
@@ -41,7 +36,7 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 	// (for approx. 20 km => 3kWh) with 3 kW-heating on
 	@Positive
 	@DecimalMax("1.0")
-	public double minSoc = 0.3;
+	private double minSoc = 0.3;
 
 	@Parameter
 	@Comment("Specifies how often idle vehicles are checked if they have become"
@@ -49,7 +44,7 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 			+ " The default value is 300 (used for simulating Nissan Leaf taxis).")
 	// in cold winter, 3kW heating consumes 1.25% SOC every 5 min
 	@Positive
-	public int socCheckTimeStep = 300;
+	private int socCheckTimeStep = 300;
 
 	private RuleBasedTaxiOptimizerParams ruleBasedTaxiOptimizerParams;
 
@@ -72,5 +67,24 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 	@Override
 	public int getReoptimizationTimeStep() {
 		return ruleBasedTaxiOptimizerParams.getReoptimizationTimeStep();
+	}
+
+	@Positive
+	@DecimalMax("1.0")
+	public double getMinSoc() {
+		return minSoc;
+	}
+
+	public void setMinSoc(@Positive @DecimalMax("1.0") double minSoc) {
+		this.minSoc = minSoc;
+	}
+
+	@Positive
+	public int getSocCheckTimeStep() {
+		return socCheckTimeStep;
+	}
+
+	public void setSocCheckTimeStep(@Positive int socCheckTimeStep) {
+		this.socCheckTimeStep = socCheckTimeStep;
 	}
 }

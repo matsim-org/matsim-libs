@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="FV_Dosto">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.5</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999">
+		</capacity>
+		<length meter="750.0"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="27.7778"/>
+		<costInformation>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	<vehicleType id="RE_Flirt">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.7</attribute>
+			<attribute name="railsimMaxDeceleration" class="java.lang.Double">0.7</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999">
+		</capacity>
+		<length meter="500.0"/>
+		<width meter="1.0"/>
+		<maximumVelocity meterPerSecond="13.889"/>
+		<costInformation>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	
+	<vehicle id="IC_BO_0" type="FV_Dosto"/>
+	<vehicle id="IC_BO_1" type="FV_Dosto"/>
+	<vehicle id="IC_BO_2" type="FV_Dosto"/>
+	<vehicle id="IC_BO_3" type="FV_Dosto"/>
+	<vehicle id="IC_BU_0" type="FV_Dosto"/>
+	<vehicle id="IC_BU_1" type="FV_Dosto"/>
+	<vehicle id="IC_BU_2" type="FV_Dosto"/>
+	<vehicle id="IC_BU_3" type="FV_Dosto"/>
+
+	<vehicle id="RE_BO_0" type="RE_Flirt"/>
+	<vehicle id="RE_BO_1" type="RE_Flirt"/>
+	<vehicle id="RE_BO_2" type="RE_Flirt"/>
+	<vehicle id="RE_BO_3" type="RE_Flirt"/>
+	<vehicle id="RE_BU_0" type="RE_Flirt"/>
+	<vehicle id="RE_BU_1" type="RE_Flirt"/>
+	<vehicle id="RE_BU_2" type="RE_Flirt"/>
+	<vehicle id="RE_BU_3" type="RE_Flirt"/>
+
+</vehicleDefinitions>

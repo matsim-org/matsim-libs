@@ -21,12 +21,15 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -36,9 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 final class PassengerScenarioCreator {
 
 	static int agentCounter = 1;
@@ -47,8 +47,7 @@ final class PassengerScenarioCreator {
 
 	public static void main(String[] args) {
 
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9.xml");
 
@@ -97,7 +96,7 @@ final class PassengerScenarioCreator {
 			act1.setEndTime(8*60*60);
 			plan.addActivity(act1);
 			Leg leg1 = popFactory.createLeg(TransportMode.car);
-			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(),
+			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId), scenario.getNetwork().getLinks().get(workId),
 					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute = RouteUtils.createLinkNetworkRouteImpl(homeId, getLinkIds(path1), workId);
 			leg1.setRoute(linkNetworkRoute);
@@ -108,7 +107,7 @@ final class PassengerScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2 = popFactory.createLeg(TransportMode.car);
-			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(),
+			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId), scenario.getNetwork().getLinks().get(homeId),
 					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute2 = RouteUtils.createLinkNetworkRouteImpl(workId, getLinkIds(path2), homeId);
 			leg2.setRoute(linkNetworkRoute2);

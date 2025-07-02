@@ -70,9 +70,9 @@ public class ChainedPtFareHandlerTest {
 		distanceBased2.setTransactionPartner(DISTANCE_BASED_TRANSACTION_PARTNER);
 		distanceBased2.setMinFare(7.0);
 
-		ptFareConfigGroup.addParameterSet(fareZoneBased);
-		ptFareConfigGroup.addParameterSet(distanceBased);
-		ptFareConfigGroup.addParameterSet(distanceBased2);
+		ptFareConfigGroup.addPtFareParameterSet(fareZoneBased);
+		ptFareConfigGroup.addPtFareParameterSet(distanceBased);
+		ptFareConfigGroup.addPtFareParameterSet(distanceBased2);
 
 		ptFareConfigGroup.setUpperBoundFactor(2.0);
 
@@ -145,7 +145,8 @@ public class ChainedPtFareHandlerTest {
 		// rb17 to Regensburg 2nd home location departs at 16:52 (beyond distance fare 1 zone, distance fare 2 applies, 10230.93m)
 		work2.setEndTime(16 * 3600. + 40 * 60);
 		Activity work3 = fac.createActivityFromCoord("work", new Coord(726645.48, 5433383.16));
-		// rb17 to Kelheim home location departs at 18:46, then transfer to bus 6022 (beyond distance fare 1 zone, distance fare 2 applies, 19871.38m)
+		// rb17 to Kelheim home location departs at 18:46, then transfer to bus 6022 (beyond distance fare 1 zone, distance fare 2 applies, 19871
+		// .38m)
 		work3.setEndTime(18 * 3600. + 40 * 60);
 		Activity home2 = fac.createActivityFromCoord("home", new Coord(710300.624, 5422165.737));
 

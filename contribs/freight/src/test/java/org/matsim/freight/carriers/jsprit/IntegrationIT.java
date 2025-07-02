@@ -27,6 +27,8 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,8 +43,6 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.concurrent.ExecutionException;
-
 public class IntegrationIT {
 
 	@RegisterExtension
@@ -51,7 +51,7 @@ public class IntegrationIT {
 	@Test
 	void testJsprit() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
-		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+		final String vehicleTypeFilename = Path.of(utils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString();
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
 
 		Config config = ConfigUtils.createConfig();
@@ -77,7 +77,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
@@ -88,10 +88,11 @@ public class IntegrationIT {
 			Assertions.assertEquals(2, carrier.getPlans().size(), "The number of plans is not as expected");
 			// Test method if all jobs are handled
 			Assertions.assertTrue(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "Not all jobs are handled");
-			CarrierService newService = CarrierService.Builder.newInstance(Id.create(
-				"service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"))
-				.setServiceDuration(10.).setServiceStartTimeWindow(TimeWindow.newInstance(0,86000)).build();
-			carrier.getServices().put(newService.getId(), newService);
+			CarrierService newService  = CarrierService.Builder.newInstance(Id.create("service" + carrier.getServices().size(), CarrierService.class), Id.createLinkId("100603"),0)
+				.setServiceDuration(10.)
+				.setServiceStartingTimeWindow(TimeWindow.newInstance(0, 86000))
+				.build();
+			CarriersUtils.addService(carrier, newService);
 			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
 		}
 	}
@@ -99,7 +100,7 @@ public class IntegrationIT {
 	@Test
 	void testJspritWithDefaultSolutionOption() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
-		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
+		final String vehicleTypeFilename = Path.of(utils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString();
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
 
 		Config config = ConfigUtils.createConfig();
@@ -125,7 +126,7 @@ public class IntegrationIT {
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getCarrierVehicleTypes(scenario));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), CarriersUtils.getCarriers(scenario), CarriersUtils.getOrAddCarrierVehicleTypes(scenario));
 		Assertions.assertEquals(scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON, "The score of both runs are not the same");
 	}
 
@@ -148,7 +149,7 @@ public class IntegrationIT {
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
 			// (maybe not optimal, but since re-routing is a matsim strategy,

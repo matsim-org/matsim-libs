@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * NetworkChangeEventsEngine.java
@@ -25,8 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
+import org.matsim.core.mobsim.messagequeue.Message;
+import org.matsim.core.mobsim.messagequeue.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
@@ -58,18 +57,12 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	}
 
 	private void addNetworkChangeEventToMessageQ(NetworkChangeEvent changeEvent) {
-		Message m = new Message() {
-			@Override
-			public void processEvent() {
-
-			}
-
+		Message m = new Message(changeEvent.getStartTime()) {
 			@Override
 			public void handleMessage() {
 				applyTheChangeEvent(changeEvent);
 			}
 		};
-		m.setMessageArrivalTime(changeEvent.getStartTime());
 		this.messageQueue.putMessage(m);
 	}
 
@@ -81,7 +74,6 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			} else {
 				throw new RuntimeException("link not time variant") ;
 			}
-
 		}
 	}
 
@@ -94,7 +86,6 @@ class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			log.warn("network change event already in central data structure; not adding it again") ;
 		} else {
 			log.warn("network change event not yet in central data structure; adding it") ;
-//			centralNetworkChangeEvents.add( event ) ;
 			NetworkUtils.addNetworkChangeEvent(this.internalInterface.getMobsim().getScenario().getNetwork(), event);
 			// need to add this here since otherwise speed lookup in mobsim does not work. And need to hedge against
 			// code that may already have added it by itself.  kai, feb'18

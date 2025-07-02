@@ -21,9 +21,13 @@
 
 package org.matsim.freight.carriers.jsprit;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -42,12 +47,6 @@ import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
-
-import java.util.Arrays;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 public class NetworkBasedTransportCostsTest {
 
@@ -59,8 +58,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_itMustAccountForThem(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -93,8 +91,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenVehicleTypeNotKnow_throwException(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -121,8 +118,7 @@ public class NetworkBasedTransportCostsTest {
 
 	@Test
 	void test_whenAddingTwoVehicleTypesViaConstructor_itMustAccountForThat(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
@@ -173,8 +169,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollAllTypes(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
@@ -228,8 +223,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollOneTypeTollFactor(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
@@ -311,8 +305,7 @@ public class NetworkBasedTransportCostsTest {
 	 */
 	@Test
 	void test_whenAddingTwoDifferentVehicleTypes_tollBasedOnVehicleId(){
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "network.xml");
 
@@ -331,14 +324,10 @@ public class NetworkBasedTransportCostsTest {
 		TollFactor tollFactor = (personId, vehicleId, linkId, time) -> {
 			//No information about the vehicleType available anywhere, because it is not registered centrally.
 			// -> Use the vehicleId to distinguish the types.
+			// KMT (Feb'25): I think the type should no be available.
 			var vehTypeIdString = vehicleId.toString();
-			if (vehTypeIdString.equals("vehicle1")) {
-				return 1;
-			} else if (vehTypeIdString.equals("vehicle2")) {
-				return 0.5;
-			} else {
-				return 0;
-			}
+			//Factor 1 for vehicle1, 0.5 for vehicle2, 0 for all others.
+			return vehTypeIdString.equals("vehicle1") ? 1 : vehTypeIdString.equals("vehicle2") ? 0.5 : 0;
 		};
 		RoadPricingSchemeUsingTollFactor rpSchemeWTollFactor = new RoadPricingSchemeUsingTollFactor( scheme , tollFactor );
 

@@ -1,5 +1,7 @@
 package org.matsim.application.analysis.traffic.traveltime;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -47,6 +49,8 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 )
 public class TravelTimeComparison implements MATSimAppCommand {
 
+	private static final Logger log = LogManager.getLogger(TravelTimeComparison.class);
+
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TravelTimeComparison.class);
 
@@ -85,22 +89,35 @@ public class TravelTimeComparison implements MATSimAppCommand {
 
 		data.addColumns(
 			DoubleColumn.create("simulated", data.rowCount()),
-			DoubleColumn.create("free_flow", data.rowCount())
+			DoubleColumn.create("simulated_tt", data.rowCount()),
+			DoubleColumn.create("free_flow", data.rowCount()),
+			DoubleColumn.create("free_flow_tt", data.rowCount())
 		);
 
 		for (Row row : data) {
 			LeastCostPathCalculator.Path congested = computePath(network, congestedRouter, row);
+
+			// Skip if path is not found
+			if (congested == null) {
+				row.setDouble("simulated", Double.NaN);
+				continue;
+			}
+
 			double dist = congested.links.stream().mapToDouble(Link::getLength).sum();
 			double speed = 3.6 * dist / congested.travelTime;
 
 			row.setDouble("simulated", speed);
+			row.setDouble("simulated_tt", congested.travelTime);
 
 			LeastCostPathCalculator.Path freeflow = computePath(network, freeflowRouter, row);
 			dist = freeflow.links.stream().mapToDouble(Link::getLength).sum();
 			speed = 3.6 * dist / freeflow.travelTime;
 
 			row.setDouble("free_flow", speed);
+			row.setDouble("free_flow_tt", freeflow.travelTime);
 		}
+
+		data = data.dropWhere(data.doubleColumn("simulated").isMissing());
 
 		data.addColumns(
 			data.doubleColumn("simulated").subtract(data.doubleColumn("mean")).setName("bias")
@@ -128,6 +145,16 @@ public class TravelTimeComparison implements MATSimAppCommand {
 	private LeastCostPathCalculator.Path computePath(Network network, LeastCostPathCalculator router, Row row) {
 		Node fromNode = network.getNodes().get(Id.createNodeId(row.getString("from_node")));
 		Node toNode = network.getNodes().get(Id.createNodeId(row.getString("to_node")));
+
+		if (fromNode == null) {
+			log.error("Node {} not found in network", row.getString("from_node"));
+			return null;
+		}
+
+		if (toNode == null) {
+			log.error("Node {} not found in network", row.getString("to_node"));
+			return null;
+		}
 
 		return router.calcLeastCostPath(fromNode, toNode, row.getInt("hour") * 3600, null, null);
 	}

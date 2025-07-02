@@ -21,8 +21,6 @@
 
 package org.matsim.freight.carriers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
@@ -33,21 +31,17 @@ import org.matsim.vehicles.VehicleType;
 
 /**
  *
- *
  * @author sschroeder
- *
  */
 public final class CarrierVehicle implements Vehicle {
-
-	private static final Logger log = LogManager.getLogger(CarrierVehicle.class);
 
 	/**
 	 * Returns a new instance of carrierVehicle.
 	 * <p>
 	 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
 	 *
-	 * @param vehicleId
-	 * @param locationId
+	 * @param vehicleId 	the vehicle id
+	 * @param locationId 	the location id
 	 * @return CarrierVehicle
 	 * @see CarrierVehicle
 	 */
@@ -59,7 +53,6 @@ public final class CarrierVehicle implements Vehicle {
 	 * Builder to build vehicles.
 	 *
 	 * @author sschroeder
-	 *
 	 */
 	public static class Builder {
 
@@ -68,9 +61,9 @@ public final class CarrierVehicle implements Vehicle {
 		 * <p>
 		 * The default values for other fields (being implicitly set) are [capacity=0][earliestStart=0.0][latestEnd=Integer.MaxValue()].
 		 *
-		 * @param vehicleId
-		 * @param locationId
-		 * @param vehicleType
+		 * @param vehicleId		the vehicle id
+		 * @param locationId 	the location id
+		 * @param vehicleType 	the vehicle type
 		 * @return a new vehicle builder
 		 */
 		public static Builder newInstance( Id<Vehicle> vehicleId, Id<Link> locationId, VehicleType vehicleType ){
@@ -80,7 +73,6 @@ public final class CarrierVehicle implements Vehicle {
 		private final Id<Link> locationId;
 		private final Id<Vehicle> vehicleId;
 		private final VehicleType type;
-//		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 
@@ -90,29 +82,6 @@ public final class CarrierVehicle implements Vehicle {
 			this.vehicleId = vehicleId;
 			this.type = vehicleType;
 		}
-
-		/**
-		 * @param type
-		 * @deprecated The vehicleType need now to be set in the constructor kai/kai jan'22
-		 */
-		@Deprecated
-		public Builder setType( VehicleType type ){
-			log.warn(".setType has no functionality anymore and is deprecated");
-//			this.type=type;
-			return this;
-		}
-
-		/**
-		 * @param typeId
-		 * @deprecated The vehicleTypeId is no longer needed and was confusing -> Use getType().getId kai/kai jan'22
-		 */
-		@Deprecated
-		public Builder setTypeId(Id<VehicleType> typeId ){
-			log.warn(".setTypeId has no functionality anymore and is deprecated");
-//			this.typeId = typeId;
-			return this;
-		}
-
 
 		public Builder setEarliestStart(double earliestStart){
 			this.earliestStart=earliestStart;
@@ -151,10 +120,7 @@ public final class CarrierVehicle implements Vehicle {
 	public Id<Link> getLinkId() {
 		return locationId;
 	}
-	/**
-	 * @deprecated -- please inline.  kai, jul'22
-	 */
-	@Deprecated public Id<Link> getLocation() { return getLinkId(); }
+
 	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
@@ -199,7 +165,6 @@ public final class CarrierVehicle implements Vehicle {
 
 
 	public Id<VehicleType> getVehicleTypeId() {
-//		return typeId;
 		return vehicleType.getId();
 	}
 

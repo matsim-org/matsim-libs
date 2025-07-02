@@ -33,9 +33,21 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
+	/**
+	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
+	 * */
 	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY = "marginalUtilityOfUserDefinedNetworkAttribute_m";
+	/**
+	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
+	 * */
 	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_NAME = "userDefinedNetworkAttributeName";
+	/**
+	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
+	 * */
 	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE = "userDefinedNetworkAttributeDefaultValue";
+	/**
+	 * @deprecated  -- I think that this has been superseeded by mode vehicles.
+	 * */
 	private static final String MAX_BICYCLE_SPEED_FOR_ROUTING = "maxBicycleSpeedForRouting";
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
@@ -73,6 +85,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(MAX_BICYCLE_SPEED_FOR_ROUTING, "maxBicycleSpeed");
 		return map;
 	}
+	/**
+	 * This is something like "cobblestone" or "paved" or "sand".
+	 */
 	@StringSetter( INPUT_COMFORT )
 	public BicycleConfigGroup setMarginalUtilityOfComfort_m( final double value ) {
 		this.marginalUtilityOfComfort = value;
@@ -82,6 +97,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public double getMarginalUtilityOfComfort_m() {
 		return this.marginalUtilityOfComfort;
 	}
+	/**
+	 * This is something like "arterial" or "residential road" or "has separate bicycle lane".
+	 */
 	@StringSetter( INPUT_INFRASTRUCTURE )
 	public BicycleConfigGroup setMarginalUtilityOfInfrastructure_m( final double value ) {
 		this.marginalUtilityOfInfrastructure = value;
@@ -93,6 +111,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter( INPUT_GRADIENT )
 	public BicycleConfigGroup setMarginalUtilityOfGradient_m_100m( final double value ) {
+		// yy I do not understand what the _m_100m exactly means.  IMO, there is a "per meter" missing (i.e. _m_100m_m, or maybe just _m and the rest in the documentation).
 		this.marginalUtilityOfGradient = value;
 		return this;
 	}
@@ -100,12 +119,21 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public double getMarginalUtilityOfGradient_m_100m() {
 		return this.marginalUtilityOfGradient;
 	}
+
+	/**
+	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
+	 * */
 	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
+	@Deprecated
 	public BicycleConfigGroup setMarginalUtilityOfUserDefinedNetworkAttribute_m(final double value) {
 		this.marginalUtilityOfUserDefinedNetworkAttribute = value;
 		return this;
 	}
+	/**
+	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
+	 * */
 	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
+	@Deprecated
 	public double getMarginalUtilityOfUserDefinedNetworkAttribute_m() {
 		return this.marginalUtilityOfUserDefinedNetworkAttribute;
 	}
@@ -117,6 +145,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
+	@Deprecated
 	public BicycleConfigGroup setUserDefinedNetworkAttributeName(String value) {
 		this.userDefinedNetworkAttributeName = value;
 		return this;
@@ -129,6 +158,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
+	@Deprecated
 	public String getUserDefinedNetworkAttributeName() {
 		return this.userDefinedNetworkAttributeName;
 	}
@@ -139,6 +169,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
+	@Deprecated
 	public BicycleConfigGroup setUserDefinedNetworkAttributeDefaultValue(double value) {
 		this.userDefinedNetworkAttributeDefaultValue = value;
 		return this;
@@ -150,6 +181,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
+	@Deprecated
 	public double getUserDefinedNetworkAttributeDefaultValue() {
 		return this.userDefinedNetworkAttributeDefaultValue;
 	}

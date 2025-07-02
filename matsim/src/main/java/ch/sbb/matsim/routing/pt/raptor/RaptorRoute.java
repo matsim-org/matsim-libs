@@ -20,15 +20,15 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author mrieser / SBB
@@ -75,6 +75,16 @@ public class RaptorRoute {
         this.ptLegCount++;
     }
 
+	void addChainedPart(TransitStopFacility fromStop, TransitStopFacility toStop, TransitLine line, TransitRoute route, String mode, double depTime, double boardingTime, double vehDepTime, double arrivalTime, double distance) {
+		RoutePart part = new RoutePart(fromStop, toStop, mode, depTime, boardingTime, vehDepTime, arrivalTime, distance, line, route, null);
+		this.travelTime += (arrivalTime - depTime);
+		RoutePart lastPart = editableParts.getLast();
+		while (lastPart.chainedPart != null) {
+			lastPart = lastPart.chainedPart;
+		}
+		lastPart.chainedPart = part;
+	}
+
     public double getTotalCosts() {
         return this.totalCosts;
     }
@@ -110,6 +120,12 @@ public class RaptorRoute {
         public final double distance;
         public final TransitLine line;
         public final TransitRoute route;
+
+		/**
+		 * Optional chained route part.
+		 */
+		public RoutePart chainedPart;
+
         final List<? extends PlanElement> planElements;
 
         RoutePart(TransitStopFacility fromStop, TransitStopFacility toStop, String mode, double depTime, double boardingTime, double vehicleDepTime, double arrivalTime, double distance, TransitLine line, TransitRoute route, List<? extends PlanElement> planElements) {
@@ -125,5 +141,15 @@ public class RaptorRoute {
             this.route = route;
             this.planElements = planElements;
         }
+
+		/**
+		 * Return the arrival time of the last part of the route.
+		 */
+		public double getChainedArrivalTime() {
+			if (this.chainedPart == null) {
+				return this.arrivalTime;
+			}
+			return this.chainedPart.getChainedArrivalTime();
+		}
     }
 }

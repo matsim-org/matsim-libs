@@ -1,16 +1,29 @@
 package org.matsim.contrib.drt.prebooking;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -26,8 +39,16 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -45,13 +66,13 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class PrebookingTestEnvironment {
 	private final MatsimTestUtils utils;
@@ -62,13 +83,16 @@ public class PrebookingTestEnvironment {
 	private final double edgeLength = 200.0;
 	private final double speed = 10.0;
 
-	private int vehicleCapacity = 4;
+	private IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
+	private DvrpLoad vehicleCapacity = integerLoadType.fromInt(4);
 
 	private double maximumWaitTime = 3600.0;
 	private double detourRelative = 1.3;
 	private double detourAbsolute = 300.0;
 	private double stopDuration = 60.0;
 	private double endTime = 30.0 * 3600.0;
+
+	private boolean useExactTravelTimeEstimates = false;
 
 	public PrebookingTestEnvironment(MatsimTestUtils utils) {
 		this.utils = utils;
@@ -141,8 +165,18 @@ public class PrebookingTestEnvironment {
 		return this;
 	}
 
-	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+	public PrebookingTestEnvironment setVehicleCapacity(DvrpLoad vehicleCapacity) {
 		this.vehicleCapacity = vehicleCapacity;
+		return this;
+	}
+
+	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+		this.vehicleCapacity = integerLoadType.fromInt(vehicleCapacity);
+		return this;
+	}
+
+	public PrebookingTestEnvironment useExactTravelTimeEstimates() {
+		this.useExactTravelTimeEstimates = true;
 		return this;
 	}
 
@@ -164,9 +198,11 @@ public class PrebookingTestEnvironment {
 
 		configureRequestListener(controller);
 		configureVehicleListener(controller);
+		configureStuckListener(controller);
 
 		return controller;
 	}
+
 
 	private void buildFleet(Controler controller) {
 		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
@@ -196,6 +232,24 @@ public class PrebookingTestEnvironment {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(controller.getConfig());
 		controller.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfigGroup));
+
+		if (useExactTravelTimeEstimates) {
+			for (var mode : MultiModeDrtConfigGroup.get(controller.getConfig()).getModalElements()) {
+				controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(mode.getMode()) {
+					@Override
+					protected void configureQSim() {
+						bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
+							Network network = getter.getModal(Network.class);
+							TravelTime travelTime = getter.getModal(TravelTime.class);
+							TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+
+							LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+							return DetourTimeEstimator.createExactEstimator(router, travelTime);
+						}));
+					}
+				});
+			}
+		}
 	}
 
 	private void buildConfig(Config config) {
@@ -226,16 +280,16 @@ public class PrebookingTestEnvironment {
 
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
-		modeConfig.mode = "drt";
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) modeConfig.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxWaitTime = maximumWaitTime;
-		defaultConstraintsSet.maxTravelTimeAlpha = detourRelative;
-		defaultConstraintsSet.maxTravelTimeBeta = detourAbsolute;
-		modeConfig.stopDuration = stopDuration;
-		modeConfig.idleVehiclesReturnToDepots = false;
-		modeConfig.vehiclesFile = null;
+		modeConfig.setMode("drt");
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = modeConfig
+				.addOrGetDrtOptimizationConstraintsParams()
+				.addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.setMaxWaitTime(maximumWaitTime);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(detourRelative);
+		defaultConstraintsSet.setMaxTravelTimeBeta(detourAbsolute);
+		modeConfig.setStopDuration(stopDuration);
+		modeConfig.setIdleVehiclesReturnToDepots(false);
+		modeConfig.setVehiclesFile(null);
 
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);
@@ -270,13 +324,13 @@ public class PrebookingTestEnvironment {
 			plan.addLeg(firstLeg);
 
 			if (!Double.isNaN(request.submissionTime)) {
-				firstActivity.getAttributes().putAttribute(AttributeBasedPrebookingLogic.getSubmissionAttribute("drt"),
+				firstActivity.getAttributes().putAttribute(AttributeBasedPrebookingLogic.getSubmissionTimeAttribute("drt"),
 						request.submissionTime);
 			}
 
 			if (!Double.isNaN(request.plannedDepartureTime)) {
 				firstActivity.getAttributes().putAttribute(
-						AttributeBasedPrebookingLogic.getPlannedDepartureAttribute("drt"),
+						AttributeBasedPrebookingLogic.getPlannedDepartureTimeAttribute("drt"),
 						request.plannedDepartureTime);
 			}
 
@@ -442,6 +496,28 @@ public class PrebookingTestEnvironment {
 		@Override
 		public void handleEvent(TaskEndedEvent event) {
 			taskInfo.get(event.getDvrpVehicleId().toString()).getLast().endTime = event.getTime();
+		}
+	}
+
+	private final List<PersonStuckEvent> stuckEvents = new LinkedList<>();
+
+	public List<PersonStuckEvent> getStuckInfo() {
+		return stuckEvents;
+	}
+
+	private void configureStuckListener(Controler controller) {
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(new StuckListener());
+			}
+		});
+	}
+
+	private class StuckListener implements PersonStuckEventHandler {
+		@Override
+		public void handleEvent(PersonStuckEvent event) {
+			stuckEvents.add(event);
 		}
 	}
 }

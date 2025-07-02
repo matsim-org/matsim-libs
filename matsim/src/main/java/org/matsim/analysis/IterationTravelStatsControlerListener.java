@@ -99,7 +99,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		// This uses the same logic as in PlansDumpingImpl
 		int writeTripsInterval = config.controller().getWriteTripsInterval();
 		final boolean writingTripsAtAll = writeTripsInterval > 0;
-		final boolean earlyIteration = event.getIteration() <= config.controller().getWritePlansInterval() ;
+		final boolean earlyIteration = event.getIteration()-config.controller().getFirstIteration()==1;
 
 		if (!writingTripsAtAll) {
 			return false;

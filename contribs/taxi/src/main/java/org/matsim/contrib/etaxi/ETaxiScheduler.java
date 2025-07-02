@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
+import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -50,10 +51,13 @@ import org.matsim.core.router.util.TravelTime;
 public class ETaxiScheduler extends TaxiScheduler {
 	public static final TaxiTaskType DRIVE_TO_CHARGER = new TaxiTaskType("DRIVE_TO_CHARGER", EMPTY_DRIVE);
 
+	private final ChargingStrategy.Factory chargingStrategyFactory;
+
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
 			TravelTime travelTime, Supplier<LeastCostPathCalculator> routerCreator, EventsManager eventsManager,
-			MobsimTimer mobsimTimer) {
+			MobsimTimer mobsimTimer, ChargingStrategy.Factory chargingStrategyFactory) {
 		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, routerCreator, eventsManager, mobsimTimer);
+		this.chargingStrategyFactory = chargingStrategyFactory;
 	}
 
 	// FIXME underestimated due to the ongoing AUX/drive consumption
@@ -65,12 +69,13 @@ public class ETaxiScheduler extends TaxiScheduler {
 		divertOrAppendDrive(schedule, vrpPath, DRIVE_TO_CHARGER);
 
 		ChargingWithAssignmentLogic logic = (ChargingWithAssignmentLogic)charger.getLogic();
+		ChargingStrategy strategy = chargingStrategyFactory.createStrategy(charger.getSpecification(), ev);
 		double chargingEndTime = vrpPath.getArrivalTime() + ChargingEstimations.estimateMaxWaitTimeForNextVehicle(
 				charger)// TODO not precise!!!
-				+ logic.getChargingStrategy().calcRemainingTimeToCharge(ev);// TODO not precise !!! (SOC will be lower)
+				+ strategy.calcRemainingTimeToCharge();// TODO not precise !!! (SOC will be lower)
 		schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev,
-				-logic.getChargingStrategy().calcRemainingEnergyToCharge(ev)));// TODO not precise !!! (ditto)
-		logic.assignVehicle(ev);
+				-strategy.calcRemainingEnergyToCharge(), strategy));// TODO not precise !!! (ditto)
+		logic.assignVehicle(ev, strategy);
 
 		appendStayTask(vehicle);
 	}

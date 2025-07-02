@@ -20,14 +20,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -44,9 +43,6 @@ import picocli.CommandLine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
@@ -129,8 +125,17 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
 	private Set<String> modes;
 
-	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept", defaultValue = TransportMode.pt, split = ",")
+	@CommandLine.Option(names = "--clean-modes", description = "Additional modes to consider for network cleaning", split = ",")
+	private Set<String> cleanModes;
+
+	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept. No change events will be generated for these.", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
+
+	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
+	private boolean checkBeeline;
+
+	@CommandLine.Option(names = "--keep-capacities", description = "Keep the capacities of all links, even outside the shp file", defaultValue = "false")
+	private boolean keepCapacities;
 
 	@CommandLine.Mixin
 	private CrsOptions crs;
@@ -299,18 +304,18 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		log.info("number of links before cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes before cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(scenario.getNetwork());
-		cleaner.removeNodesWithoutLinks();
+		log.info("Cleaning modes {}", modes);
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), modes);
 
-		for (String mode : modes) {
-			log.info("Cleaning mode {}", mode);
-			cleaner.run(Set.of(mode));
+		if (cleanModes != null && !cleanModes.isEmpty()) {
+			log.info("Cleaning modes {}", cleanModes);
+			NetworkUtils.cleanNetwork(scenario.getNetwork(), cleanModes);
 		}
 
 		log.info("number of links after cleaning: {}", scenario.getNetwork().getLinks().size());
 		log.info("number of nodes after cleaning: {}", scenario.getNetwork().getNodes().size());
 
-		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), new CleanPersonLinkIds());
+		ParallelPersonAlgorithmUtils.run(scenario.getPopulation(), Runtime.getRuntime().availableProcessors(), PersonNetworkLinkCheck.createPersonAlgorithm(scenario.getNetwork()));
 
 		PopulationUtils.writePopulation(scenario.getPopulation(), outputPopulation);
 
@@ -398,7 +403,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		return c;
 	}
 
-	private Node getFromNode(Network network, Trip trip) {
+	private Link getFromLink(Network network, Trip trip) {
 		if (network.getLinks().isEmpty()) {
 			if (emptyNetworkWarnings++ < 10)
 				log.warn("Tried to get a from-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
@@ -408,13 +413,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getOriginActivity().getLinkId() != null && modeLinks.get(trip.getOriginActivity().getLinkId()) != null) {
-			return modeLinks.get(trip.getOriginActivity().getLinkId()).getFromNode();
+			return modeLinks.get(trip.getOriginActivity().getLinkId());
 		} else {
-			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getOriginActivity())).getFromNode();
+			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getOriginActivity()));
 		}
 	}
 
-	private Node getToNode(Network network, Trip trip) {
+	private Link getToLink(Network network, Trip trip) {
 		if (network.getLinks().isEmpty()) {
 			if (emptyNetworkWarnings++ < 10)
 				log.warn("Tried to get a to-node on an empty network. Maybe you defined a wrong mode? Skipping ...");
@@ -423,9 +428,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		Map<Id<Link>, ? extends Link> modeLinks = network.getLinks();
 		if (trip.getDestinationActivity().getLinkId() != null && modeLinks.get(trip.getDestinationActivity().getLinkId()) != null) {
-			return modeLinks.get(trip.getDestinationActivity().getLinkId()).getToNode();
+			return modeLinks.get(trip.getDestinationActivity().getLinkId());
 		} else {
-			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity())).getToNode();
+			return NetworkUtils.getNearestLink(network, getActivityCoord(trip.getDestinationActivity()));
 		}
 	}
 
@@ -435,13 +440,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private LeastCostPathCalculator.Path getModeNetworkPath(Network network, String mode, Trip trip) {
 		LeastCostPathCalculator router = createRouter(network, mode);
 
-		Node fromNode = getFromNode(network, trip);
-		Node toNode = getToNode(network, trip);
+		Link fromLink = getFromLink(network, trip);
+		Link toLink = getToLink(network, trip);
 
-		if (fromNode == null || toNode == null)
+		if (fromLink == null || toLink == null)
 			return null;
 
-		return router.calcLeastCostPath(fromNode, toNode, 0, null, null);
+		return router.calcLeastCostPath(fromLink, toLink, 0, null, null);
 	}
 
 	/**
@@ -476,19 +481,44 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
 				continue;
 
-			// Setting capacity outside shapefile (and buffer) to infinite
-			link.setCapacity(Double.MAX_VALUE);
+			// Don't generate events for these fixed modes.
+			if (link.getAllowedModes().equals(keepModes))
+				continue;
+
+
+			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
+			if (!keepCapacities) {
+				link.setCapacity(1_000_000);
+				// Increase the number of lanes which increases the storage capacity
+				link.setNumberOfLanes(10_000);
+			}
+
+			Double prevSpeed = null;
 
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
 
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
+
+				// avoid that link speed is higher than the free speed of the link
+				if (freespeed >= link.getFreespeed()) {
+					freespeed = link.getFreespeed();
+				}
+
+				// Skip if the speed is the same as the previous speed
+				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
+					continue;
+				}
+
+
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
 				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
+
+				prevSpeed = freespeed;
 			}
 		}
 
@@ -533,13 +563,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			Coord originCoord = getActivityCoord(trip.getOriginActivity());
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
-			if (originCoord != null && destinationCoord != null) {
+			// also keep persons traveling through or close to area (beeline)
+			if (checkBeeline && originCoord != null && destinationCoord != null) {
 				LineString line = geoFactory.createLineString(new Coordinate[]{
 					MGC.coord2Coordinate(originCoord),
 					MGC.coord2Coordinate(destinationCoord)
 				});
 
-				// also keep persons traveling through or close to area (beeline)
 				if (line.intersects(geom)) {
 					keepPerson = true;
 				}
@@ -590,45 +620,13 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		// Remove all unselected plans because these are not handled
-		person.getPlans().stream()
-			.filter(p -> p != person.getSelectedPlan())
-			.forEach(person::removePlan);
-	}
-
-
-	private final class CleanPersonLinkIds implements PersonAlgorithm {
-
-
-		@Override
-		public void run(Person person) {
-
-			Plan plan = person.getSelectedPlan();
-			Network network = scenario.getNetwork();
-
-			for (Trip trip : TripStructureUtils.getTrips(plan)) {
-				// activity link ids are reset, if they are not retained in the cleaned network
-				if (trip.getOriginActivity().getLinkId() != null) {
-					if (!network.getLinks().containsKey(trip.getOriginActivity().getLinkId()))
-						trip.getOriginActivity().setLinkId(null);
-				}
-
-				if (trip.getDestinationActivity().getLinkId() != null) {
-					if (!network.getLinks().containsKey(trip.getDestinationActivity().getLinkId()))
-						trip.getDestinationActivity().setLinkId(null);
-				}
+		List<Plan> plans = new ArrayList<>(person.getPlans());
+		for(Plan p : plans){
+			if (p != person.getSelectedPlan()){
+				person.removePlan(p);
 			}
-
-			// Remove routes that contain now non-existing links
-			Set<Id<Link>> linkIds = TripStructureUtils.getLegs(plan).stream()
-				.map(Leg::getRoute)
-				.filter(r -> r instanceof NetworkRoute)
-				.map(r -> (NetworkRoute) r)
-				.flatMap(r -> Stream.concat(Stream.of(r.getStartLinkId(), r.getEndLinkId()), r.getLinkIds().stream()))
-				.collect(Collectors.toSet());
-
-			if (!linkIds.stream().allMatch(l -> network.getLinks().containsKey(l)))
-				PopulationUtils.resetRoutes(person.getSelectedPlan());
 		}
 	}
+
 
 }

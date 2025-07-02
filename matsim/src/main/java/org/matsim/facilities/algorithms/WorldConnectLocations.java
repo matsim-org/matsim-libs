@@ -36,6 +36,11 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
+// this class seems to be unmaintained, uses deprecated code and was never updated.
+// we added some hard-coded RuntimeExceptions in the code below in march 2025
+// while the code might have worked before, because the deprecated methods always return null,
+// it will never have done anything in that case.
+@Deprecated(since="march 2025")
 public class WorldConnectLocations {
 
 	private final static Logger log = LogManager.getLogger(WorldConnectLocations.class);
@@ -103,10 +108,11 @@ public class WorldConnectLocations {
 
 		Set<Id<ActivityFacility>> remainingFacilities = new HashSet<>(facilities.getFacilities().keySet());
 		if (this.config != null) {
-			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
-			if (inputF2LFile != null) {
-				connectByFile(facilities,network,inputF2LFile,remainingFacilities);
-			}
+			throw new RuntimeException("outdated code, should use materialized config group since 2016. / march 2025.");
+//			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
+//			if (inputF2LFile != null) {
+//				connectByFile(facilities,network,inputF2LFile,remainingFacilities);
+//			}
 		}
 
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
@@ -119,10 +125,11 @@ public class WorldConnectLocations {
 		log.info("    done.");
 
 		if (this.config != null) {
-			String outputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
-			if (outputF2LFile != null) {
-				writeF2LFile(facilities,outputF2LFile);
-			}
+			throw new RuntimeException("outdated code, should use materialized config group since 2016. / march 2025.");
+//			String outputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
+//			if (outputF2LFile != null) {
+//				writeF2LFile(facilities,outputF2LFile);
+//			}
 		}
 		log.info("  done. (connecting facilities with links)");
 	}

@@ -53,17 +53,17 @@ public class TestScenarioGeneration {
     public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
 
-        Carrier italianPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_italian", Carrier.class));
+		Carrier italianPizzaPlace = CarriersUtils.createCarrier(Id.create("pizza_italian", Carrier.class));
         CarriersUtils.setCarrierMode(italianPizzaPlace, TransportMode.car);
         CarriersUtils.setJspritIterations(italianPizzaPlace, 20);
         italianPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
-        Carrier americanPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_american", Carrier.class));
+		Carrier americanPizzaPlace = CarriersUtils.createCarrier(Id.create("pizza_american", Carrier.class));
         CarriersUtils.setCarrierMode(americanPizzaPlace, TransportMode.car);
         CarriersUtils.setJspritIterations(americanPizzaPlace, 20);
         americanPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
-        Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
+		Carrier shopping_1 = CarriersUtils.createCarrier(Id.create("shopping_1", Carrier.class));
         CarriersUtils.setCarrierMode(shopping_1, TransportMode.car);
         CarriersUtils.setJspritIterations(shopping_1, 20);
         shopping_1.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "shopping");
@@ -126,8 +126,6 @@ public class TestScenarioGeneration {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create((id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId, type );
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
-        vBuilder.setType(type);
-        vBuilder.setTypeId(type.getId());
         return vBuilder.build();
     }
 

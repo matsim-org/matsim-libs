@@ -1,16 +1,23 @@
 package org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import java.util.List;
@@ -25,11 +32,21 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
 	private final InsertionCostCalculator delegate;
 	private final MobsimTimer timer;
+	private final TravelTimeMatrix travelTimeMatrix;
+	private final OperationFacilities opFas;
+	private final Network network;
 
-	public ShiftInsertionCostCalculator(MobsimTimer timer,
-			InsertionCostCalculator delegate) {
+	public ShiftInsertionCostCalculator(
+			MobsimTimer timer,
+			InsertionCostCalculator delegate,
+			OperationFacilities operationFacilities,
+			Network network,
+			TravelTimeMatrix travelTimeMatrix) {
 		this.timer = timer;
 		this.delegate = delegate;
+		this.opFas = operationFacilities;
+		this.network = network;
+		this.travelTimeMatrix = travelTimeMatrix;
 	}
 
 	@Override
@@ -40,6 +57,19 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 		return delegate.calculate(drtRequest, insertion, detourTimeInfo);
 	}
 
+	/*
+	 * @Nico: I replaced the use of that info object with this function. 
+	 * You assume zero dropoff duration here, I think. What you probably 
+	 * would want to add is to take into account the duration of the stop. 
+	 */
+	private double calculateStopEnd(DropoffDetourInfo info) {
+		return info.requestDropoffTime;
+	}
+
+	private double calculateStopEnd(PickupDetourInfo info) {
+		return info.vehicleDepartureTime;
+	}
+
 	boolean checkShiftTimeConstraintsForScheduledRequests(Insertion insertion, DetourTimeInfo detourTimeInfo) {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		final int pickupIdx = insertion.pickup.index;
@@ -47,10 +77,11 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
 		DrtShift currentShift = ((ShiftDvrpVehicle) vEntry.vehicle).getShifts().peek();
 		double shiftEndTime = currentShift.getEndTime();
-		if(shiftEndTime < detourTimeInfo.dropoffDetourInfo.arrivalTime) {
+		if(shiftEndTime < calculateStopEnd(detourTimeInfo.dropoffDetourInfo)) {
 			// fast fail which also captures requests that are prebooked for times outside of the shift.
 			return false;
 		}
+
 
 		for (int s = 0; s < pickupIdx; s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
@@ -79,10 +110,14 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 			} else if (stop.task instanceof ShiftChangeOverTask) {
 				//no stop _after_ shift change over
 				return false;
+			} else if(stop.task instanceof WaitForShiftTask) {
+				// there still is a wait for shift task that needs to finish before the insertion
+				return false;
 			}
 		}
 
 		double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
+		boolean shiftEndScheduled = false;
 
 		// all stops after the new (potential) dropoff are delayed by totalTimeLoss
 		// check if this delay satisfies the time constraints at these stops
@@ -97,6 +132,7 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 					}
 				}
 			} else if (stop.task instanceof ShiftChangeOverTask) {
+				shiftEndScheduled = true;
 				final List<? extends Task> tasks = vEntry.vehicle.getSchedule().getTasks();
 				final Task task = tasks.get(tasks.indexOf(stop.task) - 1);
 
@@ -113,6 +149,9 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				} else {
 					return false;
 				}
+			} else if(stop.task instanceof WaitForShiftTask) {
+				// there still is a wait for shift task that needs to finish before the insertion
+				return false;
 			}
 
 			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime
@@ -127,21 +166,50 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 			DrtShiftBreak drtShiftBreak = currentShift.getBreak().get();
 			if(!drtShiftBreak.isScheduled()) {
 
-
-				if(detourTimeInfo.dropoffDetourInfo.arrivalTime < drtShiftBreak.getEarliestBreakStartTime()) {
+				if(calculateStopEnd(detourTimeInfo.dropoffDetourInfo) < drtShiftBreak.getEarliestBreakStartTime()) {
 					// insertion finished before break corridor
 					//ok
-				} else if(detourTimeInfo.pickupDetourInfo.departureTime > drtShiftBreak.getLatestBreakEndTime()) {
+				} else if(calculateStopEnd(detourTimeInfo.pickupDetourInfo) > drtShiftBreak.getLatestBreakEndTime()) {
 					// insertion start after break corridor
 					//ok
 				} else {
-					double remainingTime = drtShiftBreak.getLatestBreakEndTime() - detourTimeInfo.dropoffDetourInfo.arrivalTime;
+					double remainingTime = drtShiftBreak.getLatestBreakEndTime() - calculateStopEnd(detourTimeInfo.dropoffDetourInfo);
 					if (remainingTime < drtShiftBreak.getDuration()) {
 						// no meaningful break possible after insertion
 						// (there could still be enough time before a prebooking though)
 						return false;
 					}
 				}
+			}
+		}
+
+		if(!shiftEndScheduled) {
+			// shift end has not been scheduled yet, try to approximate whether the slack is large enough
+			if(currentShift.getOperationFacilityId().isPresent()) {
+				// we know where the shift will end
+
+				Link lastLink = null;
+				double potentialReturnToHubDepartureTime;
+				if(dropoffIdx == vEntry.stops.size()) {
+					// last stop is the new stop
+					lastLink = insertion.dropoff.newWaypoint.getLink();
+					potentialReturnToHubDepartureTime = calculateStopEnd(detourTimeInfo.dropoffDetourInfo);
+				} else {
+					// last stop is an existing stop
+					lastLink = vEntry.stops.getLast().getLink();
+					potentialReturnToHubDepartureTime = vEntry.stops.getLast().getDepartureTime() + totalTimeLoss;
+				}
+
+				Link hubLink = network.getLinks()
+						.get(opFas.getDrtOperationFacilities()
+								.get(currentShift.getOperationFacilityId().get())
+								.getLinkId());
+				int travelTimeEstimate = travelTimeMatrix.getTravelTime(lastLink.getToNode(), hubLink.getToNode(), potentialReturnToHubDepartureTime);
+
+				if(potentialReturnToHubDepartureTime + travelTimeEstimate > currentShift.getEndTime()) {
+					return false;
+				}
+
 			}
 		}
 

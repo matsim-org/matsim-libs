@@ -29,6 +29,10 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 		super(MODULE_NAME);
 	}
 
+	public void addPtFareParameterSet(PtFareParams ptFareParams) {
+		addParameterSet(ptFareParams);
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
@@ -60,14 +64,11 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
-		switch (type) {
-			case DistanceBasedPtFareParams.SET_TYPE:
-				return new DistanceBasedPtFareParams();
-			case FareZoneBasedPtFareParams.SET_TYPE:
-				return new FareZoneBasedPtFareParams();
-			default:
-				throw new IllegalArgumentException(type);
-		}
+		return switch (type) {
+			case DistanceBasedPtFareParams.SET_TYPE -> new DistanceBasedPtFareParams();
+			case FareZoneBasedPtFareParams.SET_TYPE -> new FareZoneBasedPtFareParams();
+			default -> throw new IllegalArgumentException(type);
+		};
 	}
 
 	@Override

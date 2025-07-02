@@ -1,8 +1,12 @@
 name: weekly-code-coverage
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '30 3 * * 0' # Sun 3:30 UTC
+  pull_request:
+    paths:
+      - '.github/workflows/code-coverage.yaml' # so that it also runs on PRs that change this file
 
 jobs:
   code-coverage:
@@ -23,12 +27,14 @@ jobs:
 
       # Run unit and integration tests with jacoco profile
       - name: Create coverage report
-        run: mvn verify -P jacoco --batch-mode --also-make --projects matsim -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+        run: mvn install -P jacoco --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 
-      - name: Push coverage to CodeCov
-        uses: codecov/codecov-action@v4
+      - name: Push code coverage to CodeCov
+        uses: codecov/codecov-action@v5
         with:
-          files: ./matsim/target/site/jacoco/jacoco.xml
+          files: ./matsim/target/site/jacoco/jacoco.xml,contribs/*/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
     env:
       MAVEN_OPTS: -Xmx2g

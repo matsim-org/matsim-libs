@@ -39,7 +39,7 @@ public class ShiftDrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.
             final DrtShiftBreak shiftBreak = ((ShiftBreakTask) task).getShiftBreak();
             return newBeginTime + shiftBreak.getDuration();
         } else if (task instanceof ShiftChangeOverTask) {
-            return Math.max(newBeginTime, ((ShiftChangeOverTask) task).getShift().getEndTime()) + drtShiftParams.changeoverDuration;
+            return Math.max(newBeginTime, ((ShiftChangeOverTask) task).getShift().getEndTime()) + drtShiftParams.getChangeoverDuration();
         } else if (DrtTaskBaseType.getBaseTypeOrElseThrow(task).equals(DrtTaskBaseType.STAY)) {
             final List<? extends Task> tasks = vehicle.getSchedule().getTasks();
             final int taskIdx = tasks.indexOf(task);

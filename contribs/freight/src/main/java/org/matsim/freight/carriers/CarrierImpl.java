@@ -21,14 +21,13 @@
 
 package org.matsim.freight.carriers;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -90,6 +89,7 @@ public final class CarrierImpl implements Carrier {
 	public boolean addPlan(CarrierPlan carrierPlan) {
 		// Make sure there is a selected carrierPlan if there is at least one carrierPlan
 		if (this.selectedPlan == null) this.selectedPlan = carrierPlan;
+		carrierPlan.setCarrier(this); //TODO Add this here as backpointer. (Comment from Kai/Kai Mtg)
 		return this.plans.add(carrierPlan);
 	}
 

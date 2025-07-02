@@ -21,14 +21,13 @@
 
 package org.matsim.freight.carriers;
 
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.Map;
 
 /**
  * A writer that writes carriers and their plans in a xml-file.

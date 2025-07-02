@@ -11,7 +11,7 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 /**
  * This is the default mode chain generator. It can be used right away or as a
  * template for more specialized implementatons.
- * 
+ *
  * It works as follows: Since the available modes are known and the number of
  * trips in the requested mode chain it is possible to calculate the total
  * amount of chains that can be created: modes ^ trips. Therefore, each distinct
@@ -19,7 +19,7 @@ import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
  * increased every time a new mode chain is requested and a new chain
  * corresponding to that integer is created. This way this generator has a very
  * low memory footprint.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -71,7 +71,7 @@ public class DefaultModeChainGenerator implements ModeChainGenerator {
 
 	static public class Factory implements ModeChainGeneratorFactory {
 		@Override
-		public ModeChainGenerator createModeChainGenerator(Collection<String> modes, Person person,
+		public DefaultModeChainGenerator createModeChainGenerator(Collection<String> modes, Person person,
 				List<DiscreteModeChoiceTrip> trips) {
 			return new DefaultModeChainGenerator(modes, trips.size());
 		}

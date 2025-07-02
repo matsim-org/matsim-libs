@@ -38,20 +38,20 @@ public class CostCalculationStrategyTest {
 	@Test
 	void RejectSoftConstraintViolations_tooLongWaitTime() {
 		assertRejectSoftConstraintViolations(10, 9999,
-				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, 0), new DropoffDetourInfo(22, 22, 0)),
 				INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	void RejectSoftConstraintViolations_tooLongTravelTime() {
 		assertRejectSoftConstraintViolations(9999, 10,
-				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)), INFEASIBLE_SOLUTION_COST);
+				new DetourTimeInfo(new PickupDetourInfo(0, 0, 0), new DropoffDetourInfo(11, 11, 0)), INFEASIBLE_SOLUTION_COST);
 	}
 
 	@Test
 	void RejectSoftConstraintViolations_allConstraintSatisfied() {
 		assertRejectSoftConstraintViolations(9999, 9999,
-				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, 33), new DropoffDetourInfo(22, 22, 44)), 33 + 44);
 	}
 
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
@@ -59,6 +59,7 @@ public class CostCalculationStrategyTest {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(Double.POSITIVE_INFINITY)
 				.build();
 		assertThat(new CostCalculationStrategy.RejectSoftConstraintViolations().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);
@@ -67,21 +68,21 @@ public class CostCalculationStrategyTest {
 	@Test
 	void DiscourageSoftConstraintViolations_tooLongWaitTime() {
 		assertDiscourageSoftConstraintViolations(10, 9999,
-				new DetourTimeInfo(new PickupDetourInfo(11, 0), new DropoffDetourInfo(22, 0)),
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, 0), new DropoffDetourInfo(22, 22, 0)),
 				MAX_WAIT_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	void DiscourageSoftConstraintViolations_tooLongTravelTime() {
 		assertDiscourageSoftConstraintViolations(9999, 10,
-				new DetourTimeInfo(new PickupDetourInfo(0, 0), new DropoffDetourInfo(11, 0)),
+				new DetourTimeInfo(new PickupDetourInfo(0, 0, 0), new DropoffDetourInfo(11, 11, 0)),
 				MAX_TRAVEL_TIME_VIOLATION_PENALTY);
 	}
 
 	@Test
 	void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
 		assertDiscourageSoftConstraintViolations(9999, 9999,
-				new DetourTimeInfo(new PickupDetourInfo(11, 33), new DropoffDetourInfo(22, 44)), 33 + 44);
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, 33), new DropoffDetourInfo(22, 22, 44)), 33 + 44);
 	}
 
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
@@ -89,6 +90,7 @@ public class CostCalculationStrategyTest {
 		var drtRequest = DrtRequest.newBuilder()
 				.latestStartTime(latestStartTime)
 				.latestArrivalTime(latestArrivalTime)
+				.maxRideDuration(Double.POSITIVE_INFINITY)
 				.build();
 		assertThat(new CostCalculationStrategy.DiscourageSoftConstraintViolations().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);
