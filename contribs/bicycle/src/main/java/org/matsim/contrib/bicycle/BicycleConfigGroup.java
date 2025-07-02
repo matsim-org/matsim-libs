@@ -145,7 +145,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
-	@Deprecated
 	public BicycleConfigGroup setUserDefinedNetworkAttributeName(String value) {
 		this.userDefinedNetworkAttributeName = value;
 		return this;
@@ -158,7 +157,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
-	@Deprecated
 	public String getUserDefinedNetworkAttributeName() {
 		return this.userDefinedNetworkAttributeName;
 	}
@@ -169,7 +167,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
-	@Deprecated
 	public BicycleConfigGroup setUserDefinedNetworkAttributeDefaultValue(double value) {
 		this.userDefinedNetworkAttributeDefaultValue = value;
 		return this;
@@ -181,7 +178,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@Deprecated
 	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
-	@Deprecated
 	public double getUserDefinedNetworkAttributeDefaultValue() {
 		return this.userDefinedNetworkAttributeDefaultValue;
 	}
