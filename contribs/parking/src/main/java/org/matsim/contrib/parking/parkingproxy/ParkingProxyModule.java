@@ -44,6 +44,8 @@ import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
  */
 public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModule {
 	
+	public static final String PENALTY_ATTRIBUTE = "parkingPenalty";
+	
 	private final static int GRIDSIZE = 500;
 	private final Scenario scenario;
 	
