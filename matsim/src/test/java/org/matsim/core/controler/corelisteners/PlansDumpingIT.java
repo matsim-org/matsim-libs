@@ -22,10 +22,17 @@ package org.matsim.core.controler.corelisteners;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.*;
+import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,6 +49,11 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(3);
+
+		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
+		walkParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(walkParams);
+
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
         c.getConfig().controller().setCreateGraphs(false);
@@ -66,6 +78,11 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
+
+		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
+		walkParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(walkParams);
+
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
         c.getConfig().controller().setCreateGraphs(false);
@@ -90,6 +107,11 @@ public class PlansDumpingIT {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(1);
+
+		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
+		walkParams.setMarginalUtilityOfTraveling(0);
+		config.scoring().addModeParams(walkParams);
+
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
         c.getConfig().controller().setCreateGraphs(false);
