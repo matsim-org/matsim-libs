@@ -10,4 +10,6 @@ public interface BicycleParams {
 	double getGradient(Link link);
 
 	double computeSurfaceFactor(Link link);
+
+	// James Woodcock reported some values from Corine Staves (Jul' 2025).
 }
