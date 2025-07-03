@@ -1,10 +1,22 @@
 package org.matsim.simwrapper;
 
+import java.nio.file.Path;
+
 /**
  * Function interface that allows to construct dashboards.
  */
 @FunctionalInterface
 public interface Dashboard {
+
+	Path pathToBaseCase = null;
+
+	default Path getPathToBaseCase(){
+		return pathToBaseCase;
+	};
+
+	default void setPathToBaseCase(Path path){
+		this.pathToBaseCase = path;
+	};
 
 	/**
 	 * Wrap an existing dashboard to customize its configuration.
@@ -44,9 +56,22 @@ public interface Dashboard {
 
 		private String title;
 		private String description;
+		private Path pathToBaseCase;
 
 		private Customizable(Dashboard delegate) {
 			this.delegate = delegate;
+		}
+
+		@Override
+		public Path getPathToBaseCase() {
+			if (pathToBaseCase != null)
+				return pathToBaseCase;
+			return delegate.getPathToBaseCase();
+		}
+
+		@Override
+		public void getPathToBaseCase() {
+			delegate.setPathToBaseCase();
 		}
 
 		@Override
