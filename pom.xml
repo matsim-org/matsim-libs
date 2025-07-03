@@ -377,7 +377,7 @@
 			<dependency>
 				<groupId>tech.tablesaw</groupId>
 				<artifactId>tablesaw-jsplot</artifactId>
-				<version>0.44.1</version>
+				<version>0.44.4</version>
 			</dependency>
 
 			<dependency>
