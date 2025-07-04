@@ -157,7 +157,7 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
-			collectionLSP.assignShipmentToLSP(shipment);
+			collectionLSP.assignShipmentToLspPlan(shipment);
 		}
 		collectionLSP.scheduleLogisticChains();
 
