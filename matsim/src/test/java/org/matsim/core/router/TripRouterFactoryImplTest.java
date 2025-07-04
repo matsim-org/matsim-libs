@@ -34,7 +34,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.DefaultPrepareForSimModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -102,6 +104,9 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2pt );
 		net.addLink( l3 );
 
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		scenario.getPopulation().addPerson(p);
+
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
@@ -112,10 +117,12 @@ public class TripRouterFactoryImplTest {
 						install(new TimeInterpretationModule());
 						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+						install(new DefaultPrepareForSimModule());
 					}
 				}));
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		// create the factory, get a router, route.
 		Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
@@ -127,12 +134,10 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
+				p, new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
+
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
@@ -181,6 +186,9 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2short );
 		net.addLink( l3 );
 
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		scenario.getPopulation().addPerson(p);
+
 		// create the factory, get a router, route.
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
@@ -194,8 +202,10 @@ public class TripRouterFactoryImplTest {
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
+				install(new DefaultPrepareForSimModule());
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		TripRouter router = injector.getInstance(TripRouter.class);
 
@@ -204,12 +214,9 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
+				p, new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
-		}
+		Leg l = (Leg) trip.get(2) ;
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -81,6 +82,7 @@ public class ReRoutingIT {
 	void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
@@ -92,6 +94,7 @@ public class ReRoutingIT {
 	void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
@@ -103,6 +106,7 @@ public class ReRoutingIT {
 	void testReRoutingSpeedyALT() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controller().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		scenario.getConfig().routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);

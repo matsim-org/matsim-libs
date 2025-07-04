@@ -21,10 +21,13 @@
 package org.matsim.core.router;
 
 import java.util.Arrays;
+import java.util.List;
 
+import com.google.inject.multibindings.Multibinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -33,14 +36,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
@@ -155,6 +158,23 @@ public class RoutingIT {
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
 		new PopulationReader(scenario).readFile(inPlansName);
+
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(new ScenarioByInstanceModule(scenario));
+				install(AbstractModule.override(List.of(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+				install(new TimeInterpretationModule());
+				install(new DefaultPrepareForSimModule());
+			}
+		});
+		injector.getInstance( PrepareForSim.class ).run();
 
 		calcRoute(provider, scenario);
 
