@@ -205,6 +205,12 @@ public class TrafficCountsDashboard implements Dashboard {
 					.name("road_type")
 				);
 
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).mode(ScatterTrace.Mode.LINE).build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("yFit")
+				);
+
+
 			});
 
 		layout.row("map" + suffix, tabName)
