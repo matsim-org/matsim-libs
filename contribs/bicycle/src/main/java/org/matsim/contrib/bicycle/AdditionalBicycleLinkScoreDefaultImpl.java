@@ -8,6 +8,8 @@ import org.matsim.core.network.NetworkUtils;
 
 public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBicycleLinkScore {
 
+	@Inject
+	private BicycleParams bicycleParams;
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double userDefinedNetworkAttributeDefaultValue;
 	private final double marginalUtilityOfComfort_m;
@@ -31,13 +33,13 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 
 		double distance = link.getLength();
 
-		double comfortFactor = BicycleUtils.getComfortFactor(surface );
+		double comfortFactor = bicycleParams.getComfortFactor(surface );
 		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradient = BicycleUtils.getGradient( link );
+		double gradient = bicycleParams.getGradient( link );
 		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
 
 		// I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
