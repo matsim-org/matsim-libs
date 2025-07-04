@@ -214,7 +214,7 @@ public final class LSPUtils {
 		for (LspShipment lspShipment : lsp.getLspShipments()) {
 			int sizeOfShipment = lspShipment.getSize();
 			int sizeOfNewShipments =0;
-			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0 && lowestCapacity < Integer.MAX_VALUE) {
+			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0 ) {
 				log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling. Will split it into smaller parts.",
 					lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
 				int fullParts = (int) (lspShipment.getSize() / lowestCapacity);
