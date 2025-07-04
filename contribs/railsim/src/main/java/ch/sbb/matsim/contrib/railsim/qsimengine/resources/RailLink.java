@@ -34,6 +34,7 @@ public final class RailLink implements HasLinkId {
 	private final Id<Link> id;
 	private final boolean isEntryLink;
 	private final boolean isExitLink;
+	private final boolean isNonBlockingArea;
 
 	public final double length;
 	public final double minimumHeadwayTime;
@@ -53,6 +54,7 @@ public final class RailLink implements HasLinkId {
 		this.minimumHeadwayTime = RailsimUtils.getMinimumHeadwayTime(link);
 		this.isEntryLink = RailsimUtils.isEntryLink(link);
 		this.isExitLink = RailsimUtils.isExitLink(link);
+		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
 	}
 
 	@Override
@@ -90,6 +92,13 @@ public final class RailLink implements HasLinkId {
 	 */
 	public boolean isExitLink() {
 		return isExitLink;
+	}
+
+	/**
+	 * Whether this link is a non-blocking area, e.g. an intersection area.
+	 */
+	public boolean isNonBlockingArea() {
+		return isNonBlockingArea;
 	}
 
 	/**

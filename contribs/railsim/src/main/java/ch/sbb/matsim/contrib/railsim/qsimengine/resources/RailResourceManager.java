@@ -150,6 +150,44 @@ public final class RailResourceManager {
 			return reservedDist;
 		}
 
+		// For non-blocking areas a whole segment of links needs to be reserved
+		if (link.isNonBlockingArea()) {
+
+			List<RailLink> route = position.getRouteUntilNextStop();
+			int idx = route.indexOf(link);
+
+			List<RailLink> links = new LinkedList<>();
+			boolean allFree = true;
+
+			for (int i = idx; i < route.size(); i++) {
+				RailLink l = route.get(i);
+
+				if (l.isNonBlockingArea()) {
+					allFree = l.resource.hasCapacity(time, l, track, position) && dla.checkLink(time, l, position);
+					if (!allFree)
+						break;
+
+					links.addFirst(l);
+				} else
+					break;
+			}
+
+			if (!allFree) {
+				return RailResourceInternal.NO_RESERVATION;
+			}
+
+			double dist = RailResourceInternal.NO_RESERVATION;
+			for (RailLink l : links) {
+				dist = l.resource.reserve(time, l, track, position);
+				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
+					position.getDriver().getVehicle().getId(), l.resource.getState(l)));
+				dla.onReserve(time, l.resource, position);
+			}
+
+			return dist;
+		}
+
+		// Check and reserve a single link
 		if (link.resource.hasCapacity(time, link, track, position)) {
 
 			if (!dla.checkLink(time, link, position)) {
@@ -207,6 +245,7 @@ public final class RailResourceManager {
 
 	/**
 	 * Check if a re-route is allowed.
+	 *
 	 * @see DeadlockAvoidance#checkReroute(double, RailLink, RailLink, List, List, TrainPosition)
 	 */
 	public boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position) {

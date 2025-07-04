@@ -26,6 +26,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 
 /**
@@ -40,6 +41,7 @@ public final class RailsimUtils {
 	public static final String LINK_ATTRIBUTE_RESOURCE_ID = "railsimResourceId";
 	public static final String LINK_ATTRIBUTE_CAPACITY = "railsimTrainCapacity";
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
+	public static final String LINK_NONBLOCKING_AREA = "railsimNonBlockingArea";
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
 	public static final String RESOURCE_TYPE = "railsimResourceType";
@@ -89,6 +91,20 @@ public final class RailsimUtils {
 	 */
 	public static String getResourceId(Link link) {
 		return (String) link.getAttributes().getAttribute(LINK_ATTRIBUTE_RESOURCE_ID);
+	}
+
+	/**
+	 * Sets whether this link is an intersection area.
+	 */
+	public static void setLinkNonBlockingArea(Link link, boolean isIntersectionArea) {
+		link.getAttributes().putAttribute(LINK_NONBLOCKING_AREA, isIntersectionArea);
+	}
+
+	/**
+	 * Whether this link is an intersection area.
+	 */
+	public static boolean isLinkNonBlockingArea(Link link) {
+		return Objects.equals(link.getAttributes().getAttribute(LINK_NONBLOCKING_AREA), true);
 	}
 
 	/**

@@ -334,6 +334,9 @@ public class RailsimIntegrationTest {
 		expectedArrivals.put(Id.createVehicleId("trainAC7"), 31197.0);
 		expectedArrivals.put(Id.createVehicleId("trainCA7"), 32946.0);
 
+		// TODO: network layout and scheduling has changed, timings needs to be updated
+		// deadlock avoidance has large impact on timings
+
 		for (Map.Entry<Id<Vehicle>, Double> entry : expectedArrivals.entrySet()) {
 			Id<Vehicle> vehicleId = entry.getKey();
 			double expectedTime = entry.getValue();
@@ -342,7 +345,7 @@ public class RailsimIntegrationTest {
 
 			double actualTime = actualArrivals.get(vehicleId);
 
-			Assertions.assertEquals(expectedTime, actualTime, MatsimTestUtils.EPSILON,
+			Assertions.	assertEquals(expectedTime, actualTime, MatsimTestUtils.EPSILON,
 				"Arrival time for critical train " + vehicleId + " has changed.");
 		}
 
