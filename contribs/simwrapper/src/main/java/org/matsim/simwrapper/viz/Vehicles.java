@@ -33,6 +33,11 @@ public class Vehicles extends Viz {
 	 */
 	public Boolean mapIsIndependent;
 
+	/**
+	 * Set to true to animate vehicles on the left side of road centerlines
+	 */
+	public Boolean leftside;
+
 	public Vehicles() {
 		super("vehicles");
 	}
