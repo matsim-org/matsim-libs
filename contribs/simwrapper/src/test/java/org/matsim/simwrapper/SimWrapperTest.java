@@ -160,17 +160,6 @@ public class SimWrapperTest {
 					viz.projection = "EPSG:25832";
 					viz.mapIsIndependent = true;
 				}));
-			layout.row("fourteenth")
-				.el(Vehicles.class, ((viz, data) -> {
-					viz.title = "DRT Vehicle Animation";
-					viz.description = "drt animation";
-					viz.center = new double[]{13.45, 52.5};
-					viz.zoom = 11.0;
-					viz.drtTrips = "drt-vehicles.json";
-					viz.projection = "EPSG:25832";
-					viz.mapIsIndependent = true;
-				}));
-
 		});
 
 		String outputDirectory = utils.getOutputDirectory();
