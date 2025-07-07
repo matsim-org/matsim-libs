@@ -809,11 +809,15 @@ public class SwissRailRaptorCore {
 			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
 		}
 
-		if (hasChains) {
+		if (hasChains && lastPE != null) {
+			// One could expect that there is always a lastPE when we have chains.
+			// But it might happen that we start searching for a connection at the end of a chained route,
+			// in this case lastPE is null. But in such a case we do not need to follow the chained routes,
+			// as those routes should be independently be found and handled.
+			// Also, we don't want to skip such TransitRouteStops completely, as they could be used for transfers
+			// at the beginning of a connection.
 
 			MutableInt tmp = new MutableInt(-1);
-
-			assert lastPE != null : "Path element should not be null if we have chains";
 
 			for (SwissRailRaptorData.RChained chain : chains) {
 
