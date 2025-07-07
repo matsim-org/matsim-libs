@@ -86,6 +86,26 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return Math.sqrt(2 * diff * diff / sum);
 	}
 
+	/**
+	 * Calculate the sqv value for simulated and reference count
+	 */
+	private static double sqv_daily(double simulated, double observed) {
+		final double diff = simulated - observed;
+		final double scale_factor_for_daily_volumes = 10000.;
+
+		return  1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
+	}
+
+	/**
+	 * Calculate the sqv value for hourly count numbers for simulated and reference count
+	 */
+	private static double sqv_hourly(double simulated, double observed) {
+		final double diff = simulated - observed;
+		final double scale_factor_for_daily_volumes = 1000.;
+
+		return  1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -125,7 +145,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			IntColumn.create("hour"),
 			DoubleColumn.create("observed_traffic_volume"),
 			DoubleColumn.create("simulated_traffic_volume"),
-			DoubleColumn.create("geh")
+			DoubleColumn.create("geh"),
+			DoubleColumn.create("sqv")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
@@ -133,7 +154,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			StringColumn.create("road_type"),
 			DoubleColumn.create("observed_traffic_volume"),
 			DoubleColumn.create("simulated_traffic_volume"),
-			DoubleColumn.create("geh")
+			DoubleColumn.create("geh"),
+			DoubleColumn.create("sqv")
 		);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
@@ -183,6 +205,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 					row.setDouble("geh", geh(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
+					row.setDouble("sqv", sqv_hourly(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
 				}
 			} else {
 				// Get the daily values
@@ -197,6 +220,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
 			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("sqv", sqv_daily(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
 		}
 
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")

@@ -10,6 +10,7 @@ import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -162,25 +163,38 @@ public class TrafficCountsDashboard implements Dashboard {
 		layout.row("scatter" + suffix, tabName)
 			.el(context, Plotly.class, (viz, data) -> {
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
-				viz.title = "Traffic volumes by hour";
-				viz.description = "simulated vs. observed";
-				viz.fixedRatio = true;
-				viz.interactive = Plotly.Interactive.slider;
+				viz.title = "Daily sqv values";
+				viz.description = "SQV values for all count stations based on the observed traffic counts";
+				viz.fixedRatio = false;
 				viz.height = 8.0;
-
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Observed traffic count").build())
-					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.yAxis(Axis.builder().title("sqv").build())
 					.build();
+
+//				Table table = Table.read().csv(countsPath);
+//				double minX = table.doubleColumn("observed_traffic_volume").min();
+//				double maxX = table.doubleColumn("observed_traffic_volume").max();
+
+				viz.addTrace(
+					ScatterTrace.builder(
+							new double[]{0, 10000},
+							new double[]{0.75, 0.75}
+						)
+						.name("Threshold")
+						.mode(ScatterTrace.Mode.LINE)
+						.line(Line.builder().color("red").dash(Line.Dash.DASH).width(2).build())
+						.build()
+				);
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("observed_traffic_volume")
-					.y("simulated_traffic_volume")
+					.y("sqv")
 					.text("name")
-					.name("hour")
+					.name("road_type")
 				);
 
 			})
@@ -208,23 +222,29 @@ public class TrafficCountsDashboard implements Dashboard {
 			});
 
 		layout.row("map" + suffix, tabName)
-			.el(context, MapPlot.class, (viz, data) -> {
-				viz.title = "Relative traffic volumes";
+			.el(context, Plotly.class, (viz, data) -> {
+
+				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
+
+				viz.title = "Traffic volumes by hour";
+				viz.description = "simulated vs. observed";
+				viz.fixedRatio = true;
+				viz.interactive = Plotly.Interactive.slider;
 				viz.height = 8.0;
 
-				viz.setShape(data.withDefaultContext().compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
-				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
-				viz.center = data.withDefaultContext().context().getCenter();
-				viz.zoom = data.withDefaultContext().context().getMapZoomLevel();
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Observed traffic count").build())
+					.yAxis(Axis.builder().title("Simulated traffic count").build())
+					.build();
 
-				viz.display.lineColor.dataset = "counts";
-				viz.display.lineColor.columnName = "quality";
-				viz.display.lineColor.join = "link_id";
-				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, labels.size(), false);
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("simulated_traffic_volume")
+					.text("name")
+					.name("hour")
+				);
 
-				// 8px
-				viz.display.lineWidth.dataset = "@8";
 			})
 			.el(context, Plotly.class, (viz, data) -> {
 
@@ -264,6 +284,24 @@ public class TrafficCountsDashboard implements Dashboard {
 			});
 
 		layout.row("details" + suffix, tabName)
+			.el(context, MapPlot.class, (viz, data) -> {
+				viz.title = "Relative traffic volumes";
+				viz.height = 8.0;
+
+				viz.setShape(data.withDefaultContext().compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "id");
+				viz.addDataset("counts", data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
+
+				viz.center = data.withDefaultContext().context().getCenter();
+				viz.zoom = data.withDefaultContext().context().getMapZoomLevel();
+
+				viz.display.lineColor.dataset = "counts";
+				viz.display.lineColor.columnName = "quality";
+				viz.display.lineColor.join = "link_id";
+				viz.display.lineColor.setColorRamp(ColorScheme.RdYlBu, labels.size(), false);
+
+				// 8px
+				viz.display.lineWidth.dataset = "@8";
+			})
 			.el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Count stations";
