@@ -26,7 +26,6 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
-import tech.tablesaw.columns.strings.AbstractStringColumn;
 import tech.tablesaw.io.csv.CsvReadOptions;
 import tech.tablesaw.joining.DataFrameJoiner;
 import tech.tablesaw.selection.Selection;
@@ -133,11 +132,11 @@ public class TripAnalysis implements MATSimAppCommand {
 	}
 
 	private static Map<String, ColumnType> getColumnTypes() {
-		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.TEXT,
+		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.STRING,
 			"trav_time", ColumnType.STRING, "wait_time", ColumnType.STRING, "dep_time", ColumnType.STRING,
 			"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING,
-			"start_activity_type", ColumnType.TEXT, "end_activity_type", ColumnType.TEXT,
-			"first_pt_boarding_stop", ColumnType.TEXT, "last_pt_egress_stop", ColumnType.TEXT));
+			"start_activity_type", ColumnType.STRING, "end_activity_type", ColumnType.STRING,
+			"first_pt_boarding_stop", ColumnType.STRING, "last_pt_egress_stop", ColumnType.STRING));
 
 		// Map.of only has 10 argument max
 		columnTypes.put("traveled_distance", ColumnType.LONG);
@@ -150,7 +149,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
-			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
+			.columnTypesPartial(Map.of("person", ColumnType.STRING))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("persons.csv"))).build());
 
@@ -158,7 +157,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		if (matchId != null) {
 			log.info("Using id filter {}", matchId);
-			persons = persons.where(persons.textColumn("person").matchesRegex(matchId));
+			persons = persons.where(persons.stringColumn("person").matchesRegex(matchId));
 		}
 
 //		filter persons according to person (attribute) filter
@@ -285,7 +284,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		joined.addColumns(dist_group);
 
-		TextColumn purpose = joined.textColumn("end_activity_type");
+		StringColumn purpose = joined.stringColumn("end_activity_type");
 
 		// Remove suffix durations like _345
 		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
@@ -482,12 +481,12 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		double avgTrips = tripsPerPerson.values().intStream().average().orElse(0);
 
-		Table table = Table.create(TextColumn.create("main_mode", usedModes.size()), DoubleColumn.create("user", usedModes.size()));
+		Table table = Table.create(StringColumn.create("main_mode", usedModes.size()), DoubleColumn.create("user", usedModes.size()));
 
 		int i = 0;
 		for (String m : modeOrder) {
 			int n = usedModes.getInt(m);
-			table.textColumn(0).set(i, m);
+			table.stringColumn(0).set(i, m);
 			table.doubleColumn(1).set(i++, n / totalMobile);
 		}
 
@@ -707,7 +706,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		// It was not clear if the purpose is a string or text colum, therefor this code uses the abstract version
 		for (String label : purposes) {
 			DoubleColumn all = aggr.doubleColumn("share");
-			Selection sel = ((AbstractStringColumn<?>) aggr.column("purpose")).isEqualTo(label);
+			Selection sel = ((StringColumn) aggr.column("purpose")).isEqualTo(label);
 
 			double total = all.where(sel).sum();
 			if (total > 0)
