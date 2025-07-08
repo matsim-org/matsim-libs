@@ -60,22 +60,22 @@ public class InsertionCostCalculatorTest {
 
 		//feasible solution
 		final DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 11), new DropoffDetourInfo(0, 22)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 11), new DropoffDetourInfo(0, 0, 22)),
 				11 + 22, drtRequest, drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//feasible solution - longest possible pickup and dropoff time losses
 		final DrtConfigGroup drtConfigGroup1 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 30)),
 				20 + 30, drtRequest, drtConfigGroup1.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - time constraints at stop 0
 		final DrtConfigGroup drtConfigGroup2 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 21), new DropoffDetourInfo(0, 29)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 21), new DropoffDetourInfo(0, 0, 29)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup2.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - vehicle time constraints
 		final DrtConfigGroup drtConfigGroup3 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 31)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 31)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup3.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 	}
 
@@ -115,11 +115,11 @@ public class InsertionCostCalculatorTest {
 		DrtOptimizationConstraintsSet drtOptimizationConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtOptimizationConstraintsSet);
 
 		// new insertion before dropoff of boarded passenger, inside of threshold but no additional delay - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 0), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 120, 0), new DropoffDetourInfo(300, 300, 30)),
 				30, drtRequest, drtOptimizationConstraintsSet);
 
 		DrtRequest drtRequest2 = builder
@@ -132,13 +132,13 @@ public class InsertionCostCalculatorTest {
 				.build();
 
 		// new insertion before dropoff of boarded passenger, but outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest2, drtOptimizationConstraintsSet);
 
 
 		// new insertion after dropoff of boarded passenger - feasible solution
 		insertion = insertion(entry, 1, 1);
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest, drtOptimizationConstraintsSet);
 	}
 
@@ -182,7 +182,7 @@ public class InsertionCostCalculatorTest {
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
 		DrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, constraintsSet);
 
 		DrtRequest drtRequest2 = builder
@@ -195,7 +195,7 @@ public class InsertionCostCalculatorTest {
 				.build();
 
 		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				120, drtRequest2, constraintsSet);
 	}
 
