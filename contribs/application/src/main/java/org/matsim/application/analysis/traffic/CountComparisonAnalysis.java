@@ -202,7 +202,6 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		DoubleColumn x = dailyTrafficVolume.doubleColumn("observed_traffic_volume");
 		DoubleColumn y = dailyTrafficVolume.doubleColumn("simulated_traffic_volume");
 
-		// Calculate best fit line: y = a + b * x
 		double xMean = x.mean();
 		double yMean = y.mean();
 		double numerator = 0;
@@ -213,13 +212,13 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			denominator += (x.getDouble(i) - xMean) * (x.getDouble(i) - xMean);
 		}
 
-		double b = numerator / denominator;      // slope
-		double a = yMean - b * xMean;            // intercept
+		double a = numerator / denominator;    
+		double b = yMean - b * xMean;            
 
-		// Compute predicted y values (best fit line)
+		// best fit line
 		DoubleColumn yFit = DoubleColumn.create("yFit");
 		for (int i = 0; i < x.size(); i++) {
-			yFit.append(a + b * x.getDouble(i));
+			yFit.append(a * x.getDouble(i) + b);
 		}
 
 
