@@ -1,4 +1,4 @@
-package org.matsim.freightDemandGeneration;
+package commercialDemandGeneration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -8,7 +8,7 @@ import org.matsim.core.controler.Controller;
 
 import java.util.HashMap;
 
-public interface DemandGenerationSpecification {
+interface DemandGenerationSpecification {
 
 	/**
 	 * Gets the demand to distribute for this demand information element.

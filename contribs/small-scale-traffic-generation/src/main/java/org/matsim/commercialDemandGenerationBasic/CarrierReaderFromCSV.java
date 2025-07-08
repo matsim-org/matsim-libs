@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.freightDemandGeneration;
+package commercialDemandGeneration;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -48,7 +48,7 @@ import java.util.*;
  * @author Ricardo Ewert
  *
  */
-public final class CarrierReaderFromCSV {
+final class CarrierReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(CarrierReaderFromCSV.class);
 
 	/**
@@ -454,8 +454,8 @@ public final class CarrierReaderFromCSV {
 					&& !link.getId().toString().contains("pt")
 					&& (!link.getAttributes().getAsMap().containsKey("type")
 					|| !link.getAttributes().getAsMap().get("type").toString().contains("motorway"))
-					&& FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-					singleNewCarrier.getAreaOfAdditionalDepots(), crsTransformationNetworkAndShape)) {
+					&& CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+					singleNewCarrier.getAreaOfAdditionalDepots(), crsTransformationNetworkAndShape )) {
 					singleNewCarrier.getVehicleDepots().add(link.getId().toString());
 				}
 			}

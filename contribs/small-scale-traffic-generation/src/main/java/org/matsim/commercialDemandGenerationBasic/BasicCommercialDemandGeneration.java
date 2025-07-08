@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.freightDemandGeneration;
+package commercialDemandGeneration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,11 +54,11 @@ import java.util.concurrent.ExecutionException;
  *
  * @author: Ricardo Ewert
  */
-@CommandLine.Command(name = "generate-freight-demand", description = "The class generates a freight demand based on the "
+@CommandLine.Command(name = "generate-commercial-demand-basic", description = "The class generates a freight demand based on the "
 	+ " *          selected input options and the read input files. The format and "
 	+ " *          column titles of the input csv should not be changed. The format of"
 	+ " *          these files are given in the example project. See: TODO", showDefaultValues = true)
-public class FreightDemandGeneration implements MATSimAppCommand {
+public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 
 	private final DemandGenerationSpecification demandGenerationSpecification;
 
@@ -91,7 +91,7 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 		toRandomLinks, toRandomPersons, toPersonsByAge, NoSelection
 	}
 
-	private static final Logger log = LogManager.getLogger(FreightDemandGeneration.class);
+	private static final Logger log = LogManager.getLogger( BasicCommercialDemandGeneration.class );
 
 	@CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
 	private Path outputLocation;
@@ -162,18 +162,18 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 	@CommandLine.Option(names = "--defaultJspritIterations", description = "Set the default number of jsprit iterations.")
 	private int defaultJspritIterations;
 
-	public FreightDemandGeneration() {
+	public BasicCommercialDemandGeneration() {
 		this.demandGenerationSpecification = new DefaultDemandGenerationSpecification();
 		log.info("Using default {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
-	public FreightDemandGeneration(DemandGenerationSpecification demandGenerationSpecification) {
+	public BasicCommercialDemandGeneration( DemandGenerationSpecification demandGenerationSpecification ) {
 		this.demandGenerationSpecification = demandGenerationSpecification;
 		log.info("Using {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new FreightDemandGeneration()).execute(args));
+		System.exit(new CommandLine(new BasicCommercialDemandGeneration()).execute(args ) );
 	}
 
 	@Override
@@ -389,8 +389,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 * locations are created related to the given share of persons in the population
 						 * with this demand.
 						 */
-						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-							upSamplePopulationTo, "changeNumberOfLocationsWithDemand");
+						CommercialDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeNumberOfLocationsWithDemand" );
 					case increaseDemandOnLocation -> {
 						/*
 						 * If the demand sample is higher than the population sample, the demand per
@@ -398,16 +398,16 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						 */
 						log.warn("You have selected the option to increase the demand on the location. "
 							+ "Because the simulation always uses the given demand the results are similar to the option with the same sample size.");
-						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-							upSamplePopulationTo, "changeDemandOnLocation");
+						CommercialDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							upSamplePopulationTo, "changeDemandOnLocation" );
 					}
 					case noPopulationSampling ->
 						/*
 						 * If the demand sample is equal to the population sample, the demand is created
 						 * based on the given population and the set input population sampleSize
 						 */
-						FreightDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
-							sampleSizeInputPopulation, "noPopulationSampling");
+						CommercialDemandGenerationUtils.preparePopulation(population, sampleSizeInputPopulation,
+							sampleSizeInputPopulation, "noPopulationSampling" );
 					default -> throw new RuntimeException("No valid sampling option selected!");
 				}
 				switch (selectedPopulationOption) {
@@ -423,8 +423,8 @@ public class FreightDemandGeneration implements MATSimAppCommand {
 						break;
 					case usePopulationInShape:
 						// uses only the population with home location in the given shape file
-						FreightDemandGenerationUtils.reducePopulationToShapeArea(population,
-							shp.createIndex(populationCRS, "_"));
+						CommercialDemandGenerationUtils.reducePopulationToShapeArea(population,
+							shp.createIndex(populationCRS, "_") );
 						DemandReaderFromCSV.readAndCreateDemand(scenario, csvLocationDemand, indexShape,
 								combineSimilarJobs, crsTransformationNetworkAndShape, population, shapeCategory, demandGenerationSpecification);
 						break;

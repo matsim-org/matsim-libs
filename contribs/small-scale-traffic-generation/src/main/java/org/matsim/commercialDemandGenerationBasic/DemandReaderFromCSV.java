@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.freightDemandGeneration;
+package commercialDemandGeneration;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -50,7 +50,7 @@ import java.util.*;
  *
  * @author Ricardo Ewert
  */
-public final class DemandReaderFromCSV {
+final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
 	private static final Random rand = new Random(4711);
 
@@ -1385,8 +1385,8 @@ public final class DemandReaderFromCSV {
 			for (Link link : scenario.getNetwork().getLinks().values())
 				if (!link.getId().toString().contains("pt") && (!link.getAttributes().getAsMap().containsKey(
 					"type") || !link.getAttributes().getAsMap().get("type").toString().contains(
-					"motorway")) && FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-					areasForLocations, crsTransformationNetworkAndShape)) {
+					"motorway")) && CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+					areasForLocations, crsTransformationNetworkAndShape )) {
 					possibleLinkPersonPairs.add(new LinkPersonPair(link, null));
 				}
 		} else {
@@ -1480,8 +1480,8 @@ public final class DemandReaderFromCSV {
 			if (crsTransformationNetworkAndShape != null)
 				coord = crsTransformationNetworkAndShape.transform(coord);
 
-			if (FreightDemandGenerationUtils.checkPositionInShape(null, coord, indexShape,
-				areasForJobElementLocations, crsTransformationNetworkAndShape))
+			if ( CommercialDemandGenerationUtils.checkPositionInShape(null, coord, indexShape,
+				areasForJobElementLocations, crsTransformationNetworkAndShape ))
 				possiblePersons.put(person.getId(), person);
 		}
 		log.info("Number of possible persons for the demand: {}", possiblePersons.size());
@@ -1507,7 +1507,7 @@ public final class DemandReaderFromCSV {
 		}
 		for (Link link : scenario.getNetwork().getLinks().values())
 			if (checkLinkAttributesForDemand(link)) {
-				Coord middlePointLink = FreightDemandGenerationUtils.getCoordOfMiddlePointOfLink(link);
+				Coord middlePointLink = CommercialDemandGenerationUtils.getCoordOfMiddlePointOfLink(link );
 				double distance = NetworkUtils.getEuclideanDistance(homePoint, middlePointLink);
 				if (!nearestLinkPerPerson.containsKey(person.getId())
 					|| distance < nearestLinkPerPerson.get(person.getId()).keySet().iterator().next()) {
@@ -1610,8 +1610,8 @@ public final class DemandReaderFromCSV {
 	private static boolean checkLinkFeasibility(ShpOptions.Index indexShape, String[] areasForTheDemand,
 												CoordinateTransformation crsTransformationNetworkAndShape, Link newLink) {
 		return checkLinkAttributesForDemand(newLink)
-			&& (indexShape == null || FreightDemandGenerationUtils.checkPositionInShape(newLink, null,
-			indexShape, areasForTheDemand, crsTransformationNetworkAndShape));
+			&& (indexShape == null || CommercialDemandGenerationUtils.checkPositionInShape(newLink, null,
+			indexShape, areasForTheDemand, crsTransformationNetworkAndShape ));
 	}
 
 	/**

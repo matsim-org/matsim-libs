@@ -1,4 +1,4 @@
-package org.matsim.freightDemandGeneration;
+package commercialDemandGeneration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -8,7 +8,7 @@ import org.matsim.core.controler.Controller;
 
 import java.util.HashMap;
 
-public class DefaultDemandGenerationSpecification implements DemandGenerationSpecification {
+class DefaultDemandGenerationSpecification implements DemandGenerationSpecification {
 	private static double roundingError;
 
 	@Override
@@ -77,7 +77,7 @@ public class DefaultDemandGenerationSpecification implements DemandGenerationSpe
 
 	@Override
 	public void writeAdditionalOutputFiles(Controller controller) {
-		FreightDemandGenerationUtils.createDemandLocationsFile(controller);
+		CommercialDemandGenerationUtils.createDemandLocationsFile(controller );
 	}
 
 	/**

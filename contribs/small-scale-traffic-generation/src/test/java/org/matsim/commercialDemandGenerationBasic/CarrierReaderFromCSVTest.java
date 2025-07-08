@@ -1,4 +1,4 @@
-package org.matsim.freightDemandGeneration;
+package org.matsim.commercialDemandGeneration;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -19,7 +19,7 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
+import org.matsim.commercialDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -139,9 +139,9 @@ public class CarrierReaderFromCSVTest {
 			if (!depot.equals("j(2,6)R")) {
 				Link link = network.getLinks().get(Id.createLinkId(depot));
 				Assertions.assertTrue(
-						FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-				Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area1"}, null));
-				Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area2"}, null));
+						CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+				Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area1"}, null ) );
+				Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, new String[]{"area2"}, null ) );
 			}
 
 		}
