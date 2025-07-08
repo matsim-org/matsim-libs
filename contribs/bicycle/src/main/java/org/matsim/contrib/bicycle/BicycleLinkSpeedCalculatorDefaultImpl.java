@@ -46,10 +46,10 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
 
 		// prior to matsim 12.0 routers would not pass a vehicle. This is why we have a fallback for a default value from the config
-		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
+//		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
 		// when using bicycle, one should always have vehicles with individual maximum speeds, possibly by using modeVehicleTypes.
 
-//		double maxBicycleSpeed = vehicle.getType().getMaximumVelocity();
+		double maxBicycleSpeed = vehicle.getType().getMaximumVelocity();
 		double bicycleInfrastructureFactor = computeInfrastructureFactor(link);
 		double surfaceFactor = params.computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
@@ -54,18 +55,18 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 
 	private double marginalUtilityOfComfort;
 
-	@Deprecated
-	@StringGetter(MAX_BICYCLE_SPEED_FOR_ROUTING)
-	public double getMaxBicycleSpeedForRouting() {
-		return this.maxBicycleSpeedForRouting;
-	}
+//	@Deprecated
+//	@StringGetter(MAX_BICYCLE_SPEED_FOR_ROUTING)
+//	public double getMaxBicycleSpeedForRouting() {
+//		return this.maxBicycleSpeedForRouting;
+//	}
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
 	private double marginalUtilityOfUserDefinedNetworkAttribute;
 	private String userDefinedNetworkAttributeName;
 	private double userDefinedNetworkAttributeDefaultValue;
 //	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
-	private double maxBicycleSpeedForRouting = 25.0/3.6;
+//	private double maxBicycleSpeedForRouting = 25.0/3.6;
 	private String bicycleMode = "bicycle";
 	private boolean motorizedInteraction = false;
 
@@ -189,16 +190,16 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 //		return this.bicycleScoringType;
 //	}
 
-	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
-	/**
-	 * @deprecated
-	 * Please only change this
-	 */
-	@Deprecated
-	public BicycleConfigGroup setMaxBicycleSpeedForRouting( final double value ) {
-		this.maxBicycleSpeedForRouting = value;
-		return this;
-	}
+//	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
+//	/**
+//	 * @deprecated
+//	 * Please only change this
+//	 */
+//	@Deprecated
+//	public BicycleConfigGroup setMaxBicycleSpeedForRouting( final double value ) {
+//		this.maxBicycleSpeedForRouting = value;
+//		return this;
+//	}
 
 //	public enum BicycleScoringType {legBased, @Deprecated linkBased}
 	@StringGetter( BICYCLE_MODE )
@@ -218,5 +219,33 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public BicycleConfigGroup setMotorizedInteraction( boolean motorizedInteraction ) {
 		this.motorizedInteraction = motorizedInteraction;
 		return this;
+	}
+
+	@Override protected void checkConsistency( Config config ){
+		super.checkConsistency( config );
+		switch( config.qsim().getVehiclesSource() ) {
+			case defaultVehicle -> {
+				throw new RuntimeException( "cannot use qsim.getVehiclesSource = defaultVehicle with bicycle contrib.  Instead use" +
+				"modeVehicles ... or fromVehiclesData; it is important that bicycles have speeds.  See RunBicycleContribExample in matsim-code-examples." );
+			}
+			case modeVehicleTypesFromVehiclesData -> {
+			}
+			case fromVehiclesData -> {
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + config.qsim().getVehiclesSource());
+		}
+		switch( config.routing().getAccessEgressType() ) {
+			case none -> {
+				throw new RuntimeException( "cannot use the bicycle contrib together with accessEgressType==none.  See " +
+				"RunBicycleContribExample in matsim-code-examples." );
+			}
+			case accessEgressModeToLink -> {
+			}
+			case walkConstantTimeToLink -> {
+			}
+			case accessEgressModeToLinkPlusTimeConstant -> {
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + config.routing().getAccessEgressType());
+		}
 	}
 }
