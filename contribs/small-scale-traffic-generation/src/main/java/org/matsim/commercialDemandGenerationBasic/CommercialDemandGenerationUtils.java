@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.freightDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,8 +52,8 @@ import java.util.Objects;
  * @author Ricardo Ewert
  *
  */
-public class FreightDemandGenerationUtils {
-	private static final Logger log = LogManager.getLogger(FreightDemandGenerationUtils.class);
+class CommercialDemandGenerationUtils{
+	private static final Logger log = LogManager.getLogger( CommercialDemandGenerationUtils.class );
 
 	/**
 	 * Adds the home coordinates to attributes and removes plans
@@ -129,7 +129,7 @@ public class FreightDemandGenerationUtils {
 
 			for (Carrier thisCarrier : CarriersUtils.getCarriers(controller.getScenario()).getCarriers().values()) {
 				for (CarrierService thisService : thisCarrier.getServices().values()) {
-					Coord coord = FreightDemandGenerationUtils
+					Coord coord = CommercialDemandGenerationUtils
 						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisService.getServiceLinkId()));
 					writer.write(thisCarrier.getId().toString() + thisService.getId().toString() + "	" +
 							coord.getX()+ "	" + coord.getY() + "	" +
@@ -140,9 +140,9 @@ public class FreightDemandGenerationUtils {
 							" "+"\n");
 				}
 				for (CarrierShipment thisShipment : thisCarrier.getShipments().values()) {
-					Coord coordFrom = FreightDemandGenerationUtils
+					Coord coordFrom = CommercialDemandGenerationUtils
 						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getPickupLinkId()));
-					Coord coordTo = FreightDemandGenerationUtils
+					Coord coordTo = CommercialDemandGenerationUtils
 						.getCoordOfMiddlePointOfLink(network.getLinks().get(thisShipment.getDeliveryLinkId()));
 
 					writer.write(thisCarrier.getId().toString() + thisShipment.getId().toString() + "	"

@@ -1,4 +1,4 @@
-package org.matsim.freightDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
  *         exceptions.
  *
  */
-public class FreightDemandGenerationTest {
+public class BasicCommercialDemandGenerationTest{
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -29,7 +29,7 @@ public class FreightDemandGenerationTest {
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			String shapeCategory = "Ortsteil";
-			new FreightDemandGeneration().execute(
+			new BasicCommercialDemandGeneration().execute(
 					"--output", output.toString(),
 					"--carrierOption", "createCarriersFromCSV",
 					"--demandOption", "createDemandFromCSVAndUsePopulation",
@@ -52,7 +52,7 @@ public class FreightDemandGenerationTest {
 					"--populationSample", "0.5",
 					"--populationSamplingTo", "1.0",
 					"--defaultJspritIterations", "3"
-			);
+								     );
 		} catch (Exception e) {
 			LogManager.getLogger(this.getClass()).error("An error occurred while processing run the test: {}", e.getMessage(), e);
 			// if one catches an exception, then one needs to explicitly fail the test:
@@ -72,7 +72,7 @@ public class FreightDemandGenerationTest {
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			String shapeCategory = "Ortsteil";
-			new FreightDemandGeneration(demandGenerationSpecificationForParcelDelivery).execute(
+			new BasicCommercialDemandGeneration(demandGenerationSpecificationForParcelDelivery).execute(
 				"--output", output.toString(),
 				"--carrierOption", "createCarriersFromCSV",
 				"--demandOption", "createDemandFromCSVAndUsePopulation",
@@ -95,7 +95,7 @@ public class FreightDemandGenerationTest {
 				"--populationSample", "1.0",
 				"--populationSamplingTo", "1.0",
 				"--defaultJspritIterations", "3"
-			);
+														   );
 		} catch (Exception e) {
 			LogManager.getLogger(this.getClass()).error("An error occurred while processing run the test: {}", e.getMessage(), e);
 			Assertions.fail();
