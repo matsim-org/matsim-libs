@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-public class FreightAgentGenerator {
+class FreightAgentGenerator {
     private final LocationCalculator locationCalculator;
     private final DepartureTimeCalculator departureTimeCalculator;
     private final NumOfTripsCalculator numOfTripsCalculator;

@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.optimization;
+package org.matsim.application.prepare.freight.dataPreparation;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

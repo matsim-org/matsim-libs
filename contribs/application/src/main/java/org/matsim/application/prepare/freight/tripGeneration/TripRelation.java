@@ -16,7 +16,7 @@ import java.util.List;
  * from the table and stored as the TripRelation. The data can then be used by different tools to generate MATSim
  * plans file.
  */
-public class TripRelation {
+class TripRelation {
 	/**
 	 * Start location of the full trip relation
 	 */

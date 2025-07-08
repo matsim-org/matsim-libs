@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Type description //TODO
  * // TODO Typo 2021--> 2016
  */
-public class DefaultLocationCalculator implements FreightAgentGenerator.LocationCalculator {
+class DefaultLocationCalculator implements FreightAgentGenerator.LocationCalculator {
 	private final static Logger logger = LogManager.getLogger(DefaultLocationCalculator.class);
 	private final Random rnd = new Random(5678);
 	private final LanduseOptions landUse;

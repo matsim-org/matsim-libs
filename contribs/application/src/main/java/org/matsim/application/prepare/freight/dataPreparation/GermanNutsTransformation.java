@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.dataProcessing;
+package org.matsim.application.prepare.freight.dataPreparation;
 
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GermanNutsTransformation {
+class GermanNutsTransformation {
     private final ShpOptions oldShapeFile;
     private final ShpOptions shapeFile2021;
 

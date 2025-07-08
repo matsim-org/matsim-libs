@@ -2,7 +2,7 @@ package org.matsim.application.prepare.freight.tripGeneration;
 
 import java.util.Random;
 
-public class DefaultNumberOfTripsCalculator implements FreightAgentGenerator.NumOfTripsCalculator {
+class DefaultNumberOfTripsCalculator implements FreightAgentGenerator.NumOfTripsCalculator {
     private final Random rnd = new Random(1234);
     private final double averageLoad;
     private final int workingDays;

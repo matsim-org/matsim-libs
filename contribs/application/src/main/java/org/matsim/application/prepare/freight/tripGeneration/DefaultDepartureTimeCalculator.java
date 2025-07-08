@@ -2,7 +2,7 @@ package org.matsim.application.prepare.freight.tripGeneration;
 
 import java.util.Random;
 
-public class DefaultDepartureTimeCalculator implements FreightAgentGenerator.DepartureTimeCalculator {
+class DefaultDepartureTimeCalculator implements FreightAgentGenerator.DepartureTimeCalculator {
     private final Random rnd = new Random(1111);
 
     @Override
