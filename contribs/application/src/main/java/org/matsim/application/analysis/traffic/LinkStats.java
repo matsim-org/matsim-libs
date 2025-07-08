@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This calculation is re-implemented in {@link TrafficStatsCalculator}. The new analysis will be called by {@link TrafficAnalysis}.
+ */
+@Deprecated
 @CommandLine.Command(name = "link-stats", description = "Compute aggregated link statistics, like volume, travel time and congestion")
 public class LinkStats implements MATSimAppCommand {
 
