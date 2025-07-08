@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.dataPreparation;
+package org.matsim.application.prepare.longDistanceFreightGER.dataPreparation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

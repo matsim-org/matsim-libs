@@ -1,4 +1,4 @@
-package commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static commercialDemandGeneration.DemandReaderFromCSV.getHomeCoord;
+import static org.matsim.commercialDemandGenerationBasic.DemandReaderFromCSV.getHomeCoord;
 
 /**
  * This class can be used to generate demand for parcel delivery shipments by using the tool FreightDemandGeneration.

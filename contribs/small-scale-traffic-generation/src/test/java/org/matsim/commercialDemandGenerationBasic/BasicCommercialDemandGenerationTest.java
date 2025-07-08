@@ -1,4 +1,4 @@
-package org.matsim.commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;

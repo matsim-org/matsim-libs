@@ -1,4 +1,4 @@
-package org.matsim.commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,8 +19,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.commercialDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
-import org.matsim.commercialDemandGeneration.DemandReaderFromCSV.DemandInformationElement;
+import org.matsim.commercialDemandGenerationBasic.CarrierReaderFromCSV.CarrierInformationElement;
+import org.matsim.commercialDemandGenerationBasic.DemandReaderFromCSV.DemandInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;

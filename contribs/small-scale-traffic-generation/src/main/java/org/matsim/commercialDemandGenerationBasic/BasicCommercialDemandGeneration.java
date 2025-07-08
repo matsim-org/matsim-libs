@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

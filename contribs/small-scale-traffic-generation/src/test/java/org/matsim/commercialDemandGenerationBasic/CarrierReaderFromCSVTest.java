@@ -1,4 +1,4 @@
-package org.matsim.commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -19,7 +19,7 @@ import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarrierVehicle;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.commercialDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
+import org.matsim.commercialDemandGenerationBasic.CarrierReaderFromCSV.CarrierInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;

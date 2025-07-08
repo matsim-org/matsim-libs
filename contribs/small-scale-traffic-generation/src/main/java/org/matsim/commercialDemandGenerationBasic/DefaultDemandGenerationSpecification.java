@@ -1,4 +1,4 @@
-package commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

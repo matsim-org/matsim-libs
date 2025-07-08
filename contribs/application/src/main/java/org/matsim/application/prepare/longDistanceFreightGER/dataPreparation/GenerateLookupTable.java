@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.dataPreparation;
+package org.matsim.application.prepare.longDistanceFreightGER.dataPreparation;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

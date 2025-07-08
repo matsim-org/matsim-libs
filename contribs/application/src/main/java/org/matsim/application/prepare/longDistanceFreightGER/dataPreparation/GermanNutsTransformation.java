@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.dataPreparation;
+package org.matsim.application.prepare.longDistanceFreightGER.dataPreparation;
 
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.locationtech.jts.geom.Geometry;

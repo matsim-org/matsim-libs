@@ -1,4 +1,4 @@
-package org.matsim.commercialDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

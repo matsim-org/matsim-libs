@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.tripGeneration;
+package org.matsim.application.prepare.longDistanceFreightGER.tripGeneration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

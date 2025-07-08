@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.tripExtraction;
+package org.matsim.application.prepare.longDistanceFreightGER.tripExtraction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.application.prepare.freight.tripGeneration.GenerateFreightPlans;
+import org.matsim.application.prepare.longDistanceFreightGER.tripGeneration.GenerateFreightPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;

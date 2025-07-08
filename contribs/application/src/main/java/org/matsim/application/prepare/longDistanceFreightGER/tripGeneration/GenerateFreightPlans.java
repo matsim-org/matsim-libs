@@ -1,4 +1,4 @@
-package org.matsim.application.prepare.freight.tripGeneration;
+package org.matsim.application.prepare.longDistanceFreightGER.tripGeneration;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
