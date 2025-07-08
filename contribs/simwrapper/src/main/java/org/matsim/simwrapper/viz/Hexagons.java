@@ -31,6 +31,11 @@ public final class Hexagons extends Viz {
 	public Double maxHeight;
 
 	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+	/**
 	 * List of all shown aggregations
 	 */
 	private Map<String, List<Aggregations.FromToObject>> aggregations = new HashMap<>();
