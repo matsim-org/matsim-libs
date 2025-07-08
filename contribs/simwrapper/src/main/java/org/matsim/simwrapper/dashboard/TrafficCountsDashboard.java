@@ -175,16 +175,18 @@ public class TrafficCountsDashboard implements Dashboard {
 					.yAxis(Axis.builder().title("sqv").build())
 					.build();
 
-				viz.addTrace(
-					ScatterTrace.builder(
-							new double[]{0, 10000},
-							new double[]{0.75, 0.75}
-						)
-						.name("Threshold")
-						.mode(ScatterTrace.Mode.LINE)
-						.line(Line.builder().color("red").dash(Line.Dash.DASH).width(2).build())
-						.build()
-				);
+				// Uncomment to add a threshold line at 0.75.
+				// Because the range of the x-axis has to be set manually, this is not done by default.
+//				viz.addTrace(
+//					ScatterTrace.builder(
+//							new double[]{0, 10000},
+//							new double[]{0.75, 0.75}
+//						)
+//						.name("Threshold")
+//						.mode(ScatterTrace.Mode.LINE)
+//						.line(Line.builder().color("red").dash(Line.Dash.DASH).width(2).build())
+//						.build()
+//				);
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("observed_traffic_volume")
