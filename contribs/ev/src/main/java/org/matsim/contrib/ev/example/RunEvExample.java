@@ -40,7 +40,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEvExample {
-	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
+	static final String DEFAULT_CONFIG_FILE = "contribs/ev/test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
 	private static final Logger log = LogManager.getLogger(RunEvExample.class);
 
 	public static void main(String[] args) throws IOException {
@@ -54,7 +54,7 @@ public class RunEvExample {
 				args = new String[] {DEFAULT_CONFIG_FILE};
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[] {"https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/ev/"
+				args = new String[] {"https://raw.githubusercontent.com/matsim-org/matsim/main/"
 						+ DEFAULT_CONFIG_FILE};
 			}
 		}

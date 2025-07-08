@@ -29,7 +29,7 @@
     <module name="controler">
         <param name="outputDirectory" value="./output/evExample"/>
         <param name="firstIteration" value="0"/>
-        <param name="lastIteration" value="0"/>
+        <param name="lastIteration" value="10"/>
         <param name="eventsFileFormat" value="xml"/>
         <param name="mobsim" value="qsim"/>
     </module>
@@ -80,6 +80,13 @@
         <param name="Module_1" value="BestScore"/>
 
     </module>
+
+	<module name="routing">
+
+		<param name="networkModes" value="car" />
+		<param name="accessEgressType" value="accessEgressModeToLink"/>
+
+	</module>
 
 
 </config>

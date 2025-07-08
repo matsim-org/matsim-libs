@@ -104,11 +104,20 @@ final class EvNetworkRoutingModule implements RoutingModule {
 		final Person person = request.getPerson();
 
 		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
+		List<Leg> nonWalkLegs = basicRoute.stream()
+			.filter(Leg.class::isInstance) // only Leg elements
+			.map(Leg.class::cast)
+			.filter(leg -> !leg.getMode().equals("walk"))
+			.toList();
+		Leg basicLeg = (Leg) nonWalkLegs.get(0);
+		// Skip if the main leg is not truck mode (e.g. access/egress walk)
+		if (!TransportMode.truck.equals(basicLeg.getMode())) {
+			return basicRoute;
+		}
 		Id<Vehicle> evId = Id.create(person.getId() + vehicleSuffix, Vehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
 		} else {
-			Leg basicLeg = (Leg)basicRoute.get(0);
 			ElectricVehicleSpecification ev = electricFleet.getVehicleSpecifications().get(evId);
 
 			Map<Link, Double> estimatedEnergyConsumption = estimateConsumption(ev, basicLeg);
@@ -150,7 +159,12 @@ final class EvNetworkRoutingModule implements RoutingModule {
 					}
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, nexttoFacility,
 							lastArrivaltime, person, request.getAttributes()));
-					Leg lastLeg = (Leg)routeSegment.get(0);
+					List<Leg> lastLegNonWalk = routeSegment.stream()
+						.filter(Leg.class::isInstance) // only Leg elements
+						.map(Leg.class::cast)
+						.filter(leg -> !leg.getMode().equals("walk"))
+						.toList();
+					Leg lastLeg = (Leg) lastLegNonWalk.get(0);
 					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
@@ -176,6 +190,8 @@ final class EvNetworkRoutingModule implements RoutingModule {
 
 	private Map<Link, Double> estimateConsumption(ElectricVehicleSpecification ev, Leg basicLeg) {
 		Map<Link, Double> consumptions = new LinkedHashMap<>();
+
+
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 		ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(ev, driveConsumptionFactory, auxConsumptionFactory,

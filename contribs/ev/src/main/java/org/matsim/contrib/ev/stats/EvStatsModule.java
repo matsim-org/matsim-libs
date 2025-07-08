@@ -70,6 +70,7 @@ public class EvStatsModule extends AbstractModule {
 			});
 			bind(ChargerPowerTimeProfileCalculator.class).asEagerSingleton();
 			addEventHandlerBinding().to(ChargerPowerTimeProfileCalculator.class);
+			addControlerListenerBinding().to(ChargerPowerTimeProfileCalculator.class);
 			addControlerListenerBinding().toProvider(new Provider<>() {
 				@Inject
 				private ChargerPowerTimeProfileCalculator calculator;
