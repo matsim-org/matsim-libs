@@ -9,8 +9,8 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
+import org.matsim.simwrapper.viz.Tile;
 import tech.tablesaw.plotly.components.Axis;
-import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -118,6 +118,12 @@ public class TrafficCountsDashboard implements Dashboard {
 
 		// Name with capital letters
 		tabName = tabName == null ? null : StringUtils.capitalize(tabName);
+
+		layout.row("averages" + suffix, tabName)
+			.el(context, Tile.class, (viz, data) -> {
+				viz.dataset = data.compute(CountComparisonAnalysis.class, "count_comparison_daily_averages.csv", args);
+				viz.height = 0.1;
+			});
 
 		layout.row("overview" + suffix, tabName)
 			.el(context, Plotly.class, (viz, data) -> {
