@@ -33,8 +33,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.*;
+import org.matsim.core.router.DefaultRoutingRequest;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -180,6 +182,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
             // Calculate route from current position (facility) to destination
             List<? extends PlanElement> routeSegment = delegate.calcRoute(
                     DefaultRoutingRequest.of(lastFacility, toFacility, departureTime, person, request.getAttributes()));
+          
 			List<Leg> nonWalkLegs = routeSegment.stream()
 				.filter(Leg.class::isInstance) // only Leg elements
 				.map(Leg.class::cast)
@@ -315,7 +318,9 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
     private Map<Link, Double> estimateConsumption(ElectricVehicleSpecification evSpec, Leg leg) {
         Map<Link, Double> consumptionMap = new LinkedHashMap<>();
         NetworkRoute route = (NetworkRoute) leg.getRoute();
-		List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
+		    List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
         double departureTime = leg.getDepartureTime().seconds();
 
         // Create a temporary electric vehicle instance to use its energy models

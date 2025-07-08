@@ -28,6 +28,11 @@ public class GridMap extends Viz {
 	public double[] center;
 
 	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+	/**
 	 * The filepath containing the data.
 	 */
 	@JsonProperty(required = true)
