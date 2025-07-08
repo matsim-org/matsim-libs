@@ -175,10 +175,6 @@ public class TrafficCountsDashboard implements Dashboard {
 					.yAxis(Axis.builder().title("sqv").build())
 					.build();
 
-//				Table table = Table.read().csv(countsPath);
-//				double minX = table.doubleColumn("observed_traffic_volume").min();
-//				double maxX = table.doubleColumn("observed_traffic_volume").max();
-
 				viz.addTrace(
 					ScatterTrace.builder(
 							new double[]{0, 10000},
