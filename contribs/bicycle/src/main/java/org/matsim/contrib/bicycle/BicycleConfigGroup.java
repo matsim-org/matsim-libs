@@ -225,7 +225,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency( config );
 		switch( config.qsim().getVehiclesSource() ) {
 			case defaultVehicle -> {
-				throw new RuntimeException( "cannot use qsim.getVehiclesSource = defaultVehicle with bicycle contrib.  Instead use" +
+				throw new RuntimeException( "cannot use qsim.getVehiclesSource = defaultVehicle with bicycle contrib.  Instead use " +
 				"modeVehicles ... or fromVehiclesData; it is important that bicycles have speeds.  See RunBicycleContribExample in matsim-code-examples." );
 			}
 			case modeVehicleTypesFromVehiclesData -> {
