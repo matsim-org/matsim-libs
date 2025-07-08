@@ -78,6 +78,11 @@ public class OccupancyData {
 		}
 
 		for (DepartureData dep : departures) {
+			if (!Double.isInfinite(dep.earliestWaitStart) && Double.isInfinite(dep.latestWaitStart)) {
+				// the vehicle is at a stop, there was at least one agent that already boarded,
+				// but the vehicle has not left yet. Assume everybody can board this vehicle.
+				return dep;
+			}
 			if (time <= dep.latestWaitStart) {
 				return dep;
 			}
@@ -239,7 +244,17 @@ public class OccupancyData {
 
 		List<DepartureData> getSortedDepartures() {
 			if (!this.sorted) {
-				this.depList.sort((o1, o2) -> Double.compare(o1.vehDepTime, o2.vehDepTime));
+				this.depList.sort((o1, o2) -> {
+					double depTime1 = o1.vehDepTime;
+					double depTime2 = o2.vehDepTime;
+					if (Double.isInfinite(depTime1)) {
+						depTime1 = Double.POSITIVE_INFINITY;
+					}
+					if (Double.isInfinite(depTime2)) {
+						depTime2 = Double.POSITIVE_INFINITY;
+					}
+					return Double.compare(depTime1, depTime2);
+				});
 				this.sorted = true;
 			}
 

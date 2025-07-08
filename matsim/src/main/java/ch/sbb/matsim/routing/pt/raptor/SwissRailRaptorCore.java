@@ -719,6 +719,14 @@ public class SwissRailRaptorCore {
 		boolean hasChains = chains != null;
 
 		for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
+			// In the original raptor algorithm, we step once through all route-stops in order,
+			// which ensures that we don't handle any stop or route twice.
+			// With chained departures, we actually jump out of this sequence,
+			// resulting in the state that the same stop or route might be handled a second time in the same round.
+			// To prevent this (as it could have unintended side-effects and even produce wrong results), we
+			// proactively clear the handled route stop. So if this a chained route, it already gets handled now
+			// and will not have to be handled (regularly) later on, thus we can just clear the corresponding bits.
+			this.improvedRouteStopIndices.clear(toRouteStopIndex);
 			RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
 			if (!toRouteStop.routeStop.isAllowAlighting()) {
 				continue;
@@ -801,11 +809,15 @@ public class SwissRailRaptorCore {
 			firstRouteStopIndex = toRouteStopIndex; // we've handled this route stop, so we can skip it in the outer loop
 		}
 
-		if (hasChains) {
+		if (hasChains && lastPE != null) {
+			// One could expect that there is always a lastPE when we have chains.
+			// But it might happen that we start searching for a connection at the end of a chained route,
+			// in this case lastPE is null. But in such a case we do not need to follow the chained routes,
+			// as those routes should be independently be found and handled.
+			// Also, we don't want to skip such TransitRouteStops completely, as they could be used for transfers
+			// at the beginning of a connection.
 
 			MutableInt tmp = new MutableInt(-1);
-
-			assert lastPE != null : "Path element should not be null if we have chains";
 
 			for (SwissRailRaptorData.RChained chain : chains) {
 
