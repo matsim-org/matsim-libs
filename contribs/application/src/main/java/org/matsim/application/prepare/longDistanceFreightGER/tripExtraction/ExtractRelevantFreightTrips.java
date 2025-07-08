@@ -1,5 +1,7 @@
-package org.matsim.application.prepare.freight.tripExtraction;
+package org.matsim.application.prepare.longDistanceFreightGER.tripExtraction;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -12,7 +14,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
-import org.matsim.application.prepare.freight.tripGeneration.GenerateFreightPlans;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -28,6 +29,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import picocli.CommandLine;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -222,9 +225,26 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
 		String resultSummaryPath = outputPath.toString().replace(".gz", "").replace(".xml", "")
 				+ "-locations-summary.tsv";
-		GenerateFreightPlans.createOutput_tripOD_relations(resultSummaryPath, outputPlans);
+		createOutput_tripOD_relations(resultSummaryPath, outputPlans);
 
 		return 0;
+	}
+
+	private static void createOutput_tripOD_relations(String freightTripTsvPath, Population outputPopulation) throws IOException{
+		// this was now copied from GenerateFreightPlans which was moved to matsim-germany.  Could be organized in a better way if desired; as
+		// a quick fix e.g. use the static method from here inside matsim-germany.
+
+		CSVPrinter tsvWriter = new CSVPrinter(new FileWriter(freightTripTsvPath), CSVFormat.TDF);
+		tsvWriter.printRecord("trip_id", "from_x", "from_y", "to_x", "to_y");
+		for (Person person : outputPopulation.getPersons().values()) {
+			List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+			Activity act0 = (Activity) planElements.get(0);
+			Activity act1 = (Activity) planElements.get(2);
+			Coord fromCoord = act0.getCoord();
+			Coord toCoord = act1.getCoord();
+			tsvWriter.printRecord(person.getId().toString(), fromCoord.getX(), fromCoord.getY(), toCoord.getX(), toCoord.getY());
+		}
+		tsvWriter.close();
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package org.matsim.freightDemandGeneration;
+package org.matsim.commercialDemandGenerationBasic;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,8 +19,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.freightDemandGeneration.CarrierReaderFromCSV.CarrierInformationElement;
-import org.matsim.freightDemandGeneration.DemandReaderFromCSV.DemandInformationElement;
+import org.matsim.commercialDemandGenerationBasic.CarrierReaderFromCSV.CarrierInformationElement;
+import org.matsim.commercialDemandGenerationBasic.DemandReaderFromCSV.DemandInformationElement;
 import org.matsim.testcases.MatsimTestUtils;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -42,7 +42,7 @@ public class DemandReaderFromCSVTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand");
+		CommercialDemandGenerationUtils.preparePopulation(population, 1.0, 1.0, "changeNumberOfLocationsWithDemand" );
 		HashMap<Id<Person>, TreeMap<Double, String>> nearestLinkPerPerson = new HashMap<>();
 		for (Person person :  population.getPersons().values()) {
 			DemandReaderFromCSV.findLinksForPerson(scenario, nearestLinkPerPerson, person);
@@ -75,7 +75,7 @@ public class DemandReaderFromCSVTest {
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeNumberOfLocationsWithDemand");
+		CommercialDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeNumberOfLocationsWithDemand" );
 		Boolean combineSimilarJobs = false;
 
 
@@ -119,11 +119,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-					FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-					new String[] { "area1" }, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-					new String[] { "area2" }, null));
+					CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+					new String[] { "area1" }, null ));
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+					new String[] { "area2" }, null ));
 		}
 	}
 
@@ -145,7 +145,7 @@ public class DemandReaderFromCSVTest {
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeDemandOnLocation");
+		CommercialDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeDemandOnLocation" );
 		Boolean combineSimilarJobs = false;
 
 		createDemandAndCheckCarrier(carrierCSVLocation, scenario, freightCarriersConfigGroup, indexShape, demandCSVLocation, shapeCategory,
@@ -186,11 +186,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ));
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 	}
 
@@ -212,7 +212,7 @@ public class DemandReaderFromCSVTest {
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeDemandOnLocation");
+		CommercialDemandGenerationUtils.preparePopulation(population, 0.5, 1.0, "changeDemandOnLocation" );
 		Boolean combineSimilarJobs = true;
 
 		createDemandAndCheckCarrier(carrierCSVLocation, scenario, freightCarriersConfigGroup, indexShape, demandCSVLocation, shapeCategory,
@@ -253,11 +253,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ));
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 	}
 
@@ -280,7 +280,7 @@ public class DemandReaderFromCSVTest {
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 0.5, "changeDemandOnLocation");
+		CommercialDemandGenerationUtils.preparePopulation(population, 0.5, 0.5, "changeDemandOnLocation" );
 		Boolean combineSimilarJobs = false;
 
 		// run methods
@@ -323,11 +323,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ));
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 	}
 
@@ -349,7 +349,7 @@ public class DemandReaderFromCSVTest {
 		ShpOptions.Index indexShape = shp.createIndex("Ortsteil");
 		String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 		Population population = PopulationUtils.readPopulation(populationLocation);
-		FreightDemandGenerationUtils.preparePopulation(population, 0.5, 0.5, "changeDemandOnLocation");
+		CommercialDemandGenerationUtils.preparePopulation(population, 0.5, 0.5, "changeDemandOnLocation" );
 		Boolean combineSimilarJobs = false;
 
 		// run methods
@@ -384,10 +384,10 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfShipmentElement : locationsPerShipmentElement.get("ShipmentElement1_delivery")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfShipmentElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null) || FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ) || CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 	}
 
@@ -583,11 +583,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfServiceElement : locationsPerServiceElement.get("serviceElement1")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfServiceElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ));
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 		Assertions.assertEquals(4, locationsPerServiceElement.get("serviceElement2").size());
 		Assertions.assertTrue(locationsPerServiceElement.get("serviceElement2").contains("i(2,0)"));
@@ -682,11 +682,11 @@ public class DemandReaderFromCSVTest {
 		for (String locationsOfServiceElement : locationsPerServiceElement.get("serviceElement1")) {
 			Link link = network.getLinks().get(Id.createLinkId(locationsOfServiceElement));
 			Assertions.assertTrue(
-				FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null));
-			Assertions.assertFalse(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area1" }, null));
-			Assertions.assertTrue(FreightDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
-				new String[] { "area2" }, null));
+				CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape, null, null ) );
+			Assertions.assertFalse( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area1" }, null ));
+			Assertions.assertTrue( CommercialDemandGenerationUtils.checkPositionInShape(link, null, indexShape,
+				new String[] { "area2" }, null ));
 		}
 		Assertions.assertEquals(4, locationsPerServiceElement.get("serviceElement2").size());
 		Assertions.assertTrue(locationsPerServiceElement.get("serviceElement2").contains("i(2,0)"));
