@@ -111,13 +111,13 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.marginalUtilityOfInfrastructure;
 	}
 	@StringSetter( INPUT_GRADIENT )
-	public BicycleConfigGroup setMarginalUtilityOfGradient_m_100m( final double value ) {
+	public BicycleConfigGroup setMarginalUtilityOfGradient_pct_m( final double value ) {
 		// yy I do not understand what the _m_100m exactly means.  IMO, there is a "per meter" missing (i.e. _m_100m_m, or maybe just _m and the rest in the documentation).
 		this.marginalUtilityOfGradient = value;
 		return this;
 	}
 	@StringGetter( INPUT_GRADIENT )
-	public double getMarginalUtilityOfGradient_m_100m() {
+	public double getMarginalUtilityOfGradient_pct_m() {
 		return this.marginalUtilityOfGradient;
 	}
 
