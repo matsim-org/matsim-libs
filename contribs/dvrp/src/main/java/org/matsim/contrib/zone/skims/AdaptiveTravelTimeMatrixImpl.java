@@ -108,7 +108,7 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 
 	@Override
 	public double getTravelTime(Node fromNode, Node toNode, double departureTime) {
-		int bin = this.getBin(departureTime);
+		int bin = this.getBin(Math.max(0,departureTime));
 		Double sparseValue = this.sparseTravelTimeCache.get(this.getSparseTravelTimeKey(fromNode, toNode, bin));
 		if (sparseValue != null) {
 			return sparseValue;
