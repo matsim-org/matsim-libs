@@ -148,14 +148,14 @@ public class TrafficDashboard implements Dashboard {
 				When it comes to the network index, the absolute excess travel time for each link are first summed up, and then normalized to the summed free speed travel time. The traffic volume is considered when summing up. \s
 				The idea is based on the TomTom travel time index. For example, an excess travel time index of 0.2 means 20% of extra travel time is expected, compared to the free flow condition.\s
 			\t
-				- (Note: The congestion index is not recommended by VSP, please use the excess travel time index above described instead)s
-				 The speed performance index is the ratio of average travel speed and the free speed (in the MATSim sense, i.e. the effective speed including traffic lights etc. but excluding congestion).\s
+				- (Note: The congestion index introduced below is not recommended by VSP, please use the excess travel time index above described instead)
+				 - The speed performance index is the ratio of average travel speed and the free speed (in the MATSim sense, i.e. the effective speed including traffic lights etc. but excluding congestion).\s
 				 A performance index of 0.5 means that the average speed is half of the free speed. A road with a performance index below 0.5 is considered to be in a congested state.\s
 				 \s
 				 cf. *A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index* by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
 			\t""";
 		});
-		
+
 //		- The congestion index is the fraction of time a road is in an uncongested state. 0.5 means that a road is congested half of the time. A road with 1.0 is always uncongested.
 		// (it is also re-weighted by the fraction of uncongested time.)
 	}

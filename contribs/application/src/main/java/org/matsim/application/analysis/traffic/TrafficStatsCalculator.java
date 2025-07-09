@@ -79,20 +79,22 @@ public final class TrafficStatsCalculator {
 			if (roadType != null && !type.equals(roadType))
 				continue;
 
-			if (!volumesAnalyzer.getLinkIds().contains(link.getId())){
-				continue;
-			}
-
 			for (int time = startTime; time < endTime; time += timeSlice) {
 				double excessTravelTime = this.getLinkExcessTravelTime(link, time);
 				double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
 
-				// We cannot get time-bin-size of the Volumes (as it is private). In the analysis, time-bin-size is always 3600, so we enter the value
-				// by hand.
-				int volumeIdx = (int) Math.floor(time / 3600.);
-				double volumeRatio = timeSlice / 3600.;
+				// by default, every link contributes for 1 unit of weight
+				double volumeDuringTimeSlice = 1.0;
 
-				double volumeDuringTimeSlice = volumesAnalyzer.getVolumesForLink(link.getId())[volumeIdx] * volumeRatio;
+				if (volumesAnalyzer.getLinkIds().contains(link.getId())){
+					// We cannot get time-bin-size of the Volumes (as it is private). In the analysis, time-bin-size is always 3600, so we enter the value
+					// by hand.
+					int volumeIdx = (int) Math.floor(time / 3600.);
+					double volumeRatio = timeSlice / 3600.;
+					// additional weight for links with higher volumes
+					volumeDuringTimeSlice += volumesAnalyzer.getVolumesForLink(link.getId())[volumeIdx] * volumeRatio;
+				}
+
 				sumExcessTravelTime += excessTravelTime * volumeDuringTimeSlice;
 				sumFreeSpeedTravelTime += freeSpeedTravelTime * volumeDuringTimeSlice;
 			}
