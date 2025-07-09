@@ -206,10 +206,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 */
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
-			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" ) || filename.startsWith( "http:" )) {
-				// looks like an URI
-				return new URL(filename);
+			// I) Generic URI-scheme detection
+			//    matches e.g. "http:", "https:", "jar:file:", "s3:", "hdfs:", "foo+bar:", etc.
+			if (filename.matches("^[a-zA-Z][a-zA-Z0-9+\\-.]*:.*")) {
+				// But reject Windows drive-letters (e.g. "C:\...")
+				if (!filename.matches("^[A-Za-z]:[\\\\/].*")) {
+					return new URL(filename);
+				}
 			}
 
 			// II) Replace home identifier
