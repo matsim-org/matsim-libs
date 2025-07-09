@@ -4,18 +4,21 @@ package org.matsim.contrib.emissions;
 import com.google.common.collect.Iterables;
 import jakarta.annotation.Nullable;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.utils.collections.ArrayMap;
 
 import java.util.*;
 
 public class HbefaConsistencyChecker {
 	/**
-	 * Tests the read-in hbefa-maps and makes sure that: <br>
-	 * 	(1) Technology-column contains petrol or diesel <br>
-	 * 	(2) EmissionConcept contains neither petrol nor diesel <br>
-	 * 	(3) EmissionConcept and SizeClass contains "average" as fallback (used in technology-average-lookup, skipped if not needed by lookup-behavior) <br>
-	 * 	(4) Average table contain only average entries in VehicleAttributes <br>
+	 * Tests the read-in hbefa-tables and makes sure that: <br>
+	 * 	(1) Average table contain only average entries in VehicleAttributes. <br>
+	 * 	(2) Technology-column contains a valid HBEFA V4.1 technology key. <br>
+	 * 	(3) EmissionConcept contains a valid HBEFA V4.1 emConcept leading key Id (given by vehCat). <br>
+	 * 	(4) EmissionConcept and SizeClass contains "average" as fallback (used in technology-average-lookup, skipped if not needed by lookup-behavior). <br>
+	 * 	(5) EmissionConcept leading key Id mapps correctly to the given vehCat. <br>
 	 *
-	 * 	Background of this consistency check is an error in the hbefa database, which causes the column names to be named wrong.
+	 * 	Background of this consistency check is an error in the hbefa database, which causes the column names to be named wrong. This checker works
+	 * 	with HBEFA version V4.1. Future versions may not work with this setup.
 	 *
 	 * @throws IllegalArgumentException with explanation, if one of the check listed above failed.
 	 */
@@ -25,98 +28,122 @@ public class HbefaConsistencyChecker {
 								 @Nullable Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaAvgCold,
 								 @Nullable Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaDetCold) throws IllegalArgumentException {
 
-		Set<String> technologies = new HashSet<>();
-		Set<String> sizeClass = new HashSet<>();
-		Set<String> emConcepts = new HashSet<>();
+		// First, prepare the allowed combinations
+
+		// List of all possible technologies:
+		List<String> allowedTechnologies = List.of("average", "bifuel CNG/petrol", "bifuel LPG/petrol", "diesel", "petrol (4S)", "electricity", "flex-fuel E85", "FuelCell", "LCV", "petrol (2S)", "petrol (4S)", "Plug-in Hybrid diesel/electric", "Plug-in Hybrid petrol/electric");
+
+		// Each emConceptKey has one or multiple identifier(s), which depends on the vehCat to which the emConcept is mapped
+		List<String> allowedEmConceptLeadingIds = List.of("average", "PC", "LCV", "HGV", "Coach", "UBus", "MC", "moped", "SMC");
+
+		Map<HbefaVehicleCategory, List<String>> vehCat2emConceptLeadingIds = new ArrayMap<>();
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.PASSENGER_CAR, List.of("PC"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE, List.of("LCV"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, List.of("HGV"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.COACH, List.of("Coach"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.URBAN_BUS, List.of("UBus"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.MOTORCYCLE, List.of("MC", "SMC", "moped"));
 
 		if(hbefaAvgWarm != null){
+			Set<String> technologiesAvg = new HashSet<>();
+			Set<String> sizeClassesAvg = new HashSet<>();
+			Set<String> emConceptsAvg = new HashSet<>();
+
 			// Test for the average warm tables
 			for (var key : hbefaAvgWarm.keySet()){
-				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
-				sizeClass.add(key.getVehicleAttributes().getHbefaSizeClass());
-				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
-			}
-
-			// Test (4)
-			if(technologies.size() != 1)
-				throw new IllegalArgumentException("average warm table contains " + technologies.size() + " entries in technology-column. It should contain only \"average\". Technologies in table:" + technologies);
-			if(!technologies.contains("average"))
-				throw new IllegalArgumentException("average warm table contains " + technologies.iterator().next() + " key in technology-column. It should contain only \"average\"");
-
-			if(sizeClass.size() != 1)
-				throw new IllegalArgumentException("average cold table contains " + sizeClass.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClass);
-			if(!sizeClass.contains("average"))
-				throw new IllegalArgumentException("average cold table contains " + sizeClass.iterator().next() + " key in size-class-column. It should contain only \"average\"");
-
-			if(emConcepts.size() != 1)
-				throw new IllegalArgumentException("average warm table contains " + emConcepts.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologies);
-			if(!emConcepts.contains("average"))
-				throw new IllegalArgumentException("average warm table contains " + emConcepts.iterator().next() + " key in emission-concept-column. It should contain only \"average\"");
-
-			technologies.clear();
-			sizeClass.clear();
-			emConcepts.clear();
-		}
-
-		if(hbefaAvgCold != null){
-			// Test for average cold tables
-			// Test for the average warm tables
-			for (var key : hbefaAvgCold.keySet()){
-				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
-				sizeClass.add(key.getVehicleAttributes().getHbefaSizeClass());
-				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
-			}
-
-			// Test (4)
-			if(technologies.size() != 1)
-				throw new IllegalArgumentException("average cold table contains " + technologies.size() + " entries in technology-column. It should contain only \"average\". Technologies in table:" + technologies);
-			if(!technologies.contains("average"))
-				throw new IllegalArgumentException("average cold table contains " + technologies.iterator().next() + " key in technology-column. It should contain only \"average\"");
-
-			if(sizeClass.size() != 1)
-				throw new IllegalArgumentException("average cold table contains " + sizeClass.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClass);
-			if(!sizeClass.contains("average"))
-				throw new IllegalArgumentException("average cold table contains " + sizeClass.iterator().next() + " key in size-class-column. It should contain only \"average\"");
-
-			if(emConcepts.size() != 1)
-				throw new IllegalArgumentException("average cold table contains " + emConcepts.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologies);
-			if(!emConcepts.contains("average"))
-				throw new IllegalArgumentException("average cold table contains " + emConcepts.iterator().next() + " key in emission-concept-column. It should contain only \"average\"");
-
-			technologies.clear();
-			emConcepts.clear();
-		}
-
-		if(hbefaDetWarm != null){
-			// Test for the detailed warm tables
-			for (var key : hbefaDetWarm.keySet()){
-				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
-				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
+				technologiesAvg.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClassesAvg.add(key.getVehicleAttributes().getHbefaSizeClass());
+				emConceptsAvg.add(key.getVehicleAttributes().getHbefaEmConcept());
 			}
 
 			// Test (1)
-			if( technologies.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() &&
-				technologies.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
-				throw new CorruptedHbefaTableException(
-					"Detailed warm table does not contain neither diesel nor petrol key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n"+
-					"The first 5 entries of technology-column are: " + Iterables.limit(technologies, 5));
+			if(technologiesAvg.size() != 1)
+				throw new IllegalArgumentException("average warm table contains " + technologiesAvg.size() + " entries in technology-column. It should contain only \"average\". Technologies in table:" + technologiesAvg);
+			if(!technologiesAvg.contains("average"))
+				throw new IllegalArgumentException("average warm table contains " + technologiesAvg.iterator().next() + " key in technology-column. It should contain only \"average\"");
 
-			if( !emConcepts.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() ||
-				!emConcepts.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
-				throw new CorruptedHbefaTableException("Detailed warm table contain diesel or petrol key in the emission-concept-column. Unless you specifically put them in, you are probably using a corrupted hbefa table! \n"+
-					"The first 5 entries of emission-concept-column are: " + Iterables.limit(emConcepts, 5));
+			if(sizeClassesAvg.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + sizeClassesAvg.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClassesAvg);
+			if(!sizeClassesAvg.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + sizeClassesAvg.iterator().next() + " key in size-class-column. It should contain only \"average\"");
+
+			if(emConceptsAvg.size() != 1)
+				throw new IllegalArgumentException("average warm table contains " + emConceptsAvg.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologiesAvg);
+			if(!emConceptsAvg.contains("average"))
+				throw new IllegalArgumentException("average warm table contains " + emConceptsAvg.iterator().next() + " key in emission-concept-column. It should contain only \"average\"");
+
+		}
+
+		if(hbefaAvgCold != null){
+			Set<String> technologiesAvg = new HashSet<>();
+			Set<String> sizeClassesAvg = new HashSet<>();
+			Set<String> emConceptsAvg = new HashSet<>();
+
+			// Test for average cold tables
+			// Test for the average warm tables
+			for (var key : hbefaAvgCold.keySet()){
+				technologiesAvg.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClassesAvg.add(key.getVehicleAttributes().getHbefaSizeClass());
+				emConceptsAvg.add(key.getVehicleAttributes().getHbefaEmConcept());
+			}
+
+			// Test (1)
+			if(technologiesAvg.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + technologiesAvg.size() + " entries in technology-column. It should contain only \"average\". Technologies in table:" + technologiesAvg);
+			if(!technologiesAvg.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + technologiesAvg.iterator().next() + " key in technology-column. It should contain only \"average\"");
+
+			if(sizeClassesAvg.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + sizeClassesAvg.size() + " entries in size-class-column. It should contain only \"average\". Technologies in table:" + sizeClassesAvg);
+			if(!sizeClassesAvg.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + sizeClassesAvg.iterator().next() + " key in size-class-column. It should contain only \"average\"");
+
+			if(emConceptsAvg.size() != 1)
+				throw new IllegalArgumentException("average cold table contains " + emConceptsAvg.size() + " entries in emission-concept-column. It should contain only \"average\". Technologies in table:" + technologiesAvg);
+			if(!emConceptsAvg.contains("average"))
+				throw new IllegalArgumentException("average cold table contains " + emConceptsAvg.iterator().next() + " key in emission-concept-column. It should contain only \"average\"");
+
+		}
+
+		if(hbefaDetWarm != null){
+			Set<String> technologiesDetailed = new HashSet<>();
+			Set<String> sizeClassesDetailed = new HashSet<>();
+			Set<String> emConceptsDetailed = new HashSet<>();
+			Map<HbefaVehicleCategory, Set<String>> vehCat2emConceptsDetailed = new ArrayMap<>();
+
+			// Test for the detailed warm tables
+			for (var key : hbefaDetWarm.keySet()){
+				technologiesDetailed.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClassesDetailed.add(key.getVehicleAttributes().getHbefaSizeClass());
+				emConceptsDetailed.add(key.getVehicleAttributes().getHbefaEmConcept());
+				vehCat2emConceptsDetailed.putIfAbsent(key.getVehicleCategory(), new HashSet<>());
+			}
+
+			// Test (2)
+			if( technologiesDetailed.stream().noneMatch(allowedTechnologies::contains) ) {
+				throw new CorruptedHbefaTableException(
+					"Detailed warm table does not contain any technology key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n" +
+					"The first 5 entries of technology-column are: " + Iterables.limit(technologiesDetailed, 5));
+			}
 
 			// Test (3)
+			if( emConceptsDetailed.stream().noneMatch(s -> allowedEmConceptLeadingIds.stream().anyMatch(s::startsWith)) ){
+				throw new CorruptedHbefaTableException(
+					"Detailed warm table does not contain any emConcept key in the emission-concept-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n" +
+					"The first 5 entries of emission-concept-column are: " + Iterables.limit(emConceptsDetailed, 5));
+			}
+
+			// Test (4)
 			if( lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort &&
-				lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable){
-				if( !emConcepts.contains("average"))
+				lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable ){
+				if( !emConceptsDetailed.contains("average"))
 					throw new IllegalArgumentException("""
 					Emission-concept-column of warm detailed table does not contain average as key.\s
 					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
 					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
 					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()\s""");
 
-				if( !sizeClass.contains("average"))
+				if( !sizeClassesDetailed.contains("average"))
 					throw new IllegalArgumentException("""
 					size-class-column of warm detailed table does not contain average as key.\s
 					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
@@ -124,39 +151,56 @@ public class HbefaConsistencyChecker {
 					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()\s""");
 			}
 
-
-			technologies.clear();
-			emConcepts.clear();
-
+			// Test (5)
+			if ( !vehCat2emConceptsDetailed.entrySet().stream().allMatch(
+				e -> vehCat2emConceptLeadingIds.get(e.getKey()).stream().anyMatch(
+					ids -> e.getValue().stream().allMatch(ids::contains))) ){
+				throw new IllegalArgumentException("""
+					Emission-concept-column of warm detailed table has a emConcept, which's leading vehCat id does not match with the vehCat of the entry.\s
+					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> \"PC\", urban bus -> \"UBus\".\s
+					In the given table, there is at least one emConcept, which has a different leading Id. You should investigate this before continuing.""");
+			}
 		}
 
-		if(hbefaDetCold != null){
+		if( hbefaDetCold != null ){
+			Set<String> technologiesDetailed = new HashSet<>();
+			Set<String> sizeClassesDetailed = new HashSet<>();
+			Set<String> emConceptsDetailed = new HashSet<>();
+			Map<HbefaVehicleCategory, Set<String>> vehCat2emConceptsDetailed = new ArrayMap<>();
+
+
 			// Test for the detailed cold tables
 			for (var key : hbefaDetCold.keySet()){
-				technologies.add(key.getVehicleAttributes().getHbefaTechnology());
-				emConcepts.add(key.getVehicleAttributes().getHbefaEmConcept());
+				technologiesDetailed.add(key.getVehicleAttributes().getHbefaTechnology());
+				sizeClassesDetailed.add(key.getVehicleAttributes().getHbefaSizeClass());
+				emConceptsDetailed.add(key.getVehicleAttributes().getHbefaEmConcept());
 			}
 
-			// Test (1)
-			if( technologies.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() &&
-				technologies.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
-				throw new CorruptedHbefaTableException("Detailed cold table does not contains neither diesel nor petrol key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table!");
-
-			if( !emConcepts.stream().filter(s -> s.matches(".*diesel.*")).toList().isEmpty() ||
-				!emConcepts.stream().filter(s -> s.matches(".*petrol.*")).toList().isEmpty())
-				throw new CorruptedHbefaTableException("Detailed cold table contains diesel or petrol key in the emission-concept-column. Unless you specifically put them in, you are probably using a corrupted hbefa table!");
+			// Test (2)
+			if( technologiesDetailed.stream().noneMatch(allowedTechnologies::contains)) {
+				throw new CorruptedHbefaTableException(
+					"Detailed cold table does not contain any technology key in the technology-column. Unless you specifically filtered them out, you are probably using a corrupted hbefa table! \n" +
+					"The first 5 entries of technology-column are: " + Iterables.limit(technologiesDetailed, 5));
+			}
 
 			// Test (3)
+			if(emConceptsDetailed.stream().noneMatch(s -> allowedEmConceptLeadingIds.stream().anyMatch(s::startsWith))) {
+				throw new CorruptedHbefaTableException(
+					"Detailed cold table does not contain any emConcept key in the emission-concept-column. Unless you specifically put them in, you are probably using a corrupted hbefa table! \n" +
+					"The first 5 entries of emission-concept-column are: " + Iterables.limit(emConceptsDetailed, 5));
+			}
+
+			// Test (4)
 			if( lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort &&
 				lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable) {
-				if ( !emConcepts.contains("average"))
+				if ( !emConceptsDetailed.contains("average"))
 					throw new IllegalArgumentException("""
 						Emission-concept-column of warm detailed table does not contain average as key.\s
 						This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
 						"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
 						If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()""");
 
-				if ( !sizeClass.contains("average"))
+				if ( !sizeClassesDetailed.contains("average"))
 					throw new IllegalArgumentException("""
 						size-class-column of warm detailed table does not contain average as key.\s
 						This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
@@ -164,12 +208,20 @@ public class HbefaConsistencyChecker {
 						If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()""");
 			}
 
-			technologies.clear();
-			emConcepts.clear();
+			// Test (5)
+			if ( !vehCat2emConceptsDetailed.entrySet().stream().allMatch(
+				e -> vehCat2emConceptLeadingIds.get(e.getKey()).stream().anyMatch(
+					ids -> e.getValue().stream().allMatch(ids::contains))) ){
+				throw new IllegalArgumentException("""
+					Emission-concept-column of cold detailed table has a emConcept, which's leading vehCat id does not match with the vehCat of the entry.\s
+					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> \"PC\", urban bus -> \"UBus\".\s
+					In the given table, there is at least one emConcept, which has a different leading Id. You should investigate this before continuing.""");
+			}
 		}
 	}
 
 	static class CorruptedHbefaTableException extends IllegalArgumentException{
+		// TODO Improve message
 		public CorruptedHbefaTableException(String msg){
 			super(
 				 msg + "\n" +
