@@ -191,7 +191,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 				    .mode(ScatterTrace.Mode.LINE)
 				    .name("SQV Threshold")
-				    .line(Line.builder().color("red").build()) // Hier die Farbe anpassen
+					.line(Line.builder().color("grey").build())
 				    .build(), ds.mapping()
 				    .x("observed_traffic_volume")
 				    .y("sqv_threshold"));
@@ -219,13 +219,13 @@ public class TrafficCountsDashboard implements Dashboard {
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 					.mode(ScatterTrace.Mode.LINE)
 					.name("Benchmark")
-					.line(Line.builder().color("red").build()) // Hier die Farbe anpassen
+					.line(Line.builder().color("grey").build())
 					.build(), ds.mapping()
 					.x("observed_traffic_volume")
 					.y("observed_traffic_volume"));
 			});
 
-		layout.row("map" + suffix, tabName)
+		layout.row("perHour" + suffix, tabName)
 			.el(context, Plotly.class, (viz, data) -> {
 
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_by_hour.csv", args));
@@ -287,7 +287,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 			});
 
-		layout.row("details" + suffix, tabName)
+		layout.row("map" + suffix, tabName)
 			.el(context, MapPlot.class, (viz, data) -> {
 				viz.title = "Relative traffic volumes";
 				viz.height = 8.0;
@@ -305,7 +305,9 @@ public class TrafficCountsDashboard implements Dashboard {
 
 				// 8px
 				viz.display.lineWidth.dataset = "@8";
-			})
+			});
+		layout.row("hoursPerStation" + suffix, tabName)
+
 			.el(context, Plotly.class, (viz, data) -> {
 
 				viz.title = "Count stations";
