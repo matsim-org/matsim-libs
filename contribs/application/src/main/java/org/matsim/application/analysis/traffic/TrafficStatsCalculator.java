@@ -79,6 +79,10 @@ public final class TrafficStatsCalculator {
 			if (roadType != null && !type.equals(roadType))
 				continue;
 
+			if (!volumesAnalyzer.getLinkIds().contains(link.getId())){
+				continue;
+			}
+
 			for (int time = startTime; time < endTime; time += timeSlice) {
 				double excessTravelTime = this.getLinkExcessTravelTime(link, time);
 				double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
