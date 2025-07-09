@@ -226,9 +226,10 @@ public class HbefaConsistencyChecker {
 			super(
 				 msg + "\n" +
 				"When exporting hbefa-tables out of the Microsoft Access database, it can happen that technology-column and emission-concept-column are switched. There are the following possible fixes:\n" +
-				"\t(1) Fixing the hbefa table by switching technology-class and emission-class in the header-entry. This may change your MATSim emission results.\n" +
-				"\t(2) Disabling this Checker (with EmissionsConfigGroup.setHbefaConsistencyChecker()) and setting the EmissionConfigGroup lookup bahviour to \"directlyTryAverageTable\" (with EmissionsConfigGroup.setDetailedVsAverageLookupBehavior()). This will keep the current MATSim Behavior but results will be unprecise.\n" +
-				"If neither of the 2 fixes worked, ask Jakub or KMT.");
+				"\t(1) VSP provides encrypted default tables which were checked for this problem. If you just need a general emission setup, you can use these." +
+				"\t(2) In case that you are using custom exported tables, you can fix the hbefa table by switching technology-class and emission-class in the header-entry. This may change your MATSim emission results.\n" +
+				"\t(3) Disabling this Checker with EmissionsConfigGroup.setHbefaConsistencyChecker() and setting the EmissionConfigGroup lookup bahviour to \"directlyTryAverageTable\" (with EmissionsConfigGroup.setDetailedVsAverageLookupBehavior()). This will keep the current MATSim Behavior but results will be unprecise.\n" +
+				"If neither of the 3 fixes worked, ask Aleks or KMT.");
 		}
 	}
 }
