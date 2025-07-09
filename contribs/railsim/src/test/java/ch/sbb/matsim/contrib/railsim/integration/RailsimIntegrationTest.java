@@ -70,10 +70,7 @@ import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 
-public class RailsimIntegrationTest {
-
-	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroSimpleBiDirectionalTrack() {
@@ -556,125 +553,5 @@ public class RailsimIntegrationTest {
 	@Test
 	void testScenarioMicroMesoConstructionSiteLsGe() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
-	}
-
-	private EventsCollector runSimulation(File scenarioDir) {
-		return runSimulation(scenarioDir, null);
-	}
-
-	private EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
-		Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
-
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setDumpDataAtEnd(true);
-		config.controller().setCreateGraphs(false);
-		config.controller().setLastIteration(0);
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		if (f != null) f.accept(scenario);
-
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new RailsimModule());
-		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-		EventsCollector collector = new EventsCollector();
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance(collector);
-			}
-		});
-
-		controler.run();
-
-		return collector;
-	}
-
-	private void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
-		Random rnd = MatsimRandom.getRandom();
-		rnd.setSeed(1242);
-
-		for (double maxRndDelaySeconds = 0; maxRndDelaySeconds <= maxMaxRndDelay; maxRndDelaySeconds = maxRndDelaySeconds + maxRndDelayStepSize) {
-			Config config = ConfigUtils.loadConfig(new File(scenarioDir, "config.xml").toString());
-
-			config.controller().setOutputDirectory(utils.getOutputDirectory() + "maxRndDelay_" + maxRndDelaySeconds);
-			config.controller().setDumpDataAtEnd(true);
-			config.controller().setCreateGraphs(false);
-			config.controller().setLastIteration(0);
-
-			Scenario scenario = ScenarioUtils.loadScenario(config);
-
-			Controler controler = new Controler(scenario);
-			controler.addOverridingModule(new RailsimModule());
-			controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
-
-			// modify scenario
-			for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
-				for (TransitRoute route : line.getRoutes().values()) {
-					List<Departure> departuresToRemove = new ArrayList<>();
-					List<Departure> departuresToAdd = new ArrayList<>();
-					for (Departure departure : route.getDepartures().values()) {
-						departuresToRemove.add(departure);
-						double departureTime = departure.getDepartureTime() + rnd.nextDouble() * maxRndDelaySeconds;
-						Departure modifiedDeparture = scenario.getTransitSchedule().getFactory().createDeparture(departure.getId(), departureTime);
-						modifiedDeparture.setVehicleId(departure.getVehicleId());
-						departuresToAdd.add(modifiedDeparture);
-					}
-
-					for (Departure departureToRemove : departuresToRemove) {
-						route.removeDeparture(departureToRemove);
-					}
-					for (Departure departureToAdd : departuresToAdd) {
-						route.addDeparture(departureToAdd);
-					}
-				}
-			}
-
-			controler.run();
-		}
-	}
-
-	private double timeToAccelerate(double v0, double v, double a) {
-		return (v - v0) / a;
-	}
-
-	private double distanceTravelled(double v0, double a, double t) {
-		return 0.5 * a * t * t + v0 * t;
-	}
-
-	private double timeForDistance(double d, double v) {
-		return d / v;
-	}
-
-	private void assertTrainState(double time, double speed, double targetSpeed, double acceleration, double headPosition, List<RailsimTrainStateEvent> events) {
-
-		RailsimTrainStateEvent prev = null;
-		for (RailsimTrainStateEvent event : events) {
-
-			if (event.getTime() > Math.ceil(time)) {
-				Assertions.fail(
-					String.format("No matching event found for time %f, speed %f pos %f, Closest event is%s", time, speed, headPosition, prev));
-			}
-
-			// If all assertions are true, returns successfully
-			try {
-				Assertions.assertEquals(Math.ceil(time), event.getTime(), 1e-7);
-				Assertions.assertEquals(speed, event.getSpeed(), 1e-5);
-				Assertions.assertEquals(targetSpeed, event.getTargetSpeed(), 1e-7);
-				Assertions.assertEquals(acceleration, event.getAcceleration(), 1e-5);
-				Assertions.assertEquals(headPosition, event.getHeadPosition(), 1e-5);
-				return;
-			} catch (AssertionError e) {
-				// Check further events in loop
-			}
-
-			prev = event;
-		}
-	}
-
-	private List<RailsimTrainStateEvent> filterTrainEvents(EventsCollector collector, String train) {
-		return collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event)
-			.filter(event -> event.getVehicleId().toString().equals(train)).toList();
 	}
 }
