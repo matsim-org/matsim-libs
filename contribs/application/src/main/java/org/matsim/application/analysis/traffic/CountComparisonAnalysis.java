@@ -46,7 +46,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
-	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1.2,1.4")
+	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "-0.4,-0.2,0.2,0.4")
 	private List<Double> limits;
 
 	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
@@ -232,12 +232,12 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		}
 
 		DoubleColumn relError = (dailyTrafficVolume.doubleColumn("simulated_traffic_volume").subtract(dailyTrafficVolume.doubleColumn("observed_traffic_volume")))
-			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume")).abs()
+			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
 			.setName("rel_error");
 		StringColumn qualityLabel = relError.copy()
 			.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
 			.setName("quality");
-
+		relError = relError.abs();
 		// Total stats
 		double sum_sqv_daily = dailyTrafficVolume.doubleColumn("sqv").sum();
 		double sum_geh_daily = dailyTrafficVolume.doubleColumn("geh").sum();
@@ -246,7 +246,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			printer.printRecord("number counting station", dailyTrafficVolume.rowCount(), "user-group");
 			printer.printRecord("average SQV-value", new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_sqv_daily / dailyTrafficVolume.rowCount()), "chart-line");
 			printer.printRecord("average geh-value", new DecimalFormat("0.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_geh_daily / dailyTrafficVolume.rowCount()), "chart-line");
-			printer.printRecord("average relative error", new DecimalFormat("0.000", DecimalFormatSymbols.getInstance(Locale.US)).format(relError.sum() / dailyTrafficVolume.rowCount()), "chart-line");
+			printer.printRecord("average relative error", new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.US)).format(relError.multiply(100).sum() / dailyTrafficVolume.rowCount()) + '%', "circle-exclamation");
 			} catch (IOException ex) {
 			throw new RuntimeException("Error writing count comparison averages", ex);
 		}

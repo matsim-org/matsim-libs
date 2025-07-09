@@ -27,7 +27,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 	private final Map<String, Set<String>> networkModes = new LinkedHashMap<>();
 
-	private List<Double> limits = List.of(0.6, 0.8, 1.2, 1.4);
+	private List<Double> limits = List.of(-0.4,-0.2,0.2,0.4);
 	private List<String> labels = List.of("major under", "under", "ok", "over", "major over");
 
 	private String countsPath = null;
