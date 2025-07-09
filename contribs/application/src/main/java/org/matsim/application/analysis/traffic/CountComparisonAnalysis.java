@@ -231,8 +231,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("sqv_threshold", 0.75);
 		}
 
-		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
-			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
+		DoubleColumn relError = (dailyTrafficVolume.doubleColumn("simulated_traffic_volume").subtract(dailyTrafficVolume.doubleColumn("observed_traffic_volume")))
+			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume")).abs()
 			.setName("rel_error");
 		StringColumn qualityLabel = relError.copy()
 			.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
