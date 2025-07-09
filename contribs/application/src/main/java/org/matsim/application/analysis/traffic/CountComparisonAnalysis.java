@@ -161,7 +161,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			DoubleColumn.create("observed_traffic_volume"),
 			DoubleColumn.create("simulated_traffic_volume"),
 			DoubleColumn.create("geh"),
-			DoubleColumn.create("sqv")
+			DoubleColumn.create("sqv"),
+			DoubleColumn.create("sqv_threshold")
 		);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
@@ -227,6 +228,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
 			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
 			row.setDouble("sqv", sqv_daily(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("sqv_threshold", 0.75);
 		}
 
 		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")

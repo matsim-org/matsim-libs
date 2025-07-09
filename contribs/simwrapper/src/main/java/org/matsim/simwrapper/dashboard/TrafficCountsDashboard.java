@@ -11,6 +11,7 @@ import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Plotly;
 import org.matsim.simwrapper.viz.Tile;
 import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
@@ -181,26 +182,19 @@ public class TrafficCountsDashboard implements Dashboard {
 					.yAxis(Axis.builder().title("sqv").build())
 					.build();
 
-				// Uncomment to add a threshold line at 0.75.
-				// Because the range of the x-axis has to be set manually, this is not done by default.
-//				viz.addTrace(
-//					ScatterTrace.builder(
-//							new double[]{0, 10000},
-//							new double[]{0.75, 0.75}
-//						)
-//						.name("Threshold")
-//						.mode(ScatterTrace.Mode.LINE)
-//						.line(Line.builder().color("red").dash(Line.Dash.DASH).width(2).build())
-//						.build()
-//				);
-
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("observed_traffic_volume")
 					.y("sqv")
 					.text("name")
 					.name("road_type")
 				);
-
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+				    .mode(ScatterTrace.Mode.LINE)
+				    .name("SQV Threshold")
+				    .line(Line.builder().color("red").build()) // Hier die Farbe anpassen
+				    .build(), ds.mapping()
+				    .x("observed_traffic_volume")
+				    .y("sqv_threshold"));
 			})
 			.el(context, Plotly.class, (viz, data) -> {
 
@@ -208,7 +202,7 @@ public class TrafficCountsDashboard implements Dashboard {
 
 				viz.title = "Daily traffic volumes";
 				viz.description = "simulated vs. observed";
-				viz.fixedRatio = true;
+				viz.fixedRatio = false;
 				viz.height = 8.0;
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
@@ -222,7 +216,13 @@ public class TrafficCountsDashboard implements Dashboard {
 					.text("name")
 					.name("road_type")
 				);
-
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE)
+					.name("Benchmark")
+					.line(Line.builder().color("red").build()) // Hier die Farbe anpassen
+					.build(), ds.mapping()
+					.x("observed_traffic_volume")
+					.y("observed_traffic_volume"));
 			});
 
 		layout.row("map" + suffix, tabName)
