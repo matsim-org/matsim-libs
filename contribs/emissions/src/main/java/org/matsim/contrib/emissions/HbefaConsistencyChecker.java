@@ -157,7 +157,7 @@ public class HbefaConsistencyChecker {
 					ids -> e.getValue().stream().allMatch(ids::contains))) ){
 				throw new IllegalArgumentException("""
 					Emission-concept-column of warm detailed table has a emConcept, which's leading vehCat id does not match with the vehCat of the entry.\s
-					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> \"PC\", urban bus -> \"UBus\".\s
+					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> "PC", urban bus -> "UBus".\s
 					In the given table, there is at least one emConcept, which has a different leading Id. You should investigate this before continuing.""");
 			}
 		}
@@ -174,6 +174,7 @@ public class HbefaConsistencyChecker {
 				technologiesDetailed.add(key.getVehicleAttributes().getHbefaTechnology());
 				sizeClassesDetailed.add(key.getVehicleAttributes().getHbefaSizeClass());
 				emConceptsDetailed.add(key.getVehicleAttributes().getHbefaEmConcept());
+				vehCat2emConceptsDetailed.putIfAbsent(key.getVehicleCategory(), new HashSet<>());
 			}
 
 			// Test (2)
@@ -214,14 +215,13 @@ public class HbefaConsistencyChecker {
 					ids -> e.getValue().stream().allMatch(ids::contains))) ){
 				throw new IllegalArgumentException("""
 					Emission-concept-column of cold detailed table has a emConcept, which's leading vehCat id does not match with the vehCat of the entry.\s
-					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> \"PC\", urban bus -> \"UBus\".\s
+					Explanation: Each emConept starts with an acronym of the vehCat it is mapped to: passenger car -> "PC", urban bus -> "UBus".\s
 					In the given table, there is at least one emConcept, which has a different leading Id. You should investigate this before continuing.""");
 			}
 		}
 	}
 
 	static class CorruptedHbefaTableException extends IllegalArgumentException{
-		// TODO Improve message
 		public CorruptedHbefaTableException(String msg){
 			super(
 				 msg + "\n" +
