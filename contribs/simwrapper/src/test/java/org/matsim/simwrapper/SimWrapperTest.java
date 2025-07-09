@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.viz.*;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -112,19 +113,42 @@ public class SimWrapperTest {
 						viz.addAggregation("O/D Summary", "Origins", "fromX", "fromY", "Destinations", "toX", "toY");
 					}));
 
+			layout.row("eleventh")
+				.el(CarrierViewer.class, (viz, data) -> {
+					viz.title = "carrierViewer";
+
+					// Include a network that has not been filtered
+					viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+						"--mode-filter", "", "--shp", "none");
+
+					viz.carriers = data.output("output_carriers.xml.gz");
+				});
+
+			layout.row("twelfth")
+				.el(LogisticViewer.class, (viz, data) -> {
+					viz.title = "logisticViewer";
+
+					// Include a network that has not been filtered
+					viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
+						"--mode-filter", "", "--shp", "none");
+
+					viz.carriers = data.output("output_carriers.xml.gz");
+					viz.lsps = data.output("output_lsps.xml.gz");
+				});
 			layout.row("thirteenth")
 				.el(FlowMap.class, ((viz, data) -> {
-					viz.metrics = new FlowMap.Metrics();
 					viz.title = "Flow Map";
-					viz.description = "this viz is a flow map";
-					viz.zoom = 9.5;
-					viz.metrics.setLabel("headway per Stop");
-					viz.metrics.setDataset("analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv");
-					viz.metrics.setOrigin("stopAreaOrStop");
-					viz.metrics.setDestination("stopAreaOrStopNext");
-					viz.metrics.setFlow("meanHeadway");
-					viz.metrics.setColorScheme("BurgYl");
-					viz.metrics.setValueTransform(FlowMap.Metrics.ValueTransform.NORMAL);
+					viz.description = "Visualize the flows of different metrics";
+					FlowMap.Metrics metrics = new FlowMap.Metrics();
+					metrics.setZoom(9.5);
+					metrics.setLabel("headway metric");
+					metrics.setDataset("analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv");
+					metrics.setOrigin("stopAreaOrStop");
+					metrics.setDestination("stopAreaOrStopNext");
+					metrics.setFlow("meanHeadway");
+					metrics.setColorScheme("BurgYl");
+					metrics.setValueTransform(FlowMap.Metrics.ValueTransform.INVERSE);
+					viz.metrics.add(metrics);
 				}));
 			layout.row("fourteenth")
 				.el(Vehicles.class, ((viz, data) -> {
@@ -136,7 +160,6 @@ public class SimWrapperTest {
 					viz.projection = "EPSG:25832";
 					viz.mapIsIndependent = true;
 				}));
-
 		});
 
 		String outputDirectory = utils.getOutputDirectory();
