@@ -82,6 +82,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				header.description += String.format(Locale.US, "%s: %.2f - %.2f; ", labels.get(i), limits.get(i - 1), limits.get(i));
 		}
 
+		header.description += "\n\n. The Scalable Quality Value (SQV) and the Geoffrey E. Havers (GEH) value are used to assess the quality of the simulated traffic counts. For the SQV a threshold of 0.75 is used, which is the threshold for an acceptable simulation quality. See: https://doi.org/10.1177/0361198119838849";
 		List<String> argList = new ArrayList<>(List.of(
 			"--limits", limits.stream().map(String::valueOf).collect(Collectors.joining(",")),
 			"--labels", String.join(",", labels)
@@ -173,7 +174,7 @@ public class TrafficCountsDashboard implements Dashboard {
 				Plotly.DataSet ds = viz.addDataset(data.compute(CountComparisonAnalysis.class, "count_comparison_daily.csv", args));
 
 				viz.title = "Daily sqv values";
-				viz.description = "SQV values for all count stations based on the observed traffic counts";
+				viz.description = "SQV values for all count stations based on the observed traffic counts. A higher value indicates a better simulation quality and 0.75 is the threshold for an acceptable simulation quality.";
 				viz.fixedRatio = false;
 				viz.height = 8.0;
 

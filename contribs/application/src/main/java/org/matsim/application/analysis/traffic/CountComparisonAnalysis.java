@@ -243,9 +243,9 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		double sum_geh_daily = dailyTrafficVolume.doubleColumn("geh").sum();
 
 		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("count_comparison_daily_averages.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("number counting station", dailyTrafficVolume.rowCount(), "user-group");
+			printer.printRecord("number counting station", dailyTrafficVolume.rowCount(), "calculator");
 			printer.printRecord("average SQV-value", new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_sqv_daily / dailyTrafficVolume.rowCount()), "chart-line");
-			printer.printRecord("average geh-value", new DecimalFormat("0.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_geh_daily / dailyTrafficVolume.rowCount()), "chart-line");
+			printer.printRecord("average GEH-value", new DecimalFormat("0.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_geh_daily / dailyTrafficVolume.rowCount()), "chart-line");
 			printer.printRecord("average relative error", new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.US)).format(relError.multiply(100).sum() / dailyTrafficVolume.rowCount()) + '%', "circle-exclamation");
 			} catch (IOException ex) {
 			throw new RuntimeException("Error writing count comparison averages", ex);
