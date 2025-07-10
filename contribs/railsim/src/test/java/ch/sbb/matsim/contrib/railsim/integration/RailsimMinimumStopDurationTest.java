@@ -1,14 +1,8 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
 
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
-import org.matsim.api.core.v01.events.Event;
 
 public class RailsimMinimumStopDurationTest extends AbstractIntegrationTest {
 

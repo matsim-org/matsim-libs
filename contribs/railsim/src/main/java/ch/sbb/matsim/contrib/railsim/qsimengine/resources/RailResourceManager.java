@@ -162,8 +162,10 @@ public final class RailResourceManager {
 			for (int i = idx; i < route.size(); i++) {
 				RailLink l = route.get(i);
 
+				// Note that the deadlock avoidance is not checked here on the single links
+				// It will be invoked later on the whole segment of links
 				if (l.isNonBlockingArea()) {
-					allFree = l.resource.hasCapacity(time, l, track, position) && dla.checkLink(time, l, position);
+					allFree = l.resource.hasCapacity(time, l, track, position);
 					if (!allFree)
 						break;
 
@@ -172,7 +174,7 @@ public final class RailResourceManager {
 					break;
 			}
 
-			if (!allFree) {
+			if (!allFree || !dla.checkLinks(time, links, position)) {
 				return RailResourceInternal.NO_RESERVATION;
 			}
 

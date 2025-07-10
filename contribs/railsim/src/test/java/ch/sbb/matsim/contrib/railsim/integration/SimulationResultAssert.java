@@ -1,12 +1,16 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.SequencedMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.AbstractAssert;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 /**
  * Assertions for maps of stop times organized by train and station.
@@ -138,7 +142,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 			.toList();
 
 		if (!trainsWithWrongCount.isEmpty()) {
-			failWithMessage("Expected all trains to have <%d> stops but the following did not:\n%s",
+			failWithMessage("Expected all trains to have <%d> stops but the following did not:\n\t%s",
 				expectedCount, String.join("\n\t", trainsWithWrongCount));
 		}
 		return this;
@@ -165,7 +169,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 			.toList();
 
 		if (!failingStops.isEmpty()) {
-			failWithMessage("Expected all stop times to satisfy the predicate but the following failed:\n%s",
+			failWithMessage("Expected all stop times to satisfy the predicate but the following failed:\n\t%s",
 				String.join("\n\t", failingStops));
 		}
 		return this;
@@ -203,7 +207,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 			.toList();
 
 		if (!failingStops.isEmpty()) {
-			failWithMessage("Expected all stop times except first and last of each train to satisfy the predicate but the following failed:\n%s",
+			failWithMessage("Expected all stop times except first and last of each train to satisfy the predicate but the following failed:\n\t%s",
 				String.join("\n\t", failingStops));
 		}
 		return this;
@@ -237,7 +241,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 				.toList();
 
 			String sampleMessage = sampleStops.isEmpty() ? "no stop times found" :
-				String.format("sample of failing stops:\n%s", String.join("\n\t", sampleStops));
+				String.format("sample of failing stops:\n\t%s", String.join("\n\t", sampleStops));
 
 			failWithMessage("Expected at least one stop time to satisfy the predicate but none did. %s", sampleMessage);
 		}
@@ -266,10 +270,114 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 			.toList();
 
 		if (!satisfyingStops.isEmpty()) {
-			failWithMessage("Expected no stop time to satisfy the predicate but the following did:\n%s",
+			failWithMessage("Expected no stop time to satisfy the predicate but the following did:\n\t%s",
 				String.join("\n\t", satisfyingStops));
 		}
 		return this;
+	}
+
+	/**
+	 * Asserts that all trains from the transit schedule have arrived at all their scheduled stops.
+	 * This method checks that for every transit line, route, and departure in the schedule,
+	 * there is corresponding arrival data in the simulation results.
+	 *
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert allTrainsArrived() {
+		isNotNull();
+
+		// Get the transit schedule from the scenario
+		var transitSchedule = actual.getScenario().getTransitSchedule();
+		List<String> missingArrivals = new ArrayList<>();
+
+		// Iterate through all transit lines
+		for (TransitLine line : transitSchedule.getTransitLines().values()) {
+			// Iterate through all routes in the line
+			for (TransitRoute route : line.getRoutes().values()) {
+				// Iterate through all departures in the route
+				for (Departure departure : route.getDepartures().values()) {
+					String trainId = departure.getVehicleId().toString();
+					
+					// Check if this train has any arrival data
+					if (!actual.stopTimes.containsKey(trainId)) {
+						missingArrivals.add(String.format("train %s (line %s, route %s, departure %s): no arrival data found",
+							trainId, line.getId(), route.getId(), departure.getId()));
+						continue;
+					}
+
+					// Check if the train arrived at all scheduled stops
+					var trainStops = actual.stopTimes.get(trainId);
+					for (TransitRouteStop routeStop : route.getStops()) {
+						String stopId = routeStop.getStopFacility().getId().toString();
+						
+						if (!trainStops.containsKey(stopId)) {
+							missingArrivals.add(String.format("train %s (line %s, route %s, departure %s): missing arrival at stop %s",
+								trainId, line.getId(), route.getId(), departure.getId(), stopId));
+						} else {
+							// Check if the train actually arrived (has arrival time)
+							StopTimeData stopData = trainStops.get(stopId);
+							if (!stopData.hasArrived()) {
+								missingArrivals.add(String.format("train %s (line %s, route %s, departure %s): no arrival time at stop %s",
+									trainId, line.getId(), route.getId(), departure.getId(), stopId));
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!missingArrivals.isEmpty()) {
+			failWithMessage("Expected all trains to arrive at all scheduled stops but the following arrivals were missing:\n%s",
+				String.join("\n\t", missingArrivals));
+		}
+		return this;
+	}
+
+	/**
+	 * Asserts that a specific train has arrived at its last stop with the expected arrival time.
+	 * This method checks if the train has any stops and if the last stop has the specified arrival time.
+	 *
+	 * @param trainId the train ID to check
+	 * @param expectedArrivalTime the expected arrival time in seconds
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert trainHasLastArrival(String trainId, double expectedArrivalTime) {
+		isNotNull();
+		containsTrain(trainId);
+
+		var trainStops = actual.stopTimes.get(trainId);
+		if (trainStops.isEmpty()) {
+			failWithMessage("Expected train <%s> to have stops but found none", trainId);
+		}
+
+		// Get the last stop (latest stop in the sequence)
+		var lastStopEntry = trainStops.lastEntry();
+		String lastStopId = lastStopEntry.getKey();
+		StopTimeData lastStopData = lastStopEntry.getValue();
+
+		if (!lastStopData.hasArrived()) {
+			failWithMessage("Expected train <%s> to have arrived at its last stop <%s> but no arrival time found. Stop data: %s",
+				trainId, lastStopId, lastStopData);
+		}
+
+		if (lastStopData.arrivalTime != expectedArrivalTime) {
+			failWithMessage("Expected train <%s> to arrive at its last stop <%s> at time <%s> but arrived at <%s>. Stop data: %s",
+				trainId, lastStopId, expectedArrivalTime, lastStopData.arrivalTime, lastStopData);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Asserts that a specific train has arrived at its last stop with the expected arrival time.
+	 * This method checks if the train has any stops and if the last stop has the specified arrival time.
+	 *
+	 * @param trainId the train ID to check
+	 * @param expectedArrivalTime the expected arrival time as a string (e.g., "8:00", "08:30:15")
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert trainHasLastArrival(String trainId, String expectedArrivalTime) {
+		return trainHasLastArrival(trainId, org.matsim.core.utils.misc.Time.parseTime(expectedArrivalTime));
 	}
 
 }

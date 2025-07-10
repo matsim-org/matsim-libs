@@ -27,14 +27,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,9 +47,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -61,7 +57,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -305,46 +300,16 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 	void testMicroJunctionFlat() {
 		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionFlat"));
 
-		Map<Id<Vehicle>, Double> actualArrivals = new HashMap<>();
-		for (Event event : collector.getEvents()) {
-			if (event instanceof VehicleArrivesAtFacilityEvent e) {
-				actualArrivals.put(e.getVehicleId(), e.getTime());
-			}
-		}
-
-		// check that all 32 trains arrived and were not stuck.
-		Assertions.assertEquals(32, actualArrivals.size(),
-			"Expected 32 trains to arrive, but some seem to be stuck or did not complete their routes.");
-
-		// check the arrival times for the most critical trains.
-		Map<Id<Vehicle>, Double> expectedArrivals = new HashMap<>();
-
-		// first trains of each line
-		expectedArrivals.put(Id.createVehicleId("trainAB0"), 30877.0);
-		expectedArrivals.put(Id.createVehicleId("trainBA0"), 30869.0);
-		expectedArrivals.put(Id.createVehicleId("trainAC0"), 33135.0);
-		expectedArrivals.put(Id.createVehicleId("trainCA0"), 31543.0);
-
-		// last trains of each line
-		expectedArrivals.put(Id.createVehicleId("trainAB7"), 31042.0);
-		expectedArrivals.put(Id.createVehicleId("trainBA7"), 32099.0);
-		expectedArrivals.put(Id.createVehicleId("trainAC7"), 31197.0);
-		expectedArrivals.put(Id.createVehicleId("trainCA7"), 32946.0);
-
-		// TODO: network layout and scheduling has changed, timings needs to be updated
-		// deadlock avoidance has large impact on timings
-
-		for (Map.Entry<Id<Vehicle>, Double> entry : expectedArrivals.entrySet()) {
-			Id<Vehicle> vehicleId = entry.getKey();
-			double expectedTime = entry.getValue();
-
-			Assertions.assertTrue(actualArrivals.containsKey(vehicleId), "Critical train " + vehicleId + " did not arrive.");
-
-			double actualTime = actualArrivals.get(vehicleId);
-
-			Assertions.	assertEquals(expectedTime, actualTime, MatsimTestUtils.EPSILON,
-				"Arrival time for critical train " + vehicleId + " has changed.");
-		}
+		assertThat(collector)
+			.trainHasLastArrival("trainAB0", 30884.0)
+			.trainHasLastArrival("trainBA0", 30875.0)
+			.trainHasLastArrival("trainAC0", 31443.0)
+			.trainHasLastArrival("trainCA0", 31027.0)
+			.trainHasLastArrival("trainAB7", 31061.0)
+			.trainHasLastArrival("trainBA7", 32221.0)
+			.trainHasLastArrival("trainAC7", 32184.0)
+			.trainHasLastArrival("trainCA7", 33122.0)
+			.allTrainsArrived();
 
 	}
 
