@@ -100,7 +100,7 @@ public class TopKChoicesGeneratorTest extends ScenarioTest {
 		PlanCandidate first = result.iterator().next();
 
 		assertThat(first.getPlanType()).isEqualTo("car-car-car-car");
-		assertThat(first.getUtility()).isEqualTo(-6.186329864145045);
+		assertThat(first.getUtility()).isEqualTo(-6.523753780811715);
 
 
 		List<PlanCandidate> candidates = generator.generatePredefined(model, List.of(

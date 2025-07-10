@@ -90,6 +90,7 @@ public class MultiModalControlerListenerTest {
 
 		Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 		config.qsim().setEndTime(24 * 3600);
 
 		config.controller().setLastIteration(0);

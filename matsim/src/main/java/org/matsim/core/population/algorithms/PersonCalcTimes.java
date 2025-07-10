@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -69,7 +70,7 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 			int max = plan.getPlanElements().size();
 			for (PlanElement pe : plan.getPlanElements()) {
 				cnt++;
-				if (pe instanceof Activity) {
+				if (pe instanceof Activity && !TripStructureUtils.isStageActivityType(((Activity) pe).getType())) {
 					act = (Activity) pe;
 
 					if (cnt == 1) {

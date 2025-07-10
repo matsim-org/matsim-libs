@@ -160,6 +160,7 @@ public class NoiseIT {
 		runTest2a( config ) ;
 	}
 
+
 	@Test
 	final void test2aWAccessEgress(){
 		// start a simple MATSim run with a single iteration
@@ -913,30 +914,30 @@ public class NoiseIT {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
-				if ( !!runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assertions.assertEquals(0.020745817449213576,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				} else {
 					Assertions.assertEquals(0.02062821077070937,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
-				if ( !!runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assertions.assertEquals(0.017444990107520864,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				} else {
 					Assertions.assertEquals(0.017327383429596242,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
-				if ( !!runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+				if ( runConfig.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assertions.assertEquals(0.028225601971719153,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				} else {
 					Assertions.assertEquals(0.028225601971719153,
-							event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+						event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				}
 				counter2++;
 			} else {
@@ -960,9 +961,6 @@ public class NoiseIT {
 			String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
 			runConfig.controller().setOutputDirectory(testUtils.getOutputDirectory());
-
-			runConfig.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
-			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16
 
 			Controler controler = new Controler(runConfig);
 			controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
@@ -1007,16 +1005,16 @@ public class NoiseIT {
 			tested = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				Assertions.assertEquals(0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.008501218474617447, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				Assertions.assertEquals(0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.008501218474617447, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				Assertions.assertEquals(0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.00011951678071236982, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				Assertions.assertEquals(0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.00011951678071236982, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter++;
 			} else {
 				Assertions.assertEquals(0., event.getAmount(), MatsimTestUtils.EPSILON, "There should either be no further events, or the amount should be zero.");
@@ -1031,10 +1029,10 @@ public class NoiseIT {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
-				Assertions.assertEquals(0.020745817449213576, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.020628210770709370, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
-				Assertions.assertEquals(0.017444990107520864, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
+				Assertions.assertEquals(0.017327383429596242, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
 				Assertions.assertEquals(0.028225601971719153, event.getAmount(), MatsimTestUtils.EPSILON, "wrong cost per car for the given link and time interval");
