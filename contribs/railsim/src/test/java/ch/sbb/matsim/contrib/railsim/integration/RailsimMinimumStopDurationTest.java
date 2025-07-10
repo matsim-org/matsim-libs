@@ -1,24 +1,43 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
-import org.junit.jupiter.api.Test;
-import org.matsim.api.core.v01.events.Event;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedMap;
+
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Condition;
+import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.events.Event;
 
 public class RailsimMinimumStopDurationTest extends AbstractIntegrationTest {
 
 	@Test
 	void minimumStopDuration() {
 
-		List<Event> events = runSimulation(new File(utils.getPackageInputDirectory(), "congested")).getEvents();
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "congested"));
 
-		Map<String, SequencedMap<String, StopTimeData>> stopTimes = processStopTimes(events);
+		// First two trains depart on time, they can stop for more than 60 seconds
+		assertThat(result)
+			.forTrainAtStation("train1", "stop_B")
+			.hasStopDuration(105)
+			.hasDepartureTime("8:10");
 
-		System.out.println(stopTimes);
+		assertThat(result)
+			.forTrainAtStation("train2", "stop_B")
+			.hasStopDuration(105)
+			.hasDepartureTime("8:15");
 
+		// Late Departure
+		assertThat(result)
+			.forTrainAtStation("train3", "stop_C")
+			.hasDepartureTime("8:40:09")
+			.hasStopDuration(60);
+
+		// All trains stop at least for 60 seconds along the route
+		assertThat(result)
+			.allTrainsHaveNumberOfStops(4)
+			.allStopTimesExceptFirstAndLastSatisfy(t -> t.getStopDuration() >= 60);
 
 	}
 }

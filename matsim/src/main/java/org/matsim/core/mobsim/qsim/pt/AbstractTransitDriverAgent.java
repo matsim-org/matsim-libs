@@ -171,12 +171,12 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
 		// yy can't make this final because of tests.  kai, oct'12
 
-		assertExpectedStop(stop);
-		processEventVehicleArrives(stop, now);
-
-		// Store arrival, needed for stop time calculation
+		// Process the arrival only if not currently waiting at the station
 		if (currentArrivalTime == null) {
+			// Store arrival, needed for stop time calculation
 			currentArrivalTime = now;
+			assertExpectedStop(stop);
+			processEventVehicleArrives(stop, now);
 		}
 
 		TransitRoute route = this.getTransitRoute();

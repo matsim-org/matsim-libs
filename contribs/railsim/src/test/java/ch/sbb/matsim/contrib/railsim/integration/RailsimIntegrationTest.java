@@ -74,15 +74,15 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroSimpleBiDirectionalTrack() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
 	}
 
 	@Test
 	void testMesoUniDirectionalVaryingCapacities() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoUniDirectionalVaryingCapacities"));
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoUniDirectionalVaryingCapacities"));
 
 		// print events of train1 for debugging
-		List<RailsimTrainStateEvent> train1events = filterTrainEvents(collector, "train1");
+		List<RailsimTrainStateEvent> train1events = filterTrainEvents(result.getEvents(), "train1");
 		train1events.forEach(System.out::println);
 
 		// calculation of expected time for train1: acceleration = 0.5, length = 100
@@ -186,28 +186,28 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroTrackOppositeTraffic() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
 	}
 
 	@Test
 	void testMicroTrackOppositeTrafficMany() {
 		// multiple trains, one slow train
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
 	}
 
 	@Test
 	void testMesoTwoSources() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
 	}
 
 	@Test
 	void testMesoTwoSourcesComplex() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
 	}
 
 	@Test
 	void testScenarioMesoGenfBernAllTrains() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
 	}
 
 	@Test
@@ -234,44 +234,44 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			remove.forEach(v -> scenario.getTransitVehicles().removeVehicle(v));
 		};
 
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
+		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
 
 	}
 
 	@Test
 	void testMicroThreeUniDirectionalTracks() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
 	}
 
 	@Test
 	void testMicroTrainFollowingConstantSpeed() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
 	}
 
 	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
 	@Test
 	void testMicroTrainFollowingVaryingSpeed() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
 	}
 
 	@Test
 	void testMicroTrainFollowingFixedVsMovingBlock() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
 	}
 
 	@Test
 	void testMicroStationSameLink() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
 	}
 
 	@Test
 	void testMicroStationDifferentLink() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
 	}
 
 	@Test
 	void testMicroJunctionCross() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
+		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
 		// check if the train arrives at the stop
 		boolean vehicleArrivesAtFacilityEventFound1 = false;
 		boolean vehicleArrivesAtFacilityEventFound2 = false;
@@ -303,7 +303,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroJunctionFlat() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionFlat"));
+		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionFlat"));
 
 		Map<Id<Vehicle>, Double> actualArrivals = new HashMap<>();
 		for (Event event : collector.getEvents()) {
@@ -350,27 +350,27 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroJunctionY() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
 	}
 
 	@Test
 	void testMesoStationCapacityOne() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
 	}
 
 	@Test
 	void testMesoStationCapacityTwo() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
 	}
 
 	@Test
 	void testMesoStations() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
 	}
 
 	@Test
 	void testMicroSimpleUniDirectionalTrack() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleUniDirectionalTrack"));
+		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleUniDirectionalTrack"));
 
 		for (Event event : collector.getEvents()) {
 			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
@@ -387,15 +387,15 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroStationRerouting() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"));
+		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"));
 		collector.getEvents().forEach(System.out::println);
 		// Checks end times
-		assertTrainState(30854, 0, 0, 0, 400, filterTrainEvents(collector, "train1"));
+		assertTrainState(30854, 0, 0, 0, 400, filterTrainEvents(collector.getEvents(), "train1"));
 		// 1min later
-		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector, "train2"));
+		assertTrainState(30914, 0, 0, 0, 400, filterTrainEvents(collector.getEvents(), "train2"));
 		// These arrive closer together, because both waited
-		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector, "train3"));
-		assertTrainState(31034, 0, 0, 0, 400, filterTrainEvents(collector, "train4"));
+		assertTrainState(30974, 0, 0, 0, 400, filterTrainEvents(collector.getEvents(), "train3"));
+		assertTrainState(31034, 0, 0, 0, 400, filterTrainEvents(collector.getEvents(), "train4"));
 
 		// collect all arrivals and departures
 		Map<Id<Vehicle>, List<Id<TransitStopFacility>>> train2arrivalStops = new HashMap<>();
@@ -461,7 +461,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			}
 		};
 
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
+		runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
 	}
 
 	@Test
@@ -547,11 +547,11 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testScenarioMicroMesoCombination() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
 	}
 
 	@Test
 	void testScenarioMicroMesoConstructionSiteLsGe() {
-		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
+		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
 	}
 }

@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -32,11 +30,11 @@ abstract class AbstractIntegrationTest {
 	@RegisterExtension
 	protected final MatsimTestUtils utils = new MatsimTestUtils();
 
-	protected EventsCollector runSimulation(File scenarioDir) {
+	protected SimulationResult runSimulation(File scenarioDir) {
 		return runSimulation(scenarioDir, null);
 	}
 
-	protected EventsCollector runSimulation(File scenarioDir, Consumer<Scenario> f) {
+	protected SimulationResult runSimulation(File scenarioDir, Consumer<Scenario> f) {
 		File configPath = new File(scenarioDir, "config.xml");
 
 		Config config;
@@ -75,7 +73,7 @@ abstract class AbstractIntegrationTest {
 
 		controler.run();
 
-		return collector;
+		return new SimulationResult(scenario, collector);
 	}
 
 	protected void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
@@ -172,100 +170,16 @@ abstract class AbstractIntegrationTest {
 		}
 	}
 
-	protected List<RailsimTrainStateEvent> filterTrainEvents(EventsCollector collector, String train) {
-		return collector.getEvents().stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event)
+	protected List<RailsimTrainStateEvent> filterTrainEvents(List<Event> events, String train) {
+		return events.stream().filter(event -> event instanceof RailsimTrainStateEvent).map(event -> (RailsimTrainStateEvent) event)
 			.filter(event -> event.getVehicleId().toString().equals(train)).toList();
 	}
 
 	/**
-	 * Processes events to extract stop time information for each train and facility combination.
-	 *
-	 * @param events List of all simulation events
-	 * @return Map of train ID -> facility ID -> stop time data
+	 * Create an assertion object for a map of stop times organized by train and station as returned.
 	 */
-	protected Map<String, SequencedMap<String, StopTimeData>> processStopTimes(List<Event> events) {
-		Map<String, SequencedMap<String, StopTimeData>> stopTimesByTrainAndFacility = new LinkedHashMap<>();
-
-		for (Event event : events) {
-			if (event instanceof VehicleArrivesAtFacilityEvent arrivalEvent) {
-				String trainId = arrivalEvent.getVehicleId().toString();
-				String facilityId = arrivalEvent.getFacilityId().toString();
-
-				SequencedMap<String, StopTimeData> stops = stopTimesByTrainAndFacility
-					.computeIfAbsent(trainId, k -> new LinkedHashMap<>());
-
-				stops.computeIfAbsent(facilityId, k -> new StopTimeData(stops.lastEntry()))
-					.arrivalTime = arrivalEvent.getTime();
-
-			} else if (event instanceof VehicleDepartsAtFacilityEvent departureEvent) {
-				String trainId = departureEvent.getVehicleId().toString();
-				String facilityId = departureEvent.getFacilityId().toString();
-
-				SequencedMap<String, StopTimeData> stops = stopTimesByTrainAndFacility
-					.computeIfAbsent(trainId, k -> new LinkedHashMap<>());
-
-				stops.computeIfAbsent(facilityId, k -> new StopTimeData(stops.lastEntry()))
-					.departureTime = departureEvent.getTime();
-			}
-		}
-
-		return stopTimesByTrainAndFacility;
-	}
-
-	/**
-	 * Data class to hold arrival and departure times for a train at a specific facility.
-	 */
-	protected final static class StopTimeData {
-
-		double arrivalTime = -1.0;
-		double departureTime = -1.0;
-
-		/**
-		 * Previous stop time data, if any. This can be used to chain stop times together.
-		 */
-		private final StopTimeData prev;
-
-		public StopTimeData(Map.Entry<String, StopTimeData> prev) {
-			this.prev = prev != null ? prev.getValue() : null;
-		}
-
-		/**
-		 * @return true if both arrival and departure times are set
-		 */
-		boolean isComplete() {
-			return arrivalTime >= 0 && departureTime >= 0;
-		}
-
-		/**
-		 * @return true if the train has arrived at the facility.
-		 */
-		boolean hasArrived() {
-			return arrivalTime >= 0;
-		}
-
-		/**
-		 * @return the stop duration in seconds, or -1 if incomplete
-		 */
-		double getStopDuration() {
-			return isComplete() ? departureTime - arrivalTime : -1.0;
-		}
-
-		/**
-		 * Calculates the travel time from the previous stop to this one.
-		 */
-		double getTravelTime() {
-			return hasArrived() && prev != null ? arrivalTime - prev.departureTime : -1.0;
-		}
-
-		@Override
-		public String toString() {
-			return "StopTimeData{" +
-				"arrivalTime=" + arrivalTime +
-				", departureTime=" + departureTime +
-				", travelTime=" + getTravelTime() +
-				", stopDuration=" + getStopDuration() +
-				'}';
-		}
+	protected SimulationResultAssert assertThat(SimulationResult result) {
+		return SimulationResultAssert.assertThat(result);
 	}
 
 }
