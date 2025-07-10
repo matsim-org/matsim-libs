@@ -159,7 +159,7 @@ public class MultipleChainsReplanningTest {
 				.build();
 
 		for (LspShipment shipment : createInitialLSPShipments()) {
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 
 		lsp.scheduleLogisticChains();
