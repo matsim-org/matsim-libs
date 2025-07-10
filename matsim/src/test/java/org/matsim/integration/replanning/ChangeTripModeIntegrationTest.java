@@ -124,8 +124,9 @@ public class ChangeTripModeIntegrationTest {
 				install(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
 				install(new TimeInterpretationModule());
-				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
-				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
+//				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
+//				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
+				// should both be in NewControlerModule
 			}
 		});
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);

@@ -94,8 +94,8 @@ public class PlanRouterTest {
         }
     }
 
-	@Test
-	void keepsVehicleIfTripRouterUsesOneAlready() {
+    @Test
+    void keepsVehicleIfTripRouterUsesOneAlready() {
         final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
