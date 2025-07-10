@@ -51,6 +51,7 @@ public class DetourTimeEstimatorWithAdaptiveTravelTimes implements DetourTimeEst
 
 	@Override
 	public double estimateTime(Link from, Link to, double departureTime) {
+		departureTime = Math.max(0, departureTime);
 
 		if (from == to) {
 			return 0;
