@@ -22,33 +22,35 @@ public class BicycleParamsDefaultImplTest {
 //	################################## Test Gradients ##################################################
 
 	@Test
-	void getGradientNoFromZ() {
+	void getGradientPctNoFromZ() {
 		Link link = createLink(new Coord(0, 0), new Coord(100, 0, 100));
-		assertEquals(0., params.getGradient(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
 	}
 
 	@Test
-	void getGradientNoToZ() {
+	void getGradientPctNoToZ() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0));
-		assertEquals(0., params.getGradient(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
 	}
 
 	@Test
-	void getGradientFlat() {
+	void getGradientPctFlat() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 100));
-		assertEquals(0., params.getGradient(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
 	}
 
 	@Test
-	void getGradientUphill() {
+	void getGradientPctUphill() {
 		Link link = createLink(new Coord(0, 0, 0), new Coord(100, 0, 100));
-		assertEquals(1., params.getGradient(link ), 0.00001 );
+		assertEquals(100., params.getGradient_pct(link ), 0.00001 );
 	}
 
 	@Test
-	void getGradientDownhill() {
+	void getGradientPctDownhill() {
 		Link link = createLink(new Coord(0, 0, 100), new Coord(100, 0, 0));
-		assertEquals(0., params.getGradient(link ), 0.00001 );
+		assertEquals(0., params.getGradient_pct(link ), 0.00001 );
+		// yyyy The method returns 0 when the gradient is downhill in order to set the corresponding scoring to zero.  I don't think it is
+		// good to change the "physics" in order to have a scoring consequence; the gradient should just be the gradient.  kai, jul'25
 	}
 
 //		################################## Test comfort factors ##################################################

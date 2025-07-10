@@ -82,7 +82,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
-		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
+		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m());
 		this.marginalCostOfUserDefinedNetworkAttribute_m = -(bicycleConfigGroup.getMarginalUtilityOfUserDefinedNetworkAttribute_m());
 		this.nameOfUserDefinedNetworkAttribute = bicycleConfigGroup.getUserDefinedNetworkAttributeName();
 		this.userDefinedNetworkAttributeDefaultValue = bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue();
@@ -112,7 +112,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = bicycleParams.getGradient(link );
+		double gradientFactor = bicycleParams.getGradient_pct(link );
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
 		double userDefinedNetworkAttritubeDisutility = 0.;

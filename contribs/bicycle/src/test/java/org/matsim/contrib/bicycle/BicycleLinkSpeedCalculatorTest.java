@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.NetworkUtils;
@@ -23,8 +25,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BicycleLinkSpeedCalculatorTest {
     @RegisterExtension
@@ -32,21 +33,28 @@ public class BicycleLinkSpeedCalculatorTest {
     private static final double MAX_BICYCLE_SPEED = 15;
 
     private final Config config = ConfigUtils.createConfig();
-    private BicycleConfigGroup configGroup;
+    private BicycleConfigGroup bicycleConfigGroup;
     private final Network unusedNetwork = NetworkUtils.createNetwork();
 
 	private Injector injector;
 
     @BeforeEach
     public void before() {
-        configGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
-        configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);
-        configGroup.setBicycleMode("bike");
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		Scenario scenario = ScenarioUtils.createScenario(config) ;
-		Controler controler = new Controler( scenario ) ;
-		controler.addOverridingModule(new BicycleModule());
-		injector = controler.getInjector();
+	    bicycleConfigGroup = ConfigUtils.addOrGetModule( config, BicycleConfigGroup.class );
+//        configGroup.setMaxBicycleSpeedForRouting(MAX_BICYCLE_SPEED);
+	    bicycleConfigGroup.setBicycleMode("bike" );
+
+	    config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
+	    config.routing().setAccessEgressType( RoutingConfigGroup.AccessEgressType.accessEgressModeToLink );
+
+	    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+	    Scenario scenario = ScenarioUtils.createScenario(config) ;
+	    scenario.getVehicles().addModeVehicleType( "bike" ).setMaximumVelocity( 25./3.6 );
+
+	    Controler controler = new Controler( scenario ) ;
+	    controler.addOverridingModule(new BicycleModule());
+	    injector = controler.getInjector();
 	}
 
     // The  more general parts of the test (testing different car behavior) were moved to SpeedCalculatorTest in the core, because there it was
@@ -86,14 +94,17 @@ public class BicycleLinkSpeedCalculatorTest {
 	@Test
 	void getMaximumVelocityForLink_bikeIsNull() {
 
-        Link link = createLinkWithNoGradientAndNoSpecialSurface();
+		Link link = createLinkWithNoGradientAndNoSpecialSurface();
 
 		BicycleLinkSpeedCalculator calculator = injector.getInstance(BicycleLinkSpeedCalculator.class);
+		assertThrows( NullPointerException.class,
+			() -> calculator.getMaximumVelocityForLink(link, null),
+			"if the vehicle is null, we expect an exception"
+		);
 
-        double speed = calculator.getMaximumVelocityForLink(link, null);
 
-        assertEquals(configGroup.getMaxBicycleSpeedForRouting(), speed, 0.001);
-    }
+//        assertEquals(configGroup.getMaxBicycleSpeedForRouting(), speed, 0.001);
+	}
 
 	@Test
 	void getMaximumVelocityForLink_withGradient() {
