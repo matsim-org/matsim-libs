@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.DefaultPrepareForSimModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -70,6 +71,7 @@ public class PlanRouterTest {
                 install(new TripRouterModule());
                 install(new ScenarioByInstanceModule(scenario));
                 install(new TimeInterpretationModule());
+                install( new DefaultPrepareForSimModule() );
                 addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
             }

@@ -30,6 +30,6 @@ public class DefaultPrepareForSimModule extends AbstractModule {
     @Override
     public void install() {
         bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+        Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
     }
 }
