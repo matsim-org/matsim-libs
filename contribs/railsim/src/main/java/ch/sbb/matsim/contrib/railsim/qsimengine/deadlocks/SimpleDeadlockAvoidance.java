@@ -89,8 +89,8 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 		// This strategy cannot handle cases where one train reserves a segment of links efficiently.
 		// The non-blocking areas should already be designed such that trains don't block each other.
 		// Checking each link individually is possible but too restrictive,
-		// Instead it simply allows links to be reserved, under the assumption they belong to the same area which is conflict-free.
-		return true;
+		// Instead it checks only the link used for entering the segment.
+		return checkLink(time, links.getLast(), position);
 	}
 
 	@Override
@@ -125,5 +125,12 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 		private RailLink direction;
 		private final Set<MobsimDriverAgent> trains = new LinkedHashSet<>();
 
+		@Override
+		public String toString() {
+			return "Reservation{" +
+				"direction=" + direction +
+				", trains=" + trains +
+				'}';
+		}
 	}
 }

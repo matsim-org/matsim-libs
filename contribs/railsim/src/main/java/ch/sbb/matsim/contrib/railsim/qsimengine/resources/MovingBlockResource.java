@@ -247,6 +247,14 @@ final class MovingBlockResource implements RailResourceInternal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "MovingBlockResource{" +
+			"id=" + id +
+			", capacity=" + capacity +
+			'}';
+	}
+
 	/**
 	 * Class to keep track of train positions and reservations.
 	 */

@@ -205,4 +205,11 @@ final class FixedBlockResource implements RailResourceInternal {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "FixedBlockResource{" +
+			"id=" + id +
+			", capacity=" + capacity +
+			'}';
+	}
 }
