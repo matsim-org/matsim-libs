@@ -1,7 +1,10 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.scheduler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
@@ -21,6 +24,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -31,11 +35,14 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author nkuehnel / MOIA
  */
 public final class EShiftTaskScheduler implements ShiftTaskScheduler {
+
+    private final static Logger logger = LogManager.getLogger(EShiftTaskScheduler.class);
 
     private final ShiftTaskSchedulerImpl delegate;
 
@@ -128,8 +135,19 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
             stayTask.setEndTime(now);
             if (stayTask instanceof EDrtWaitForShiftTask eTask) {
                 if (eTask.getChargingTask() != null) {
-                    eTask.getChargingTask().getChargingLogic().removeVehicle(eTask.getChargingTask().getElectricVehicle(), now);
-                    eTask.setEndTime(now);
+                    ChargingWithAssignmentLogic chargingLogic = eTask.getChargingTask().getChargingLogic();
+                    ElectricVehicle ev = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle();
+                    if(Stream.concat(chargingLogic.getPluggedVehicles().stream(), chargingLogic.getQueuedVehicles().stream())
+                            .map(ChargingLogic.ChargingVehicle::ev)
+                            .anyMatch(chargerEv -> chargerEv.getId().equals(ev.getId()))) {
+                        chargingLogic.removeVehicle(ev, now);
+                        eTask.setEndTime(now);
+                    } else {
+                        logger.warn("Vehicle {} had active charging task when trying to start shift {}. " +
+                                "However, it was neither queued nor plugged in the logic (anymore). This may happen if the logic " +
+                                "decided to end charging in the second before the shift start. ", vehicle.getId(), shift
+                                .getId());
+                    }
                 }
             }
             if (Schedules.getLastTask(schedule).equals(stayTask)) {

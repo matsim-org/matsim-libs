@@ -22,8 +22,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 /**
  * Intention of this class is to have the controler defaults clearly marked and visible.
@@ -43,12 +41,6 @@ public final class ControlerDefaults {
 
 	private ControlerDefaults(){} // should not be instantiated
 
-	/**
-	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
-	 */
-	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
-		return new CharyparNagelScoringFunctionFactory( scenario );
-	}
 
 	/**
 	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20

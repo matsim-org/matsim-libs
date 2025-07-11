@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
@@ -40,6 +41,8 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 
 	private final static Logger log = LogManager.getLogger(ExperiencedPlansServiceImpl.class);
 
+	@Inject
+	Network network;
 	@Inject private Config config;
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
@@ -98,7 +101,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	@Override
 	public void writeExperiencedPlans(String iterationFilename) {
 //		finishIteration(); // already called somewhere else in pgm flow.
-		Population tmpPop = PopulationUtils.createPopulation(config);
+		Population tmpPop = PopulationUtils.createPopulation(config,network);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();

@@ -21,7 +21,6 @@ package org.matsim.core.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.matsim.core.config.ConfigWriter.Verbosity;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
@@ -131,7 +130,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 					} else if ( pSet instanceof ActivityParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateActivityParams(((ActivityParams) pSet).getActivityType());
 					} else if ( pSet instanceof RoutingConfigGroup.TeleportedModeParams ) {
-						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((RoutingConfigGroup.TeleportedModeParams) pSet).getMode() ) ;
+						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams( ((RoutingConfigGroup.TeleportedModeParams) pSet).getMode(), verbosity ) ;
 					} else {
 						try {
 							comparisonPSet = pSet.getClass().newInstance();
@@ -283,10 +282,6 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 	 void writeModule(
 			final ConfigGroup module,
 			final BufferedWriter out) {
-		if ( ! (module instanceof ChangeLegModeConfigGroup) ) {
-			// yyyy special case to provide error message; may be removed eventually.  kai, may'16
-
-
 			ConfigGroup comparisonConfig = null ;
 			if ( verbosity==Verbosity.minimal) {
 				comparisonConfig = ConfigUtils.createConfig().getModules().get(module.getName());
@@ -302,7 +297,6 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 					module,
 					comparisonConfig
 			);
-		}
 	}
 
 	@Override

@@ -359,8 +359,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private AgentState getAgentStateForActivity(Id<Person> id) {
 
 		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
-		var marker = getMarkerFromAttributes(id);
-		if (marker != null) return AgentState.MARKER;
+//		var marker = getMarkerFromAttributes(id);
+//		if (marker != null) return AgentState.MARKER;
+		// (if we return the marker state here, the agents are also visualized at activities.  kai, jun'25`)
 
 		return AgentState.PERSON_AT_ACTIVITY;
 	}

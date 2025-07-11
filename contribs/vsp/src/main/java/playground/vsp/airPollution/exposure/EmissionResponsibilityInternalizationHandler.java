@@ -30,7 +30,6 @@ import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
-import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 
 
 /**
@@ -67,10 +66,10 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double time = event.getTime();
 		double coldEmissionCosts = emissionResponsibilityCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), time);
 		double amount2Pay = - coldEmissionCosts;
-		
-		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "coldEmissionCost", null);
+
+		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "coldEmissionCost", null, null);
 		eventsManager.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 
@@ -81,12 +80,12 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double time = event.getTime();
 		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
 		double amount2Pay = - warmEmissionCosts;
-		
-		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "warmEmissionCost", null);
+
+		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "warmEmissionCost", null, null);
 		eventsManager.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 	}
-	
+
 }

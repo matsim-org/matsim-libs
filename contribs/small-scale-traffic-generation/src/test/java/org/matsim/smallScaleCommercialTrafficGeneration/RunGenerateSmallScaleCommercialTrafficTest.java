@@ -62,7 +62,7 @@ import java.util.Objects;
 public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testMainRunAndResults() {
@@ -80,20 +80,21 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String resultPopulation = "testPopulation.xml.gz";
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
-				pathToConfig,
-				"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
-				"--pathToCommercialFacilities", pathToCommercialFacilities,
-				"--sample", sample,
-				"--jspritIterations", jspritIterations,
-				"--creationOption", creationOption,
-				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
-				"--additionalTravelBufferPerIterationInMinutes", "10",
-				"--includeExistingModels",
-				"--zoneShapeFileName", zoneShapeFileName,
-				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
-				"--shapeCRS", shapeCRS,
-				"--nameOutputPopulation", resultPopulation,
-				"--pathOutput", output);
+			pathToConfig,
+			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToCommercialFacilities", pathToCommercialFacilities,
+			"--sample", sample,
+			"--jspritIterations", jspritIterations,
+			"--creationOption", creationOption,
+			"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
+			"--additionalTravelBufferPerIterationInMinutes", "10",
+			"--includeExistingModels",
+			"--zoneShapeFileName", zoneShapeFileName,
+			"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
+			"--shapeCRS", shapeCRS,
+			"--nameOutputPopulation", resultPopulation,
+			"--pathOutput", output,
+			"--resistanceFactor", "0.005");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();

@@ -21,19 +21,13 @@
 package org.matsim.pt.transitSchedule;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
+import org.matsim.pt.transitSchedule.api.*;
 
 
 public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
@@ -76,6 +70,11 @@ public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 	@Override
 	public Departure createDeparture(final Id<Departure> departureId, final double time) {
 		return new DepartureImpl(departureId, time);
+	}
+
+	@Override
+	public ChainedDeparture createChainedDeparture(final Id<TransitLine> transitLineId, final Id<TransitRoute> transitRouteId, final Id<Departure> departureId) {
+		return new ChainedDepartureImpl(transitLineId, transitRouteId, departureId);
 	}
 
 }

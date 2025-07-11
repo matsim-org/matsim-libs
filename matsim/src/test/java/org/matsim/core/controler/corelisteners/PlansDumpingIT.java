@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -40,13 +41,14 @@ public class PlansDumpingIT {
 	@Test
 	void testPlansDump_Interval() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "walk" ) );
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(3);
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+		c.getConfig().controller().setCreateGraphs(false);
 
-        c.run();
+		c.run();
 
 		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
@@ -64,13 +66,14 @@ public class PlansDumpingIT {
 	@Test
 	void testPlansDump_Never() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "walk" ) );
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(0);
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+		c.getConfig().controller().setCreateGraphs(false);
 
-        c.run();
+		c.run();
 
 		assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertFalse(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
@@ -88,13 +91,14 @@ public class PlansDumpingIT {
 	@Test
 	void testPlansDump_Always() {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( "walk" ) );
 		config.controller().setLastIteration(10);
 		config.controller().setWritePlansInterval(1);
 		Controler c = new Controler(config);
 		c.getConfig().controller().setWriteEventsInterval(0);
-        c.getConfig().controller().setCreateGraphs(false);
+		c.getConfig().controller().setCreateGraphsInterval( 0 );
 
-        c.run();
+		c.run();
 
 		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written

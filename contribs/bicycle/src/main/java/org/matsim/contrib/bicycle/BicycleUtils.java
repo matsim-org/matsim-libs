@@ -51,9 +51,15 @@ public final class BicycleUtils {
 		return (String) link.getAttributes().getAttribute( nameOfUserDefinedNetworkAttribute );
 	}
 
+
+	/**
+	 * @deprecated -- should be injected, not directly instantiated
+	 */
+	@Deprecated
 	public static AdditionalBicycleLinkScore createDefaultBicycleLinkScore( Scenario scenario ) {
 		return new AdditionalBicycleLinkScoreDefaultImpl( scenario );
 	}
+
 	/* package */ static double getGradient(Link link ) {
 
 		if (!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()) return 0.;

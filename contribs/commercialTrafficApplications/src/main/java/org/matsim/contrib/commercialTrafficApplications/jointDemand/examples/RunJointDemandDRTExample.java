@@ -73,7 +73,7 @@ class RunJointDemandDRTExample {
                 configUrl = localConfigFile.toURI().toURL();
             } else {
                 log.info("Starting simulation run with the example config file from GitHub repository");
-                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/commercialTrafficApplications/"
+                configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/commercialTrafficApplications/"
                         + EXAMPLE_CONFIG);
             }
         }
@@ -145,9 +145,9 @@ class RunJointDemandDRTExample {
         DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-        defaultConstraintsSet.maxWaitTime = 2 * 3600;
-		defaultConstraintsSet.maxTravelTimeAlpha = 5;
-		defaultConstraintsSet.maxTravelTimeBeta = 15 * 60;
+        defaultConstraintsSet.setMaxWaitTime(2 * 3600);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(15 * 60);
         drtCfg.setStopDuration(60);
         drtCfg.setVehiclesFile("jointDemand_vehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);

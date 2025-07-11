@@ -21,10 +21,13 @@
 package org.matsim.pt.transitSchedule;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.ChainedDeparture;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 
 /**
@@ -37,8 +40,9 @@ public class DepartureImpl implements Departure {
 	private final Id<Departure> id;
 	private final double departureTime;
 	private Id<Vehicle> vehicleId = null;
+	private List<ChainedDeparture> chainedDepartures = List.of();
 	private final Attributes attributes = new AttributesImpl();
-	
+
 	protected DepartureImpl(final Id<Departure> id, final double departureTime) {
 		this.id = id;
 		this.departureTime = departureTime;
@@ -70,8 +74,18 @@ public class DepartureImpl implements Departure {
 	}
 
 	@Override
+	public List<ChainedDeparture> getChainedDepartures() {
+		return chainedDepartures;
+	}
+
+	@Override
+	public void setChainedDepartures(final List<ChainedDeparture> chainedDepartures) {
+		this.chainedDepartures = chainedDepartures;
+	}
+
+	@Override
 	public String toString() {
 		return "[DepartureImpl: id=" + this.id + ", depTime=" + this.departureTime + "]";
 	}
-	
+
 }

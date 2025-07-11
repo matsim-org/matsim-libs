@@ -71,8 +71,8 @@ public class ConfigTest {
 				"</config>";
 		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
 
-		Assertions.assertEquals("aaa", config.getParam("ctg", "a"));
-		Assertions.assertEquals("bbb", config.getParam("ctg", "b"));
+		Assertions.assertEquals("aaa", config.getModule("ctg").getParams().get("a"));
+		Assertions.assertEquals("bbb", config.getModule("ctg").getParams().get("b"));
 		Assertions.assertNull(group.getA());
 		Assertions.assertNull(group.getB());
 

@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.BenensonDynLeg;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
@@ -84,7 +83,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		Node nextNode;
 		Id<Link> nextLinkId = null;
 
-		for (Link outLink : ParkingUtils.getOutgoingLinksForMode(currentLink, mode)) {
+		for (Link outLink : NetworkUtils.getOutgoingLinksForMode(currentLink, mode)) {
 			Id<Link> outLinkId = outLink.getId();
 			if (outLinkId.equals(destinationLinkId)) {
 				return outLinkId;
@@ -108,7 +107,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 		Link nextLink;
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Link> outGoingLinks = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
+		List<Link> outGoingLinks = NetworkUtils.getOutgoingLinksForMode(currentLink, mode);
 		List<Link> outGoingLinksCopy = new ArrayList<>(outGoingLinks);
 		int nrOfOutGoingLinks = outGoingLinks.size();
 		for (int i = 1; i <= nrOfOutGoingLinks; i++) {
@@ -177,7 +176,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		}
 
 		double distToDest = NetworkUtils.getEuclideanDistance(network.getLinks().get(currentLinkId).getCoord(), network.getLinks().get(endLinkId)
-																													   .getCoord());
+			.getCoord());
 		double timeSpent = timeOfDay - firstDestLinkEnterTime;
 		double acceptedDistance = ACCEPTED_DISTANCE_START + ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN * (timeSpent / 60);
 

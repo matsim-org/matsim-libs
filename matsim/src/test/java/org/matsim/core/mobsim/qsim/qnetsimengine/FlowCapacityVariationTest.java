@@ -193,7 +193,7 @@ public class FlowCapacityVariationTest {
 				population.addPerson(p);
 
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
-				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(travelMode, vehId ) );
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

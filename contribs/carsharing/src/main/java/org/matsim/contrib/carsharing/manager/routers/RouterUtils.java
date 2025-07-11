@@ -24,8 +24,7 @@ public class RouterUtils {
 		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Vehicle vehicle = null ;
-		Path path = pathCalculator.calcLeastCostPath(startLink.getToNode(), destinationLink.getFromNode(), 
-				now, person, vehicle ) ;
+		Path path = pathCalculator.calcLeastCostPath(startLink, destinationLink, now, person, vehicle ) ;
 		
 		NetworkRoute carRoute = routeFactory.createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId() );
 		carRoute.setLinkIds(startLink.getId(), NetworkUtils.getLinkIds( path.links), destinationLink.getId());

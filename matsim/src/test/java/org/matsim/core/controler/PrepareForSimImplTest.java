@@ -783,7 +783,7 @@ public class PrepareForSimImplTest {
 		// Create test person
 		Person p1 = f.createPerson(Id.createPersonId("1"));
 		{
-			VehicleUtils.insertVehicleTypesIntoAttributes(p1, Map.of(TransportMode.car, Id.create("truck", VehicleType.class)));
+			VehicleUtils.insertVehicleTypesIntoPersonAttributes( p1, Map.of(TransportMode.car, Id.create("truck", VehicleType.class ) ) );
 
 			Plan plan = f.createPlan();
 			Activity act = f.createActivityFromCoord("home", new Coord(0, 0));

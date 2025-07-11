@@ -381,7 +381,7 @@ public class InsertionGenerator {
 			return true;
 		}
 
-		return vEntry.getStartSlackTime() >= pickupDetourInfo.departureTime - stopTask.getEndTime();
+		return vEntry.getStartSlackTime() >= pickupDetourInfo.vehicleDepartureTime - stopTask.getEndTime();
 	}
 
 	private DvrpLoad getVehicleCapacityAtStop(VehicleEntry vEntry, int stopIndex) {
@@ -400,7 +400,7 @@ public class InsertionGenerator {
 		var insertion = new Insertion(vehicleEntry, pickupInsertion, dropoffInsertion, request.getLoad());
 
 		double toDropoffDepartureTime = pickupInsertion.index == dropoffIdx ?
-				pickupDetourInfo.departureTime :
+				pickupDetourInfo.vehicleDepartureTime :
 				dropoffInsertion.previousWaypoint.getDepartureTime() + pickupDetourInfo.pickupTimeLoss;
 		double toDropoffTT = pickupInsertion.index == dropoffIdx ?
 				fromPickupTT :

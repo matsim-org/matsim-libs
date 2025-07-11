@@ -73,23 +73,6 @@ public class TurnRestrictionsSimulationIT {
 		for (List<Id<Link>> linkSequence : linkSequencesFromRoutes) {
 			for (List<Id<Link>> disallowedLinkSequence : disallowedLinkSequences) {
 				boolean containsForbiddenSequence = containsSublist(linkSequence, disallowedLinkSequence);
-
-				// Todo: fix #3804
-				if (containsForbiddenSequence
-						&& linkSequence.subList(0, disallowedLinkSequence.size()).equals(disallowedLinkSequence)) {
-					// As the router routes from the start link's toNode, turn restrictions
-					// affecting the start link will not be considered.
-					LOG.info(
-							"'{}' found in '{}', but that's expected, for now. See https://github.com/matsim-org/matsim-libs/issues/3804",
-							disallowedLinkSequence.stream()
-									.map(Id::toString)
-									.collect(Collectors.joining(" ")),
-							linkSequence.stream()
-									.map(Id::toString)
-									.collect(Collectors.joining(" ")));
-					continue; // turn restriction is not considered at beginning of route currently
-				}
-
 				Assertions.assertFalse(containsForbiddenSequence);
 			}
 		}

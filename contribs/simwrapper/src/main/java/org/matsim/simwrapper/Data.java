@@ -6,7 +6,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.URI;

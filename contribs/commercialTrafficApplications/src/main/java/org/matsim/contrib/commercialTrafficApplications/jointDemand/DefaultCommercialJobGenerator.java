@@ -117,7 +117,7 @@ class DefaultCommercialJobGenerator implements CommercialJobGenerator {
 		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
 			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
 		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier), vid));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes( driverPerson, Map.of(CarriersUtils.getCarrierMode(carrier ), vid ) );
 		scenario.getVehicles()
 				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
 		freightVehicles.add(vid);

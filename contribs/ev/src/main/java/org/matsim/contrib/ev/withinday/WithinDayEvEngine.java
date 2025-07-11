@@ -50,6 +50,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -98,6 +100,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	private final ChargingAlternativeProvider alternativeProvider;
 	private final ChargingSlotProvider slotProvider;
 	private final EventsManager eventsManager;
+	private final TimeInterpretation timeInterpretation;
 	private ChargingScheduler chargingScheduler;
 
 	private final boolean performAbort;
@@ -106,12 +109,13 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 
 	private final Logger logger = LogManager.getLogger(WithinDayEvEngine.class);
 
-	public WithinDayEvEngine(WithinDayEvConfigGroup config, QSim qsim, ElectricFleet electricFleet,
-			ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
-			EventsManager eventsManager,
-			ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
-			Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
+	public WithinDayEvEngine(WithinDayEvConfigGroup config, QSim qsim, TimeInterpretation timeInterpretation, ElectricFleet electricFleet,
+							 ChargingAlternativeProvider onlineSlotProvider, ChargingSlotProvider offlineSlotProvider,
+							 EventsManager eventsManager,
+							 ChargingScheduler chargingScheduler, Vehicles vehicles, QVehicleFactory qVehicleFactory,
+							 Scenario scenario, WithinDayChargingStrategy.Factory chargingStrategyFactory) {
 		this.qsim = qsim;
+		this.timeInterpretation = timeInterpretation;
 		this.electricFleet = electricFleet;
 		this.alternativeProvider = onlineSlotProvider;
 		this.slotProvider = offlineSlotProvider;
@@ -268,33 +272,33 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 	}
 
 	private void startOvernightCharging(MobsimAgent agent, ChargingSlot slot) {
-		Activity endActivity = slot.endActivity();
-		endActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
+        Activity endActivity = slot.endActivity();
+        endActivity.getAttributes().putAttribute(CHARGING_SLOT_ATTRIBUTE, slot);
 
-		double now = internalInterface.getMobsim().getSimTimer().getSimStartTime();
-		ChargingProcess process = createChargingProcess(agent.getId(), now, slot, null, false);
-		process.isOvernight = true;
+        double now = internalInterface.getMobsim().getSimTimer().getSimStartTime();
+        ChargingProcess process = createChargingProcess(agent.getId(), now, slot, null, false);
+        process.isOvernight = true;
 
-		// Handle end time from here
+        // Handle end time from here
 
-		Preconditions.checkState(endActivity.getEndTime().isDefined());
-		double endTime = endActivity.getEndTime().seconds();
+        OptionalTime endTime = timeInterpretation.decideOnActivityEndTimeAlongPlan(endActivity, WithinDayAgentUtils.getModifiablePlan(agent));
+        Preconditions.checkState(endTime.isDefined());
 
-		endActivity.getAttributes().putAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE, endTime);
-		endActivity.setEndTime(Double.MAX_VALUE);
+        endActivity.getAttributes().putAttribute(INITIAL_ACTIVITY_END_TIME_ATTRIBUTE, endTime.seconds());
+        endActivity.setEndTime(Double.MAX_VALUE);
 
-		WithinDayAgentUtils.resetCaches(agent);
+        WithinDayAgentUtils.resetCaches(agent);
 
-		/*
-		 * We would usually include the following line, but we must not call it here
-		 * because it is called automatically by the QSim at simulation startup.
-		 * Otherwise, the agent will appear twice in the agent queue:
-		 * 
-		 * WithinDayAgentUtils.rescheduleActivityEnd(agent, qsim);
-		 */
+        /*
+         * We would usually include the following line, but we must not call it here
+         * because it is called automatically by the QSim at simulation startup.
+         * Otherwise, the agent will appear twice in the agent queue:
+         *
+         * WithinDayAgentUtils.rescheduleActivityEnd(agent, qsim);
+         */
 
-		plugging.put(process.vehicle.getId(), process);
-	}
+        plugging.put(process.vehicle.getId(), process);
+    }
 
 	private void startWholeDayCharging(MobsimAgent agent, ChargingSlot slot) {
 		double now = internalInterface.getMobsim().getSimTimer().getSimStartTime();

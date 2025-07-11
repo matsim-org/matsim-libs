@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.qsim.agents.HasModifiablePlan;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -408,10 +408,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 							// the agent is on an activity, let it get stuck further below
 							stuckUponActivity.add(passengerId);
 						} else {
-							// the agent is on a leg, so we cannot make it stuck directly. 
-							// instead, we set the next activity to an infinite duration and 
+							// the agent is on a leg, so we cannot make it stuck directly.
+							// instead, we set the next activity to an infinite duration and
 							// make the agent get stuck right after the activity starts
-							
+
 							while (index < plan.getPlanElements().size()) {
 								if (plan.getPlanElements().get(index) instanceof Activity activity) {
 									activity.setEndTime(Double.MAX_VALUE); // very long but not infinite (= regular last activity)
@@ -448,10 +448,10 @@ public class PrebookingManager implements MobsimEngine, MobsimAfterSimStepListen
 	}
 
 	private void abortAgent(MobsimAgent agent, Activity activity, double now) {
-		// this would be the simple way, but then it looks like the agent is stuck 
-		// because of something related to the activity. however, we want to make 
+		// this would be the simple way, but then it looks like the agent is stuck
+		// because of something related to the activity. however, we want to make
 		//it clear that drt is the cause here
-		
+
 		// agent.setStateToAbort(now);
 		// internalInterface.arrangeNextAgentState(agent);
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.options.SampleOptions;
-import org.matsim.application.prepare.freight.tripExtraction.ExtractRelevantFreightTrips;
+import org.matsim.application.prepare.longDistanceFreightGER.tripExtraction.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
 import org.matsim.application.prepare.population.MergePopulations;
 import org.matsim.application.prepare.population.TrajectoryToPlans;

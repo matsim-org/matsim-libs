@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.InvalidAttributeValueException;
+
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,9 +41,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
+import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -175,7 +180,7 @@ public class CarriersUtils {
 	public static int getJspritIterations(Carrier carrier) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute(JSPRIT_ITERATIONS);
 		if (result == null) {
-			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritIterations does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		} else {
 			return result;
@@ -220,10 +225,30 @@ public class CarriersUtils {
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
+		// Create the NetBasedCosts based on the network and the vehicle types
+		//Consider tolls if a RoadPricingScheme is available in the scenario.
+		RoadPricingScheme roadPricingScheme = null;
+		try {
+			roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
+		} catch (Exception e) {
+			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
+		}
+
+		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
+				.setRoadPricingScheme(roadPricingScheme)
+				.build();
+
 
 		Carriers carriers = getCarriers(scenario);
+
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
+		if (result == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
+		}
 
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
@@ -244,33 +269,54 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
+
+
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
-		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
+		List<Future<?>> futures;
+		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
+			futures = new ArrayList<>();
+			List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+				.toList();
 
-		List<Future<?>> futures = new ArrayList<>();
-		List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-			.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
-			.toList();
-
-		for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
-			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
-				startedVRPCounter, carriers.getCarriers().size());
-			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
-			futures.add(executor.submit(task));
+			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
+				JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
+					startedVRPCounter, carriers.getCarriers().size());
+				log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
+				futures.add(executor.submit(task));
+			}
 		}
 
 		for (Future<?> future : futures) {
 			future.get();
 		}
+
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
+		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There are carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details.");
+		}
+
+
 	}
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
 	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
+	 * <p
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it checks only one specific carrier.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
+	 *
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
@@ -300,20 +346,13 @@ public class CarriersUtils {
 	}
 
 	/**
-	 * Checks if all carriers with jobs have at least one plan.
-	 *
-	 * @param carriers the carriers
-	 * @return true if all carriers with jobs have at teast one plan
-	 */
-	public static boolean allCarriersWithJobsHavePlans(Carriers carriers) {
-		for (Carrier carrier : carriers.getCarriers().values())
-			if (hasJobs(carrier) && carrier.getSelectedPlan() == null) return false;
-
-		return true;
-	}
-
-	/**
 	 * Creates a list of carriers with unhandled jobs.
+	 * <p></p>
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it returns a list of carriers with unhandled jobs instead of a boolean.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications) ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
 	 *
 	 * @param carriers the carriers
 	 * @return list of carriers with unhandled jobs
@@ -748,7 +787,7 @@ public class CarriersUtils {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}

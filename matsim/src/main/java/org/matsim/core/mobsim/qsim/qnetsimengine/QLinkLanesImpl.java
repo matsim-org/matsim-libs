@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,19 +30,17 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalIn
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.parking.ParkingSearchTimeCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.VisLane;
-import org.matsim.lanes.VisLaneModelBuilder;
-import org.matsim.lanes.VisLinkWLanes;
+import org.matsim.lanes.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.*;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed into something
@@ -117,23 +113,28 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		private LinkSpeedCalculator linkSpeedCalculator;
 		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 		private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
+		private ParkingSearchTimeCalculator parkingSearchTimeCalculator;
 
-		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
+		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
 			this.context = context;
 			this.netsimEngine = netsimEngine;
 		}
 
-		public final void setLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ) {
-			this.linkSpeedCalculator = linkSpeedCalculator ;
+		public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
+			this.linkSpeedCalculator = linkSpeedCalculator;
 		}
 
 		public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
 			this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 		}
 
-		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
-			Objects.requireNonNull( linkSpeedCalculator );
-			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler ) ;
+		public void setParkingSearchTimeCalculator(ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+			this.parkingSearchTimeCalculator = parkingSearchTimeCalculator;
+		}
+
+		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes) {
+			Objects.requireNonNull(linkSpeedCalculator);
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler, parkingSearchTimeCalculator);
 		}
 
 	}
@@ -170,15 +171,17 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * @param context TODO
-	 * @param netsimEngine TODO
+	 *
+	 * @param context                  TODO
+	 * @param netsimEngine             TODO
 	 * @param linkSpeedCalculator
 	 * @param flowEfficiencyCalculator
 	 */
 	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
-						   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, FlowEfficiencyCalculator flowEfficiencyCalculator, VehicleHandler vehicleHandler) {
-		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
-		this.context = context ;
+						   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, FlowEfficiencyCalculator flowEfficiencyCalculator,
+						   VehicleHandler vehicleHandler, ParkingSearchTimeCalculator parkingSearchTimeCalculator) {
+		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler, parkingSearchTimeCalculator);
+		this.context = context;
 		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();

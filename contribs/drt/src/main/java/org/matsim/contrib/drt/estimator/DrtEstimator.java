@@ -4,13 +4,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.utils.objectattributes.attributable.Attributable;
+
+import static org.matsim.contrib.dvrp.passenger.TeleportingEstimationPassengerEngine.*;
 
 /**
  * Interface to estimate a DRT service's detour, waiting time and costs.
  */
 public interface DrtEstimator extends ControlerListener {
-
 	/**
 	 * Provide an estimate for a drt route with specific pickup and dropoff point.
 	 *
@@ -31,16 +31,16 @@ public interface DrtEstimator extends ControlerListener {
 	 * @param rejectionRate probability of a trip being rejected
 	 */
 	record Estimate(double rideDistance, double rideTime, double waitingTime, double rejectionRate) {
-
 	}
 
 	/**
 	 * Write estimate information into the leg attributes.
 	 */
 	static void setEstimateAttributes(Leg leg, Estimate estimate) {
-		leg.getAttributes().putAttribute("est_ride_time", estimate.rideTime());
-		leg.getAttributes().putAttribute("est_ride_distance", estimate.rideDistance());
-		leg.getAttributes().putAttribute("est_wait_time", estimate.waitingTime());
+		leg.getAttributes().putAttribute(EST_RIDE_TIME, estimate.rideTime());
+		leg.getAttributes().putAttribute(EST_RIDE_DISTANCE, estimate.rideDistance());
+		leg.getAttributes().putAttribute(EST_WAIT_TIME, estimate.waitingTime());
+		leg.getAttributes().putAttribute(EST_REJECTION_RATE, estimate.rejectionRate());
 	}
 
 }

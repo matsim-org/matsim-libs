@@ -20,14 +20,33 @@
 
 package org.matsim.core.config.groups;
 
+import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.google.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 public class ControllerConfigGroupTest {
+
+	@RegisterExtension
+	private MatsimTestUtils util = new MatsimTestUtils();
 
 	/**
 	 * Ensure that the events-file-format is correctly stored
@@ -176,6 +195,79 @@ public class ControllerConfigGroupTest {
 		//modify by deprecated setter
 		cg.setCreateGraphs(true);
 		Assertions.assertEquals(1, cg.getCreateGraphsInterval());
+	}
+
+	@Test
+	public void testAnalysisConfigSettings() {
+		Config config = this.util.loadConfig((String) null);
+
+		ControllerConfigGroup ac = config.controller();
+
+		ac.setLegHistogramInterval(2);
+		ac.setLegDurationsInterval(3);
+
+		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controller().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(ControllerConfigGroupTest.DummyMobsimFactory.class);
+				}
+			}
+		});
+		int maxIterations = 10;
+		config.controller().setMobsim("dummy");
+		config.controller().setFirstIteration(0);
+		config.controller().setLastIteration(maxIterations);
+
+		controler.getConfig().controller().setCreateGraphsInterval(0);
+		controler.getConfig().controller().setDumpDataAtEnd(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
+		config.controller().setWritePlansInterval(0);
+		controler.run();
+
+		assertFileStatus(maxIterations, config.controller().getOutputDirectory(), ac.getLegHistogramInterval(), "legHistogram.txt");
+		assertFileStatus(maxIterations, config.controller().getOutputDirectory(), ac.getLegDurationsInterval(), "legdurations.txt");
+	}
+
+	private void assertFileStatus(int maxIterations, String outputDirectory, int interval, String filename) {
+		for (int iteration = 0; iteration < maxIterations; iteration++) {
+			boolean exists = (iteration % interval) == 0;
+			Assertions.assertEquals(exists, new File(outputDirectory + "ITERS/it." + iteration + "/" + iteration + "." + filename).exists());
+		}
+		// it should always exist in the last iteration
+		Assertions.assertTrue(new File(outputDirectory + "ITERS/it." + maxIterations + "/" + maxIterations + "." + filename).exists());
+	}
+
+	private static class DummyMobsim implements Mobsim {
+		private final EventsManager eventsManager;
+		private final int nOfEvents;
+
+		public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
+			this.eventsManager = eventsManager;
+			this.nOfEvents = nOfEvents;
+		}
+
+		@Override
+		public void run() {
+			Id<Link> linkId = Id.create("100", Link.class);
+			for (int i = 0; i < this.nOfEvents; i++) {
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Vehicle.class), linkId));
+			}
+		}
+	}
+
+	@Singleton
+	private static class DummyMobsimFactory implements Provider<Mobsim> {
+		private int count = 1;
+
+		@Inject
+		EventsManager eventsManager;
+
+		@Override
+		public Mobsim get() {
+			return new ControllerConfigGroupTest.DummyMobsim(eventsManager, count++);
+		}
 	}
 
 

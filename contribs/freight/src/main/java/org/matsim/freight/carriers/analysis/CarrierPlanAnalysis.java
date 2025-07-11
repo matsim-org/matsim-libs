@@ -50,19 +50,19 @@ import org.matsim.freight.carriers.*;
  *
  * @author Kai Martins-Turner (kturner), Ricardo Ewert
  */
-public class CarrierPlanAnalysis {
+/*package-private*/ class CarrierPlanAnalysis {
 
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
-	public final String delimiter;
+	private final String delimiter;
 
 	final Carriers carriers;
 
-	public CarrierPlanAnalysis(String delimiter, Carriers carriers) {
+	/*package-private*/ CarrierPlanAnalysis(String delimiter, Carriers carriers) {
 		this.delimiter = delimiter;
 		this.carriers = carriers;
 	}
 
-	public void runAnalysisAndWriteStats(String analysisOutputDirectory, CarriersAnalysis.CarrierAnalysisType analysisType) {
+	/*package-private*/ void runAnalysisAndWriteStats(String analysisOutputDirectory, CarriersAnalysis.CarrierAnalysisType analysisType) {
 		log.info("Writing out carrier analysis ...");
 
 		Path path = Path.of(analysisOutputDirectory);

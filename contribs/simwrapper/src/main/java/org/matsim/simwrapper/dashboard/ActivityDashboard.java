@@ -9,7 +9,7 @@ import org.matsim.simwrapper.viz.ColorScheme;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.TextBlock;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 

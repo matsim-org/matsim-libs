@@ -213,7 +213,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   }
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
-    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.controller().getRunId(), config.global().getCoordinateSystem());
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
 	carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
   }
 

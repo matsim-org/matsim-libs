@@ -32,15 +32,26 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface Household extends Identifiable<Household>, Attributable {
 
-	public List<Id<Person>> getMemberIds();
-	
-	/**
-	 * This returns an Income, not a number.  The Income type contains a method `getIncomePeriod()'. 
-	 */
-	public Income getIncome();
-	
-	public List<Id<Vehicle>> getVehicleIds();
+	List<Id<Person>> getMemberIds();
 
-	public void setIncome(Income income);
+	/**
+	 * This returns an Income, not a number.  The Income type contains a method `getIncomePeriod()'.
+	 */
+	Income getIncome();
+
+	List<Id<Vehicle>> getVehicleIds();
+
+	void setIncome(Income income);
+
+	void addMemberId(Id<Person> personId);
+
+	void addVehicleId(Id<Vehicle> vehicleId);
+
+	void removeMemberId(Id<Person> personId);
+
+	void removeVehicleId(Id<Vehicle> vehicleId);
+	void setMemberIds(List<Id<Person>> memberIds);
+
+	void setVehicleIds(List<Id<Vehicle>> vehicleIds);
 
 }

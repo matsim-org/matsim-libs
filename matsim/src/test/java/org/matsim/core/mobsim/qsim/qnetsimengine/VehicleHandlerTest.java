@@ -21,7 +21,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Arrays;
+import com.google.inject.Provides;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -34,12 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +48,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Provides;
+import java.util.Arrays;
 
 public class VehicleHandlerTest {
 
@@ -150,16 +145,16 @@ public class VehicleHandlerTest {
 		}
 
 		@Override
-		public boolean handleVehicleArrival(QVehicle vehicle, Link link) {
+		public VehicleArrival handleVehicleArrival(QVehicle vehicle, Link link) {
 			if (link.getId().equals(Id.createLinkId("CD"))) {
 				if (count >= capacity) {
-					return false;
+					return VehicleArrival.BLOCKED;
 				}
 
 				count++;
 			}
 
-			return true;
+			return VehicleArrival.ALLOWED;
 		}
 
 		@Override

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network name="drawn_network">
+
+	<attributes>
+		<attribute name="coordinateReferenceSystem" class="java.lang.String">Atlantis</attribute>
+	</attributes>
+
+	<nodes>
+		<node id="A1" x="-1505.0" y="0.0">
+		</node>
+		<node id="A2" x="-1227.5" y="0.0">
+		</node>
+		<node id="A3" x="-1230.0" y="-20.0">
+		</node>
+		<node id="A4" x="-1505.0" y="-20.0">
+		</node>
+		<node id="Abzw1" x="1030.0" y="0.0">
+		</node>
+		<node id="Abzw1Post" x="1050.0" y="0.0">
+		</node>
+		<node id="Abzw2" x="1025.0" y="-20.0">
+		</node>
+		<node id="Abzw3" x="1067.5" y="0.0">
+		</node>
+		<node id="Abzw3Post" x="1047.5" y="-10.0">
+		</node>
+		<node id="B1" x="3780.0" y="0.0">
+		</node>
+		<node id="B2" x="4030.0" y="0.0">
+		</node>
+		<node id="B3" x="4030.0" y="-20.0">
+		</node>
+		<node id="B4" x="3775.0" y="-20.0">
+		</node>
+		<node id="C1" x="3045.0" y="1070.0">
+		</node>
+		<node id="C2" x="3225.0" y="1167.5">
+		</node>
+		<node id="C3" x="3265.0" y="1160.0">
+		</node>
+		<node id="C4" x="3090.0" y="1065.0">
+		</node>
+		<node id="SigA" x="952.5" y="0.0">
+		</node>
+		<node id="SigB" x="1125.0" y="-20.0">
+		</node>
+		<node id="SigC" x="1105.0" y="20.0">
+		</node>
+		<node id="ToA" x="750.0" y="-20.0">
+		</node>
+		<node id="ToB" x="1350.0" y="0.0">
+		</node>
+		<node id="ToC" x="1222.5" y="102.5">
+		</node>
+	</nodes>
+
+	<links capperiod="01:00:00">
+		<link id="A1-A2" from="A1" to="A2" length="277.5" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="A2-SigA" from="A2" to="SigA" length="2180.0" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="A3-A4" from="A3" to="A4" length="275.0" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw1-Abzw1Post" from="Abzw1" to="Abzw1Post" length="20.0" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw1-ToC" from="Abzw1" to="ToC" length="218.1" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw1Post-Abzw3" from="Abzw1Post" to="Abzw3" length="17.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw2-ToA" from="Abzw2" to="ToA" length="275.0" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw3-Abzw3Post" from="Abzw3" to="Abzw3Post" length="22.4" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw3-ToB" from="Abzw3" to="ToB" length="282.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="Abzw3Post-Abzw2" from="Abzw3Post" to="Abzw2" length="24.6" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="B1-B2" from="B1" to="B2" length="250.0" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="B3-B4" from="B3" to="B4" length="255.0" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="B4-SigB" from="B4" to="SigB" length="2650.0" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="C1-C2" from="C1" to="C2" length="204.7" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="C3-C4" from="C3" to="C4" length="199.1" freespeed="33.3" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">999</attribute>
+			</attributes>
+		</link>
+		<link id="C4-SigC" from="C4" to="SigC" length="2243.3" freespeed="33" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="SigA-Abzw1" from="SigA" to="Abzw1" length="77.5" freespeed="33" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="SigB-Abzw2" from="SigB" to="Abzw2" length="100.0" freespeed="33" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="SigC-Abzw3" from="SigC" to="Abzw3" length="42.5" freespeed="22" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+				<attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
+			</attributes>
+		</link>
+		<link id="ToA-A3" from="ToA" to="A3" length="1980.0" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="ToB-B1" from="ToB" to="B1" length="2430.0" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+		<link id="ToC-C1" from="ToC" to="C1" length="2063.4" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
+			</attributes>
+		</link>
+	</links>
+
+</network>

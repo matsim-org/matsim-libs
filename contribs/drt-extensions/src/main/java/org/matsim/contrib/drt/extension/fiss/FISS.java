@@ -26,7 +26,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -103,11 +102,11 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			return false ;
 		} else if ( agent instanceof DynAgent ) {
 			return delegate.handleDeparture( now,agent, linkId );
-		} else if ( !this.fissConfigGroup.sampledModes.contains( agent.getMode() ) ) {
+		} else if ( !this.fissConfigGroup.getSampledModes().contains( agent.getMode() ) ) {
 			return delegate.handleDeparture( now,agent, linkId ); // not covered by test
 			// (the earlier design would have such agents fall through, in which case they would be treated by the standard network mode
 			// dp handler)
-		} else if (random.nextDouble() < fissConfigGroup.sampleFactor || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
+		} else if (random.nextDouble() < fissConfigGroup.getSampleFactor() || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
 			return delegate.handleDeparture(now, agent, linkId);
 		}
 
@@ -171,9 +170,9 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	}
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
-		for (String sampledQsimModes : fissConfigGroup.sampledModes) {
+		for (String sampledQsimModes : fissConfigGroup.getSampledModes()) {
 			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes,VehicleType.class));
-			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.sampleFactor);
+			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
 		}
 	}
 
@@ -182,7 +181,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	}
 
 	private boolean switchOffFISS() {
-		return (this.fissConfigGroup.switchOffFISSLastIteration && this.matsimServices.getConfig().controller().getLastIteration() == this.matsimServices.getIterationNumber());
+		return (this.fissConfigGroup.isSwitchOffFISSLastIteration() && this.matsimServices.getConfig().controller().getLastIteration() == this.matsimServices.getIterationNumber());
 		// yyyy note that with current implementation one canNOT change this to "switchOffFISS every x timesteps", since the pces are
 		// deflated to their original values in onPrepareSim, and there is nothing in the code that multiply them to the FISS values
 		// afterwards again.

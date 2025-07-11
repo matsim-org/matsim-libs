@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.*;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -201,8 +201,11 @@ public class RoutingIT {
 						bindLeastCostPathCalculatorFactory().toInstance(factory1);
 					}
 				}));
+				install( new DefaultPrepareForSimModule() );
 			}
 		});
+
+		injector.getInstance( PrepareForSim.class ).run();
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		final PersonAlgorithm router = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));

@@ -23,6 +23,11 @@ public class XYTime extends Viz {
 	public Double radius;
 
 	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+	/**
 	 * The name of the color ramp.
 	 */
 	@JsonProperty(required = false)

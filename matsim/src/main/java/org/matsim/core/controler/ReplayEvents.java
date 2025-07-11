@@ -111,7 +111,7 @@ public final class ReplayEvents {
         ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerShutdownEvent(false, iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof ShutdownListener) {
-                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false, iterationNumber));
+                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false, iterationNumber, null));
             }
         }
     }

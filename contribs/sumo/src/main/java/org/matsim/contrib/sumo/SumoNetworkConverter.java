@@ -1,6 +1,8 @@
 package org.matsim.contrib.sumo;
 
-import com.google.common.collect.Sets;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
@@ -14,23 +16,31 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.osm.networkReader.LinkProperties;
 import org.matsim.contrib.osm.networkReader.OsmTags;
-import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.Sets;
+
 import picocli.CommandLine;
 
-import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -335,7 +345,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		// clean up network
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network,
+				Set.of(TransportMode.car, TransportMode.ride, TransportMode.bike,
+						TransportMode.truck));
 
 		Set<Id<Link>> ignored = new HashSet<>();
 
@@ -383,7 +395,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
 		}
 
 		// clean again (possibly with turn restrictions)
-		new NetworkCleaner().run(network);
+		NetworkUtils.cleanNetwork(network,
+				Set.of(TransportMode.car, TransportMode.ride, TransportMode.bike,
+						TransportMode.truck));
 
 		if (!ignored.isEmpty()) {
 			log.warn("Ignored turn restrictions for {} links with no connections: {}", ignored.size(), ignored);

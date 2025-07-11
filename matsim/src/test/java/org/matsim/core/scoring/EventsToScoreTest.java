@@ -26,9 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -49,11 +47,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.MutableScenario;
@@ -84,7 +79,7 @@ public class EventsToScoreTest {
 		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
 		e2s.beginIteration(0, false);
 		events.initProcessing();
-		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
+		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator", null));
 		events.finishProcessing();
 		e2s.finish();
 		Assertions.assertEquals(3.4, e2s.getAgentScore(person.getId()), 0);
@@ -118,7 +113,7 @@ public class EventsToScoreTest {
 			events.initProcessing();
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
-			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98, "bribe", "contractor" ));
+			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98, "bribe", "contractor", null));
 
 			events.finishProcessing();
 			e2s.finish() ;
@@ -234,7 +229,7 @@ public class EventsToScoreTest {
 				this.addMobsimListenerBinding().toInstance(new MobsimInitializedListener() {
 					@Override
 					public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-						events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), iteration[0] -98, "bribe", "contractor" ));
+						events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), iteration[0] -98, "bribe", "contractor", null));
 					}
 				});
 			}

@@ -74,8 +74,7 @@ public class SharingNetworkRentalsHandler implements SharingPickupEventHandler, 
 			double minimumFare = serviceParams.getMinimumFare();
 
 			double sharedFare = Math.max(minimumFare, sharedBaseFare + sharedDistanceFare + sharedTimeFare);
-			eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -sharedFare,
-					PERSON_MONEY_EVENT_PURPOSE_SHARING_FARE, event.getServiceId().toString()));
+			eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -sharedFare, PERSON_MONEY_EVENT_PURPOSE_SHARING_FARE, event.getServiceId().toString(), null));
 			this.distance.remove(event.getPersonId());
 			this.pickups.remove(event.getPersonId());
 		}

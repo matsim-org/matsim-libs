@@ -52,6 +52,7 @@ public class DistanceBasedPtFareParams extends PtFareParams {
 	// in Deutschlandtarif, the linear function for the prices above 100km seem to have a different steepness
 	// hence the following difference in data points
 	// prices taken from https://deutschlandtarifverbund.de/wp-content/uploads/2024/07/20231201_TBDT_J_10_Preisliste_V07.pdf
+//	the prices og the above link have "Tarifstand" 10.12.2023 and are valid for 2024, at the end of 2024 a new table was released. -sm0425
 	// TODO: This fare will change. We might need a way to select the fare of a specific year
 	private static DistanceBasedPtFareParams germanWideFare2024() {
 		final double MIN_FARE = 1.70;

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="defaultVehicleType">
+
+		<capacity seats="4" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="HGV16">
+
+		<capacity seats="0" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="chargerTypes" class="java.util.Collections$UnmodifiableCollection">["default"]</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">200.0</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="truck"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicle id="0_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="1_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="10_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="11_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="12_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="13_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="14_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="2_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="3_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="4_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="5_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="6_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="7_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="8_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="9_truck" type="HGV16">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="0_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="1_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="10_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="11_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="12_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="13_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="14_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="2_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="3_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="4_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="5_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="6_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="7_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="8_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+	<vehicle id="9_car" type="defaultVehicleType">
+		<attributes>
+			<attribute name="initialSoc" class="java.lang.Double">1.0</attribute>
+		</attributes>
+	</vehicle>
+
+</vehicleDefinitions>

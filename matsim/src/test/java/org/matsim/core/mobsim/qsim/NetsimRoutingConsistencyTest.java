@@ -167,7 +167,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					VehicleUtils.createDefaultVehicleType());
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, Map.of(TransportMode.car, vehicle.getId() ) );
 			scenario.getVehicles().addVehicleType(VehicleUtils.createDefaultVehicleType());
 			scenario.getVehicles().addVehicle(vehicle);
 

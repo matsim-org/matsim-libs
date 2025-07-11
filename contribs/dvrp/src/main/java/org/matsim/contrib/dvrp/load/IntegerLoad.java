@@ -54,6 +54,15 @@ public class IntegerLoad implements DvrpLoad {
 	}
 
 	@Override
+    public int compareTo(DvrpLoad other) {
+        if (other instanceof IntegerLoad otherLoad) {
+			return Integer.compare(value, otherLoad.value);
+        }
+
+        throw new IllegalStateException();
+    }
+
+	@Override
 	public boolean equals(Object other) {
 		if (other instanceof IntegerLoad otherLoad) {
 			return this.value == otherLoad.value;

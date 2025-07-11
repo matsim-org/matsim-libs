@@ -12,9 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -41,6 +43,7 @@ public class PlanInheritanceTest {
 			config.controller().setLastIteration(10);
 			config.controller().setOutputDirectory(outputDirectory);
 			config.planInheritance().setEnabled(true);
+			config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.walk ) );
 			Controler c = new Controler(config);
 
 			c.run();

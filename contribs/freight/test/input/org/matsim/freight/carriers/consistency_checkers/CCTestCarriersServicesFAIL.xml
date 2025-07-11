@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.1.xsd">
+	<carrier id="ccCarrier1withServices">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="cargo_bike_1" depotLinkId="1" typeId="cargo_bike" earliestStart="10:00:00" latestEnd="11:00:00"/>
+				<vehicle id="heavy_truck_1" depotLinkId="1" typeId="heavy_truck" earliestStart="12:00:00" latestEnd="23:00:00"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="small_service_1" to="i(1,9)R" capacityDemand="3" earliestStart="08:00:00" latestEnd="09:00:00" serviceDuration="00:05:00"/>
+			<service id="medium_service_1" to="i(1,9)R" capacityDemand="6" earliestStart="08:00:00" latestEnd="11:00:00" serviceDuration="00:05:00"/>
+			<service id="large_service_1" to="i(1,9)R" capacityDemand="16" earliestStart="16:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+			<service id="extra_large_service_1" to="i(1,9)R" capacityDemand="31" earliestStart="16:00:00" latestEnd="23:00:00" serviceDuration="00:05:00"/>
+		</services>
+	</carrier>
+	<carrier id="ccCarrier2withServices">
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="medium_van_2" depotLinkId="1" typeId="medium_van" earliestStart="00:00:00" latestEnd="23:00:00"/>
+				<vehicle id="heavy_truck_2" depotLinkId="1" typeId="heavy_truck" earliestStart="00:00:00" latestEnd="23:00:00"/>
+			</vehicles>
+		</capabilities>
+		<services>
+			<service id="small_service_2" to="i(1,9)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="23:30:00" serviceDuration="00:05:00"/>
+			<service id="medium_service_2" to="i(1,9)R" capacityDemand="8" earliestStart="00:00:00" latestEnd="23:30:00" serviceDuration="00:05:00"/>
+			<service id="large_service_2" to="i(1,9)R" capacityDemand="16" earliestStart="00:00:00" latestEnd="23:30:00" serviceDuration="00:05:00"/>
+			<service id="extra_large_service_2" to="i(1,9)R" capacityDemand="33" earliestStart="00:00:00" latestEnd="23:30:00" serviceDuration="00:05:00"/>
+		</services>
+	</carrier>
+</carriers>

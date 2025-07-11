@@ -21,11 +21,13 @@
 
  package org.matsim.core.mobsim.qsim;
 
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -43,11 +45,13 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import java.time.Month;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicLong;
 
-	public class AbstractQSimModuleTest {
+import static org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
+
+public class AbstractQSimModuleTest {
 	 @Test
 	 void testOverrides() {
 		AbstractQSimModule moduleA = new AbstractQSimModule() {
@@ -162,11 +166,15 @@ import com.google.inject.Injector;
 		}
 	}
 
-	 @Test
-	 void testAddEngine() {
+
+	 @ParameterizedTest
+	 @EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	 void testAddEngine( AccessEgressType accessEgressType ) {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
+
+		config.routing().setAccessEgressType( accessEgressType );
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

@@ -32,16 +32,16 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Defines the share of agents that should be explicitly assigned in the QSim. " +
 				 "Values between (0,1]")
 	@Positive
-	public double sampleFactor = 1.; // TODO: sample factors by mode?
+	private double sampleFactor = 1.; // TODO: sample factors by mode?
 
 	@Parameter
 	@Comment("Defines the mods that will be considered for the FISS. Defaults to {car}")
 	@NotNull
-	public Set<String> sampledModes = Collections.singleton(TransportMode.car);
+	private Set<String> sampledModes = Collections.singleton(TransportMode.car);
 
 	@Parameter
 	@Comment("Disable FISS in the last iteration to get events of all agents. May be required for post-processing")
-	public boolean switchOffFISSLastIteration = true;
+	private boolean switchOffFISSLastIteration = true;
 
 	public FISSConfigGroup() {
 		super(GROUP_NAME);
@@ -67,7 +67,7 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 			// reason is that FISS changes the PCE in the mode vehicles.
 		}
 
-		for( String sampledMode : sampledModes ){
+		for( String sampledMode : getSampledModes()){
 			if( !config.qsim().getMainModes().contains( sampledMode ) ){
 				final String message = sampledMode + " is not a qsim mode, it cannot apply FISS, please remove that mode from the list of qsim modes";
 				LOG.fatal( message );
@@ -76,5 +76,30 @@ public class FISSConfigGroup extends ReflectiveConfigGroup {
 		}
 
 
+	}
+
+	@Positive
+	public double getSampleFactor() {
+		return sampleFactor;
+	}
+
+	public void setSampleFactor(@Positive double sampleFactor) {
+		this.sampleFactor = sampleFactor;
+	}
+
+	public @NotNull Set<String> getSampledModes() {
+		return sampledModes;
+	}
+
+	public void setSampledModes(@NotNull Set<String> sampledModes) {
+		this.sampledModes = sampledModes;
+	}
+
+	public boolean isSwitchOffFISSLastIteration() {
+		return switchOffFISSLastIteration;
+	}
+
+	public void setSwitchOffFISSLastIteration(boolean switchOffFISSLastIteration) {
+		this.switchOffFISSLastIteration = switchOffFISSLastIteration;
 	}
 }

@@ -70,6 +70,11 @@ public final class BicycleModule extends AbstractModule {
 		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 		// (this computes the value of the per-link scoring event.  yyyy Very unfortunately, it is a re-implementation of the BicycleTravelDisutility (mentioned above).)
 
+
+//		here, different values for surface types and infrastructure factors can be defined.
+//		by default, the default values in BicycleParamsDefaultImpl are bound
+		this.bind(BicycleParams.class).to(BicycleParamsDefaultImpl.class);
+
 		this.installOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
 				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
@@ -104,9 +109,12 @@ public final class BicycleModule extends AbstractModule {
 					}
 				}
 			}
+
 			if (!scenario.getConfig().qsim().getMainModes().contains(bicycleConfigGroup.getBicycleMode())) {
 				LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
 			}
+			// (yy should move into the config consistency checker)
+
 		}
 	}
 }

@@ -33,7 +33,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.utils.EditPlans;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 

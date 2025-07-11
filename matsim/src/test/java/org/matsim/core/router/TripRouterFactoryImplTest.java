@@ -32,9 +32,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.DefaultPrepareForSimModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -114,8 +117,10 @@ public class TripRouterFactoryImplTest {
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
+				install( new DefaultPrepareForSimModule() );
 			}
 		});
+		injector.getInstance( PrepareForSim.class ).run();
 
 		// create the factory, get a router, route.
 		Provider<TripRouter> factory = injector.getProvider(TripRouter.class);

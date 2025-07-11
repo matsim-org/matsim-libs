@@ -15,7 +15,7 @@ import tech.tablesaw.plotly.components.Line;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;

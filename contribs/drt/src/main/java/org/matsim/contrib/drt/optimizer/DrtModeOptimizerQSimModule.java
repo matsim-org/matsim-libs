@@ -89,14 +89,16 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> {
-					return new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
-						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
-						getter.getModal(DrtRequestInsertionRetryQueue.class));
-					}));
+		addModalComponent(DrtOptimizer.class,
+			modalKey(DefaultDrtOptimizer.class));
+
+		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(getter -> {
+			return new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+				getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
+				getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+				getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
+				getter.getModal(DrtRequestInsertionRetryQueue.class));
+			}));
 
 		bindModal(DepotFinder.class).toProvider(
 				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class)))).asEagerSingleton();
@@ -133,7 +135,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		DrtOptimizationConstraintsSet defaultOptimizationConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 		bindModal(CostCalculationStrategy.class)
-				.to(defaultOptimizationConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated
+				.to(defaultOptimizationConstraintsSet.isRejectRequestIfMaxWaitOrTravelTimeViolated()
 						?
 				CostCalculationStrategy.RejectSoftConstraintViolations.class :
 				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();

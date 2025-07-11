@@ -261,7 +261,7 @@ public class VehicleSourceTest {
 					Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
 					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
 					scenario.getVehicles().addVehicle(v);
-					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(transportModes[i], vId));
+					VehicleUtils.insertVehicleIdsIntoPersonAttributes( p, Map.of(transportModes[i], vId ) );
 
 					break;
 				default:

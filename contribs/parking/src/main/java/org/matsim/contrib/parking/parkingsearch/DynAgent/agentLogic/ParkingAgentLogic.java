@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.ParkingSearchUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
@@ -266,7 +266,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 				}
 				this.lastParkActionState = LastParkActionState.WALKTOPARK;
 				this.currentlyAssignedVehicleId = vehicleId;
-				this.stageInteractionType = ParkingUtils.ParkingStageInteractionType;
+				this.stageInteractionType = ParkingSearchUtils.ParkingStageInteractionType;
 				return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 			} else if (currentLeg.getMode().equals(TransportMode.pt)) {
 				if (currentLeg.getRoute() instanceof TransitPassengerRoute) {

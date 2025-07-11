@@ -141,7 +141,7 @@ public final class EditTrips {
 		return findTripAtPlanElement( agent, WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ) ;
 	}
 	// current trip:
-	public final boolean replanCurrentTrip(MobsimAgent agent, double now, String routingMode ) {
+	public boolean replanCurrentTrip(MobsimAgent agent, double now, String routingMode) {
 		log.debug("entering replanCurrentTrip with routingMode=" + routingMode) ;
 
 		// I will treat this here in the way that it will make the trip consistent with the activities.  So if the activity in the
@@ -301,9 +301,9 @@ public final class EditTrips {
 						// element 2 is the first pt leg, which we don't need because we updated the
 						// current pt leg
 						// so remove elements 0, 1 and 2, i.e. remove first element 3 times (index is moving)
-						newTripElements.remove(0);
-						newTripElements.remove(0);
-						newTripElements.remove(0);
+						newTripElements.removeFirst();
+						newTripElements.removeFirst();
+						newTripElements.removeFirst();
 						wantsToLeaveStop = false;
 						WithinDayAgentUtils.resetCaches(agent);
 					}
@@ -335,8 +335,7 @@ public final class EditTrips {
 			 *  arrive at the next stop and we risk that the agent misses the bus he is already riding on. - gl jul'19
 			 */
 			double reRoutingTime;
-			if (driver instanceof TransitDriverAgentImpl) { // this is ugly, but there seems to be no other way to find out the scheduled arrival time. Maybe add to interface?
-				TransitDriverAgentImpl driverImpl = (TransitDriverAgentImpl) driver;
+			if (driver instanceof TransitDriverAgentImpl driverImpl) { // this is ugly, but there seems to be no other way to find out the scheduled arrival time. Maybe add to interface?
 				double departureFirstTransitRouteStop = driverImpl.getDeparture().getDepartureTime();
 				double arrivalOffsetNextTransitRouteStop = driverImpl.getTransitRoute().getStop(currentOrNextStop).getArrivalOffset().seconds();
 				reRoutingTime = departureFirstTransitRouteStop + arrivalOffsetNextTransitRouteStop;
@@ -351,8 +350,7 @@ public final class EditTrips {
 			if (newTripElements.size() >= 2) {
 				// check if the agent has a useless teleport leg from a transit stop to the very same stop
 				Leg firstPtLeg = (Leg) newTripElements.get(2);
-				if (firstPtLeg.getRoute() instanceof TransitPassengerRoute) {
-					TransitPassengerRoute newPtRoute = (TransitPassengerRoute) firstPtLeg.getRoute();
+				if (firstPtLeg.getRoute() instanceof TransitPassengerRoute newPtRoute) {
 					if (newPtRoute.getAccessStopId().equals(currentOrNextStop.getId())) {
 						// the agent will take a pt vehicle from the stop where the bus will arrive next
 						if (oldPtRoute.getLineId().equals(newPtRoute.getLineId())
@@ -382,9 +380,9 @@ public final class EditTrips {
 							// element 2 is the first pt leg, which we don't need because we updated the
 							// current pt leg
 							// so remove elements 0, 1 and 2, i.e. remove first element 3 times (index is moving)
-							newTripElements.remove(0);
-							newTripElements.remove(0);
-							newTripElements.remove(0);
+							newTripElements.removeFirst();
+							newTripElements.removeFirst();
+							newTripElements.removeFirst();
 							WithinDayAgentUtils.resetCaches(agent);
 							agentStaysOnSameVehicle = true;
 						}
@@ -434,7 +432,7 @@ public final class EditTrips {
 				}
 			}
 			log.debug("") ;
-			log.debug( "agent" + agent.getId() + " new plan: " + stb.toString() );
+			log.debug( "agent" + agent.getId() + " new plan: " + stb);
 		}
 		log.debug("") ;
 		log.debug("agent" + agent.getId() + " new plan: " ) ;
@@ -456,7 +454,7 @@ public final class EditTrips {
 			this.internalInterface.arrangeNextAgentState( (MobsimAgent) ptPassengerAgent );
 		}
 
-		PopulationUtils.putPersonAttribute( person, AgentSnapshotInfo.marker, true );
+		person.getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 	}
 
 	/**
@@ -571,10 +569,9 @@ public final class EditTrips {
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		Person person = plan.getPerson() ;
 
-		if ( ! ( trip.getTripElements().get(tripElementsIndex) instanceof Activity) ) {
+		if ( ! (trip.getTripElements().get(tripElementsIndex) instanceof Activity currentStageActivity) ) {
 			throw new RuntimeException("Expected a stage activity as current plan element");
 		}
-		Activity currentStageActivity = (Activity) trip.getTripElements().get(tripElementsIndex);
 
 		// (1) get new trip from current position to new activity:
 		Facility currentLocationFacility = FacilitiesUtils.toFacility(currentStageActivity, scenario.getActivityFacilities());
@@ -606,25 +603,25 @@ public final class EditTrips {
 		TripRouter.insertTrip(plan, fromActivity, list, toActivity ) ;
 		return true ;
 	}
-	public final boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode ) {
+	public boolean insertEmptyTrip(Plan plan, Activity fromActivity, Activity toActivity, String mainMode) {
 		return insertEmptyTrip( plan, fromActivity, toActivity, mainMode, this.pf ) ;
 	}
 	/**
 	 * Convenience method that estimates the trip departure time rather than explicitly requesting it.
 	 */
-	public final List<? extends PlanElement> replanFutureTrip( Trip trip, Plan plan, String mainMode ) {
+	public List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String mainMode) {
 		double departureTime = timeInterpretation.decideOnActivityEndTimeAlongPlan( trip.getOriginActivity(), plan ).seconds() ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
 
-	public final List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
-			double departureTime) {
+	public List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+																											double departureTime) {
 		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter, scenario );
 	}
 
 	// utility methods (plans splicing):
 	private static void replaceRemainderOfCurrentRoute(Leg currentLeg, List<? extends PlanElement> newTrip, MobsimAgent agent) {
-		Leg newCurrentLeg = (Leg) newTrip.get(0) ;
+		Leg newCurrentLeg = (Leg) newTrip.getFirst() ;
 		Gbl.assertNotNull(newCurrentLeg);
 
 		// prune remaining route from current route:
@@ -652,7 +649,7 @@ public final class EditTrips {
 
 	private List<PlanElement> defaultMergeOldAndNewCurrentPtLeg(Leg currentLeg, List<? extends PlanElement> newTrip,
 			MobsimAgent agent, TransitStopFacility nextStop, TransitPassengerRoute oldPtRoute) {
-		Leg newCurrentLeg = (Leg) newTrip.get(0);
+		Leg newCurrentLeg = (Leg) newTrip.getFirst();
 
 		List<PlanElement> newPlanElementsAfterMerge = new ArrayList<>();
 
@@ -686,8 +683,8 @@ public final class EditTrips {
 		// an infill leg from pt stop to start of other mode necessary seems to be
 		// automatically produced while routing new mode from pt stop facility, so we don't have to add one
 
-		for (int ijk = 0; ijk < newTrip.size(); ijk++) {
-			newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
+		for (PlanElement planElement : newTrip) {
+			newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), planElement);
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 		return newPlanElementsAfterMerge;
@@ -713,8 +710,7 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.
 	 */
-	@Deprecated // prefer the non-static methods
-	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
+	private static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
 			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		log.debug( "entering replanFutureTrip for agentid=" + plan.getPerson().getId() ) ;
 
@@ -739,13 +735,6 @@ public final class EditTrips {
 
 	/**
 	 * Convenience method, to be consistent with earlier syntax. kai, may'16
-	 *
-	 * @param trip
-	 * @param plan
-	 * @param mainMode
-	 * @param departureTime
-	 * @param tripRouter
-	 * @param scenario
 	 */
 	@Deprecated // prefer the non-static methods
 	public static List<? extends PlanElement> relocateFutureTrip(Trip trip, Plan plan, String mainMode,
