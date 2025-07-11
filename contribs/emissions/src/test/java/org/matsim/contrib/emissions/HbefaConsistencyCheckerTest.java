@@ -9,32 +9,31 @@ import org.matsim.contrib.emissions.utils.TestUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 
 class HbefaConsistencyCheckerTest {
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	// TODO Replace by small local test files
-	private static String PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-
-	@Test
-	public void validHbefaTableTest(){
-		// Set up the emission module
+	private EmissionsConfigGroup getEmissionsConfigGroup(String detCold, String detWarm) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		ecg.setWritingEmissionsEvents(false);
-		ecg.setAverageColdEmissionFactorsFile(PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc");
-		ecg.setAverageWarmEmissionFactorsFile(PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc");
-		ecg.setDetailedColdEmissionFactorsFile(PATH + "b63f949211b7c93776cdce8a7600eff4e36460c8.enc");
-		ecg.setDetailedWarmEmissionFactorsFile(PATH + "f5b276f41a0531ed740a81f4615ec00f4ff7a28d.enc");
+		ecg.setAverageColdEmissionFactorsFile(utils.getClassInputDirectory() + "EFA_ColdStart_TEST_Average.csv");
+		ecg.setAverageWarmEmissionFactorsFile(utils.getClassInputDirectory() + "EFA_HOT_TEST_Average.csv");
+		ecg.setDetailedColdEmissionFactorsFile(utils.getClassInputDirectory() + detCold);
+		ecg.setDetailedWarmEmissionFactorsFile(utils.getClassInputDirectory() + detWarm);
+		return ecg;
+	}
+
+	@Test
+	public void validHbefaTableTest() {
+		// Set up the emission module
+		EmissionsConfigGroup ecg = getEmissionsConfigGroup("EFA_ColdStart_TEST_detailed_valid.csv", "EFA_HOT_TEST_detailed_valid.csv");
 
 		// Create the scenario. The test should run through without problems. If this test fails the Checker gives false alarm and should be investigated.
-		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = utils.createConfig();
 		config.addModule(ecg);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
@@ -52,16 +51,9 @@ class HbefaConsistencyCheckerTest {
 		// Tests a table, where a corrupt table with switched emConcept and technology columns is used
 		// Main purpose of this test is to make sure, that the checker will warn about the corrupted hbefa-tables with switched columns
 		// Set up the emission module
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		ecg.setWritingEmissionsEvents(false);
-		ecg.setAverageColdEmissionFactorsFile("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/old/EFA_ColdStart_Vehcat_2020_Average.csv");
-		ecg.setAverageWarmEmissionFactorsFile("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/old/EFA_HOT_Vehcat_2020_Average.csv");
-		ecg.setDetailedColdEmissionFactorsFile("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/old/EFA_ColdStart_Concept_2020_detailed_perTechAverage_Bln_carOnly.csv");
-		ecg.setDetailedWarmEmissionFactorsFile("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/old/EFA_HOT_Concept_2020_detailed_perTechAverage_Bln_carOnly.csv");
-
+		EmissionsConfigGroup ecg = getEmissionsConfigGroup("EFA_ColdStart_TEST_detailed_corrupted.csv", "EFA_HOT_TEST_detailed_corrupted.csv");
 		// Create the scenario. The test should run through without problems. If this test fails the Checker gives false alarm and should be investigated.
-		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = utils.createConfig();
 		config.addModule(ecg);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
