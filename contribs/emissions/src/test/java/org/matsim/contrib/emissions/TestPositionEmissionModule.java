@@ -83,6 +83,7 @@ public class TestPositionEmissionModule {
         var emissionConfig = new EmissionsConfigGroup();
         emissionConfig.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
         emissionConfig.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+		emissionConfig.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
 
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

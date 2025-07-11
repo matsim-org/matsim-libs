@@ -142,6 +142,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		emissionsConfig.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
+		emissionsConfig.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
 
 		offlineExample.run();
 	}
@@ -162,6 +163,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.csv" );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 		emissionsConfig.setHbefaTableConsistencyCheckingLevel( EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.consistent ); // because we only use a sample hbefa file "allCombinations" is irrelevant.
+		emissionsConfig.setHbefaConsistencyChecker(EmissionsConfigGroup.UseHbefaConsistencyChecker.skip);
 
 		offlineExample.run();
 	}
