@@ -45,7 +45,7 @@ public class RunEvExampleTruckLTH {
 			} else {
 				// I couldn't check if this works as the config_trucks-file didn't exist already
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/"
 					+ DEFAULT_CONFIG_FILE};
 			}
 		}
