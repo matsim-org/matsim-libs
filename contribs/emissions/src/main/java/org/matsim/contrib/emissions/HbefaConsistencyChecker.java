@@ -31,10 +31,28 @@ public class HbefaConsistencyChecker {
 		// First, prepare the allowed combinations
 
 		// List of all possible technologies:
-		List<String> allowedTechnologies = List.of("average", "bifuel CNG/petrol", "bifuel LPG/petrol", "diesel", "petrol (4S)", "electricity", "flex-fuel E85", "FuelCell", "LCV", "petrol (2S)", "petrol (4S)", "Plug-in Hybrid diesel/electric", "Plug-in Hybrid petrol/electric");
+		List<String> allowedTechnologies = List.of(
+			"average",
+			HbefaTechnology.BIFUEL_CNG_PETROL.id,
+			HbefaTechnology.BIFUEL_LPG_PETROL.id,
+			HbefaTechnology.ELECTRICITY.id,
+			HbefaTechnology.FLEX_FUEL_E85.id,
+			HbefaTechnology.FUEL_CELL.id,
+			HbefaTechnology.LCV.id,
+			HbefaTechnology.PETROL_2S.id,
+			HbefaTechnology.PETROL_4S.id,
+			HbefaTechnology.PLUG_IN_HYBRID_DIESEL_ELECTRIC.id,
+			HbefaTechnology.PLUG_IN_HYBRID_PETROL_ELECTRIC.id);
 
 		// Each emConceptKey has one or multiple identifier(s), which depends on the vehCat to which the emConcept is mapped
-		List<String> allowedEmConceptLeadingIds = List.of("average", "PC", "LCV", "HGV", "Coach", "UBus", "MC", "moped", "SMC");
+		List<String> allowedEmConceptLeadingIds = new ArrayList<>();
+		allowedEmConceptLeadingIds.add("average");
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.PASSENGER_CAR.ids);
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE.ids);
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.ids);
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.URBAN_BUS.ids);
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.COACH.ids);
+		allowedEmConceptLeadingIds.addAll(HbefaVehicleCategory.MOTORCYCLE.ids);
 
 		Map<HbefaVehicleCategory, List<String>> vehCat2emConceptLeadingIds = new ArrayMap<>();
 		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.PASSENGER_CAR, HbefaVehicleCategory.PASSENGER_CAR.ids);
