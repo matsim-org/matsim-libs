@@ -37,12 +37,12 @@ public class HbefaConsistencyChecker {
 		List<String> allowedEmConceptLeadingIds = List.of("average", "PC", "LCV", "HGV", "Coach", "UBus", "MC", "moped", "SMC");
 
 		Map<HbefaVehicleCategory, List<String>> vehCat2emConceptLeadingIds = new ArrayMap<>();
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.PASSENGER_CAR, List.of("PC"));
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE, List.of("LCV"));
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, List.of("HGV"));
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.COACH, List.of("Coach"));
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.URBAN_BUS, List.of("UBus"));
-		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.MOTORCYCLE, List.of("MC", "SMC", "moped"));
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.PASSENGER_CAR, HbefaVehicleCategory.PASSENGER_CAR.ids);
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE, HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE.ids);
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.ids);
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.COACH, HbefaVehicleCategory.COACH.ids);
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.URBAN_BUS, HbefaVehicleCategory.URBAN_BUS.ids);
+		vehCat2emConceptLeadingIds.put(HbefaVehicleCategory.MOTORCYCLE, HbefaVehicleCategory.MOTORCYCLE.ids);
 
 		if(hbefaAvgWarm != null){
 			Set<String> technologiesAvg = new HashSet<>();
