@@ -184,6 +184,8 @@ public final class EmissionModule {
 		if(emissionConfigGroup.getHbefaConsistencyChecker() == EmissionsConfigGroup.UseHbefaConsistencyChecker.check){
 			logger.info("Checking consistency of hbefa-tables");
 			HbefaConsistencyChecker.checkConsistency(emissionConfigGroup.getDetailedVsAverageLookupBehavior(), avgHbefaWarmTable, detailedHbefaWarmTable, avgHbefaColdTable, detailedHbefaColdTable);
+		} else {
+			logger.warn("Consistency Checker for HBEFA Tables is disabled. Make sure that your HBEFA files are valid!");
 		}
 
 		logger.info("leaving createLookupTables");
