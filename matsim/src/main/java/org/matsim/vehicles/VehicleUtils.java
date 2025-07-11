@@ -148,7 +148,7 @@ public final class VehicleUtils {
 	public static Map<String, Id<Vehicle>> getVehicleIds(Person person) {
 		var personVehicles = (PersonVehicles) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
 		if (personVehicles == null) {
-			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() +
+			throw new RuntimeException("Could not retrieve PersonVehicles from person: " + person.getId().toString() +
 								   ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
 								   "a vehicle for each mode for each person. Attach a PersonVehicles instance (containing a map of mode:String -> id:Id<Vehicle>) with key 'vehicles' as person attribute to each person." +
 								   "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
@@ -206,15 +206,18 @@ public final class VehicleUtils {
 	 *                      We use PersonVehicle Class in order to have a dedicated PersonVehicleAttributeConverter to/from XML
 	 */
 	public static void insertVehicleIdsIntoPersonAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
-		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
-		// copy in case it's a UnmodifiableMap
-		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
+		PersonVehicles attr = (PersonVehicles) person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+
 		PersonVehicles personVehicles;
 		if (attr == null) {
 			personVehicles = new PersonVehicles();
 		} else {
-			personVehicles = (PersonVehicles) attr;
+			personVehicles = attr;
 		}
+
+		// copy in case it's a UnmodifiableMap
+		Map<String, Id<Vehicle>> modeToVehicleCopy = new HashMap<>(modeToVehicle);
+
 		personVehicles.addModeVehicleList(modeToVehicleCopy);
 		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, personVehicles);
 	}
@@ -233,15 +236,17 @@ public final class VehicleUtils {
 	 * @param modeToVehicleType mode string mapped to vehicle type ids. The provided map is copied and stored as unmodifiable map.
 	 */
 	public static void insertVehicleTypesIntoPersonAttributes(Person person, Map<String, Id<VehicleType>> modeToVehicleType) {
-		Object attr = person.getAttributes().getAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY);
+		PersonVehicleTypes attr = (PersonVehicleTypes) person.getAttributes().getAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY);
 
-		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
 		PersonVehicleTypes personVehiclesTypes;
 		if (attr == null) {
 			personVehiclesTypes = new PersonVehicleTypes();
 		} else {
-			personVehiclesTypes = (PersonVehicleTypes) attr;
+			personVehiclesTypes = attr;
 		}
+
+		Map<String, Id<VehicleType>> modeToTypesCopy = new HashMap<>(modeToVehicleType);
+
 		personVehiclesTypes.putModeVehicleTypes(modeToTypesCopy);
 		person.getAttributes().putAttribute(VEHICLE_TYPES_ATTRIBUTE_KEY, personVehiclesTypes);
 	}

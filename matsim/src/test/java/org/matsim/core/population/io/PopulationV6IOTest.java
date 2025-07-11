@@ -122,9 +122,9 @@ public class PopulationV6IOTest {
 
 		Map<String, Id<Vehicle>> vehiclesMap = new HashMap<>();
 		vehiclesMap.put("car", Id.createVehicleId("limo"));
-		VehicleUtils.insertVehicleIdsIntoAttributes(person, vehiclesMap);
+		 VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, vehiclesMap );
 
-		final String file = utils.getOutputDirectory()+"/population.xml";
+		 final String file = utils.getOutputDirectory()+"/population.xml";
 		new PopulationWriter( population ).writeV6( file );
 
 		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );

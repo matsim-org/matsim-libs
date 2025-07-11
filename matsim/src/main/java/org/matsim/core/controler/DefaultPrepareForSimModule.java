@@ -26,10 +26,13 @@ import com.google.inject.multibindings.Multibinder;
  */
 
 public class DefaultPrepareForSimModule extends AbstractModule {
-    // probably, rename it.
     @Override
     public void install() {
+
         bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+
         Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+        // (Explicitly create the set binder so that it always available (even if empty))
+
     }
 }

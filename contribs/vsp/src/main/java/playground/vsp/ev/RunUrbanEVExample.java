@@ -65,8 +65,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
-
 /**
  * this is an example of how to run MATSim with the UrbanEV module which inserts charging activities for all legs which use a EV.
  * By default, {@link ElectricFleetUpdater} is used, which declares any vehicle as an EV
@@ -170,7 +168,7 @@ public class RunUrbanEVExample {
 			mode2Vehicle.put(TransportMode.bike, bikeVehicle.getId());
 
 			//override the attribute - we assume to need car and bike only
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2Vehicle);
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, mode2Vehicle );
 		}
 	}
 }

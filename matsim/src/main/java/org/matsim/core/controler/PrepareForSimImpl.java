@@ -221,28 +221,31 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
+		// get the mode vehicle types for all network modes.  Also if they are only routed, since we need the vehicle max speed.
 		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworkAndMainModes();
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
+			Map<String, Id<Vehicle>> vehiclesByMode = new HashMap<>();
 
-			Map<String, Id<Vehicle>> modeToVehicle = new HashMap<>();
-
-			// optional attribute, that can be null
-			Map<String, Id<VehicleType>> modeTypes = VehicleUtils.getVehicleTypes(person);
+			// optional attribute, which can be null
+			Map<String, Id<VehicleType>> personSpecificVehicleTypes = VehicleUtils.getVehicleTypes(person);
 
 			for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
+				// go through all mode vehicle types, derived from the network modes:
 
+				// get the mode string:
 				String mode = modeType.getKey();
 
+				// create a vehicle ID:
 				Id<Vehicle> vehicleId = createVehicleId(person, mode);
 
-				// get the type
+				// get the type:
 				VehicleType type = modeType.getValue();
 
-				// Use the person attribute to map to a more specific vehicle type
-				if (modeTypes != null && modeTypes.containsKey(mode)) {
-					Id<VehicleType> typeId = modeTypes.get(mode);
+				// Check if the person has a more specific vehicle type in their attributes:
+				if (personSpecificVehicleTypes != null && personSpecificVehicleTypes.containsKey(mode)) {
+					Id<VehicleType> typeId = personSpecificVehicleTypes.get(mode);
 					type = scenario.getVehicles().getVehicleTypes().get(typeId);
 					if (type == null) {
 						throw new IllegalStateException("Vehicle type " + typeId + " specified for person " + person.getId() + ", but not found in scenario.");
@@ -252,10 +255,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				createAndAddVehicleIfNecessary(vehicleId, type);
 
 				// write mode-string to vehicle-id into a map
-				modeToVehicle.put(mode, vehicleId);
+				vehiclesByMode.put(mode, vehicleId);
 			}
 
-			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
+			// insert the resulting vehicles table into the person:
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes( person, vehiclesByMode );
 		}
 	}
 
@@ -284,10 +288,14 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		if (qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)) {
 			// in this case the user has to do everything on their own and we can short circuit here.
+			// (yy from just reading the code here, I am not sure why returning an empty collection will work. kai, jul'25)
 			return modeVehicleTypes;
 		}
 
+		// get the network modes of the qsim:
 		Set<String> modes = new HashSet<>(qSimConfigGroup.getMainModes());
+
+		// add the network modes of the routing.  This is necessary since the max speed of the vehicles is needed.
 		modes.addAll(scenario.getConfig().routing().getNetworkModes());
 
 		for (String mode : modes) {
@@ -302,13 +310,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				case modeVehicleTypesFromVehiclesData:
 					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
 					if ( type==null ) {
-						log.fatal( "Could not find requested vehicle type =" + mode + ". With config setting " + modeVehicleTypesFromVehiclesData.toString() + ", you need");
+						log.fatal( "Could not find requested vehicle type =" + mode + ". With config setting " + modeVehicleTypesFromVehiclesData + ", you need" );
 						log.fatal( "to add, for each mode that performs network routing and/or is used as network/main mode in the qsim, a vehicle type for that mode." );
 						throw new RuntimeException("Could not find requested vehicle type = " + mode + ". See above.");
 					}
 					break;
 				default:
-					throw new RuntimeException(qSimConfigGroup.getVehiclesSource().toString() + " is not implemented yet.");
+					throw new RuntimeException( qSimConfigGroup.getVehiclesSource() + " is not implemented.");
 			}
 			Gbl.assertNotNull(type);
 			modeVehicleTypes.put(mode, type);

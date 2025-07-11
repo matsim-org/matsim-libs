@@ -40,10 +40,14 @@ public final class NewControlerModule extends AbstractModule {
 		// (I don't want to always inject the whole MatsimServices just to get the iteration number.  If
 		// someone has a better idea, please let me know. kai, aug'18)
 
-		bind(PrepareForSim.class).to(PrepareForSimImpl.class);
 		bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
 
-		// Explicitly create the set binder so that it always available (even if empty)
-		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+//		bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+//		// Explicitly create the set binder so that it always available (even if empty)
+//		Multibinder.newSetBinder(binder(), PersonPrepareForSimAlgorithm.class);
+
+		// ... above three lines replaced by ..
+
+		install( new DefaultPrepareForSimModule() );
 	}
 }
