@@ -76,4 +76,18 @@ class SparseTravelTimeCacheTest {
         assertEquals(50.0, cache.get(key1), 1e-6);
         assertEquals(75.0, cache.get(key2), 1e-6);
     }
+
+	@Test
+	void testBitPackingAndUnpacking() {
+		int fromIndex = 123456;
+		int toIndex = 654321;
+		int timeBin = 17;
+
+		AdaptiveTravelTimeMatrixImpl.IntSparseKey key = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(fromIndex, toIndex, timeBin);
+
+		assertEquals(fromIndex, key.getFromIndex(), "fromIndex should match after unpacking");
+		assertEquals(toIndex, key.getToIndex(), "toIndex should match after unpacking");
+		assertEquals(timeBin, key.getTimeBin(), "timeBin should match after unpacking");
+	}
+
 }

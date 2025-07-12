@@ -149,8 +149,19 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 		private final long key;
 
 		public IntSparseKey(int fromIndex, int toIndex, int timeBin) {
-			// 20 Bit for fromIndex, 20 Bit for toIndex, 24 Bit for timeBin
 			this.key = (((long) timeBin) << 40) | (((long) fromIndex & 0xFFFFF) << 20) | ((long) toIndex & 0xFFFFF);
+		}
+
+		public int getFromIndex() {
+			return (int) ((key >> 20) & 0xFFFFF);
+		}
+
+		public int getToIndex() {
+			return (int) (key & 0xFFFFF);
+		}
+
+		public int getTimeBin() {
+			return (int) ((key >> 40) & 0xFFFFFF);
 		}
 
 		@Override
@@ -166,5 +177,6 @@ public class AdaptiveTravelTimeMatrixImpl implements AdaptiveTravelTimeMatrix {
 			return Long.hashCode(key);
 		}
 	}
+
 
 }
