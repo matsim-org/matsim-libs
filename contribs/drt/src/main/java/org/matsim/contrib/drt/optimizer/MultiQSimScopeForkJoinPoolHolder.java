@@ -20,29 +20,35 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-
 /**
- * Keeps a reference to a pool and shuts it down on MobsimBeforeCleanupListener event
+ * Creates lazy new instances and manage the shutdown. Might be required for ParallelUnplannedRequestInserter
+ * to provide more ForkJoinPool for insertion search.
  *
- * @author Michal Maciejewski (michalm)
+ * @author Steffen Axer
  */
-public class QSimScopeForkJoinPoolHolder implements QsimScopeForkJoinPool {
-	private final ForkJoinPool forkJoinPool;
+public class MultiQSimScopeForkJoinPoolHolder implements QsimScopeForkJoinPool {
+	private final int numberOfThreads;
+	private final List<ForkJoinPool> forkJoinPoolList = new ArrayList<>();
 
-	public QSimScopeForkJoinPoolHolder(int numberOfThreads) {
-		forkJoinPool = new ForkJoinPool(numberOfThreads);
+
+	public MultiQSimScopeForkJoinPoolHolder(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
 	}
 
 	public ForkJoinPool getPool() {
+		ForkJoinPool forkJoinPool = new ForkJoinPool(this.numberOfThreads);
+		this.forkJoinPoolList.add(forkJoinPool);
 		return forkJoinPool;
 	}
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		forkJoinPool.shutdown();
+		this.forkJoinPoolList.forEach(ForkJoinPool::shutdown);
 	}
 }

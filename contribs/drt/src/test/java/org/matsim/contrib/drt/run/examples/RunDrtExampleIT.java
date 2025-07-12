@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.ParallelRequestInserterModule;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -86,6 +88,139 @@ public class RunDrtExampleIT {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	void testRunDrtExampleWithParallelInserter_ExtensiveSearch() {
+		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+			new OTFVisConfigGroup());
+
+		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
+
+		//disable rejections
+		drtCfg.addOrGetDrtOptimizationConstraintsParams()
+			.addOrGetDefaultDrtOptimizationConstraintsSet()
+			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		DrtParallelInserterParams params = new DrtParallelInserterParams();
+		params.setLogThreadActivity(true);
+		drtCfg.addParameterSet(params);
+
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(301.37)
+			.inVehicleTravelTimeMean(381.11)
+			.totalTravelTimeMean(682.48)
+			.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+
+	@Test
+	void testRunDrtExampleWithParallelInserter_SelectiveSearch() {
+		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+			new OTFVisConfigGroup());
+
+		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
+
+		//disable rejections
+		drtCfg.addOrGetDrtOptimizationConstraintsParams()
+			.addOrGetDefaultDrtOptimizationConstraintsSet()
+			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		DrtParallelInserterParams params = new DrtParallelInserterParams();
+		params.setLogThreadActivity(true);
+		drtCfg.addParameterSet(params);
+
+		drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+		var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
+		// using exactly free-speed estimates
+		selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);
+		drtCfg.addParameterSet(selectiveInsertionSearchParams);
+
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(299.05)
+			.inVehicleTravelTimeMean(383.94)
+			.totalTravelTimeMean(682.98)
+			.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+
+	@Test
+	void testRunDrtExampleWithParallelInserter_RepeatedSelectiveSearch() {
+		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+			new OTFVisConfigGroup());
+
+		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
+
+		//disable rejections
+		drtCfg.addOrGetDrtOptimizationConstraintsParams()
+			.addOrGetDefaultDrtOptimizationConstraintsSet()
+			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		DrtParallelInserterParams params = new DrtParallelInserterParams();
+		params.setLogThreadActivity(true);
+		drtCfg.addParameterSet(params);
+
+		drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+		var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
+		drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
+
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		controller.run();
+
+		var expectedStats = Stats.newBuilder()
+			.rejectionRate(0.0)
+			.rejections(0)
+			.waitAverage(297.12)
+			.inVehicleTravelTimeMean(393.82)
+			.totalTravelTimeMean(690.95)
+			.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
 
 	@Test
 	void testRunDrtExampleWithNoRejections_ExtensiveSearch() {
@@ -479,7 +614,7 @@ public class RunDrtExampleIT {
 		public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 			modify = e.getSimulationTime() >= 11.0 * 3600.0 && e.getSimulationTime() <= 16.0 * 3600.0;
 		}
-	} 
+	}
 
 	@Test
 	void testRunDrtOfferRejectionExample() {
