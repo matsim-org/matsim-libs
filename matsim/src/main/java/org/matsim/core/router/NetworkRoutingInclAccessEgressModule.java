@@ -181,12 +181,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 																final Link egressActLink, double departureTime, PlanElement previousPlanElement,
 																final PopulationFactory populationFactory, final String stageActivityType,
 																Config config, Attributes routingAttributes) {
-
-		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
-
-		if (isNotNeedingBushwhackingLeg(toFacility)) {
+		if (isNotNeedingBushwhackingLeg(toFacility, egressActLink.getId())) {
 			return Collections.emptyList();
 		}
+
+		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
 		Coord startCoord = NetworkUtils.findNearestPointOnLink(toFacility.getCoord(),egressActLink);
 		Gbl.assertNotNull(startCoord);
@@ -216,7 +215,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			egressTrip.add(egressLeg);
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
-			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
+			// Use non_network_walk as mode because in this case we do not want to route on the network as the travel time is constant.
+			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			double egressTime = NetworkUtils.getLinkEgressTime(egressActLink, mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId()));
@@ -241,20 +241,26 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return egressTrip;
 	}
 
-	private static boolean isNotNeedingBushwhackingLeg(Facility toFacility) {
+	private static boolean isNotNeedingBushwhackingLeg(Facility toFacility, Id<Link> linkId) {
 		if (toFacility.getCoord() == null) {
 			// facility does not have a coordinate; we cannot bushwhack
 			return true;
 		}
-		// trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
-		return toFacility instanceof LinkWrapperFacility;
+
+		// trip ends/starts on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
+		// we are the opinion that this is not a problem if we are on the same link. see following code. kai/paul, may'25
+		if (!(toFacility instanceof LinkWrapperFacilityI)) {
+			return false;
+		}
+
+		return toFacility.getLinkId().equals(linkId);
 	}
 
 	private List<? extends PlanElement> computeAccessTripFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
 																  final Link accessActLink, double departureTime,
 																  final PopulationFactory populationFactory, final String stageActivityType,
 																  Config config, Attributes routingAttributes) {
-		if (isNotNeedingBushwhackingLeg(fromFacility)) {
+		if (isNotNeedingBushwhackingLeg(fromFacility, accessActLink.getId())) {
 			return Collections.emptyList();
 		}
 
@@ -277,7 +283,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 			accessTrip.add(accessLeg);
 		} else if (accessEgressType.equals(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
-			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
+			// Use non_network_walk as mode because in this case we do not want to route on the network as the travel time is constant.
+			Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			accessLeg.setDepartureTime(departureTime);
 			Id<Link> startLinkId = fromFacility.getLinkId();
 			if (startLinkId == null) {

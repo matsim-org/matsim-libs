@@ -81,16 +81,38 @@ layout:
       - title: Destinations
         x: toX
         "y": toY
+  eleventh:
+  - type: carrier
+    title: carrierViewer
+    network: analysis/network-all/network.avro
+    carriers: output_carriers.xml.gz
+  twelfth:
+  - type: lsp
+    title: logisticViewer
+    network: analysis/network-all/network.avro
+    carriers: output_carriers.xml.gz
+    lsps: output_lsps.xml.gz
   thirteenth:
   - type: flowmap
     title: Flow Map
-    description: this viz is a flow map
+    description: Visualize the flows of different metrics
     metrics:
-      label: headway per Stop
+    - label: headway metric
       dataset: analysis/pt/pt_headway_per_stop_area_pair_and_hour.csv
       origin: stopAreaOrStop
+      zoom: 9.5
       destination: stopAreaOrStopNext
       flow: meanHeadway
       colorScheme: BurgYl
-      valueTransform: normal
-    zoom: 9.5
+      valueTransform: inverse
+  fourteenth:
+  - type: vehicles
+    title: DRT Vehicle Animation
+    description: drt animation
+    drtTrips: drt-vehicles.json
+    projection: EPSG:25832
+    center:
+    - 13.45
+    - 52.5
+    zoom: 11.0
+    mapIsIndependent: true
