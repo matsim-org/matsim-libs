@@ -74,8 +74,8 @@ final class QNodeImpl extends AbstractQNode {
 	private final NetsimInternalInterface netsimEngine;
 
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
-	private NodeTransition nodeTransitionLogic;
-	private boolean stopMoveNodeWhenSingleOutlinkFull;
+	private final NodeTransition nodeTransitionLogic;
+	private final boolean stopMoveNodeWhenSingleOutlinkFull;
 	private boolean atLeastOneOutgoingLaneIsJammed;
 
 	/**
