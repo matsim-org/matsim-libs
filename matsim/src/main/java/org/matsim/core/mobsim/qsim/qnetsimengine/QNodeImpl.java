@@ -74,8 +74,8 @@ final class QNodeImpl extends AbstractQNode {
 	private final NetsimInternalInterface netsimEngine;
 
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
-	private NodeTransition nodeTransitionLogic;
-	private boolean stopMoveNodeWhenSingleOutlinkFull;
+	private final NodeTransition nodeTransitionLogic;
+	private final boolean stopMoveNodeWhenSingleOutlinkFull;
 	private boolean atLeastOneOutgoingLaneIsJammed;
 
 	/**
@@ -127,13 +127,15 @@ final class QNodeImpl extends AbstractQNode {
 	 * Cannot be called in constructor, as the queueNetwork does not yet know
 	 * the queueLinks. Should be called by QueueNetwork, after creating all
 	 * QueueNodes and QueueLinks.
+	 *
+	 * (Possibly, the qLinks ctor could do this?  kai, jun'25)
 	 */
 	@Override
-	public void init() {
+	public void init( QNetwork qNetwork ) {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			QNetwork network = netsimEngine.getNetsimNetwork() ;
-			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
+//			QNetwork qNetwork = netsimEngine.getNetsimNetwork() ;
+			this.inLinksArrayCache[i] = qNetwork.getNetsimLinks().get(l.getId());
 			i++;
 		}
 		/* As the order of links has an influence on the simulation results,

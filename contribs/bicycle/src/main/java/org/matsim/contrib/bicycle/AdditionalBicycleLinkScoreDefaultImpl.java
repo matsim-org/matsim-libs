@@ -8,17 +8,19 @@ import org.matsim.core.network.NetworkUtils;
 
 public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBicycleLinkScore {
 
+	@Inject
+	private BicycleParams bicycleParams;
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double userDefinedNetworkAttributeDefaultValue;
 	private final double marginalUtilityOfComfort_m;
-	private final double marginalUtilityOfGradient_m_100m;
+	private final double marginalUtilityOfGradient_pct_m;
 	private final double marginalUtilityOfUserDefinedNetworkAttribute_m;
 	private final String nameOfUserDefinedNetworkAttribute;
 	@Inject AdditionalBicycleLinkScoreDefaultImpl( Scenario scenario ) {
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), BicycleConfigGroup.class );
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
-		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
+		this.marginalUtilityOfGradient_pct_m = bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m();
 		this.marginalUtilityOfUserDefinedNetworkAttribute_m = bicycleConfigGroup.getMarginalUtilityOfUserDefinedNetworkAttribute_m();
 		this.nameOfUserDefinedNetworkAttribute = bicycleConfigGroup.getUserDefinedNetworkAttributeName();
 		this.userDefinedNetworkAttributeDefaultValue = bicycleConfigGroup.getUserDefinedNetworkAttributeDefaultValue();
@@ -29,16 +31,16 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		String type = NetworkUtils.getType( link );
 		String cyclewaytype = BicycleUtils.getCyclewaytype( link );
 
-		double distance = link.getLength();
+		double distance_m = link.getLength();
 
-		double comfortFactor = BicycleUtils.getComfortFactor(surface );
-		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
+		double comfortFactor = bicycleParams.getComfortFactor(surface );
+		double comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance_m;
 
-		double infrastructureFactor = BicycleUtils.getInfrastructureFactor(type, cyclewaytype );
-		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance_m;
 
-		double gradient = BicycleUtils.getGradient( link );
-		double gradientScore = marginalUtilityOfGradient_m_100m * gradient * distance;
+		double gradient_pct = bicycleParams.getGradient_pct( link );
+		double gradientScore = marginalUtilityOfGradient_pct_m * gradient_pct * distance_m;
 
 		// I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
 		String userDefinedNetworkAttributeString;
@@ -46,7 +48,7 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 		if ( nameOfUserDefinedNetworkAttribute != null) {
 			userDefinedNetworkAttributeString = BicycleUtils.getUserDefinedNetworkAttribute( link, nameOfUserDefinedNetworkAttribute );
 			double userDefinedNetworkAttributeFactor = BicycleUtils.getUserDefinedNetworkAttributeFactor(userDefinedNetworkAttributeString, userDefinedNetworkAttributeDefaultValue );
-			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance;
+			userDefinedNetworkAttributeScore = marginalUtilityOfUserDefinedNetworkAttribute_m * (1. - userDefinedNetworkAttributeFactor) * distance_m;
 		}
 
 		return (infrastructureScore + comfortScore + gradientScore + userDefinedNetworkAttributeScore);
