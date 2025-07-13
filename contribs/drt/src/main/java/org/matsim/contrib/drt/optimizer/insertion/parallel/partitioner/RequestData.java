@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2025 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
+package org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner;
 
+
+import com.google.common.base.Verify;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
+import java.util.*;
 /**
- * @author michalm
+ * @author Steffen Axer
  */
-public interface UnplannedRequestInserter extends MobsimEngine {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+public class RequestData {
+    private final DrtRequest drtRequest;
+	private InsertionRecord solution;
+
+    public RequestData(DrtRequest drtRequest) {
+        this.drtRequest = drtRequest;
+	}
+
+    public DrtRequest getDrtRequest() {
+        return drtRequest;
+    }
+
+	public InsertionRecord getSolution() {
+		return solution;
+	}
+
+	public void setSolution(InsertionRecord solution) {
+		Verify.verify(this.solution==null);
+		this.solution = solution;
+	}
+
+	public record InsertionRecord(Optional<InsertionWithDetourData> insertion) {}
+
 }
