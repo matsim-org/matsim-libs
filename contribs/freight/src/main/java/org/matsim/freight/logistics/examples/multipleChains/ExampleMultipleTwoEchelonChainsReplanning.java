@@ -188,14 +188,15 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 		log.info("create LSP");
 
 		// A plan with a two hub chains is created
-		LSPPlan multipleTwoEchelonChainsPlan;
+		LSPPlan multipleTwoEchelonChainsPlan = createLSPPlan();
 		{
 			// === the "left" logistics chain: ===
-			LogisticChain hubChainLeft;
 			{
+				LogisticChainBuilder hubChainLeftBuilder = LogisticChainBuilder.newInstance( Id.create( "hubChainLeft", LogisticChain.class ) );
+
 				// this will be the main run(s):
-				LogisticChainElement mainCarrierElementLeft;
 				{
+
 					Carrier mainCarrierLeft = CarriersUtils.createCarrier( Id.create( "mainCarrierLeft", Carrier.class ) );
 					mainCarrierLeft.getCarrierCapabilities().setFleetSize( CarrierCapabilities.FleetSize.INFINITE );
 
@@ -214,13 +215,15 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 																					   .build();
 
 					// the resource is wrapped into a chain element:
-					mainCarrierElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "mainCarrierElementLeft", LogisticChainElement.class ) )
+					LogisticChainElement mainCarrierElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "mainCarrierElementLeft", LogisticChainElement.class ) )
 																							 .setResource( mainCarrierResourceLeft )
 																							 .build();
+
+					hubChainLeftBuilder.addLogisticChainElement( mainCarrierElementLeft );
 				}
 				// this will be the hub (in between the main runs and the distribution runs):
-				LogisticChainElement hubElementLeft;
 				{
+
 					LSPResourceScheduler hubSchedulerLeft = TranshipmentHubSchedulerBuilder.newInstance()
 																						   .setCapacityNeedFixed( 10 )
 																						   .setCapacityNeedLinear( 1 )
@@ -231,12 +234,13 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 																		 .build();
 					setFixedCost( hubResourceLeft, HUBCOSTS_FIX );
 
-					hubElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "HubElement", LogisticChainElement.class ) )
-																.setResource( hubResourceLeft )
-																.build();
+					LogisticChainElement hubElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "HubElement", LogisticChainElement.class ) )
+																					 .setResource( hubResourceLeft )
+																					 .build();
+
+					hubChainLeftBuilder.addLogisticChainElement( hubElementLeft );
 				}
 				// this will be the distribution run(s):
-				LogisticChainElement distributionCarrierElementLeft;
 				{
 					Carrier distributionCarrierLeft = CarriersUtils.createCarrier( Id.create( "distributionCarrierLeft", Carrier.class ) );
 					distributionCarrierLeft.getCarrierCapabilities().setFleetSize( CarrierCapabilities.FleetSize.INFINITE );
@@ -248,25 +252,30 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 																									.setDistributionScheduler( createDefaultDistributionCarrierScheduler( scenario ) )
 																									.build();
 
-					distributionCarrierElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "distributionCarrierElementLeft", LogisticChainElement.class ) )
-													   .setResource( distributionCarrierResourceLeft )
-													   .build();
+					LogisticChainElement distributionCarrierElementLeft = LogisticChainElementBuilder.newInstance( Id.create( "distributionCarrierElementLeft", LogisticChainElement.class ) )
+																									 .setResource( distributionCarrierResourceLeft )
+																									 .build();
+
+					hubChainLeftBuilder.addLogisticChainElement( distributionCarrierElementLeft );
 				}
-				mainCarrierElementLeft.connectWithNextElement(hubElementLeft);
-				hubElementLeft.connectWithNextElement(distributionCarrierElementLeft);
+//				mainCarrierElementLeft.connectWithNextElement(hubElementLeft);
+//				hubElementLeft.connectWithNextElement(distributionCarrierElementLeft);
 				// yyyy would it be possible to get the info for the two previous lines out of the logistic chain? Because then one could write this a
 				// lot more like matsim standard: first generate the logistic chain, and then keep adding material to it. However, one would need to
 				// remove the chain builder and build "directly".  kai, jul'25
+				// --> I have moved this into the "build" method?
 
-				hubChainLeft = LogisticChainBuilder.newInstance( Id.create("hubChainLeft", LogisticChain.class))
-													 .addLogisticChainElement(mainCarrierElementLeft)
-													 .addLogisticChainElement(hubElementLeft)
-													 .addLogisticChainElement(distributionCarrierElementLeft)
-													 .build();
+//																 .addLogisticChainElement( mainCarrierElementLeft )
+//																 .addLogisticChainElement( hubElementLeft )
+//																 .addLogisticChainElement( distributionCarrierElementLeft )
+//																 .build();
+
+				multipleTwoEchelonChainsPlan.addLogisticChain( hubChainLeftBuilder.build() );
 			}
 
+			// for the above, I have collected material "as we go".  For the below, this could be done as well.
+
 			// === the "right" logistics chain: ===
-			LogisticChain hubChainRight;
 			{
 				LogisticChainElement mainCarrierElement;
 				{
@@ -324,27 +333,27 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 																			.setResource( distributionCarrierResource )
 																			.build();
 				}
-				mainCarrierElement.connectWithNextElement(hubElementRight);
-				hubElementRight.connectWithNextElement(distributionCarrierElement);
+//				mainCarrierElement.connectWithNextElement(hubElementRight);
+//				hubElementRight.connectWithNextElement(distributionCarrierElement);
+				// done in "build"
 
-				hubChainRight = LogisticChainBuilder.newInstance( Id.create("hubChainRight", LogisticChain.class))
-															 .addLogisticChainElement(mainCarrierElement)
-															 .addLogisticChainElement(hubElementRight)
-															 .addLogisticChainElement(distributionCarrierElement)
-															 .build();
+				LogisticChain hubChainRight = LogisticChainBuilder.newInstance( Id.create( "hubChainRight", LogisticChain.class ) )
+																  .addLogisticChainElement( mainCarrierElement )
+																  .addLogisticChainElement( hubElementRight )
+																  .addLogisticChainElement( distributionCarrierElement )
+																  .build();
+
+				multipleTwoEchelonChainsPlan.addLogisticChain( hubChainRight );
 			}
 
-			multipleTwoEchelonChainsPlan = createLSPPlan()
-											.addLogisticChain(hubChainLeft)
-											.addLogisticChain(hubChainRight)
-											.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
+			multipleTwoEchelonChainsPlan.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 		}
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		lspPlans.add(multipleTwoEchelonChainsPlan);
 
 		LSP lsp = LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-															 .setInitialPlan(multipleTwoEchelonChainsPlan)
+															 .setInitialPlan( lspPlans.getFirst() )
 															 .setLogisticChainScheduler(
 																			 createDefaultSimpleForwardLogisticChainScheduler(
 																							 createResourcesListFromLSPPlans(lspPlans)))
