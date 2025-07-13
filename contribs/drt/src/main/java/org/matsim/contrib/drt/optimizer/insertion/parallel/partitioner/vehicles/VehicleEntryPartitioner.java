@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2025 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+
+package org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.vehicles;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.RequestData;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-/**
- * @author michalm
- */
-public interface UnplannedRequestInserter extends MobsimEngine {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+public interface VehicleEntryPartitioner {
+	List<Map<Id<DvrpVehicle>, VehicleEntry>> partition(
+		Map<Id<DvrpVehicle>, VehicleEntry> entries, List<Collection<RequestData>> requestsPartitions);
 }

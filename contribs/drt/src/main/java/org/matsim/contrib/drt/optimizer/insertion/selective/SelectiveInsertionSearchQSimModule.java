@@ -21,9 +21,10 @@
 package org.matsim.contrib.drt.optimizer.insertion.selective;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
+import org.matsim.contrib.drt.optimizer.QsimScopeForkJoinPool;
 import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchManager;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
@@ -56,11 +57,11 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 					getter.getModal(TravelTime.class));
 			return restrictiveDetourTimeEstimator;
 		}));
-		
-		addModalComponent(SelectiveInsertionSearch.class, modalProvider(getter -> {
+
+		addModalComponent(DrtInsertionSearchManager.class, modalProvider(getter -> {
 			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(
 					getter.getModal(InsertionCostCalculator.class),
-					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
+					getter.getModal(QsimScopeForkJoinPool.class).getPool(),
 					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
@@ -69,20 +70,21 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//   so we do not want to check for time window violations
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
-			return new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculator.class),
-					zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class), getter.getModal(StopTimeCalculator.class));
+			return new DrtInsertionSearchManager(() -> new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculatorManager.class).create(),
+				zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class), getter.getModal(StopTimeCalculator.class)));
 		}));
-		bindModal(DrtInsertionSearch.class).to(modalKey(SelectiveInsertionSearch.class));
 
-		addModalComponent(SingleInsertionDetourPathCalculator.class,
+		bindModal(DrtInsertionSearch.class).toProvider(modalProvider( getter -> getter.getModal(DrtInsertionSearchManager.class).create()));
+
+		addModalComponent(SingleInsertionDetourPathCalculatorManager.class,
 				new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 					@Override
-					public SingleInsertionDetourPathCalculator get() {
+					public SingleInsertionDetourPathCalculatorManager get() {
 						var travelTime = getModalInstance(TravelTime.class);
 						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new SingleInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
+						return new SingleInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg);
 					}
 				});
 	}

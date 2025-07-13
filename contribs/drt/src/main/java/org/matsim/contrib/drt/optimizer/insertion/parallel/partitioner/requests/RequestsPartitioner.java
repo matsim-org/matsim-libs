@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2025 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+
+package org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.requests;
+
+import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.RequestData;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import java.util.Collection;
-
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import java.util.List;
 
 /**
- * @author michalm
+ * @author Steffen Axer
  */
-public interface UnplannedRequestInserter extends MobsimEngine {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+public interface RequestsPartitioner {
+	List<Collection<RequestData>> partition(Collection<DrtRequest> unplannedRequests, int n, double collectionPeriod);
 }
