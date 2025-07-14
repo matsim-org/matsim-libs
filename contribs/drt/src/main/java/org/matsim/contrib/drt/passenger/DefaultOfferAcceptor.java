@@ -24,7 +24,7 @@ import java.util.Optional;
 public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 
 	@Override
-	public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime) {
+	public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
 		double updatedLatestStartTime = Math.min(departureTime
 			+ request.getMaxPickupDelay(), request.getLatestStartTime());
 		return Optional.of(AcceptedDrtRequest
@@ -34,6 +34,7 @@ public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 			.maxRideDuration(request.getMaxRideDuration())
 			.latestArrivalTime(Math.min(updatedLatestStartTime + request.getMaxRideDuration(), request.getLatestArrivalTime()))
 			.latestStartTime(updatedLatestStartTime)
+			.dropoffDuration(dropoffDuration)
 			.build());
 	}
 }

@@ -2,6 +2,8 @@ package org.matsim.application.analysis.traffic;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,12 +17,16 @@ import org.matsim.application.options.SampleOptions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.*;
 import picocli.CommandLine;
 import tech.tablesaw.api.*;
 import tech.tablesaw.selection.Selection;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
@@ -28,7 +34,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.mean;
 
 @CommandLine.Command(name = "count-comparison", description = "Produces comparisons of observed and simulated counts.")
 @CommandSpec(requireEvents = true, requireCounts = true, requireNetwork = true,
-	produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv"})
+	produces = {"count_comparison_by_hour.csv", "count_comparison_daily.csv", "count_comparison_quality.csv", "count_error_by_hour.csv", "count_comparison_daily_averages.csv"})
 public class CountComparisonAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
@@ -40,7 +46,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private SampleOptions sample;
 
-	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "0.6,0.8,1.2,1.4")
+	@CommandLine.Option(names = "--limits", split = ",", description = "Limits for quality label categories", defaultValue = "-0.4,-0.2,0.2,0.4")
 	private List<Double> limits;
 
 	@CommandLine.Option(names = "--labels", split = ",", description = "Labels for quality categories", defaultValue = "major under,under,ok,over,major over")
@@ -86,6 +92,26 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 		return Math.sqrt(2 * diff * diff / sum);
 	}
 
+	/**
+	 * Calculate the sqv value for simulated and reference count
+	 */
+	private static double sqv_daily(double simulated, double observed) {
+		final double diff = simulated - observed;
+		final double scale_factor_for_daily_volumes = 10000.;
+
+		return 1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
+	}
+
+	/**
+	 * Calculate the sqv value for hourly count numbers for simulated and reference count
+	 */
+	private static double sqv_hourly(double simulated, double observed) {
+		final double diff = simulated - observed;
+		final double scale_factor_for_daily_volumes = 1000.;
+
+		return 1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
+	}
+
 	@Override
 	public Integer call() throws Exception {
 
@@ -125,7 +151,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			IntColumn.create("hour"),
 			DoubleColumn.create("observed_traffic_volume"),
 			DoubleColumn.create("simulated_traffic_volume"),
-			DoubleColumn.create("geh")
+			DoubleColumn.create("geh"),
+			DoubleColumn.create("sqv")
 		);
 
 		Table dailyTrafficVolume = Table.create(StringColumn.create("link_id"),
@@ -133,13 +160,15 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			StringColumn.create("road_type"),
 			DoubleColumn.create("observed_traffic_volume"),
 			DoubleColumn.create("simulated_traffic_volume"),
-			DoubleColumn.create("geh")
+			DoubleColumn.create("geh"),
+			DoubleColumn.create("sqv"),
+			DoubleColumn.create("sqv_threshold")
 		);
 
 		for (Map.Entry<Id<Link>, MeasurementLocation<Link>> entry : counts.getMeasureLocations().entrySet()) {
 			Id<Link> key = entry.getKey();
 
-			Int2DoubleMap countVolume =  aggregateObserved(entry.getValue(), modes);
+			Int2DoubleMap countVolume = aggregateObserved(entry.getValue(), modes);
 
 			String name = entry.getValue().getDisplayName();
 
@@ -183,6 +212,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
 					row.setDouble("geh", geh(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
+					row.setDouble("sqv", sqv_hourly(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
 				}
 			} else {
 				// Get the daily values
@@ -197,18 +227,31 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
 			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("sqv", sqv_daily(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("sqv_threshold", 0.75);
 		}
 
-		DoubleColumn relError = dailyTrafficVolume.doubleColumn("simulated_traffic_volume")
+		DoubleColumn relError = (dailyTrafficVolume.doubleColumn("simulated_traffic_volume").subtract(dailyTrafficVolume.doubleColumn("observed_traffic_volume")))
 			.divide(dailyTrafficVolume.doubleColumn("observed_traffic_volume"))
 			.setName("rel_error");
-
 		StringColumn qualityLabel = relError.copy()
 			.map(err -> cut(err, limits, labels), ColumnType.STRING::create)
 			.setName("quality");
+		relError = relError.abs();
+		// Total stats
+		double sum_sqv_daily = dailyTrafficVolume.doubleColumn("sqv").sum();
+		double sum_geh_daily = dailyTrafficVolume.doubleColumn("geh").sum();
+
+		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("count_comparison_daily_averages.csv").toString()), CSVFormat.DEFAULT)) {
+			printer.printRecord("number counting station", dailyTrafficVolume.rowCount(), "calculator");
+			printer.printRecord("average SQV-value", new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_sqv_daily / dailyTrafficVolume.rowCount()), "chart-line");
+			printer.printRecord("average GEH-value", new DecimalFormat("0.0#", DecimalFormatSymbols.getInstance(Locale.US)).format(sum_geh_daily / dailyTrafficVolume.rowCount()), "chart-line");
+			printer.printRecord("average relative error", new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.US)).format(relError.multiply(100).sum() / dailyTrafficVolume.rowCount()) + '%', "circle-exclamation");
+			} catch (IOException ex) {
+			throw new RuntimeException("Error writing count comparison averages", ex);
+		}
 
 		dailyTrafficVolume.addColumns(relError, qualityLabel);
-
 
 		dailyTrafficVolume = dailyTrafficVolume.sortOn("road_type", "link_id");
 		dailyTrafficVolume.write().csv(output.getPath("count_comparison_daily.csv").toFile());
