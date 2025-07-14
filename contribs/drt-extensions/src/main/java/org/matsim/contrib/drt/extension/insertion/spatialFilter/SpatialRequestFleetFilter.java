@@ -23,6 +23,19 @@ import java.util.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Filter that periodically updates a spatial search tree with current vehicle positions.
+ * For a given request, only returns "nearby" vehicles.
+ * Suitable for large scenarios with a certain degree of spatial coverage
+ * Reduces insertion generation downstream.
+ *
+ * The spatial filter will start with a minimum expansion around the request origin and will
+ * iteratively expand further by the increment factor until either the maximum expansion or
+ * a minimum number of candidates is found.
+ *
+ *
+ * @author nuehnel / MOIA
+ */
 public class SpatialRequestFleetFilter implements RequestFleetFilter {
 
 	private volatile double lastTreeUpdate = Double.NEGATIVE_INFINITY;
