@@ -83,11 +83,11 @@ public class VehicleDataEntryFactoryImplTest {
 				.maxRideDuration(200)
 				.earliestStartTime(100)
 				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
 				.build();
 
 		// stop duration == 0 --> pickup time == stop begin time
-		mockRequest.setPickupTime(100);
-		mockRequest.setDropoffTime(300);
 		// ---> ride duration == 200 == max ride duration --> slack should be == 0
 
 		pickupStop.task.addPickupRequest(mockRequest);
@@ -118,11 +118,11 @@ public class VehicleDataEntryFactoryImplTest {
 				.maxRideDuration(210)
 				.earliestStartTime(100)
 				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
 				.build();
 
 		// stop duration == 0 --> pickup time == stop begin time
-		mockRequest.setPickupTime(100);
-		mockRequest.setDropoffTime(300);
 		// ---> ride duration == 200 == max ride duration --> slack should be == 0
 
 		pickupStop.task.addPickupRequest(mockRequest);

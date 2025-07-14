@@ -19,16 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.DoubleSupplier;
-import java.util.stream.Collectors;
-
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,9 +37,12 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.DoubleSupplier;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -152,11 +146,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
 				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
 				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
-				acceptedRequest.get().setPickupTime(expectedPickupTime);
 
 				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
 				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
-				acceptedRequest.get().setDropoffTime(expectedDropoffTime);
 
 				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 				if (newVehicleEntry != null) {

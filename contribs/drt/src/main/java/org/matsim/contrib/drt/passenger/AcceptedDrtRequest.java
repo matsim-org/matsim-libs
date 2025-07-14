@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -58,10 +58,10 @@ public class AcceptedDrtRequest {
 	private final double dropoffDuration;
 
 	// allow null to ensure we realize it hasn't been set
-	private Double pickupTime = null;
+	private final Double plannedPickupTime;
 
 	// allow null to ensure we realize it hasn't been set
-	private Double dropoffTime = null;
+	private final Double plannedDroppoffTime;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
@@ -70,6 +70,8 @@ public class AcceptedDrtRequest {
 		latestArrivalTime = builder.latestArrivalTime;
 		maxRideDuration = builder.maxRideDuration;
 		dropoffDuration = builder.dropoffDuration;
+		plannedPickupTime = builder.plannedPickupTime;
+		plannedDroppoffTime = builder.plannedDropoffTime;
 	}
 
 	public static Builder newBuilder() {
@@ -83,6 +85,9 @@ public class AcceptedDrtRequest {
 		builder.latestStartTime = copy.getLatestStartTime();
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
 		builder.maxRideDuration = copy.getMaxRideDuration();
+		builder.dropoffDuration = copy.getDropoffDuration();
+		copy.getPlannedPickupTime().ifDefined(val -> builder.plannedPickupTime = val);
+		copy.getPlannedDropoffTime().ifDefined(val -> builder.plannedDropoffTime = val);
 		return builder;
 	}
 
@@ -137,20 +142,12 @@ public class AcceptedDrtRequest {
 		return request.getMode();
 	}
 
-	public void setPickupTime(double pickupTime) {
-		this.pickupTime = pickupTime;
+	public OptionalTime getPlannedPickupTime() {
+		return plannedPickupTime == null ? OptionalTime.undefined(): OptionalTime.defined(plannedPickupTime);
 	}
 
-	public Optional<Double> getPickupTime() {
-		return Optional.ofNullable(pickupTime);
-	}
-
-	public void setDropoffTime(double dropoffTime) {
-		this.dropoffTime = dropoffTime;
-	}
-
-	public Optional<Double> getDropoffTime() {
-		return Optional.ofNullable(dropoffTime);
+	public OptionalTime getPlannedDropoffTime() {
+		return plannedDroppoffTime == null ? OptionalTime.undefined(): OptionalTime.defined(plannedDroppoffTime);
 	}
 
 	@Override
@@ -170,6 +167,8 @@ public class AcceptedDrtRequest {
 		private double latestArrivalTime;
 		private double maxRideDuration;
 		private double dropoffDuration;
+		private Double plannedPickupTime;
+		private Double plannedDropoffTime;
 
 		private Builder() {
 		}
@@ -206,6 +205,16 @@ public class AcceptedDrtRequest {
 
 		public AcceptedDrtRequest build() {
 			return new AcceptedDrtRequest(this);
+		}
+
+		public Builder plannedPickupTime(Double val) {
+			plannedPickupTime = val;
+			return this;
+		}
+
+		public Builder plannedDropoffTime(Double val) {
+			plannedDropoffTime = val;
+			return this;
 		}
 	}
 }

@@ -35,6 +35,8 @@ public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 			.latestArrivalTime(request.getLatestArrivalTime())
 			.latestStartTime(updatedLatestStartTime)
 			.dropoffDuration(dropoffDuration)
+			.plannedPickupTime(departureTime)
+			.plannedDropoffTime(arrivalTime)
 			.build());
 	}
 }

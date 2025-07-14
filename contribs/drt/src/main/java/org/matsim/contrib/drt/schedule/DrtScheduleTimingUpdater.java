@@ -7,6 +7,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,13 +56,32 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
 
         for (int i = startIdx; i < tasks.size(); i++) {
             if(tasks.get(i) instanceof DrtStopTask stopTask) {
+                List<AcceptedDrtRequest> updatedPudos = new ArrayList<>();
                 for (AcceptedDrtRequest pickup : stopTask.getPickupRequests().values()) {
                     double expectedPickupTime = Math.max(stopTask.getBeginTime(), pickup.getEarliestStartTime());
                     expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, pickup.getRequest());
-                    pickup.setPickupTime(expectedPickupTime);
+                    if(expectedPickupTime != pickup.getPlannedPickupTime().seconds()) {
+                        updatedPudos.add(AcceptedDrtRequest.newBuilder(pickup).plannedPickupTime(expectedPickupTime).build());
+                    }
                 }
+
+                for (AcceptedDrtRequest updatedPickup : updatedPudos) {
+                    stopTask.removePickupRequest(updatedPickup.getId());
+                    stopTask.addPickupRequest(updatedPickup);
+                }
+                updatedPudos.clear();
+
+
                 for (AcceptedDrtRequest dropoff : stopTask.getDropoffRequests().values()) {
-                    dropoff.setDropoffTime(stopTask.getBeginTime() + dropoff.getDropoffDuration());
+                    double expectedDropoffTime = stopTask.getBeginTime() + dropoff.getDropoffDuration();
+                    if(expectedDropoffTime != dropoff.getPlannedDropoffTime().seconds()) {
+                        updatedPudos.add(AcceptedDrtRequest.newBuilder(dropoff).plannedDropoffTime(expectedDropoffTime).build());
+                    }
+                }
+
+                for (AcceptedDrtRequest updatedPickup : updatedPudos) {
+                    stopTask.removeDropoffRequest(updatedPickup.getId());
+                    stopTask.addDropoffRequest(updatedPickup);
                 }
             }
         }
