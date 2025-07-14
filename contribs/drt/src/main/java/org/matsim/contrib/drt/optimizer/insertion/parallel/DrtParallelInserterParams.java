@@ -114,12 +114,12 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 		this.maxIterations = maxIterations;
 	}
 
-	@StringGetter("workers")
+	@StringGetter("maxPartitions")
 	public int getMaxPartitions() {
 		return maxPartitions;
 	}
 
-	@StringSetter("workers")
+	@StringSetter("maxPartitions")
 	public void setMaxPartitions(int maxPartitions) {
 		this.maxPartitions = maxPartitions;
 	}

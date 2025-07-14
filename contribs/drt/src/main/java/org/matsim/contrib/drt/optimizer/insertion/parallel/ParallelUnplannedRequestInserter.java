@@ -222,6 +222,15 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 			int index = i.getAndIncrement();
 			Collection<RequestData> requestDataPartition = requestsPartitions.get(index);
 			Map<Id<DvrpVehicle>, VehicleEntry> vehiclePartition = vehiclePartitions.get(index);
+
+			if(vehiclePartition.isEmpty())
+			{
+				// If one is in low demand, vehiclePartition could be empty,
+				// but than there should be also no requests in the corresponding requestDataPartition
+				Verify.verify(requestDataPartition.isEmpty());
+				continue;
+			}
+
 			tasks.add(inserterExecutorService.submit(() -> worker.process(now, requestDataPartition, vehiclePartition)));
 		}
 
