@@ -61,7 +61,7 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
                     pickup.setPickupTime(expectedPickupTime);
                 }
                 for (AcceptedDrtRequest dropoff : stopTask.getDropoffRequests().values()) {
-                    dropoff.setDropoffTime(stopTask.getBeginTime() + stopDurationProvider.calcDropoffDuration(vehicle, dropoff.getRequest()));
+                    dropoff.setDropoffTime(stopTask.getBeginTime() + dropoff.getDropoffDuration());
                 }
             }
         }
