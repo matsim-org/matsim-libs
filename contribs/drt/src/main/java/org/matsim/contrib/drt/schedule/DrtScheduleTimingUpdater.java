@@ -60,7 +60,7 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
                 for (AcceptedDrtRequest pickup : stopTask.getPickupRequests().values()) {
                     double expectedPickupTime = Math.max(stopTask.getBeginTime(), pickup.getEarliestStartTime());
                     expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, pickup.getRequest());
-                    if(expectedPickupTime != pickup.getPlannedPickupTime().seconds()) {
+                    if(pickup.getPlannedPickupTime().isUndefined() || expectedPickupTime != pickup.getPlannedPickupTime().seconds()) {
                         updatedPudos.add(AcceptedDrtRequest.newBuilder(pickup).plannedPickupTime(expectedPickupTime).build());
                     }
                 }
@@ -74,7 +74,7 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
 
                 for (AcceptedDrtRequest dropoff : stopTask.getDropoffRequests().values()) {
                     double expectedDropoffTime = stopTask.getBeginTime() + dropoff.getDropoffDuration();
-                    if(expectedDropoffTime != dropoff.getPlannedDropoffTime().seconds()) {
+                    if(dropoff.getPlannedDropoffTime().isUndefined() || expectedDropoffTime != dropoff.getPlannedDropoffTime().seconds()) {
                         updatedPudos.add(AcceptedDrtRequest.newBuilder(dropoff).plannedDropoffTime(expectedDropoffTime).build());
                     }
                 }
