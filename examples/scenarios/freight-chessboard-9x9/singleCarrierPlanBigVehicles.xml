@@ -6,7 +6,7 @@
 			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="carrier_19_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
+					<vehicle id="carrier_1_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
 				</vehicles>
 
 			</capabilities>
@@ -65,7 +65,7 @@
 			</services>
 
 			<plan score="-343.0533333333334" selected="true">
-				<tour vehicleId="carrier_19_heavyVehicle">
+				<tour vehicleId="carrier_1_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg expected_dep_time="06:00:00" expected_transp_time="00:11:06">
 						<route>i(1,0) i(2,0) i(3,0) j(3,1)</route>

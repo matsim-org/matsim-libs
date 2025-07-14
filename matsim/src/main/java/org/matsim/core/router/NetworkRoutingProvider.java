@@ -135,6 +135,12 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 
 		} else {
 			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
+			log.warn( "This can be achieved by something like" );
+			log.warn("\t\tconfig.routing().setAccessEgressType( AccessEgressType.accessEgressModeToLink );");
+			log.warn( "in code or" );
+			log.warn( "\t<module name=\"routing\" >" );
+			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
+			log.warn( "in the config xml.");
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}
 	}

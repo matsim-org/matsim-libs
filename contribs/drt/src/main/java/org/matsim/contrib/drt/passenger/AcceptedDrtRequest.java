@@ -34,14 +34,19 @@ import java.util.Optional;
  * @author Michal Maciejewski (michalm)
  */
 public class AcceptedDrtRequest {
-	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request) {
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request, double dropoffDuration) {
 		return AcceptedDrtRequest.newBuilder()
 				.request(request)
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
 				.maxRideDuration(request.getMaxRideDuration())
+				.dropoffDuration(dropoffDuration)
 				.build();
+	}
+
+	public static AcceptedDrtRequest createFromOriginalRequest(DrtRequest request) {
+		return createFromOriginalRequest(request, 0.0);
 	}
 
 	private final DrtRequest request;
@@ -50,6 +55,7 @@ public class AcceptedDrtRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
+	private final double dropoffDuration;
 
 	// allow null to ensure we realize it hasn't been set
 	private Double pickupTime = null;
@@ -63,6 +69,7 @@ public class AcceptedDrtRequest {
 		latestStartTime = builder.latestStartTime;
 		latestArrivalTime = builder.latestArrivalTime;
 		maxRideDuration = builder.maxRideDuration;
+		dropoffDuration = builder.dropoffDuration;
 	}
 
 	public static Builder newBuilder() {
@@ -96,6 +103,10 @@ public class AcceptedDrtRequest {
 	}
 	public double getMaxRideDuration() {
 		return maxRideDuration;
+	}
+
+	public double getDropoffDuration() {
+		return dropoffDuration;
 	}
 
 	public Id<Request> getId() {
@@ -158,6 +169,7 @@ public class AcceptedDrtRequest {
 		private double latestStartTime;
 		private double latestArrivalTime;
 		private double maxRideDuration;
+		private double dropoffDuration;
 
 		private Builder() {
 		}
@@ -184,6 +196,11 @@ public class AcceptedDrtRequest {
 
 		public Builder maxRideDuration(double val) {
 			this.maxRideDuration = val;
+			return this;
+		}
+
+		public Builder dropoffDuration(double val) {
+			this.dropoffDuration = val;
 			return this;
 		}
 

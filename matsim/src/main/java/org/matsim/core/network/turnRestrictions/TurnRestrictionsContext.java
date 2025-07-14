@@ -284,8 +284,16 @@ public final class TurnRestrictionsContext {
                     ColoredNode toNode = newlyColoredNodes.get(outLink.getToNode().getId());
                     newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, toNode, null);
                 } else {
-                    Node toNode = outLink.getToNode();
-                    newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, null, toNode);
+                    if(replacedOutLink != null) {
+                        // we are on a link exiting the current colored subgraph (to node is real) but the link is also
+                        // a replaced one, which means we should directly enter into the next turn restriction by entering
+                        // the respective subgraph through the existing colored node. hrewald & nkuehnel, May 2025
+                        ColoredNode toNode = replacedOutLink.toColoredNode;
+                        newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, toNode, null);
+                    } else {
+                        Node toNode = outLink.getToNode();
+                        newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, null, toNode);
+                    }
                 }
                 fromNode.outLinks.add(newlyColoredLink);
                 context.coloredLinks.add(newlyColoredLink);

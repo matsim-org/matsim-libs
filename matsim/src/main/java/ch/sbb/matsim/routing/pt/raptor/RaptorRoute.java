@@ -150,6 +150,19 @@ public class RaptorRoute {
 				return this.arrivalTime;
 			}
 			return this.chainedPart.getChainedArrivalTime();
-		}
     }
+
+			@Override
+			public String toString() {
+				return "RoutePart{" +
+					"fromStop=" + fromStop.getId() + " (" + fromStop.getName() + ")" +
+					", toStop=" + toStop.getId() + " (" + toStop.getName() + ")" +
+					", mode='" + mode + '\'' +
+					", depTime=" + depTime +
+					", line=" + line.getId() +
+					", route=" + route.getId() +
+					", chainedPart=" + chainedPart +
+					'}';
+			}
+		}
 }
