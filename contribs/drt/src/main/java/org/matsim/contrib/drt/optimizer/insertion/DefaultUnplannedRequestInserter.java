@@ -147,6 +147,10 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
 				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
 
+				// if the stop task ends earlier, it means that it was decided that the stop duration
+				// is shorter, which can happen if a request is merged with an existing stop
+				expectedPickupTime = Math.min(expectedPickupTime, pickupDropoffTaskPair.pickupTask.getEndTime());
+
 				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
 				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 

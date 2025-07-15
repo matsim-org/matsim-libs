@@ -60,6 +60,11 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
                 for (AcceptedDrtRequest pickup : stopTask.getPickupRequests().values()) {
                     double expectedPickupTime = Math.max(stopTask.getBeginTime(), pickup.getEarliestStartTime());
                     expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, pickup.getRequest());
+
+                    // if the stop task ends earlier, it means that somewhere upstream it was decided that the stop duration
+                    // is shorter, which can happen if a request is merged with an existing stop
+                    expectedPickupTime = Math.min(expectedPickupTime, stopTask.getEndTime());
+
                     RequestTiming requestTiming = pickup.getRequestTiming();
                     if(requestTiming.getPlannedPickupTime().isUndefined()
                             || expectedPickupTime != requestTiming.getPlannedPickupTime().seconds()) {
