@@ -12,7 +12,7 @@ import java.net.URL;
 
 public class AWSStreamExceptionTest {
 
-    private final static String TEST_S3_URI = "s3://matsim-jobs-input-443370681674/input/mob1156/scenario0/nowel4_network.xml";
+    private final static String TEST_S3_URI = "s3://...";
 
 
     @RegisterExtension
