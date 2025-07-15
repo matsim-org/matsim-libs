@@ -112,6 +112,7 @@ public class ParallelRequestInserterModule extends AbstractDvrpModeQSimModule {
 				getter.getModal(RequestFleetFilter.class),
 				getter.getModal(DrtRequestInsertionRetryQueue.class)
 			))).asEagerSingleton();
+		addModalQSimComponentBinding().to(modalKey(UnplannedRequestInserter.class));
 
 		addModalComponent(QsimScopeForkJoinPool.class,
 			() -> new MultiQSimScopeForkJoinPoolHolder(drtParallelInserterParams.get().getInsertionSearchThreadsPerWorker()));

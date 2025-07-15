@@ -19,16 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.DoubleSupplier;
-import java.util.stream.Collectors;
-
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,9 +37,12 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.DoubleSupplier;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -149,19 +143,23 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				var vehicle = insertion.insertion.vehicleEntry.vehicle;
 				var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
+				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
+				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
+				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+
+				// if the stop task ends earlier, it means that it was decided that the stop duration
+				// is shorter, which can happen if a request is merged with an existing stop
+				expectedPickupTime = Math.min(expectedPickupTime, pickupDropoffTaskPair.pickupTask.getEndTime());
+
+				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
+				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
+
 				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 				if (newVehicleEntry != null) {
 					vehicleEntries.put(vehicle.getId(), newVehicleEntry);
 				} else {
 					vehicleEntries.remove(vehicle.getId());
 				}
-
-				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
-				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
-				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
-
-				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
-				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),

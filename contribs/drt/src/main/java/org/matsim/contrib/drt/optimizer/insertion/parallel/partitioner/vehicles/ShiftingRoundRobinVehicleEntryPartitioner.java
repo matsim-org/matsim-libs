@@ -54,6 +54,7 @@ public class ShiftingRoundRobinVehicleEntryPartitioner implements VehicleEntryPa
 		Map<Id<DvrpVehicle>, VehicleEntry> entries,
 		List<Collection<RequestData>> requestsPartitions) {
 
+
 		int n = requestsPartitions.size();
 		List<Map<Id<DvrpVehicle>, VehicleEntry>> partitions = new ArrayList<>(n);
 		for (int i = 0; i < n; i++) {
@@ -75,7 +76,6 @@ public class ShiftingRoundRobinVehicleEntryPartitioner implements VehicleEntryPa
 		sortedEntries.sort(Map.Entry.comparingByKey(Comparator.comparing(Id::toString)));
 
 		int shift = callCounter.getAndIncrement() % activePartitionIndices.size();
-
 		int index = 0;
 		for (Map.Entry<Id<DvrpVehicle>, VehicleEntry> entry : sortedEntries) {
 			int partitionIndex = activePartitionIndices.get((index + shift) % activePartitionIndices.size());
