@@ -54,9 +54,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -197,8 +195,11 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		List<ForkJoinTask<?>> tasks = new ArrayList<>();
 
 		int requests = this.tmpQueue.size();
-		List<Collection<RequestData>> requestsPartitions = requestsPartitioner.partition(this.tmpQueue, this.workers.size(), this.collectionPeriod);
+		// Do not create more requestPartitions than available vehicles
+		// e.g. 60 req / 20 req/min --> 3 active partitions but only 2 available veh right now
+		int maxPartitions = Math.min(this.workers.size(), entries.size());
 
+		List<Collection<RequestData>> requestsPartitions = requestsPartitioner.partition(this.tmpQueue, maxPartitions, this.collectionPeriod);
 		if (drtParallelInserterParams.isLogThreadActivity()) {
 			int activePartitions = (int) requestsPartitions.stream()
 				.filter(partition -> partition != null && !partition.isEmpty())
@@ -210,21 +211,20 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		List<Map<Id<DvrpVehicle>, VehicleEntry>> vehiclePartitions = partitioner.partition(entries, requestsPartitions);
 
 		Verify.verify(
-			vehiclePartitions.size() == this.workers.size(),
-			"Mismatch between number of vehicle entry vehiclePartitions (%s) and number of workers (%s)",
-			vehiclePartitions.size(), this.workers.size()
+			vehiclePartitions.size() == requestsPartitions.size(),
+			"Mismatch between number of vehicle entry vehiclePartitions (%s) and requestsPartitions (%s)",
+			vehiclePartitions.size(), requestsPartitions.size()
 		);
 
 		validateUniqueRequests(requestsPartitions);
 
-		AtomicInteger i = new AtomicInteger(0);
-		for (RequestInsertWorker worker : this.workers) {
-			int index = i.getAndIncrement();
-			Collection<RequestData> requestDataPartition = requestsPartitions.get(index);
-			Map<Id<DvrpVehicle>, VehicleEntry> vehiclePartition = vehiclePartitions.get(index);
+		// We only could use the number of maxPartitions
+		for (int i = 0; i < maxPartitions; i++) {
+			var worker = this.workers.get(i);
+			Collection<RequestData> requestDataPartition = requestsPartitions.get(i);
+			Map<Id<DvrpVehicle>, VehicleEntry> vehiclePartition = vehiclePartitions.get(i);
 
-			if(vehiclePartition.isEmpty())
-			{
+			if (vehiclePartition.isEmpty()) {
 				// If one is in low demand, vehiclePartition could be empty,
 				// but than there should be also no requests in the corresponding requestDataPartition
 				Verify.verify(requestDataPartition.isEmpty());
@@ -531,8 +531,8 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 
-record DataRecord(double time, int requestsDensityPerMinute, int activePartitions) {
-}
+	record DataRecord(double time, int requestsDensityPerMinute, int activePartitions) {
+	}
 
 
 }
