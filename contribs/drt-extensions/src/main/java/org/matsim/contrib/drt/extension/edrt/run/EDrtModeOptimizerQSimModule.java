@@ -40,6 +40,7 @@ import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtRoutingDriveTaskUpdater;
+import org.matsim.contrib.drt.schedule.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -55,6 +56,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
@@ -199,9 +201,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		}
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+				getter -> new DrtScheduleTimingUpdater(new ScheduleTimingUpdaterImpl(getter.get(MobsimTimer.class),
 						new EDrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)),
-						getter.getModal(DriveTaskUpdater.class)))).asEagerSingleton();
+						getter.getModal(DriveTaskUpdater.class)), getter.getModal(PassengerStopDurationProvider.class)))).asEagerSingleton();
 
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
