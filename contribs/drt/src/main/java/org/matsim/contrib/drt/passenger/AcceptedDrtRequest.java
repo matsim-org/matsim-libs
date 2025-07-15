@@ -24,9 +24,9 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.schedule.RequestTiming;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.core.utils.misc.OptionalTime;
 
 import java.util.List;
 
@@ -56,12 +56,7 @@ public class AcceptedDrtRequest {
 	private final double latestArrivalTime;
 	private final double maxRideDuration;
 	private final double dropoffDuration;
-
-	// allow null to ensure we realize it hasn't been set
-	private final Double plannedPickupTime;
-
-	// allow null to ensure we realize it hasn't been set
-	private final Double plannedDroppoffTime;
+	private final RequestTiming requestTiming;
 
 	private AcceptedDrtRequest(Builder builder) {
 		request = builder.request;
@@ -70,8 +65,7 @@ public class AcceptedDrtRequest {
 		latestArrivalTime = builder.latestArrivalTime;
 		maxRideDuration = builder.maxRideDuration;
 		dropoffDuration = builder.dropoffDuration;
-		plannedPickupTime = builder.plannedPickupTime;
-		plannedDroppoffTime = builder.plannedDropoffTime;
+		requestTiming = new RequestTiming(builder.plannedPickupTime, builder.plannedDropoffTime);
 	}
 
 	public static Builder newBuilder() {
@@ -86,8 +80,8 @@ public class AcceptedDrtRequest {
 		builder.latestArrivalTime = copy.getLatestArrivalTime();
 		builder.maxRideDuration = copy.getMaxRideDuration();
 		builder.dropoffDuration = copy.getDropoffDuration();
-		copy.getPlannedPickupTime().ifDefined(val -> builder.plannedPickupTime = val);
-		copy.getPlannedDropoffTime().ifDefined(val -> builder.plannedDropoffTime = val);
+		copy.requestTiming.getPlannedPickupTime().ifDefined(val -> builder.plannedPickupTime = val);
+		copy.requestTiming.getPlannedDropoffTime().ifDefined(val -> builder.plannedDropoffTime = val);
 		return builder;
 	}
 
@@ -142,12 +136,8 @@ public class AcceptedDrtRequest {
 		return request.getMode();
 	}
 
-	public OptionalTime getPlannedPickupTime() {
-		return plannedPickupTime == null ? OptionalTime.undefined(): OptionalTime.defined(plannedPickupTime);
-	}
-
-	public OptionalTime getPlannedDropoffTime() {
-		return plannedDroppoffTime == null ? OptionalTime.undefined(): OptionalTime.defined(plannedDroppoffTime);
+	public RequestTiming getRequestTiming() {
+		return requestTiming;
 	}
 
 	@Override
@@ -167,8 +157,8 @@ public class AcceptedDrtRequest {
 		private double latestArrivalTime;
 		private double maxRideDuration;
 		private double dropoffDuration;
-		private Double plannedPickupTime;
-		private Double plannedDropoffTime;
+		private double plannedPickupTime = RequestTiming.UNDEFINED_TIME;
+		private double plannedDropoffTime = RequestTiming.UNDEFINED_TIME;
 
 		private Builder() {
 		}
@@ -203,18 +193,18 @@ public class AcceptedDrtRequest {
 			return this;
 		}
 
-		public AcceptedDrtRequest build() {
-			return new AcceptedDrtRequest(this);
-		}
-
-		public Builder plannedPickupTime(Double val) {
+		public Builder plannedPickupTime(double val) {
 			plannedPickupTime = val;
 			return this;
 		}
 
-		public Builder plannedDropoffTime(Double val) {
+		public Builder plannedDropoffTime(double val) {
 			plannedDropoffTime = val;
 			return this;
+		}
+
+		public AcceptedDrtRequest build() {
+			return new AcceptedDrtRequest(this);
 		}
 	}
 }

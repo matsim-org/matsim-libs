@@ -140,9 +140,9 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
 
 			for (AcceptedDrtRequest req : onboard) {
-				double plannedPickupTime = req.getPlannedPickupTime().orElseThrow(()
+				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
-				double plannedDropoffTime = req.getPlannedDropoffTime().orElseThrow(()
+				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) dropoff time at this point."));
 				double currentRideDuration = plannedDropoffTime - plannedPickupTime;
 				double currentRideSlack = Math.max(0, req.getMaxRideDuration() - currentRideDuration);

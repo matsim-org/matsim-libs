@@ -54,34 +54,26 @@ public class DrtScheduleTimingUpdater implements ScheduleTimingUpdater {
         Schedule schedule = vehicle.getSchedule();
         List<? extends Task> tasks = schedule.getTasks();
 
+
         for (int i = startIdx; i < tasks.size(); i++) {
             if(tasks.get(i) instanceof DrtStopTask stopTask) {
-                List<AcceptedDrtRequest> updatedPudos = new ArrayList<>();
                 for (AcceptedDrtRequest pickup : stopTask.getPickupRequests().values()) {
                     double expectedPickupTime = Math.max(stopTask.getBeginTime(), pickup.getEarliestStartTime());
                     expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, pickup.getRequest());
-                    if(pickup.getPlannedPickupTime().isUndefined() || expectedPickupTime != pickup.getPlannedPickupTime().seconds()) {
-                        updatedPudos.add(AcceptedDrtRequest.newBuilder(pickup).plannedPickupTime(expectedPickupTime).build());
+                    RequestTiming requestTiming = pickup.getRequestTiming();
+                    if(requestTiming.getPlannedPickupTime().isUndefined()
+                            || expectedPickupTime != requestTiming.getPlannedPickupTime().seconds()) {
+                        requestTiming.updatePlannedPickupTime(expectedPickupTime);
                     }
                 }
-
-                for (AcceptedDrtRequest updatedPickup : updatedPudos) {
-                    stopTask.removePickupRequest(updatedPickup.getId());
-                    stopTask.addPickupRequest(updatedPickup);
-                }
-                updatedPudos.clear();
 
 
                 for (AcceptedDrtRequest dropoff : stopTask.getDropoffRequests().values()) {
                     double expectedDropoffTime = stopTask.getBeginTime() + dropoff.getDropoffDuration();
-                    if(dropoff.getPlannedDropoffTime().isUndefined() || expectedDropoffTime != dropoff.getPlannedDropoffTime().seconds()) {
-                        updatedPudos.add(AcceptedDrtRequest.newBuilder(dropoff).plannedDropoffTime(expectedDropoffTime).build());
+                    RequestTiming requestTiming = dropoff.getRequestTiming();
+                    if(requestTiming.getPlannedDropoffTime().isUndefined() || expectedDropoffTime != requestTiming.getPlannedDropoffTime().seconds()) {
+                        requestTiming.updatePlannedDropoffTime(expectedDropoffTime);
                     }
-                }
-
-                for (AcceptedDrtRequest updatedPickup : updatedPudos) {
-                    stopTask.removeDropoffRequest(updatedPickup.getId());
-                    stopTask.addDropoffRequest(updatedPickup);
                 }
             }
         }
