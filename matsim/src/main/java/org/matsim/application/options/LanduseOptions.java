@@ -8,6 +8,7 @@ import picocli.CommandLine;
 import jakarta.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -35,6 +36,17 @@ public class LanduseOptions {
 	 * Holds the index of geometries
 	 */
 	private ShpOptions.Index index;
+
+	public LanduseOptions() {
+	}
+
+	/**
+	 * Create {@link LanduseOptions} with default options.
+	 */
+	public LanduseOptions(Path landuse, Set<String> filter){
+		this.landuse = landuse;
+		this.filter = filter;
+	}
 
 	/**
 	 * Create an index of landuse shapes.
