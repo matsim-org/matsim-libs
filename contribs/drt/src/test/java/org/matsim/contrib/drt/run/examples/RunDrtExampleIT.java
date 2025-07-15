@@ -38,6 +38,7 @@ import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemP
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.ParallelRequestInserterModule;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -391,6 +392,33 @@ public class RunDrtExampleIT {
 				.waitAverage(260.24)
 				.inVehicleTravelTimeMean(375.14)
 				.totalTravelTimeMean(635.38)
+				.build();
+
+		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
+	}
+
+	@Test
+	void testRunDrtStopbasedExample_maxRideDuration() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		DrtOptimizationConstraintsSetImpl drtOptimizationConstraintsSet = multiModeDrtConfigGroup.getModalElements().iterator().next().addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		drtOptimizationConstraintsSet.setMaxAbsoluteDetour(5 * 60);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+
+		var expectedStats = Stats.newBuilder()
+				.rejectionRate(0.04)
+				.rejections(16)
+				.waitAverage(259.95)
+				.inVehicleTravelTimeMean(368.72)
+				.totalTravelTimeMean(628.67)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

@@ -30,12 +30,15 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.Waypoint.Stop;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -65,6 +68,77 @@ public class VehicleDataEntryFactoryImplTest {
 		//final stay task not started - vehicle slack time is 10 and limits the slack times at all stops
 		assertThat(computeSlackTimes(vehicle(500, 490), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(10, 10, 10, 10);
 	}
+
+	@Test
+	void computeSlackTimes_withRideDurationConstraints_a() {
+
+		//time slack: 20 (arrival is the constraint)
+		Waypoint.Stop pickupStop =  stop(100, 120, 200, 230);
+		//time slack: 30 (departure is the constraint)
+		Waypoint.Stop dropoffStop = stop(300, 340, 400, 430);
+
+		AcceptedDrtRequest mockRequest = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("mock", Request.class)).build())
+				.latestArrivalTime(340)
+				.maxRideDuration(200)
+				.earliestStartTime(100)
+				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		// stop duration == 0 --> pickup time == stop begin time
+		// ---> ride duration == 200 == max ride duration --> slack should be == 0
+
+		pickupStop.task.addPickupRequest(mockRequest);
+		dropoffStop.task.addDropoffRequest(mockRequest);
+
+		Stop[] stops = new Stop[] {pickupStop, dropoffStop};
+
+		var precedingStayTimes = List.of(0.0, 0.0);
+
+		// initial vehicle slack == 1000
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
+		assertThat(slackTimes).containsExactly(0, 0, 0, 1000);
+	}
+
+	@Test
+	void computeSlackTimes_withRideDurationConstraints_b() {
+
+		//time slack: 20 (arrival is the constraint)
+		Waypoint.Stop pickupStop =  stop(100, 120, 200, 230);
+		//time slack: 30 (departure is the constraint)
+		Waypoint.Stop dropoffStop = stop(300, 340, 400, 430);
+
+		AcceptedDrtRequest mockRequest = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("mock", Request.class)).build())
+				.latestArrivalTime(340)
+				.maxRideDuration(210)
+				.earliestStartTime(100)
+				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		// stop duration == 0 --> pickup time == stop begin time
+		// ---> ride duration == 200 == max ride duration --> slack should be == 0
+
+		pickupStop.task.addPickupRequest(mockRequest);
+		dropoffStop.task.addDropoffRequest(mockRequest);
+
+		Stop[] stops = new Stop[] {pickupStop, dropoffStop};
+
+		var precedingStayTimes = List.of(0.0, 0.0);
+
+		// initial vehicle slack == 1000
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
+		assertThat(slackTimes).containsExactly(10, 10, 10, 1000);
+	}
+
 
 	@Test
 	void computeSlackTimes_withoutStops() {
