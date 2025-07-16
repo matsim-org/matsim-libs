@@ -266,16 +266,16 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 					// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
 					// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
 
-					operationMethods.values().stream()
-						.filter(operationMethod -> operationMethod.className.equals(type) && operationMethod.methodName.equals(method))
-						.findFirst()
-						.ifPresent(operationMethod -> {
-							stages.putIfAbsent(new Operation(operationMethod.operationName, method, true), time);
-							if (!ongoingOperations.contains(operationMethod.methodName)) {
-								ongoingOperations.addFirst(operationMethod.methodName);
-								System.out.println(operationMethod.operationName + " started with " +  statistics.interval + " ms since previous sample");
+					if (operationMethods.containsKey(method)) {
+						var operation = operationMethods.get(method);
+						if (operation.className.equals(type)) {
+							stages.putIfAbsent(new Operation(operation.operationName, method, true), time);
+							if (!ongoingOperations.contains(method)) {
+								ongoingOperations.addFirst(method);
+								System.out.println(operation.operationName + " started with " +  statistics.interval + " ms since previous sample");
 							}
-						});
+						}
+					}
 				});
 				//System.out.println("---");
 			}
