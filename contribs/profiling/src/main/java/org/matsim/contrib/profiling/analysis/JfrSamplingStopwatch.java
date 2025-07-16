@@ -5,6 +5,7 @@ import jdk.jfr.consumer.EventStream;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.contrib.profiling.aop.stopwatch.AopIterationJfrEvent;
 import org.matsim.contrib.profiling.events.IterationJfrEvent;
 
 import java.awt.*;
@@ -25,7 +26,14 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	private final EventStream eventStream;
 	private final SamplingStatistics statistics = new SamplingStatistics();
 
-	// linked hashmap to keep insertion order but also hashmap access times
+	/**
+	 * Manual count in case the approach used to determine the iteration does not provide one.
+	 */
+	private int iterationCount = 0;
+
+	/**
+	 * linked hashmap to keep insertion order but also hashmap access times todo rename to encountered
+	 */
 	private final Map<Operation, Long> stages = Collections.synchronizedMap(new LinkedHashMap<>());
 
 	/**
@@ -164,11 +172,13 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		eventStream.setOrdered(true); // this orders all events by their *commit* time
 		// JFRIterationEvents will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
-		eventStream.onEvent(IterationJfrEvent.class.getAnnotation(Name.class).value(), event -> {
+		eventStream.onEvent(AopIterationJfrEvent.class.getAnnotation(Name.class).value(), event -> {
 			// start iteration in stopwatch
-			var iteration = event.getInt("iteration");
-			System.out.println(event.getStartTime() + " BEGIN iteration " + iteration);
-			stopwatch.beginIteration(iteration, event.getStartTime().toEpochMilli());
+			if (event.hasField("iteration")) {
+				iterationCount = Math.max(event.getInt("iteration"), iterationCount);
+			}
+			System.out.println(event.getStartTime() + " BEGIN iteration " + iterationCount);
+			stopwatch.beginIteration(iterationCount, event.getStartTime().toEpochMilli());
 			// add all other recorded events to stopwatch
 			synchronized (stages) {
 				stages.forEach((operation, timestamp) -> {
@@ -192,6 +202,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 			// end iteration in stopwatch
 			System.out.println(event.getEndTime() + " END   iteration");
 			stopwatch.endIteration(event.getEndTime().toEpochMilli());
+			iterationCount++;
 		});
 
 		eventStream.onEvent(this::handleAllEvents);
