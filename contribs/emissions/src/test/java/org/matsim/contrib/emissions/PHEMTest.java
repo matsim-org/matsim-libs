@@ -4,28 +4,20 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -52,14 +44,11 @@ public class PHEMTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	// TODO Files were changed to local for debugging purposes. CHange them back to the svn entries, when fixed hbefa tables are available
-	private final static String HBEFA_4_1_PATH = "D:/Projects/VSP/MATSim/PHEM/hbefa/";
-	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
-	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
-	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
-	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
-
-	static CSVPrinter csvPrinter = null;
+	private final static String HBEFA_4_1_PATH = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
+	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc";
+	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc";
+	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "c3b212c452ec186d06e75771694886cd.enc";
+	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "5a297db51545335b2f7899002a1ea6c45d4511a3.enc";
 
 	// ----- Helper methods -----
 
@@ -384,7 +373,6 @@ public class PHEMTest {
 					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
 					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
 
-				// TODO We are comparing PMx to PM10. SUMO does not specify, what PMx exactly means.
 				new double[]{sumoSegments.get(i).PMx/1000,
 					link_pollutant2grams.get(i).get(Pollutant.PM),
 					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
@@ -398,7 +386,7 @@ public class PHEMTest {
 			currentSecond += wltpLinkAttributes.get(i).time;
 		}
 
-		// Print out the results as csv
+		// Print out the results as csv (can be used to update the tests to newer versions
 		CSVPrinter writer = new CSVPrinter(
 			IOUtils.getBufferedWriter(utils.getOutputDirectory() + "diff_" + fuel + "_out.csv"),
 			CSVFormat.DEFAULT);
