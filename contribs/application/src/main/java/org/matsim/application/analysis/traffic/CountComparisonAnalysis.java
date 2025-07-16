@@ -113,7 +113,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	}
 
 	private static double getSQV_value(double observed, double diff, double scale_factor_for_daily_volumes, Set<String> modes) {
-		if (modes.contains(TransportMode.truck))
+		if (modes.contains(TransportMode.truck)  && !modes.contains(TransportMode.car))
 			scale_factor_for_daily_volumes = scale_factor_for_daily_volumes * 0.1; // see p. 183: https://fops.de/wp-content/uploads/2021/02/FE-70.0919-2015-Anf-an-staedt-Verkehrsnachfragemodelle-Schlussbericht.pdf
 		return 1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
 	}
