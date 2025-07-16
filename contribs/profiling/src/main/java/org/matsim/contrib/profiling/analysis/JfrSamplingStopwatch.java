@@ -34,7 +34,9 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	private final Deque<String> ongoingOperations = new LinkedBlockingDeque<>();
 
 	/**
-	 * Keys: method names to retrieve
+	 * Operations to look for in the {@code ExecutionSample} {@link jdk.jfr.Event events}.
+	 *
+	 * @apiNote Keys: {@link OperationSampleMethod#methodName method names} to retrieve
 	 */
 	private final Map<String, OperationSampleMethod> operationMethods = Collections.synchronizedMap(new HashMap<>());
 
@@ -61,13 +63,14 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	*/
 	public static class SamplingStatistics {
 		// interval durations
-		String configured;
+		String configured; // todo can be multiple if recording with different setting is started during this one - change to a list
 		String configuredNative;
 		long min = Long.MAX_VALUE;
 		long max;
 		long sum; // total to calculate the average
 		long count; // event count
-		long maxStacktraceFrameCount;
+		long maxStacktraceFrameCountMain;
+		long maxStacktraceFrameCountAll;
 
 		Long previousEvent;
 		long interval;
@@ -85,7 +88,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 				sum += interval;
 			}
 			count++;
-			maxStacktraceFrameCount = Math.max(maxStacktraceFrameCount, event.getStackTrace().getFrames().size());
+			maxStacktraceFrameCountMain = Math.max(maxStacktraceFrameCountMain, event.getStackTrace().getFrames().size());
 			previousEvent = now;
 		}
 
@@ -99,8 +102,9 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 					max=%s ms
 					avg=%s ms
 					count=%s
-					maxStacktraceFrameCount=%s
-				]""".formatted(configured, configuredNative, min, max, avg(), count, maxStacktraceFrameCount);
+					maxStacktraceFrameCountMain=%s
+					maxStacktraceFrameCountAll=%s
+				]""".formatted(configured, configuredNative, min, max, avg(), count, maxStacktraceFrameCountMain, maxStacktraceFrameCountAll);
 		}
 	}
 
@@ -190,11 +194,13 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 			stopwatch.endIteration(event.getEndTime().toEpochMilli());
 		});
 
+		eventStream.onEvent(this::handleAllEvents);
+		// todo switch to all or just the sample events
 		eventStream.onEvent("jdk.ExecutionSample", this::handleSampleEvent);
 		eventStream.onEvent("jdk.NativeMethodSample", this::handleSampleEvent);
 
-		var idExecutionSample = new AtomicLong();
-		var idNativeExecutionSample = new AtomicLong();
+		var idExecutionSample = new AtomicLong(-1L);
+		var idNativeExecutionSample = new AtomicLong(-1L);
 
 		eventStream.onMetadata(metadataEvent -> {
 			metadataEvent.getEventTypes()
@@ -224,61 +230,92 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	}
 
+	protected void handleAllEvents(RecordedEvent recordedEvent) {
+		switch (recordedEvent.getEventType().getName()) {
+			case "jdk.ExecutionSample":
+			case "jdk.NativeMethodSample":
+				return; // skip sampling events - they are handled separately
+			case String name when name.startsWith("matsim."):
+				return; // skip our custom events for comparability
+			default:
+				//System.out.println(recordedEvent.getEventType().getName());
+		}
+
+		handleSampleEvent(recordedEvent);
+	}
+
 	protected void handleSampleEvent(RecordedEvent event) {
-			// event and attribute names may seem like hidden arcane knowledge, but can be found via `jfr metadata <jfr-file>`
-			var thread = event.getThread("sampledThread"); // getThread() is always null: https://bugs.openjdk.org/browse/JDK-8291503
-			//System.out.println(thread.getJavaName() + "@");
+		var stackTrace = event.getStackTrace();
+		if (stackTrace == null) {
+			return;
+		}
+		// collect the max stacktrace info from all events
+		statistics.maxStacktraceFrameCountAll = Math.max(statistics.maxStacktraceFrameCountAll, stackTrace.getFrames().size());
 
-			if ("main".equals(thread.getJavaName())) {
-				statistics.add(event);
+		var thread = event.getThread();
+		// getThread() is always null for sample events: https://bugs.openjdk.org/browse/JDK-8291503
+		if (thread == null) {
+			// event and attribute names may seem like hidden arcane knowledge, but can be found via `jfr metadata <jfr-file>` (or `jfr metadata` for just the jdk events)
+			if (event.hasField("sampledThread")) {
+				thread = event.getThread("sampledThread");
+			} else {
+				return; // we need the thread to attribute
+			}
+		}
 
-				var methodsInStackTrace = event.getStackTrace()
-					.getFrames()
-					.reversed()
-					.stream()
-					.filter(RecordedFrame::isJavaFrame)
-					.map(RecordedFrame::getMethod)
-					.toList();
+		if (!"main".equals(thread.getJavaName())) {
+			return;
+		}
 
-				// for all started but not ended operations
-				synchronized (stages) {
-					while (!ongoingOperations.isEmpty()) {
-						var operation = ongoingOperations.getFirst();
-						// if no mention anymore in the stacktrace, the operation is assumed to be over
-						if (methodsInStackTrace.stream().noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
-							stages.put(new Operation(operationMethods.get(operation).operationName, operation, false), event.getEndTime().toEpochMilli());
-							ongoingOperations.removeFirst();
-							System.out.println(operationMethods.get(operation).operationName + " ended with " +  statistics.interval + " ms since previous sample");
-						} else {
-							// only the topmost ongoing operation can be ended
-							// assuming the nested operation has to be higher on the stacktrace and thus exited earlier
-							break;
-						}
+		statistics.add(event);
+
+		var methodsInStackTrace = stackTrace.getFrames()
+			.reversed()
+			.stream()
+			.filter(RecordedFrame::isJavaFrame)
+			.map(RecordedFrame::getMethod)
+			.toList();
+
+		// for all started but not ended operations
+		synchronized (ongoingOperations) {
+			while (!ongoingOperations.isEmpty()) {
+				var operation = ongoingOperations.getFirst();
+				// if no mention anymore in the stacktrace, the operation is assumed to be over
+				if (methodsInStackTrace.stream().noneMatch(frameMethod -> operation.equals(frameMethod.getName()))) {
+					stages.put(new Operation(operationMethods.get(operation).operationName, operation, false), event.getEndTime().toEpochMilli());
+					ongoingOperations.removeFirst();
+					System.out.println(event.getEventType().getName());
+					System.out.println(operationMethods.get(operation).operationName + " ended with " +  statistics.interval + " ms since previous sample");
+				} else {
+					// only the topmost ongoing operation can be ended
+					// assuming the nested operation has to be higher on the stacktrace and thus exited earlier
+					break;
+				}
+			}
+		}
+
+		methodsInStackTrace.forEach(recordedMethod -> {
+			var type = recordedMethod.getType().getName();
+			var method = recordedMethod.getName();
+			var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
+
+			//System.out.println(type + "#" + method);
+			// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
+			// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
+
+			if (operationMethods.containsKey(method)) {
+				var operation = operationMethods.get(method);
+				if (operation.className.equals(type)) {
+					stages.putIfAbsent(new Operation(operation.operationName, method, true), time);
+					if (!ongoingOperations.contains(method)) {
+						ongoingOperations.addFirst(method);
+						System.out.println(event.getEventType().getName());
+						System.out.println(operation.operationName + " started with " +  statistics.interval + " ms since previous sample");
 					}
 				}
-
-				methodsInStackTrace.forEach(recordedMethod -> {
-					var type = recordedMethod.getType().getName();
-					var method = recordedMethod.getName();
-					var time = event.getStartTime().toEpochMilli(); // start and end time are equal on marker events like execution sample
-
-					//System.out.println(type + "#" + method);
-					// todo theoretically could support interfaces/abstract methods, if we have access to types/classes and can analyze their inheritance tree?
-					// but likely not worth the effort. Since AbstractController and NewControler are both only package-private, those probably won't be extended further
-
-					if (operationMethods.containsKey(method)) {
-						var operation = operationMethods.get(method);
-						if (operation.className.equals(type)) {
-							stages.putIfAbsent(new Operation(operation.operationName, method, true), time);
-							if (!ongoingOperations.contains(method)) {
-								ongoingOperations.addFirst(method);
-								System.out.println(operation.operationName + " started with " +  statistics.interval + " ms since previous sample");
-							}
-						}
-					}
-				});
-				//System.out.println("---");
 			}
+		});
+		//System.out.println("---");
 	}
 
 	public void addOperationMethod(OperationSampleMethod operationSampleMethod) {
@@ -311,7 +348,8 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		clone.max = statistics.max;
 		clone.sum = statistics.sum;
 		clone.count = statistics.count;
-		clone.maxStacktraceFrameCount = statistics.maxStacktraceFrameCount;
+		clone.maxStacktraceFrameCountMain = statistics.maxStacktraceFrameCountMain;
+		clone.maxStacktraceFrameCountAll = statistics.maxStacktraceFrameCountAll;
 		clone.previousEvent = statistics.previousEvent;
 		clone.interval =  statistics.interval;
 
