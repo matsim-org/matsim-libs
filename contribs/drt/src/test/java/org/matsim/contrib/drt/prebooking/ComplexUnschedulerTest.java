@@ -36,11 +36,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.network.NetworkUtils;
@@ -632,7 +628,7 @@ public class ComplexUnschedulerTest {
 
 			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);
 
-			this.timingUpdater = Mockito.mock(ScheduleTimingUpdater.class);
+			this.timingUpdater = Mockito.mock(ScheduleTimingUpdaterImpl.class);
 		}
 
 		AcceptedDrtRequest createRequest() {

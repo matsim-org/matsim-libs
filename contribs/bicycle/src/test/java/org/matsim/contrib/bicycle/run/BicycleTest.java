@@ -39,6 +39,7 @@ import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -492,7 +493,7 @@ public class BicycleTest {
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
 		config.scoring().addModeParams(bicycle);
-
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		config.routing().setNetworkModes(mainModeList);
 
 		// link 2 has infrastructure speed factor = 1.0, all other links 0.01
@@ -559,6 +560,7 @@ public class BicycleTest {
 		config.controller().setDumpDataAtEnd(false);
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(14. * 3600.);
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");

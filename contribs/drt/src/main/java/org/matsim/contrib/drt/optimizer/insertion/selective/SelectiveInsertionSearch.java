@@ -29,13 +29,13 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -47,13 +47,14 @@ import com.opencsv.CSVWriter;
  * @author michalm
  */
 final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBeforeCleanupListener {
-
 	private final SelectiveInsertionProvider insertionProvider;
 	private final SingleInsertionDetourPathCalculator detourPathCalculator;
 	private final InsertionDetourTimeCalculator detourTimeCalculator;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final MatsimServices matsimServices;
 	private final String mode;
+	private static final AtomicInteger instanceCounter = new AtomicInteger(0);
+	private final int instanceId;
 
 	public SelectiveInsertionSearch(SelectiveInsertionProvider insertionProvider,
 			SingleInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
@@ -64,6 +65,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
 		this.matsimServices = matsimServices;
 		this.mode = drtCfg.getMode();
+		this.instanceId = instanceCounter.incrementAndGet();
 	}
 
 	@Override
@@ -79,7 +81,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
 
-		collectDifferences(drtRequest, selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
+		collectDifferences(selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 
 		double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
 				insertionWithDetourData.detourTimeInfo);
@@ -89,7 +91,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 	private final Map<Integer, SummaryStatistics> pickupTimeLossStats = new LinkedHashMap<>();
 	private final Map<Integer, SummaryStatistics> dropoffTimeLossStats = new LinkedHashMap<>();
 
-	private void collectDifferences(DrtRequest request, DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
+	private void collectDifferences(DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
 		addRelativeDiff(matrixTimeInfo.pickupDetourInfo.pickupTimeLoss, networkTimeInfo.pickupDetourInfo.pickupTimeLoss,
 				networkTimeInfo.pickupDetourInfo.requestPickupTime, pickupTimeLossStats);
 		addRelativeDiff(matrixTimeInfo.dropoffDetourInfo.dropoffTimeLoss,
@@ -112,7 +114,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent event) {
 		String filename = matsimServices.getControlerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(),
-						mode + "_selective_insertion_detour_time_estimation_errors.csv");
+						mode + "_selective_insertion_detour_time_estimation_errors_instance_"+instanceId+".csv");
 		try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");) {
 			writer.writeNext(new String[] { "type", "hour", "count", "mean", "std_dev", "min", "max" }, false);
 			pickupTimeLossStats.forEach((hour, stats) -> printStats(writer, "pickup", hour, stats));
@@ -120,6 +122,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		instanceCounter.set(0);
 	}
 
 	private void printStats(CSVWriter writer, String type, int hour, SummaryStatistics stats) {
