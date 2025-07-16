@@ -193,29 +193,6 @@ public class JfrEventStopwatch implements AutoCloseable {
 
 			System.out.println(event.getStartTime() + " BEGIN iteration " + iteration);
 			stopwatch.beginIteration(iteration, event.getStartTime().toEpochMilli());
-
-			// wip remove - force fix colors
-			var expectedOperations = List.of(
-				new Operation("iterationStartsListeners", true),
-				new Operation("iterationStartsListeners", false),
-				new Operation("replanning", true),
-				new Operation("replanning", false),
-				new Operation("beforeMobsimListeners", true),
-				new Operation("dump all plans", true),
-				new Operation("dump all plans", false),
-				new Operation("beforeMobsimListeners", false),
-				new Operation("prepareForMobsim", true),
-				new Operation("prepareForMobsim", false),
-				new Operation("mobsim", true),
-				new Operation("mobsim", false),
-				new Operation("afterMobsimListeners", true),
-				new Operation("afterMobsimListeners", false),
-				new Operation("scoring", true),
-				new Operation("scoring", false),
-				new Operation("iterationEndsListeners", true),
-				new Operation("iterationEndsListeners", false)
-				).iterator();
-
 			// add all other recorded events to stopwatch
 			synchronized (stages) {
 				stages.entrySet()
@@ -224,20 +201,6 @@ public class JfrEventStopwatch implements AutoCloseable {
 					.forEach(entry -> {
 						Operation operation = entry.getKey();
 						Instant timestamp = entry.getValue();
-
-						// wip remove - force fix colors
-						Operation expectedOperation = expectedOperations.next();
-						while (!expectedOperation.equals(operation)) {
-							if (expectedOperation.isBegin) {
-								System.out.println(timestamp + " BEGIN " + expectedOperation.name + " --- inserted");
-								stopwatch.beginOperation(expectedOperation.name, timestamp.toEpochMilli());
-							} else {
-								System.out.println(timestamp + " END   " + expectedOperation.name + " --- inserted");
-								stopwatch.endOperation(expectedOperation.name, timestamp.toEpochMilli());
-							}
-							expectedOperation = expectedOperations.next();
-						}
-
 						if (operation.isBegin) {
 							System.out.println(timestamp + " BEGIN " + operation.name);
 							stopwatch.beginOperation(operation.name, timestamp.toEpochMilli());
