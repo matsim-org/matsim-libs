@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="stop_A" x="0.0" y="0.0" linkRefId="link_AA1" isBlocking="false" />
+		<stopFacility id="stop_B" x="1000.0" y="0.0" linkRefId="link_A1B" isBlocking="false" />
+		<stopFacility id="stop_C" x="500.0" y="866.025" linkRefId="link_CC1" isBlocking="false" />
+	</transitStops>
+	<transitLine id="line_1">
+		<transitRoute id="route_1">
+			<transportMode>train</transportMode>
+			<routeProfile>
+				<stop refId="stop_A" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="stop_B" departureOffset="00:02:30" arrivalOffset="00:02:30" awaitDeparture="true" />
+				<stop refId="stop_C" departureOffset="00:05:00" arrivalOffset="00:05:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<!-- Simplified ring route: A -> A1 -> B -> B1 -> C -> C1 -> A -->
+				<link refId="link_AA1" />
+				<link refId="link_A1B" />
+				<link refId="link_BB1" />
+				<link refId="link_B1C" />
+				<link refId="link_CC1" />
+				<link refId="link_C1A" />
+			</route>
+			<departures>
+				<departure id="dep_1" departureTime="00:00:00" vehicleRefId="train_1" />
+				<departure id="dep_2" departureTime="00:04:00" vehicleRefId="train_1" />
+				<departure id="dep_3" departureTime="00:08:00" vehicleRefId="train_1" />
+				<departure id="dep_4" departureTime="00:12:00" vehicleRefId="train_1" />
+				<departure id="dep_5" departureTime="00:16:00" vehicleRefId="train_1" />
+				<departure id="dep_6" departureTime="00:20:00" vehicleRefId="train_1" />
+				<departure id="dep_7" departureTime="00:24:00" vehicleRefId="train_1" />
+				<departure id="dep_8" departureTime="00:28:00" vehicleRefId="train_1" />
+				<departure id="dep_9" departureTime="00:32:00" vehicleRefId="train_1" />
+				<departure id="dep_10" departureTime="00:36:00" vehicleRefId="train_1" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

@@ -44,6 +44,7 @@ public final class RailsimUtils {
 	public static final String LINK_NONBLOCKING_AREA = "railsimNonBlockingArea";
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
+	public static final String VEHICLE_ATTRIBUTE_REVERSIBLE = "railsimReversible";
 	public static final String RESOURCE_TYPE = "railsimResourceType";
 
 	private RailsimUtils() {
@@ -172,6 +173,27 @@ public final class RailsimUtils {
 	 */
 	public static void setTrainAcceleration(VehicleType vehicle, double acceleration) {
 		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_ACCELERATION, acceleration);
+	}
+
+	/**
+	 * Sets whether the train is reversible.
+	 *
+	 * @param vehicle The vehicle type to set the attribute for.
+	 * @param reversible True if the train can be reversed, false otherwise.
+	 */
+	public static void setTrainReversible(VehicleType vehicle, boolean reversible) {
+		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE, reversible);
+	}
+
+	/**
+	 * Checks if the train is reversible.
+	 *
+	 * @param vehicle The vehicle type to check.
+	 * @return True if the train can be reversed, false otherwise.
+	 */
+	public static boolean isTrainReversible(VehicleType vehicle) {
+		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
+		return Objects.equals(attr, Boolean.TRUE);
 	}
 
 	/**
