@@ -188,9 +188,17 @@ public final class LSPUtils {
 
 	/**
 	 * Splits the shipments of the given LSP if they are larger than the smallest vehicle capacity of the LSP's resources.
+	 * This method will create new shipments with adjusted sizes and service times.
+	 * It will also clear the existing shipments and plans in the LSP before adding the new shipments.
+	 * The new shipments will be assigned to the LSP's plans.
 	 * @param lsp the lsp for which the shipments should be split if needed
 	 */
 	public static void splitShipmentsIfNeeded(LSP lsp) {
+		if (lsp.getLspShipments().isEmpty()) {
+			log.warn("LSP {} has no shipments. No splitting will be done. ", lsp.getId());
+			return;
+		}
+
 		double lowestCapacity = Double.MAX_VALUE;
 		for (LSPResource lspResource : lsp.getResources()) {
 			if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
@@ -211,6 +219,9 @@ public final class LSPUtils {
 		}
 
 		List<LspShipment> newShipments = new LinkedList<>();
+
+
+
 		for (LspShipment lspShipment : lsp.getLspShipments()) {
 			int sizeOfShipment = lspShipment.getSize();
 			int sizeOfNewShipments =0;
@@ -253,8 +264,17 @@ public final class LSPUtils {
 				newShipments.add(lspShipment);
 			}
 		}
+
+		// Clear the existing shipments and plans in the LSP
+		for (LSPPlan lspPlan : lsp.getPlans()) {
+			lspPlan.getShipmentPlans().clear();
+		}
 		lsp.getLspShipments().clear();
-		lsp.getLspShipments().addAll(newShipments);
+
+		// Add the new shipments to the LSP and assign them to the lspPlans
+		for (LspShipment newLspShipment : newShipments) {
+			lsp.assignShipmentToLspPlan(newLspShipment);
+		}
 
 	}
 
