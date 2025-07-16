@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Service to generate a stopwatch.png from jfr profiling recording files using dedicated operation events.
@@ -29,7 +31,6 @@ public class JfrEventStopwatch implements AutoCloseable {
 	private final EventStream eventStream;
 	private String iterationEventName = getEventName(IterationJfrEvent.class); // listener based iteration jfr event by default
 	private int iterationCount = 0;
-	private int operationCount = 0;
 
 	/**
 	 * Hold all encountered operation starts and ends, and their timestamps.
@@ -44,8 +45,12 @@ public class JfrEventStopwatch implements AutoCloseable {
 
 	/**
 	 * Events produced by the {@link org.matsim.contrib.profiling.events.FireDefaultProfilingEventsModule} via MATSim listeners.
-	 * Key: operation name as visible in stopwatch
-	 * Value: name of event
+	 * <ul>
+	 *     <li> Key: operation name as visible in stopwatch
+	 *     <li> Value: name of event
+	 * </ul>
+	 *
+	 * @see #addEvent(String, String)
 	 */
 	public static final Map<String, String> LISTENER_EVENT_OPERATIONS = Map.of(
 		"iterationStartsListeners", IterationStartsListenersJfrEvent.class.getAnnotation(Name.class).value(),
@@ -59,6 +64,15 @@ public class JfrEventStopwatch implements AutoCloseable {
 	);
 
 
+	/**
+	 * Events produced by via aspectj.
+	 * <ul>
+	 *     <li> Key: operation name as visible in stopwatch
+	 *     <li> Value: Class of the event
+	 * </ul>
+	 *
+	 * @see #addEvent(String, Class)
+	 */
 	public static final Map<String, Class<? extends Event>> AOP_EVENT_OPERATIONS = Map.of(
 		"iterationStartsListeners", AopStopwatchIterationStartsJfrEvent.class,
 		"replanning", 				AopStopwatchReplanningJfrEvent.class,
@@ -72,13 +86,11 @@ public class JfrEventStopwatch implements AutoCloseable {
 	);
 
 	public static String getEventName(Class<? extends Event> event) {
-		String eventName;
-		try {
-			eventName = event.getAnnotation(Name.class).value();
-		} catch (NullPointerException e) {
-			eventName = event.getName();
+		var nameAnnotation = event.getAnnotation(Name.class);
+		if (nameAnnotation != null) {
+			return nameAnnotation.value();
 		}
-		return eventName;
+		return event.getName();
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -145,13 +157,16 @@ public class JfrEventStopwatch implements AutoCloseable {
 	}
 
 	public void addEvent(String operationName, Class<? extends Event> event) {
-		String eventName =  getEventName(event);
+		String eventName = getEventName(event);
 		this.operationEvents.put(operationName, eventName);
 	}
 
-	protected void handleEvent(String name, RecordedEvent event) {
-		stages.put(new Operation(name, true), event.getStartTime());
-		stages.put(new Operation(name, false), event.getEndTime());
+	/**
+	 * Handler for a specific event and operation combination, intended to be used for {@link EventStream#onEvent(String, Consumer)}
+	 */
+	protected void handleEvent(String operationName, RecordedEvent event) {
+		stages.put(new Operation(operationName, true), event.getStartTime());
+		stages.put(new Operation(operationName, false), event.getEndTime());
 	}
 
 	protected void beforeStart() {
@@ -163,9 +178,8 @@ public class JfrEventStopwatch implements AutoCloseable {
 				}
 			});
 		} else {
-			operationEvents.forEach((operation, event) -> {
-				eventStream.onEvent(event, recordedEvent -> handleEvent(operation, recordedEvent));
-			});
+			operationEvents.forEach((operation, eventName) ->
+				eventStream.onEvent(eventName, recordedEvent -> handleEvent(operation, recordedEvent)));
 		}
 
 		// IterationJfrEvents will occur *after* all the operations happening within them
