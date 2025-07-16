@@ -91,7 +91,7 @@ final class RailsimEngine implements Steppable {
 			update = updateQueue.peek();
 		}
 
-		if (time % config.updateInterval == 0.) {
+		if (time % config.getUpdateInterval() == 0.) {
 			updateAllPositions(time);
 		}
 	}
@@ -196,7 +196,7 @@ final class RailsimEngine implements Steppable {
 			// train needs to stop
 			decideTargetSpeed(event, state);
 
-			event.checkReservation = time + config.pollInterval;
+			event.checkReservation = time + config.getPollInterval();
 			decideNextUpdate(event);
 
 		} else {
@@ -220,7 +220,7 @@ final class RailsimEngine implements Steppable {
 			if (allBlocked)
 				event.checkReservation = -1;
 			else {
-				event.checkReservation = time + config.pollInterval;
+				event.checkReservation = time + config.getPollInterval();
 			}
 
 			// Train already waits at the end of previous link, next link is already blocked
@@ -242,11 +242,11 @@ final class RailsimEngine implements Steppable {
 
 		} else {
 
-			event.checkReservation = time + config.pollInterval;
+			event.checkReservation = time + config.getPollInterval();
 
 			// If train is already standing still and waiting, there is no update needed.
 			if (event.waitingForLink && FuzzyUtils.equals(state.speed, 0)) {
-				event.plannedTime = time + config.pollInterval;
+				event.plannedTime = time + config.getPollInterval();
 			} else {
 				decideNextUpdate(event);
 			}
@@ -294,7 +294,7 @@ final class RailsimEngine implements Steppable {
 
 		} else {
 			// vehicle will wait and call departure again
-			event.plannedTime += config.pollInterval;
+			event.plannedTime += config.getPollInterval();
 		}
 	}
 
@@ -398,7 +398,7 @@ final class RailsimEngine implements Steppable {
 			if (!resources.isBlockedBy(currentLink, state)) {
 				event.waitingForLink = true;
 				event.type = UpdateEvent.Type.WAIT_FOR_RESERVATION;
-				event.plannedTime = time + config.pollInterval;
+				event.plannedTime = time + config.getPollInterval();
 				return;
 			}
 		}
