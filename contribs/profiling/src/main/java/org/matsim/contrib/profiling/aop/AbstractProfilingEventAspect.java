@@ -27,14 +27,17 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 
+// todo annotation style and code style may differ in performance, due to runtime checks
 @Aspect
 public abstract class AbstractProfilingEventAspect {
 
 	@Pointcut
 	public abstract void eventPoints();
 
+	// todo provide more classes to inherit, with: no param, static part, full joinpoint
 	public abstract Event createEvent(JoinPoint.StaticPart thisJoinPointStaticPart);
 
+	// todo if the return value is never used (as opposed to the trace aspect), can we use before & after instead to potentially profit from optimizations?
 	@Around("eventPoints()")
 	public Object around(ProceedingJoinPoint thisJoinPoint) throws Throwable {
 		Event jfrEvent = createEvent(thisJoinPoint.getStaticPart());

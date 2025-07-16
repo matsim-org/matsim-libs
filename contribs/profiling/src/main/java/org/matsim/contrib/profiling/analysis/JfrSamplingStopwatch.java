@@ -38,6 +38,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	/**
 	 * Method names of the currently started but not ended operations
+	 * TODO are these even unique? shouldn't that be the operation name? here and for operationMethods: use SampleOperation(String methodName, String className) as keys to ensure uniqueness (which would need parameters as well in case of overloaded methods)
 	 */
 	private final Deque<String> ongoingOperations = new LinkedBlockingDeque<>();
 

@@ -105,7 +105,7 @@ public class EnableProfilingModule extends AbstractModule {
 
 		public ProfilingControlRegistry(int startIteration, int endIteration, String outputFilename, boolean trace) {
 			if (startIteration < 0 || endIteration < 0 || startIteration > endIteration) {
-				throw new IllegalArgumentException("startIteration must be positive and less than endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
+				throw new IllegalArgumentException("startIteration must be positive and less than or equal endIteration, but was: " + startIteration + ", endIteration: " + endIteration);
 			}
 
 			this.startIteration = startIteration;
@@ -124,6 +124,7 @@ public class EnableProfilingModule extends AbstractModule {
 
 			try {
 				log.info("Instantiating JFR Recording");
+				// todo default to profile for now, but could be configurable
 				recording = new Recording(Configuration.getConfiguration("profile"));
 				recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), outputFilename + ".jfr"));
 				recording.setName("instrumented-profile-" + startIteration + "-" + endIteration);

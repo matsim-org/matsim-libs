@@ -27,7 +27,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.matsim.contrib.profiling.events.MatsimJfrEvent;
 
 @Aspect
-public class ScoringListenerProfilingAspect extends AbstractProfilingEventAspect{
+public class ScoringListenerProfilingAspect extends AbstractProfilingEventAspect {
 
     /**
      * Use the full canonical name (including package) in the pointcut declaration to ensure aspectj finds the targeted class.
