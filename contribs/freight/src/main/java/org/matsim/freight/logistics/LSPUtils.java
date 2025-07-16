@@ -214,6 +214,8 @@ public final class LSPUtils {
 		for (LspShipment lspShipment : lsp.getLspShipments()) {
 			int sizeOfShipment = lspShipment.getSize();
 			int sizeOfNewShipments =0;
+			double durationPickupOfNewShipments = 0;
+
 			if (lspShipment.getSize() > lowestCapacity && lowestCapacity > 0 ) {
 				log.warn("Shipment {} of LSP {} has a size of {}, which is larger than the smallest vehicle capacity of {}. This may lead to problems during scheduling. Will split it into smaller parts.",
 					lspShipment.getId(), lsp.getId(), lspShipment.getSize(), lowestCapacity);
@@ -222,22 +224,29 @@ public final class LSPUtils {
 				char suffix = 'a';
 				for (int i = 0; i < fullParts; i++) {
 					LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) lowestCapacity);
-					//Todo: Durantion proportional anpassen.
 					newShipments.add(part);
 					sizeOfNewShipments = sizeOfNewShipments + part.getSize();
+					durationPickupOfNewShipments = durationPickupOfNewShipments + part.getPickupServiceTime();
 					suffix++;
 				}
 				if (rest > 0) {
 					LspShipment part = createLspShipmentWithNewIdAndSize(lspShipment, Id.create(lspShipment.getId().toString() + "_" + suffix, LspShipment.class), (int) rest);
 					newShipments.add(part);
 					sizeOfNewShipments = sizeOfNewShipments + part.getSize();
+					durationPickupOfNewShipments = durationPickupOfNewShipments + part.getPickupServiceTime();
 				}
 				log.info("Shipment {} of LSP {} was split into {} parts due to capacity limit {}.", lspShipment.getId(), lsp.getId(), newShipments.size(), lowestCapacity);
 
 				//Assert that the size of the new shipments matches the original shipment size
 				if (sizeOfNewShipments != sizeOfShipment) {
 					log.error("The size of the new shipments {} ({}) does not match the original shipment size ({}). This may lead to problems during scheduling.", lspShipment.getId(), sizeOfNewShipments, sizeOfShipment);
-					throw new IllegalStateException("Sum of split shipments does not match original shipment size.");
+					throw new IllegalStateException("Sum of demand of the split shipments does not match the original shipment size.");
+				}
+
+				//Assert that the duration of the pickup of the new created shipments matches the original shipment duration
+				if (durationPickupOfNewShipments != lspShipment.getPickupServiceTime()) {
+					log.error("The pickupServiceTime of all new shipments {} ({}) does not match the original pickupServiceTime ({}). This will change the problem.", lspShipment.getId(), durationPickupOfNewShipments, lspShipment.getPickupServiceTime());
+					throw new IllegalStateException("Sum of pickupDurations of the split shipments does not match the original shipment pickupDurations.");
 				}
 
 			} else { //keep the shipment as it is
@@ -246,10 +255,12 @@ public final class LSPUtils {
 		}
 		lsp.getLspShipments().clear();
 		lsp.getLspShipments().addAll(newShipments);
+
 	}
 
 	/**
 	 * Creates a new {@link LspShipment} with a new Id and size.
+	 * The durations for pickup and delivery are adjusted proportionally to the new size.
 	 * All other parameters are copied from the given {@link LspShipment}.
 	 * @param lspShipment the original LspShipment to copy parameters from
 	 * @param newId the new Id for the LspShipment
@@ -257,13 +268,15 @@ public final class LSPUtils {
 	 * @return the new LspShipment with the given Id and size
 	 */
 	static LspShipment createLspShipmentWithNewIdAndSize(LspShipment lspShipment, Id<LspShipment> newId, int size) {
+		var proportion = (double) size / lspShipment.getSize();
+
 		var builder = LspShipmentUtils.LspShipmentBuilder.newInstance(newId);
 			builder.setCapacityDemand(size);
 			builder.setFromLinkId(lspShipment.getFrom());
 			builder.setToLinkId(lspShipment.getTo());
-			builder.setPickupServiceTime(lspShipment.getPickupServiceTime());
+			builder.setPickupServiceTime(lspShipment.getPickupServiceTime() * proportion);
 			builder.setStartTimeWindow(lspShipment.getPickupTimeWindow());
-			builder.setDeliveryServiceTime(lspShipment.getDeliveryServiceTime());
+			builder.setDeliveryServiceTime(lspShipment.getDeliveryServiceTime() * proportion);
 			builder.setEndTimeWindow(lspShipment.getDeliveryTimeWindow());
 		return builder.build();
 	}
