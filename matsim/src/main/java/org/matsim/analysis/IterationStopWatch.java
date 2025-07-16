@@ -27,7 +27,6 @@ import org.matsim.core.utils.io.IOUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -75,6 +74,7 @@ public final class IterationStopWatch {
 
 	/** A formatter for dates, used when writing out the data. */
 	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+	private final DateTimeFormatter durationFormatter = formatter.withZone(ZoneOffset.UTC);
 
 	/** data structures to identify nested operations */
 	private Stack<String> currentMeasuredOperations;
@@ -265,7 +265,7 @@ public final class IterationStopWatch {
 					Long endTime = data.get("END " + identifier);
 					writer.write(delimiter);
 					if (startTime != null && endTime != null) {
-						writer.write(formatMilliTime(endTime - startTime));
+						writer.write(durationFormatter.format(Instant.ofEpochMilli(endTime - startTime)));
 					}
 				}
 
@@ -397,7 +397,7 @@ public final class IterationStopWatch {
 		if (millis == null) {
 			return "";
 		}
-		return this.formatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.UTC));
+		return this.formatter.format(Instant.ofEpochMilli(millis));
 	}
 
 }
