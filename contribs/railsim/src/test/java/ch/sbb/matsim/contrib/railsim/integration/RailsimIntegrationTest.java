@@ -69,9 +69,21 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroSimpleBiDirectionalTrack() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
-	}
+		// We have 6 trains going sequantially from t1 to t3.
+		List<Event> events = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack")).getEvents();
 
+		// assert that all of them arrived at the final station (facility t3) and check their travel duration.
+		for (String train : List.of("train1", "train2", "train3", "train4", "train5", "train6")) {
+			// check if the train arrived at the final station
+			List<VehicleArrivesAtFacilityEvent> arrivals = filterVehicleArrivesAtFacilityEvent(events, train);
+			Assertions.assertTrue(arrivals.stream().anyMatch(event -> event.getFacilityId().toString().equals("t3")),
+				"Train " + train + " did not arrive at the final station t3.");
+
+			double duration = getTravelDuration(events, train, "t1", "t3");
+			Assertions.assertEquals(380.0, duration, 1.0,
+				"Train " + train + " did not have the expected travel duration. Expected 380s, but was " + duration + "s.");
+		}
+	}
 	@Test
 	void testMesoUniDirectionalVaryingCapacities() {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoUniDirectionalVaryingCapacities"));
@@ -181,7 +193,21 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroTrackOppositeTraffic() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
+		// two trains approach each other, they meet approximately in the middle of the track (double laned track with same resource id "t2_A-t2_B")
+		// one train has to wait for the other train to pass, then continues
+		List<Event> events = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic")).getEvents();
+
+		// assert that both trains arrive at their final facility
+		Assertions.assertTrue(filterVehicleArrivesAtFacilityEvent(events, "train1").stream().anyMatch(event -> (event.getFacilityId().toString().equals("t3_A-B"))),
+			"Train1 did not arrive at the final facility t3_A-B.");
+
+		Assertions.assertTrue(filterVehicleArrivesAtFacilityEvent(events, "train2").stream().anyMatch(event -> (event.getFacilityId().toString().equals("t1_B-A"))),
+			"Train2 did not arrive at the final facility t1_B-A.");
+
+		// check that train2 waits multiple /events for train1 to pass
+		List<RailsimTrainStateEvent> train2EventsOnMiddleLink = filterTrainEvents(events, "train2").stream().filter(event -> (event.getHeadLink().toString().equals("t3_A-t2_B"))).toList();
+		Assertions.assertTrue(train2EventsOnMiddleLink.stream().filter(event -> (event.getSpeed() == 0.0)).count() > 40);
+
 	}
 
 	@Test
@@ -518,5 +544,25 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 	@Test
 	void testScenarioMicroMesoConstructionSiteLsGe() {
 		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
+	}
+
+	private List<VehicleArrivesAtFacilityEvent> filterVehicleArrivesAtFacilityEvent(List<Event> events, String train) {
+		return events.stream().filter(event -> event instanceof VehicleArrivesAtFacilityEvent).map(event -> (VehicleArrivesAtFacilityEvent) event)
+			.filter(event -> event.getVehicleId().toString().equals(train)).toList();
+	}
+
+	private List<VehicleDepartsAtFacilityEvent> filterVehicleDepartsAtFacilityEvent(List<Event> events, String train) {
+		return events.stream().filter(event -> event instanceof VehicleDepartsAtFacilityEvent).map(event -> (VehicleDepartsAtFacilityEvent) event)
+			.filter(event -> event.getVehicleId().toString().equals(train)).toList();
+	}
+
+	private double getTravelDuration(List<Event> events, String train, String startFacility, String endFacility) {
+		double departureTime = filterVehicleDepartsAtFacilityEvent(events, train).stream()
+			.filter(event -> event.getFacilityId().toString().equals(startFacility)).findFirst().orElseThrow(() -> new RuntimeException("No departure found for train " + train + " at facility " + startFacility)).getTime();
+
+		double arrivalTime = filterVehicleArrivesAtFacilityEvent(events, train).stream()
+			.filter(event -> event.getFacilityId().toString().equals(endFacility)).findFirst().orElseThrow(() -> new RuntimeException("No arrival found for train " + train + " at facility " + endFacility)).getTime();
+
+		return arrivalTime - departureTime;
 	}
 }
