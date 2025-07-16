@@ -7,7 +7,7 @@
 		<param name="coordinateSystem" value="Atlantis"/>
 	</module>
 
-	<module name="controler">
+	<module name="controller">
 		<param name="runId" value="test"/>
 		<param name="firstIteration" value="0"/>
 		<param name="compressionType" value="none"/>

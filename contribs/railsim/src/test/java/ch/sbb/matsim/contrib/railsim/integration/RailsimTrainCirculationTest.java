@@ -21,7 +21,9 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 
 	@Test
 	void shuttle() {
-		// TODO: Implement shuttle test with back-and-forth movement
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "shuttle"));
+
 	}
 
 	@Test

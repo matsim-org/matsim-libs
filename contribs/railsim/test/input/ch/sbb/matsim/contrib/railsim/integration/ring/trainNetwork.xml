@@ -12,50 +12,51 @@
 	Main Stations: A - B - C (equilateral triangular ring)
 	Intermediate Nodes: A1, B1, C1 (midpoints between main stations)
 	Primary Route: A-A1-B-B1-C-C1-A (clockwise ring)
+	Scaled for ~30 minute round trip at 20 m/s speed
 	-->
 
 	<nodes>
 		<!-- Main stations forming an equilateral triangle -->
 		<node id="node_A" x="0.0" y="0.0" />
-		<node id="node_B" x="1000.0" y="0.0" />
-		<node id="node_C" x="500.0" y="866.025" />
+		<node id="node_B" x="13170.0" y="0.0" />
+		<node id="node_C" x="6585.0" y="11405.0" />
 
 		<!-- Intermediate nodes at midpoints of each edge -->
-		<node id="node_A1" x="500.0" y="0.0" />
-		<node id="node_B1" x="750.0" y="433.013" />
-		<node id="node_C1" x="250.0" y="433.013" />
+		<node id="node_A1" x="6585.0" y="0.0" />
+		<node id="node_B1" x="9877.5" y="5702.5" />
+		<node id="node_C1" x="3292.5" y="5702.5" />
 	</nodes>
 
 	<!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
 		<!-- Primary ring route: A -> A1 -> B -> B1 -> C -> C1 -> A -->
-		<link id="link_AA1" from="node_A" to="node_A1" length="500.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_AA1" from="node_A" to="node_A1" length="6585.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_A1B" from="node_A1" to="node_B" length="500.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_A1B" from="node_A1" to="node_B" length="6585.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_BB1" from="node_B" to="node_B1" length="433.013" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_BB1" from="node_B" to="node_B1" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_B1C" from="node_B1" to="node_C" length="433.013" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_B1C" from="node_B1" to="node_C" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_CC1" from="node_C" to="node_C1" length="433.013" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_CC1" from="node_C" to="node_C1" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_C1A" from="node_C1" to="node_A" length="433.013" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_C1A" from="node_C1" to="node_A" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
