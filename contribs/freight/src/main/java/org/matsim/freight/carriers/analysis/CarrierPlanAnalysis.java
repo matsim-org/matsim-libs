@@ -39,9 +39,9 @@ import org.matsim.freight.carriers.*;
  * For all carriers it writes out the:
  * - score of the selected plan
  * - number of tours (= vehicles) of the selected plan
- * - number of Services _input
+ * - number of Services _planned
  * - number of Services _handled
- * - number of shipments _input
+ * - number of shipments _planned
  * - number of shipments _handled
  * - number of not handled jobs
  * - number of planned demand size
@@ -54,7 +54,9 @@ import org.matsim.freight.carriers.*;
 
 	private static final Logger log = LogManager.getLogger(CarrierPlanAnalysis.class);
 	private final String delimiter;
-
+	private enum JobsType {
+		shipments, services, none
+	}
 	final Carriers carriers;
 
 	/*package-private*/ CarrierPlanAnalysis(String delimiter, Carriers carriers) {
@@ -77,28 +79,27 @@ import org.matsim.freight.carriers.*;
 				"fleetSize",
 				"nuOfPossibleVehicleTypes",
 				"nuOfPossibleVehicles",
-				"nuOfServiceLocations_input",
-				"nuOfPickupLocations_input",
-				"nuOfDeliveryLocations_input");
+				"nuOfServiceLocations_planned",
+				"nuOfPickupLocations_planned",
+				"nuOfDeliveryLocations_planned");
 			String header = switch (analysisType) {
 				case carriersPlans_unPlanned -> String.join(delimiter,
 					headerGeneral,
-					"nuOfShipments_input",
-					"nuOfServices_input",
-					"nuOfPlanedDemandSize"
+					"jobType",
+					"nuOfJobs_planned",
+					"demandSize_planned"
 				);
 				case carriersPlans, carriersAndEvents -> String.join(delimiter,
 					headerGeneral,
 					"MATSimScoreSelectedPlan",
 					"jSpritScoreSelectedPlan",
 					"nuOfTours",
-					"nuOfShipments_input",
-					"nuOfShipments_handled",
-					"nuOfServices_input",
-					"nuOfServices_handled",
-					"noOfNotHandledJobs",
-					"nuOfPlanedDemandSize",
-					"nuOfHandledDemandSize",
+					"jobType",
+					"nuOfJobs_planned",
+					"nuOfJobs_handled",
+					"noOfJobs_notHandled",
+					"demandSize_planned",
+					"demandSize_handled",
 					"jspritComputationTime"
 				);
 			};
@@ -115,8 +116,8 @@ import org.matsim.freight.carriers.*;
 				int numberOfPossibleVehicleTypes = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().map(
 					CarrierVehicle::getVehicleTypeId).distinct().mapToInt(vt -> 1).sum();
 				String fleetSize = carrier.getCarrierCapabilities().getFleetSize().toString();
-				int numberOfPlanedShipments = carrier.getShipments().size();
-				int numberOfPlanedServices = carrier.getServices().size();
+				int numberOfPlannedJobs = carrier.getShipments().size() + carrier.getServices().size();
+				JobsType jobsType;
 				int numberJspritIterations = CarriersUtils.getJspritIterations(carrier);
 
 				int numberOfDifferentServiceLocations_demand = (int) carrier.getServices().values().stream().map(
@@ -126,11 +127,17 @@ import org.matsim.freight.carriers.*;
 				int numberOfDifferentDeliveryLocations_demand = (int) carrier.getShipments().values().stream().map(
 					CarrierShipment::getDeliveryLinkId).distinct().count();
 
-				int numberOfPlanedDemandSize;
-				if (numberOfPlanedShipments > 0) {
-					numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getCapacityDemand).sum();
-				} else {
-					numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getCapacityDemand).sum();
+				int numberOfPlannedDemandSize;
+				if (!carrier.getShipments().isEmpty()) {
+					numberOfPlannedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getCapacityDemand).sum();
+					jobsType = JobsType.shipments;
+				} else if (!carrier.getServices().isEmpty()) {
+					numberOfPlannedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getCapacityDemand).sum();
+					jobsType = JobsType.services;
+				}
+				else {
+					numberOfPlannedDemandSize = 0;
+					jobsType = JobsType.none;
 				}
 
 				bw1.write(carrier.getId().toString());
@@ -143,49 +150,40 @@ import org.matsim.freight.carriers.*;
 				bw1.write(delimiter + numberOfDifferentDeliveryLocations_demand);
 				switch (analysisType) {
 					case carriersPlans_unPlanned -> {
-						bw1.write(delimiter + numberOfPlanedShipments);
-						bw1.write(delimiter + numberOfPlanedServices);
-						bw1.write(delimiter + numberOfPlanedDemandSize);
+						bw1.write(delimiter + jobsType);
+						bw1.write(delimiter + numberOfPlannedJobs);
+						bw1.write(delimiter + numberOfPlannedDemandSize);
 					}
 					case carriersAndEvents -> {
 						int numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
 							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
-						int numberOfHandledDeliveries = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
-							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Delivery).count()).sum();
 						int nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
 							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
+						int numberOfHandledJobs = numberOfHandledPickups + nuOfServiceHandled;
 						int notHandledJobs;
 						int numberOfHandledDemandSize;
 
-						if (numberOfPlanedShipments > 0) {
-							numberOfPlanedDemandSize = carrier.getShipments().values().stream().mapToInt(CarrierShipment::getCapacityDemand).sum();
+						if (jobsType == JobsType.shipments) {
 							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
 									te -> ((Tour.Pickup) te).getShipment().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlanedShipments - numberOfHandledPickups;
+							notHandledJobs = numberOfPlannedJobs - numberOfHandledPickups;
 						} else {
-							numberOfPlanedDemandSize = carrier.getServices().values().stream().mapToInt(CarrierService::getCapacityDemand).sum();
 							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
 								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
 									te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlanedServices - nuOfServiceHandled;
+							notHandledJobs = numberOfPlannedJobs - nuOfServiceHandled;
 						}
 						CarriersUtils.allJobsHandledBySelectedPlan(carrier);
 
-						if (numberOfHandledDeliveries != numberOfHandledPickups) {
-							log.warn(
-								"Number of handled pickups and deliveries are not equal for carrier {}. Pickups: {}, Deliveries: {}. This should not happen!!",
-								carrier.getId(), numberOfHandledPickups, numberOfHandledDeliveries);
-						}
 						bw1.write(delimiter + carrier.getSelectedPlan().getScore());
 						bw1.write(delimiter + carrier.getSelectedPlan().getJspritScore());
 						bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
-						bw1.write(delimiter + numberOfPlanedShipments);
-						bw1.write(delimiter + numberOfHandledPickups);
-						bw1.write(delimiter + numberOfPlanedServices);
-						bw1.write(delimiter + nuOfServiceHandled);
+						bw1.write(delimiter + jobsType);
+						bw1.write(delimiter + numberOfPlannedJobs);
+						bw1.write(delimiter + numberOfHandledJobs);
 						bw1.write(delimiter + notHandledJobs);
-						bw1.write(delimiter + numberOfPlanedDemandSize);
+						bw1.write(delimiter + numberOfPlannedDemandSize);
 						bw1.write(delimiter + numberOfHandledDemandSize);
 						if (CarriersUtils.getJspritComputationTime(carrier) != Integer.MIN_VALUE)
 							bw1.write(delimiter + Time.writeTime(CarriersUtils.getJspritComputationTime(carrier), Time.TIMEFORMAT_HHMMSS));
