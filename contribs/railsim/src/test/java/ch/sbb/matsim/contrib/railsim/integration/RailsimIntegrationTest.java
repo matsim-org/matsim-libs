@@ -58,6 +58,7 @@ import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
+import org.opentest4j.AssertionFailedError;
 
 public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
@@ -76,7 +77,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			.trainHasLastArrival("train6", 29180.0 + 5 * 600);
 
 		// check that there is only one train on each link at a time
-		for (String link: result.getScenario().getNetwork().getLinks().keySet().stream().map(Id::toString).toList()) {
+		for (String link : result.getScenario().getNetwork().getLinks().keySet().stream().map(Id::toString).toList()) {
 			assertSingleTrainOnLink(result.getEvents(), link);
 		}
 	}
@@ -227,7 +228,10 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 	void testMesoTwoSources() {
 		// several trains start at the same time from two different sources (one having capacity >>1), they meet at a bottleneck with capacity 1
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
-
+		// on the mesoscopic link there should be multiple trains at the same time, so which check that this assertion fails
+		Assertions.assertThrows(AssertionFailedError.class, () -> {
+			assertSingleTrainOnLink(result.getEvents(), "t1_B-t2_A");
+		});
 		// check that only one train is on the bottleneck link at a time
 		assertSingleTrainOnLink(result.getEvents(), "t2_A-t2_B");
 
@@ -244,18 +248,29 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMesoTwoSourcesComplex() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
+		// seems redundant to me, this test is simpler than testMesoTwoSources...
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 37358.0)
+			.trainHasLastArrival("train2", 41578.0);
 	}
 
 	@Test
 	void testScenarioMesoGenfBernAllTrains() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+		// this is a complex (realistic) scenario...
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+
+		//assertThat(result).allTrainsArrived(); this fails, some don't arrive...
+		assertThat(result).hasNumberOfTrains(210);
+		// check the number of events... we could see if something changes significantly in the future
+		Assertions.assertEquals(2605247, result.getEvents().size(), 1000);
 	}
 
 	@Test
 	void testScenarioMesoGenfBernOneTrain() {
-
-		// Remove vehicles except the first one
+		// simplified scenario from the above...Remove vehicles except the first one
 		Consumer<Scenario> filter = scenario -> {
 
 			Set<Id<Vehicle>> remove = scenario.getTransitVehicles().getVehicles().values().stream()
@@ -276,18 +291,45 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			remove.forEach(v -> scenario.getTransitVehicles().removeVehicle(v));
 		};
 
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
 
+		assertThat(result).allTrainsArrived().trainHasLastArrival("Bummelzug_GE_BE_train_0", 9221.0);
 	}
 
 	@Test
 	void testMicroThreeUniDirectionalTracks() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
+		// three parallel uni-directional tracks. Train1 starts from the uppermost track and goes to the bottom
+		// Train2 stays in middle track and waits for train1 to pass, then continues
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 30640.0)
+			.trainHasLastArrival("train2", 30531.0);
 	}
 
 	@Test
 	void testMicroTrainFollowingConstantSpeed() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+		// two train starts from a station (low speed) and accelerate once their tail reaches the end of the station link
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 29820.0)
+			.trainHasLastArrival("train2", 30111.0);
+
+		// train1 is faster than train2
+		// Both trains do not accelerate to their maximum speed but only to targetSpeed
+		// targetSpeed << than min(freeSpeed Link, maxSpeed Train), why?
+		filterTrainEvents(result.getEvents(), "train1").forEach(event -> {
+			if (event.getHeadLink().toString().equals("12-13")) {
+				Assertions.assertEquals(24, event.getSpeed(), 1, "Train1 speed on link is not correct.");
+			}
+		});
+
+		filterTrainEvents(result.getEvents(), "train2").forEach(event -> {
+			if (event.getHeadLink().toString().equals("12-13")) {
+				Assertions.assertEquals(11.5, event.getSpeed(), 1, "Train1 speed on link is not correct.");
+			}
+		});
 	}
 
 	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
@@ -587,69 +629,20 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		return arrivalTime - departureTime;
 	}
 
-	private void assertSingleTrainOnLink(List<Event> events, String linkId)
-	/**
-	 * Asserts that only one train is present on the specified link at any given time.
-	 * It checks RailsimTrainStateEvents for each vehicle and verifies that their time intervals
-	 * on the link do not overlap.
-	 *
-	 * @param events List of simulation events to analyze.
-	 * @param linkId The ID of the link to check for single train occupancy.
-	 */
-	{
-		Map<Id<Vehicle>, List<Double>> linkEntryExitTimes = new HashMap<>();
 
-		// Group RailsimTrainStateEvents by vehicle
-		Map<Id<Vehicle>, List<RailsimTrainStateEvent>> eventsByVehicle = events.stream()
+	private void assertSingleTrainOnLink(List<Event> events, String linkId) {
+		// Group events by time and check for multiple trains on the same link at the same time
+		Map<Double, List<RailsimTrainStateEvent>> eventsByTime = events.stream()
 			.filter(e -> e instanceof RailsimTrainStateEvent)
 			.map(e -> (RailsimTrainStateEvent) e)
-			.collect(Collectors.groupingBy(RailsimTrainStateEvent::getVehicleId));
+			.filter(e -> e.getHeadLink().toString().equals(linkId) || e.getTailLink().toString().equals(linkId))
+			.collect(Collectors.groupingBy(Event::getTime));
 
-		for (Map.Entry<Id<Vehicle>, List<RailsimTrainStateEvent>> entry : eventsByVehicle.entrySet()) {
-			Id<Vehicle> vehicleId = entry.getKey();
-			List<RailsimTrainStateEvent> trainEvents = entry.getValue();
-			trainEvents.sort(Comparator.comparingDouble(Event::getTime));
-
-			boolean onLink = false;
-			for (RailsimTrainStateEvent event : trainEvents) {
-				// A train is considered on the link if its head is on or past the link,
-				// and its tail has not yet left the link. This requires route information
-				// which is not directly in the event. A simpler check is if the head is on the link.
-				boolean headOnLink = event.getHeadLink().toString().equals(linkId);
-
-				if (headOnLink && !onLink) {
-					// Train entered the link
-					linkEntryExitTimes.computeIfAbsent(vehicleId, k -> new ArrayList<>()).add(event.getTime());
-					onLink = true;
-				} else if (!headOnLink && onLink) {
-					// Train left the link
-					linkEntryExitTimes.get(vehicleId).add(event.getTime());
-					onLink = false;
-				}
-			}
-		}
-
-		// Check for overlapping time intervals
-		List<Map.Entry<Id<Vehicle>, List<Double>>> sortedEntries = new ArrayList<>(linkEntryExitTimes.entrySet());
-
-		for (int i = 0; i < sortedEntries.size(); i++) {
-			for (int j = i + 1; j < sortedEntries.size(); j++) {
-				List<Double> times1 = sortedEntries.get(i).getValue();
-				List<Double> times2 = sortedEntries.get(j).getValue();
-
-				// Assuming one entry/exit pair per train on the link for simplicity
-				if (times1.size() == 2 && times2.size() == 2) {
-					double start1 = times1.get(0);
-					double end1 = times1.get(1);
-					double start2 = times2.get(0);
-					double end2 = times2.get(1);
-
-					// Check for overlap
-					if (Math.max(start1, start2) < Math.min(end1, end2)) {
-						Assertions.fail("Trains " + sortedEntries.get(i).getKey() + " and " + sortedEntries.get(j).getKey() +
-							" were on link " + linkId + " at the same time.");
-					}
-				}
+		for (Map.Entry<Double, List<RailsimTrainStateEvent>> entry : eventsByTime.entrySet()) {
+			Set<String> trainsOnLink = entry.getValue().stream().map(x -> x.getVehicleId().toString()).collect(Collectors.toSet());
+			if (trainsOnLink.size() > 1) {
+				List<String> vehicleIds = entry.getValue().stream().map(RailsimTrainStateEvent::getVehicleId).map(Id<Vehicle>::toString).toList();
+				Assertions.fail("Multiple trains " + vehicleIds + " on link " + linkId + " at time " + entry.getKey());
 			}
 		}
 	}
