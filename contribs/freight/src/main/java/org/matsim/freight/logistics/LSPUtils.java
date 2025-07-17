@@ -268,10 +268,15 @@ public final class LSPUtils {
 		// Clear the existing shipments and plans in the LSP
 		for (LSPPlan lspPlan : lsp.getPlans()) {
 			lspPlan.getShipmentPlans().clear();
+			for (LogisticChain logisticChain : lspPlan.getLogisticChains()) {
+				logisticChain.getLspShipmentIds().clear();
+			}
 		}
 		lsp.getLspShipments().clear();
 
 		// Add the new shipments to the LSP and assign them to the lspPlans
+		// Todo: Now, this is done with the some algorithm as in the InitialShipmentAssigner.
+		// so it may be that the splitted shipments are not assigned to the same plans as before and/or that some parts of the same original shipment are assigned to different plans.
 		for (LspShipment newLspShipment : newShipments) {
 			lsp.assignShipmentToLspPlan(newLspShipment);
 		}

@@ -80,12 +80,15 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   private void insertShipmentsAtBeginning() {
     for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
       LogisticChainElement firstElement = getFirstElement(logisticChain);
-      assert firstElement != null;
+		if (firstElement == null)
+		{
+			throw new AssertionError("The first element of the logistic chain " + logisticChain.getId() + " is null. This should not happen.");
+		}
       for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
         if (shipment == null) {
 			log.error("Shipment with id {} not found in LSP {}. This should not happen.", lspShipmentId, lsp.getId());
-			throw new IllegalStateException("Shipment with id " + lspShipmentId + " not found in LSP " + lsp.getId() + ". This should not happen.");
+			throw new AssertionError("Shipment with id " + lspShipmentId + " not found in LSP " + lsp.getId() + ". This should not happen.");
 		}
         firstElement
             .getIncomingShipments()
