@@ -34,6 +34,9 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.Steppable;
@@ -137,6 +140,44 @@ final class RailsimEngine implements Steppable {
 		return true;
 	}
 
+	/**
+	 * Prepare the departure of a train that has been waiting.
+	 */
+	private void prepareDeparture(double time, UpdateEvent event) {
+
+		RailsimTransitDriverAgent driver = event.state.pt;
+		assert driver != null : "Train must have a pt driver";
+
+		// Prepares the next route and initializes events
+		driver.endActivityAndComputeNextState(time);
+
+		PlanElement el = driver.getCurrentPlanElement();
+
+		if (!(el instanceof Leg leg)) {
+			throw new IllegalStateException("Plan element of agent " + driver + " is not a leg.");
+		}
+		Route route = leg.getRoute();
+		if (!(route instanceof NetworkRoute networkRoute)) {
+			throw new IllegalStateException("A network route is required for agent " + driver + ".");
+		}
+
+		event.type = UpdateEvent.Type.IDLE;
+
+		// New states and events will be created for the new departure
+		activeTrains.remove(event.state);
+
+		// Check consistency of the route
+		if (config.getVehicleCirculation() == RailsimConfigGroup.VehicleCirculation.moveOnward) {
+			if (!Objects.equals(event.state.headLink, networkRoute.getStartLinkId())) {
+				throw new IllegalStateException("Train " + driver.getId() + " is not at the start link of its route. Expected: " + networkRoute.getStartLinkId() + ", but was: " + event.state.getHeadLink());
+			}
+
+			// TODO: Allow reversing the train is this case
+		}
+
+		handleDeparture(time, driver, networkRoute.getStartLinkId(), networkRoute);
+	}
+
 	private void updateAllPositions(double time) {
 		for (TrainState train : activeTrains) {
 			if (train.timestamp < time)
@@ -169,6 +210,7 @@ final class RailsimEngine implements Steppable {
 				// event will be removed
 				event.type = UpdateEvent.Type.IDLE;
 			}
+			case WAIT_DEPARTURE -> prepareDeparture(time, event);
 			default -> throw new IllegalStateException("Unhandled update type " + event.type);
 		}
 	}
@@ -384,9 +426,17 @@ final class RailsimEngine implements Steppable {
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
 			state.driver.endLegAndComputeNextState(Math.ceil(time));
 
-			activeTrains.remove(state);
+			double nextDeparture = state.driver.getActivityEndTime();
+			if (Double.isFinite(nextDeparture)) {
 
-			event.type = UpdateEvent.Type.IDLE;
+				event.plannedTime = nextDeparture;
+				event.type = UpdateEvent.Type.WAIT_DEPARTURE;
+
+			} else {
+				activeTrains.remove(state);
+				event.type = UpdateEvent.Type.IDLE;
+			}
+
 			return;
 		}
 

@@ -12,7 +12,7 @@
 	Main Stations: A - M - B (linear shuttle route)
 	Intermediate Node: M (midpoint between A and B)
 	Shuttle Route: A -> M -> B -> M -> A (back and forth)
-	Stop Links: Dedicated links for train stops (150m length each)
+	Stop Links: Dedicated links for train stops (150m length each) - bidirectional
 	Extended route for 10-minute one-way travel time
 	-->
 
@@ -29,40 +29,55 @@
 	<!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<!-- Stop links for train boarding/alighting -->
-		<link id="link_A" from="node_A" to="node_A_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<!-- Stop links for train boarding/alighting - bidirectional -->
+		<link id="link_A_to_stop" from="node_A" to="node_A_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_M" from="node_M" to="node_M_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_A_from_stop" from="node_A_stop" to="node_A" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_B" from="node_B" to="node_B_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_M_to_stop" from="node_M" to="node_M_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_M_from_stop" from="node_M_stop" to="node_M" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_B_to_stop" from="node_B" to="node_B_stop" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_B_from_stop" from="node_B_stop" to="node_B" length="150.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
 		
 		<!-- Main route links -->
-		<link id="link_AM" from="node_A_stop" to="node_M" length="4850.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_AM" from="node_A_stop" to="node_M" length="5000.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_MB" from="node_M_stop" to="node_B" length="4850.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_MB" from="node_M_stop" to="node_B" length="5000.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_BM" from="node_B_stop" to="node_M" length="4850.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_BM" from="node_B" to="node_M_stop" length="5000.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_MA" from="node_M_stop" to="node_A" length="4850.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_MA" from="node_M" to="node_A_stop" length="5000.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>

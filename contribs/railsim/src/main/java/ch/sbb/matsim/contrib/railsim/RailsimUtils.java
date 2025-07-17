@@ -27,6 +27,8 @@ import org.matsim.vehicles.VehicleType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 
 /**
@@ -181,19 +183,21 @@ public final class RailsimUtils {
 	 * @param vehicle The vehicle type to set the attribute for.
 	 * @param reversible True if the train can be reversed, false otherwise.
 	 */
-	public static void setTrainReversible(VehicleType vehicle, boolean reversible) {
+	public static void setTrainReversible(VehicleType vehicle, double reversible) {
 		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE, reversible);
 	}
 
 	/**
-	 * Checks if the train is reversible.
+	 * Returns whether the train can be reversed and the time in seconds it takes.
 	 *
 	 * @param vehicle The vehicle type to check.
-	 * @return True if the train can be reversed, false otherwise.
+	 * @return time to reverse, if the vehicle is reversible, otherwise an empty OptionalDouble.
 	 */
-	public static boolean isTrainReversible(VehicleType vehicle) {
+	public static OptionalDouble getTrainReversible(VehicleType vehicle) {
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
-		return Objects.equals(attr, Boolean.TRUE);
+		return attr instanceof Double d
+			? OptionalDouble.of(d)
+			: OptionalDouble.empty();
 	}
 
 	/**

@@ -108,7 +108,10 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		BLOCK_TRACK,
 		WAIT_FOR_RESERVATION,
 		SPEED_CHANGE,
-		UNBLOCK_LINK
+		UNBLOCK_LINK,
+
+		// Train finished its transit route and is waiting to start the next one
+		WAIT_DEPARTURE,
 
 	}
 
