@@ -318,7 +318,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		// train1 is faster than train2
 		// Both trains do not accelerate to their maximum speed but only to targetSpeed
-		// targetSpeed << than min(freeSpeed Link, maxSpeed Train), why?
+		// targetSpeed << than min(freeSpeed Link, maxSpeed Train) because of train disposition
 		filterTrainEvents(result.getEvents(), "train1").forEach(event -> {
 			if (event.getHeadLink().toString().equals("12-13")) {
 				Assertions.assertEquals(24, event.getSpeed(), 1, "Train1 speed on link is not correct.");
@@ -332,15 +332,56 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		});
 	}
 
-	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
+
 	@Test
 	void testMicroTrainFollowingVaryingSpeed() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
+		// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 29525.0)
+			.trainHasLastArrival("train2", 29782.0);
+
+		// some links have 2m/s limit
+		String slowLink = "8-9"; // link with 2m/s limit
+		String fastLink = "15-16"; // link with 10m/s limit
+		// note: the train will only accelerate when the tail is also in a fast link (which starts 11-12)
+
+		filterTrainEvents(result.getEvents(), "train1").forEach(event -> {
+			if (event.getHeadLink().toString().equals(slowLink)) {
+				Assertions.assertEquals(result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), event.getSpeed(), 0.01, "Train1 speed on link is not correct.");
+			}
+
+			if (event.getHeadLink().toString().equals(fastLink)) {
+				Assertions.assertTrue(event.getSpeed() > result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), "Train1 speed on link is not correct.");
+			}
+		});
+
+		filterTrainEvents(result.getEvents(), "train2").forEach(event -> {
+			if (event.getHeadLink().toString().equals(slowLink)) {
+				Assertions.assertEquals(result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), event.getSpeed(), 0.01, "Train2 speed on link is not correct.");
+			}
+			if (event.getHeadLink().toString().equals(fastLink)) {
+				Assertions.assertTrue(event.getSpeed() > result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), "Train2 speed on link is not correct.");
+			}
+		});
 	}
 
 	@Test
 	void testMicroTrainFollowingFixedVsMovingBlock() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+		// two parallel tracks, one with fixed block (upper) and one with moving block (lower)
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("t1_train1", 30531.0)
+			.trainHasLastArrival("t1_train2", 30810.0)
+			.trainHasLastArrival("t2_train1", 30531.0)
+			.trainHasLastArrival("t2_train2", 30682.0);
+
+		// lower trains which follow first train ("2") arrive sooner (moving block)
+		Assertions.assertTrue(result.getStopTimes().get("t1_train2").lastEntry().getValue().arrivalTime > result.getStopTimes().get("t2_train2").lastEntry().getValue().arrivalTime);
 	}
 
 	@Test
