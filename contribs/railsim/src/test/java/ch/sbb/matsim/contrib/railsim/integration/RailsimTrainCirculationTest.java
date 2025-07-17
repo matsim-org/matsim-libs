@@ -14,9 +14,10 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 
 		// Verify that the train circulates around the triangle
 		assertThat(result)
-			.trainHasStopAt("train_1", "stop_A")
-			.trainHasStopAt("train_1", "stop_B")
-			.trainHasStopAt("train_1", "stop_C");
+			.trainHasStopAt("train_1", "stop_North")
+			.trainHasStopAt("train_1", "stop_East")
+			.trainHasStopAt("train_1", "stop_South")
+			.trainHasStopAt("train_1", "stop_West");
 	}
 
 	@Test

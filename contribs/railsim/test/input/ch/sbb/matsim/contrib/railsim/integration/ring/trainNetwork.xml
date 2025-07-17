@@ -8,55 +8,102 @@
 	<!-- ====================================================================== -->
 
 	<!--
-	Ring Network with Intermediate Nodes
-	Main Stations: A - B - C (equilateral triangular ring)
-	Intermediate Nodes: A1, B1, C1 (midpoints between main stations)
-	Primary Route: A-A1-B-B1-C-C1-A (clockwise ring)
+	Ring Network with 8 Links Approximating a Circle
+	8 nodes arranged in a ring with links aligned to coordinate axes
+	4 Orthogonal Links: North-South (parallel to x-axis) and East-West (parallel to y-axis)
+	4 Connecting Links: Diagonal connections to complete the ring
 	Scaled for ~30 minute round trip at 20 m/s speed
 	-->
 
 	<nodes>
-		<!-- Main stations forming an equilateral triangle -->
-		<node id="node_A" x="0.0" y="0.0" />
-		<node id="node_B" x="13170.0" y="0.0" />
-		<node id="node_C" x="6585.0" y="11405.0" />
+		<!-- Station Nodes -->
+		<node id="node_North_Station" x="-4700.0" y="10000.0" />
+		<node id="node_East_Station" x="10000.0" y="4700.0" />
+		<node id="node_South_Station" x="4700.0" y="-10000.0" />
+		<node id="node_West_Station" x="-10000.0" y="-4700.0" />
 
-		<!-- Intermediate nodes at midpoints of each edge -->
-		<node id="node_A1" x="6585.0" y="0.0" />
-		<node id="node_B1" x="9877.5" y="5702.5" />
-		<node id="node_C1" x="3292.5" y="5702.5" />
+		<!-- North nodes (connected by horizontal link parallel to x-axis) -->
+		<node id="node_North1" x="-5000.0" y="10000.0" />
+		<node id="node_North2" x="5000.0" y="10000.0" />
+
+		<!-- East nodes (connected by vertical link parallel to y-axis) -->
+		<node id="node_East1" x="10000.0" y="5000.0" />
+		<node id="node_East2" x="10000.0" y="-5000.0" />
+
+		<!-- South nodes (connected by horizontal link parallel to x-axis) -->
+		<node id="node_South1" x="5000.0" y="-10000.0" />
+		<node id="node_South2" x="-5000.0" y="-10000.0" />
+
+		<!-- West nodes (connected by vertical link parallel to y-axis) -->
+		<node id="node_West1" x="-10000.0" y="-5000.0" />
+		<node id="node_West2" x="-10000.0" y="5000.0" />
 	</nodes>
 
 	<!-- ====================================================================== -->
 
 	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<!-- Primary ring route: A -> A1 -> B -> B1 -> C -> C1 -> A -->
-		<link id="link_AA1" from="node_A" to="node_A1" length="6585.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+
+		<!-- 4 Station Links -->
+		<link id="station_South" from="node_South1" to="node_South_Station" length="300.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_A1B" from="node_A1" to="node_B" length="6585.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="station_North" from="node_North1" to="node_North_Station" length="300.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_BB1" from="node_B" to="node_B1" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="station_East" from="node_East1" to="node_East_Station" length="300.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_B1C" from="node_B1" to="node_C" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="station_West" from="node_West1" to="node_West_Station" length="300.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_CC1" from="node_C" to="node_C1" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+
+		<!-- 4 Orthogonal Links (aligned to axes) -->
+		<link id="link_North" from="node_North_Station" to="node_North2" length="9700.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
 		</link>
-		<link id="link_C1A" from="node_C1" to="node_A" length="5703.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+		<link id="link_East" from="node_East_Station" to="node_East2" length="9700.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_South" from="node_South_Station" to="node_South2" length="9700.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_West" from="node_West_Station" to="node_West2" length="9700.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+
+		<!-- 4 Connecting Links to complete the ring -->
+		<link id="link_NorthEast" from="node_North2" to="node_East1" length="7071.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_EastSouth" from="node_East2" to="node_South1" length="7071.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_SouthWest" from="node_South2" to="node_West1" length="7071.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
+			<attributes>
+				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
+			</attributes>
+		</link>
+		<link id="link_WestNorth" from="node_West2" to="node_North1" length="7071.0" freespeed="20.0" capacity="1000.0" permlanes="1.0" oneway="1" modes="rail">
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">2</attribute>
 			</attributes>
