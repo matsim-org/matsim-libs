@@ -69,20 +69,17 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroSimpleBiDirectionalTrack() {
-		// We have 6 trains going sequantially from t1 to t3.
-		List<Event> events = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack")).getEvents();
+		// We have 6 trains going sequentially from t1 to t3.
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
 
-		// assert that all of them arrived at the final station (facility t3) and check their travel duration.
-		for (String train : List.of("train1", "train2", "train3", "train4", "train5", "train6")) {
-			// check if the train arrived at the final station
-			List<VehicleArrivesAtFacilityEvent> arrivals = filterVehicleArrivesAtFacilityEvent(events, train);
-			Assertions.assertTrue(arrivals.stream().anyMatch(event -> event.getFacilityId().toString().equals("t3")),
-				"Train " + train + " did not arrive at the final station t3.");
-
-			double duration = getTravelDuration(events, train, "t1", "t3");
-			Assertions.assertEquals(380.0, duration, 1.0,
-				"Train " + train + " did not have the expected travel duration. Expected 380s, but was " + duration + "s.");
-		}
+		// trains depart in 10min intervals
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1",29180.0)
+			.trainHasLastArrival("train2",29180.0+1*600)
+			.trainHasLastArrival("train3",29180.0+2*600)
+			.trainHasLastArrival("train4",29180.0+3*600)
+			.trainHasLastArrival("train5",29180.0+4*600)
+			.trainHasLastArrival("train6",29180.0+5*600);
 	}
 	@Test
 	void testMesoUniDirectionalVaryingCapacities() {
@@ -195,16 +192,13 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 	void testMicroTrackOppositeTraffic() {
 		// two trains approach each other, they meet approximately in the middle of the track (double laned track with same resource id "t2_A-t2_B")
 		// one train has to wait for the other train to pass, then continues
-		List<Event> events = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic")).getEvents();
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
+		List<Event> events = result.getEvents();
 
-		// assert that both trains arrive at their final facility
-		Assertions.assertTrue(filterVehicleArrivesAtFacilityEvent(events, "train1").stream().anyMatch(event -> (event.getFacilityId().toString().equals("t3_A-B"))),
-			"Train1 did not arrive at the final facility t3_A-B.");
+		// assert that both trains arrive at their final facility at time ("train2" arrives later than "train1" because it waits for "train1" to pass)
+		assertThat(result).trainHasLastArrival("train1",36845.0).trainHasLastArrival("train2",37253.0);
 
-		Assertions.assertTrue(filterVehicleArrivesAtFacilityEvent(events, "train2").stream().anyMatch(event -> (event.getFacilityId().toString().equals("t1_B-A"))),
-			"Train2 did not arrive at the final facility t1_B-A.");
-
-		// check that train2 waits multiple /events for train1 to pass
+		// check that train2 waits multiple timesteps for train1 to pass
 		List<RailsimTrainStateEvent> train2EventsOnMiddleLink = filterTrainEvents(events, "train2").stream().filter(event -> (event.getHeadLink().toString().equals("t3_A-t2_B"))).toList();
 		Assertions.assertTrue(train2EventsOnMiddleLink.stream().filter(event -> (event.getSpeed() == 0.0)).count() > 40);
 
