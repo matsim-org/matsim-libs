@@ -459,17 +459,16 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMesoStationCapacityTwo() {
-		// same as above, but middle link has capacity 2, so two trains could pass at the same time
+		// same as above, but middle link has capacity 3, so two trains could pass at the same time
+		// Note, that with deadlock prevention, the capacity needs to be 3 so that 2 trains can pass at the same time
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
 
-		// TODO: interestingly, the increased capacity has no effect on the arrival times of the trains, they still arrive sequentially
 		assertThat(result)
 			.trainHasLastArrival("train1", 29588.0)
-			.trainHasLastArrival("train2", 30180.0)
-			.trainHasLastArrival("train3", 29856.0)
+			.trainHasLastArrival("train2", 29972.0)
+			.trainHasLastArrival("train3", 29828.0)
 			.allTrainsArrived();
 
-		// there is only one train on the link "X" at a time, is this a bug?
 		assertMultipleTrainsOnLink(result.getEvents(), "X");
 	}
 
@@ -602,7 +601,9 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testScenarioKelheim() {
-		// TODO : what is this test about, check with Merlin...
+
+		// This tests runs railsim on a conventional pt network, in a standard scenario.
+
 		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(base, "config.xml"));
@@ -634,8 +635,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pE : plan.getPlanElements()) {
-					if (pE instanceof Activity) {
-						Activity act = (Activity) pE;
+					if (pE instanceof Activity act) {
 						String baseType = act.getType().split("_")[0];
 						act.setType(baseType);
 						activityTypes.add(baseType);
@@ -663,8 +663,8 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		controler.run();
 		SimulationResult result = new SimulationResult(scenario, collector);
 
-		assertThat(result).allTrainsArrived();
-		// TODO : Assert something meaningful...
+		assertThat(result)
+			.allTrainsArrived();
 	}
 
 	@Test
