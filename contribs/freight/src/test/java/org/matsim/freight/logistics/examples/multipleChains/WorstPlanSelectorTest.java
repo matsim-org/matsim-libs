@@ -66,7 +66,7 @@ public class WorstPlanSelectorTest {
 	private static final VehicleType VEH_TYPE_EXPENSIVE = createVehType("expensive", 100., 0.01, 0.01);
 
 	private static VehicleType createVehType(String vehicleTypeId, double fix, double perDistanceUnit, double perTimeUnit) {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeId, VehicleType.class), TransportMode.car);
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.createVehicleTypeId(vehicleTypeId), TransportMode.car);
 		vehicleType.getCapacity().setOther(50);
 		vehicleType.getCostInformation().setCostsPerMeter(perDistanceUnit);
 		vehicleType.getCostInformation().setCostsPerSecond(perTimeUnit);
@@ -184,7 +184,7 @@ public class WorstPlanSelectorTest {
 		lsp.addPlan(lspPlan_twoChains);
 
 		for (LspShipment shipment : createInitialLSPShipments(network)) {
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 
 		lsp.scheduleLogisticChains();

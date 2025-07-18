@@ -43,6 +43,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
+ * A carrier scoring function based on events.
+ * Please note: The fixed costs are reduced, of service based carriers are driving severeal tours. (Workaround for service-based carriers)
+ * <p>
+ * Todo: Score toll based on personMoney events
+ *
  * @author Kai Martins-Turner (kturner)
  */
 class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
@@ -107,6 +112,9 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		}
 
 		// Fix costs for vehicle usage
+		//Todo: reduce this for a fixed-based scoring for each verhicle used, once shipment-based carriers are implemented for all carrierTypes
+		//maybe do it stepwise: if (carrierType=distributionCarrier): score each vehicle, else use current workaround
+		// Reason: distCarrier is the first, I am implementing the shipment-based approach.
 		private void handleEvent(CarrierTourEndEvent event) {
 			// Fix costs for vehicle usage
 			final VehicleType vehicleType =
@@ -116,19 +124,12 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 			{ // limit fixed costs of vehicles if vehicles could be reused during shift
 				double MAX_SHIFT_DURATION = 8 * 3600;
 				if (tourDuration > MAX_SHIFT_DURATION) {
-					throw new RuntimeException(
-						"Duration of tour is longer than max shift defined in scoring fct, caused by event:"
-							+ event
-							+ " tourDuration: "
-							+ tourDuration
-							+ " max shift duration:  "
-							+ MAX_SHIFT_DURATION);
+					log.fatal("Duration of tour is longer than max shift defined in scoring fct, caused by event: {}, tourDuration: {}, max shift duration: {}", event, tourDuration, MAX_SHIFT_DURATION, new RuntimeException());
 				}
 
 				// sum up tour durations
 				if (vehicleType2TourDuration.containsKey(vehicleType)) {
-					vehicleType2TourDuration.put(
-						vehicleType, vehicleType2TourDuration.get(vehicleType) + tourDuration);
+					vehicleType2TourDuration.put(vehicleType, vehicleType2TourDuration.get(vehicleType) + tourDuration);
 				} else {
 					vehicleType2TourDuration.put(vehicleType, tourDuration);
 				}
@@ -152,11 +153,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
 		private void handleEvent(LinkEnterEvent event) {
 			final double distance = network.getLinks().get(event.getLinkId()).getLength();
-			final double costPerMeter =
-				(VehicleUtils.findVehicle(event.getVehicleId(), scenario))
-					.getType()
-					.getCostInformation()
-					.getCostsPerMeter();
+			final double costPerMeter = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getCostInformation().getCostsPerMeter();
 			// variable costs per distance
 			score = score - (distance * costPerMeter);
 		}

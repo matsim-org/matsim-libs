@@ -125,7 +125,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private org.matsim.vehicles.VehicleType makeType(String typeId, double maxVelocity) {
 			org.matsim.vehicles.VehicleType vehicleTypeImpl = VehicleUtils
-					.createVehicleType(Id.create(typeId, VehicleType.class));
+					.createVehicleType(Id.createVehicleTypeId(typeId));
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}
