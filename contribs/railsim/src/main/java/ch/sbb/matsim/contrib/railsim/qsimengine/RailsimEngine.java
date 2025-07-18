@@ -427,7 +427,9 @@ final class RailsimEngine implements Steppable {
 			state.driver.endLegAndComputeNextState(Math.ceil(time));
 
 			double nextDeparture = state.driver.getActivityEndTime();
-			if (Double.isFinite(nextDeparture)) {
+
+			// Handles the "Umlauf" of pt drivers
+			if (state.pt != null && Double.isFinite(nextDeparture)) {
 
 				event.plannedTime = nextDeparture;
 				event.type = UpdateEvent.Type.WAIT_DEPARTURE;
