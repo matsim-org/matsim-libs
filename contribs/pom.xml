@@ -61,6 +61,7 @@
 		<module>analysis</module>
 		<module>application</module>
 		<module>av</module>
+		<module>aws</module>
 		<module>bicycle</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>

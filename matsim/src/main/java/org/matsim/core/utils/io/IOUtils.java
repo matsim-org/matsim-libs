@@ -251,12 +251,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			new URL(url).toURI();
 			return true;
-		} catch (MalformedURLException e) {
-			return false;
-		} catch (URISyntaxException e) {
+		} catch (MalformedURLException | URISyntaxException e) {
+			if(url.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib startup hook.");
+			}
 			return false;
 		}
-	}
+    }
 
 	/**
 	 * Gets the compression of a certain URL by file extension. May return null if
@@ -521,6 +522,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			return new URL(context, extension);
 		} catch (MalformedURLException e) {
+			if(extension.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib");
+			}
 			// We cannot construct a URL for some reason (see respective unit test)
 			return getFileUrl(extension);
 		}
