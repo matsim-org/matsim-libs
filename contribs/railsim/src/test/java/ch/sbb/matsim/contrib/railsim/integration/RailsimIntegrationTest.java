@@ -21,13 +21,7 @@ package ch.sbb.matsim.contrib.railsim.integration;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,6 +41,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -57,6 +52,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -64,12 +60,28 @@ import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
+import org.opentest4j.AssertionFailedError;
 
 public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroSimpleBiDirectionalTrack() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
+		// We have 6 trains going sequentially from t1 to t3.
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microSimpleBiDirectionalTrack"));
+
+		// trains depart in 10min intervals
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 29180.0)
+			.trainHasLastArrival("train2", 29180.0 + 1 * 600)
+			.trainHasLastArrival("train3", 29180.0 + 2 * 600)
+			.trainHasLastArrival("train4", 29180.0 + 3 * 600)
+			.trainHasLastArrival("train5", 29180.0 + 4 * 600)
+			.trainHasLastArrival("train6", 29180.0 + 5 * 600);
+
+		// check that there is only one train on each link at a time
+		for (String link : result.getScenario().getNetwork().getLinks().keySet().stream().map(Id::toString).toList()) {
+			assertSingleTrainOnLink(result.getEvents(), link);
+		}
 	}
 
 	@Test
@@ -181,34 +193,84 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testMicroTrackOppositeTraffic() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
+		// two trains approach each other, they meet approximately in the middle of the track (double laned track with same resource id "t2_A-t2_B")
+		// one train has to wait for the other train to pass, then continues
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTraffic"));
+		List<Event> events = result.getEvents();
+
+		// assert that both trains arrive at their final facility at time ("train2" arrives later than "train1" because it waits for "train1" to pass)
+		assertThat(result).trainHasLastArrival("train1", 36845.0).trainHasLastArrival("train2", 37253.0);
+
+		// check that train2 waits multiple timesteps for train1 to pass
+		List<RailsimTrainStateEvent> train2EventsOnMiddleLink = filterTrainEvents(events, "train2").stream().filter(event -> (event.getHeadLink().toString().equals("t3_A-t2_B"))).toList();
+		Assertions.assertTrue(train2EventsOnMiddleLink.stream().filter(event -> (event.getSpeed() == 0.0)).count() > 40);
 	}
 
 	@Test
 	void testMicroTrackOppositeTrafficMany() {
-		// multiple trains, one slow train
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
+		// multiple trains, one slow train (train3)
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrackOppositeTrafficMany"));
+
+		// trains 1-4 go from left to right, trains 5-8 go from right to left but wait for trains 1-4 to pass the middle resource
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 36845.0)
+			.trainHasLastArrival("train2", 40545.0)
+			.trainHasLastArrival("train3", 44245.0)
+			.trainHasLastArrival("train4", 47945.0)
+			// now the trains from the right side arrive
+			.trainHasLastArrival("train5", 51645.0)
+			.trainHasLastArrival("train6", 52054.0)
+			.trainHasLastArrival("train7", 55755.0)
+			.trainHasLastArrival("train8", 59455.0);
+
 	}
 
 	@Test
 	void testMesoTwoSources() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
+		// several trains start at the same time from two different sources (one having capacity >>1), they meet at a bottleneck with capacity 1
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSources"));
+		// on the mesoscopic link there should be multiple trains at the same time
+		assertMultipleTrainsOnLink(result.getEvents(), "t1_B-t2_A");
+		// check that only one train is on the bottleneck link at a time
+		assertSingleTrainOnLink(result.getEvents(), "t2_A-t2_B");
+
+		// The trains can only pass the bottleneck one after another, this the arrival times are spread out
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 29769.0)
+			.trainHasLastArrival("train2", 29887.0)
+			.trainHasLastArrival("train3", 30007.0)
+			.trainHasLastArrival("train4", 30127.0)
+			.trainHasLastArrival("train5", 30339.0)
+			.trainHasLastArrival("train6", 30789.0);
 	}
 
 	@Test
 	void testMesoTwoSourcesComplex() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
+		// seems redundant to me, this test is simpler than testMesoTwoSources...
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoTwoSourcesComplex"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 37358.0)
+			.trainHasLastArrival("train2", 41578.0);
 	}
 
 	@Test
 	void testScenarioMesoGenfBernAllTrains() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+		// this is a complex (realistic) scenario...
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"));
+
+		//assertThat(result).allTrainsArrived(); this fails, some don't arrive...
+		assertThat(result).hasNumberOfTrains(210);
+		// check the number of events... we could see if something changes significantly in the future
+		Assertions.assertEquals(2605247, result.getEvents().size(), 1000);
 	}
 
 	@Test
 	void testScenarioMesoGenfBernOneTrain() {
-
-		// Remove vehicles except the first one
+		// simplified scenario from the above...Remove vehicles except the first one
 		Consumer<Scenario> filter = scenario -> {
 
 			Set<Id<Vehicle>> remove = scenario.getTransitVehicles().getVehicles().values().stream()
@@ -229,71 +291,129 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			remove.forEach(v -> scenario.getTransitVehicles().removeVehicle(v));
 		};
 
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMesoGenfBern"), filter);
 
+		assertThat(result).allTrainsArrived().trainHasLastArrival("Bummelzug_GE_BE_train_0", 9221.0);
 	}
 
 	@Test
 	void testMicroThreeUniDirectionalTracks() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
+		// three parallel uni-directional tracks. Train1 starts from the uppermost track and goes to the bottom
+		// Train2 stays in middle track and waits for train1 to pass, then continues
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microThreeUniDirectionalTracks"));
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 30640.0)
+			.trainHasLastArrival("train2", 30531.0);
 	}
 
 	@Test
 	void testMicroTrainFollowingConstantSpeed() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+		// two train starts from a station (low speed) and accelerate once their tail reaches the end of the station link
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 29820.0)
+			.trainHasLastArrival("train2", 30111.0);
+
+		// train1 is faster than train2
+		// Both trains do not accelerate to their maximum speed but only to targetSpeed
+		// targetSpeed << than min(freeSpeed Link, maxSpeed Train) because of train disposition
+		filterTrainEvents(result.getEvents(), "train1").forEach(event -> {
+			if (event.getHeadLink().toString().equals("12-13")) {
+				Assertions.assertEquals(24, event.getSpeed(), 1, "Train1 speed on link is not correct.");
+			}
+		});
+
+		filterTrainEvents(result.getEvents(), "train2").forEach(event -> {
+			if (event.getHeadLink().toString().equals("12-13")) {
+				Assertions.assertEquals(11.5, event.getSpeed(), 1, "Train1 speed on link is not correct.");
+			}
+		});
 	}
 
-	// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
+
 	@Test
 	void testMicroTrainFollowingVaryingSpeed() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
+		// This test is similar to testMicroTrainFollowingConstantSpeed but with varying speed levels along the corridor.
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 29525.0)
+			.trainHasLastArrival("train2", 29782.0);
+
+		// some links have 2m/s limit
+		String slowLink = "8-9"; // link with 2m/s limit
+		String fastLink = "15-16"; // link with 10m/s limit
+		// note: the train will only accelerate when the tail is also in a fast link (which starts 11-12)
+
+		filterTrainEvents(result.getEvents(), "train1").forEach(event -> {
+			if (event.getHeadLink().toString().equals(slowLink)) {
+				Assertions.assertEquals(result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), event.getSpeed(), 0.01, "Train1 speed on link is not correct.");
+			}
+
+			if (event.getHeadLink().toString().equals(fastLink)) {
+				Assertions.assertTrue(event.getSpeed() > result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), "Train1 speed on link is not correct.");
+			}
+		});
+
+		filterTrainEvents(result.getEvents(), "train2").forEach(event -> {
+			if (event.getHeadLink().toString().equals(slowLink)) {
+				Assertions.assertEquals(result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), event.getSpeed(), 0.01, "Train2 speed on link is not correct.");
+			}
+			if (event.getHeadLink().toString().equals(fastLink)) {
+				Assertions.assertTrue(event.getSpeed() > result.getScenario().getNetwork().getLinks().get(Id.createLinkId(slowLink)).getFreespeed(), "Train2 speed on link is not correct.");
+			}
+		});
 	}
 
 	@Test
 	void testMicroTrainFollowingFixedVsMovingBlock() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+		// two parallel tracks, one with fixed block (upper) and one with moving block (lower)
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingFixedVsMovingBlock"));
+
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("t1_train1", 30531.0)
+			.trainHasLastArrival("t1_train2", 30810.0)
+			.trainHasLastArrival("t2_train1", 30531.0)
+			.trainHasLastArrival("t2_train2", 30682.0);
+
+		// lower trains which follow first train ("2") arrive sooner (moving block)
+		Assertions.assertTrue(result.getStopTimes().get("t1_train2").lastEntry().getValue().arrivalTime > result.getStopTimes().get("t2_train2").lastEntry().getValue().arrivalTime);
 	}
 
 	@Test
 	void testMicroStationSameLink() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
+		// complex (realistic network) with a station at the center. Not sure what this test is supposed to test...
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationSameLink"));
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 30152.0)
+			.trainHasLastArrival("train2", 30025.0);
 	}
 
 	@Test
 	void testMicroStationDifferentLink() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
+		// Same network as testMicroStationSameLink but the trains take different links at the station.
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationDifferentLink"));
+
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("train1", 29505.0)
+			.trainHasLastArrival("train2", 29443.0);
 	}
 
 	@Test
 	void testMicroJunctionCross() {
-		SimulationResult collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
-		// check if the train arrives at the stop
-		boolean vehicleArrivesAtFacilityEventFound1 = false;
-		boolean vehicleArrivesAtFacilityEventFound2 = false;
+		// two trains approach a junction (4 links having same resource id)
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
+		assertThat(result).allTrainsArrived()
+			.trainHasLastArrival("train1", 28997.0)
+			.trainHasLastArrival("train2", 29068.0);
 
-		for (Event event : collector.getEvents()) {
-			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
-
-				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
-
-				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") && vehicleArrivesEvent.getFacilityId().toString()
-					.equals("stop_A5")) {
-					vehicleArrivesAtFacilityEventFound1 = true;
-					// TODO: also test the arrival time
-//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
-				}
-
-				if (vehicleArrivesEvent.getVehicleId().toString().equals("train2") && vehicleArrivesEvent.getFacilityId().toString()
-						.equals("stop_B5")) {
-						vehicleArrivesAtFacilityEventFound2 = true;
-					// TODO: also test the arrival time
-//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
-				}
-			}
-		}
-		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound1, "VehicleArrivesAtFacilityEvent for train1 at stop_A5 not found.");
-		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound2, "VehicleArrivesAtFacilityEvent for train2 at stop_B5 not found.");
-
+		// TODO: can we check that only 1 train is on a railsimResourceId? Can't get railsimResourceId out of the Network class
+		assertSingleTrainOnLinks(result.getEvents(), List.of("A2", "B2", "A3", "B3"));
 	}
 
 	@Test
@@ -310,27 +430,52 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			.trainHasLastArrival("trainAC7", 32184.0)
 			.trainHasLastArrival("trainCA7", 33122.0)
 			.allTrainsArrived();
-
 	}
 
 	@Test
 	void testMicroJunctionY() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
+		// two trains apprach a junction from different directions (microscopic), then merge on the same mesoscopic link where
+		// train 2 overtakes train 1
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionY"));
+		assertThat(result)
+			.trainHasLastArrival("train1", 40210.0)
+			.trainHasLastArrival("train2", 36207.0)
+			.allTrainsArrived();
 	}
 
 	@Test
 	void testMesoStationCapacityOne() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
+		// 3 trains drive towards a station with capacity 1, they pass sequentially
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityOne"));
+
+		assertThat(result)
+			.trainHasLastArrival("train1", 29588.0)
+			.trainHasLastArrival("train2", 30180.0)
+			.trainHasLastArrival("train3", 29856.0)
+			.allTrainsArrived();
+
+		assertSingleTrainOnLink(result.getEvents(), "X");
 	}
 
 	@Test
 	void testMesoStationCapacityTwo() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
+		// same as above, but middle link has capacity 2, so two trains could pass at the same time
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStationCapacityTwo"));
+
+		// TODO: interestingly, the increased capacity has no effect on the arrival times of the trains, they still arrive sequentially
+		assertThat(result)
+			.trainHasLastArrival("train1", 29588.0)
+			.trainHasLastArrival("train2", 30180.0)
+			.trainHasLastArrival("train3", 29856.0)
+			.allTrainsArrived();
+
+		// there is only one train on the link "X" at a time, is this a bug?
+		assertMultipleTrainsOnLink(result.getEvents(), "X");
 	}
 
 	@Test
 	void testMesoStations() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "mesoStations"));
 	}
 
 	@Test
@@ -426,7 +571,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			}
 		};
 
-		runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microStationRerouting"), filter);
 	}
 
 	@Test
@@ -457,7 +602,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	@Test
 	void testScenarioKelheim() {
-
+		// TODO : what is this test about, check with Merlin...
 		URL base = ExamplesUtils.getTestScenarioURL("kelheim");
 
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(base, "config.xml"));
@@ -489,7 +634,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pE : plan.getPlanElements()) {
-					if(pE instanceof Activity) {
+					if (pE instanceof Activity) {
 						Activity act = (Activity) pE;
 						String baseType = act.getType().split("_")[0];
 						act.setType(baseType);
@@ -507,16 +652,95 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		controler.addOverridingModule(new RailsimModule());
 		controler.configureQSimComponents(components -> new RailsimQSimModule().configure(components));
 
+		EventsCollector collector = new EventsCollector();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(collector);
+			}
+		});
+
 		controler.run();
+		SimulationResult result = new SimulationResult(scenario, collector);
+
+		assertThat(result).allTrainsArrived();
+		// TODO : Assert something meaningful...
 	}
 
 	@Test
 	void testScenarioMicroMesoCombination() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
+		// rather complex scenario with a combination of micro and mesoscopic links
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoCombination"));
+
+		// just checking times...
+		assertThat(result)
+			.allTrainsArrived()
+			.trainHasLastArrival("v_CARGO_1", 29030.0)
+			.trainHasLastArrival("v_CARGO_2", 29032.0)
+			.trainHasLastArrival("v_IC_1", 29583.0)
+			.trainHasLastArrival("v_IC_2", 29650.0)
+			.trainHasLastArrival("v_IC_3", 31383.0)
+			.trainHasLastArrival("v_IC_4", 31450.0)
+			.trainHasLastArrival("v_IR_1", 30321.0)
+			.trainHasLastArrival("v_IR_2", 30609.0)
+			.trainHasLastArrival("v_IR_3", 32121.0)
+			.trainHasLastArrival("v_IR_4", 32409.0);
+
 	}
 
 	@Test
 	void testScenarioMicroMesoConstructionSiteLsGe() {
-		runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
+		// two parallel tracks with opposite traffic...
+		// TODO: I don't see the purpose of this test
+		// TODO: note that we have two links from="MOR2" to="REN1", is this on purpose?
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
+
+		assertThat(result).hasNumberOfTrains(71).allTrainsArrived();
+		Assertions.assertEquals(result.getEvents().size(), 31731, 10);
+	}
+
+	private void assertSingleTrainOnLink(List<Event> events, String linkId) {
+		assertSingleTrainOnLinks(events, List.of(linkId));
+	}
+
+	private void assertSingleTrainOnLinks(List<Event> events, List<String> linkIds) {
+		// Group events by time and check for multiple trains on the same set of links at the same time
+		Map<Double, List<RailsimTrainStateEvent>> eventsByTime = events.stream()
+			.filter(e -> e instanceof RailsimTrainStateEvent)
+			.map(e -> (RailsimTrainStateEvent) e)
+			.filter(e -> linkIds.contains(e.getHeadLink().toString()) || linkIds.contains(e.getTailLink().toString()))
+			.collect(Collectors.groupingBy(Event::getTime));
+
+		for (Map.Entry<Double, List<RailsimTrainStateEvent>> entry : eventsByTime.entrySet()) {
+			Set<Id<Vehicle>> trainsOnLinks = entry.getValue().stream()
+				.map(RailsimTrainStateEvent::getVehicleId)
+				.collect(Collectors.toSet());
+
+			if (trainsOnLinks.size() > 1) {
+				List<Id<Vehicle>> vehicleIds = new ArrayList<>(trainsOnLinks);
+				Assertions.fail("Multiple trains " + vehicleIds + " on links " + linkIds + " at time " + entry.getKey());
+			}
+		}
+	}
+
+	private void assertMultipleTrainsOnLink(List<Event> events, String linkId) {
+		// Group events by time to check for multiple trains on the same link at the same time
+		Map<Double, List<RailsimTrainStateEvent>> eventsByTime = events.stream()
+			.filter(e -> e instanceof RailsimTrainStateEvent)
+			.map(e -> (RailsimTrainStateEvent) e)
+			.filter(e -> e.getHeadLink().toString().equals(linkId) || e.getTailLink().toString().equals(linkId))
+			.collect(Collectors.groupingBy(Event::getTime));
+
+		for (Map.Entry<Double, List<RailsimTrainStateEvent>> entry : eventsByTime.entrySet()) {
+			Set<Id<Vehicle>> trainsOnLink = entry.getValue().stream()
+				.map(RailsimTrainStateEvent::getVehicleId)
+				.collect(Collectors.toSet());
+			if (trainsOnLink.size() > 1) {
+				// Found a time with multiple trains, assertion passes
+				return;
+			}
+		}
+
+		Assertions.fail("No instance found with multiple trains on link " + linkId + " at the same time.");
 	}
 }
