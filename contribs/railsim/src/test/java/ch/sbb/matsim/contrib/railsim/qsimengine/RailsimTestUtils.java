@@ -123,7 +123,7 @@ public class RailsimTestUtils {
 
 		RailsimUtils.setTrainCapacity(link, trainCapacity);
 
-		return new RailLink(link);
+		return new RailLink(link, null);
 	}
 
 	/**

@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.*;
 
@@ -97,7 +98,8 @@ public final class RailResourceManager {
 		for (Map.Entry<Id<Link>, ? extends Link> e : network.getLinks().entrySet()) {
 			if (e.getValue().getAllowedModes().stream().anyMatch(modes::contains)) {
 
-				RailLink link = new RailLink(e.getValue());
+				Link opposite = NetworkUtils.findLinkInOppositeDirection(e.getValue());
+				RailLink link = new RailLink(e.getValue(), opposite);
 				resourceMapping.computeIfAbsent(getResourceId(e.getValue()), k -> new ArrayList<>()).add(link);
 				this.links.put(e.getKey(), link);
 			}

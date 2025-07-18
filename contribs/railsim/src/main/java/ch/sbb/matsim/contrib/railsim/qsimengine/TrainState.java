@@ -140,6 +140,19 @@ final class TrainState implements TrainPosition {
 		this.targetDecelDist = Double.POSITIVE_INFINITY;
 	}
 
+	/**
+	 * Initialize a new route for this train.
+	 */
+	void reset(double time, List<RailLink> route) {
+		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
+		this.route.clear();
+		this.route.addAll(route);
+		this.timestamp = time;
+		this.routeIdx = 0;
+		this.acceleration = 0.0;
+		this.targetDecelDist = Double.POSITIVE_INFINITY;
+	}
+
 	@Override
 	public String toString() {
 		return "TrainState{" +

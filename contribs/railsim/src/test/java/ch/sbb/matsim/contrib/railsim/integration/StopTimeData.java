@@ -9,6 +9,7 @@ final class StopTimeData {
 
 	double arrivalTime = -1.0;
 	double departureTime = -1.0;
+	int stopCount = 0;
 
 	/**
 	 * Previous stop time data, if any. This can be used to chain stop times together.
@@ -47,6 +48,10 @@ final class StopTimeData {
 		return hasArrived() && prev != null ? arrivalTime - prev.departureTime : -1.0;
 	}
 
+	public int getStopCount() {
+		return stopCount;
+	}
+
 	@Override
 	public String toString() {
 		return "StopTimeData{" +
@@ -54,6 +59,7 @@ final class StopTimeData {
 			", departureTime=" + departureTime +
 			", travelTime=" + getTravelTime() +
 			", stopDuration=" + getStopDuration() +
+			", stopCount=" + stopCount +
 			'}';
 	}
 }

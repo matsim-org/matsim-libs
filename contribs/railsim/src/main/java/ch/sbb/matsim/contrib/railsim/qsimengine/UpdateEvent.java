@@ -113,6 +113,8 @@ final class UpdateEvent implements Comparable<UpdateEvent> {
 		// Train finished its transit route and is waiting to start the next one
 		WAIT_DEPARTURE,
 
+		// Reverse the train to continue its route in opposite direction
+		REVERSE_TRAIN,
 	}
 
 }

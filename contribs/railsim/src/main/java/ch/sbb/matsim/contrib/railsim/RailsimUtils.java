@@ -21,6 +21,7 @@ package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.VehicleType;
 
@@ -181,10 +182,13 @@ public final class RailsimUtils {
 	 * Sets whether the train is reversible.
 	 *
 	 * @param vehicle The vehicle type to set the attribute for.
-	 * @param reversible True if the train can be reversed, false otherwise.
+	 * @param reversible time in seconds it takes to reverse the train, or null if not reversible.
 	 */
-	public static void setTrainReversible(VehicleType vehicle, double reversible) {
-		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE, reversible);
+	public static void setTrainReversible(VehicleType vehicle, @Nullable Double reversible) {
+		if (reversible == null) {
+			vehicle.getAttributes().removeAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
+		} else
+			vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE, reversible);
 	}
 
 	/**

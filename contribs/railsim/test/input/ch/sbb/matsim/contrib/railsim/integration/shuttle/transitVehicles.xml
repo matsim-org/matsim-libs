@@ -6,6 +6,7 @@
 		<attributes>
 			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
 			<attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimReversible" class="java.lang.Double">60.0</attribute>
 		</attributes>
 		<capacity seats="200" standingRoomInPersons="300"/>
 		<length meter="150.0"/>
@@ -23,4 +24,4 @@
 	<vehicle id="train_3" type="train_type"/>
 	<vehicle id="train_4" type="train_type"/>
 
-</vehicleDefinitions> 
+</vehicleDefinitions>

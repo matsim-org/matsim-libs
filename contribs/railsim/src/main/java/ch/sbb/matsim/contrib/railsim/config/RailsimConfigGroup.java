@@ -54,7 +54,7 @@ public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Defines how trains circulate in the network if the same vehicle is used for multiple trips.")
-	private VehicleCirculation vehicleCirculation = VehicleCirculation.teleport;
+	private VehicleCirculation vehicleCirculation = VehicleCirculation.yes;
 
 	public RailsimConfigGroup() {
 		super(GROUP_NAME);
@@ -128,16 +128,11 @@ public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 	 * Defines how trains circulate in the network if the same vehicle is used for multiple trips.
 	 */
 	public enum VehicleCirculation {
+
 		/**
-		 * Trains are teleported to the next station and continue their trip from there.
+		 * Trains follow the route calculated by the transit router and circulate on the network.
 		 */
-		teleport,
-		/**
-		 * Trains continue their trip from the last position in the network.
-		 * The next starting position must be connected to the last position.
-		 * Transit schedules must be set up accordingly.
-		 */
-		moveOnward
+		yes
 	}
 
 }

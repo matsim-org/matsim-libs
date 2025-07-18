@@ -111,6 +111,16 @@ final class RailsimEngine implements Steppable {
 		updateAllPositions(time);
 	}
 
+	private List<RailLink> createRoute(Id<Link> currentLinkId, NetworkRoute route) {
+		List<RailLink> list = route.getLinkIds().stream()
+			.map(resources::getLink)
+			.collect(Collectors.toList());
+
+		list.addFirst(resources.getLink(currentLinkId));
+		list.add(resources.getLink(route.getEndLinkId()));
+		return list;
+	}
+
 	/**
 	 * Handle the departure of a train.
 	 */
@@ -122,10 +132,7 @@ final class RailsimEngine implements Steppable {
 		// NO events can be generated here, or temporal ordering is not guaranteed
 		// (departures are handled before event queue is processed)
 
-		List<RailLink> list = route.getLinkIds().stream().map(resources::getLink).collect(Collectors.toList());
-		list.add(0, resources.getLink(linkId));
-		list.add(resources.getLink(route.getEndLinkId()));
-
+		List<RailLink> list = createRoute(linkId, route);
 		VehicleType type = agent.getVehicle().getVehicle().getType();
 		TrainState state = new TrainState(agent, new TrainInfo(type, config), now, linkId, list);
 
@@ -145,7 +152,8 @@ final class RailsimEngine implements Steppable {
 	 */
 	private void prepareDeparture(double time, UpdateEvent event) {
 
-		RailsimTransitDriverAgent driver = event.state.pt;
+		TrainState state = event.state;
+		RailsimTransitDriverAgent driver = state.pt;
 		assert driver != null : "Train must have a pt driver";
 
 		// Prepares the next route and initializes events
@@ -161,21 +169,26 @@ final class RailsimEngine implements Steppable {
 			throw new IllegalStateException("A network route is required for agent " + driver + ".");
 		}
 
-		event.type = UpdateEvent.Type.IDLE;
-
-		// New states and events will be created for the new departure
-		activeTrains.remove(event.state);
-
-		// Check consistency of the route
-		if (config.getVehicleCirculation() == RailsimConfigGroup.VehicleCirculation.moveOnward) {
-			if (!Objects.equals(event.state.headLink, networkRoute.getStartLinkId())) {
-				throw new IllegalStateException("Train " + driver.getId() + " is not at the start link of its route. Expected: " + networkRoute.getStartLinkId() + ", but was: " + event.state.getHeadLink());
+		// Free reservations of the old route
+		for (RailLink link : state.route) {
+			if (resources.isBlockedBy(link, state) && link.getLinkId() != state.headLink) {
+				disposition.unblockRailLink(time, state.driver, link);
 			}
-
-			// TODO: Allow reversing the train is this case
 		}
 
-		handleDeparture(time, driver, networkRoute.getStartLinkId(), networkRoute);
+		// Check the consistency of the route
+		if (config.getVehicleCirculation() == RailsimConfigGroup.VehicleCirculation.yes) {
+			if (!Objects.equals(state.headLink, networkRoute.getStartLinkId())) {
+				throw new IllegalStateException("Train " + driver.getId() + " is not at the start link of its route. Expected: " + networkRoute.getStartLinkId() + ", but was: " + state.getHeadLink());
+			}
+		}
+
+		state.reset(time, createRoute(networkRoute.getStartLinkId(), networkRoute));
+
+		disposition.onDeparture(time, state.driver, state.route);
+
+		event.plannedTime = time;
+		event.type = UpdateEvent.Type.DEPARTURE;
 	}
 
 	private void updateAllPositions(double time) {
@@ -201,7 +214,7 @@ final class RailsimEngine implements Steppable {
 				decideNextUpdate(event);
 			}
 			case SPEED_CHANGE -> updateSpeed(time, event);
-			case ENTER_LINK -> enterLink(time, event);
+			case ENTER_LINK, REVERSE_TRAIN -> enterLink(time, event);
 			case LEAVE_LINK -> leaveLink(time, event);
 			case BLOCK_TRACK -> blockTrack(time, event);
 			case WAIT_FOR_RESERVATION -> checkTrackReservation(time, event);
@@ -415,13 +428,6 @@ final class RailsimEngine implements Steppable {
 
 //			assert FuzzyUtils.equals(state.speed, 0) : "Speed must be 0 at end, but was " + state.speed;
 
-			// Free all reservations
-			for (RailLink link : state.route) {
-				if (resources.isBlockedBy(link, state)) {
-					disposition.unblockRailLink(time, state.driver, link);
-				}
-			}
-
 			state.speed = 0;
 			state.driver.notifyArrivalOnLinkByNonNetworkMode(state.headLink);
 			state.driver.endLegAndComputeNextState(Math.ceil(time));
@@ -435,6 +441,14 @@ final class RailsimEngine implements Steppable {
 				event.type = UpdateEvent.Type.WAIT_DEPARTURE;
 
 			} else {
+
+				// Free all reservations
+				for (RailLink link : state.route) {
+					if (resources.isBlockedBy(link, state)) {
+						disposition.unblockRailLink(time, state.driver, link);
+					}
+				}
+
 				activeTrains.remove(state);
 				event.type = UpdateEvent.Type.IDLE;
 			}
@@ -455,17 +469,44 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
+		// Get link and increment
+		RailLink nextLink = state.route.get(state.routeIdx++);
+
+		// Check if needs to reverse
+		if (event.type != UpdateEvent.Type.REVERSE_TRAIN && nextLink.isOppositeLink(state.headLink)) {
+			if (state.train.reversible() < 0)
+				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to enter the opposite link " + nextLink.getLinkId() + " with a non-reversible train.");
+
+			if (state.train.length() > nextLink.length) {
+				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to reverse on link " + nextLink.getLinkId() + " with a train that is longer than the link. This is currently not supported.");
+			}
+
+			// Reverse the increment
+			state.routeIdx -= 1;
+
+			// Reschedule the event
+			event.plannedTime = time + state.train.reversible();
+			event.type = UpdateEvent.Type.REVERSE_TRAIN;
+			return;
+		}
+
 		// On route departure the head link is null
 		createEvent(new LinkLeaveEvent(time, state.driver.getVehicle().getId(), state.headLink));
-
-		// Get link and increment
-		state.headLink = state.route.get(state.routeIdx++).getLinkId();
+		state.headLink = nextLink.getLinkId();
 
 		assert resources.isBlockedBy(resources.getLink(state.headLink), state) : "Link has to be blocked by driver when entered";
 
 		state.headPosition = 0;
+
+		// Swap head and tail position
+		if (event.type == UpdateEvent.Type.REVERSE_TRAIN) {
+			state.headPosition = state.tailPosition;
+			state.tailPosition = 0;
+		}
+
 		// Reset waiting flag
 		event.waitingForLink = false;
+		event.type = UpdateEvent.Type.ENTER_LINK;
 
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));

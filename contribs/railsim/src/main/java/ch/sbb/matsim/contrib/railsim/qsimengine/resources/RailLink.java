@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
@@ -36,6 +37,12 @@ public final class RailLink implements HasLinkId {
 	private final boolean isExitLink;
 	private final boolean isNonBlockingArea;
 
+	/**
+	 * Id of opposite link, if any.
+	 */
+	@Nullable
+	private final Id<Link> oppositeLinkId;
+
 	public final double length;
 	public final double minimumHeadwayTime;
 	public final double freeSpeed;
@@ -46,7 +53,7 @@ public final class RailLink implements HasLinkId {
 	 */
 	RailResourceInternal resource;
 
-	public RailLink(Link link) {
+	public RailLink(Link link, Link opposite) {
 		this.id = link.getId();
 		this.length = link.getLength();
 		this.tracks = RailsimUtils.getTrainCapacity(link);
@@ -55,6 +62,7 @@ public final class RailLink implements HasLinkId {
 		this.isEntryLink = RailsimUtils.isEntryLink(link);
 		this.isExitLink = RailsimUtils.isExitLink(link);
 		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
+		this.oppositeLinkId = opposite != null ? opposite.getId() : null;
 	}
 
 	@Override
@@ -106,6 +114,16 @@ public final class RailLink implements HasLinkId {
 	 */
 	public double getLength() {
 		return length;
+	}
+
+	/**
+	 * Determines if the given link is the opposite link of this link.
+	 *
+	 * @param linkId the identifier of the link to be checked
+	 * @return true if the provided linkId matches the opposite link's Id, false otherwise
+	 */
+	public boolean isOppositeLink(Id<Link> linkId) {
+		return oppositeLinkId != null && oppositeLinkId.equals(linkId);
 	}
 
 	@Override

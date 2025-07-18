@@ -64,6 +64,25 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	}
 
 	/**
+	 * Asserts that a specific train has a stop at a specific station.
+	 *
+	 * @param trainId   the train ID
+	 * @param stationId the station ID
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert trainHasStopAt(String trainId, String stationId, int expectedStopCount) {
+		isNotNull();
+		containsTrain(trainId);
+		trainHasStopAt(trainId, stationId);
+		int actualCount = actual.stopTimes.get(trainId).get(stationId).getStopCount();
+		if (actualCount != expectedStopCount) {
+			failWithMessage("Expected train <%s> to have <%d> stops at station <%s> but found <%d>",
+				trainId, expectedStopCount, stationId, actualCount);
+		}
+		return this;
+	}
+
+	/**
 	 * Asserts that a specific train does not have a stop at a specific station.
 	 *
 	 * @param trainId   the train ID
@@ -118,7 +137,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	public SimulationResultAssert trainHasNumberOfStops(String trainId, int expectedCount) {
 		isNotNull();
 		containsTrain(trainId);
-		int actualCount = actual.stopTimes.get(trainId).size();
+		int actualCount = actual.stopTimes.get(trainId).values().stream().mapToInt(StopTimeData::getStopCount).sum();
 		if (actualCount != expectedCount) {
 			failWithMessage("Expected train <%s> to have <%d> stops but found <%d>", trainId, expectedCount, actualCount);
 		}
@@ -136,9 +155,9 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 
 		// Find trains that don't have the expected number of stops
 		List<String> trainsWithWrongCount = actual.stopTimes.entrySet().stream()
-			.filter(trainEntry -> trainEntry.getValue().size() != expectedCount)
+			.filter(trainEntry -> trainEntry.getValue().values().stream().mapToInt(StopTimeData::getStopCount).sum() != expectedCount)
 			.map(trainEntry -> String.format("train %s: expected %d stops, found %d",
-				trainEntry.getKey(), expectedCount, trainEntry.getValue().size()))
+				trainEntry.getKey(), expectedCount, trainEntry.getValue().values().stream().mapToInt(StopTimeData::getStopCount).sum()))
 			.toList();
 
 		if (!trainsWithWrongCount.isEmpty()) {
@@ -297,7 +316,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 				// Iterate through all departures in the route
 				for (Departure departure : route.getDepartures().values()) {
 					String trainId = departure.getVehicleId().toString();
-					
+
 					// Check if this train has any arrival data
 					if (!actual.stopTimes.containsKey(trainId)) {
 						missingArrivals.add(String.format("train %s (line %s, route %s, departure %s): no arrival data found",
@@ -309,7 +328,7 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 					var trainStops = actual.stopTimes.get(trainId);
 					for (TransitRouteStop routeStop : route.getStops()) {
 						String stopId = routeStop.getStopFacility().getId().toString();
-						
+
 						if (!trainStops.containsKey(stopId)) {
 							missingArrivals.add(String.format("train %s (line %s, route %s, departure %s): missing arrival at stop %s",
 								trainId, line.getId(), route.getId(), departure.getId(), stopId));
