@@ -84,7 +84,7 @@ public class ControlerEventsTest {
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
-		controler.addControlerListener(listener);
+		controler.addControllerListener(listener);
 		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();

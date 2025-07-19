@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+package org.matsim.core.controler.listener;
 
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import com.google.inject.Singleton;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import java.util.EventListener;
+
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.controler.Controler;
 
 /**
- * Railsim module installing all needed component.
+ * ControllerListeners are notified at specific points in the {@link Controler} loop.  See sub-interfaces for more information
+ * and specific usages.
+ * <p>
+ * Example(s):<ul>
+ * <li> {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample}
+ * </ul>
+ *
+ * @author dgrether
  */
-public class RailsimModule extends AbstractModule {
+public interface ControllerListener extends EventListener, MatsimExtensionPoint {
 
-	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
-
-		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);
-
-		bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimTrainStateControlerListener.class);
+	/**
+	 * Return the priority of this listener. Listeners with higher priority are executed first. The default priority is 0.
+	 */
+	default double priority() {
+		return 0;
 	}
+
 }

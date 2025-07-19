@@ -88,7 +88,7 @@ public abstract class BuildingEnergyRunnerMain {
 				overwrite ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.addControlerListener(new MyControlerListener(c, sc.getNetwork()));
+		controler.addControllerListener(new MyControlerListener(c, sc.getNetwork()));
 		controler.run();
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CountControlerListener.java
+ * CountControllerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -54,7 +54,7 @@ import java.util.Set;
 /**
  * @author dgrether
  */
-class CountsControlerListener implements StartupListener, IterationEndsListener {
+class CountsControllerListener implements StartupListener, IterationEndsListener {
 
 	/*
 	 * String used to identify the operation in the IterationStopWatch.
@@ -77,7 +77,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+		CountsControllerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
         this.globalConfigGroup = globalConfigGroup;
         this.network = network;
         this.controllerConfigGroup = controllerConfigGroup;

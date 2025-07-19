@@ -112,13 +112,13 @@ public class FleetModule extends AbstractDvrpModeModule {
 			bindModal(VehicleStartLinkToLastLinkUpdater.class).toProvider(modalProvider(
 					getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class),
 							getter.getModal(ExecutedScheduleCollector.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(VehicleStartLinkToLastLinkUpdater.class));
+			addControllerListenerBinding().to(modalKey(VehicleStartLinkToLastLinkUpdater.class));
 		}
 
 		bindModal(FleetControlerListener.class).toProvider(modalProvider(
 				getter -> new FleetControlerListener(getMode(), getter.get(OutputDirectoryHierarchy.class),
 						getter.getModal(FleetSpecification.class), getter.getModal(DvrpLoadType.class)))).in(Singleton.class);
-		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
+		addControllerListenerBinding().to(modalKey(FleetControlerListener.class));
 
 		bindModal(VehicleType.class).toInstance(vehicleType);
 	}

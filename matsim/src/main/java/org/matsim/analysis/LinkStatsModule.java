@@ -38,7 +38,7 @@ public final class LinkStatsModule extends AbstractModule {
 		    traveltimes in linkStats are the avg. traveltimes between xx.00 and
 		    xx.15, and not between xx.00 and xx.59*/
             bind(LinkStatsControlerListener.class).asEagerSingleton();
-            addControlerListenerBinding().to(LinkStatsControlerListener.class);
+            addControllerListenerBinding().to(LinkStatsControlerListener.class);
         }
     }
 

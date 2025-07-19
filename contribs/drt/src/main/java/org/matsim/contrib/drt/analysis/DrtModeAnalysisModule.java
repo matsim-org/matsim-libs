@@ -128,7 +128,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.get(QSimConfigGroup.class), passengerServingTaskTypes, getter.getModal(DvrpLoadType.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleOccupancyProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+		addControllerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);
 			String mode = drtCfg.getMode();
 			var profileView = new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class),
@@ -141,14 +141,14 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.get(QSimConfigGroup.class)))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(VehicleTaskProfileCalculator.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> {
+		addControllerListenerBinding().toProvider(modalProvider(getter -> {
 			MatsimServices matsimServices = getter.get(MatsimServices.class);
 			String mode = drtCfg.getMode();
 			var profileView = new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints);
 			return new ProfileWriter(matsimServices, mode, profileView, "task_time_profiles");
 		}));
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 						getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg, getter.getModal(FleetSpecification.class),
 								getter.getModal(DrtVehicleDistanceStats.class), getter.get(MatsimServices.class), getter.get(Network.class),
 								getter.getModal(DrtEventSequenceCollector.class), getter.getModal(VehicleOccupancyProfileCalculator.class), getter.getModal(DvrpLoadType.class))))
@@ -156,7 +156,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		install(new SharingMetricsModule(drtCfg));
 
-		addControlerListenerBinding().toProvider(modalProvider( //
+		addControllerListenerBinding().toProvider(modalProvider( //
 			getter -> new CapacityLoadAnalysisHandler(getMode(), //
 			getter.getModal(FleetSpecification.class), //
 			getter.get(OutputDirectoryHierarchy.class), //
@@ -189,7 +189,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 					return new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
 						zoneSystem);
 				})).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
+		addControllerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 		addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
 		bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
@@ -199,6 +199,6 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 					return new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtEventSequenceCollector.class),
 						zoneSystem, getConfig().global().getDefaultDelimiter());
 				})).asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
+		addControllerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 	}
 }

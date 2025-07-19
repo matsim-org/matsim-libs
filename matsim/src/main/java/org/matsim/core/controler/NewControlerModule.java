@@ -29,7 +29,7 @@ public final class NewControlerModule extends AbstractModule {
 	public void install() {
 		bind(ControlerI.class).to(NewControler.class).asEagerSingleton();
 		bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-		bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+		bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
 
 		bind(IterationStopWatch.class).asEagerSingleton();
 		bind(OutputDirectoryHierarchy.class).asEagerSingleton();

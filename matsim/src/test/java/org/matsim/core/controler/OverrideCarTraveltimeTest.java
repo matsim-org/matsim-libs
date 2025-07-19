@@ -49,7 +49,7 @@ import java.util.Map;
             public void install() {
                 bindCarTravelDisutilityFactory().to(InterestingTravelDisutilityFactory.class);
                 bindNetworkTravelTime().to(InterestingTravelTime.class);
-                addControlerListenerBinding().to(InterestingControlerListener.class);
+                addControllerListenerBinding().to(InterestingControlerListener.class);
             }
         });
         controler.run();

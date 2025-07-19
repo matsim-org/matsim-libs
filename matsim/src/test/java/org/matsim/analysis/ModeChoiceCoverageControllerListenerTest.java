@@ -28,7 +28,7 @@ import java.util.Map;
  * adapted from Aravind "ModeStatsControlerListenerTest"
  *
  */
-public class ModeChoiceCoverageControlerListenerTest {
+public class ModeChoiceCoverageControllerListenerTest {
 
     @RegisterExtension
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -48,7 +48,7 @@ public class ModeChoiceCoverageControlerListenerTest {
         Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
         population.addPerson(person);
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControllerListener modeCC = new ModeChoiceCoverageControllerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // Iteration 0: walk - walk
@@ -99,7 +99,7 @@ public class ModeChoiceCoverageControlerListenerTest {
         population.addPerson(person2);
 
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControllerListener modeCC = new ModeChoiceCoverageControllerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // Iteration 0: walk - walk
@@ -159,7 +159,7 @@ public class ModeChoiceCoverageControlerListenerTest {
         Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
         population.addPerson(person);
 
-        ModeChoiceCoverageControlerListener modeCC = new ModeChoiceCoverageControlerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
+        ModeChoiceCoverageControllerListener modeCC = new ModeChoiceCoverageControllerListener(controllerConfigGroup, population, controlerIO, scoreConfig, transportId);
         modeCC.notifyStartup(new StartupEvent(null));
 
         // After 1 iteration

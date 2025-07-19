@@ -298,7 +298,7 @@ public class SwissRailRaptorModuleTest {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
-                addControlerListenerBinding().to(ScheduleModifierControlerListener.class);
+                addControllerListenerBinding().to(ScheduleModifierControlerListener.class);
             }
         });
 

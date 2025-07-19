@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
@@ -79,7 +79,7 @@ public final class EventsToScore {
 						bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
@@ -99,7 +99,7 @@ public final class EventsToScore {
 						bind(NewScoreAssigner.class).to(NoopNewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
 						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}

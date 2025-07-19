@@ -116,7 +116,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControlerListener.class);
 
 			}
 		});
@@ -248,7 +248,7 @@ public class DecongestionPricingTestIT {
 		// ===
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
 		Network network = scenario.getNetwork();
 
 		// make middle link faster
@@ -373,7 +373,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControlerListener.class);
 
 			}
 		});
@@ -515,7 +515,7 @@ public class DecongestionPricingTestIT {
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControlerListener.class);
 
 			}
 		});
@@ -599,7 +599,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControlerListener.class);
 			}
 		});
 
@@ -657,7 +657,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControlerListener.class);
 
 			}
 		});

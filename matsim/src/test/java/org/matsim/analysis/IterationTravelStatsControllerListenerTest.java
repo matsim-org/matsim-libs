@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -39,7 +39,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Aravind
  *
  */
-public class IterationTravelStatsControlerListenerTest {
+public class IterationTravelStatsControllerListenerTest {
 
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
@@ -113,11 +113,11 @@ public class IterationTravelStatsControlerListenerTest {
 				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
-				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
-				bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+				bind(IterationTravelStatsControllerListener.class).asEagerSingleton();
+				bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
 			}
 		});
-		IterationTravelStatsControlerListener ltcl = injector.getInstance(IterationTravelStatsControlerListener.class);
+		IterationTravelStatsControllerListener ltcl = injector.getInstance(IterationTravelStatsControllerListener.class);
 		ltcl.notifyShutdown(shutdownEvent);
 		readAndValidateValues(scenario);
 	}

@@ -1,7 +1,5 @@
 package org.matsim.contrib.drt.sharingmetrics;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.MatsimServices;
@@ -28,6 +26,6 @@ public class SharingMetricsModule extends AbstractDvrpModeModule {
                         getter.getModal(SharingMetricsTracker.class),
                         getter.get(MatsimServices.class))
         ));
-        addControlerListenerBinding().to(modalKey(SharingMetricsControlerListener.class));
+        addControllerListenerBinding().to(modalKey(SharingMetricsControlerListener.class));
     }
 }

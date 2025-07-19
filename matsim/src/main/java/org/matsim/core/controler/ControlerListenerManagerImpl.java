@@ -36,7 +36,7 @@ import java.util.Comparator;
  *
  * @author dgrether
  */
-public final class ControlerListenerManagerImpl implements ControlerListenerManager {
+public final class ControlerListenerManagerImpl implements ControllerListenerManager {
 
 	private final static Logger log = LogManager.getLogger(ControlerListenerManagerImpl.class);
 
@@ -49,8 +49,8 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners
 	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
 	 * always running in a predefined order to ensure correctness.
-	 * The second list manages the other listeners, which can be added by calling addControlerListener(...).
-	 * A normal ControlerListener is not allowed to depend on the execution of other ControlerListeners.
+	 * The second list manages the other listeners, which can be added by calling addControllerListener(...).
+	 * A normal ControllerListener is not allowed to depend on the execution of other ControllerListeners.
 	 */
 	private final EventListenerList coreListenerList = new EventListenerList();
 	private final EventListenerList listenerList = new EventListenerList();
@@ -61,9 +61,9 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 *
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addCoreControlerListener(final ControlerListener l) {
+	protected void addCoreControlerListener(final ControllerListener l) {
 		for (Class type : ClassUtils.getAllTypes(l.getClass())) {
-			if (type.isInterface() && ControlerListener.class.isAssignableFrom(type)) {
+			if (type.isInterface() && ControllerListener.class.isAssignableFrom(type)) {
 				this.coreListenerList.add(type, l);
 			}
 		}
@@ -74,41 +74,46 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	 *
 	 */
 	@SuppressWarnings("unchecked")
-	public void addControlerListener(final ControlerListener l) {
+	public void addControllerListener(final ControllerListener l) {
 		for (Class type : ClassUtils.getAllTypes(l.getClass())) {
-			if (ControlerListener.class.isAssignableFrom(type)) {
+			if (ControllerListener.class.isAssignableFrom(type)) {
 				this.listenerList.add(type, l);
 			}
 		}
 	}
 
 	/**
-	 * Removes a ControlerListener from the Controler instance
+	 * Removes a ControllerListener from the Controler instance
 	 *
 	 */
 	@SuppressWarnings("unchecked")
-	public void removeControlerListener(final ControlerListener l) {
+	public void removeControllerListener(final ControllerListener l) {
 		Class[] interfaces = l.getClass().getInterfaces();
         for (Class anInterface : interfaces) {
-            if (ControlerListener.class.isAssignableFrom(anInterface)) {
+            if (ControllerListener.class.isAssignableFrom(anInterface)) {
                 this.listenerList.remove(anInterface, l);
             }
         }
 	}
 
+	@Deprecated(since="2025-09-17")
+	public void removeControlerListener(final ControllerListener l) {
+		this.removeControllerListener(l);
+	}
+
 	/**
-	 * Notifies all ControlerListeners
+	 * Notifies all ControllerListeners
 	 */
 	public void fireControlerStartupEvent() {
 		StartupEvent event = new StartupEvent(this.controler);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (StartupListener aListener : listener) {
             log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
         }
 		listener = this.listenerList.getListeners(StartupListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (StartupListener aListener : listener) {
             log.info("calling notifyStartup on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyStartup(event);
@@ -131,14 +136,14 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable Throwable exception) {
 		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration, exception);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
 
         for (ShutdownListener aListener : listener) {
             log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyShutdown(event);
         }
         listener = this.listenerList.getListeners(ShutdownListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
 
         for (ShutdownListener aListener : listener) {
             log.info("calling notifyShutdown on " + aListener.getClass().getName() + " with priority " + aListener.priority());
@@ -154,13 +159,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	public void fireControlerIterationStartsEvent(final int iteration, boolean isLastIteration) {
 		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration, isLastIteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (IterationStartsListener aListener : listener) {
             log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyIterationStarts(event);
         }
 		listener = this.listenerList.getListeners(IterationStartsListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (IterationStartsListener aListener : listener) {
             log.info("calling notifyIterationStarts on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyIterationStarts(event);
@@ -176,7 +181,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration, isLastIteration);
 		{
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
-			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
 			for (IterationEndsListener aListener : listener) {
                 log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyIterationEnds(event);
@@ -184,7 +189,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		}
 		{
 			IterationEndsListener[] listener = this.listenerList.getListeners(IterationEndsListener.class);
-			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
             for (IterationEndsListener aListener : listener) {
                 log.info("calling notifyIterationEnds on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyIterationEnds(event);
@@ -201,7 +206,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		ScoringEvent event = new ScoringEvent(this.controler, iteration, isLastIteration);
 		{
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
-			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
             for (ScoringListener aListener : listener) {
                 log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyScoring(event);
@@ -209,7 +214,7 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		}
 		{
 			ScoringListener[] listener = this.listenerList.getListeners(ScoringListener.class);
-			Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
             for (ScoringListener aListener : listener) {
                 log.info("calling notifyScoring on " + aListener.getClass().getName() + " with priority " + aListener.priority());
                 aListener.notifyScoring(event);
@@ -225,13 +230,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	public void fireControlerReplanningEvent(final int iteration, boolean isLastIteration) {
 		ReplanningEvent event = new ReplanningEvent(this.controler, iteration, isLastIteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (ReplanningListener aListener : listener) {
             log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyReplanning(event);
         }
 		listener = this.listenerList.getListeners(ReplanningListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (ReplanningListener aListener : listener) {
             log.info("calling notifyReplanning on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyReplanning(event);
@@ -246,13 +251,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	public void fireControlerBeforeMobsimEvent(final int iteration, boolean isLastIteration) {
 		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration, isLastIteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (BeforeMobsimListener aListener : listener) {
             log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyBeforeMobsim(event);
         }
 		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (BeforeMobsimListener aListener : listener) {
             log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyBeforeMobsim(event);
@@ -267,13 +272,13 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 	public void fireControlerAfterMobsimEvent(final int iteration, boolean isLastIteration) {
 		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration, isLastIteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (AfterMobsimListener aListener : listener) {
             log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyAfterMobsim(event);
         }
 		listener = this.listenerList.getListeners(AfterMobsimListener.class);
-		Arrays.sort(listener, Comparator.comparingDouble(ControlerListener::priority).reversed());
+		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (AfterMobsimListener aListener : listener) {
             log.info("calling notifyAfterMobsim on " + aListener.getClass().getName() + " with priority " + aListener.priority());
             aListener.notifyAfterMobsim(event);

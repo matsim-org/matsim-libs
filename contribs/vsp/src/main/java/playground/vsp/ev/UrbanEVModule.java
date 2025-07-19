@@ -54,7 +54,7 @@ public class UrbanEVModule extends AbstractModule {
 		install(new ElectricFleetModule());
 
 		//bind custom EVFleet stuff
-		addControlerListenerBinding().to(ElectricFleetUpdater.class).in( Singleton.class );
+		addControllerListenerBinding().to(ElectricFleetUpdater.class).in( Singleton.class );
 		// (this takes the matsim modal vehicles for each leg and gives them to the ElectricFleetSpecification.  Don't know why it has to be in
 		// this ad-hoc way.  kai, apr'23)
 
@@ -79,7 +79,7 @@ public class UrbanEVModule extends AbstractModule {
 		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
 		addMobsimListenerBinding().to(ChargerToXY.class);
 		addEventHandlerBinding().to(ActsWhileChargingAnalyzer.class).in(Singleton.class);
-		addControlerListenerBinding().to(ActsWhileChargingAnalyzer.class);
+		addControllerListenerBinding().to(ActsWhileChargingAnalyzer.class);
 	}
 
 }

@@ -35,15 +35,15 @@ public final class AccidentsModule extends AbstractModule {
 		AccidentsConfigGroup accidentsConfigGroup = ConfigUtils.addOrGetModule( getConfig() , AccidentsConfigGroup.class );
 
 		if ( accidentsConfigGroup.isEnableAccidentsModule()) {
-			
+
 			this.bind(AccidentsContext.class).in( Singleton.class ) ;
-			
+
 			this.bind(AnalysisEventHandler.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(AnalysisEventHandler.class) ;
-			
-			this.addControlerListenerBinding().to(AccidentControlerListener.class);
+
+			this.addControllerListenerBinding().to(AccidentControlerListener.class);
 		}
-				
+
 	}
 
 }

@@ -28,6 +28,6 @@ public final class LinkPaxVolumesAnalysisModule extends AbstractModule {
     @Override
     public void install() {
         bind(LinkPaxVolumesControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(LinkPaxVolumesControlerListener.class);
+        addControllerListenerBinding().to(LinkPaxVolumesControlerListener.class);
     }
 }

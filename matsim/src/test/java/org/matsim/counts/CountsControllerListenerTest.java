@@ -57,7 +57,7 @@ import com.google.inject.Provider;
 /**
  * @author mrieser
  */
-public class CountsControlerListenerTest {
+public class CountsControllerListenerTest {
 
 	@RegisterExtension private MatsimTestUtils util = new MatsimTestUtils();
 
@@ -65,7 +65,7 @@ public class CountsControlerListenerTest {
 	void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controller(), config.counts(), null, null, null);
+		CountsControllerListener ccl = new CountsControllerListener(config.global(), scenario.getNetwork(), config.controller(), config.counts(), null, null, null);
 
 		// test defaults
 		Assertions.assertEquals(10, config.counts().getWriteCountsInterval());

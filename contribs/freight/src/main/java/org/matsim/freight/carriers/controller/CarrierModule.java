@@ -50,7 +50,7 @@ public final class CarrierModule extends AbstractModule {
 		// this is probably ok
 
 		bind(CarrierControllerListener.class).in( Singleton.class );
-		addControlerListenerBinding().to(CarrierControllerListener.class);
+		addControllerListenerBinding().to(CarrierControllerListener.class);
 
 		bind(CarrierAgentTracker.class).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );
@@ -97,7 +97,7 @@ public final class CarrierModule extends AbstractModule {
 		bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
+		this.addControllerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
 
 	}
 

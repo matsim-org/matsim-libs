@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.corelisteners.*;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 import jakarta.inject.Inject;
@@ -47,17 +47,17 @@ class NewControler extends AbstractController implements ControlerI {
 	private final PlansScoring plansScoring;
 	private final TerminationCriterion terminationCriterion;
 	private final DumpDataAtEnd dumpDataAtEnd;
-	private final Set<ControlerListener> controlerListenersDeclaredByModules;
+	private final Set<ControllerListener> controllerListenersDeclaredByModules;
 	private final ControllerConfigGroup controllerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
 	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
-			 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
-			 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
-			 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
-			 Set<ControlerListener> controlerListenersDeclaredByModules, ControllerConfigGroup controllerConfigGroup,
-			 OutputDirectoryHierarchy outputDirectoryHierarchy
+							 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
+							 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
+							 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
+							 Set<ControllerListener> controllerListenersDeclaredByModules, ControllerConfigGroup controllerConfigGroup,
+							 OutputDirectoryHierarchy outputDirectoryHierarchy
 			, PrepareForMobsim prepareForMobsim
  ) {
 		super(controlerListenerManager, stopWatch, matsimServices);
@@ -72,7 +72,7 @@ class NewControler extends AbstractController implements ControlerI {
 		this.plansScoring = plansScoring;
 		this.terminationCriterion = terminationCriterion;
 		this.dumpDataAtEnd = dumpDataAtEnd;
-		this.controlerListenersDeclaredByModules = controlerListenersDeclaredByModules;
+		this.controllerListenersDeclaredByModules = controllerListenersDeclaredByModules;
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
@@ -104,8 +104,8 @@ class NewControler extends AbstractController implements ControlerI {
 		this.addCoreControlerListener(this.eventsHandling);
 		// must be last being added (=first being executed)
 
-		for (ControlerListener controlerListener : this.controlerListenersDeclaredByModules) {
-			this.addControlerListener(controlerListener);
+		for (ControllerListener controllerListener : this.controllerListenersDeclaredByModules) {
+			this.addControllerListener(controllerListener);
 		}
 	}
 
