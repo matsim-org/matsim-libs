@@ -45,7 +45,7 @@ public class RunEquil {
 		controler.getEvents().addHandler(allDay);
 
 
-		controler.addControlerListener(new IterationEndsListener() {
+		controler.addControllerListener(new IterationEndsListener() {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				System.out.println("Night maximum link occupancy ---");

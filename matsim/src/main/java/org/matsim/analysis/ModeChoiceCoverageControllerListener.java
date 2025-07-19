@@ -34,7 +34,7 @@ import java.util.Map.Entry;
  *
  * @author jakobrehmann
  */
-public class ModeChoiceCoverageControlerListener implements StartupListener, IterationEndsListener,
+public class ModeChoiceCoverageControllerListener implements StartupListener, IterationEndsListener,
         ShutdownListener {
 
     private final static Logger log = LogManager.getLogger(ModeStatsControlerListener.class);
@@ -64,8 +64,8 @@ public class ModeChoiceCoverageControlerListener implements StartupListener, Ite
 
 
     @Inject
-    ModeChoiceCoverageControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-																				ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
+		ModeChoiceCoverageControllerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
+																				 ScoringConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
 
         this.controllerConfigGroup = controllerConfigGroup;
         this.population = population1;

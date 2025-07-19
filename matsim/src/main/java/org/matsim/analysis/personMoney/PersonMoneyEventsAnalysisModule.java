@@ -34,6 +34,6 @@ public class PersonMoneyEventsAnalysisModule extends AbstractModule {
         bind(PersonMoneyEventsAggregator.class).in(Singleton.class);
         bind(PersonMoneyEventsCollector.class).in(Singleton.class);
         bind(PersonMoneyEventsAnalysisControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(PersonMoneyEventsAnalysisControlerListener.class);
+        addControllerListenerBinding().to(PersonMoneyEventsAnalysisControlerListener.class);
     }
 }

@@ -48,7 +48,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
@@ -282,11 +282,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+				addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 					@Inject Scenario scenario;
 					@Inject EventsManager eventsManager;
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
 					}
 				});
@@ -363,11 +363,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+				addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 					@Inject Scenario scenario;
 					@Inject EventsManager eventsManager;
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
 					}
 				});
@@ -449,11 +449,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+				addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 					@Inject Scenario scenario;
 					@Inject EventsManager eventsManager;
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
 					}
 				});
@@ -517,11 +517,11 @@ public class AdvancedMarginalCongestionPricingIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+				addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 					@Inject Scenario scenario;
 					@Inject EventsManager eventsManager;
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
 					}
 				});

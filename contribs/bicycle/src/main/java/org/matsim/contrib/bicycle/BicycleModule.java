@@ -84,7 +84,7 @@ public final class BicycleModule extends AbstractModule {
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
 		// (both the router and the mobsim need this)
 
-		addControlerListenerBinding().to(ConsistencyCheck.class);
+		addControllerListenerBinding().to(ConsistencyCheck.class);
 	}
 
 	static class ConsistencyCheck implements StartupListener {

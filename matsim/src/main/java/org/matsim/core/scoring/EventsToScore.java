@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManager;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -50,8 +50,8 @@ import jakarta.inject.Inject;
 public final class EventsToScore {
 
 	private final NewScoreAssigner newScoreAssigner;
-	private final ControlerListenerManagerImpl controlerListenerManager;
-	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+	private final ControllerListenerManagerImpl controllerListenerManager;
+	private final ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	private final Population population;
 
 	private boolean finished = false;
@@ -60,8 +60,8 @@ public final class EventsToScore {
 	private boolean isLastIteration = false;
 
 	@Inject
-	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
-		this.controlerListenerManager = controlerListenerManager;
+	private EventsToScore(ControllerListenerManagerImpl controllerListenerManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
+		this.controllerListenerManager = controllerListenerManager;
 		this.scoringFunctionsForPopulation = scoringFunctionsForPopulation;
 		this.population = scenario.getPopulation();
 		this.newScoreAssigner = newScoreAssigner;
@@ -78,8 +78,8 @@ public final class EventsToScore {
 						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 						bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
-						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManagerImpl.class).asEagerSingleton();
+						bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
@@ -98,8 +98,8 @@ public final class EventsToScore {
 						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 						bind(NewScoreAssigner.class).to(NoopNewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
-						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManagerImpl.class).asEagerSingleton();
+						bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 						bind(EventsManagerModule.EventHandlerRegistrator.class).asEagerSingleton();
 					}
@@ -110,7 +110,7 @@ public final class EventsToScore {
 	public void beginIteration(int iteration, boolean isLastIteration) {
 		this.iteration = iteration;
 		this.isLastIteration = isLastIteration;
-		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration, isLastIteration);
+		this.controllerListenerManager.fireControllerIterationStartsEvent(iteration, isLastIteration);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public final class EventsToScore {
 		if (iteration == -1) {
 			throw new RuntimeException("Please initialize me before the iteration starts.");
 		}
-		controlerListenerManager.fireControlerAfterMobsimEvent(iteration, isLastIteration);
+		controllerListenerManager.fireControllerAfterMobsimEvent(iteration, isLastIteration);
 		scoringFunctionsForPopulation.finishScoringFunctions();
 		newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
 		finished = true;

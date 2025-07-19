@@ -10,7 +10,7 @@ import com.google.inject.Singleton;
  * This module enables the reservation-based charging logic that requires
  * vehicles to have or make a reservation when attempting to charge at a
  * charger.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ChargerReservationModule extends AbstractModule {
@@ -26,7 +26,7 @@ public class ChargerReservationModule extends AbstractModule {
 
     @Override
     public void install() {
-        addControlerListenerBinding().to(ChargerReservationManager.class);
+        addControllerListenerBinding().to(ChargerReservationManager.class);
 
         if (bindPriority) {
             bind(ChargingPriority.Factory.class).to(ReservationBasedChargingPriority.Factory.class);

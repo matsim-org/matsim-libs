@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.MemoryObserver;
 
@@ -36,7 +36,7 @@ import java.io.UncheckedIOException;
 
     private static final  Logger log = LogManager.getLogger(AbstractController.class);
 
-    private OutputDirectoryHierarchy controlerIO;
+    private OutputDirectoryHierarchy controllerIO;
 
     private final IterationStopWatch stopwatch;
 
@@ -44,19 +44,19 @@ import java.io.UncheckedIOException;
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    private ControlerListenerManagerImpl controlerListenerManagerImpl;
+    private ControllerListenerManagerImpl controllerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
 
     protected AbstractController() {
-        this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
+        this(new ControllerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
-    AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
+    AbstractController(ControllerListenerManagerImpl controllerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-        this.controlerListenerManagerImpl = controlerListenerManager;
-        this.controlerListenerManagerImpl.setControler(matsimServices);
+        this.controllerListenerManagerImpl = controllerListenerManager;
+        this.controllerListenerManagerImpl.setControler(matsimServices);
         this.stopwatch = stopWatch;
     }
 
@@ -68,7 +68,7 @@ import java.io.UncheckedIOException;
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
-        this.controlerIO = controlerIO;
+        this.controllerIO = controlerIO;
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
@@ -78,7 +78,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
                 loadCoreListeners();
-                controlerListenerManagerImpl.fireControlerStartupEvent();
+                controllerListenerManagerImpl.fireControllerStartupEvent();
                 ControllerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" );
                 prepareForSim();
                 doIterations(config);
@@ -86,7 +86,7 @@ import java.io.UncheckedIOException;
 
             @Override
             public void shutdown(boolean unexpected, Throwable exception) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exception);
+                controllerListenerManagerImpl.fireControllerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exception);
             }
         };
         MatsimRuntimeModifications.run(runnable);
@@ -141,7 +141,7 @@ import java.io.UncheckedIOException;
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerIterationStartsEvent(iteration, isLastIteration);
             }
         });
 
@@ -149,7 +149,7 @@ import java.io.UncheckedIOException;
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerReplanningEvent(iteration, isLastIteration);
                 }
             });
         }
@@ -160,7 +160,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controlerListenerManagerImpl.fireControlerScoringEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerScoringEvent(iteration, isLastIteration);
             }
         });
 
@@ -168,7 +168,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerIterationEndsEvent(iteration, isLastIteration);
             }
         });
 
@@ -186,7 +186,7 @@ import java.io.UncheckedIOException;
     }
 
     private void mobsim(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-        // ControlerListeners may create managed resources in
+        // ControllerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
         // For instance, ParallelEventsManagerImpl leaves Threads waiting if we don't do this
@@ -195,7 +195,7 @@ import java.io.UncheckedIOException;
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
 
@@ -235,7 +235,7 @@ import java.io.UncheckedIOException;
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerAfterMobsimEvent(iteration, isLastIteration);
                 }
             });
         }
@@ -253,20 +253,29 @@ import java.io.UncheckedIOException;
 
     /**
      * Design comments:<ul>
-     * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
+     * <li> This is such that ControllerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
      * </ul>
      */
-    public final void addControlerListener(ControlerListener l) {
-        this.controlerListenerManagerImpl.addControlerListener(l);
+    public final void addControllerListener(ControllerListener l) {
+        this.controllerListenerManagerImpl.addControllerListener(l);
     }
 
-    protected final void addCoreControlerListener(ControlerListener l) {
-        this.controlerListenerManagerImpl.addCoreControlerListener(l);
+		@Deprecated(since = "2025-07-19")
+    public final void addControlerListener(ControllerListener l) {
+			this.addControllerListener(l);
+		}
+
+    protected final void addCoreControllerListener(ControllerListener l) {
+        this.controllerListenerManagerImpl.addCoreControllerListener(l);
     }
 
+		@Deprecated(since = "2025-07-19")
+    protected final void addCoreControlerListener(ControllerListener l) {
+			this.addCoreControllerListener(l);
+		}
 
     public final OutputDirectoryHierarchy getControlerIO() {
-        return controlerIO;
+        return controllerIO;
     }
 
 

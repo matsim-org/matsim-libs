@@ -30,7 +30,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifie
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 
 import jakarta.inject.Singleton;
 import java.util.Collections;
@@ -45,15 +45,15 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 		final Identifier groupIdentifier = new Identifier();
 		binder().requestInjection( groupIdentifier );
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
+		this.addControllerListenerBinding().toProvider(
+				new Provider<ControllerListener>() {
 					@Inject
 					OutputDirectoryHierarchy controlerIO;
 					@Inject
 					Scenario scenario;
 
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new FilteredScoreStats(
 								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
 								controlerIO,
@@ -62,13 +62,13 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 					}
 				});
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
+		this.addControllerListenerBinding().toProvider(
+				new Provider<ControllerListener>() {
 					@Inject OutputDirectoryHierarchy controlerIO;
 					@Inject Scenario scenario;
 
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 
 						return new JointPlanSizeStats(
 									((GroupReplanningConfigGroup) scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME )).getGraphWriteInterval(),
@@ -78,15 +78,15 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 					}
 				});
 
-		this.addControlerListenerBinding().toProvider(
-				new Provider<ControlerListener>() {
+		this.addControllerListenerBinding().toProvider(
+				new Provider<ControllerListener>() {
 					@Inject
 					OutputDirectoryHierarchy controlerIO;
 					@Inject
 					Scenario scenario;
 
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 
 						return new JointTripsStats(
 								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
@@ -99,7 +99,7 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 
 		bind( CourtesyHistogram.class ).in( Singleton.class );
 		this.addEventHandlerBinding().to( CourtesyHistogram.class );
-		this.addControlerListenerBinding().to(CourtesyHistogramListener.class);
+		this.addControllerListenerBinding().to(CourtesyHistogramListener.class);
 	}
 
 	private static class Identifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {

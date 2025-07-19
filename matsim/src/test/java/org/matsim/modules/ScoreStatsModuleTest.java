@@ -65,7 +65,7 @@ public class ScoreStatsModuleTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(MyControlerListener.class);
+				addControllerListenerBinding().to(MyControlerListener.class);
 			}
 		});
 		controler.run();

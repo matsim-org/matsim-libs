@@ -39,6 +39,6 @@ public class DrtShiftEfficiencyModeModule extends AbstractDvrpModeModule {
 								getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}),
 								getter.get(MatsimServices.class))
 		));
-        addControlerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
+        addControllerListenerBinding().to(modalKey(ShiftEfficiencyAnalysisControlerListener.class));
     }
 }

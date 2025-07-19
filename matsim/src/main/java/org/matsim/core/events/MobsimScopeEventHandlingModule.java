@@ -36,7 +36,7 @@ public class MobsimScopeEventHandlingModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(MobsimScopeEventHandling.class).asEagerSingleton();
-		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
+		addControllerListenerBinding().to(MobsimScopeEventHandling.class);
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override

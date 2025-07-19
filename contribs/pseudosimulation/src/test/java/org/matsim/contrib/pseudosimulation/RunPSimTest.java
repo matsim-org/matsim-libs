@@ -85,7 +85,7 @@ public class RunPSimTest {
 
 		RunPSim runPSim = new RunPSim(config, pSimConfigGroup);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(runPSim.getMatsimControler());
-		runPSim.getMatsimControler().addControlerListener(execScoreTracker);
+		runPSim.getMatsimControler().addControllerListener(execScoreTracker);
 
 		((Controler) runPSim.getMatsimControler()).addOverridingModule(new AbstractModule() {
 			@Override
@@ -123,7 +123,7 @@ public class RunPSimTest {
 		config.routing().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
-		controler.addControlerListener(execScoreTracker);
+		controler.addControllerListener(execScoreTracker);
 		controler.run();
 
 		double qsimScore = execScoreTracker.executedScore;

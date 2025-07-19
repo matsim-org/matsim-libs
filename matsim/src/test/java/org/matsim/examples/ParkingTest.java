@@ -152,10 +152,10 @@ public class ParkingTest {
 				bind(KernelDistance.class).toInstance(new ConstantKernelDistance(100));
 				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -6));
 
-				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
-				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
+				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 
@@ -230,10 +230,10 @@ public class ParkingTest {
 				//changed to beta=-10
 				bind(ParkingSearchTimeFunction.class).toInstance(new BellochePenaltyFunction(2, -10));
 
-				addControlerListenerBinding().to(ParkingOccupancyObserver.class);
+				addControllerListenerBinding().to(ParkingOccupancyObserver.class);
 				addMobsimListenerBinding().to(ParkingOccupancyObserver.class);
 				addEventHandlerBinding().toInstance(testEventHandler);
-				addControlerListenerBinding().to(DumpParkingDataAtEnd.class);
+				addControllerListenerBinding().to(DumpParkingDataAtEnd.class);
 			}
 		});
 

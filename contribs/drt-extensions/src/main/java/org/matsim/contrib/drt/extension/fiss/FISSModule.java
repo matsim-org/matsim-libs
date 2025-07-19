@@ -21,7 +21,7 @@ public class FISSModule extends AbstractModule{
 
 	@Override public void install(){
 
-		this.addControlerListenerBinding().toInstance( new StartupListener(){
+		this.addControllerListenerBinding().toInstance(new StartupListener(){
 			@Inject private FISSConfigGroup fissConfigGroup;
 			@Inject private Scenario scenario;
 

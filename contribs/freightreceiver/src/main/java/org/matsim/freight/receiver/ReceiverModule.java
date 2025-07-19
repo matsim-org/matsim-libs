@@ -49,7 +49,7 @@ public final class ReceiverModule extends AbstractModule {
         configGroup = ConfigUtils.addOrGetModule(this.getConfig(), ReceiverConfigGroup.NAME, ReceiverConfigGroup.class);
 
         /* Carrier */
-        this.addControlerListenerBinding().to(ReceiverTriggersCarrierReplanningListener.class);
+        this.addControllerListenerBinding().to(ReceiverTriggersCarrierReplanningListener.class);
 
         bind(ReceiverScoringFunctionFactory.class).toInstance(new ReceiverScoringFunctionFactoryMoneyOnly());
 		bind(ReceiverCostAllocation.class).toInstance(costAllocation);
@@ -77,12 +77,12 @@ public final class ReceiverModule extends AbstractModule {
 			default -> throw new RuntimeException("Strategy manager for '" + configGroup.getReplanningType() + "' not implemented yet!!");
 		}
 
-        addControlerListenerBinding().to(ReceiverControlerListener.class);
+        addControllerListenerBinding().to(ReceiverControlerListener.class);
         //FIXME override the createPNG
 
         /* Statistics and output */
 //        CarrierScoreStats scoreStats = new CarrierScoreStats( ReceiverUtils.getCarriers( controler.getScenario() ), controler.getScenario().getConfig().controler().getOutputDirectory() + "/carrier_scores", this.createPNG);
-        addControlerListenerBinding().to(ReceiverScoreStats.class);
+        addControllerListenerBinding().to(ReceiverScoreStats.class);
     }
 
 

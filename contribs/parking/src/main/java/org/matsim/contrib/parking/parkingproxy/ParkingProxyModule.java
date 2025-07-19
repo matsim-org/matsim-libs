@@ -38,17 +38,17 @@ import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
  * penalty is calculated based on that value and added to every agent's egress walk from the car if they are arriving by
  * car in that specific space-time-gridcell.
  * <p>
- * 
+ *
  * @author tkohl / Senozon
  *
  */
 public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModule {
-	
+
 	public static final String PENALTY_ATTRIBUTE = "parkingPenalty";
-	
+
 	private final static int GRIDSIZE = 500;
 	private final Scenario scenario;
-	
+
 	public ParkingProxyModule(Scenario scenario) {
 		this.scenario = scenario;
 	}
@@ -56,21 +56,21 @@ public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModul
 	@Override
 	public void install() {
 		ParkingProxyConfigGroup parkingConfig = ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class );
-		
+
 		Collection<Tuple<Coord, Integer>> initialLoad = calculateInitialLoad(parkingConfig);
 		int qsimEndTime = (int) getConfig().qsim().getEndTime().orElse(30*3600);
 		MovingEntityCounter carCounter = new MovingEntityCounter(
-				initialLoad, 
-				parkingConfig.getTimeBinSize(), 
+				initialLoad,
+				parkingConfig.getTimeBinSize(),
 				qsimEndTime,
 				GRIDSIZE
 				);
 		PenaltyFunction penaltyFunction = new LinearPenaltyFunctionWithCap(parkingConfig.getDelayPerCar(), parkingConfig.getMaxDelay());
 		//PenaltyFunction penaltyFunction = new ExponentialPenaltyFunctionWithCap(10, parkingConfig.getGridSize(), parkingConfig.getMaxDelay(), 360);
-		
+
 		ParkingVehiclesCountEventHandler parkingHandler = new ParkingVehiclesCountEventHandler(carCounter, scenario.getNetwork(), parkingConfig.getScenarioScaleFactor());
 		super.addEventHandlerBinding().toInstance(parkingHandler);
-		
+
 		CarEgressWalkObserver walkObserver;
 		switch (parkingConfig.getIter0Method()) {
 		case hourPenalty:
@@ -92,14 +92,14 @@ public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModul
 			throw new RuntimeException("Unknown iter0 mode");
 		}
 		if (parkingConfig.getObserveOnly()) {
-			super.addControlerListenerBinding().toInstance(walkObserver);
+			super.addControllerListenerBinding().toInstance(walkObserver);
 		} else {
 			CarEgressWalkChanger walkChanger = new CarEgressWalkChanger(parkingHandler, penaltyFunction, walkObserver, parkingConfig.getIter0Method());
-			super.addControlerListenerBinding().toInstance(walkChanger);
-			super.addControlerListenerBinding().toInstance(walkChanger.getBackChanger());
+			super.addControllerListenerBinding().toInstance(walkChanger);
+			super.addControllerListenerBinding().toInstance(walkChanger.getBackChanger());
 		}
 	}
-	
+
 	protected Collection<Tuple<Coord, Integer>> calculateInitialLoad(ParkingProxyConfigGroup parkingConfig) {
 		InitialLoadGenerator loadGenerator = new InitialLoadGeneratorWithConstantShare(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor(), parkingConfig.getCarsPer1000Persons());
 //		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );

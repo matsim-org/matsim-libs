@@ -22,9 +22,8 @@ package org.matsim.freight.logistics;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -125,7 +124,7 @@ class LSPControllerListener
 				log.info("adding eventsHandler: {}", simulationTracker);
 				eventsManager.addHandler(simulationTracker);
 				registeredHandlers.add(simulationTracker);
-				matsimServices.addControlerListener(simulationTracker);
+				matsimServices.addControllerListener(simulationTracker);
 				simulationTracker.setEventsManager(eventsManager);
 			} else if ( addListenerCnt < maxAddListenerCnt ){
 				log.warn("not adding eventsHandler since already added: {}", simulationTracker);

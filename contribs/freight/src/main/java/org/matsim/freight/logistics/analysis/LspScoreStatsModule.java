@@ -29,7 +29,7 @@ public class LspScoreStatsModule extends AbstractModule {
     @Override
     public void install() {
         bind(LspScoreStatsControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(LspScoreStatsControlerListener.class);
+        addControllerListenerBinding().to(LspScoreStatsControlerListener.class);
         bind(LspScoreStats.class).to(LspScoreStatsControlerListener.class);
     }
 }

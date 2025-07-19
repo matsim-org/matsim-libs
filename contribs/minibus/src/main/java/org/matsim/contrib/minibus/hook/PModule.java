@@ -38,8 +38,8 @@ public final class PModule extends AbstractModule {
 
 	@Override public void install() {
 
-		addControlerListenerBinding().to(PControlerListener.class) ;
-//		addControlerListenerBinding().toInstance(pTransitRouterFactory);
+		addControllerListenerBinding().to(PControlerListener.class) ;
+//		addControllerListenerBinding().toInstance(pTransitRouterFactory);
 		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
 		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
 		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
@@ -51,16 +51,16 @@ public final class PModule extends AbstractModule {
 		// it needs to be explicitly triggered in PControlerListener which is mainly same as before. See also MATSim-768. GL, AA, AN. Jan'18
 
 		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
-		
+
 		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach() == null ) {
 			log.info("There is no subsidy added to the operators' score.");
-			
+
 		} else if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach().equals("perPassenger") )  {
 			log.warn("There is a subsidy added to the operators' score. Approach: 'perPassenger'."
 					+ " This approach is rather an example how to implement a subsidy computation approach and should not be used"
 					+ " for real studies...");
 			bind(SubsidyI.class).to(PerPassengerSubsidy.class);
-		
+
 		} else {
 			log.warn("Unknown subsidy approach: " + ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach());
 			log.warn("Add the following lines of code to your run class:");

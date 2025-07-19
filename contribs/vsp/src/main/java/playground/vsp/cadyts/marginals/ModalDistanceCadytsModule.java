@@ -15,7 +15,7 @@ public class ModalDistanceCadytsModule extends AbstractModule {
 		bind(ModalDistanceCadytsContext.class).in(Singleton.class);
 		bind(ModalDistancePlansTranslator.class).in(Singleton.class);
 
-		addControlerListenerBinding().to(ModalDistanceCadytsContext.class);
+		addControllerListenerBinding().to(ModalDistanceCadytsContext.class);
 		addEventHandlerBinding().to(TripEventHandler.class);
 	}
 }

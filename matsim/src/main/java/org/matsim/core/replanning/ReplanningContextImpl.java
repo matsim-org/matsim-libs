@@ -22,7 +22,7 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
@@ -35,8 +35,8 @@ class ReplanningContextImpl implements ReplanningContext, IterationStartsListene
     private int iteration;
 
     @Inject
-    ReplanningContextImpl(ControlerListenerManager controlerListenerManager) {
-        controlerListenerManager.addControlerListener(this);
+    ReplanningContextImpl(ControllerListenerManager controllerListenerManager) {
+        controllerListenerManager.addControllerListener(this);
     }
 
     @Override

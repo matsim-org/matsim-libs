@@ -41,7 +41,7 @@ public class CadytsCarModule extends AbstractModule {
 		// I think.  kai, jan'16
 
 		bind(CadytsContext.class).in( Singleton.class );
-		addControlerListenerBinding().to(CadytsContext.class);
+		addControllerListenerBinding().to(CadytsContext.class);
 	}
 
 	private static class CalibrationCountsProvider implements Provider<Counts<Link>> {

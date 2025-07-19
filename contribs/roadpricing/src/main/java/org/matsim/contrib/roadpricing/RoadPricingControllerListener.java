@@ -37,7 +37,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.  Does the
+ * Integrates the RoadPricing functionality into the MATSim Controller.  Does the
  * following:
  * <p></p>
  * <strike>Initialization:
@@ -55,22 +55,22 @@ import org.matsim.core.router.util.TravelDisutility;
  *
  * @author mrieser
  */
-class RoadPricingControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
+class RoadPricingControllerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = LogManager.getLogger(RoadPricingControlerListener.class);
+	final static private Logger log = LogManager.getLogger(RoadPricingControllerListener.class);
 
 	private final RoadPricingScheme scheme;
 	private final RoadPricingTollCalculator calcPaidToll;
 	private final CalcAverageTolledTripLength cattl;
-	private final OutputDirectoryHierarchy controlerIO;
+	private final OutputDirectoryHierarchy controllerIO;
 
 	@Inject
-	RoadPricingControlerListener( RoadPricingScheme scheme, Network network,
-				      EventsManager events, OutputDirectoryHierarchy controlerIO ) {
+	RoadPricingControllerListener(RoadPricingScheme scheme, Network network,
+																EventsManager events, OutputDirectoryHierarchy controllerIO) {
 		this.scheme = scheme;
 		this.calcPaidToll = new RoadPricingTollCalculator( network, scheme, events );
 		this.cattl = new CalcAverageTolledTripLength( network, scheme, events );
-		this.controlerIO = controlerIO;
+		this.controllerIO = controllerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
@@ -88,7 +88,7 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz") ;
+		String filename = this.controllerIO.getOutputFilename("output_toll.xml.gz") ;
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
 	}
 

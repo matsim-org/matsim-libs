@@ -45,7 +45,7 @@ public class PtFareModule extends AbstractModule {
 		if (ptFareConfigGroup.getApplyUpperBound()) {
 			PtFareUpperBoundHandler ptFareUpperBoundHandler = new PtFareUpperBoundHandler(ptFareConfigGroup.getUpperBoundFactor());
 			addEventHandlerBinding().toInstance(ptFareUpperBoundHandler);
-			addControlerListenerBinding().toInstance(ptFareUpperBoundHandler);
+			addControllerListenerBinding().toInstance(ptFareUpperBoundHandler);
 		}
 	}
 }

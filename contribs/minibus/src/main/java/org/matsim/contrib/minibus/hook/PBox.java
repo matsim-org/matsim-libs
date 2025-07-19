@@ -105,13 +105,13 @@ public final class PBox implements POperators {
 		// init fare collector
 		this.stageCollectorHandler.init(event.getServices().getScenario().getNetwork());
 		event.getServices().getEvents().addHandler(this.stageCollectorHandler);
-		event.getServices().addControlerListener(this.stageCollectorHandler);
+		event.getServices().addControllerListener(this.stageCollectorHandler);
 		this.stageCollectorHandler.addStageContainerHandler(this.scorePlansHandler);
 
 		// init operator cost collector
 		this.operatorCostCollectorHandler.init(event.getServices().getScenario().getNetwork());
 		event.getServices().getEvents().addHandler(this.operatorCostCollectorHandler);
-		event.getServices().addControlerListener(this.operatorCostCollectorHandler);
+		event.getServices().addControllerListener(this.operatorCostCollectorHandler);
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
 
 		// init fare2moneyEvent

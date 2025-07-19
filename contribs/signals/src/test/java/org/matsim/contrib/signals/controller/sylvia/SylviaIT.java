@@ -211,7 +211,7 @@ public class SylviaIT {
 			@Override
 			public void install() {
 				this.addEventHandlerBinding().toInstance(signalAnalyzer);
-				this.addControlerListenerBinding().toInstance(signalAnalyzer);
+				this.addControllerListenerBinding().toInstance(signalAnalyzer);
 			}
 		});
 

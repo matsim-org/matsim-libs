@@ -151,7 +151,7 @@ public class BetaTravelTest66IT {
 				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
 			}
 		});
-		controler.addControlerListener(new TestControlerListener());
+		controler.addControllerListener(new TestControlerListener());
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);

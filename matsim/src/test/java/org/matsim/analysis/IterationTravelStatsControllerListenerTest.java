@@ -22,8 +22,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManager;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -39,7 +39,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Aravind
  *
  */
-public class IterationTravelStatsControlerListenerTest {
+public class IterationTravelStatsControllerListenerTest {
 
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	Config config = ConfigUtils.createConfig();
@@ -54,7 +54,7 @@ public class IterationTravelStatsControlerListenerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControllerListener() {
 
 		Plans plans = new Plans();
 
@@ -95,7 +95,7 @@ public class IterationTravelStatsControlerListenerTest {
 		scenario.getPopulation().addPerson(person3);
 		scenario.getPopulation().addPerson(person4);
 
-		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControlerListener");
+		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControllerListener");
 	}
 
 	private void performTest(Scenario scenario, String outputDirectory) {
@@ -113,11 +113,11 @@ public class IterationTravelStatsControlerListenerTest {
 				install(new TimeInterpretationModule());
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
-				bind(IterationTravelStatsControlerListener.class).asEagerSingleton();
-				bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+				bind(IterationTravelStatsControllerListener.class).asEagerSingleton();
+				bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 			}
 		});
-		IterationTravelStatsControlerListener ltcl = injector.getInstance(IterationTravelStatsControlerListener.class);
+		IterationTravelStatsControllerListener ltcl = injector.getInstance(IterationTravelStatsControllerListener.class);
 		ltcl.notifyShutdown(shutdownEvent);
 		readAndValidateValues(scenario);
 	}

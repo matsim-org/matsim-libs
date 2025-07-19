@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ControllerListenerManager.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+ package org.matsim.core.controler;
 
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import com.google.inject.Singleton;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.api.internal.MatsimManager;
+import org.matsim.core.controler.listener.ControllerListener;
 
-/**
- * Railsim module installing all needed component.
- */
-public class RailsimModule extends AbstractModule {
+public interface ControllerListenerManager extends MatsimManager {
 
-	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
+	void addControllerListener(ControllerListener controllerListener);
 
-		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);
+	@Deprecated(since = "2025-07-19")
+	default void addControlerListener(ControllerListener controllerListener) {
+		addControllerListener(controllerListener);
+	};
 
-		bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimTrainStateControlerListener.class);
-	}
 }

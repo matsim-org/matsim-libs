@@ -108,7 +108,7 @@ public class MultiModalModule extends AbstractModule {
                 }
             }
         }
-        addControlerListenerBinding().to(MultiModalControlerListener.class);
+        addControllerListenerBinding().to(MultiModalControlerListener.class);
         bindMobsim().toProvider(MultimodalQSimFactory.class);
     }
 

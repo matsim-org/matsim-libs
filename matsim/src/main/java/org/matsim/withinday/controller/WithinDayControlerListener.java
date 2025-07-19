@@ -49,7 +49,7 @@ import java.util.Set;
 
 /**
  * Attempt to realize functionality provided by WithinDayController by
- * a ControlerListener (similar to what is done by the MultiModalControlerListener).
+ * a ControllerListener (similar to what is done by the MultiModalControlerListener).
  *
  * Note: this class has to be registered as Controller Listener!
  *

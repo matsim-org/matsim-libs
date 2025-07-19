@@ -50,7 +50,7 @@ import com.google.inject.name.Names;
 
 /**
  * Main entry-point for startegic electric vehicle charging.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class StrategicChargingModule extends AbstractModule {
@@ -66,7 +66,7 @@ public class StrategicChargingModule extends AbstractModule {
 		addPlanStrategyBinding(StrategicChargingReplanningStrategy.STRATEGY)
 				.toProvider(StrategicChargingReplanningStrategy.class);
 
-		addControlerListenerBinding().to(ChargerTypeAnalysisListener.class);
+		addControllerListenerBinding().to(ChargerTypeAnalysisListener.class);
 		addEventHandlerBinding().to(ChargerTypeAnalysisListener.class);
 
 		bind(Key.get(TravelTime.class, Names.named(MODE_BINDING)))
@@ -91,8 +91,8 @@ public class StrategicChargingModule extends AbstractModule {
 		// bind(ChargingPlanCreator.class).to(EmptyChargingPlanCreator.class);
 		bind(ChargingPlanInnovator.class).to(RandomChargingPlanInnovator.class);
 
-		addControlerListenerBinding().to(ChargingPlanScoring.class);
-		addControlerListenerBinding().to(ChargingPlanScoringListener.class);
+		addControllerListenerBinding().to(ChargingPlanScoring.class);
+		addControllerListenerBinding().to(ChargingPlanScoringListener.class);
 
 		if (chargingConfig.getChargingScoreWeight() != 0.0) {
 			bind(ScoringFunctionFactory.class).to(StrategicChargingScoringFunction.Factory.class).in(Singleton.class);

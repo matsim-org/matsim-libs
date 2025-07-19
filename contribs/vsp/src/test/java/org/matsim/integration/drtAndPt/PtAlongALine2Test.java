@@ -710,7 +710,7 @@ public class PtAlongALine2Test {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().toInstance(new IterationEndsListener() {
+				this.addControllerListenerBinding().toInstance(new IterationEndsListener() {
 					@Inject
 					private Population population;
 

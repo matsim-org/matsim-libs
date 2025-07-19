@@ -131,7 +131,7 @@ public class RunCarsharingIT {
 			@Override
 			public void install() {
 				this.bind(MyAnalysis.class).toInstance(myAnalysis);
-				this.addControlerListenerBinding().toInstance(myAnalysis);
+				this.addControllerListenerBinding().toInstance(myAnalysis);
 			}
 		});
 

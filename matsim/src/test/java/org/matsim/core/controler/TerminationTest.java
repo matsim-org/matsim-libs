@@ -161,7 +161,7 @@ public class TerminationTest {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addControlerListenerBinding().to(CustomConvergenceCriterion.class);
+					addControllerListenerBinding().to(CustomConvergenceCriterion.class);
 					bind(TerminationCriterion.class).to(CustomConvergenceCriterion.class);
 					addEventHandlerBinding().to(CustomConvergenceCriterion.class);
 				}

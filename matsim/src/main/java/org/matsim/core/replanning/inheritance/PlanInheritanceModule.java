@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -265,6 +264,6 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 
 	@Override
 	public void install() {
-		if (getConfig().planInheritance().getEnabled()) addControlerListenerBinding().to(PlanInheritanceModule.class);
+		if (getConfig().planInheritance().getEnabled()) addControllerListenerBinding().to(PlanInheritanceModule.class);
 	}
 }

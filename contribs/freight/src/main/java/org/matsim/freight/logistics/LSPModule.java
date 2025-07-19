@@ -49,7 +49,7 @@ public class LSPModule extends AbstractModule {
         ConfigUtils.addOrGetModule(getConfig(), FreightCarriersConfigGroup.class);
 
     bind(LSPControllerListener.class).in(Singleton.class);
-    addControlerListenerBinding().to(LSPControllerListener.class);
+    addControllerListenerBinding().to(LSPControllerListener.class);
 
     install(new CarrierModule());
     install(new LspScoreStatsModule());
@@ -103,7 +103,7 @@ public class LSPModule extends AbstractModule {
     // else, there are "empty implementations" that do nothing.  kai, jul'22
     bind(LSPStrategyManager.class).toProvider(() -> null);
 
-    this.addControlerListenerBinding().to(DumpLSPPlans.class);
+    this.addControllerListenerBinding().to(DumpLSPPlans.class);
   }
 
   private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory {

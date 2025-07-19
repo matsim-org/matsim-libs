@@ -78,7 +78,7 @@ public class LanesIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(TestListener.class);
+				addControllerListenerBinding().to(TestListener.class);
 				addMobsimListenerBinding().toInstance(new MobsimInitializedListener() {
 					@Override
 					public void notifyMobsimInitialized(MobsimInitializedEvent e) {

@@ -59,8 +59,8 @@ public class JointDemandModule extends AbstractModule {
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         bind(CommercialJobGenerator.class).to(DefaultCommercialJobGenerator.class).in(Singleton.class);
-        addControlerListenerBinding().to(CommercialJobGenerator.class);
-        addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
+        addControllerListenerBinding().to(CommercialJobGenerator.class);
+        addControllerListenerBinding().to(CommercialTrafficAnalysisListener.class);
         bind(VRPTransportCostsFactory.class).to(NetworkBasedTransportCostsFactory.class).in(Singleton.class);
 
         //bind strategy that enables to choose between operators

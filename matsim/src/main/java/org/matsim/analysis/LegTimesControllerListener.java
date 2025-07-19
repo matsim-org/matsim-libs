@@ -35,16 +35,16 @@ import org.matsim.core.utils.misc.Time;
 
 import jakarta.inject.Inject;
 
-class LegTimesControlerListener implements AfterMobsimListener, IterationStartsListener, IterationEndsListener {
+class LegTimesControllerListener implements AfterMobsimListener, IterationStartsListener, IterationEndsListener {
 
-	private static final  Logger log = LogManager.getLogger(LegTimesControlerListener.class);
+	private static final  Logger log = LogManager.getLogger(LegTimesControllerListener.class);
 
 	private final CalcLegTimes legTimes;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final ControllerConfigGroup controllerConfigGroup;
 
 	@Inject
-    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO, ControllerConfigGroup controllerConfigGroup) {
+	LegTimesControllerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO, ControllerConfigGroup controllerConfigGroup) {
 		this.legTimes = legTimes;
 		this.controlerIO = controlerIO;
 		this.controllerConfigGroup = controllerConfigGroup;

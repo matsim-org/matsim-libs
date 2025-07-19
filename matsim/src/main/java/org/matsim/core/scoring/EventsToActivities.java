@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
@@ -62,8 +62,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager) {
-        controlerListenerManager.addControlerListener(new AfterMobsimListener() {
+    EventsToActivities(ControllerListenerManager controllerListenerManager) {
+        controllerListenerManager.addControllerListener(new AfterMobsimListener() {
             @Override
             public void notifyAfterMobsim(AfterMobsimEvent event) {
                 finish();
