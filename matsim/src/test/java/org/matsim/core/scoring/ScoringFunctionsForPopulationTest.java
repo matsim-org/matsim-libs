@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
@@ -57,7 +57,7 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
@@ -111,7 +111,7 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();

@@ -37,7 +37,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripStructureUtils;
@@ -59,7 +59,7 @@ public class ScoringFunctionsForPopulationStressIT {
 			Id<Person> personId = Id.createPersonId(1);
 			scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
 			EventsManager events = EventsUtils.createEventsManager(config);
-			ControlerListenerManagerImpl controllerListenerManager = new ControlerListenerManagerImpl();
+			ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 			ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
 			EventsToActivities e2acts = new EventsToActivities(controllerListenerManager);
 			EventsToLegs e2legs = new EventsToLegs(scenario.getNetwork());
@@ -158,7 +158,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Id<Person> personId = Id.createPersonId(1);
 		scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(personId));
-		ControlerListenerManagerImpl controllerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory() {
 			ScoringFunctionFactory delegate = new CharyparNagelScoringFunctionFactory(scenario);
@@ -364,7 +364,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
+		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
 				controlerListenerManager,
 				events,

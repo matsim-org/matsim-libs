@@ -77,38 +77,38 @@ public final class ReplayEvents {
     }
 
     public void playEventsFile(String eventsFilename, int iterationNumber, boolean isLastIteration) {
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerStartupEvent();
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerStartupEvent();
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof StartupListener) {
                 ((StartupListener) controllerListener).notifyStartup(new StartupEvent(null));
             }
         }
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerIterationStartsEvent(iterationNumber, isLastIteration);
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerIterationStartsEvent(iterationNumber, isLastIteration);
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof IterationStartsListener) {
                 ((IterationStartsListener) controllerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber, isLastIteration);
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber, isLastIteration);
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof BeforeMobsimListener) {
                 ((BeforeMobsimListener) controllerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber, isLastIteration));
             }
         }
         new MatsimEventsReader(eventsManager).readFile(eventsFilename);
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerAfterMobsimEvent(iterationNumber, isLastIteration);
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerAfterMobsimEvent(iterationNumber, isLastIteration);
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof AfterMobsimListener) {
                 ((AfterMobsimListener) controllerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerIterationEndsEvent(iterationNumber, isLastIteration);
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerIterationEndsEvent(iterationNumber, isLastIteration);
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof IterationEndsListener) {
                 ((IterationEndsListener) controllerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controllerListenerManager).fireControlerShutdownEvent(false, iterationNumber);
+        ((ControllerListenerManagerImpl) controllerListenerManager).fireControlerShutdownEvent(false, iterationNumber);
         for (ControllerListener controllerListener : controllerListenersDeclaredByModules) {
             if (controllerListener instanceof ShutdownListener) {
                 ((ShutdownListener) controllerListener).notifyShutdown(new ShutdownEvent(null, false, iterationNumber, null));
@@ -120,7 +120,7 @@ public final class ReplayEvents {
         @Override
 		public void install() {
 			bind(ReplayEvents.class).asEagerSingleton();
-            bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class).asEagerSingleton();
+            bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class).asEagerSingleton();
 		}
     }
 }

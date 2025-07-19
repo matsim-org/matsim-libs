@@ -36,7 +36,7 @@ import java.io.UncheckedIOException;
 
     private static final  Logger log = LogManager.getLogger(AbstractController.class);
 
-    private OutputDirectoryHierarchy controlerIO;
+    private OutputDirectoryHierarchy controllerIO;
 
     private final IterationStopWatch stopwatch;
 
@@ -44,16 +44,16 @@ import java.io.UncheckedIOException;
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    private ControlerListenerManagerImpl controllerListenerManagerImpl;
+    private ControllerListenerManagerImpl controllerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
 
     protected AbstractController() {
-        this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
+        this(new ControllerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
-    AbstractController(ControlerListenerManagerImpl controllerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
+    AbstractController(ControllerListenerManagerImpl controllerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controllerListenerManagerImpl = controllerListenerManager;
         this.controllerListenerManagerImpl.setControler(matsimServices);
@@ -68,7 +68,7 @@ import java.io.UncheckedIOException;
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
-        this.controlerIO = controlerIO;
+        this.controllerIO = controlerIO;
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
@@ -265,13 +265,17 @@ import java.io.UncheckedIOException;
 			this.addControllerListener(l);
 		}
 
-    protected final void addCoreControlerListener(ControllerListener l) {
+    protected final void addCoreControllerListener(ControllerListener l) {
         this.controllerListenerManagerImpl.addCoreControllerListener(l);
     }
 
+		@Deprecated(since = "2025-07-19")
+    protected final void addCoreControlerListener(ControllerListener l) {
+			this.addCoreControllerListener(l);
+		}
 
     public final OutputDirectoryHierarchy getControlerIO() {
-        return controlerIO;
+        return controllerIO;
     }
 
 

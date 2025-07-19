@@ -69,9 +69,9 @@ public class ControllerEventsTest {
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
 
-		controler.addCoreControlerListener(firstListener);
-		controler.addCoreControlerListener(secondListener);
-		controler.addCoreControlerListener(thirdListener);
+		controler.addCoreControllerListener(firstListener);
+		controler.addCoreControllerListener(secondListener);
+		controler.addCoreControllerListener(thirdListener);
 		controler.run(config);
 		assertEquals(3, this.calledStartupListener.get(0).intValue());
 		assertEquals(2, this.calledStartupListener.get(1).intValue());

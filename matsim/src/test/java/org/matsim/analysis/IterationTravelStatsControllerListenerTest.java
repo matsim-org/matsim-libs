@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControllerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -54,7 +54,7 @@ public class IterationTravelStatsControllerListenerTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testIterationTravelStatsControlerListener() {
+	void testIterationTravelStatsControllerListener() {
 
 		Plans plans = new Plans();
 
@@ -95,7 +95,7 @@ public class IterationTravelStatsControllerListenerTest {
 		scenario.getPopulation().addPerson(person3);
 		scenario.getPopulation().addPerson(person4);
 
-		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControlerListener");
+		performTest(scenario, utils.getOutputDirectory() + "/IterationTravelStatsControllerListener");
 	}
 
 	private void performTest(Scenario scenario, String outputDirectory) {
@@ -114,7 +114,7 @@ public class IterationTravelStatsControllerListenerTest {
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				//bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class);
 				bind(IterationTravelStatsControllerListener.class).asEagerSingleton();
-				bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
+				bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 			}
 		});
 		IterationTravelStatsControllerListener ltcl = injector.getInstance(IterationTravelStatsControllerListener.class);

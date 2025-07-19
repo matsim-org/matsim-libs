@@ -52,7 +52,7 @@ class NewControler extends AbstractController implements ControlerI {
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
-	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
+	NewControler(Config config, ControllerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
 							 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
 							 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
 							 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
@@ -95,13 +95,13 @@ class NewControler extends AbstractController implements ControlerI {
 		 * are added to the list.
 		 */
 		if (controllerConfigGroup.getDumpDataAtEnd()) {
-			this.addCoreControlerListener(this.dumpDataAtEnd);
+			this.addCoreControllerListener(this.dumpDataAtEnd);
 		}
 
-		this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(this.plansReplanning);
-		this.addCoreControlerListener(this.plansDumping);
-		this.addCoreControlerListener(this.eventsHandling);
+		this.addCoreControllerListener(this.plansScoring);
+		this.addCoreControllerListener(this.plansReplanning);
+		this.addCoreControllerListener(this.plansDumping);
+		this.addCoreControllerListener(this.eventsHandling);
 		// must be last being added (=first being executed)
 
 		for (ControllerListener controllerListener : this.controllerListenersDeclaredByModules) {

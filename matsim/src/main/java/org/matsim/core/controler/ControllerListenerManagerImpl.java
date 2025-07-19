@@ -36,9 +36,9 @@ import java.util.Comparator;
  *
  * @author dgrether
  */
-public final class ControlerListenerManagerImpl implements ControllerListenerManager {
+public final class ControllerListenerManagerImpl implements ControllerListenerManager {
 
-	private final static Logger log = LogManager.getLogger(ControlerListenerManagerImpl.class);
+	private final static Logger log = LogManager.getLogger(ControllerListenerManagerImpl.class);
 
 	private MatsimServices controller = null;
 

@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.ControllerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -83,7 +83,7 @@ public class ListenersInjectionTest {
                     @Override
                     public void install() {
 						// put dummy dependencies to get the listenners happy
-						bind(ControllerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
 								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
 								config.controller().getCompressionType()));
