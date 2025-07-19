@@ -42,28 +42,28 @@ public class ControllerListenerManagerImplTest {
 		m.addControllerListener(ccl);
 		m.addControllerListener(ecl);
 
-		m.fireControlerStartupEvent();
+		m.fireControllerStartupEvent();
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(0, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(0, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(0, false);
+		m.fireControllerIterationStartsEvent(0, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(1, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(1, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(1, false);
+		m.fireControllerIterationStartsEvent(1, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(2, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerShutdownEvent(false, 1);
+		m.fireControllerShutdownEvent(false, 1);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
@@ -79,28 +79,28 @@ public class ControllerListenerManagerImplTest {
 		m.addCoreControllerListener(ccl);
 		m.addCoreControllerListener(ecl);
 
-		m.fireControlerStartupEvent();
+		m.fireControllerStartupEvent();
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(0, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(0, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(0, false);
+		m.fireControllerIterationStartsEvent(0, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(1, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(1, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(1, false);
+		m.fireControllerIterationStartsEvent(1, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(2, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerShutdownEvent(false, 1);
+		m.fireControllerShutdownEvent(false, 1);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);

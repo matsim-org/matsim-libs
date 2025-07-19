@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.listener;
 
-@Deprecated(since = "2025-09-17") // use ControllerListener, with 2 'l'
+@Deprecated(since = "2025-07-19") // use ControllerListener, with 2 'l'
 public interface ControlerListener extends ControllerListener {
 
 }

@@ -110,7 +110,7 @@ public final class EventsToScore {
 	public void beginIteration(int iteration, boolean isLastIteration) {
 		this.iteration = iteration;
 		this.isLastIteration = isLastIteration;
-		this.controllerListenerManager.fireControlerIterationStartsEvent(iteration, isLastIteration);
+		this.controllerListenerManager.fireControllerIterationStartsEvent(iteration, isLastIteration);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public final class EventsToScore {
 		if (iteration == -1) {
 			throw new RuntimeException("Please initialize me before the iteration starts.");
 		}
-		controllerListenerManager.fireControlerAfterMobsimEvent(iteration, isLastIteration);
+		controllerListenerManager.fireControllerAfterMobsimEvent(iteration, isLastIteration);
 		scoringFunctionsForPopulation.finishScoringFunctions();
 		newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
 		finished = true;

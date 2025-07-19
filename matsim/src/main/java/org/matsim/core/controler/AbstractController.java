@@ -78,7 +78,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
                 loadCoreListeners();
-                controllerListenerManagerImpl.fireControlerStartupEvent();
+                controllerListenerManagerImpl.fireControllerStartupEvent();
                 ControllerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" );
                 prepareForSim();
                 doIterations(config);
@@ -86,7 +86,7 @@ import java.io.UncheckedIOException;
 
             @Override
             public void shutdown(boolean unexpected, Throwable exception) {
-                controllerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exception);
+                controllerListenerManagerImpl.fireControllerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration, exception);
             }
         };
         MatsimRuntimeModifications.run(runnable);
@@ -141,7 +141,7 @@ import java.io.UncheckedIOException;
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controllerListenerManagerImpl.fireControlerIterationStartsEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerIterationStartsEvent(iteration, isLastIteration);
             }
         });
 
@@ -149,7 +149,7 @@ import java.io.UncheckedIOException;
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controllerListenerManagerImpl.fireControlerReplanningEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerReplanningEvent(iteration, isLastIteration);
                 }
             });
         }
@@ -160,7 +160,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controllerListenerManagerImpl.fireControlerScoringEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerScoringEvent(iteration, isLastIteration);
             }
         });
 
@@ -168,7 +168,7 @@ import java.io.UncheckedIOException;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controllerListenerManagerImpl.fireControlerIterationEndsEvent(iteration, isLastIteration);
+                controllerListenerManagerImpl.fireControllerIterationEndsEvent(iteration, isLastIteration);
             }
         });
 
@@ -195,7 +195,7 @@ import java.io.UncheckedIOException;
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controllerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
 
@@ -235,7 +235,7 @@ import java.io.UncheckedIOException;
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controllerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration, isLastIteration);
+                    controllerListenerManagerImpl.fireControllerAfterMobsimEvent(iteration, isLastIteration);
                 }
             });
         }
