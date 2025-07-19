@@ -298,7 +298,7 @@ public class SwissRailRaptorModuleTest {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
-                addControllerListenerBinding().to(ScheduleModifierControlerListener.class);
+                addControllerListenerBinding().to(ScheduleModifierControllerListener.class);
             }
         });
 
@@ -382,7 +382,7 @@ public class SwissRailRaptorModuleTest {
         Assertions.assertEquals(-60.0, parameters.getRaptorParameters(personB).getMarginalUtilityOfWaitingPt_utl_s(), 1e-3);
     }
 
-    private static class ScheduleModifierControlerListener implements StartupListener, IterationStartsListener {
+    private static class ScheduleModifierControllerListener implements StartupListener, IterationStartsListener {
 
         @Override
         public void notifyIterationStarts(IterationStartsEvent event) {

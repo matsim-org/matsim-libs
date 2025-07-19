@@ -57,15 +57,15 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controllerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
+		controllerListenerManager.fireControlerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 		Assertions.assertEquals(RecordingScoringFunction.class, s.getClass());
 		RecordingScoringFunction rs = (RecordingScoringFunction) s;
@@ -111,15 +111,15 @@ public class ScoringFunctionsForPopulationTest {
 		Person p = pf.createPerson(personId);
 		population.addPerson(p);
 
-		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		ScoringFunctionFactory scoringFunctionFactory = agentId -> new RecordingScoringFunction();
 
-		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controlerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		ScoringFunctionsForPopulation sf = new ScoringFunctionsForPopulation(controllerListenerManager, eventsManager, eventsToActivities, eventsToLegs, population, scoringFunctionFactory, scenario.getConfig());
+		controllerListenerManager.fireControlerIterationStartsEvent(0, false);
 		ScoringFunction s = sf.getScoringFunctionForAgent(personId);
 
 		eventsManager.initProcessing();

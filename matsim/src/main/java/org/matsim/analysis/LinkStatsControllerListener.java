@@ -46,7 +46,7 @@ import java.util.*;
 /**
  * @author mrieser
  */
-final class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener, ShutdownListener {
+final class LinkStatsControllerListener implements IterationEndsListener, IterationStartsListener, ShutdownListener {
 
 	@Inject
 	private LinkStatsConfigGroup linkStatsConfigGroup;
@@ -57,7 +57,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 	@Inject
 	private VolumesAnalyzer volumes;
 	@Inject
-	private OutputDirectoryHierarchy controlerIO;
+	private OutputDirectoryHierarchy controllerIO;
 	@Inject
 	private Map<String, TravelTime> travelTime;
 
@@ -77,7 +77,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 		}
 
 		if (createLinkStatsInIteration(iteration)) {
-			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.linkstats));
+			linkStats.writeFile(this.controllerIO.getIterationFilename(iteration, Controler.DefaultFiles.linkstats));
 			this.doReset = true;
 		}
 	}
@@ -113,7 +113,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 
-		String fileName = this.controlerIO.getOutputFilename(Controler.DefaultFiles.linkscsv);
+		String fileName = this.controllerIO.getOutputFilename(Controler.DefaultFiles.linkscsv);
 		CSVFormat format = CSVFormat.DEFAULT.builder()
 				.setDelimiter(event.getServices().getConfig().global().getDefaultDelimiter().charAt(0))
 				.build();

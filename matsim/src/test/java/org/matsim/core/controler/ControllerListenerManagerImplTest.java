@@ -1,7 +1,6 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerListenerManagerImplTest.java
+ * ControllerListenerManagerImplTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -38,8 +37,8 @@ public class ControllerListenerManagerImplTest {
 	 @Test
 	 void testAddControllerListener_ClassHierarchy() {
 		ControllerListenerManagerImpl m = new ControllerListenerManagerImpl();
-		CountingControlerListener ccl = new CountingControlerListener();
-		ExtendedControlerListener ecl = new ExtendedControlerListener();
+		CountingControllerListener ccl = new CountingControllerListener();
+		ExtendedControllerListener ecl = new ExtendedControllerListener();
 		m.addControllerListener(ccl);
 		m.addControllerListener(ecl);
 
@@ -73,10 +72,10 @@ public class ControllerListenerManagerImplTest {
 	}
 
 	 @Test
-	 void testAddCoreControlerListener_ClassHierarchy() {
+	 void testAddCoreControllerListener_ClassHierarchy() {
 		ControllerListenerManagerImpl m = new ControllerListenerManagerImpl();
-		CountingControlerListener ccl = new CountingControlerListener();
-		ExtendedControlerListener ecl = new ExtendedControlerListener();
+		CountingControllerListener ccl = new CountingControllerListener();
+		ExtendedControllerListener ecl = new ExtendedControllerListener();
 		m.addCoreControllerListener(ccl);
 		m.addCoreControllerListener(ecl);
 
@@ -109,7 +108,7 @@ public class ControllerListenerManagerImplTest {
 		Assertions.assertEquals(1, ecl.nOfShutdowns);
 	}
 
-	private static class CountingControlerListener implements StartupListener, IterationStartsListener {
+	private static class CountingControllerListener implements StartupListener, IterationStartsListener {
 
 		/*package*/ int nOfStartups = 0;
 		/*package*/ int nOfIterStarts = 0;
@@ -126,7 +125,7 @@ public class ControllerListenerManagerImplTest {
 
 	}
 
-	private static class ExtendedControlerListener extends CountingControlerListener implements ShutdownListener, StartupListener {
+	private static class ExtendedControllerListener extends CountingControllerListener implements ShutdownListener, StartupListener {
 		// StartupListener is explicitly implemented, even if not necessary, to test that it will not be called twice
 
 		/*package*/ int nOfShutdowns = 0;

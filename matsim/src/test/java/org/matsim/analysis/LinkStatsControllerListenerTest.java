@@ -56,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author mrieser
  */
-public class LinkStatsControlerListenerTest {
+public class LinkStatsControllerListenerTest {
 
 	@RegisterExtension
 	private MatsimTestUtils util = new MatsimTestUtils();
@@ -98,7 +98,7 @@ public class LinkStatsControlerListenerTest {
 				bind(IterationStopWatch.class).asEagerSingleton();
 			}
 		});
-		LinkStatsControlerListener lscl = injector.getInstance(LinkStatsControlerListener.class);
+		LinkStatsControllerListener lscl = injector.getInstance(LinkStatsControllerListener.class);
 
 		config.linkStats().setWriteLinkStatsInterval(10);
 

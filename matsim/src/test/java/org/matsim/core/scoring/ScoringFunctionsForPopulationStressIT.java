@@ -364,17 +364,17 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ControllerListenerManagerImpl controlerListenerManager = new ControllerListenerManagerImpl();
+		ControllerListenerManagerImpl controllerListenerManager = new ControllerListenerManagerImpl();
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(
-				controlerListenerManager,
+				controllerListenerManager,
 				events,
-				new EventsToActivities(controlerListenerManager),
+				new EventsToActivities(controllerListenerManager),
 				new EventsToLegs(scenario.getNetwork()),
 				scenario.getPopulation(),
 				scoringFunctionFactory,
 				config
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
+		controllerListenerManager.fireControlerIterationStartsEvent(0, false);
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {

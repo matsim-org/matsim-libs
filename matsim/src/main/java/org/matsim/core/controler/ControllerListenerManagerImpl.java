@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerListenerManager
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -69,7 +68,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 	}
 
 	/**
-	 * Add a ControlerListener to the Controler instance
+	 * Add a ControllerListener to the Controller instance
 	 *
 	 */
 	@SuppressWarnings("unchecked")
@@ -121,7 +120,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 	}
 
 	/**
-	 * Notifies all ControlerListeners
+	 * Notifies all ControllerListeners
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
 	public void fireControlerShutdownEvent(final boolean unexpected, int iteration) {
@@ -129,7 +128,7 @@ public final class ControllerListenerManagerImpl implements ControllerListenerMa
 	}
 
 	/**
-	 * Notifies all ControlerListeners
+	 * Notifies all ControllerListeners
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
 	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable Throwable exception) {

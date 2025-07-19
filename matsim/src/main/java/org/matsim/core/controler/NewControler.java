@@ -52,7 +52,7 @@ class NewControler extends AbstractController implements ControlerI {
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
-	NewControler(Config config, ControllerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
+	NewControler(Config config, ControllerListenerManagerImpl controllerListenerManager, MatsimServices matsimServices,
 							 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
 							 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
 							 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
@@ -60,7 +60,7 @@ class NewControler extends AbstractController implements ControlerI {
 							 OutputDirectoryHierarchy outputDirectoryHierarchy
 			, PrepareForMobsim prepareForMobsim
  ) {
-		super(controlerListenerManager, stopWatch, matsimServices);
+		super(controllerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.prepareForMobsim = prepareForMobsim;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());

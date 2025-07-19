@@ -186,7 +186,7 @@ import java.io.UncheckedIOException;
     }
 
     private void mobsim(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-        // ControlerListeners may create managed resources in
+        // ControllerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
         // For instance, ParallelEventsManagerImpl leaves Threads waiting if we don't do this
@@ -253,7 +253,7 @@ import java.io.UncheckedIOException;
 
     /**
      * Design comments:<ul>
-     * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
+     * <li> This is such that ControllerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
      * </ul>
      */
     public final void addControllerListener(ControllerListener l) {
