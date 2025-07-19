@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author dgrether
  */
-public class ControlerEventsTest {
+public class ControllerEventsTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();

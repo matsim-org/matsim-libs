@@ -27,13 +27,13 @@ import org.matsim.core.controler.MatsimServices;
  *
  * @author dgrether
  */
-public abstract class ControlerEvent {
+public abstract class ControllerEvent {
 	/**
 	 * The Controler instance which fired this event
 	 */
 	protected final MatsimServices services;
 
-	public ControlerEvent(final MatsimServices services) {
+	public ControllerEvent(final MatsimServices services) {
 		this.services = services;
 	}
 

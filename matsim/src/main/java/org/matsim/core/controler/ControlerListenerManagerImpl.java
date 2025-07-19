@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Class encapsulating all behavior concerning the ControlerEvents/Listeners
+ * Class encapsulating all behavior concerning the ControllerEvents/Listeners
  *
  * @author dgrether
  */
@@ -40,13 +40,13 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 
 	private final static Logger log = LogManager.getLogger(ControlerListenerManagerImpl.class);
 
-    private MatsimServices controler = null;
+	private MatsimServices controller = null;
 
-	void setControler(MatsimServices controler) {
-        this.controler = controler;
+	void setControler(MatsimServices controller) {
+        this.controller = controller;
     }
 
-	/** The swing event listener list to manage ControlerListeners efficiently. First list manages core listeners
+	/** The swing event listener list to manage ControllerListeners efficiently. First list manages core listeners
 	 * which are called first when a ControlerEvent is thrown. I.e. this list contains the listeners that are
 	 * always running in a predefined order to ensure correctness.
 	 * The second list manages the other listeners, which can be added by calling addControllerListener(...).
@@ -57,11 +57,10 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 
 
 	/**
-	 * Add a core ControlerListener to the Controler instance
-	 *
+	 * Add a core ControllerListener to the Controller instance
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addCoreControlerListener(final ControllerListener l) {
+	protected void addCoreControllerListener(final ControllerListener l) {
 		for (Class type : ClassUtils.getAllTypes(l.getClass())) {
 			if (type.isInterface() && ControllerListener.class.isAssignableFrom(type)) {
 				this.coreListenerList.add(type, l);
@@ -105,7 +104,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 * Notifies all ControllerListeners
 	 */
 	public void fireControlerStartupEvent() {
-		StartupEvent event = new StartupEvent(this.controler);
+		StartupEvent event = new StartupEvent(this.controller);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (StartupListener aListener : listener) {
@@ -134,7 +133,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
 	public void fireControlerShutdownEvent(final boolean unexpected, int iteration, @Nullable Throwable exception) {
-		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected, iteration, exception);
+		ShutdownEvent event = new ShutdownEvent(this.controller, unexpected, iteration, exception);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
 
@@ -157,7 +156,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
      *
 	 */
 	public void fireControlerIterationStartsEvent(final int iteration, boolean isLastIteration) {
-		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration, isLastIteration);
+		IterationStartsEvent event = new IterationStartsEvent(this.controller, iteration, isLastIteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (IterationStartsListener aListener : listener) {
@@ -178,7 +177,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 *
 	 */
 	public void fireControlerIterationEndsEvent(final int iteration, boolean isLastIteration) {
-		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration, isLastIteration);
+		IterationEndsEvent event = new IterationEndsEvent(this.controller, iteration, isLastIteration);
 		{
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
@@ -203,7 +202,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 *
 	 */
 	public void fireControlerScoringEvent(final int iteration, boolean isLastIteration) {
-		ScoringEvent event = new ScoringEvent(this.controler, iteration, isLastIteration);
+		ScoringEvent event = new ScoringEvent(this.controller, iteration, isLastIteration);
 		{
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
 			Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
@@ -228,7 +227,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 *
 	 */
 	public void fireControlerReplanningEvent(final int iteration, boolean isLastIteration) {
-		ReplanningEvent event = new ReplanningEvent(this.controler, iteration, isLastIteration);
+		ReplanningEvent event = new ReplanningEvent(this.controller, iteration, isLastIteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (ReplanningListener aListener : listener) {
@@ -249,7 +248,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 *
 	 */
 	public void fireControlerBeforeMobsimEvent(final int iteration, boolean isLastIteration) {
-		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration, isLastIteration);
+		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controller, iteration, isLastIteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (BeforeMobsimListener aListener : listener) {
@@ -270,7 +269,7 @@ public final class ControlerListenerManagerImpl implements ControllerListenerMan
 	 *
 	 */
 	public void fireControlerAfterMobsimEvent(final int iteration, boolean isLastIteration) {
-		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration, isLastIteration);
+		AfterMobsimEvent event = new AfterMobsimEvent(this.controller, iteration, isLastIteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
 		Arrays.sort(listener, Comparator.comparingDouble(ControllerListener::priority).reversed());
         for (AfterMobsimListener aListener : listener) {

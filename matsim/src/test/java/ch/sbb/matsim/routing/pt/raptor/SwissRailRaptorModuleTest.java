@@ -46,7 +46,7 @@ import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.events.ControlerEvent;
+import org.matsim.core.controler.events.ControllerEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -397,7 +397,7 @@ public class SwissRailRaptorModuleTest {
             event.getServices().getEvents().processEvent(new TransitScheduleChangedEvent(0.0));
         }
 
-        private void addLineAndStop(ControlerEvent event, int iteration) {
+        private void addLineAndStop(ControllerEvent event, int iteration) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
             TransitScheduleFactory scheduleFactory = schedule.getFactory();
             Vehicles transitVehicles = event.getServices().getScenario().getTransitVehicles();
@@ -436,7 +436,7 @@ public class SwissRailRaptorModuleTest {
             schedule.addTransitLine(addedLine);
         }
 
-        private void removeGreenLineAndStop(ControlerEvent event) {
+        private void removeGreenLineAndStop(ControllerEvent event) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
 
             // Remove a line and a stop only served by that line

@@ -77,8 +77,8 @@ public class ControllerListenerManagerImplTest {
 		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
-		m.addCoreControlerListener(ccl);
-		m.addCoreControlerListener(ecl);
+		m.addCoreControllerListener(ccl);
+		m.addCoreControllerListener(ecl);
 
 		m.fireControlerStartupEvent();
 		Assertions.assertEquals(1, ccl.nOfStartups);

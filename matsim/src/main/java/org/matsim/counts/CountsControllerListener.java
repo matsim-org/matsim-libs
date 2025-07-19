@@ -68,7 +68,7 @@ class CountsControllerListener implements StartupListener, IterationEndsListener
     private final Set<String> analyzedModes;
     private final VolumesAnalyzer volumesAnalyzer;
     private final IterationStopWatch iterationStopwatch;
-    private final OutputDirectoryHierarchy controlerIO;
+    private final OutputDirectoryHierarchy controllerIO;
 
     @com.google.inject.Inject(optional=true)
     private Counts<Link> counts = null;
@@ -77,7 +77,7 @@ class CountsControllerListener implements StartupListener, IterationEndsListener
     private int iterationsUsed = 0;
 
     @Inject
-		CountsControllerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+		CountsControllerListener(GlobalConfigGroup globalConfigGroup, Network network, ControllerConfigGroup controllerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controllerIO) {
         this.globalConfigGroup = globalConfigGroup;
         this.network = network;
         this.controllerConfigGroup = controllerConfigGroup;
@@ -85,11 +85,11 @@ class CountsControllerListener implements StartupListener, IterationEndsListener
         this.volumesAnalyzer = volumesAnalyzer;
         this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
         this.iterationStopwatch = iterationStopwatch;
-        this.controlerIO = controlerIO;
+        this.controllerIO = controllerIO;
 	}
 
 	@Override
-	public void notifyStartup(final StartupEvent controlerStartupEvent) {
+	public void notifyStartup(final StartupEvent startupEvent) {
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
                 this.linkStats.put(linkId, new double[24]);
@@ -130,7 +130,7 @@ class CountsControllerListener implements StartupListener, IterationEndsListener
 
                 if (this.config.getOutputFormat().contains("html") ||
                         this.config.getOutputFormat().contains("all")) {
-                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
+                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controllerIO.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
                     cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
                     cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
                     cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
@@ -139,13 +139,13 @@ class CountsControllerListener implements StartupListener, IterationEndsListener
                 }
                 if (this.config.getOutputFormat().contains("txt") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
+                    String filename = controllerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
                     CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
                     ctw.writeFile(filename);
                 }
                 if (this.config.getOutputFormat().contains("xml") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "simulatedCounts.xml.gz");
+                    String filename = controllerIO.getIterationFilename(event.getIteration(), "simulatedCounts.xml.gz");
                     Counts<Link> simCounts = new Counts<>();
                     simCounts.setDescription("sim values from iteration " + event.getIteration()); simCounts.setName("sim values from iteration " + event.getIteration()); simCounts.setYear(event.getIteration());
                     for (CountSimComparison countSimComparison : cca.getComparison()) {

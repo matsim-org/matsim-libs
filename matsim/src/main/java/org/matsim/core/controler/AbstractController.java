@@ -266,7 +266,7 @@ import java.io.UncheckedIOException;
 		}
 
     protected final void addCoreControlerListener(ControllerListener l) {
-        this.controllerListenerManagerImpl.addCoreControlerListener(l);
+        this.controllerListenerManagerImpl.addCoreControllerListener(l);
     }
 
 
