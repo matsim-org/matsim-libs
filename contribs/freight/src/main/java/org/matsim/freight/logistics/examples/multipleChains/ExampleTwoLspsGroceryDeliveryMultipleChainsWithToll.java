@@ -127,7 +127,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
             .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controller.run();
 
-    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controller.getControllerIO().getOutputPath(), config);
 
     log.info("Done.");
   }

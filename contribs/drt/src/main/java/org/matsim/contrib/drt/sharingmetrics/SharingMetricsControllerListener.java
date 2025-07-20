@@ -117,7 +117,7 @@ class SharingMetricsControllerListener implements IterationEndsListener {
     }
 
     private String filename(IterationEndsEvent event, String prefix, String extension) {
-        return matsimServices.getControlerIO()
+        return matsimServices.getControllerIO()
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 
@@ -140,6 +140,6 @@ class SharingMetricsControllerListener implements IterationEndsListener {
     }
 
     private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
-        return IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtConfigGroup.getMode() + extension));
+        return IOUtils.getAppendingBufferedWriter(matsimServices.getControllerIO().getOutputFilename(prefix + "_" + drtConfigGroup.getMode() + extension));
     }
 }

@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimServices.java
@@ -19,8 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
-
+package org.matsim.core.controler;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
@@ -72,7 +70,12 @@ public interface MatsimServices extends IterationCounter {
 
 	StrategyManager getStrategyManager();
 
-	OutputDirectoryHierarchy getControlerIO();
+	OutputDirectoryHierarchy getControllerIO();
+
+	@Deprecated(since = "2025-07-19")
+	default OutputDirectoryHierarchy getControlerIO() {
+		return this.getControllerIO();
+	}
 
 	void addControllerListener(ControllerListener controllerListener);
 

@@ -63,14 +63,14 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 
 		int iteration = event.getIteration() ;
 
-		this.calcLegTimes.writeStats(event.getServices().getControlerIO().getIterationFilename(iteration, "stats_"));
+		this.calcLegTimes.writeStats(event.getServices().getControllerIO().getIterationFilename(iteration, "stats_"));
 
 	}
 
 	@Override
 	public void notifyShutdown( ShutdownEvent event ){
 
-		this.calcLegTimes.writeStats(event.getServices().getControlerIO().getOutputFilename( "stats_") );
+		this.calcLegTimes.writeStats(event.getServices().getControllerIO().getOutputFilename( "stats_") );
 
 	}
 

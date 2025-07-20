@@ -88,7 +88,7 @@ public final class ControlerDefaultsModule extends AbstractModule {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(event.getServices().getControlerIO().getTempPath()));
+				ImageIO.setCacheDirectory(new File(event.getServices().getControllerIO().getTempPath()));
 			}
 		});
 

@@ -57,7 +57,7 @@ public final class PStatsModule extends AbstractModule {
 
 		this.addControllerListenerBinding().toInstance(new StartupListener() {
 			@Override public void notifyStartup(StartupEvent event) {
-				String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
+				String outFilename = event.getServices().getControllerIO().getOutputPath() + PConstants.statsOutputFolder;
 				new File(outFilename).mkdir();
 			}
 		});

@@ -87,10 +87,10 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		this.delimiter = event.getServices().getConfig().global().getDefaultDelimiter().charAt(0);
 		// initialize all default writers
 		CompressionType compressionType = event.getServices().getConfig().controller().getCompressionType();
-		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
+		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
 		this.strategies = this.getActiveStrategies(event.getServices().getConfig().replanning().getStrategySettings(), event.getServices().getStrategyManager());
-		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
-		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
+		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
+		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
 
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {

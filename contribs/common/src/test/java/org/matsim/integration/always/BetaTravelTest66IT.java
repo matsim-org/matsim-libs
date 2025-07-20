@@ -357,7 +357,7 @@ public class BetaTravelTest66IT {
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
+				this.ttAnalyzer.plot(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
 				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {

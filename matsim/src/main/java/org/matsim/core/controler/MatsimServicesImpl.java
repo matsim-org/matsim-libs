@@ -127,7 +127,7 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public OutputDirectoryHierarchy getControlerIO() {
+	public OutputDirectoryHierarchy getControllerIO() {
 		return injector.getInstance(OutputDirectoryHierarchy.class);
 	}
 

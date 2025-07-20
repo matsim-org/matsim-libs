@@ -144,7 +144,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 
 		if(this.pConfig.getWriteStatsInterval() > 0){
 			log.info("enabled");
-			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
+			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControllerIO().getOutputFilename("pStats.txt"));
 			try {
 				this.pStatsWriter.write(PStatsOverviewDataContainer.getHeaderLine());
 				this.pStatsWriter.newLine();
@@ -379,14 +379,14 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						relaxPax.addMatsimLogo();
 						relaxVeh.addMatsimLogo();
 
-						size.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_size.png"), 800, 600);
-						scores.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_score.png"), 800, 600);
-						passengers.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_pax.png"), 800, 600);
-						shares.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_shares.png"), 800, 600);
-						relaxOperator.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_relaxOperators.png"), 800, 600);
-						relaxRoutes.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_relaxRoutes.png"), 800, 600);
-						relaxPax.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_relaxPax.png"), 800, 600);
-						relaxVeh.saveAsPng(event.getServices().getControlerIO().getOutputFilename("pStats_relaxVeh.png"), 800, 600);
+						size.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_size.png"), 800, 600);
+						scores.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_score.png"), 800, 600);
+						passengers.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_pax.png"), 800, 600);
+						shares.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_shares.png"), 800, 600);
+						relaxOperator.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_relaxOperators.png"), 800, 600);
+						relaxRoutes.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_relaxRoutes.png"), 800, 600);
+						relaxPax.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_relaxPax.png"), 800, 600);
+						relaxVeh.saveAsPng(event.getServices().getControllerIO().getOutputFilename("pStats_relaxVeh.png"), 800, 600);
 					}
 				}
 				if (index == (this.history[0].length - 1)) {
