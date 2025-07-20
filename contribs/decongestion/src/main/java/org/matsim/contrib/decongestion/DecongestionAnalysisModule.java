@@ -42,7 +42,7 @@ public class DecongestionAnalysisModule extends AbstractModule {
 		this.bind(PersonVehicleTracker.class).asEagerSingleton();
 		this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-		this.addControllerListenerBinding().to(DecongestionControlerListener.class);
+		this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 	}
 
 }

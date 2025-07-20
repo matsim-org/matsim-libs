@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScoreStats.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -58,7 +57,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener {
+final class ModeStatsControllerListener implements StartupListener, IterationEndsListener {
 
 	private final static String FILENAME_MODESTATS = "modestats";
 
@@ -78,14 +77,14 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 	// Keep all modes encountered so far in a sorted set to ensure output is written for modes sorted by mode.
 	private final Set<String> modes = new TreeSet<>();
 
-	private final static Logger log = LogManager.getLogger(ModeStatsControlerListener.class);
+	private final static Logger log = LogManager.getLogger(ModeStatsControllerListener.class);
 
 	@Inject
-	ModeStatsControlerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-														 GlobalConfigGroup globalConfigGroup, AnalysisMainModeIdentifier mainModeIdentifier) {
+	ModeStatsControllerListener(ControllerConfigGroup controllerConfigGroup, Population population1, OutputDirectoryHierarchy controllerIO,
+															GlobalConfigGroup globalConfigGroup, AnalysisMainModeIdentifier mainModeIdentifier) {
 		this.controllerConfigGroup = controllerConfigGroup;
 		this.population = population1;
-		this.modeFileName = controlerIO.getOutputFilename(FILENAME_MODESTATS);
+		this.modeFileName = controllerIO.getOutputFilename(FILENAME_MODESTATS);
 		this.delimiter = globalConfigGroup.getDefaultDelimiter();
 		this.mainModeIdentifier = mainModeIdentifier;
 	}

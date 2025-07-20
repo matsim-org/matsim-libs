@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * @author nkuehnel / MOIA
  */
-public class SharingMetricsControlerListener implements IterationEndsListener {
+class SharingMetricsControllerListener implements IterationEndsListener {
     private final MatsimServices matsimServices;
 
     private final DrtConfigGroup drtConfigGroup;
@@ -42,10 +42,10 @@ public class SharingMetricsControlerListener implements IterationEndsListener {
 
 
     @Inject
-    public SharingMetricsControlerListener(Config config,
-										   DrtConfigGroup drtConfigGroup,
-										   SharingMetricsTracker sharingFactorTracker,
-										   MatsimServices matsimServices) {
+    public SharingMetricsControllerListener(Config config,
+																						DrtConfigGroup drtConfigGroup,
+																						SharingMetricsTracker sharingFactorTracker,
+																						MatsimServices matsimServices) {
         this.drtConfigGroup = drtConfigGroup;
         this.sharingFactorTracker = sharingFactorTracker;
         this.matsimServices = matsimServices;

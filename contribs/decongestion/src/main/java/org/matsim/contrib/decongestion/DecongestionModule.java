@@ -79,7 +79,7 @@ public class DecongestionModule extends AbstractModule {
 
 		this.addEventHandlerBinding().to(PersonVehicleTracker.class).in( Singleton.class );
 
-		this.addControllerListenerBinding().to(DecongestionControlerListener.class).in( Singleton.class );
+		this.addControllerListenerBinding().to(DecongestionControllerListener.class).in( Singleton.class );
 	}
 
 }

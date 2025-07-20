@@ -21,11 +21,11 @@ public class SharingMetricsModule extends AbstractDvrpModeModule {
         bindModal(SharingMetricsTracker.class).toProvider(modalProvider(getter ->
                 new SharingMetricsTracker())).asEagerSingleton();
         addEventHandlerBinding().to(modalKey(SharingMetricsTracker.class));
-        bindModal(SharingMetricsControlerListener.class).toProvider(modalProvider(getter ->
-                new SharingMetricsControlerListener(getConfig(), drtConfigGroup,
+        bindModal(SharingMetricsControllerListener.class).toProvider(modalProvider(getter ->
+                new SharingMetricsControllerListener(getConfig(), drtConfigGroup,
                         getter.getModal(SharingMetricsTracker.class),
                         getter.get(MatsimServices.class))
         ));
-        addControllerListenerBinding().to(modalKey(SharingMetricsControlerListener.class));
+        addControllerListenerBinding().to(modalKey(SharingMetricsControllerListener.class));
     }
 }

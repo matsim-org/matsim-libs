@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonMoneyEventsControlerListener.java
+ * PersonMoneyEventsControllerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -39,7 +39,7 @@ import jakarta.inject.Inject;
  *
  * @author vsp-gleich
  */
-public class PersonMoneyEventsAnalysisControlerListener implements IterationStartsListener, IterationEndsListener, ShutdownListener, StartupListener {
+class PersonMoneyEventsAnalysisControllerListener implements IterationStartsListener, IterationEndsListener, ShutdownListener, StartupListener {
 
     @Inject
     private PersonMoneyEventsAggregator personMoneyEventsAggregator;
