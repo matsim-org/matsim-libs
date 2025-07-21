@@ -53,16 +53,13 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
 			var insertionParams = (SelectiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
 			var restrictiveDetourTimeEstimator = DetourTimeEstimator.createMatrixBasedEstimator(
-                    insertionParams.getRestrictiveBeelineSpeedFactor(), getter.getModal(TravelTimeMatrix.class),
-					getter.getModal(TravelTime.class));
+				insertionParams.getRestrictiveBeelineSpeedFactor(), getter.getModal(TravelTimeMatrix.class),
+				getter.getModal(TravelTime.class));
 			return restrictiveDetourTimeEstimator;
 		}));
 
 		addModalComponent(DrtInsertionSearchManager.class, modalProvider(getter -> {
-			SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(
-					getter.getModal(InsertionCostCalculator.class),
-					getter.getModal(QsimScopeForkJoinPool.class).getPool(),
-					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
+
 			// Use 0 as the cost for the selected insertion:
 			// - In the selective strategy, there is at most 1 insertion pre-selected. So no need to compute as there is
 			//   no other insertion to compare with.
@@ -70,8 +67,15 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 			//   so we do not want to check for time window violations
 			//  Re (*) currently, free-speed travel times are quite accurate. We still need to adjust them to different times of day.
 			InsertionCostCalculator zeroCostInsertionCostCalculator = (drtRequest, insertion, detourTimeInfo) -> 0;
-			return new DrtInsertionSearchManager(() -> new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculatorManager.class).create(),
-				zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class), getter.getModal(StopTimeCalculator.class)));
+			return new DrtInsertionSearchManager(() -> {
+				// Each instance should have its own insertionProvider
+				SelectiveInsertionProvider provider = SelectiveInsertionProvider.create(
+					getter.getModal(InsertionCostCalculator.class),
+					getter.getModal(QsimScopeForkJoinPool.class).getPool(),
+					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
+				return new SelectiveInsertionSearch(provider, getter.getModal(SingleInsertionDetourPathCalculatorManager.class).create(),
+					zeroCostInsertionCostCalculator, drtCfg, getter.get(MatsimServices.class), getter.getModal(StopTimeCalculator.class));
+			});
 		}));
 
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider( getter -> getter.getModal(DrtInsertionSearchManager.class).create()));

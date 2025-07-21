@@ -42,7 +42,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.selective.RequestDataCo
 public class RequestInsertWorker {
 	private final RequestFleetFilter requestFleetFilter;
 	private final DrtInsertionSearch insertionSearch;
-	private final Queue<RequestData> unplannedRequests = new ConcurrentLinkedQueue<>();
+	private final Queue<RequestData> unplannedRequests = new ArrayDeque<>();
 	private final Map<Id<DvrpVehicle>, SortedSet<RequestData>> solutions;
 	private final SortedSet<DrtRequest> noSolutions;
 
