@@ -39,7 +39,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Aravind
  *
  */
-public class ModeStatsControlerListenerTest {
+public class ModeStatsControllerListenerTest {
 
 	int bike;
 	int car;
@@ -355,7 +355,7 @@ public class ModeStatsControlerListenerTest {
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
-		ModeStatsControlerListener modStatListner = new ModeStatsControlerListener(controllerConfigGroup, population,
+		ModeStatsControllerListener modStatListner = new ModeStatsControllerListener(controllerConfigGroup, population,
 				controlerIO, new GlobalConfigGroup(), transportId);
 
 		StartupEvent eventStart = new StartupEvent(null);

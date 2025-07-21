@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ControlerEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2023 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+package org.matsim.core.controler.events;
 
-import ch.sbb.matsim.contrib.railsim.analysis.linkstates.RailsimLinkStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.analysis.trainstates.RailsimTrainStateControlerListener;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import com.google.inject.Singleton;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.MatsimServices;
 
 /**
- * Railsim module installing all needed component.
+ * Basic event class for all Events fired by the Controler
+ *
+ * @author dgrether
  */
-public class RailsimModule extends AbstractModule {
+public abstract class ControllerEvent {
+	/**
+	 * The Controler instance which fired this event
+	 */
+	protected final MatsimServices services;
 
-	@Override
-	public void install() {
-		installQSimModule(new RailsimQSimModule());
-		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
-
-		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);
-
-		bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
-		addControllerListenerBinding().to(RailsimTrainStateControlerListener.class);
+	public ControllerEvent(final MatsimServices services) {
+		this.services = services;
 	}
+
+	/**
+	 * Returns an aggregate interface of many services which are available during a MATSim run.
+	 * Consider if you can instead only use the concrete services which you need.
+	 * Everything which this interface returns is also accessible via the @Inject annotation.
+	 *
+	 * @return the global services interface
+	 */
+	public MatsimServices getServices() {
+		return this.services;
+	}
+
 }

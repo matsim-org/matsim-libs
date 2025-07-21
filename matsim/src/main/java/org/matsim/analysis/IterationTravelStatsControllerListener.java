@@ -1,7 +1,6 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelDistanceStatsControlerListener.java
+ * TravelDistanceStatsControllerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -32,7 +31,7 @@ import org.matsim.core.scoring.ExperiencedPlansService;
 
 import jakarta.inject.Inject;
 
-class IterationTravelStatsControlerListener implements IterationEndsListener, ShutdownListener {
+class IterationTravelStatsControllerListener implements IterationEndsListener, ShutdownListener {
 
     @Inject
     Config config;

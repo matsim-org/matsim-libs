@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkPaxVolumesControlerListener.java
+ * LinkPaxVolumesControllerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -33,7 +33,7 @@ import jakarta.inject.Inject;
 /**
  * @author vsp-gleich
  */
-public final class LinkPaxVolumesControlerListener implements IterationEndsListener, IterationStartsListener {
+final class LinkPaxVolumesControllerListener implements IterationEndsListener, IterationStartsListener {
 
 	private LinkPaxVolumesAnalysis linkPaxVolumesAnalysis;
 	private OutputDirectoryHierarchy controlerIO;
@@ -42,7 +42,7 @@ public final class LinkPaxVolumesControlerListener implements IterationEndsListe
 	private final String sep;
 
 	@Inject
-	LinkPaxVolumesControlerListener(Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+	LinkPaxVolumesControllerListener(Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.eventsManager = eventsManager;
 		this.controlerIO = controlerIO;
 		this.scenario = scenario;
