@@ -22,7 +22,6 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Inject;
 import org.matsim.analysis.IterationTravelStatsModule;
 import org.matsim.analysis.LegHistogramModule;
 import org.matsim.analysis.LegTimesModule;
@@ -63,7 +62,7 @@ public final class ControlerDefaultsModule extends AbstractModule {
         install(new StrategyManagerModule());
         install(new TimeInterpretationModule());
         if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
-            addControlerListenerBinding().to(ReplanningAnnealer.class);
+            addControllerListenerBinding().to(ReplanningAnnealer.class);
         }
 
         // I think that the ones coming here are all for analysis only, and thus not central to the iterations. kai, apr'18
@@ -85,11 +84,11 @@ public final class ControlerDefaultsModule extends AbstractModule {
 		// The ImageIO.setCacheDirectory method checks if the provided directory exists so it needs to be created first
 		// Maybe not the best place to but this but since ChartUtils is used by many modules, including default ones,
 		//  the cache needs to be always set correctly.
-		addControlerListenerBinding().toInstance(new StartupListener() {
+		addControllerListenerBinding().toInstance(new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				ImageIO.setCacheDirectory(new File(event.getServices().getControlerIO().getTempPath()));
+				ImageIO.setCacheDirectory(new File(event.getServices().getControllerIO().getTempPath()));
 			}
 		});
 

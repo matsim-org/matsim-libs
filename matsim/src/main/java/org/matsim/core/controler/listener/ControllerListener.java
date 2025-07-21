@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerEvent.java
+ * ControllerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,34 +18,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.events;
+package org.matsim.core.controler.listener;
 
-import org.matsim.core.controler.MatsimServices;
+import java.util.EventListener;
+
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.controler.Controler;
 
 /**
- * Basic event class for all Events fired by the Controler
+ * ControllerListeners are notified at specific points in the {@link Controler} loop.  See sub-interfaces for more information
+ * and specific usages.
+ * <p>
+ * Example(s):<ul>
+ * <li> {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample}
+ * </ul>
  *
  * @author dgrether
  */
-public abstract class ControlerEvent {
-	/**
-	 * The Controler instance which fired this event
-	 */
-	protected final MatsimServices services;
-
-	public ControlerEvent(final MatsimServices services) {
-		this.services = services;
-	}
+public interface ControllerListener extends EventListener, MatsimExtensionPoint {
 
 	/**
-	 * Returns an aggregate interface of many services which are available during a MATSim run.
-	 * Consider if you can instead only use the concrete services which you need.
-	 * Everything which this interface returns is also accessible via the @Inject annotation.
-	 *
-	 * @return the global services interface
+	 * Return the priority of this listener. Listeners with higher priority are executed first. The default priority is 0.
 	 */
-	public MatsimServices getServices() {
-		return this.services;
+	default double priority() {
+		return 0;
 	}
 
 }

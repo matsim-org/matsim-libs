@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PopulationUtils;
@@ -50,8 +50,8 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
 
 	@Inject
-    ExperiencedPlansServiceImpl(ControlerListenerManager controlerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
-        controlerListenerManager.addControlerListener(new IterationStartsListener() {
+    ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+        controllerListenerManager.addControllerListener(new IterationStartsListener() {
             @Override
             public void notifyIterationStarts(IterationStartsEvent event) {
                 for (Person person : population.getPersons().values()) {

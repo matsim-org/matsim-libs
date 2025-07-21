@@ -1,7 +1,6 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerListenerManagerImplTest.java
+ * ControllerListenerManagerImplTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -33,38 +32,38 @@ import org.matsim.core.controler.listener.StartupListener;
 	/**
  * @author mrieser / senozon
  */
-public class ControlerListenerManagerImplTest {
+public class ControllerListenerManagerImplTest {
 
 	 @Test
-	 void testAddControlerListener_ClassHierarchy() {
-		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
-		CountingControlerListener ccl = new CountingControlerListener();
-		ExtendedControlerListener ecl = new ExtendedControlerListener();
-		m.addControlerListener(ccl);
-		m.addControlerListener(ecl);
-		
-		m.fireControlerStartupEvent();
+	 void testAddControllerListener_ClassHierarchy() {
+		ControllerListenerManagerImpl m = new ControllerListenerManagerImpl();
+		CountingControllerListener ccl = new CountingControllerListener();
+		ExtendedControllerListener ecl = new ExtendedControllerListener();
+		m.addControllerListener(ccl);
+		m.addControllerListener(ecl);
+
+		m.fireControllerStartupEvent();
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(0, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(0, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
-		
-		m.fireControlerIterationStartsEvent(0, false);
+
+		m.fireControllerIterationStartsEvent(0, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(1, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(1, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
-		
-		m.fireControlerIterationStartsEvent(1, false);
+
+		m.fireControllerIterationStartsEvent(1, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(2, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
-		
-		m.fireControlerShutdownEvent(false, 1);
+
+		m.fireControllerShutdownEvent(false, 1);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
@@ -73,47 +72,47 @@ public class ControlerListenerManagerImplTest {
 	}
 
 	 @Test
-	 void testAddCoreControlerListener_ClassHierarchy() {
-		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
-		CountingControlerListener ccl = new CountingControlerListener();
-		ExtendedControlerListener ecl = new ExtendedControlerListener();
-		m.addCoreControlerListener(ccl);
-		m.addCoreControlerListener(ecl);
-		
-		m.fireControlerStartupEvent();
+	 void testAddCoreControllerListener_ClassHierarchy() {
+		ControllerListenerManagerImpl m = new ControllerListenerManagerImpl();
+		CountingControllerListener ccl = new CountingControllerListener();
+		ExtendedControllerListener ecl = new ExtendedControllerListener();
+		m.addCoreControllerListener(ccl);
+		m.addCoreControllerListener(ecl);
+
+		m.fireControllerStartupEvent();
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(0, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(0, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(0, false);
+		m.fireControllerIterationStartsEvent(0, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(1, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(1, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
 
-		m.fireControlerIterationStartsEvent(1, false);
+		m.fireControllerIterationStartsEvent(1, false);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(2, ecl.nOfIterStarts);
 		Assertions.assertEquals(0, ecl.nOfShutdowns);
-		
-		m.fireControlerShutdownEvent(false, 1);
+
+		m.fireControllerShutdownEvent(false, 1);
 		Assertions.assertEquals(1, ccl.nOfStartups);
 		Assertions.assertEquals(2, ccl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfStartups);
 		Assertions.assertEquals(2, ecl.nOfIterStarts);
 		Assertions.assertEquals(1, ecl.nOfShutdowns);
 	}
-	
-	private static class CountingControlerListener implements StartupListener, IterationStartsListener {
+
+	private static class CountingControllerListener implements StartupListener, IterationStartsListener {
 
 		/*package*/ int nOfStartups = 0;
 		/*package*/ int nOfIterStarts = 0;
-		
+
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			this.nOfIterStarts++;
@@ -123,19 +122,19 @@ public class ControlerListenerManagerImplTest {
 		public void notifyStartup(StartupEvent event) {
 			this.nOfStartups++;
 		}
-		
+
 	}
-	
-	private static class ExtendedControlerListener extends CountingControlerListener implements ShutdownListener, StartupListener {
-		// StartupListener is explicitly implemented, even if not necessary, to test that it will not be called twice 
+
+	private static class ExtendedControllerListener extends CountingControllerListener implements ShutdownListener, StartupListener {
+		// StartupListener is explicitly implemented, even if not necessary, to test that it will not be called twice
 
 		/*package*/ int nOfShutdowns = 0;
-		
+
 		@Override
 		public void notifyShutdown(ShutdownEvent event) {
 			this.nOfShutdowns++;
 		}
-		
+
 	}
-	
+
 }

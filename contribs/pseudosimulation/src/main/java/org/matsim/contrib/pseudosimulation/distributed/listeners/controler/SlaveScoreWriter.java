@@ -74,7 +74,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 
 
 		chart.addMatsimLogo();
-		chart.saveAsPng(controler.getMATSimControler().getControlerIO().getOutputPath()
+		chart.saveAsPng(controler.getMATSimControler().getControllerIO().getOutputPath()
 				+ "/slaveScoreStats.png", 1200, 800);
 
 	}
@@ -91,7 +91,7 @@ public class SlaveScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		String fileName = controler.getMATSimControler().getControlerIO().getOutputPath()
+		String fileName = controler.getMATSimControler().getControllerIO().getOutputPath()
 				+ "/slaveScoreStats.txt";
 		this.out = IOUtils.getBufferedWriter(fileName);
 

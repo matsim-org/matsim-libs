@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,10 +16,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-/**
- *
- */
 
 package org.matsim.contrib.decongestion;
 
@@ -69,12 +64,10 @@ import com.google.inject.Inject;
  *
  *
  * @author ikaddoura
- *
  */
+class DecongestionControllerListener implements StartupListener, AfterMobsimListener, IterationStartsListener, IterationEndsListener {
 
-public class DecongestionControlerListener implements StartupListener, AfterMobsimListener, IterationStartsListener, IterationEndsListener {
-
-	private static final Logger log = LogManager.getLogger(DecongestionControlerListener.class);
+	private static final Logger log = LogManager.getLogger(DecongestionControllerListener.class);
 
 	private final SortedMap<Integer, Double> iteration2totalDelay = new TreeMap<>();
 	private final SortedMap<Integer, Double> iteration2totalTollPayments = new TreeMap<>();
