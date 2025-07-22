@@ -19,6 +19,7 @@
  */
 package org.matsim.contrib.drt.extension.services.dispatcher;
 
+import org.apache.commons.lang.math.IntRange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -115,7 +116,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			for (ServiceExecutionTrigger serviceExecutionTrigger : serviceExecutionTracker.getTriggers(drtServiceParams)) {
 				if (serviceExecutionTrigger.requiresService(dvrpVehicle, timeStep)) {
 					LOG.debug("{} scheduled service {} for vehicle {} at {}.", serviceExecutionTrigger.getName(), drtServiceParams.getServiceName(), dvrpVehicle.getId(), timeStep);
-					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle), drtServiceParams, stackable));
+					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle, timeStep), drtServiceParams, stackable));
 				}
 			}
 		}
@@ -138,7 +139,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 		}
 	}
 
-	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle) {
+	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle, double timeStep) {
 		final Schedule schedule = dvrpVehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		Link lastLink;
@@ -155,7 +156,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			lastLink = ((DrtStayTask) schedule.getTasks()
 				.get(schedule.getTaskCount() - 1)).getLink();
 		}
-		return operationFacilityFinder.findFacility(lastLink.getCoord()).orElseThrow();
+		return operationFacilityFinder.findFacility(lastLink.getCoord(), new IntRange(timeStep, Integer.MAX_VALUE)).orElseThrow();
 	}
 
 }
