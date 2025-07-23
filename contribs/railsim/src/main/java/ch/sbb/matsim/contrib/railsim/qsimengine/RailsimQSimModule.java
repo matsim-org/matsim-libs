@@ -21,7 +21,9 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
@@ -53,6 +55,7 @@ public class RailsimQSimModule extends AbstractQSimModule implements QSimCompone
 		// These interfaces might be replaced with other implementations
 		bind(TrainDisposition.class).to(SimpleDisposition.class).asEagerSingleton();
 		bind(DeadlockAvoidance.class).to(SimpleDeadlockAvoidance.class).asEagerSingleton();
+		bind(SpeedProfile.class).to(MaxSpeedProfile.class).asEagerSingleton();
 
 		addQSimComponentBinding(COMPONENT_NAME).to(RailsimQSimEngine.class);
 

@@ -61,7 +61,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	private TransitRouteStop currentStop = null;
 	private Double currentArrivalTime = null;
 	protected TransitRouteStop nextStop;
-	private ListIterator<TransitRouteStop> stopIterator;
+	protected ListIterator<TransitRouteStop> stopIterator;
 	private final InternalInterface internalInterface;
 
 	private final PassengerAccessEgressImpl accessEgress;

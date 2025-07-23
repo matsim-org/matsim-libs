@@ -254,4 +254,10 @@ final class TrainState implements TrainPosition {
 		}
 		return route.subList(from, route.size());
 	}
+
+	@Override
+	@Nullable
+	public TransitStopFacility getNextStop() {
+		return nextStop;
+	}
 }

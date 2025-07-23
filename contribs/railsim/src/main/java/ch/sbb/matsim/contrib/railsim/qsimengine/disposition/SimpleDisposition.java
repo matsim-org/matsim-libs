@@ -36,6 +36,7 @@ import java.util.List;
 public class SimpleDisposition implements TrainDisposition {
 
 	private final RailResourceManager resources;
+	private final SpeedProfile speedProfile;
 	private final TrainRouter router;
 
 	/**
@@ -48,8 +49,9 @@ public class SimpleDisposition implements TrainDisposition {
 	}
 
 	@Inject
-	public SimpleDisposition(RailResourceManager resources, TrainRouter router) {
+	public SimpleDisposition(RailResourceManager resources, SpeedProfile speedProfile, TrainRouter router) {
 		this.resources = resources;
+		this.speedProfile = speedProfile;
 		this.router = router;
 	}
 
@@ -111,7 +113,15 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		}
 
-		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, null);
+		double approvedSpeed;
+		if (stop) {
+			approvedSpeed = 0;
+		} else {
+			PlannedArrival nextArrival = speedProfile.getNextArrival(time, position);
+			approvedSpeed = speedProfile.getTargetSpeed(time, position, nextArrival);
+		}
+
+		return new DispositionResponse(reserveDist, approvedSpeed, null);
 	}
 
 	private Detour checkDetour(double time, List<RailLink> segment, TrainPosition position) {
