@@ -86,9 +86,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		boolean scheduleTimingUpdated = false;
 		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
-			for (DvrpVehicle v : fleet.getVehicles().values()) {
-				scheduleTimingUpdater.updateTimings(v);
-			}
+			fleet.getVehicles().values().parallelStream().forEach(scheduleTimingUpdater::updateTimings);
 			scheduleTimingUpdated = true;
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);
