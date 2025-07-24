@@ -27,55 +27,56 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.matsim.contrib.zone.skims.AdaptiveTravelTimeMatrixImpl.KeyUtils.*;
 
 class SparseTravelTimeCacheTest {
 
-    private Map<AdaptiveTravelTimeMatrixImpl.IntSparseKey, Double> cache;
+	private Map<Long, Double> cache;
 
-    @BeforeEach
-    void setUp() {
-        cache = new ConcurrentHashMap<>();
-    }
+	@BeforeEach
+	void setUp() {
+		cache = new ConcurrentHashMap<>();
+	}
 
-    @Test
-    void testPutAndGetTravelTime() {
-        int fromIndex = 123;
-        int toIndex = 456;
-        int timeBin = 5;
-        double travelTime = 321.5;
+	@Test
+	void testPutAndGetTravelTime() {
+		int fromIndex = 123;
+		int toIndex = 456;
+		int timeBin = 5;
+		double travelTime = 321.5;
 
-        AdaptiveTravelTimeMatrixImpl.IntSparseKey key = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(fromIndex, toIndex, timeBin);
-        cache.put(key, travelTime);
+		long key = getKey(fromIndex, toIndex, timeBin);
+		cache.put(key, travelTime);
 
-        assertTrue(cache.containsKey(key), "Key should exist in cache");
-        assertEquals(travelTime, cache.get(key), 1e-6, "Travel time should match");
-    }
+		assertTrue(cache.containsKey(key), "Key should exist in cache");
+		assertEquals(travelTime, cache.get(key), 1e-6, "Travel time should match");
+	}
 
-    @Test
-    void testDifferentBinsAreDifferentKeys() {
-        AdaptiveTravelTimeMatrixImpl.IntSparseKey key1 = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(1, 2, 3);
-        AdaptiveTravelTimeMatrixImpl.IntSparseKey key2 = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(1, 2, 4);
+	@Test
+	void testDifferentBinsAreDifferentKeys() {
+		long key1 = getKey(1, 2, 3);
+		long key2 = getKey(1, 2, 4);
 
-        cache.put(key1, 100.0);
-        cache.put(key2, 200.0);
+		cache.put(key1, 100.0);
+		cache.put(key2, 200.0);
 
-        assertNotEquals(key1, key2, "Keys with different bins should not be equal");
-        assertEquals(100.0, cache.get(key1), 1e-6);
-        assertEquals(200.0, cache.get(key2), 1e-6);
-    }
+		assertNotEquals(key1, key2, "Keys with different bins should not be equal");
+		assertEquals(100.0, cache.get(key1), 1e-6);
+		assertEquals(200.0, cache.get(key2), 1e-6);
+	}
 
-    @Test
-    void testSymmetry() {
-        AdaptiveTravelTimeMatrixImpl.IntSparseKey key1 = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(10, 20, 1);
-        AdaptiveTravelTimeMatrixImpl.IntSparseKey key2 = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(20, 10, 1);
+	@Test
+	void testSymmetry() {
+		long key1 = getKey(10, 20, 1);
+		long key2 = getKey(20, 10, 1);
 
-        cache.put(key1, 50.0);
-        cache.put(key2, 75.0);
+		cache.put(key1, 50.0);
+		cache.put(key2, 75.0);
 
-        assertNotEquals(key1, key2, "Direction matters: keys should not be equal");
-        assertEquals(50.0, cache.get(key1), 1e-6);
-        assertEquals(75.0, cache.get(key2), 1e-6);
-    }
+		assertNotEquals(key1, key2, "Direction matters: keys should not be equal");
+		assertEquals(50.0, cache.get(key1), 1e-6);
+		assertEquals(75.0, cache.get(key2), 1e-6);
+	}
 
 	@Test
 	void testBitPackingAndUnpacking() {
@@ -83,11 +84,11 @@ class SparseTravelTimeCacheTest {
 		int toIndex = 654321;
 		int timeBin = 17;
 
-		AdaptiveTravelTimeMatrixImpl.IntSparseKey key = new AdaptiveTravelTimeMatrixImpl.IntSparseKey(fromIndex, toIndex, timeBin);
+		long key = getKey(fromIndex, toIndex, timeBin);
 
-		assertEquals(fromIndex, key.getFromIndex(), "fromIndex should match after unpacking");
-		assertEquals(toIndex, key.getToIndex(), "toIndex should match after unpacking");
-		assertEquals(timeBin, key.getTimeBin(), "timeBin should match after unpacking");
+		assertEquals(fromIndex, getFromIndex(key), "fromIndex should match after unpacking");
+		assertEquals(toIndex, getToIndex(key), "toIndex should match after unpacking");
+		assertEquals(timeBin, getTimeBin(key), "timeBin should match after unpacking");
 	}
 
 }
