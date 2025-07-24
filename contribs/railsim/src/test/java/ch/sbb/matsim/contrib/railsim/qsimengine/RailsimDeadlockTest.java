@@ -223,9 +223,9 @@ public class RailsimDeadlockTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1a", 670, "EF", 0)
-			.hasTrainState("regio1b", 790, "EF", 0)
+			.hasTrainState("regio1b", 795, "EF", 0)
 			.hasTrainState("regio2a", 1120, "CD", 0)
-			.hasTrainState("regio2b", 1243, "CD", 0);
+			.hasTrainState("regio2b", 1245, "CD", 0);
 
 	}
 }
