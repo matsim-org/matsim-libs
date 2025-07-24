@@ -105,7 +105,9 @@ public final class RailsimCalc {
 
 		// Distance could be zero, speeds must be already equal then
 		if (FuzzyUtils.equals(dist, 0)) {
-			assert FuzzyUtils.equals(currentSpeed, finalSpeed) : "Current speed must be equal to allowed speed";
+			assert FuzzyUtils.equals(currentSpeed, finalSpeed) :
+				String.format("Current speed must be equal to allowed speed, but was %s != %s", currentSpeed, finalSpeed);
+
 			return new SpeedTarget(finalSpeed, 0);
 		}
 
@@ -203,7 +205,7 @@ public final class RailsimCalc {
 	/**
 	 * Calculate the projected driven distance, based on current position and state.
 	 */
-	public static double projectedDistance(double time,  TrainPosition position) {
+	public static double projectedDistance(double time, TrainPosition position) {
 
 		if (!(position instanceof TrainState state))
 			throw new IllegalArgumentException("Position must be a TrainState.");

@@ -391,12 +391,11 @@ final class RailsimEngine implements Steppable {
 
 		assert FuzzyUtils.greaterEqualThan(state.approvedDist, 0) : "Approved distance must be positive, but was " + response.approvedDist();
 
-		// At the moment the approved speed from the disposition is not used
 		// Stop when the approved distance is not enough
 		if (FuzzyUtils.lessThan(state.approvedDist, reserveDist + SAFETY_DIST))
 			state.approvedSpeed = 0;
 		else
-			state.approvedSpeed = Double.POSITIVE_INFINITY;
+			state.approvedSpeed = response.approvedSpeed();
 
 		// Return whether the train has to stop
 		return state.approvedSpeed != 0;
@@ -774,9 +773,10 @@ final class RailsimEngine implements Steppable {
 		double window = RailsimCalc.calcTraveledDist(state.allowedMaxSpeed, state.allowedMaxSpeed / state.train.deceleration(),
 			-state.train.deceleration()) + currentLink.length;
 
-		double minAllowed = state.allowedMaxSpeed;
+		double advisedSpeed = state.approvedSpeed != 0 ? Math.min(state.approvedSpeed, state.allowedMaxSpeed) : state.allowedMaxSpeed;
+		double minAllowed = advisedSpeed;
 
-		state.targetSpeed = state.allowedMaxSpeed;
+		state.targetSpeed = advisedSpeed;
 		state.targetDecelDist = Double.POSITIVE_INFINITY;
 
 		boolean stop = false;
@@ -822,7 +822,7 @@ final class RailsimEngine implements Steppable {
 			// Only need to consider if speed is lower than the allowed speed
 			if (!FuzzyUtils.equals(dist, 0) && allowed <= minAllowed) {
 				RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(),
-					state.speed, state.allowedMaxSpeed, Math.min(state.allowedMaxSpeed, allowed));
+					state.speed, advisedSpeed, Math.min(state.allowedMaxSpeed, allowed));
 
 				assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist must be greater than 0, or stopping is not possible";
 

@@ -16,6 +16,9 @@ public class AdaptiveSpeedProfile implements SpeedProfile {
 	@Override
 	public double getTargetSpeed(double time, TrainPosition position, PlannedArrival nextArrival) {
 
+		if (nextArrival == PlannedArrival.UNDEFINED || nextArrival.route().isEmpty())
+			return Double.POSITIVE_INFINITY;
+
 		double arrivalTime = nextArrival.time() - BUFFER;
 
 		double totalLength = 0;

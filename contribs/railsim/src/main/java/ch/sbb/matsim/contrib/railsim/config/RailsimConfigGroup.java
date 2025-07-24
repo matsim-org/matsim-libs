@@ -56,6 +56,10 @@ public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Defines how trains circulate in the network if the same vehicle is used for multiple trips.")
 	private VehicleCirculation vehicleCirculation = VehicleCirculation.yes;
 
+	@Parameter
+	@Comment("Speed profile to use within train disposition to calculate the target speed")
+	private SpeedProfile speedProfile = SpeedProfile.maxSpeed;
+
 	public RailsimConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -124,6 +128,15 @@ public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 
+	public SpeedProfile getSpeedProfile() {
+		return speedProfile;
+	}
+
+	public RailsimConfigGroup setSpeedProfile(SpeedProfile speedProfile) {
+		this.speedProfile = speedProfile;
+		return this;
+	}
+
 	/**
 	 * Defines how trains circulate in the network if the same vehicle is used for multiple trips.
 	 */
@@ -135,4 +148,18 @@ public final class RailsimConfigGroup extends ReflectiveConfigGroup {
 		yes
 	}
 
+	public enum SpeedProfile {
+		/**
+		 * Use the maximum speed defined in the vehicle attributes.
+		 */
+		maxSpeed,
+		/**
+		 * Use an adaptive speed profile based on the train position and the next arrival time.
+		 */
+		adaptive,
+		/**
+		 * Define speed profile by guice binding.
+		 */
+		custom
+	}
 }
