@@ -45,6 +45,8 @@ public class TrafficCountsDashboardTest {
 		contextParams.setMapCenter("12,48.95");
 		contextParams.setMapZoomLevel(9.0);
 
+		simWrapperConfigGroup.setBasePath("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/DashboardTests/ptCustom");
+
 		SimWrapper sw = SimWrapper.create(config)
 			.addDashboard(new TrafficCountsDashboard()
 				.withModes("car", Set.of(TransportMode.car))

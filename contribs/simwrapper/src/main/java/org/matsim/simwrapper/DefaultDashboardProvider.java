@@ -23,6 +23,10 @@ public class DefaultDashboardProvider implements DashboardProvider {
 			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes()))
 		));
 
+		if (simWrapper.getConfigGroup().getBasePath() != null) {
+			result.add(new DifferenceDashboard(simWrapper.getConfigGroup().getBasePath(), config.controller().getOutputDirectory()));
+		}
+
 		if (config.transit().isUseTransit()) {
 			result.add(new PublicTransitDashboard());
 		}

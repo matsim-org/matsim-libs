@@ -18,6 +18,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class TestScenario extends MATSimApplication {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setLastIteration(0);
+		config.controller().setLastIteration(2);
 		config.controller().setWriteEventsInterval(1);
 
 		return config;
