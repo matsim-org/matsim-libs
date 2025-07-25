@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -51,6 +53,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public class DefaultDrtOptimizer implements DrtOptimizer {
 	private static final Logger log = LogManager.getLogger(DefaultDrtOptimizer.class);
 
+	private final ForkJoinPool qsimScopeForkJoinPool;
 	private final DrtConfigGroup drtCfg;
 	private final Integer rebalancingInterval;
 	private final Fleet fleet;
@@ -65,9 +68,10 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private final Queue<DrtRequest> unplannedRequests = new LinkedList<>();
 
-	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
+	public DefaultDrtOptimizer(QsimScopeForkJoinPool qsimScopeForkJoinPool, DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
 			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
+		this.qsimScopeForkJoinPool = qsimScopeForkJoinPool.getPool();
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -79,14 +83,14 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.requestInserter = requestInserter;
 		this.insertionRetryQueue = insertionRetryQueue;
 
-		rebalancingInterval = drtCfg.getRebalancingParams().map(rebalancingParams -> rebalancingParams.getInterval()).orElse(null);
+		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		boolean scheduleTimingUpdated = false;
 		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
-			fleet.getVehicles().values().parallelStream().forEach(scheduleTimingUpdater::updateTimings);
+			fleet.getVehicles().values().forEach(v-> qsimScopeForkJoinPool.submit(()-> scheduleTimingUpdater.updateTimings(v)));
 			scheduleTimingUpdated = true;
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);
@@ -95,9 +99,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		relocateVehiclesToDepot(drtCfg.getReturnToDepotEvaluationInterval(), drtCfg.getReturnToDepotTimeout());
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			if (!scheduleTimingUpdated) {
-				for (DvrpVehicle v : fleet.getVehicles().values()) {
-					scheduleTimingUpdater.updateTimings(v);
-				}
+				fleet.getVehicles().values().forEach(v-> qsimScopeForkJoinPool.submit(()-> scheduleTimingUpdater.updateTimings(v)));
 			}
 
 			rebalanceFleet();
