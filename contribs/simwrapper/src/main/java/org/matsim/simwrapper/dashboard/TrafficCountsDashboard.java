@@ -22,6 +22,19 @@ import java.util.stream.Collectors;
  */
 public class TrafficCountsDashboard implements Dashboard {
 
+	private String pathToBaseCase;
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		System.out.println("TrafficCountsDashboard.setPathToBaseCase called with: " + path);
+		this.pathToBaseCase = path;
+	}
+
+	@Override
+	public String getPathToBaseCase() {
+		System.out.println("TrafficCountsDashboard.getPathToBaseCase returning: " + this.pathToBaseCase);
+		return this.pathToBaseCase;
+	}
 
 	private final Map<String, Set<String>> networkModes = new LinkedHashMap<>();
 
@@ -87,7 +100,6 @@ public class TrafficCountsDashboard implements Dashboard {
 
 		if (countsPath != null)
 			argList.addAll(List.of("--counts", countsPath));
-
 
 		// Default analysis for cars
 		if (networkModes.isEmpty())

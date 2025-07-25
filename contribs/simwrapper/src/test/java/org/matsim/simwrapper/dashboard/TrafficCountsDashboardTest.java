@@ -13,6 +13,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.*;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.TestScenario;
@@ -47,17 +48,19 @@ public class TrafficCountsDashboardTest {
 
 		simWrapperConfigGroup.setBasePath("/home/brendan/git/matsim-libs/contribs/simwrapper/test/output/org/matsim/simwrapper/dashboard/DashboardTests/ptCustom");
 
+		Dashboard TC_a = new TrafficCountsDashboard().withModes("car", Set.of(TransportMode.car))
+			.withModes("truck", Set.of(TransportMode.truck, "freight"));
+		TC_a.setPathToBaseCase(simWrapperConfigGroup.getBasePath());
+
+		Dashboard TC_b = new TrafficCountsDashboard().withQualityLabels(
+			List.of(0.0, 0.3, 1.7, 2.5),
+			List.of("way too few", "fewer", "exact", "too much", "way too much")
+		);
+		TC_b.setPathToBaseCase(simWrapperConfigGroup.getBasePath());
+
 		SimWrapper sw = SimWrapper.create(config)
-			.addDashboard(new TrafficCountsDashboard()
-				.withModes("car", Set.of(TransportMode.car))
-				.withModes("truck", Set.of(TransportMode.truck, "freight"))
-			)
-			.addDashboard(new TrafficCountsDashboard()
-				.withQualityLabels(
-					List.of(0.0, 0.3, 1.7, 2.5),
-					List.of("way too few", "fewer", "exact", "too much", "way too much")
-				)
-			);
+			.addDashboard(TC_a)
+			.addDashboard(TC_b);
 
 		Controler controler = MATSimApplication.prepare(new TestScenario(sw), config);
 		controler.addOverridingModule(new CountsModule());

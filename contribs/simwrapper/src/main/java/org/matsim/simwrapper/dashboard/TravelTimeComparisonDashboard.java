@@ -14,6 +14,18 @@ import tech.tablesaw.plotly.traces.ScatterTrace;
  */
 public class TravelTimeComparisonDashboard implements Dashboard {
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	private final String refData;
 
 	/**

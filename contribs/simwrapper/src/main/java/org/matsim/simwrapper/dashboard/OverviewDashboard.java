@@ -16,6 +16,19 @@ import java.util.List;
  * Dashboard with general overview.
  */
 public class OverviewDashboard implements Dashboard {
+
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 
@@ -51,6 +64,11 @@ public class OverviewDashboard implements Dashboard {
 
 		});
 
+		if (getPathToBaseCase() != "") {
+			System.out.println("test");
+		} else {
+			System.out.println("test");
+		}
 		// Info about the status of the run
 		layout.row("warnings").el(TextBlock.class, (viz, data) -> {
 			viz.file = data.compute(LogFileAnalysis.class, "status.md");

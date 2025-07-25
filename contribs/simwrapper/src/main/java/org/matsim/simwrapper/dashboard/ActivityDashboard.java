@@ -29,6 +29,18 @@ public class ActivityDashboard implements Dashboard {
 	private final Set<String> countSingleOccurrencesSet = new HashSet<>();
 	private List<Indicator> indicators = new ArrayList<>();
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	/**
 	 * Create a new activity dashboard using the default shape file.
 	 * Note that the shape file must contain multiple regions with an "id" column.

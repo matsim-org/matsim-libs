@@ -17,6 +17,18 @@ import java.util.List;
  */
 public class PublicTransitDashboard implements Dashboard {
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	private List<TransitViewer.CustomRouteType> customRouteTypes = new ArrayList<>();
 
 	/**

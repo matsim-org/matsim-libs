@@ -7,6 +7,19 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Tile;
 
 public class DifferenceDashboard implements Dashboard {
+
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	private String constructorBasePath;
 	private String constructorPolicyPath;
 

@@ -29,6 +29,18 @@ import java.util.Objects;
  */
 public class TripDashboard implements Dashboard {
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	private static final Logger log = LogManager.getLogger(TripDashboard.class);
 
 	@Nullable

@@ -17,6 +17,18 @@ public class EmissionsDashboard implements Dashboard {
 
 	private final String coordinateSystem;
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	/**
 	 * Best provide the crs from {@link org.matsim.core.config.groups.GlobalConfigGroup}
 	 * @param coordinateSystem
