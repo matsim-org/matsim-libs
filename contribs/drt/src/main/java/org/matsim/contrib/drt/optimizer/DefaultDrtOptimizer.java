@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
@@ -89,21 +90,29 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		boolean scheduleTimingUpdated = false;
-		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
-			fleet.getVehicles().values().forEach(v-> qsimScopeForkJoinPool.submit(()-> scheduleTimingUpdater.updateTimings(v)));
-			scheduleTimingUpdated = true;
 
+		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
+			waitForAllTimingUpdates(); // Concurrent timing updates
+			scheduleTimingUpdated = true;
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);
 		}
 
 		relocateVehiclesToDepot(drtCfg.getReturnToDepotEvaluationInterval(), drtCfg.getReturnToDepotTimeout());
+
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			if (!scheduleTimingUpdated) {
-				fleet.getVehicles().values().forEach(v-> qsimScopeForkJoinPool.submit(()-> scheduleTimingUpdater.updateTimings(v)));
+				waitForAllTimingUpdates(); // Concurrent timing updates
 			}
-
 			rebalanceFleet();
 		}
+	}
+
+	private void waitForAllTimingUpdates() {
+		CompletableFuture
+			.allOf(fleet.getVehicles().values().stream()
+				.map(v -> CompletableFuture.runAsync(() -> scheduleTimingUpdater.updateTimings(v), qsimScopeForkJoinPool))
+				.toArray(CompletableFuture[]::new))
+			.join();
 	}
 
 	private void rebalanceFleet() {
