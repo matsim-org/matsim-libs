@@ -20,34 +20,34 @@ public final class MapBinderWithStringExample{
 
 //	@Inject Map<Annotation, Set<Provider<MyInterface>>> map ;
 
-	void run() {
-		List<com.google.inject.Module> modules = new ArrayList<>() ;
+	void run(){
+		List<com.google.inject.Module> modules = new ArrayList<>();
 		// (there is also a Module in java.lang, and maven gets confused about that.  kai, jul'19)
 
-		modules.add(  new AbstractModule(){
+		modules.add( new AbstractModule(){
 			@Override
 			protected void configure(){
 				bind( MyRunner.class );
 
 				MapBinder<String, MyInterface> mapBinder = MapBinder.newMapBinder( this.binder(), String.class, MyInterface.class );
 //				mapBinder.permitDuplicates() ;
-				mapBinder.addBinding("abc" ).to( MyImpl1.class ).in( Singleton.class );
-				mapBinder.addBinding("def" ).toInstance( new MyImpl2() ) ;
-				mapBinder.addBinding("egh").toProvider( MyImpl2::new  ) ;
+				mapBinder.addBinding( "abc" ).to( MyImpl1.class ).in( Singleton.class );
+				mapBinder.addBinding( "def" ).toInstance( new MyImpl2() );
+				mapBinder.addBinding( "egh" ).toProvider( MyImpl2::new );
 
 
 			}
-		} ) ;
+		} );
 		Injector injector = Guice.createInjector( modules );
 
 		Map<Key<?>, Binding<?>> bindings = injector.getAllBindings();
 
 		for( Map.Entry<Key<?>, Binding<?>> entry : bindings.entrySet() ){
-			log.info("") ;
-			log.info( "key=" + entry.getKey() ) ;
-			log.info( "value=" + entry.getValue() ) ;
+			log.info( "" );
+			log.info( "key=" + entry.getKey() );
+			log.info( "value=" + entry.getValue() );
 		}
-		log.info("") ;
+		log.info( "" );
 
 		{
 			Map<String, MyInterface> map = injector.getInstance( Key.get( new TypeLiteral<Map<String, MyInterface>>(){
