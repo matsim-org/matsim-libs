@@ -67,7 +67,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -90,7 +89,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
 				getter ->  {
-					return new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+					return new DefaultDrtOptimizer(
+						getter.getModal(QsimScopeForkJoinPool.class),
+						drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
@@ -195,8 +196,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				TravelDisutility travelDisutility = getter.getModal(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 
-				LeastCostPathCalculator lcpc = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-				return new DrtRoutingDriveTaskUpdater(taskFactory, lcpc, travelTime);
+				return new DrtRoutingDriveTaskUpdater(taskFactory, () -> new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime), travelTime);
 			})).in(Singleton.class);
 		}
 

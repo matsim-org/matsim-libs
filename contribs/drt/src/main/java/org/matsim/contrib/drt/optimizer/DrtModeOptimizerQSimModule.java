@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
@@ -59,7 +58,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -82,13 +80,12 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		addModalComponent(DrtOptimizer.class,
 			modalKey(DefaultDrtOptimizer.class));
 
-		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(getter -> {
-			return new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
-				getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-				getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
-				getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
-				getter.getModal(DrtRequestInsertionRetryQueue.class));
-		}));
+		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(getter -> new DefaultDrtOptimizer(getter.getModal(QsimScopeForkJoinPool.class),
+			drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+			getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
+			getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+			getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
+			getter.getModal(DrtRequestInsertionRetryQueue.class))));
 
 		bindModal(DepotFinder.class).toProvider(
 			modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class)))).asEagerSingleton();
@@ -174,8 +171,8 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				TravelDisutility travelDisutility = getter.getModal(
 					TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 
-				LeastCostPathCalculator lcpc = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-				return new DrtRoutingDriveTaskUpdater(taskFactory, lcpc, travelTime);
+
+				return new DrtRoutingDriveTaskUpdater(taskFactory, () -> new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime) , travelTime);
 			})).in(Singleton.class);
 		}
 
