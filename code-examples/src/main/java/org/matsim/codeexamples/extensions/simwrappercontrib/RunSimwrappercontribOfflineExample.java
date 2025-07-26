@@ -21,6 +21,9 @@ class RunSimwrappercontribOfflineExample{
 
 		sw.generate( Path.of("dashboard") );
 
+		// now: open simwrapper in Chrome, allow the "dashboard" local directory, point simwrapper to it.
+		// It fails, possibly because "file.csv" is not there.
+
 	}
 
 	public static class MyDashboard implements Dashboard{
@@ -35,12 +38,6 @@ class RunSimwrappercontribOfflineExample{
 				viz.dataset = "file.csv";
 
 			} );
-			VizElement<PieChart> abc = new VizElement<PieChart>(){
-				@Override public void configure( PieChart viz, Data data ){
-					throw new RuntimeException( "not implemented" );
-				}
-			};
-			final Layout.Row myrow2 = layout.row( "myrow2" ).el( PieChart.class, abc );
 		}
 	}
 

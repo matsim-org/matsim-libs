@@ -14,18 +14,17 @@ import org.matsim.api.core.v01.IdSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionModule;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
-import org.matsim.contrib.drt.run.DrtConfigs;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
@@ -81,7 +80,9 @@ public class RunMelunPrebooking {
 
 	public static void runSingle(File populationPath, File networkPath, File outputPath, RunSettings settings) {
 		// configuration
-		Config config = ConfigUtils.createConfig(new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		dvrpConfigGroup.getTravelTimeMatrixParams().addParameterSet(new SquareGridZoneSystemParams());
+		Config config = ConfigUtils.createConfig(new MultiModeDrtConfigGroup(), dvrpConfigGroup);
 
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setStartTime(0.0);
@@ -114,19 +115,20 @@ public class RunMelunPrebooking {
 		DrtConfigGroup drtConfig = new DrtConfigGroup();
 		multiModeDrtConfig.addParameterSet(drtConfig);
 
-		drtConfig.mode = "drt";
-		drtConfig.operationalScheme = OperationalScheme.door2door;
-		drtConfig.stopDuration = 60.0;
-		drtConfig.maxWaitTime = settings.maxWaitTime;
-		drtConfig.maxTravelTimeAlpha = settings.maxTravelTimeAlpha;
-		drtConfig.maxTravelTimeBeta = settings.maxWaitTime;
+		drtConfig.setMode("drt");
+		drtConfig.setOperationalScheme(OperationalScheme.door2door);
+		drtConfig.setStopDuration(60.0);
+		DrtOptimizationConstraintsSetImpl constraintsParam = drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
+		constraintsParam.setMaxWaitTime(settings.maxWaitTime);
+		constraintsParam.setMaxTravelTimeAlpha(settings.maxTravelTimeAlpha);
+		constraintsParam.setMaxTravelTimeBeta(settings.maxWaitTime);
 
 		DrtInsertionSearchParams insertionSearchParams = new ExtensiveInsertionSearchParams();
 		drtConfig.addDrtInsertionSearchParams(insertionSearchParams);
 
 		PrebookingParams prebookingParams = new PrebookingParams();
 		drtConfig.addParameterSet(prebookingParams);
-		prebookingParams.scheduleWaitBeforeDrive = settings.scheduleWaitBeforeDrive;
+		prebookingParams.setScheduleWaitBeforeDrive(settings.scheduleWaitBeforeDrive);
 
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 

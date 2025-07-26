@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.ddMultiBinder;
 
 import java.util.*;
 

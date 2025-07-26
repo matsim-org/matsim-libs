@@ -103,7 +103,7 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 								
 								// insert vehicle:
 								final Id<Vehicle> vehId = Id.create("myVeh", Vehicle.class);
-								final VehicleType vehType = VehicleUtils.getDefaultVehicleType();
+								final VehicleType vehType = VehicleUtils.createDefaultVehicleType();
 								final VehiclesFactory vehFactory = VehicleUtils.getFactory();
 								final Vehicle vehicle = vehFactory.createVehicle(vehId, vehType);
 //								qsim.createAndParkVehicleOnLink(vehicle, startingLinkId);

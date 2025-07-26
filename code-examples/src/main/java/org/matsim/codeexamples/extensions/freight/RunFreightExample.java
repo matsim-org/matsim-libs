@@ -21,7 +21,6 @@ package org.matsim.codeexamples.extensions.freight;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.CarrierPlanWriter;
-import org.matsim.freight.carriers.controler.CarrierModule;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -30,7 +29,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.freight.carriers.controller.CarrierModule;
 
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
@@ -49,11 +50,11 @@ public class RunFreightExample {
 		if ( args==null || args.length==0 || args[0]==null ){
 			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ), "config.xml" ) );
 			config.plans().setInputFile( null ); // remove passenger input
-			config.controller().setOutputDirectory( "./output/freight" );
+			config.controller().setOutputDirectory( "./output/freight_services" );
 			config.controller().setLastIteration( 0 );  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
 
 			FreightCarriersConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightCarriersConfigGroup.class );
-      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes_Shipments.xml");
+      freightConfigGroup.setCarriersFile("singleCarrierFiveActivitiesWithoutRoutes.xml");
 			freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml" );
 		} else {
 			config = ConfigUtils.loadConfig( args, new FreightCarriersConfigGroup() );

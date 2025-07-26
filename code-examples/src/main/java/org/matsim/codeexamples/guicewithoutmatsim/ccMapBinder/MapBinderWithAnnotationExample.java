@@ -1,4 +1,4 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.ccMapBinder;
 
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;

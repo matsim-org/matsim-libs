@@ -21,6 +21,7 @@ package org.matsim.codeexamples.config.reflectiveConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.ControllerUtils;
 
 /**
  * @author nagel
@@ -45,7 +46,7 @@ public class RunReflectiveConfigGroupExample {
 		
 		config.checkConsistency(); 
 		
-		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "test");
+		ControllerUtils.checkConfigConsistencyAndWriteToLog(config, "test" );
 		
 	}
 

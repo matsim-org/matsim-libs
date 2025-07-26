@@ -1,16 +1,15 @@
-package org.matsim.codeexamples.guicewithoutmatsim;
+package org.matsim.codeexamples.guicewithoutmatsim.bbBasicGuiceDI;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.MultibinderBinding;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-class PartOne{
-	private static final Logger log = LogManager.getLogger( PartOne.class ) ;
+class BasicInjection{
+	private static final Logger log = LogManager.getLogger( BasicInjection.class ) ;
 
 	public static void main(String[] args){
 
@@ -28,14 +27,6 @@ class PartOne{
 		Simulation sim = injector.getInstance(Simulation.class);
 
 		sim.run() ;
-	}
-
-	interface Simulation {
-		void run() ;
-	}
-
-	interface Helper {
-		Object getAccessToSomething() ;
 	}
 
 	static class MySimulation1 implements Simulation {
@@ -71,4 +62,13 @@ class PartOne{
 			return null ;
 		}
 	}
+
+	interface Simulation {
+		void run() ;
+	}
+
+	interface Helper {
+		Object getAccessToSomething() ;
+	}
+
 }

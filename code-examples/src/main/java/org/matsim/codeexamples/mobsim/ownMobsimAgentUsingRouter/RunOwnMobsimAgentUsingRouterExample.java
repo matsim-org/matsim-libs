@@ -79,7 +79,7 @@ public class RunOwnMobsimAgentUsingRouterExample {
 								qsim.insertAgentIntoMobsim(ag);
 
 								// insert vehicle:
-								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.createDefaultVehicleType());
 								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
 //								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 								final QVehicle qVeh = new QVehicleImpl( vehicle ) ;

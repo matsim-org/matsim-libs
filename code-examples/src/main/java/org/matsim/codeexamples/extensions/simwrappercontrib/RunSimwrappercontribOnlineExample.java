@@ -10,7 +10,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperModule;
 
 import java.net.URL;
@@ -38,9 +38,10 @@ class RunSimwrappercontribOnlineExample{
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				Multibinder.newSetBinder( binder(), Dashboard.class).addBinding().to( RunSimwrappercontribOfflineExample.MyDashboard.class );
-				// yyyyyy CR was plugging this together via some java functionality.  However, it could also be plugged together using
-				// guice.  The above would be the approximate syntax, but I do not know if this was implemented in the meantime.  kai, jan'24
+
+				// Bind dashboard via guice
+				SimWrapper.addDashboardBinding(binder()).to( RunSimwrappercontribOfflineExample.MyDashboard.class );
+
 			}
 		} );
 

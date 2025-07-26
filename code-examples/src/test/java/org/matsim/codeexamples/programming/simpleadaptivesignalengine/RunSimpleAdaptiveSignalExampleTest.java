@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.matsim.codeexamples.mobsim.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalExample;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
@@ -44,8 +45,8 @@ public class RunSimpleAdaptiveSignalExampleTest {
 		// compare event files
 		final String expected = testUtils.getClassInputDirectory() + "output_events.xml.gz";
 		final String actual = testUtils.getOutputDirectory() + "output_events.xml.gz";
-		
-		EventsFileComparator.Result result = EventsFileComparator.compare(expected, actual);
+
+		ComparisonResult result = EventsFileComparator.compare(expected, actual);
 		System.out.println("result of events file comparison=" + result.name() ) ;
 		
 //		Assert.assertEquals("different event files",
