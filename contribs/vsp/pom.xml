@@ -184,7 +184,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>22.0.2</version>
+			<version>26-ea+1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
