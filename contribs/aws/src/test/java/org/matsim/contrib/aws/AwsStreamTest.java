@@ -22,7 +22,7 @@ import java.net.URL;
 /**
  * @author nkuehnel / MOIA
  */
-public class AWSStreamTest {
+public class AwsStreamTest {
 
     private final static String NETWORK_TEST_S3_URI = "s3://../network.xml.gz";
     private final static String PLANS_TEST_S3_URI = "s3://../plans.xml.gz";
@@ -34,7 +34,7 @@ public class AWSStreamTest {
 
     @BeforeAll
     static void installHandlerOnce() {
-        Assertions.assertDoesNotThrow(AWSStartupHook::registerS3UrlHandler);
+        Assertions.assertDoesNotThrow(AwsStartupHook::registerS3UrlHandler);
     }
 
     @RegisterExtension

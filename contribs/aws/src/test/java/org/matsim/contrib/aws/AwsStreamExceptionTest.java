@@ -10,9 +10,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class AWSStreamExceptionTest {
+public class AwsStreamExceptionTest {
 
-    private final static String TEST_S3_URI = "s3://matsim-jobs-input-443370681674/input/mob1156/scenario0/nowel4_network.xml";
+    private final static String TEST_S3_URI = "...";
 
 
     @RegisterExtension
@@ -20,7 +20,7 @@ public class AWSStreamExceptionTest {
 
     @Test
     void testAWSException() {
-        Assertions.assertThrows(RuntimeException.class, AWSStartupHook::registerS3UrlHandler);
+        Assertions.assertThrows(RuntimeException.class, AwsStartupHook::registerS3UrlHandler);
     }
 
     @Test

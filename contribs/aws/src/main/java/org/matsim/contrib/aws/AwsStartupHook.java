@@ -16,9 +16,9 @@ import java.net.URLStreamHandler;
 /**
  * @author nkuehnel / MOIA
  */
-public class AWSStartupHook  {
+public class AwsStartupHook {
 
-    private final static Logger logger = LogManager.getLogger(AWSStartupHook.class);
+    private final static Logger logger = LogManager.getLogger(AwsStartupHook.class);
 
 
     public static void registerS3UrlHandler() {
