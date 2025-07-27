@@ -83,9 +83,9 @@ public class OTFVisIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		Assertions.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControllerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControllerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		Assertions.assertTrue(new File(controler.getControllerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

@@ -65,7 +65,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter.NO_INSERTION_FOUND_CAUSE;
@@ -492,7 +491,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		var chart = new JFreeChart("Active Partitions Over Time", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
 
 
-		String filename = matsimServices.getControlerIO().getIterationFilename(
+		String filename = matsimServices.getControllerIO().getIterationFilename(
 			matsimServices.getIterationNumber(), mode + "_partitionActivity.png"
 		);
 
@@ -508,7 +507,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 		String sep = matsimServices.getConfig().global().getDefaultDelimiter();
 		String header = String.join(sep, "time", "requestsDensityPerMinute", "activePartitions");
-		String filename = matsimServices.getControlerIO().getIterationFilename(
+		String filename = matsimServices.getControllerIO().getIterationFilename(
 			matsimServices.getIterationNumber(), mode + "_dataRecordsLog.csv.gz"
 		);
 

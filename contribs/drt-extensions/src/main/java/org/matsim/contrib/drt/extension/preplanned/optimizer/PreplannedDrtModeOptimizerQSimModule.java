@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -69,7 +68,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 				getter.getModal(ScheduleTimingUpdater.class))));
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
-		
+
 		bindModal(VrpLegFactory.class).toProvider(modalProvider(getter -> {
 			DvrpConfigGroup dvrpCfg = getter.get(DvrpConfigGroup.class);
 			MobsimTimer timer = getter.get(MobsimTimer.class);
@@ -93,8 +92,7 @@ public class PreplannedDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimMo
 				TravelDisutility travelDisutility = getter.getModal(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 
-				LeastCostPathCalculator lcpc = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-				return new DrtRoutingDriveTaskUpdater(taskFactory, lcpc, travelTime);
+				return new DrtRoutingDriveTaskUpdater(taskFactory, () -> new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime), travelTime);
 			})).in(Singleton.class);
 		}
 

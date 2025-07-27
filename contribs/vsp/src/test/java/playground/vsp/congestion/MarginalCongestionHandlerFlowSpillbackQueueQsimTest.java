@@ -63,7 +63,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -335,11 +335,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+				addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 					@Inject Scenario scenario;
 					@Inject EventsManager eventsManager;
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new MarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, scenario));
 					}
 				});
@@ -402,7 +402,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 			}
 		});
 
-		controler.addControlerListener(new IterationStartsListener() {
+		controler.addControllerListener(new IterationStartsListener() {
 
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {

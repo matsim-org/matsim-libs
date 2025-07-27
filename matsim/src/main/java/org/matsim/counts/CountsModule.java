@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -40,7 +38,7 @@ public class CountsModule extends AbstractModule {
 
     @Override
     public void install() {
-        addControlerListenerBinding().to(CountsControlerListener.class);
+        addControllerListenerBinding().to(CountsControllerListener.class);
         bind(CountsInitializer.class).asEagerSingleton();
     }
 

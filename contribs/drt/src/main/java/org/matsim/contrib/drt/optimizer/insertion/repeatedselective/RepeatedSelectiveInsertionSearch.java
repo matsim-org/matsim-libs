@@ -156,7 +156,7 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent event) {
-		String filename = matsimServices.getControlerIO()
+		String filename = matsimServices.getControllerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(),
 						mode + "_repeated_insertion_detour_time_estimation_errors_"+instanceId+".csv");
 		try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");) {

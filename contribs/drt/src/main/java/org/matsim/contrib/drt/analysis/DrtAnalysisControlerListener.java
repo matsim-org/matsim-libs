@@ -322,11 +322,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private String filename(int iteration, String prefix, String extension) {
-		return matsimServices.getControlerIO().getIterationFilename(iteration, prefix + "_" + drtCfg.getMode() + extension);
+		return matsimServices.getControllerIO().getIterationFilename(iteration, prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	private String outputFilename(String prefix, String extension) {
-		return matsimServices.getControlerIO().getOutputFilenameWithOutputPrefix(prefix + "_" + drtCfg.getMode() + extension);
+		return matsimServices.getControllerIO().getOutputFilenameWithOutputPrefix(prefix + "_" + drtCfg.getMode() + extension);
 	}
 
 	/**
@@ -419,7 +419,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 	}
 
 	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
-		return IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
+		return IOUtils.getAppendingBufferedWriter(matsimServices.getControllerIO().getOutputFilename(prefix + "_" + drtCfg.getMode() + extension));
 	}
 
 	@Override
