@@ -36,7 +36,7 @@ public final class AwsS3OutputSync implements ShutdownListener {
         Path localDirectory = Path.of(controllerConfigGroup.getOutputDirectory());
 
         S3AsyncClient s3 = S3AsyncClient.builder()
-                .region(Region.EU_CENTRAL_1)  // for example
+                .region(awsConfig.getS3BucketRegion())
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .serviceConfiguration(S3Configuration.builder()
                         .checksumValidationEnabled(true)
