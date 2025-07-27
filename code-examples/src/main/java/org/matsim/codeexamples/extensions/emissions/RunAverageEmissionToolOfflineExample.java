@@ -142,10 +142,10 @@ public final class RunAverageEmissionToolOfflineExample{
 		eventWriterXML.closeFile();
 
 		// also write vehicles and network and config as a service so we have all out files in one directory:
-		VehicleUtils.writeVehicles( scenario.getVehicles() , config.controler().getOutputDirectory() + "/output_vehicles.xml.gz" );
-		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controler().getOutputDirectory() + "/output_network.xml.gz" );
-		ConfigUtils.writeConfig( config, config.controler().getOutputDirectory() + "/output_config.xml" );
-		ConfigUtils.writeMinimalConfig( config, config.controler().getOutputDirectory() + "/output_config_reduced.xml" );
+		VehicleUtils.writeVehicles( scenario.getVehicles() , config.controller().getOutputDirectory() + "/output_vehicles.xml.gz" );
+		NetworkUtils.writeNetwork( scenario.getNetwork(), config.controller().getOutputDirectory() + "/output_network.xml.gz" );
+		ConfigUtils.writeConfig( config, config.controller().getOutputDirectory() + "/output_config.xml" );
+		ConfigUtils.writeMinimalConfig( config, config.controller().getOutputDirectory() + "/output_config_reduced.xml" );
 	}
 
 }

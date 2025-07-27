@@ -73,7 +73,7 @@ public class RunEvExampleWithOwnConsumptionModel{
 
 	public void run( String[] args ) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// ===
 
@@ -85,7 +85,7 @@ public class RunEvExampleWithOwnConsumptionModel{
 		{
 			DriveEnergyConsumption.Factory driveEnergyConsumptionFactory = new DriveEnergyConsumption.Factory(){
 				@Override public DriveEnergyConsumption create( ElectricVehicle electricVehicle ){
-					DriveEnergyConsumption.Factory factory = new LTHConsumptionModelReader(null).readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) );
+					DriveEnergyConsumption.Factory factory = new LTHConsumptionModelReader().readURL( ConfigGroup.getInputFileURL( config.getContext(), "MidCarMap.csv" ) );
 					DriveEnergyConsumption delegate = factory.create( electricVehicle );
 
 					DriveEnergyConsumption consumption = new DriveEnergyConsumption(){
