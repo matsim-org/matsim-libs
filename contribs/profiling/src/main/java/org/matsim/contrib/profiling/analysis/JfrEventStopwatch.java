@@ -13,8 +13,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.List;
 import java.util.function.Consumer;
+
+import static org.matsim.contrib.profiling.analysis.JfrEventUtils.getEventName;
 
 /**
  * Service to generate a stopwatch.png from jfr profiling recording files using dedicated operation events.
@@ -84,14 +85,6 @@ public class JfrEventStopwatch implements AutoCloseable {
 		"scoring", 					AopStopwatchScoringJfrEvent.class,
 		"iterationEndsListeners", 	AopStopwatchIterationEndsJfrEvent.class
 	);
-
-	public static String getEventName(Class<? extends Event> event) {
-		var nameAnnotation = event.getAnnotation(Name.class);
-		if (nameAnnotation != null) {
-			return nameAnnotation.value();
-		}
-		return event.getName();
-	}
 
 	public static void main(String[] args) throws IOException {
 

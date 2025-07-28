@@ -1,6 +1,5 @@
 package org.matsim.contrib.profiling.analysis;
 
-import jdk.jfr.Name;
 import jdk.jfr.consumer.EventStream;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
@@ -16,6 +15,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static org.matsim.contrib.profiling.analysis.JfrEventUtils.getEventName;
 
 /**
  * Service to generate a stopwatch.png from jfr profiling recording files using sampling events and {@link IterationJfrEvent}s.
@@ -173,7 +174,7 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		eventStream.setOrdered(true); // this orders all events by their *commit* time
 		// JFRIterationEvents will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
-		eventStream.onEvent(AopIterationJfrEvent.class.getAnnotation(Name.class).value(), event -> {
+		eventStream.onEvent(getEventName(AopIterationJfrEvent.class), event -> {
 			// start iteration in stopwatch
 			if (event.hasField("iteration")) {
 				iterationCount = Math.max(event.getInt("iteration"), iterationCount);
