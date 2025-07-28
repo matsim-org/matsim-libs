@@ -1,7 +1,6 @@
 package org.matsim.contrib.aws;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,7 +21,7 @@ import java.net.URL;
 /**
  * @author nkuehnel / MOIA
  */
-public class AWSStreamTest {
+public class AwsStreamTest {
 
     private final static String NETWORK_TEST_S3_URI = "s3://../network.xml.gz";
     private final static String PLANS_TEST_S3_URI = "s3://../plans.xml.gz";
@@ -31,11 +30,6 @@ public class AWSStreamTest {
     private final static String CHANGE_EVENTS_TEST_S3_URI = "s3://../nces.xml.gz";
     private final static String TEST_S3_BUCKET = "bucket";
     private final static String TEST_S3_KEY = "key/key/key/network.xml.gz";
-
-    @BeforeAll
-    static void installHandlerOnce() {
-        Assertions.assertDoesNotThrow(AWSStartupHook::registerS3UrlHandler);
-    }
 
     @RegisterExtension
     private MatsimTestUtils utils = new MatsimTestUtils();
@@ -47,6 +41,8 @@ public class AWSStreamTest {
      * Run with valid credentials and existing S3 URI only
      */
     void testWithRegistrationURL() {
+        Assertions.assertDoesNotThrow(AwsStartupHook::registerS3UrlHandler);
+
         Network network = NetworkUtils.createNetwork();
         Assertions.assertDoesNotThrow(() -> new MatsimNetworkReader(network).readURL(new URL(NETWORK_TEST_S3_URI)));
         Assertions.assertFalse(network.getLinks().isEmpty());
@@ -58,6 +54,8 @@ public class AWSStreamTest {
      * Run with valid credentials and existing S3 URI only
      */
     void testWithRegistrationURLConfig() {
+        Assertions.assertDoesNotThrow(AwsStartupHook::registerS3UrlHandler);
+
         Config config = ConfigUtils.createConfig();
         config.network().setInputFile(NETWORK_TEST_S3_URI);
 
@@ -80,6 +78,8 @@ public class AWSStreamTest {
      * Run with valid credentials and existing S3 URI only
      */
     void testWithRegistrationDirectStream() {
+        Assertions.assertDoesNotThrow(AwsStartupHook::registerS3UrlHandler);
+
         Network network = NetworkUtils.createNetwork();
         ResponseInputStream<GetObjectResponse> s3InputStream = AwsS3Util.getS3InputStream(TEST_S3_BUCKET, TEST_S3_KEY);
         new MatsimNetworkReader(network).parse(s3InputStream);
@@ -93,6 +93,8 @@ public class AWSStreamTest {
      * Run with valid credentials and existing S3 URI only
      */
     void testWithRegistrationFullScenario() {
+        Assertions.assertDoesNotThrow(AwsStartupHook::registerS3UrlHandler);
+
         Config config = ConfigUtils.createConfig();
 
         config.transit().setUseTransit(true);
