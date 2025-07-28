@@ -5,6 +5,7 @@
  */
 package org.matsim.application.avro;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -728,7 +729,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
       long size3 = in.readMapStart();
       java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> m3 = this.data; // Need fresh name due to limitation of macro system
       if (m3 == null) {
-        m3 = new java.util.HashMap<java.lang.CharSequence,java.util.List<java.lang.Float>>((int)(size3 * 4)/3 + 1);
+        m3 = new java.util.HashMap<java.lang.CharSequence,java.util.List<java.lang.Float>>((int)size3);
         this.data = m3;
       } else m3.clear();
       for ( ; 0 < size3; size3 = in.mapNext()) {
@@ -816,7 +817,7 @@ public class XYTData extends org.apache.avro.specific.SpecificRecordBase impleme
           long size3 = in.readMapStart();
           java.util.Map<java.lang.CharSequence,java.util.List<java.lang.Float>> m3 = this.data; // Need fresh name due to limitation of macro system
           if (m3 == null) {
-            m3 = new java.util.HashMap<java.lang.CharSequence,java.util.List<java.lang.Float>>((int)(size3 * 4)/3 + 1);
+            m3 = new java.util.HashMap<java.lang.CharSequence,java.util.List<java.lang.Float>>((int)size3);
             this.data = m3;
           } else m3.clear();
           for ( ; 0 < size3; size3 = in.mapNext()) {
