@@ -16,27 +16,31 @@ import java.net.URLStreamHandler;
 /**
  * @author nkuehnel / MOIA
  */
-public class AWSStartupHook  {
+public class AwsStartupHook {
 
-    private final static Logger logger = LogManager.getLogger(AWSStartupHook.class);
+    private final static Logger logger = LogManager.getLogger(AwsStartupHook.class);
 
+    private static boolean registeredS3UrlHandler = false;
 
-    public static void registerS3UrlHandler() {
-        try {
-            S3Client S3 = S3Client.create();
-            URL.setURLStreamHandlerFactory(protocol -> {
-                if ("s3".equals(protocol)) {
-                    return new S3UrlStreamHandler(S3);
-                }
-                return null;
-            });
-        } catch (SdkClientException e) {
-            logger.warn("Make sure to provide valid AWS credentials in your environment variables:");
-            logger.warn("AWS_ACCESS_KEY_ID");
-            logger.warn("AWS_SECRET_ACCESS_KEY");
-            logger.warn("AWS_DEFAULT_REGION");
-            logger.warn("(opt.) AWS_SESSION_TOKEN");
-            throw new RuntimeException(e);
+    public static synchronized void registerS3UrlHandler() {
+        if (!registeredS3UrlHandler) {
+            try {
+                S3Client S3 = S3Client.create();
+                URL.setURLStreamHandlerFactory(protocol -> {
+                    if ("s3".equals(protocol)) {
+                        return new S3UrlStreamHandler(S3);
+                    }
+                    return null;
+                });
+            } catch (SdkClientException e) {
+                logger.warn("Make sure to provide valid AWS credentials in your environment variables:");
+                logger.warn("AWS_ACCESS_KEY_ID");
+                logger.warn("AWS_SECRET_ACCESS_KEY");
+                logger.warn("AWS_DEFAULT_REGION");
+                logger.warn("(opt.) AWS_SESSION_TOKEN");
+                throw new RuntimeException(e);
+            }
+            registeredS3UrlHandler = true;
         }
     }
 
