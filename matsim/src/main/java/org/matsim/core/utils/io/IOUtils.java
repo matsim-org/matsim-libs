@@ -29,22 +29,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -206,10 +191,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 */
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
-			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" ) || filename.startsWith( "http:" )) {
-				// looks like an URI
-				return new URL(filename);
+			// I) Generic URI-scheme detection
+			//    matches e.g. "http:", "https:", "jar:file:", "s3:", "hdfs:", "foo+bar:", etc.
+			if (isValidURL(filename)) {
+				// But reject Windows drive-letters (e.g. "C:\...")
+				if (!filename.matches("^[A-Za-z]:[\\\\/].*")) {
+					return new URL(filename);
+				}
 			}
 
 			// II) Replace home identifier
@@ -258,6 +246,18 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 			throw new UncheckedIOException(e);
 		}
 	}
+
+	private static boolean isValidURL(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (MalformedURLException | URISyntaxException e) {
+			if(url.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib startup hook.");
+			}
+			return false;
+		}
+    }
 
 	/**
 	 * Gets the compression of a certain URL by file extension. May return null if
@@ -522,6 +522,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			return new URL(context, extension);
 		} catch (MalformedURLException e) {
+			if(extension.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib");
+			}
 			// We cannot construct a URL for some reason (see respective unit test)
 			return getFileUrl(extension);
 		}

@@ -90,7 +90,7 @@ class TripAnalysisTest {
 			.isDirectoryContaining("glob:**mode_share_distance_distribution.csv");
 
 		Table modeShare = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString()))
-			.columnTypesPartial(Map.of("person", ColumnType.TEXT))
+			.columnTypesPartial(Map.of("person", ColumnType.STRING))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString())).build());
 

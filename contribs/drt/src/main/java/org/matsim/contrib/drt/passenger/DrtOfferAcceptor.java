@@ -32,5 +32,5 @@ public interface DrtOfferAcceptor {
 	 * @param arrivalTime   offered arrival time for the new request
 	 * @return accepted request (if accepted) or empty
 	 */
-	Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime);
+	Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffTime);
 }

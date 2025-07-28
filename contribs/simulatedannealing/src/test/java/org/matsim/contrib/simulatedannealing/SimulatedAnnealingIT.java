@@ -11,7 +11,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -87,9 +87,9 @@ public class SimulatedAnnealingIT {
 								.build()
 				);
 
-				addControlerListenerBinding().to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {}).asEagerSingleton();
+				addControllerListenerBinding().to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {}).asEagerSingleton();
 
-				addControlerListenerBinding().toProvider(new Provider<>() {
+				addControllerListenerBinding().toProvider(new Provider<>() {
 
 					@Inject
 					MatsimServices matsimServices;
@@ -98,7 +98,7 @@ public class SimulatedAnnealingIT {
 					SimulatedAnnealing<VolumeEstimator> simulatedAnnealing;
 
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new SimulatedAnnealingAnalysis<>(getConfig(), matsimServices, simulatedAnnealing);
 					}
 				});

@@ -35,11 +35,12 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
- * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
+ * {@link ControllerListener} that dumps the
  * complete plans regularly at the start of an iteration
  * ({@link ControllerConfigGroup#getWritePlansInterval()} as well as in the first
  * iteration, just in case someone might check that the replanning worked

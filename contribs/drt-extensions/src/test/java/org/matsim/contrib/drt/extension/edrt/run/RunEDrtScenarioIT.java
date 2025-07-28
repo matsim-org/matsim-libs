@@ -24,29 +24,93 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.SpatialFilterInsertionSearchQSimModule;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.ParallelRequestInserterModule;
+import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.logic.ProbabilityBasedPrebookingLogic;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author michalm
  */
 public class RunEDrtScenarioIT {
+
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
+
+
 	@Test
 	void test() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 		RunEDrtScenario.run(configUrl, false);
+	}
+
+	@Test
+	void testRunDrtExampleWithParallelInserter_SpatialFiltering() {
+		Id.resetCaches();
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(DrtWithExtensionsConfigGroup::new), dvrpConfigGroup,
+			new OTFVisConfigGroup());
+
+		var drtCfg = MultiModeDrtConfigGroup.get(config).getModalElements().iterator().next();
+
+		//disable rejections
+		drtCfg.addOrGetDrtOptimizationConstraintsParams()
+			.addOrGetDefaultDrtOptimizationConstraintsSet()
+			.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+
+		// Not optimal settings, it is just to ensure that there a multiple threads working
+		DrtParallelInserterParams params = new DrtParallelInserterParams();
+		params.setLogThreadActivity(true);
+		params.setMaxPartitions(2);
+		params.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
+		drtCfg.addParameterSet(params);
+
+		drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+		var repeatedSelectiveInsertionSearchParams = new RepeatedSelectiveInsertionSearchParams();
+		drtCfg.addParameterSet(repeatedSelectiveInsertionSearchParams);
+
+		DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams = new DrtSpatialRequestFleetFilterParams();
+		drtCfg.addParameterSet(drtSpatialRequestFleetFilterParams);
+
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		Controler controller = DrtControlerCreator.createControler(config, false);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		PassengerPickUpTracker tracker = new PassengerPickUpTracker();
+		tracker.install(controller);
+		controller.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+		controller.addOverridingQSimModule(new SpatialFilterInsertionSearchQSimModule(drtCfg));
+		controller.run();
+
+		assertEquals(388, tracker.passengerPickupEvents);
 	}
 
 	@Test

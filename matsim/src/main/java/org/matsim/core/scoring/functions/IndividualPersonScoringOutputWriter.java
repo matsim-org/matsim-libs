@@ -39,7 +39,7 @@ public class IndividualPersonScoringOutputWriter implements IterationEndsListene
 		if (!(scoring instanceof IndividualPersonScoringParameters params))
 			return;
 
-		OutputDirectoryHierarchy io = event.getServices().getControlerIO();
+		OutputDirectoryHierarchy io = event.getServices().getControllerIO();
 
 		String output = io.getOutputFilename("person_util_variations.csv.gz");
 

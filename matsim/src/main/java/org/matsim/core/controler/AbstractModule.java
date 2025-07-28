@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -109,7 +109,7 @@ public abstract class AbstractModule implements Module {
 		Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		Multibinder.newSetBinder(this.binder, EventHandler.class);
-		Multibinder.newSetBinder(this.binder, ControlerListener.class);
+		Multibinder.newSetBinder(this.binder, ControllerListener.class);
 		MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>(){}, new TypeLiteral<AttributeConverter<?>>() {} );
 		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		Multibinder.newSetBinder( this.binder, AbstractQSimModule.class, Names.named( "overridesFromAbstractModule" ) );
@@ -138,10 +138,15 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * @see ControlerListener
+	 * @see ControllerListener
 	 */
-	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
-		return Multibinder.newSetBinder(this.binder, ControlerListener.class).addBinding();
+	protected final LinkedBindingBuilder<ControllerListener> addControllerListenerBinding() {
+		return Multibinder.newSetBinder(this.binder, ControllerListener.class).addBinding();
+	}
+
+	@Deprecated(since = "2025-07-19") // use the method with two l, addControllerListenerBinding.
+	protected final LinkedBindingBuilder<ControllerListener> addControlerListenerBinding() {
+		return Multibinder.newSetBinder(this.binder, ControllerListener.class).addBinding();
 	}
 
 	/**

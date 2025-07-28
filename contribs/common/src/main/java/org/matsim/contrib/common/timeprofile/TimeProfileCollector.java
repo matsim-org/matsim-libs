@@ -84,7 +84,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+		String file = matsimServices.getControllerIO().getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 		String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
@@ -115,7 +115,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 			chartCustomizer.accept(chart, chartType);
 		}
 
-		String imageFile = matsimServices.getControlerIO()
+		String imageFile = matsimServices.getControllerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(), outputFile + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
 	}

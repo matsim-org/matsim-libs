@@ -19,16 +19,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.List;
+
 /**
  * @author benjamin
  *
  */
 public enum HbefaVehicleCategory {
-        PASSENGER_CAR,
-        LIGHT_COMMERCIAL_VEHICLE,
-        HEAVY_GOODS_VEHICLE,
-        URBAN_BUS,
-        COACH,
-        MOTORCYCLE,
-        NON_HBEFA_VEHICLE
+	PASSENGER_CAR(List.of("PC")),
+	LIGHT_COMMERCIAL_VEHICLE(List.of("LCV")),
+	HEAVY_GOODS_VEHICLE(List.of("HGV")),
+	URBAN_BUS(List.of("UBus")),
+	COACH(List.of("Coach")),
+	MOTORCYCLE(List.of("MC", "SMC", "moped")),
+	NON_HBEFA_VEHICLE(List.of());
+
+	public final List<String> ids;
+
+	HbefaVehicleCategory(List<String> ids) {
+		this.ids = ids;
+	}
 }

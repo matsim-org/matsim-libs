@@ -21,7 +21,7 @@
 package org.matsim.freight.logistics;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.freight.carriers.Carrier;
@@ -30,7 +30,7 @@ import org.matsim.freight.carriers.Carrier;
  * This is somewhat similar to the MATSim core {@link ScoringFunction}, which is also used for
  * {@link Carrier}s. A difference, however, is that it does not implement the separate methods
  * {@link ScoringFunction#handleActivity(Activity)} etc., but is just an {@link EventHandler} and a
- * {@link ControlerListener}. (This is, in some sense, the old design for {@link ScoringFunction},
+ * {@link ControllerListener}. (This is, in some sense, the old design for {@link ScoringFunction},
  * and one, where I am still not sure if the new design is truly better.) In any case, here there is
  * not a question: LSP scoring is not so much about activities and legs, since those are handled
  * through the carrier scoring, and need to be pulled in by the lsp scoring if the company is

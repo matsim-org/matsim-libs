@@ -290,8 +290,8 @@ public class DefaultUnplannedRequestInserterTest {
 	private DefaultUnplannedRequestInserter newInserter(Fleet fleet, double now,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
-		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, insertionSearch, new DefaultOfferAcceptor(),
+		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, () -> insertionScheduler,
+				vehicleEntryFactory, insertionRetryQueue, () -> insertionSearch, new DefaultOfferAcceptor(),
 				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0),
 				RequestFleetFilter.none);
 	}
