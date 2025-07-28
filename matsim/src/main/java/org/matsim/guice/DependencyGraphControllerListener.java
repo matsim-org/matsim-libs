@@ -35,7 +35,7 @@ import com.google.inject.util.Types;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -56,13 +56,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-class DependencyGraphControlerListener implements StartupListener {
+class DependencyGraphControllerListener implements StartupListener {
 
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Injector injector;
 
 	@Inject
-	DependencyGraphControlerListener(Injector injector, OutputDirectoryHierarchy controlerIO) {
+	DependencyGraphControllerListener(Injector injector, OutputDirectoryHierarchy controlerIO) {
 		this.injector = injector;
 		this.controlerIO = controlerIO;
 	}
@@ -86,7 +86,7 @@ class DependencyGraphControlerListener implements StartupListener {
 								allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
 								allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
 								allAliases.addAll(getMapBinderAliases(ReplanningConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
-								allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
+								allAliases.addAll(getMultibinderAliases(ControllerListener.class, bindings));
 								allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
 								allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
 								allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));

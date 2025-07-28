@@ -106,7 +106,7 @@ public class EquilTwoAgentsTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toInstance(new StartupListener() {
+				addControllerListenerBinding().toInstance(new StartupListener() {
 					@Inject
 					EventsManager eventsManager;
 

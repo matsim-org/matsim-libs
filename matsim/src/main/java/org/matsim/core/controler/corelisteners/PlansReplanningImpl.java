@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
@@ -33,7 +34,7 @@ import com.google.inject.Singleton;
 import jakarta.inject.Provider;
 
 /**
- * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
+ * A {@link ControllerListener} that manages the
  * replanning of plans in every iteration. Basically it integrates the
  * {@link org.matsim.core.replanning.StrategyManager} with the
  * {@link org.matsim.core.controler.Controler}.

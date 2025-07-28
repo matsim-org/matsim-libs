@@ -31,7 +31,7 @@ package org.matsim.core.router;
  * and travel surveys would count it as a "walk" leg.
  *
  * AnalysisMainModeIdentifier is a marker interface for MainModeIdentifier intended to be used in analysis code
- * (e.g. {@link org.matsim.analysis.ModeStatsControlerListener}).
+ * (e.g. {@link org.matsim.analysis.ModeStatsControllerListener}).
  * It is separate from the deprecated {@link MainModeIdentifier} which is only used for retrofitting old plans without the attribute routing mode.
  *
  * @author vsp-gleich

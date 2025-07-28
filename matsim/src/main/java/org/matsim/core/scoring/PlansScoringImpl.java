@@ -31,12 +31,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 
 
 /**
- * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
+ * A {@link ControllerListener} that manages the
  * scoring of plans in every iteration. Basically it integrates the
  * {@link org.matsim.core.scoring.ScoringFunctionsForPopulation} with the
  * {@link org.matsim.core.controler.Controler}.

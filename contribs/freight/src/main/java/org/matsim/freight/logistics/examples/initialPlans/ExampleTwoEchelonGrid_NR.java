@@ -182,13 +182,13 @@ final class ExampleTwoEchelonGrid_NR {
     log.info("Some results ....");
 
     for (LSP lsp : LSPUtils.getLSPs(controller.getScenario()).getLSPs().values()) {
-      ResourceImplementationUtils.printScores(controller.getControlerIO().getOutputPath(), lsp);
+      ResourceImplementationUtils.printScores(controller.getControllerIO().getOutputPath(), lsp);
       ResourceImplementationUtils.printShipmentsOfLSP(
-          controller.getControlerIO().getOutputPath(), lsp);
+          controller.getControllerIO().getOutputPath(), lsp);
       ResourceImplementationUtils.printResults_shipmentPlan(
-          controller.getControlerIO().getOutputPath(), lsp);
+          controller.getControllerIO().getOutputPath(), lsp);
       ResourceImplementationUtils.printResults_shipmentLog(
-          controller.getControlerIO().getOutputPath(), lsp);
+          controller.getControllerIO().getOutputPath(), lsp);
     }
     log.info("Done.");
   }

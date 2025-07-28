@@ -212,7 +212,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
+		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControllerIO();
 
 		try {
 			for (String activityType : this.activityCountData.keySet()) {

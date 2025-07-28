@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author dgrether
  */
-public class ControlerEventsTest {
+public class ControllerEventsTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -69,9 +69,9 @@ public class ControlerEventsTest {
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
 
-		controler.addCoreControlerListener(firstListener);
-		controler.addCoreControlerListener(secondListener);
-		controler.addCoreControlerListener(thirdListener);
+		controler.addCoreControllerListener(firstListener);
+		controler.addCoreControllerListener(secondListener);
+		controler.addCoreControllerListener(thirdListener);
 		controler.run(config);
 		assertEquals(3, this.calledStartupListener.get(0).intValue());
 		assertEquals(2, this.calledStartupListener.get(1).intValue());
@@ -84,7 +84,7 @@ public class ControlerEventsTest {
 
 		TestController controler = new TestController(config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
-		controler.addControlerListener(listener);
+		controler.addControllerListener(listener);
 		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();
