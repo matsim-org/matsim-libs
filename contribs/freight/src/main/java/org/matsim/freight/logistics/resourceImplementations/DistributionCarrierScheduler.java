@@ -253,6 +253,13 @@ import org.matsim.vehicles.VehicleType;
 		}
 
 		auxCarrier.setCarrierCapabilities(ccBuilder.build());
+		//Take the jsprit iterations from the DistributionCarrier and set it to the auxiliary carrier. If it was not set, set it to 1.
+		int jspritIterations = CarriersUtils.getJspritIterations(this.carrier);
+		if (jspritIterations < 0) {
+			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to 1.", carrier.getId(), jspritIterations);
+			jspritIterations = 1;
+		}
+		CarriersUtils.setJspritIterations(auxCarrier, jspritIterations);
 
 
 
@@ -453,6 +460,14 @@ import org.matsim.vehicles.VehicleType;
 		Carrier auxiliaryCarrier = CarriersUtils.createCarrier(carrierId);
 		auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 		auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
+
+		//Take the jsprit iterations from the DistributionCarrier and set it to the auxiliary carrier. If it was not set, set it to 1.
+		int jspritIterations = CarriersUtils.getJspritIterations(this.carrier);
+		if (jspritIterations < 0) {
+			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to 1.", carrier.getId(), jspritIterations);
+			jspritIterations = 1;
+		}
+		CarriersUtils.setJspritIterations(auxiliaryCarrier, jspritIterations);
 
 		for (LspShipment lspShipment : shipmentsInCurrentTour) {
 			CarrierService carrierService = convertToCarrierService(lspShipment);

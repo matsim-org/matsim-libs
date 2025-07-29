@@ -22,6 +22,9 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,6 +53,8 @@ import org.matsim.vehicles.VehicleType;
  * shipments into the vehicle * has passed.
  */
 /*package-private*/ class MainRunCarrierScheduler extends LSPResourceScheduler {
+
+	Logger log = LogManager.getLogger(MainRunCarrierScheduler.class.getName());
 
 	private Carrier carrier;
 	private MainRunCarrierResource resource;
@@ -82,6 +87,8 @@ import org.matsim.vehicles.VehicleType;
 		ArrayList<LspShipment> shipmentsInCurrentTour = new ArrayList<>();
 		//		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
+
+		log.warn("The main run carrier scheduler does not perform any tour planning, but simply bundles the shipments together until the vehicle is full. This is a temporary solution and should be replaced by a proper tour planning algorithm in the future.");
 
 		for (LspShipment lspShipment : copyOfAssignedShipments) {
 			// Add job as "services" to the carrier. So the carrier has this available
