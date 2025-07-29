@@ -36,7 +36,6 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -82,7 +81,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
 				detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
 
-		collectDifferences(drtRequest, selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
+		collectDifferences(selectedInsertion.get().detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 
 		double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
 				insertionWithDetourData.detourTimeInfo);
@@ -92,7 +91,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 	private final Map<Integer, SummaryStatistics> pickupTimeLossStats = new LinkedHashMap<>();
 	private final Map<Integer, SummaryStatistics> dropoffTimeLossStats = new LinkedHashMap<>();
 
-	private void collectDifferences(DrtRequest request, DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
+	private void collectDifferences(DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
 		addRelativeDiff(matrixTimeInfo.pickupDetourInfo.pickupTimeLoss, networkTimeInfo.pickupDetourInfo.pickupTimeLoss,
 				networkTimeInfo.pickupDetourInfo.requestPickupTime, pickupTimeLossStats);
 		addRelativeDiff(matrixTimeInfo.dropoffDetourInfo.dropoffTimeLoss,
@@ -113,7 +112,7 @@ final class SelectiveInsertionSearch implements DrtInsertionSearch, MobsimBefore
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent event) {
-		String filename = matsimServices.getControlerIO()
+		String filename = matsimServices.getControllerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(),
 						mode + "_selective_insertion_detour_time_estimation_errors_instance_"+instanceId+".csv");
 		try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");) {

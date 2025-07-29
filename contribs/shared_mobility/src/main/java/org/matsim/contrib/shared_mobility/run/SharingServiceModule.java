@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.shared_mobility.analysis.SharingLegCollectorImpl;
 import org.matsim.contrib.shared_mobility.analysis.VehicleStateCollector;
 import org.matsim.contrib.shared_mobility.analysis.VehicleStateCollectorImpl;
 import org.matsim.contrib.shared_mobility.io.DefaultSharingServiceSpecification;
@@ -88,7 +87,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 					outputHierarchy);
 		})).in(Singleton.class);
 
-		addControlerListenerBinding().to(modalKey(OutputWriter.class));
+		addControllerListenerBinding().to(modalKey(OutputWriter.class));
 
 		bindModal(FreefloatingServiceValidator.class).toProvider(modalProvider(getter -> {
 			return new FreefloatingServiceValidator(Id.create(serviceConfig.getId(), SharingService.class));
@@ -106,7 +105,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 					specification);
 		}));
 
-		addControlerListenerBinding().to(modalKey(ValidationListener.class));
+		addControllerListenerBinding().to(modalKey(ValidationListener.class));
 
 		bindModal(VehicleStateCollector.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
@@ -114,7 +113,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		})).in(Singleton.class);
 
 		addEventHandlerBinding().to(modalKey(VehicleStateCollector.class));
-		addControlerListenerBinding().to(modalKey(VehicleStateCollector.class));
+		addControllerListenerBinding().to(modalKey(VehicleStateCollector.class));
 
 
 		// based on the underlying mode and how it is simulated

@@ -27,8 +27,15 @@ public class PromisedTimeWindowOfferAcceptor implements DrtOfferAcceptor {
 				request.getLatestArrivalTime());
 
 		return Optional
-				.of(AcceptedDrtRequest.newBuilder().request(request).earliestStartTime(request.getEarliestStartTime())
-						.latestArrivalTime(updatedDropoffTimeWindow).latestStartTime(updatedPickupTimeWindow)
-						.dropoffDuration(dropoffDuration).build());
+				.of(AcceptedDrtRequest.newBuilder()
+						.request(request)
+						.earliestStartTime(request.getEarliestStartTime())
+						.latestArrivalTime(updatedDropoffTimeWindow)
+						.latestStartTime(updatedPickupTimeWindow)
+						.maxRideDuration(request.getMaxRideDuration())
+						.dropoffDuration(dropoffDuration)
+						.plannedPickupTime(departureTime)
+						.plannedDropoffTime(arrivalTime)
+						.build());
 	}
 }

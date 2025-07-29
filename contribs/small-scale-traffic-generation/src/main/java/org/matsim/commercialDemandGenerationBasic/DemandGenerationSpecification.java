@@ -8,7 +8,7 @@ import org.matsim.core.controler.Controller;
 
 import java.util.HashMap;
 
-interface DemandGenerationSpecification {
+public interface DemandGenerationSpecification {
 
 	/**
 	 * Gets the demand to distribute for this demand information element.

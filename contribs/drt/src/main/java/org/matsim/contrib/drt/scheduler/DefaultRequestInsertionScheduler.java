@@ -121,7 +121,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 		for (int i = 1; i < schedule.getTaskCount(); i++) {
 			Task first = schedule.getTasks().get(i - 1);
 			Task second = schedule.getTasks().get(i);
-			Verify.verify(first.getEndTime() == second.getBeginTime());
+			Verify.verify(first.getEndTime() == second.getBeginTime(), "End time of task %s not aligned " +
+					"with begin time %s of following task.", first.getEndTime(), second.getBeginTime());
 		}
 	}
 

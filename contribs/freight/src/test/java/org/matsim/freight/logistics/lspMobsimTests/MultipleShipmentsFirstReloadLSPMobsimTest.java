@@ -217,8 +217,8 @@ public class MultipleShipmentsFirstReloadLSPMobsimTest {
 		controller.run();
 
 		for (LSP lsp : LSPUtils.getLSPs(controller.getScenario()).getLSPs().values()) {
-			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControlerIO().getOutputPath(), lsp);
-			ResourceImplementationUtils.printResults_shipmentLog(controller.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControllerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentLog(controller.getControllerIO().getOutputPath(), lsp);
 		}
 	}
 

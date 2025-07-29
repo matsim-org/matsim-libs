@@ -99,14 +99,14 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
             var insertionWithDetourData = new InsertionWithDetourData(insertion, insertionDetourData,
                     detourTimeCalculator.calculateDetourTimeInfo(insertion, insertionDetourData, drtRequest));
 
-            collectDifferences(drtRequest, selectedInsertion.detourTimeInfo, insertionWithDetourData.detourTimeInfo);
+            collectDifferences(selectedInsertion.detourTimeInfo, insertionWithDetourData.detourTimeInfo);
 
             double insertionCost = insertionCostCalculator.calculate(drtRequest, insertion,
                     insertionWithDetourData.detourTimeInfo);
 
             // For each realized routing, we update the adaptiveTravelTimeMatrix
 			// The idea is to get a passively updated travel time estimation, without additional routing costs
-            updateMatrix(drtRequest, travelTimeMatrix, adaptiveTravelTimeMatrix, insertionWithDetourData);
+            updateMatrix(drtRequest, adaptiveTravelTimeMatrix, insertionWithDetourData);
 
             if (insertionCost < INFEASIBLE_SOLUTION_COST) {
                 return Optional.of(insertionWithDetourData);
@@ -118,7 +118,7 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 	private final Map<Integer, SummaryStatistics> pickupTimeLossStats = new LinkedHashMap<>();
 	private final Map<Integer, SummaryStatistics> dropoffTimeLossStats = new LinkedHashMap<>();
 
-	private void collectDifferences(DrtRequest request, DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
+	private void collectDifferences(DetourTimeInfo matrixTimeInfo, DetourTimeInfo networkTimeInfo) {
 		addRelativeDiff(matrixTimeInfo.pickupDetourInfo.pickupTimeLoss, networkTimeInfo.pickupDetourInfo.pickupTimeLoss,
 				networkTimeInfo.pickupDetourInfo.requestPickupTime, pickupTimeLossStats);
 		addRelativeDiff(matrixTimeInfo.dropoffDetourInfo.dropoffTimeLoss,
@@ -126,14 +126,14 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 				dropoffTimeLossStats);
 	}
 
-	private void updateMatrix(DrtRequest request, TravelTimeMatrix travelTimeMatrix, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix, InsertionWithDetourData insertionWithDetourData) {
-		updateMatrix(request, travelTimeMatrix, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourToPickup);
-		updateMatrix(request, travelTimeMatrix, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourFromPickup);
-		updateMatrix(request, travelTimeMatrix, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourToDropoff);
-		updateMatrix(request, travelTimeMatrix, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourFromDropoff);
+	private void updateMatrix(DrtRequest request, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix, InsertionWithDetourData insertionWithDetourData) {
+		updateMatrix(request, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourToPickup);
+		updateMatrix(request, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourFromPickup);
+		updateMatrix(request, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourToDropoff);
+		updateMatrix(request, updatableTravelTimeMatrix, insertionWithDetourData.detourData.detourFromDropoff);
 	}
 
-	private static void updateMatrix(DrtRequest request, TravelTimeMatrix travelTimeMatrix, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix, OneToManyPathSearch.PathData pathData) {
+	private static void updateMatrix(DrtRequest request, AdaptiveTravelTimeMatrix updatableTravelTimeMatrix, OneToManyPathSearch.PathData pathData) {
 		if(pathData!=null && pathData.getPath().links!=null)
 		{
 			LeastCostPathCalculator.Path path = pathData.getPath();
@@ -156,9 +156,9 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent event) {
-		String filename = matsimServices.getControlerIO()
+		String filename = matsimServices.getControllerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(),
-						mode + "_repeated_insertion_detour_time_estimation_errors"+instanceId+".csv");
+						mode + "_repeated_insertion_detour_time_estimation_errors_"+instanceId+".csv");
 		try (CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");) {
 			writer.writeNext(new String[] { "type", "hour", "count", "mean", "std_dev", "min", "max" }, false);
 			pickupTimeLossStats.forEach((hour, stats) -> printStats(writer, "pickup", hour, stats));
@@ -166,6 +166,7 @@ final class RepeatedSelectiveInsertionSearch implements DrtInsertionSearch, Mobs
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		instanceCounter.set(0);
 	}
 
 	private void printStats(CSVWriter writer, String type, int hour, SummaryStatistics stats) {
