@@ -83,8 +83,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
 
-	private static final int MATSIM_ITERATIONS = 0;
+	private static final int MATSIM_ITERATIONS = 100;
 	private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it";
+	private static final int jspritIterationsDistributionCarrier = 10;
+	private static final int jspritIterationsMainCarrier = 1;
+	private static final int jspritIterationsDirectCarrier = 10;
 
 
 	private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
@@ -130,7 +133,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
-//		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeLarge));
+		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeLarge));
 		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
@@ -350,6 +353,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		LogisticChain hubChain;
 		Carrier mainCarrier = CarriersUtils.createCarrier(Id.create(lspName +"_mainCarrier", Carrier.class));
 		mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+		CarriersUtils.setJspritIterations(mainCarrier, jspritIterationsMainCarrier);
 
 		for (VehicleType vehicleType : vehicleTypesMainRun.getVehicleTypes().values()) {
 			CarriersUtils.addCarrierVehicle(
@@ -396,12 +400,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 				.setResource(hubResource)
 				.build();
 
-		Carrier distributionCarrier =
-			CarriersUtils.createCarrier(Id.create(lspName +"_distributionCarrier", Carrier.class));
-		distributionCarrier
-			.getCarrierCapabilities()
+		Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create(lspName +"_distributionCarrier", Carrier.class));
+		distributionCarrier.getCarrierCapabilities()
 			//.setNumberOfJspritIterations // TODO Das mal hier einbauen. --> Ist aktuell in CarrierUtils.
 			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+		CarriersUtils.setJspritIterations(distributionCarrier, jspritIterationsDistributionCarrier);
 
 		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
@@ -480,6 +483,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		LogisticChain directChain;
 		Carrier directCarrier = CarriersUtils.createCarrier(Id.create(lspName + "_directCarrier", Carrier.class));
 		directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+		CarriersUtils.setJspritIterations(directCarrier, jspritIterationsDirectCarrier);
 
 
 		for (VehicleType vehicleType : vehicleTypes.getVehicleTypes().values()) {
