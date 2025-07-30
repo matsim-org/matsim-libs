@@ -26,6 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
@@ -164,6 +165,14 @@ final class RailsimEngine implements Steppable {
 				railLink.setFreeSpeed(RailsimCalc.calculateChange(event.getFreespeedChange(), railLink.getFreeSpeed()));
 			}
 
+			for (NetworkChangeEvent.AttributesChangeValue attributesChange : event.getAttributesChanges()) {
+				if (RailsimUtils.LINK_ATTRIBUTE_CAPACITY.equals(attributesChange.getAttribute())) {
+
+					double newCapacity = RailsimCalc.calculateChange(attributesChange, railLink.getResource().getTotalCapacity());
+					resources.setCapacity(link.getId(), (int) newCapacity);
+
+				}
+			}
 		}
 	}
 

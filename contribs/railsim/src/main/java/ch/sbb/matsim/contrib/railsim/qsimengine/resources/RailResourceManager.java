@@ -224,6 +224,14 @@ public final class RailResourceManager {
 	}
 
 	/**
+	 * Set the capacity of a link or underlying resource.
+	 */
+	public void setCapacity(Id<Link> link, int newCapacity) {
+		RailLink l = getLink(link);
+		l.resource.setCapacity(newCapacity);
+	}
+
+	/**
 	 * Whether a driver already reserved a link.
 	 */
 	public boolean isBlockedBy(RailLink link, TrainPosition position) {

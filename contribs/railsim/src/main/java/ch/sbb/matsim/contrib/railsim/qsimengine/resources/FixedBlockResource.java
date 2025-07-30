@@ -129,6 +129,10 @@ final class FixedBlockResource implements RailResourceInternal {
 		return samePresent ? reservations.size() < capacity - 1 : reservations.size() < capacity;
 	}
 
+	@Override
+	public void setCapacity(int capacity) {
+		throw new UnsupportedOperationException("Capacity cannot be changed for fixed block resources.");
+	}
 
 	@Override
 	public double getReservedDist(RailLink link, TrainPosition position) {

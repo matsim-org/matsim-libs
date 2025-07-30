@@ -108,6 +108,11 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
+	public void setCapacity(int capacity) {
+		throw new UnsupportedOperationException("Capacity cannot be changed for moving block resources.");
+	}
+
+	@Override
 	public double getReservedDist(RailLink link, TrainPosition position) {
 
 		TrainEntry entry = reservations.get(position.getDriver());
