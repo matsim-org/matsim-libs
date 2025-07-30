@@ -8,7 +8,7 @@
 		<link refId="B2"/>
 		<link refId="B3"/>
 
-		<attribute name="railsimTrainCapacity"  type="absolute" value="3"/>
+		<attribute name="railsimTrainCapacity"  type="absolute" value="0"/>
 	</networkChangeEvent>
 
 
@@ -18,7 +18,7 @@
 		<link refId="B2"/>
 		<link refId="B3"/>
 
-		<attribute name="railsimTrainCapacity"  type="absolute" value="20"/>
+		<attribute name="railsimTrainCapacity"  type="absolute" value="1"/>
 	</networkChangeEvent>
 
 

@@ -149,11 +149,22 @@ final class RailsimEngine implements Steppable {
 	}
 
 	/**
-	 * Handle {@link NetworkChangeEvent}.
+	 * Handle {@link NetworkChangeEvent}. Note that certain changes don't come into effect immediately if the train is already on the link.
 	 */
 	public void handleNetworkChangeEvent(double time, NetworkChangeEvent event) {
-		// TODO
-		System.out.println(event);
+
+		for (Link link : event.getLinks()) {
+
+			RailLink railLink = resources.getLink(link.getId());
+			if (railLink == null)
+				continue;
+
+			// Set new free speed
+			if (event.getFreespeedChange() != null) {
+				railLink.setFreeSpeed(RailsimCalc.calculateChange(event.getFreespeedChange(), railLink.getFreeSpeed()));
+			}
+
+		}
 	}
 
 	/**
@@ -833,10 +844,10 @@ final class RailsimEngine implements Steppable {
 				RailsimCalc.SpeedTarget target = RailsimCalc.calcTargetSpeed(dist, state.train.acceleration(), state.train.deceleration(),
 					state.speed, advisedSpeed, Math.min(state.allowedMaxSpeed, allowed));
 
-				assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist must be greater than 0, or stopping is not possible";
+				// This assertion does not hold when the max speed on links is adjusted by network changes
+				// assert FuzzyUtils.greaterEqualThan(target.decelDist(), 0) : "Decel dist must be greater than 0, or stopping is not possible";
 
-				if (FuzzyUtils.equals(target.decelDist(), 0)) {
-
+				if (FuzzyUtils.lessEqualThan(target.decelDist(), 0)) {
 					// Need to decelerate now
 					state.targetSpeed = allowed;
 					state.targetDecelDist = Double.POSITIVE_INFINITY;

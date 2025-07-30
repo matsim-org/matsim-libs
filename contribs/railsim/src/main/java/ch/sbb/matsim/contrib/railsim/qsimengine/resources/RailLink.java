@@ -45,8 +45,9 @@ public final class RailLink implements HasLinkId {
 
 	public final double length;
 	public final double minimumHeadwayTime;
-	public final double freeSpeed;
+
 	final int tracks;
+	private double freeSpeed;
 
 	/**
 	 * Resource this link belongs to.
@@ -85,7 +86,7 @@ public final class RailLink implements HasLinkId {
 	 * Returns the allowed freespeed, depending on the context, which is given via driver.
 	 */
 	public double getAllowedFreespeed(MobsimDriverAgent driver) {
-		return Math.min(freeSpeed, driver.getVehicle().getVehicle().getType().getMaximumVelocity());
+		return Math.min(getFreeSpeed(), driver.getVehicle().getVehicle().getType().getMaximumVelocity());
 	}
 
 	/**
@@ -145,5 +146,13 @@ public final class RailLink implements HasLinkId {
 			"id=" + id +
 			", resource=" + resource +
 			'}';
+	}
+
+	public double getFreeSpeed() {
+		return freeSpeed;
+	}
+
+	public void setFreeSpeed(double freeSpeed) {
+		this.freeSpeed = freeSpeed;
 	}
 }

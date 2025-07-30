@@ -55,6 +55,7 @@ abstract class AbstractIntegrationTest {
 		}
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setRunId(utils.getMethodName());
 		config.controller().setDumpDataAtEnd(true);
 		config.controller().setCreateGraphs(false);
 		config.controller().setLastIteration(0);

@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import org.matsim.core.network.NetworkChangeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,17 @@ import java.util.List;
 public final class RailsimCalc {
 
 	private RailsimCalc() {
+	}
+
+	/**
+	 * Calculate the change as specified by a change event.
+	 */
+	static double calculateChange(NetworkChangeEvent.ChangeValue changeValue, double oldValue) {
+		return switch (changeValue.getType()) {
+			case ABSOLUTE_IN_SI_UNITS -> changeValue.getValue();
+			case FACTOR -> changeValue.getValue() * oldValue;
+			case OFFSET_IN_SI_UNITS -> oldValue + changeValue.getValue();
+		};
 	}
 
 	/**
