@@ -50,7 +50,20 @@ import com.google.common.collect.ImmutableList;
 public class InsertionCostCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.constraints(new DrtRouteConstraints(
+					0,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					0,
+					true
+					)
+			)
+			.build();
 
 	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
@@ -114,7 +127,7 @@ public class InsertionCostCalculatorTest {
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								180.,
-								false
+								true
 						)
 				)
 				.build();
@@ -195,7 +208,7 @@ public class InsertionCostCalculatorTest {
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								300.,
-								false
+								true
 						)
 				)
 				.build();
@@ -218,7 +231,7 @@ public class InsertionCostCalculatorTest {
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								200.,
-								false
+								true
 						)
 				)
 				.build();

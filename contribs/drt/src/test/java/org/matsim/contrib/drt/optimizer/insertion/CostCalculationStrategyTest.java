@@ -66,7 +66,7 @@ public class CostCalculationStrategyTest {
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
 								Double.POSITIVE_INFINITY,
-								false
+								true
 						)
 				)
 				.build();

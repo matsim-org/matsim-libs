@@ -85,7 +85,8 @@ public class VariableStopDurationTest {
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
 					0.0,
-					false)
+					true
+					)
 			);
 			return this;
 		}
