@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.roadpricing.*;
+import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -83,8 +84,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
 
-	private static final int MATSIM_ITERATIONS = 100;
-	private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it";
+	private static int MATSIM_ITERATIONS;
+	private static String OUTPUT_DIRECTORY ;
 	private static final int jspritIterationsDistributionCarrier = 10;
 	private static final int jspritIterationsMainCarrier = 1;
 	private static final int jspritIterationsDirectCarrier = 10;
@@ -92,7 +93,19 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 	private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CommandLine.ConfigurationException {
+
+		CommandLine cmd = new CommandLine.Builder(args) //
+			.allowAnyOption(true)
+			.allowPositionalArguments(false)
+			.build();
+
+		//TODO: TryOut cmdLine arguments
+		//Muss noch weiter auf die anderen Optionen angepasst werden.
+		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1); // I know that MATSim-iters can be set more directly.
+		OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it";
+
+
 		log.info("Prepare config");
 		Config config = prepareConfig(args);
 
@@ -168,10 +181,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 				log.warn(arg);
 			}
 			ConfigUtils.applyCommandline(config, args);
-		} else {
-			config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
-			config.controller().setLastIteration(MATSIM_ITERATIONS);
 		}
+
+		config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
+		config.controller().setLastIteration(MATSIM_ITERATIONS);
 
 //		config.network().setInputFile("../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
