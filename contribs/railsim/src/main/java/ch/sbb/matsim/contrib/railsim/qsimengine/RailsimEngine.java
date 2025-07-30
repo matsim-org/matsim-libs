@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleType;
@@ -145,6 +146,14 @@ final class RailsimEngine implements Steppable {
 		updateQueue.add(new UpdateEvent(state, UpdateEvent.Type.DEPARTURE));
 
 		return true;
+	}
+
+	/**
+	 * Handle {@link NetworkChangeEvent}.
+	 */
+	public void handleNetworkChangeEvent(double time, NetworkChangeEvent event) {
+		// TODO
+		System.out.println(event);
 	}
 
 	/**

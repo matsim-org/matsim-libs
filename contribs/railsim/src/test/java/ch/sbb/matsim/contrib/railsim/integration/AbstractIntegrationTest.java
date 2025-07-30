@@ -35,6 +35,10 @@ abstract class AbstractIntegrationTest {
 	}
 
 	protected SimulationResult runSimulation(File scenarioDir, Consumer<Scenario> f) {
+		return runSimulation(scenarioDir, null, f);
+	}
+
+	protected SimulationResult runSimulation(File scenarioDir, Consumer<Config> c, Consumer<Scenario> f) {
 		File configPath = new File(scenarioDir, "config.xml");
 
 		Config config;
@@ -55,6 +59,8 @@ abstract class AbstractIntegrationTest {
 		config.controller().setCreateGraphs(false);
 		config.controller().setLastIteration(0);
 
+		if (c != null) c.accept(config);
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		if (f != null) f.accept(scenario);
@@ -74,6 +80,16 @@ abstract class AbstractIntegrationTest {
 		controler.run();
 
 		return new SimulationResult(scenario, collector);
+	}
+
+	/**
+	 * Convenience method to load network change events from the scenario directory.
+	 */
+	protected Consumer<Config> useEvents(String name) {
+		return config -> {
+			config.network().setTimeVariantNetwork(true);
+			config.network().setChangeEventsInputFile(String.format("events_%s.xml", name));
+		};
 	}
 
 	protected void modifyScheduleAndRunSimulation(File scenarioDir, int maxRndDelayStepSize, int maxMaxRndDelay) {
