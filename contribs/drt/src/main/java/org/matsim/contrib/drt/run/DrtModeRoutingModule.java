@@ -150,7 +150,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		}).asEagerSingleton();
 
 		// this binds the above as a controler listener:
-		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
+		addControllerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 
 	}
 
@@ -170,7 +170,7 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 			var travelTime = getModalInstance(TravelTime.class);
 			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
 					travelTime, getModalInstance(TravelDisutilityFactory.class),
-					getModalInstance(DrtRouteConstraintsCalculator.class), 
+					getModalInstance(DrtRouteConstraintsCalculator.class),
 					getModalInstance(DvrpLoadFromTrip.class), getModalInstance(DvrpLoadType.class));
 		}
 	}

@@ -43,48 +43,60 @@ import org.matsim.core.router.util.TravelTime;
  * @author steffenaxer
  */
 public class RepeatedSelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModule {
-    private static final double SPEED_FACTOR = 1.;
+	private static final double SPEED_FACTOR = 1.;
 
-    private final DrtConfigGroup drtCfg;
+	private final DrtConfigGroup drtCfg;
 
-    public RepeatedSelectiveInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
-        super(drtCfg.getMode());
-        this.drtCfg = drtCfg;
-    }
+	public RepeatedSelectiveInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
+		super(drtCfg.getMode());
+		this.drtCfg = drtCfg;
+	}
 
-    @Override
-    protected void configureQSim() {
+	@Override
+	protected void configureQSim() {
 		bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
 			var detourTimeEstimatorWithUpdatedTravelTimes = DetourTimeEstimatorWithAdaptiveTravelTimes.create(
-					SPEED_FACTOR, getter.getModal(AdaptiveTravelTimeMatrix.class), getter.getModal(TravelTime.class));
+				SPEED_FACTOR, getter.getModal(AdaptiveTravelTimeMatrix.class), getter.getModal(TravelTime.class));
 			return detourTimeEstimatorWithUpdatedTravelTimes;
 		}));
 
 		addModalComponent(DrtInsertionSearchManager.class, modalProvider(getter -> {
-			RepeatedSelectiveInsertionProvider provider = RepeatedSelectiveInsertionProvider.create(
+			var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
+			return new DrtInsertionSearchManager(() -> {
+				// Each instance should have its own insertionProvider
+				RepeatedSelectiveInsertionProvider provider = RepeatedSelectiveInsertionProvider.create(
 					getter.getModal(InsertionCostCalculator.class),
 					getter.getModal(QsimScopeForkJoinPool.class).getPool(),
-					getter.getModal(StopTimeCalculator.class), getter.getModal(DetourTimeEstimator.class));
-            var insertionCostCalculator = getter.getModal(InsertionCostCalculator.class);
-			return new DrtInsertionSearchManager(() -> new RepeatedSelectiveInsertionSearch(provider,
-                    getter.getModal(SingleInsertionDetourPathCalculatorManager.class).create(),
-                    insertionCostCalculator, drtCfg, getter.get(MatsimServices.class),
-                    getter.getModal(StopTimeCalculator.class), getter.getModal(TravelTimeMatrix.class),
-                    getter.getModal(AdaptiveTravelTimeMatrix.class)));
-        }));
+					getter.getModal(StopTimeCalculator.class),
+					getter.getModal(DetourTimeEstimator.class)
+				);
+
+				return new RepeatedSelectiveInsertionSearch(
+					provider,
+					getter.getModal(SingleInsertionDetourPathCalculatorManager.class).create(),
+					insertionCostCalculator,
+					drtCfg,
+					getter.get(MatsimServices.class),
+					getter.getModal(StopTimeCalculator.class),
+					getter.getModal(TravelTimeMatrix.class),
+					getter.getModal(AdaptiveTravelTimeMatrix.class)
+				);
+			});
+		}));
+
 
 		bindModal(DrtInsertionSearch.class).toProvider(modalProvider( getter -> getter.getModal(DrtInsertionSearchManager.class).create()));
 
-        addModalComponent(SingleInsertionDetourPathCalculatorManager.class,
-                new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-                    @Override
-                    public SingleInsertionDetourPathCalculatorManager get() {
-                        var travelTime = getModalInstance(TravelTime.class);
-                        Network network = getModalInstance(Network.class);
-                        TravelDisutility travelDisutility = getModalInstance(
-                                TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-                        return new SingleInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg);
-                    }
-                });
-    }
+		addModalComponent(SingleInsertionDetourPathCalculatorManager.class,
+			new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
+				@Override
+				public SingleInsertionDetourPathCalculatorManager get() {
+					var travelTime = getModalInstance(TravelTime.class);
+					Network network = getModalInstance(Network.class);
+					TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+					return new SingleInsertionDetourPathCalculatorManager(network, travelTime, travelDisutility, drtCfg);
+				}
+			});
+	}
 }

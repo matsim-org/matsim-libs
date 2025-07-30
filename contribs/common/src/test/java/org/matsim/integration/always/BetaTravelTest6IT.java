@@ -150,7 +150,7 @@ public class BetaTravelTest6IT {
 				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
 			}
 		});
-		controler.addControlerListener(new TestControlerListener());
+		controler.addControllerListener(new TestControllerListener());
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
@@ -177,7 +177,7 @@ public class BetaTravelTest6IT {
 		private final ArrayList<Double> enterTimes = new ArrayList<Double>(100);
 		private final ArrayList<Double> leaveTimes = new ArrayList<Double>(100);
 
-		private static final Logger log = LogManager.getLogger(TestControlerListener.class);
+		private static final Logger log = LogManager.getLogger(TestControllerListener.class);
 
 		protected LinkAnalyzer(final String linkId) {
 			this.linkId = linkId;
@@ -303,12 +303,12 @@ public class BetaTravelTest6IT {
 	 *
 	 * @author mrieser
 	 */
-	private static class TestControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
+	private static class TestControllerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 
 		private final LinkAnalyzer la = new LinkAnalyzer("15");
 		private BottleneckTravelTimeAnalyzer ttAnalyzer = null;
 
-		public TestControlerListener() {
+		public TestControllerListener() {
 			// empty public constructor for private class
 		}
 
@@ -354,7 +354,7 @@ public class BetaTravelTest6IT {
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
+				this.ttAnalyzer.plot(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
 				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
