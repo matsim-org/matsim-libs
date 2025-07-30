@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -193,10 +194,18 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .constraints(
+                        new DrtRouteConstraints(
+                                submissionTime,
+                                earliestStartTime,
+                                latestStartTime,
+                                latestArrivalTime,
+                                Double.POSITIVE_INFINITY,
+                                Double.POSITIVE_INFINITY,
+                                false
+                        )
+                )
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode("drt")

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
@@ -231,9 +232,17 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                earliestStartTime,
+                                latestStartTime,
+                                latestArrivalTime,
+                                Double.POSITIVE_INFINITY,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode(mode)

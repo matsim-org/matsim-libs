@@ -1,11 +1,5 @@
 package org.matsim.contrib.drt.prebooking;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.network.Link;
@@ -23,6 +17,12 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Sebastian Hörl (sebhoerl) / IRT SystemX
  */
@@ -34,6 +34,10 @@ public class VariableStopDurationTest {
 		DrtConfigGroup drtConfig = DrtConfigGroup.getSingleModeDrtConfig(controller.getConfig());
 		drtConfig.addParameterSet(new PrebookingParams());
 	}
+
+	private final static double DEPARTURE_A = 1000;
+	private final static double DEPARTURE_B = 1001;
+	private final static double DEPARTURE_C = 1002;
 
 	private class CustomStopDurationProvider implements PassengerStopDurationProvider {
 		private final Map<String, Tuple<Double, Double>> data = new HashMap<>();
@@ -69,10 +73,20 @@ public class VariableStopDurationTest {
 	private class CustomConstraintsCalculator implements DrtRouteConstraintsCalculator {
 		private final Map<String, DrtRouteConstraints> data = new HashMap<>();
 
-		public CustomConstraintsCalculator define(String personId, double travelTimeConstraint,
-				double waitTimeConstraint) {
-			data.put(personId, new DrtRouteConstraints(travelTimeConstraint, Double.POSITIVE_INFINITY,
-					waitTimeConstraint, Double.POSITIVE_INFINITY, 0.0));
+		public CustomConstraintsCalculator define(String personId,
+												  double departureTime,
+												  double travelTimeConstraint,
+												  double waitTimeConstraint
+		) {
+			data.put(personId, new DrtRouteConstraints(
+					departureTime,
+					departureTime + waitTimeConstraint,
+					departureTime + travelTimeConstraint,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					0.0,
+					false)
+			);
 			return this;
 		}
 
@@ -105,7 +119,7 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -113,7 +127,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 270.0, 1000.0)
+			.define("personA", DEPARTURE_A,   270.0, 1000.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -138,7 +152,7 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -146,7 +160,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 270.0, 1000.0)
+			.define("personA", DEPARTURE_A, 270.0, 1000.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -169,7 +183,7 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -177,7 +191,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 270.0, 1000.0)
+			.define("personA", DEPARTURE_A, 270.0, 1000.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -199,7 +213,7 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -207,7 +221,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 1000.0, 83.0)
+			.define("personA", DEPARTURE_A, 1000, 83.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -232,7 +246,7 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -240,7 +254,7 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 1000.0, 83.0)
+			.define("personA", DEPARTURE_A, 1000.0, 83.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -268,8 +282,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -277,8 +291,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 83.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -307,8 +321,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -316,8 +330,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,392.0, 83.0)
+			.define("personB", DEPARTURE_B,300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -345,8 +359,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -354,8 +368,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 83.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -388,8 +402,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personA", 5, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 3, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -397,8 +411,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 289.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -427,8 +441,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personA", 5, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 3, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -436,8 +450,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 289.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -465,8 +479,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
+				.addRequest("personA", 5, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 3, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -474,8 +488,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 289.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -508,8 +522,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -517,8 +531,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 186.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -547,8 +561,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -556,8 +570,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 186.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -585,8 +599,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -594,8 +608,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 186.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -628,8 +642,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.addRequest("personA", 1, 0, 5, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 7, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -637,8 +651,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 289.0, 83.0)
-			.define("personB", 400.0, 200.0)
+			.define("personA", DEPARTURE_A, 289.0, 83.0)
+			.define("personB", DEPARTURE_B, 400.0, 200.0)
 			.install(controller);
 			
 		new CustomStopDurationProvider() //
@@ -667,8 +681,8 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
+				.addRequest("personA", 1, 0, 5, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 7, 0, DEPARTURE_B) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -676,8 +690,8 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 289.0, 83.0)
-			.define("personB", 400.0, 200.0)
+			.define("personA", DEPARTURE_A, 289.0, 83.0)
+			.define("personB", DEPARTURE_B, 400.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -705,9 +719,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 3, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -715,9 +729,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 		
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 83.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
+			.define("personC", DEPARTURE_C,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -750,9 +764,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 3, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -760,9 +774,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 83.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
+			.define("personC", DEPARTURE_C,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -795,9 +809,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 3, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 1, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 3, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -805,9 +819,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 83.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 83.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
+			.define("personC", DEPARTURE_C,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -840,9 +854,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
-				.addRequest("personC", 1, 0, 3, 0, 1002.0) //
+				.addRequest("personA", 5, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 3, 0, DEPARTURE_B) //
+				.addRequest("personC", 1, 0, 3, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -850,9 +864,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 289.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
+			.define("personC", DEPARTURE_C, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -885,9 +899,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 5, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 3, 0, 1001.0) //
-				.addRequest("personC", 1, 0, 3, 0, 1002.0) //
+				.addRequest("personA", 5, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 3, 0, DEPARTURE_B) //
+				.addRequest("personC", 1, 0, 3, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -895,9 +909,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 289.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
+			.define("personC", DEPARTURE_C, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -940,9 +954,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 289.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 289.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
+			.define("personC", DEPARTURE_C,  300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -975,9 +989,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 1, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -985,9 +999,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A,  392.0, 186.0)
+			.define("personB", DEPARTURE_B,  300.0, 200.0)
+			.define("personC", DEPARTURE_C,  300.0, 200.0)
 			.install(controller);
 			
 		new CustomStopDurationProvider() //
@@ -1020,9 +1034,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 1, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -1030,9 +1044,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 186.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
+			.define("personC", DEPARTURE_C, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -1065,9 +1079,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 3, 0, 7, 0, 1000.0) //
-				.addRequest("personB", 1, 0, 5, 0, 1001.0) //
-				.addRequest("personC", 1, 0, 5, 0, 1002.0) //
+				.addRequest("personA", 3, 0, 7, 0, DEPARTURE_A) //
+				.addRequest("personB", 1, 0, 5, 0, DEPARTURE_B) //
+				.addRequest("personC", 1, 0, 5, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -1075,9 +1089,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 392.0, 186.0)
-			.define("personB", 300.0, 200.0)
-			.define("personC", 300.0, 200.0)
+			.define("personA", DEPARTURE_A, 392.0, 186.0)
+			.define("personB", DEPARTURE_B, 300.0, 200.0)
+			.define("personC", DEPARTURE_C, 300.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -1110,9 +1124,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
-				.addRequest("personC", 3, 0, 7, 0, 1002.0) //
+				.addRequest("personA", 1, 0, 5, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 7, 0, DEPARTURE_B) //
+				.addRequest("personC", 3, 0, 7, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -1120,9 +1134,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 289.0, 83.0)
-			.define("personB", 400.0, 200.0)
-			.define("personC", 400.0, 200.0)
+			.define("personA", DEPARTURE_A,  289.0, 83.0)
+			.define("personB", DEPARTURE_B,  400.0, 200.0)
+			.define("personC", DEPARTURE_C,  400.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //
@@ -1155,9 +1169,9 @@ public class VariableStopDurationTest {
 		PrebookingTestEnvironment environment = new PrebookingTestEnvironment(utils) //
 				.configure(600.0, 1.0, 600.0, 60.0) //
 				.addVehicle("vehicleA", 0, 0) //
-				.addRequest("personA", 1, 0, 5, 0, 1000.0) //
-				.addRequest("personB", 3, 0, 7, 0, 1001.0) //
-				.addRequest("personC", 3, 0, 7, 0, 1002.0) //
+				.addRequest("personA", 1, 0, 5, 0, DEPARTURE_A) //
+				.addRequest("personB", 3, 0, 7, 0, DEPARTURE_B) //
+				.addRequest("personC", 3, 0, 7, 0, DEPARTURE_C) //
 				.endTime(10.0 * 3600.0) //
 				.useExactTravelTimeEstimates();
 
@@ -1165,9 +1179,9 @@ public class VariableStopDurationTest {
 		prepare(controller);
 
 		new CustomConstraintsCalculator()
-			.define("personA", 289.0, 83.0)
-			.define("personB", 400.0, 200.0)
-			.define("personC", 400.0, 200.0)
+			.define("personA", DEPARTURE_A, 289.0, 83.0)
+			.define("personB", DEPARTURE_B, 400.0, 200.0)
+			.define("personC", DEPARTURE_C, 400.0, 200.0)
 			.install(controller);
 
 		new CustomStopDurationProvider() //

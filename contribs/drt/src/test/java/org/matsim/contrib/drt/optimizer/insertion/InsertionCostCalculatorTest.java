@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
@@ -105,10 +106,17 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(180)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								180.,
+								false
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
@@ -125,10 +133,17 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(120)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								120.,
+								false
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger, but outside of threshold - feasible solution
@@ -172,10 +187,17 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(300)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								300.,
+								false
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
@@ -188,10 +210,17 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(200)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								200.,
+								false
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
@@ -201,7 +230,7 @@ public class InsertionCostCalculatorTest {
 
 	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost, DrtRequest drtRequest, DrtOptimizationConstraintsSet constraintsSet) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
-				new CostCalculationStrategy.RejectSoftConstraintViolations(), constraintsSet);
+				new CostCalculationStrategy.DefaultCostCalculationStrategy(), constraintsSet);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, null, detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);
