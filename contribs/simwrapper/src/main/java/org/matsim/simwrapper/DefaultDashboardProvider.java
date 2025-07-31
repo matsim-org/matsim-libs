@@ -24,7 +24,7 @@ public class DefaultDashboardProvider implements DashboardProvider {
 		));
 
 		if (simWrapper.getConfigGroup().getBasePath() != null) {
-			result.add(new DifferenceDashboard(simWrapper.getConfigGroup().getBasePath(), config.controller().getOutputDirectory()));
+			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath(), config.controller().getOutputDirectory()));
 		}
 
 		if (config.transit().isUseTransit()) {

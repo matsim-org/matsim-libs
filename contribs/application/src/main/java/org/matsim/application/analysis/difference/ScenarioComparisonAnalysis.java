@@ -26,18 +26,17 @@ import java.util.Objects;
 
 
 @CommandLine.Command(name = "difference", description = "Calculates difference in amount of car hours traveled between base and policy case.")
-
 @CommandSpec(requireRunDirectory = true,
 	produces = {"difference_trips.csv", "difference_emissions.csv"}
 )
-public class DifferenceAnalysis implements MATSimAppCommand {
+public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 
 	@CommandLine.Mixin
-	private InputOptions input = InputOptions.ofCommand(DifferenceAnalysis.class);
+	private InputOptions input = InputOptions.ofCommand(ScenarioComparisonAnalysis.class);
 
 	@CommandLine.Mixin
-	private OutputOptions output = OutputOptions.ofCommand(DifferenceAnalysis.class);
+	private OutputOptions output = OutputOptions.ofCommand(ScenarioComparisonAnalysis.class);
 
 
 	@CommandLine.Option(names = "--input-base-path", description = "File with reference data", required = true)
@@ -46,7 +45,7 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 	private String constructorPolicyPath;
 
 	public static void main(String[] args) {
-		new DifferenceAnalysis().execute(args);
+		new ScenarioComparisonAnalysis().execute(args);
 	}
 
 	private static Map<String, ColumnType> getColumnTypes() {
@@ -65,36 +64,35 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 	}
 	@Override
 	public Integer call() throws Exception {
-		File test = new File(input.getRunDirectory() + "/analysis/population/");
-		File[] matchingPolicyFiles = test.listFiles((dir, name) -> name.matches("trip_stats.csv"));
+		File policyTripsFile = new File(input.getRunDirectory() + "/analysis/population/");
+		File[] matchingTripsPolicyFiles = policyTripsFile.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
-		File testBase = new File(constructorBasePath + "/analysis/population/");
-		File[] matchingBaseFiles = testBase.listFiles((dir, name) -> name.matches("trip_stats.csv"));
+		File baseTripsFile = new File(constructorBasePath + "/analysis/population/");
+		File[] matchingTripsBaseFiles = baseTripsFile.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
-		File testEmissions = new File(input.getRunDirectory()  + "/analysis/emissions/");
-		File[] matchingEmissionsPolicyFiles = testEmissions.listFiles((dir, name) -> name.matches("emissions_total.csv"));
+		File policyEmissionsFile = new File(input.getRunDirectory() + "/analysis/population/");
+		File[] matchingEmissionsPolicyFiles = policyEmissionsFile.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
-		File testEmissionsBase = new File(constructorBasePath + "/analysis/emissions/");
-		File[] matchingEmissionsBaseFiles = testEmissionsBase.listFiles((dir, name) -> name.matches("emissions_total.csv"));
+		File baseEmissionsFile = new File(constructorBasePath + "/analysis/emissione/");
+		File[] matchingEmissionsBaseFiles = baseEmissionsFile.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
 
-		if (matchingPolicyFiles == null || matchingBaseFiles == null) {
+		if (matchingTripsPolicyFiles  == null || matchingTripsBaseFiles == null) {
 			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_trips.csv").toString()), CSVFormat.DEFAULT)) {
 				printer.printRecord("No trips files were found", 0, "user-group");
-				log.warn("No analysis/trip_stats.csv was found for either base or policy case or both");
 			} catch (IOException ex) {
 				log.error(ex);
 			}
 		} else {
-			Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingBaseFiles[0].toURL()))
-				.columnTypesPartial(getColumnTypes())
+			Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingTripsBaseFiles [0].toURL()))
+//				.columnTypesPartial(getColumnTypes())
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingBaseFiles[0]))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingTripsBaseFiles [0]))).build());
 
-			Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingPolicyFiles[0].toURL()))
-				.columnTypesPartial(getColumnTypes())
+			Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingTripsPolicyFiles[0].toURL()))
+//				.columnTypesPartial(getColumnTypes())
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingPolicyFiles[0].toURL()))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingTripsPolicyFiles[0].toURL()))).build());
 
 			double baseCarKm = 0.0, baseBikeKm = 0.0, baseRideKm = 0.0, baseWalkKm = 0.0, basePtKm = 0.0, baseFreightKm = 0.0;
 			double policyCarKm = 0.0, policyBikeKm = 0.0, policyRideKm = 0.0, policyWalkKm = 0.0, policyPtKm = 0.0, policyFreightKm = 0.0;
@@ -109,14 +107,14 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 				if ( ! baseTripsData.columnNames().contains(columnName) ) {
 					log.warn("Column {} not found in base case trip stats, skipping", columnName);
 				} else {
-					baseTotalTimeTraveled = baseTripsData.column(baseTripsData.columnIndex(columnName))
+//					baseTotalTimeTraveled = baseTripsData.column(baseTripsData.columnIndex(columnName))
 				}
 			}
 			for (int i = 0; i < baseTripsData.rowCount(); i++) {
 				Row row = baseTripsData.row(i);
-				for (int i = 0; i < row.columnCount(); i++) {
-					columnName = row.columnNames().get(i);
-				}
+//				for (int i = 0; i < row.columnCount(); i++) {
+//					columnName = row.columnNames().get(i);
+//				}
 				if (Objects.equals(row.getString("Info"), "Total distance traveled [km]")) {
 					baseCarKm += row.getDouble("car");
 					baseBikeKm += row.getDouble("bike");
@@ -195,12 +193,12 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 			Table baseEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingEmissionsBaseFiles[0].toURL()))
 				.columnTypesPartial(getEmissionsColumnTypes())
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingBaseFiles[0]))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingEmissionsBaseFiles[0]))).build());
 
 			Table policyEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingEmissionsPolicyFiles[0].toURL()))
 				.columnTypesPartial(getEmissionsColumnTypes())
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingPolicyFiles[0].toURL()))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingEmissionsPolicyFiles[0].toURL()))).build());
 
 			double baseCO = 0.0, baseCO2 = 0.0, baseHC = 0.0, baseNOx = 0.0, basePM = 0.0, baseSO2 = 0.0;
 			double policyCO = 0.0, policyCO2 = 0.0, policyHC = 0.0, policyNOx = 0.0, policyPM = 0.0, policySO2 = 0.0;
