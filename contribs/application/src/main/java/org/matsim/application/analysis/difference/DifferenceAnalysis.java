@@ -26,11 +26,10 @@ import java.util.Objects;
 
 
 @CommandLine.Command(name = "difference", description = "Calculates difference in amount of car hours traveled between base and policy case.")
-@CommandSpec(
+
+@CommandSpec(requireRunDirectory = true,
 	produces = {"difference_trips.csv", "difference_emissions.csv"}
 )
-
-
 public class DifferenceAnalysis implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 
@@ -66,22 +65,23 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 	}
 	@Override
 	public Integer call() throws Exception {
-		File test = new File(constructorPolicyPath + "analysis/population/");
+		File test = new File(input.getRunDirectory() + "/analysis/population/");
 		File[] matchingPolicyFiles = test.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
 		File testBase = new File(constructorBasePath + "/analysis/population/");
 		File[] matchingBaseFiles = testBase.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
-		File testEmissions = new File(constructorPolicyPath + "/analysis/emissione/");
+		File testEmissions = new File(input.getRunDirectory()  + "/analysis/emissions/");
 		File[] matchingEmissionsPolicyFiles = testEmissions.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
-		File testEmissionsBase = new File(constructorBasePath + "/analysis/emissione/");
+		File testEmissionsBase = new File(constructorBasePath + "/analysis/emissions/");
 		File[] matchingEmissionsBaseFiles = testEmissionsBase.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
 
 		if (matchingPolicyFiles == null || matchingBaseFiles == null) {
 			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_trips.csv").toString()), CSVFormat.DEFAULT)) {
 				printer.printRecord("No trips files were found", 0, "user-group");
+				log.warn("No analysis/trip_stats.csv was found for either base or policy case or both");
 			} catch (IOException ex) {
 				log.error(ex);
 			}
@@ -101,8 +101,22 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 			double baseCarHours = 0.0, baseBikeHours = 0.0, baseRideHours = 0.0, baseWalkHours = 0.0, basePtHours = 0.0, baseFreightHours = 0.0;
 			double policyCarHours = 0.0, policyBikeHours = 0.0, policyRideHours = 0.0, policyWalkHours = 0.0, policyPtHours = 0.0, policyFreightHours = 0.0;
 
+			String columnName;
+			for  (int i = 1; i < policyTripsData.columnCount() - 1; i++){
+				int baseTotalTimeTraveled = 0;
+				int baseTotalDistanceTraveled = 0;
+				columnName = policyTripsData.column(i).name();
+				if ( ! baseTripsData.columnNames().contains(columnName) ) {
+					log.warn("Column {} not found in base case trip stats, skipping", columnName);
+				} else {
+					baseTotalTimeTraveled = baseTripsData.column(baseTripsData.columnIndex(columnName))
+				}
+			}
 			for (int i = 0; i < baseTripsData.rowCount(); i++) {
 				Row row = baseTripsData.row(i);
+				for (int i = 0; i < row.columnCount(); i++) {
+					columnName = row.columnNames().get(i);
+				}
 				if (Objects.equals(row.getString("Info"), "Total distance traveled [km]")) {
 					baseCarKm += row.getDouble("car");
 					baseBikeKm += row.getDouble("bike");
