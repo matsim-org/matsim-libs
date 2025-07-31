@@ -67,28 +67,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.class);
 
-	private static final Id<Link> HUB_LINK_ID_NEUKOELLN = Id.createLinkId("91085");
-	private static final double HUBCOSTS_FIX = 100;
+	private static double HUBCOSTS_FIX;
 
 	private static final List<String> TOLLED_LINKS = ExampleConstants.TOLLED_LINK_LIST_BERLIN_BOTH_DIRECTIONS;
-	private static final List<String> TOLLED_VEHICLE_TYPES = List.of("heavy40t", "heavy40t_electro"); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
-	private static final double TOLL_VALUE = 1000;
-
-//	private static final String CARRIER_PLAN_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
-//	private static final String VEHICLE_TYPE_FILE = "../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
-
+	private static List<String> TOLLED_VEHICLE_TYPES; //  Für welche Fahrzeugtypen soll das MautSchema gelten?
+	private static  double TOLL_VALUE ;
 
 	private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
 	private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
 	private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
 	private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
-
 	private static int MATSIM_ITERATIONS;
 	private static String OUTPUT_DIRECTORY ;
-	private static final int jspritIterationsDistributionCarrier = 10;
-	private static final int jspritIterationsMainCarrier = 1;
-	private static final int jspritIterationsDirectCarrier = 10;
+	private static int jspritIterationsDistributionCarrier = 10;
+	private static int jspritIterationsMainCarrier = 1;
+	private static int jspritIterationsDirectCarrier = 10;
 
 
 	private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
@@ -103,7 +97,24 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		//TODO: TryOut cmdLine arguments
 		//Muss noch weiter auf die anderen Optionen angepasst werden.
 		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1); // I know that MATSim-iters can be set more directly.
-		OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it";
+		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it");
+
+		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1);
+		jspritIterationsMainCarrier = cmd.getOption("jspritIterationsMain").map(Integer::parseInt).orElse(1);
+		jspritIterationsDirectCarrier = cmd.getOption("jspritIterationsDirect").map(Integer::parseInt).orElse(1);
+		jspritIterationsDistributionCarrier = cmd.getOption("jspritIterationsDistribution").map(Integer::parseInt).orElse(1);
+		TOLL_VALUE = cmd.getOption("tollValue").map(Double::parseDouble).orElse(1000.0);
+		TOLLED_VEHICLE_TYPES = cmd.getOption("tolledVehicleTypes")
+			.map(s -> Arrays.asList(s.split(",")))
+			.orElse(List.of("heavy40t", "heavy40t_electro")); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
+		HUBCOSTS_FIX = cmd.getOption("HubCostsFix").map(Double::parseDouble).orElse(100.0);
+		Id<Link> HUB_LINK_ID_EDEKA = cmd.getOption("HubLinkIdEdeka")
+			.map(Id::createLinkId)
+			.orElse(Id.createLinkId("91085")); // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+		Id<Link> HUB_LINK_ID_KAUFLAND = cmd.getOption("HubLinkIdKaufland")
+			.map(Id::createLinkId)
+			.orElse(Id.createLinkId("91085")); // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+
 
 
 		log.info("Prepare config");
@@ -146,8 +157,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
-		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeLarge, vehTypeLarge));
-		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
+		lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_EDEKA, vehTypeLarge, vehTypeLarge, vehTypeLarge));
+		lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_KAUFLAND, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehTypeLarge));
 //		lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT_SMALL", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehTypeSmall));
