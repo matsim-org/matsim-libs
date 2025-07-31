@@ -12,30 +12,22 @@ import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import picocli.CommandLine;
 import tech.tablesaw.api.ColumnType;
-import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvReadOptions;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.time.LocalTime;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 
 @CommandLine.Command(name = "difference", description = "Calculates difference in amount of car hours traveled between base and policy case.")
 @CommandSpec(
-//	requires = {"trips.csv"},
-	produces = {"difference.csv"}
+	produces = {"difference_trips.csv", "difference_emissions.csv"}
 )
 
 
@@ -59,79 +51,209 @@ public class DifferenceAnalysis implements MATSimAppCommand {
 	}
 
 	private static Map<String, ColumnType> getColumnTypes() {
-		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("person", ColumnType.STRING,
-			"trav_time", ColumnType.STRING, "wait_time", ColumnType.STRING, "dep_time", ColumnType.STRING,
-			"longest_distance_mode", ColumnType.STRING, "main_mode", ColumnType.STRING,
-			"start_activity_type", ColumnType.STRING, "end_activity_type", ColumnType.STRING,
-			"first_pt_boarding_stop", ColumnType.STRING, "last_pt_egress_stop", ColumnType.STRING));
+		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("Info", ColumnType.STRING,
+			"bike", ColumnType.DOUBLE, "car", ColumnType.DOUBLE, "ride", ColumnType.DOUBLE,
+			"walk", ColumnType.DOUBLE, "pt", ColumnType.DOUBLE,
+			"freight", ColumnType.DOUBLE));
 
-		// Map.of only has 10 argument max
-		columnTypes.put("traveled_distance", ColumnType.LONG);
-		columnTypes.put("euclidean_distance", ColumnType.LONG);
+		return columnTypes;
+	}
+
+	private static Map<String, ColumnType> getEmissionsColumnTypes() {
+		Map<String, ColumnType> columnTypes = new HashMap<>(Map.of("Pollutant", ColumnType.STRING, "kg", ColumnType.DOUBLE));
 
 		return columnTypes;
 	}
 	@Override
 	public Integer call() throws Exception {
-		File test = new File(constructorPolicyPath);
-		File[] matchingPolicyFiles = test.listFiles((dir, name) -> name.contains("trips.csv"));
+		File test = new File(constructorPolicyPath + "analysis/population/");
+		File[] matchingPolicyFiles = test.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
-		File testBase = new File(constructorBasePath);
-		File[] matchingBaseFiles = testBase.listFiles((dir, name) -> name.contains("trips.csv"));
+		File testBase = new File(constructorBasePath + "/analysis/population/");
+		File[] matchingBaseFiles = testBase.listFiles((dir, name) -> name.matches("trip_stats.csv"));
+
+		File testEmissions = new File(constructorPolicyPath + "/analysis/emissione/");
+		File[] matchingEmissionsPolicyFiles = testEmissions.listFiles((dir, name) -> name.matches("emissions_total.csv"));
+
+		File testEmissionsBase = new File(constructorBasePath + "/analysis/emissione/");
+		File[] matchingEmissionsBaseFiles = testEmissionsBase.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
 
-		Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingBaseFiles[0].toURL()))
-			.columnTypesPartial(getColumnTypes())
-			.sample(false)
-			.separator(CsvOptions.detectDelimiter(String.valueOf(matchingBaseFiles[0]))).build());
+		if (matchingPolicyFiles == null || matchingBaseFiles == null) {
+			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_trips.csv").toString()), CSVFormat.DEFAULT)) {
+				printer.printRecord("No trips files were found", 0, "user-group");
+			} catch (IOException ex) {
+				log.error(ex);
+			}
+		} else {
+			Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingBaseFiles[0].toURL()))
+				.columnTypesPartial(getColumnTypes())
+				.sample(false)
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingBaseFiles[0]))).build());
 
-		Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingPolicyFiles[0].toURL()))
-			.columnTypesPartial(getColumnTypes())
-			.sample(false)
-			.separator(CsvOptions.detectDelimiter(String.valueOf(matchingPolicyFiles[0].toURL()))).build());
+			Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingPolicyFiles[0].toURL()))
+				.columnTypesPartial(getColumnTypes())
+				.sample(false)
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingPolicyFiles[0].toURL()))).build());
 
-		double basePkwKm = 0.0;
-		double policyPkwKm = 0.0;
-		double basePkwHours = 0.0;
-		double policyPkwHours = 0.0;
+			double baseCarKm = 0.0, baseBikeKm = 0.0, baseRideKm = 0.0, baseWalkKm = 0.0, basePtKm = 0.0, baseFreightKm = 0.0;
+			double policyCarKm = 0.0, policyBikeKm = 0.0, policyRideKm = 0.0, policyWalkKm = 0.0, policyPtKm = 0.0, policyFreightKm = 0.0;
+			double baseCarHours = 0.0, baseBikeHours = 0.0, baseRideHours = 0.0, baseWalkHours = 0.0, basePtHours = 0.0, baseFreightHours = 0.0;
+			double policyCarHours = 0.0, policyBikeHours = 0.0, policyRideHours = 0.0, policyWalkHours = 0.0, policyPtHours = 0.0, policyFreightHours = 0.0;
 
-		for (int i = 0; i < baseTripsData.rowCount(); i++) {
-			Row row = baseTripsData.row(i);
-			if (Objects.equals(row.getString("main_mode"), "car")) {
-				basePkwKm += row.getLong("traveled_distance") / 1000.0;
-				LocalTime t = LocalTime.parse( row.getString("trav_time")) ;
-				basePkwHours += t.toSecondOfDay() / 3600.0;
+			for (int i = 0; i < baseTripsData.rowCount(); i++) {
+				Row row = baseTripsData.row(i);
+				if (Objects.equals(row.getString("Info"), "Total distance traveled [km]")) {
+					baseCarKm += row.getDouble("car");
+					baseBikeKm += row.getDouble("bike");
+					baseRideKm += row.getDouble("ride");
+					baseWalkKm += row.getDouble("walk");
+					basePtKm += row.getDouble("pt");
+					baseFreightKm += row.getDouble("freight");
+				}
+				if (Objects.equals(row.getString("Info"), "Total time traveled [h]")) {
+					baseCarHours += row.getDouble("car");
+					baseBikeHours += row.getDouble("bike");
+					baseRideHours += row.getDouble("ride");
+					baseWalkHours += row.getDouble("walk");
+					basePtHours += row.getDouble("pt");
+					baseFreightHours += row.getDouble("freight");
+				}}
+
+			for (int i = 0; i < policyTripsData.rowCount(); i++) {
+				Row row = policyTripsData.row(i);
+				if (Objects.equals(row.getString("Info"), "Total distance traveled [km]")) {
+					policyCarKm += row.getDouble("car");
+					policyBikeKm += row.getDouble("bike");
+					policyRideKm += row.getDouble("ride");
+					policyWalkKm += row.getDouble("walk");
+					policyPtKm += row.getDouble("pt");
+					policyFreightKm += row.getDouble("freight");
+				}
+				if (Objects.equals(row.getString("Info"), "Total time traveled [h]")) {
+					policyCarHours += row.getDouble("car");
+					policyBikeHours += row.getDouble("bike");
+					policyRideHours += row.getDouble("ride");
+					policyWalkHours += row.getDouble("walk");
+					policyPtHours += row.getDouble("pt");
+					policyFreightHours += row.getDouble("freight");
+				}}
+
+			double carKmsDiffValue = policyCarKm - baseCarKm;
+			double bikeKmsDiffValue = policyBikeKm - baseBikeKm;
+			double rideKmsDiffValue = policyRideKm - baseRideKm;
+			double walkKmsDiffValue = policyWalkKm - baseWalkKm;
+			double ptKmsDiffValue = policyPtKm - basePtKm;
+			double freightKmsDiffValue = policyFreightKm - baseFreightKm;
+
+			double carHoursDiffValue = policyCarHours - baseCarHours;
+			double bikeHoursDiffValue = policyBikeHours - baseBikeHours;
+			double rideHoursDiffValue = policyRideHours - baseRideHours;
+			double walkHoursDiffValue = policyWalkHours - baseWalkHours;
+			double ptHoursDiffValue = policyPtHours - basePtHours;
+			double freightHoursDiffValue = policyFreightHours - baseFreightHours;
+			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_trips.csv").toString()), CSVFormat.DEFAULT)) {
+				printer.printRecord("Car Kilometer difference", Math.round(carKmsDiffValue), "user-group");
+				printer.printRecord("Car Hour difference", Math.round(carHoursDiffValue), "person-circle-xmark");
+				printer.printRecord("Bike Kilometer difference", Math.round(bikeKmsDiffValue), "user-group");
+				printer.printRecord("Bike Hour difference", Math.round(bikeHoursDiffValue), "person-circle-xmark");
+				printer.printRecord("Ride Kilometer difference", Math.round(rideKmsDiffValue), "user-group");
+				printer.printRecord("Ride Hour difference", Math.round(rideHoursDiffValue), "person-circle-xmark");
+				printer.printRecord("Walk Kilometer difference", Math.round(walkKmsDiffValue), "user-group");
+				printer.printRecord("Walk difference", Math.round(walkHoursDiffValue), "person-circle-xmark");
+				printer.printRecord("Pt Kilometer difference", Math.round(ptKmsDiffValue), "user-group");
+				printer.printRecord("Pt Hour difference", Math.round(ptHoursDiffValue), "person-circle-xmark");
+				printer.printRecord("Freight Kilometer difference", Math.round(freightKmsDiffValue), "user-group");
+				printer.printRecord("Freight Hour difference", Math.round(freightHoursDiffValue), "person-circle-xmark");
+			} catch (IOException ex) {
+				log.error(ex);
 			}
 		}
 
-		for (int i = 0; i < policyTripsData.rowCount(); i++) {
-			Row row = policyTripsData.row(i);
-			if (Objects.equals(row.getString("main_mode"), "car")) {
-				policyPkwKm += row.getLong("traveled_distance") / 1000.0;
-				LocalTime t = LocalTime.parse( row.getString("trav_time")) ;
-				policyPkwHours += t.toSecondOfDay() / 3600.0;
+
+		if (matchingEmissionsPolicyFiles == null || matchingEmissionsBaseFiles == null) {
+			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_emissions.csv").toString()), CSVFormat.DEFAULT)) {
+				printer.printRecord("No emissions files were found", 0, "user-group");
+			} catch (IOException ex) {
+				log.error(ex);
+			}
+		} else {
+			Table baseEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingEmissionsBaseFiles[0].toURL()))
+				.columnTypesPartial(getEmissionsColumnTypes())
+				.sample(false)
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingBaseFiles[0]))).build());
+
+			Table policyEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingEmissionsPolicyFiles[0].toURL()))
+				.columnTypesPartial(getEmissionsColumnTypes())
+				.sample(false)
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingPolicyFiles[0].toURL()))).build());
+
+			double baseCO = 0.0, baseCO2 = 0.0, baseHC = 0.0, baseNOx = 0.0, basePM = 0.0, baseSO2 = 0.0;
+			double policyCO = 0.0, policyCO2 = 0.0, policyHC = 0.0, policyNOx = 0.0, policyPM = 0.0, policySO2 = 0.0;
+
+
+			for  (int i = 0; i < policyEmissionsData.rowCount(); i++) {
+				Row row = policyEmissionsData.row(i);
+				if (Objects.equals(row.getString("Pollutant"), "CO")) {
+					policyCO += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "CO2")) {
+					policyCO2 += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "HC")) {
+					policyHC += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "NOx")) {
+					policyNOx += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "PM")) {
+					policyPM += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "SO2")) {
+					policySO2 += row.getDouble("kg");
+				}
+			}
+
+			for  (int i = 0; i < baseEmissionsData.rowCount(); i++) {
+				Row row = baseEmissionsData.row(i);
+				if (Objects.equals(row.getString("Pollutant"), "CO")) {
+					baseCO += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "CO2")) {
+					baseCO2 += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "HC")) {
+					baseHC += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "NOx")) {
+					baseNOx += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "PM")) {
+					basePM += row.getDouble("kg");
+				}
+				if (Objects.equals(row.getString("Pollutant"), "SO2")) {
+					baseSO2 += row.getDouble("kg");
+				}
+			}
+
+			double CO2DiffValue = policyCO2 - baseCO2;
+			double CODiffValue = policyCO - baseCO;
+			double NOxDiffValue = policyNOx - baseNOx;
+			double PMDiffValue = policyPM - basePM;
+			double SO2DiffValue = policySO2 - baseSO2;
+			double HCDiffValue = policyHC - baseHC;
+
+			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_emissions.csv").toString()), CSVFormat.DEFAULT)) {
+				printer.printRecord("Carbon monoxide emissions (CO) difference", Math.round(CODiffValue), "user-group");
+				printer.printRecord("Carbon dioxide emissions (CO2) difference", Math.round(CO2DiffValue), "person-circle-xmark");
+				printer.printRecord("Hydrocarbon emissions (HC) difference", Math.round(HCDiffValue), "user-group");
+				printer.printRecord("Nitrogen oxide emissions (NOx) difference", Math.round(NOxDiffValue), "person-circle-xmark");
+				printer.printRecord("Particulate matter emissions (PM) difference", Math.round(PMDiffValue), "user-group");
+				printer.printRecord("Sulfur dioxide emissions (SO2) difference", Math.round(SO2DiffValue), "person-circle-xmark");
+			} catch (IOException ex) {
+				log.error(ex);
 			}
 		}
-
-		double carKmsDiffValue = policyPkwKm - basePkwKm;
-		double carHoursDiffValue = policyPkwHours - basePkwHours;
-
-		DoubleColumn carHoursDiff = DoubleColumn.create("car_kms", carKmsDiffValue);
-		DoubleColumn carKmsDiff = DoubleColumn.create("car_hours", carHoursDiffValue);
-
-//		Table diffTable = Table.create();
-//		diffTable.addColumns(carHoursDiff);
-//		diffTable.addColumns(carKmsDiff);
-
-		try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference.csv").toString()), CSVFormat.DEFAULT)) {
-			printer.printRecord("Kilometer difference", Math.round(carKmsDiffValue), "user-group");
-			printer.printRecord("Hour difference", Math.round(carHoursDiffValue), "person-circle-xmark");
-		} catch (IOException ex) {
-			log.error(ex);
-		}
-
-//		diffTable.write().csv(output.getPath("difference.csv").toFile());
-
 
 		return 0;
 	}
