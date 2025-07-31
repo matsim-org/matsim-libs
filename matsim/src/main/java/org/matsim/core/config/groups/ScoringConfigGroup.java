@@ -650,7 +650,30 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			}
 		}
 
+		checkConsistencyWithRoutingModes(config);
 	}
+
+	/**
+	 * Checks if all routing modes are defined in scoring parameters.
+	 */
+	private void checkConsistencyWithRoutingModes(Config config) {
+		Set<String> scoringModes = new HashSet<>();
+		for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+			scoringModes.addAll(scoringParameterSet.getModes().keySet());
+		}
+
+		Set<String> routingModes = new HashSet<>();
+		routingModes.addAll(config.routing().getTeleportedModeParams().keySet());
+		routingModes.addAll(config.routing().getNetworkModes());
+
+		Set<String> onlyInRouting = new HashSet<>(routingModes);
+		onlyInRouting.removeAll(scoringModes);
+
+		if (!onlyInRouting.isEmpty()) {
+			throw new RuntimeException("Some routing modes are not defined in scoring parameters. This is not allows as for routing the corresponding scoring parameters are needed. The following modes are missing: " + onlyInRouting + ". Please add them to the scoring parameters.");
+		}
+	}
+
 	private static void createAndAddInteractionActivity( ScoringParameterSet scoringParameterSet, String mode ){
 		String interactionActivityType = createStageActivityType( mode );
 		ActivityParams set = scoringParameterSet.getActivityParamsPerType().get( interactionActivityType );
