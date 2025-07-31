@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import jakarta.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.numbers.gamma.RegularizedGamma;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -696,13 +697,16 @@ public final class NetworkUtils {
 	 */
 	public static double getAllowedSpeed(Link link) {
 
-		Object speed = link.getAttributes().getAttribute(ALLOWED_SPEED);
-		if (speed == null)
+		Double speed = (Double) link.getAttributes().getAttribute(ALLOWED_SPEED);
+		if (speed == null){
 			return link.getFreespeed();
+		} else {
+			return speed;
+		}
 
-		if (speed instanceof Double s)
-			return s;
-		return Double.parseDouble(speed.toString());
+//		if (speed instanceof Double s)
+//			return s;
+//		return Double.parseDouble(speed.toString());
 	}
 
 	public static String getOrigId(Link link) {
@@ -711,7 +715,7 @@ public final class NetworkUtils {
 //		} else {
 //			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
 //		}
-		Object o = link.getAttributes().getAttribute(ORIGID);
+		String o = (String) link.getAttributes().getAttribute(ORIGID);
 		return o == null ? null : o.toString();
 	}
 
