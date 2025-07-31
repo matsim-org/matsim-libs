@@ -48,6 +48,7 @@ import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.io.LSPPlanXmlReader;
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
@@ -66,21 +67,22 @@ import org.matsim.vehicles.VehicleUtils;
  * <p>The decision which of these plans is chosen should be made via the Score of the plans. We will
  * modify the costs of the vehicles and/or for using(having) the Transshipment hub. Depending on
  * this setting, the plan selection should be done accordingly.
- * <p>
- * Please note: This example is in part on existing examples, but I start from the scratch for a)
+ *
+ * <p>Please note: This example is in part on existing examples, but I start from the scratch for a)
  * see, if this works and b) have a "clean" class :)
  *
  * @author Kai Martins-Turner (kturner)
  */
-final class ExampleTwoEchelonGrid_NR {
+final class ExampleTwoEchelonGrid_shipmentBasedDistribution {
 
 	// Run Settings
 	static final double HUBCOSTS_FIX = 100;
 	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
 	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
+	 private static final LSPUtils.LogicOfVrp vrpLogicDistribution = LSPUtils.LogicOfVrp.shipmentBased;
 	private static final double TOLL_VALUE = 1000;
 
-	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid_NR.class);
+	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid_shipmentBasedDistribution.class);
 
 	private static final Id<Link> DEPOT_LINK_ID = Id.createLinkId("i(5,0)");
 	private static final Id<Link> HUB_LINK_ID = Id.createLinkId("j(5,3)");
@@ -88,7 +90,7 @@ final class ExampleTwoEchelonGrid_NR {
 	private static final VehicleType VEH_TYPE_LARGE_50 = createVehTypeLarge50();
 	private static final VehicleType VEH_TYPE_SMALL_05 = createVehTypeSmall05();
 
-	private ExampleTwoEchelonGrid_NR() {} // so it cannot be instantiated
+	private ExampleTwoEchelonGrid_shipmentBasedDistribution() {} // so it cannot be instantiated
 
 	public static void main(String[] args) {
 		log.info("Prepare Config");
@@ -149,10 +151,10 @@ final class ExampleTwoEchelonGrid_NR {
 		log.info("Some results ....");
 
 		for (LSP lsp : LSPUtils.getLSPs(controller.getScenario()).getLSPs().values()) {
-			ResourceImplementationUtils.printScores(controller.getControllerIO().getOutputPath(), lsp);
-			ResourceImplementationUtils.printShipmentsOfLSP(controller.getControllerIO().getOutputPath(), lsp);
-			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControllerIO().getOutputPath(), lsp);
-			ResourceImplementationUtils.printResults_shipmentLog(controller.getControllerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printScores(controller.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printShipmentsOfLSP(controller.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentPlan(controller.getControlerIO().getOutputPath(), lsp);
+			ResourceImplementationUtils.printResults_shipmentLog(controller.getControlerIO().getOutputPath(), lsp);
 		}
 		log.info("Done.");
 	}
@@ -167,7 +169,7 @@ final class ExampleTwoEchelonGrid_NR {
 
 			CommandLine cmd = ConfigUtils.getCommandLine(args);
 		} else {
-			config.controller().setOutputDirectory("output/2echelon_" + demandSetting + "_" + costSetting + "_" + HUBCOSTS_FIX + "_" + TOLL_VALUE);
+			config.controller().setOutputDirectory("output/2echelon_" + demandSetting + "_" + costSetting + "_" + HUBCOSTS_FIX + "_" + TOLL_VALUE + "_" + vrpLogicDistribution);
 			config.controller().setLastIteration(2);
 		}
 
@@ -192,7 +194,7 @@ final class ExampleTwoEchelonGrid_NR {
 		}
 
 		log.info("Add LSP to the scenario");
-    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
 		return scenario;
 	}
@@ -207,6 +209,7 @@ final class ExampleTwoEchelonGrid_NR {
 
 			Carrier directCarrier = CarriersUtils.createCarrier(Id.create("directCarrier", Carrier.class));
 			directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+			CarrierSchedulerUtils.setVrpLogic(directCarrier, vrpLogicDistribution);
 
 			CarriersUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource directCarrierRessource =
@@ -234,6 +237,7 @@ final class ExampleTwoEchelonGrid_NR {
 
 			Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
 			mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+			CarrierSchedulerUtils.setVrpLogic(mainCarrier, LSPUtils.LogicOfVrp.serviceBased); //only Service-based is implemented for the mainCarrier until now (feb'25)
 
 			CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 			LSPResource mainCarrierRessource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
@@ -269,6 +273,7 @@ final class ExampleTwoEchelonGrid_NR {
 			distributionCarrier
 				.getCarrierCapabilities()
 				.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+			CarrierSchedulerUtils.setVrpLogic(distributionCarrier, vrpLogicDistribution);
 
 			final VehicleType vehType;
 			switch (costSetting) {
