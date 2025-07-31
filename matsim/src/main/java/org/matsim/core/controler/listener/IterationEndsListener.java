@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerFinishIterationListener.java
+ * IterationEndsListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
