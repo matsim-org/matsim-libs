@@ -19,15 +19,6 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Stream;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -44,9 +35,19 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Stream;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
 /**
  * @author michalm
@@ -58,7 +59,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final DrtConfigGroup drtCfg;
 	private final Integer rebalancingInterval;
 	private final Fleet fleet;
-	private final DrtScheduleInquiry scheduleInquiry;
+	private final ScheduleInquiry scheduleInquiry;
 	private final ScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
@@ -70,7 +71,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final Queue<DrtRequest> unplannedRequests = new LinkedList<>();
 
 	public DefaultDrtOptimizer(QsimScopeForkJoinPool qsimScopeForkJoinPool, DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
+			RebalancingStrategy rebalancingStrategy, ScheduleInquiry scheduleInquiry, ScheduleTimingUpdater scheduleTimingUpdater,
 			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
 		this.qsimScopeForkJoinPool = qsimScopeForkJoinPool.getPool();
 		this.drtCfg = drtCfg;
