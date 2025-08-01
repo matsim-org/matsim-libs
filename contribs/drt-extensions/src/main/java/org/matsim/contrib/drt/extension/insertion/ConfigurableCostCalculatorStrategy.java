@@ -25,7 +25,7 @@ public class ConfigurableCostCalculatorStrategy implements CostCalculationStrate
 
 	private boolean checkHardInsertion(DrtRequest request, DetourTimeInfo detourTimeInfo) {
 		return detourTimeInfo.pickupDetourInfo.requestPickupTime <= request.getLatestStartTime()
-				&& detourTimeInfo.dropoffDetourInfo.requestDropoffTime <= request.getLatestArrivalTime();
+				&& detourTimeInfo.dropoffDetourInfo.requestDropoffTime <= request.getConstraints().latestArrivalTime();
 	}
 
 	private double calculateSoftInsertionPenalty(DrtRequest request, DetourTimeInfo detourTimeInfo) {
@@ -36,7 +36,7 @@ public class ConfigurableCostCalculatorStrategy implements CostCalculationStrate
 					detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getLatestStartTime());
 
 			double dropoffDelay = Math.max(0,
-					detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getLatestArrivalTime());
+					detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getConstraints().latestArrivalTime());
 
 			return softInsertionParams.pickupWeight * pickupDelay + softInsertionParams.dropoffWeight * dropoffDelay;
 		}

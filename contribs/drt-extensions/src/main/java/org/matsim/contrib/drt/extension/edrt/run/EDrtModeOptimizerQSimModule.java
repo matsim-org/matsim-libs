@@ -149,12 +149,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(EDrtVehicleDataEntryFactory.class));
 
-		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		bindModal(CostCalculationStrategy.class)
-				.to(defaultConstraintsSet.isRejectRequestIfMaxWaitOrTravelTimeViolated()
-						?
-				CostCalculationStrategy.RejectSoftConstraintViolations.class :
-				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+		bindModal(CostCalculationStrategy.class).to(CostCalculationStrategy.DefaultCostCalculationStrategy.class).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 

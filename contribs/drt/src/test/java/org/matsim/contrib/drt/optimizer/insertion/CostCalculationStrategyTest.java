@@ -20,16 +20,17 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.junit.jupiter.api.Test;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.DiscourageSoftConstraintViolations.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
-import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.DiscourageSoftConstraintViolations.MAX_WAIT_TIME_VIOLATION_PENALTY;
+import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
+import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.MAX_WAIT_TIME_VIOLATION_PENALTY;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
-
-import org.junit.jupiter.api.Test;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -57,11 +58,19 @@ public class CostCalculationStrategyTest {
 	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
 			DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
-				.latestStartTime(latestStartTime)
-				.latestArrivalTime(latestArrivalTime)
-				.maxRideDuration(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								latestStartTime,
+								latestArrivalTime,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								true
+						)
+				)
 				.build();
-		assertThat(new CostCalculationStrategy.RejectSoftConstraintViolations().calcCost(drtRequest, null,
+		assertThat(new CostCalculationStrategy.DefaultCostCalculationStrategy().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);
 	}
 
@@ -88,11 +97,19 @@ public class CostCalculationStrategyTest {
 	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
 			DetourTimeInfo detourTimeInfo, double expectedCost) {
 		var drtRequest = DrtRequest.newBuilder()
-				.latestStartTime(latestStartTime)
-				.latestArrivalTime(latestArrivalTime)
-				.maxRideDuration(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								latestStartTime,
+								latestArrivalTime,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								false
+						)
+				)
 				.build();
-		assertThat(new CostCalculationStrategy.DiscourageSoftConstraintViolations().calcCost(drtRequest, null,
+		assertThat(new CostCalculationStrategy.DefaultCostCalculationStrategy().calcCost(drtRequest, null,
 				detourTimeInfo)).isEqualTo(expectedCost);
 	}
 }

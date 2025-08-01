@@ -32,12 +32,10 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Inse
  */
 public class DefaultInsertionCostCalculator implements InsertionCostCalculator {
 	private final CostCalculationStrategy costCalculationStrategy;
-	private final DrtOptimizationConstraintsSet constraintsSet;
 
 	public DefaultInsertionCostCalculator(CostCalculationStrategy costCalculationStrategy,
 										  DrtOptimizationConstraintsSet constraintsSet) {
 		this.costCalculationStrategy = costCalculationStrategy;
-		this.constraintsSet = constraintsSet;
 	}
 
 	/**

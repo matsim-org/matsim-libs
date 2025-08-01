@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint.Dropoff;
 import org.matsim.contrib.drt.optimizer.Waypoint.End;
 import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -67,9 +68,17 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.constraints(
+					new DrtRouteConstraints(
+							100,
+							200,
+							500,
+							Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
@@ -85,8 +94,8 @@ public class SingleInsertionDetourPathCalculatorTest {
 	void calculatePaths() {
 		var pathToPickup = mockCalcLeastCostPath(beforePickupLink, pickupLink, request.getEarliestStartTime(), 11);
 		var pathFromPickup = mockCalcLeastCostPath(pickupLink, afterPickupLink, request.getEarliestStartTime(), 22);
-		var pathToDropoff = mockCalcLeastCostPath(beforeDropoffLink, dropoffLink, request.getLatestArrivalTime(), 33);
-		var pathFromDropoff = mockCalcLeastCostPath(dropoffLink, afterDropoffLink, request.getLatestArrivalTime(), 44);
+		var pathToDropoff = mockCalcLeastCostPath(beforeDropoffLink, dropoffLink, request.getConstraints().latestArrivalTime(), 33);
+		var pathFromDropoff = mockCalcLeastCostPath(dropoffLink, afterDropoffLink, request.getConstraints().latestArrivalTime(), 44);
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));

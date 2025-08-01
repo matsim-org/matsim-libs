@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
@@ -68,25 +69,72 @@ public class InsertionGeneratorTest {
 	private static final double TIME_FROM_DROPOFF = 400;
 	private static final double TIME_REPLACED_DRIVE = 100;
 
+	private static final DrtRouteConstraints DRT_ROUTE_CONSTRAINTS = new DrtRouteConstraints(
+			0,
+			Double.POSITIVE_INFINITY,
+			Double.POSITIVE_INFINITY,
+			Double.POSITIVE_INFINITY,
+			Double.POSITIVE_INFINITY,
+			0,
+			false
+
+	);
+
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("person"))).load(LOAD_TYPE.fromInt(1)).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(
+					List.of(Id.createPersonId("person"))
+			)
+			.constraints(DRT_ROUTE_CONSTRAINTS)
+			.load(LOAD_TYPE.fromInt(1))
+			.build();
 
-	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
-			List.of(
-					Id.createPersonId("person1"),
-					Id.createPersonId("person2")
-			)).load(LOAD_TYPE.fromInt(2)).build();
+	private final DrtRequest drtRequest2Pax = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(
+				List.of(
+						Id.createPersonId("person1"),
+						Id.createPersonId("person2")
+				)
+			)
+			.load(LOAD_TYPE.fromInt(2))
+			.constraints(DRT_ROUTE_CONSTRAINTS)
+			.build();
 
-	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(
-			List.of(
-					Id.createPersonId("person1"),
-					Id.createPersonId("person2"),
-					Id.createPersonId("person3"),
-					Id.createPersonId("person4"),
-					Id.createPersonId("person5")
-			)).load(LOAD_TYPE.fromInt(5)).build();
-	private final DrtRequest prebookedRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).earliestStartTime(100).load(LOAD_TYPE.getEmptyLoad()).build();
+	private final DrtRequest drtRequest5Pax = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(
+				List.of(
+						Id.createPersonId("person1"),
+						Id.createPersonId("person2"),
+						Id.createPersonId("person3"),
+						Id.createPersonId("person4"),
+						Id.createPersonId("person5")
+				)
+			)
+			.load(LOAD_TYPE.fromInt(5))
+			.constraints(DRT_ROUTE_CONSTRAINTS)
+			.build();
+
+	private final DrtRequest prebookedRequest = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.constraints(
+					new DrtRouteConstraints(
+							100,
+							0,
+							0,
+							Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			).load(LOAD_TYPE.getEmptyLoad()).build();
 
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()

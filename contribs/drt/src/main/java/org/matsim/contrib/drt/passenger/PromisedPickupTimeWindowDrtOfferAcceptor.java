@@ -22,7 +22,7 @@ public final class PromisedPickupTimeWindowDrtOfferAcceptor implements DrtOfferA
 				.newBuilder()
 				.request(request)
 				.earliestStartTime(request.getEarliestStartTime())
-				.latestArrivalTime(request.getLatestArrivalTime())
+				.latestArrivalTime(request.getConstraints().latestArrivalTime())
 				.latestStartTime(updatedPickupTimeWindow)
 				.dropoffDuration(dropoffDuration).build());
 	}
