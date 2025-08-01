@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.AbstractAssert;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -380,8 +381,10 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 		}
 
 		if (lastStopData.arrivalTime != expectedArrivalTime) {
-			failWithMessage("Expected train <%s> to arrive at its last stop <%s> at time <%s> but arrived at <%s>. Stop data: %s",
-				trainId, lastStopId, expectedArrivalTime, lastStopData.arrivalTime, lastStopData);
+			String expectedTimeStr = Time.writeTime(expectedArrivalTime);
+			String actualTimeStr = Time.writeTime(lastStopData.arrivalTime);
+			failWithMessage("Expected train <%s> to arrive at its last stop <%s> at time <%s> (%s) but arrived at <%s> (%s). Stop data: %s",
+				trainId, lastStopId, expectedArrivalTime, expectedTimeStr, lastStopData.arrivalTime, actualTimeStr, lastStopData);
 		}
 
 		return this;

@@ -56,7 +56,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	/**
 	 * Maximum number of reservations.
 	 */
-	private final int capacity;
+	private int capacity;
 
 	FixedBlockResource(Id<RailResource> id, List<RailLink> links) {
 		this.id = id;
@@ -131,7 +131,15 @@ final class FixedBlockResource implements RailResourceInternal {
 
 	@Override
 	public void setCapacity(int capacity) {
-		throw new UnsupportedOperationException("Capacity cannot be changed for fixed block resources.");
+		this.capacity = capacity;
+
+		// Create new arrays with new capacity if necessary
+		for (RailLink link : links) {
+			MobsimDriverAgent[] tracks = this.tracks.get(link);
+			if (tracks.length < capacity) {
+				this.tracks.put(link, Arrays.copyOf(tracks, capacity));
+			}
+		}
 	}
 
 	@Override

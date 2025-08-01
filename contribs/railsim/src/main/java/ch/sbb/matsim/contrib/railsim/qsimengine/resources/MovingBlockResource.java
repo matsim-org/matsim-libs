@@ -17,8 +17,8 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	private final Id<RailResource> id;
 	private final List<RailLink> links;
-	private final Track[] tracks;
-	private final int capacity;
+	private Track[] tracks;
+	private int capacity;
 
 	/**
 	 * Links that are reserved by trains.
@@ -109,7 +109,16 @@ final class MovingBlockResource implements RailResourceInternal {
 
 	@Override
 	public void setCapacity(int capacity) {
-		throw new UnsupportedOperationException("Capacity cannot be changed for moving block resources.");
+		this.capacity = capacity;
+
+		// Create new arrays with new capacity if necessary
+		if (tracks.length < capacity) {
+			tracks = Arrays.copyOf(tracks, capacity);
+			for (int i = 0; i < capacity; i++) {
+				if (tracks[i] == null)
+					tracks[i] = new Track();
+			}
+		}
 	}
 
 	@Override
@@ -163,7 +172,7 @@ final class MovingBlockResource implements RailResourceInternal {
 
 		assert mode < 0: "Can not give a specific track at this point";
 
-		for (int i = 0; i < tracks.length; i++) {
+		for (int i = 0; i < capacity; i++) {
 			if (tracks[i].incoming == link)
 				same = i;
 			else if (tracks[i].incoming == null) {
