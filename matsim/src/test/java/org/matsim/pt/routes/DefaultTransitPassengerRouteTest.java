@@ -139,14 +139,16 @@ public class DefaultTransitPassengerRouteTest {
 					"\"accessFacilityId\" : \"5\"," +
 					"\"egressFacilityId\" : \"1055\"," +
 					"\"transitLineId\" : \"11\"," +
-					"\"transitRouteId\" : \"1980\"" +
+					"\"transitRouteId\" : \"1980\"," +
+					"\"totalRouteCost\": \"50\"" +
 				"}"
 		);
 		assertEquals("5", route.getAccessStopId().toString());
 		assertEquals("11", route.getLineId().toString());
 		assertEquals("1980", route.getRouteId().toString());
 		assertEquals("1055", route.getEgressStopId().toString());
-		assertEquals("{\"transitRouteId\":\"1980\",\"boardingTime\":\"undefined\",\"transitLineId\":\"11\",\"accessFacilityId\":\"5\",\"egressFacilityId\":\"1055\"}", route.getRouteDescription());
+		assertEquals(50.0, route.totalRouteCost);
+		assertEquals("{\"transitRouteId\":\"1980\",\"boardingTime\":\"undefined\",\"transitLineId\":\"11\",\"accessFacilityId\":\"5\",\"egressFacilityId\":\"1055\",\"totalRouteCost\":\"50.0\"}", route.getRouteDescription());
 	}
 
 	@Test

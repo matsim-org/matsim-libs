@@ -121,6 +121,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			this.transitLineIndex = parsed.transitLineId == null ? NULL_ID : parsed.transitLineId.index();
 			this.transitRouteIndex = parsed.transitRouteId == null ? NULL_ID : parsed.transitRouteId.index();
 			this.chainedRoute = createChainedRoutes(parsed.chainedRoute);
+			this.totalRouteCost = parsed.totalRouteCost;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
