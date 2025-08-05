@@ -27,9 +27,9 @@ public record DrtRouteConstraints(
 		double earliestStartTime, //
 		double latestStartTime, //
 		double latestArrivalTime, //
-		double maxRideTime, //
+		double maxRideDuration, //
 		double maxPickupDelay, //
-        double lateDiversionThreshold,
+		double lateDiversionThreshold,
 		boolean allowRejection
 ) {
 
@@ -43,4 +43,8 @@ public record DrtRouteConstraints(
 					0,
 					false
 			);
+
+	public double getMaxWaitTime() {
+		return latestStartTime - earliestStartTime;
+	}
 }

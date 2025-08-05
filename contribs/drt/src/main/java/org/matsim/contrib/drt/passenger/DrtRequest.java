@@ -133,7 +133,7 @@ public class DrtRequest implements PassengerRequest {
 				.add("earliestStartTime", constraints.earliestStartTime())
 				.add("latestStartTime", constraints.latestStartTime())
 				.add("latestArrivalTime", constraints.latestArrivalTime())
-				.add("maxRideDuration", constraints.maxRideTime())
+				.add("maxRideDuration", constraints.maxRideDuration())
 				.add("passengerIds", passengerIds.stream().map(Object::toString).collect(Collectors.joining(",")))
 				.add("mode", mode)
 				.add("fromLink", fromLink)

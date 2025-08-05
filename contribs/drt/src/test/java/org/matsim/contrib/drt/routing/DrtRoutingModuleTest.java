@@ -251,7 +251,7 @@ public class DrtRoutingModuleTest {
 						"\"allowRejection\":\"true\"," +
 						"\"maxPickupDelay\":\"120\"," +
 						"\"latestStartTime\":\"4200\"," +
-						"\"maxRideTime\":\"900\"," +
+						"\"maxRideDuration\":\"900\"," +
 						"\"earliestStartTime\":\"3600\"," +
 						"\"lateDiversionThreshold\":\"200\"," +
 						"\"latestArrivalTime\":\"7200\"" +
@@ -259,7 +259,6 @@ public class DrtRoutingModuleTest {
 				"}";
 
 		Scenario scenario = createTestScenario();
-		ActivityFacilities facilities = scenario.getActivityFacilities();
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);

@@ -67,7 +67,7 @@ public class DrtRequestInsertionRetryQueue {
 					oldRequest.getEarliestStartTime(),
 					oldRequest.getConstraints().latestStartTime() + timeDelta,
 					oldRequest.getConstraints().latestArrivalTime() + timeDelta,
-					oldRequest.getConstraints().maxRideTime(),
+					oldRequest.getConstraints().maxRideDuration(),
 					oldRequest.getConstraints().maxPickupDelay(),
 					oldRequest.getConstraints().lateDiversionThreshold(),
 					oldRequest.getConstraints().allowRejection()

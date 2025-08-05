@@ -32,7 +32,7 @@ public class PromisedTimeWindowOfferAcceptor implements DrtOfferAcceptor {
 						.earliestStartTime(request.getEarliestStartTime())
 						.latestArrivalTime(updatedDropoffTimeWindow)
 						.latestStartTime(updatedPickupTimeWindow)
-						.maxRideDuration(request.getConstraints().maxRideTime())
+						.maxRideDuration(request.getConstraints().maxRideDuration())
 						.dropoffDuration(dropoffDuration)
 						.plannedPickupTime(departureTime)
 						.plannedDropoffTime(arrivalTime)

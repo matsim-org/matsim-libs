@@ -71,7 +71,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
             DrtRouteConstraints constraints = drtRoute.getConstraints();
 			latestStartTime =  Math.min(latestStartTime, constraints.latestStartTime());
 			latesArrivalTime =  Math.min(latesArrivalTime, constraints.latestArrivalTime());
-            maxRideDuration = Math.min(maxRideDuration, constraints.maxRideTime());
+            maxRideDuration = Math.min(maxRideDuration, constraints.maxRideDuration());
             maxPickupDelay = Math.min(maxPickupDelay, constraints.maxPickupDelay());
             lateDiversionThreshold = Math.max(lateDiversionThreshold, constraints.lateDiversionThreshold());
             load = load.add(drtRoute.getLoad(dvrpLoadType));

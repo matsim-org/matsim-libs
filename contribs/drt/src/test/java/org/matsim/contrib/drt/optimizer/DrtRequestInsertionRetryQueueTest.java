@@ -82,7 +82,7 @@ public class DrtRequestInsertionRetryQueueTest {
 										request.getEarliestStartTime(),
 										now + MAX_WAIT_TIME,
 										now + MAX_TRAVEL_TIME,
-										request.getConstraints().maxRideTime(),
+										request.getConstraints().maxRideDuration(),
 										request.getConstraints().maxPickupDelay(),
 										request.getConstraints().lateDiversionThreshold(),
 										false
@@ -108,7 +108,7 @@ public class DrtRequestInsertionRetryQueueTest {
 										request.getEarliestStartTime(),
 										now + MAX_WAIT_TIME,
 										now + MAX_TRAVEL_TIME,
-										request.getConstraints().maxRideTime(),
+										request.getConstraints().maxRideDuration(),
 										request.getConstraints().maxPickupDelay(),
 										request.getConstraints().lateDiversionThreshold(),
 										false

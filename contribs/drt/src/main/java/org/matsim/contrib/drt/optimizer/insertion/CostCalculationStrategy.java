@@ -61,7 +61,7 @@ public interface CostCalculationStrategy {
             // check if the max riding time constraints is violated (with default config, the max ride duration
             // is infinity)
             double rideDuration = detourTimeInfo.dropoffDetourInfo.requestDropoffTime - detourTimeInfo.pickupDetourInfo.requestPickupTime;
-            if (rideDuration > request.getConstraints().maxRideTime()) {
+            if (rideDuration > request.getConstraints().maxRideDuration()) {
                 return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
             }
 
@@ -108,7 +108,7 @@ public interface CostCalculationStrategy {
 
         double detourViolation = Math.max(0,
                 (detourTimeInfo.dropoffDetourInfo.requestDropoffTime - detourTimeInfo.pickupDetourInfo.requestPickupTime)
-                        - request.getConstraints().maxRideTime()
+                        - request.getConstraints().maxRideDuration()
         );
 
         double lateDiversionViolation = 0;
