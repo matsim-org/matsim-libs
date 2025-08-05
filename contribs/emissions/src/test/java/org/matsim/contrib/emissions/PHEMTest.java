@@ -4,10 +4,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -652,6 +654,178 @@ public class PHEMTest {
 		testValueDeviation(refComparison, comparison);
 		averageDeviation(refComparison, comparison);
 	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"petrol", "diesel"})
+	public void testInvertedTime(String fuel) throws IOException {
+		// Prepare emission-config
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
+		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
+		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
+		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
+		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
+
+		// Create config
+		Config config = ConfigUtils.createConfig(ecg);
+
+		// Define the wltpLinkAttributes
+		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp_inverted_time.csv");
+		List<WLTPLinkAttributes> wltpLinkAttributes;
+		wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.fixedIntervalLength.setAttr(60));
+
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
+		Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
+		List<SumoEntry> sumoSegments = readSumoEmissionsForLinks(sumo_out_path, wltpLinkAttributes);
+
+		// Define vehicle
+		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
+		switch(fuel){
+			case "petrol":
+				vehicleAttributes.setHbefaTechnology("petrol (4S)");
+				vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
+				break;
+			case "diesel":
+				vehicleAttributes.setHbefaTechnology("diesel");
+				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
+				break;
+		}
+		vehicleAttributes.setHbefaSizeClass("average");
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
+			HbefaVehicleCategory.PASSENGER_CAR,
+			vehicleAttributes);
+
+		// Create Scenario and EventManager
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		EventsManager manager = EventsUtils.createEventsManager(config);
+
+		// Calculate MATSim-emissions
+		EmissionModule module = new EmissionModule(scenario, manager);
+		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
+		for (WLTPLinkAttributes wltpLinkAttribute : wltpLinkAttributes) {
+			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+				wltpLinkAttribute.time,
+				wltpLinkAttribute.hbefaStreetType,
+				wltpLinkAttribute.freespeed,
+				wltpLinkAttribute.length,
+				vehHbefaInfo));
+		}
+
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<WLTPLinkComparison> comparison = new ArrayList<>();
+		int currentSecond = 0;
+		for(int i = 0; i < wltpLinkAttributes.size(); i++){
+			comparison.add( new WLTPLinkComparison(
+				i,
+				currentSecond,
+				wltpLinkAttributes.get(i).time,
+				wltpLinkAttributes.get(i).length,
+
+				new double[]{sumoSegments.get(i).CO/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO),
+					link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO) / (sumoSegments.get(i).CO/1000)},
+
+				new double[]{sumoSegments.get(i).CO2/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
+					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) / (sumoSegments.get(i).CO2/1000)},
+
+				new double[]{sumoSegments.get(i).HC/1000,
+					link_pollutant2grams.get(i).get(Pollutant.HC),
+					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
+					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
+
+				new double[]{sumoSegments.get(i).PMx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.PM),
+					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.PM) / (sumoSegments.get(i).PMx/1000)},
+
+				new double[]{sumoSegments.get(i).NOx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.NOx),
+					link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
+					link_pollutant2grams.get(i).get(Pollutant.NOx) / (sumoSegments.get(i).NOx/1000)}
+			));
+			currentSecond += wltpLinkAttributes.get(i).time;
+		}
+
+		// Print out the results as csv TODO Change path to output
+		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
+		// If you need the files, you have to change the path to a custom file path.
+		String diff_name = "diff_" + fuel + "_inverted_time_out.csv";
+		CSVPrinter writer = new CSVPrinter(
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
+			CSVFormat.DEFAULT);
+		writer.printRecord(
+			"segment",
+			"startTime",
+			"travelTime",
+			"lengths",
+			"CO-SUMO",
+			"CO-MATSIM",
+			"CO-Diff",
+			"CO-Factor",
+			"CO2(total)-SUMO",
+			"CO2(total)-MATSIM",
+			"CO2(total)-Diff",
+			"CO2(total)-Factor",
+			"HC-SUMO",
+			"HC-MATSIM",
+			"HC-Diff",
+			"HC-Factor",
+			"PM-SUMO",
+			"PM-MATSIM",
+			"PM-Diff",
+			"PM-Factor",
+			"NOx-SUMO",
+			"NOx-MATSIM",
+			"NOx-Diff",
+			"NOx-Factor"
+		);
+
+		for(int i = 0; i < comparison.size(); i++){
+			writer.printRecord(
+				i,
+				comparison.get(i).startTime,
+				comparison.get(i).travelTime,
+				comparison.get(i).length,
+
+				comparison.get(i).CO[0],
+				comparison.get(i).CO[1],
+				comparison.get(i).CO[2],
+				comparison.get(i).CO[3],
+
+				comparison.get(i).CO2[0],
+				comparison.get(i).CO2[1],
+				comparison.get(i).CO2[2],
+				comparison.get(i).CO2[3],
+
+				comparison.get(i).HC[0],
+				comparison.get(i).HC[1],
+				comparison.get(i).HC[2],
+				comparison.get(i).HC[3],
+
+				comparison.get(i).PMx[0],
+				comparison.get(i).PMx[1],
+				comparison.get(i).PMx[2],
+				comparison.get(i).PMx[3],
+
+				comparison.get(i).NOx[0],
+				comparison.get(i).NOx[1],
+				comparison.get(i).NOx[2],
+				comparison.get(i).NOx[3]
+			);
+		}
+		writer.flush();
+		writer.close();
+
+		// TODO Add tests or remove this function
+	}
+
 
 	// ----- Helper definitions -----
 

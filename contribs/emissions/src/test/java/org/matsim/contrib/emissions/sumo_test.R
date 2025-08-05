@@ -577,7 +577,7 @@
 {
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  diff_out <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_out.csv")
+  diff_out <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_inverted_time_out.csv")
 
   # Compute the average difference for each component
   print(paste("CO:", (mean(diff_out$`CO-Factor`)-1)*100, "%"))
@@ -585,4 +585,78 @@
   print(paste("HC:", (mean(diff_out$`HC-Factor`)-1)*100, "%"))
   print(paste("NOx:", (mean(diff_out$`NOx-Factor`)-1)*100, "%"))
   print(paste("PM:", (mean(diff_out$`PM-Factor`)-1)*100, "%"))
+}
+
+# ==== Inverted Time axis ====
+{
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_out.csv", "usual")
+  data.MATSIM_usual <- r[[1]]
+  intervals <- r[[2]]
+
+  r <- read_matsim("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_inverted_time_out.csv", "inverted")
+  data.MATSIM_inverted <- r[[1]]
+
+  # Load data from SUMO with usual times and summarize for each interval
+  data.SUMO_usual <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_petrol_output.csv",
+                                   delim = ";",
+                                   col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                   col_types = cols(
+                                     time = col_integer(),
+                                     velocity = col_double(),
+                                     acceleration = col_double(),
+                                     slope = col_double(),
+                                     CO = col_double(),
+                                     CO2 = col_double(),
+                                     HC = col_double(),
+                                     PMx = col_double(),
+                                     NOx = col_double(),
+                                     fuel = col_double(),
+                                     electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
+    group_by(segment, component) %>%
+    summarize(value = sum(value)) %>%
+    mutate(model = "SUMO_usual", value=value/1000)
+
+
+  # Load data from SUMO with inverted times and summarize for each interval
+  data.SUMO_inverted <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_petrol_output_inverted_time.csv",
+                                    delim = ";",
+                                    col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                    col_types = cols(
+                                      time = col_integer(),
+                                      velocity = col_double(),
+                                      acceleration = col_double(),
+                                      slope = col_double(),
+                                      CO = col_double(),
+                                      CO2 = col_double(),
+                                      HC = col_double(),
+                                      PMx = col_double(),
+                                      NOx = col_double(),
+                                      fuel = col_double(),
+                                      electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
+    group_by(segment, component) %>%
+    summarize(value = sum(value)) %>%
+    mutate(model = "SUMO_inverted", value=value/1000)
+
+  # Append all datasets together
+  data_list <- mget(ls(pattern = "^data\\."), envir = .GlobalEnv)
+
+  # recalc: gram -> gram per kilometer
+  # separate: "MODEL_SCENARIO" -> "MODEL" | "SCENARIO"
+  data <- do.call(rbind, data_list) %>%
+    merge(intervals, by="segment") %>%
+    mutate(gPkm = value/lengths) %>%
+    separate(model, into=c("model", "scenario"), sep="_")
+
+  # Line-Plot (for scenarios with more links)
+  ggplot(data) +
+    geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
+    geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
+    scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
+    facet_wrap(component ~ scenario, scales="free") +
+    ylab("emissions in g/km") +
+    theme(text = element_text(size=18))
 }
