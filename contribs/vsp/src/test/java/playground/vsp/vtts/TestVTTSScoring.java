@@ -19,7 +19,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.vtts.VTTSHandler;
+import playground.vsp.analysis.modules.vtts.VTTSHandler;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import static org.assertj.core.api.Assertions.assertThat;

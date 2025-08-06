@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vtts;
+package playground.vsp.analysis.modules.vtts;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

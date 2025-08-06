@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vtts;
+package playground.vsp.analysis.modules.vtts;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -249,8 +249,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 			String subpop = PopulationUtils.getSubpopulation( person );
 
-			final org.matsim.vtts.MarginalSumScoringFunction marginalSumScoringFunction =
-					new org.matsim.vtts.MarginalSumScoringFunction(
+			final MarginalSumScoringFunction marginalSumScoringFunction =
+					new MarginalSumScoringFunction(
 							new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( subpop ), scenario.getConfig().scenario() ).build() );
 			// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.

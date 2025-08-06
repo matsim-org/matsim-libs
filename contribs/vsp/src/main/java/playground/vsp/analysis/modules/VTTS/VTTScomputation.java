@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vtts;
+package playground.vsp.analysis.modules.vtts;
 
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -30,9 +30,9 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class VTTScomputation implements StartupListener, AfterMobsimListener {
 
-	private final org.matsim.vtts.VTTSHandler vttsHandler;
+	private final VTTSHandler vttsHandler;
 
-	public VTTScomputation(org.matsim.vtts.VTTSHandler vttsHandler) {
+	public VTTScomputation(VTTSHandler vttsHandler) {
 		this.vttsHandler = vttsHandler;
 	}
 
