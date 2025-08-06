@@ -575,7 +575,7 @@ public class PHEMTest {
 		// Print out the results as csv TODO Change path to output
 		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
 		// If you need the files, you have to change the path to a custom file path.
-		String diff_name = "diff_" + fuel + "_" + cutSetting + "_" + cutSetting.getAttr() + "_out.csv";
+		String diff_name = "diff_" + fuel + "_output_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
 		CSVPrinter writer = new CSVPrinter(
 			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
 			CSVFormat.DEFAULT);
@@ -655,9 +655,16 @@ public class PHEMTest {
 		averageDeviation(refComparison, comparison);
 	}
 
+	static Stream<Arguments> testSumoInputArgs() {
+		// All combinations
+		return Stream.of("petrol", "diesel")
+			.flatMap(fuel -> Stream.of("", "_inverted_time", "_derivated_acc")
+				.map(setting -> Arguments.of(fuel, setting)));
+	}
+
 	@ParameterizedTest
-	@ValueSource(strings = {"petrol", "diesel"})
-	public void testInvertedTime(String fuel) throws IOException {
+	@MethodSource("testSumoInputArgs")
+	public void testSumoInputs(String fuel, String sumoInput) throws IOException {
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -672,13 +679,13 @@ public class PHEMTest {
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define the wltpLinkAttributes
-		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp_inverted_time.csv");
+		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp" + sumoInput + ".csv");
 		List<WLTPLinkAttributes> wltpLinkAttributes;
 		wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.fixedIntervalLength.setAttr(60));
 
-		// Read in the SUMO-outputs
+		// Read in the SUMO-outputs TODO currently local paths, change to UnitTestPath if this stays in the final test
 		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
-		Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
+		Path sumo_out_path = Paths.get("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_" + fuel + "_output" + sumoInput + ".csv");
 		List<SumoEntry> sumoSegments = readSumoEmissionsForLinks(sumo_out_path, wltpLinkAttributes);
 
 		// Define vehicle
@@ -713,7 +720,6 @@ public class PHEMTest {
 				wltpLinkAttribute.length,
 				vehHbefaInfo));
 		}
-
 
 		// Prepare data for comparison (and print out a csv for debugging)
 		List<WLTPLinkComparison> comparison = new ArrayList<>();
@@ -756,7 +762,7 @@ public class PHEMTest {
 		// Print out the results as csv TODO Change path to output
 		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
 		// If you need the files, you have to change the path to a custom file path.
-		String diff_name = "diff_" + fuel + "_inverted_time_out.csv";
+		String diff_name = "diff_" + fuel + "_output" + sumoInput + ".csv";
 		CSVPrinter writer = new CSVPrinter(
 			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
 			CSVFormat.DEFAULT);
@@ -872,7 +878,7 @@ public class PHEMTest {
 	 */
 	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 
-	// TODO Due to enums being a singleton, the variables can cause unexpected behavior if not used properly!
+	// TODO Due to enums being a singleton, the variables can cause unexpected behavior if not used properly! The current implementation propagates that the value is object bound. Change this for the final test!
 	public enum LinkCutSetting {
 		/**
 		 * The easiest setting: Each link corresponds to predefined {@link WLTPLinkAttributes}.
