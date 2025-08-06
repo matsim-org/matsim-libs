@@ -23,8 +23,7 @@ import java.util.*;
 
 /**
  * A simple m x m matrix storing float values, using arbitrary objects to identify rows and columns. The list of identifying objects must be known beforehand when instantiating a matrix.
- *
- * @param &lt;T&gt; identifier type for matrix entries
+ *  &lt;T&gt; identifier type for matrix entries
  * @author mrieser / SBB
  *         <p>
  *         Design considerations: The matrix stores all cell values in one big array in order to have it as compact as possible. Row/Column identifiers are indexed once at initialization in order to
@@ -170,4 +169,7 @@ public class FloatMatrix<T> {
         int toIndex = this.id2index.get(to);
         return fromIndex * this.size + toIndex;
     }
+	public Set<T> getIdentifiers() {
+		return Collections.unmodifiableSet(this.id2index.keySet());
+	}
 }
