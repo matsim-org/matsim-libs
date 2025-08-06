@@ -500,6 +500,14 @@ final class RailsimEngine implements Steppable {
 		// Get link and increment
 		RailLink nextLink = state.route.get(state.routeIdx++);
 
+		// Check for disallowed links
+		if (state.routeIdx > 1) {
+			RailLink currentLink = state.route.get(state.routeIdx - 2);
+
+			if (currentLink.isDisallowedNextLink(nextLink.getLinkId()))
+				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to enter the disallowed link " + nextLink.getLinkId() + " from link " + currentLink.getLinkId() + ".");
+		}
+
 		// Check if needs to reverse
 		if (event.type != UpdateEvent.Type.REVERSE_TRAIN && nextLink.isOppositeLink(state.headLink)) {
 			if (state.train.reversible() < 0)

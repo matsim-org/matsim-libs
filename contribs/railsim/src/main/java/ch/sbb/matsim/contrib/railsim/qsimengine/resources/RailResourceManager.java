@@ -34,6 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 
 import java.util.*;
 
@@ -99,7 +100,24 @@ public final class RailResourceManager {
 			if (e.getValue().getAllowedModes().stream().anyMatch(modes::contains)) {
 
 				Link opposite = NetworkUtils.findLinkInOppositeDirection(e.getValue());
-				RailLink link = new RailLink(e.getValue(), opposite);
+				DisallowedNextLinks disallowed = NetworkUtils.getDisallowedNextLinks(e.getValue());
+
+				Set<Id<Link>> disallowedNextLinks = null;
+				if (disallowed != null) {
+					disallowedNextLinks = new LinkedHashSet<>();
+					for (String mode : config.getNetworkModes()) {
+						List<List<Id<Link>>> sequences = disallowed.getDisallowedLinkSequences(mode);
+
+						for (List<Id<Link>> sequence : sequences) {
+							if (sequence.size() > 1)
+								throw new IllegalArgumentException("Only disallowed sequences of length 1 are supported.");
+
+							disallowedNextLinks.add(sequence.getFirst());
+						}
+					}
+				}
+
+				RailLink link = new RailLink(e.getValue(), opposite, disallowedNextLinks);
 				resourceMapping.computeIfAbsent(getResourceId(e.getValue()), k -> new ArrayList<>()).add(link);
 				this.links.put(e.getKey(), link);
 			}

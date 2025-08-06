@@ -25,8 +25,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.network.NetworkUtils;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Rail links can have multiple tracks and corresponds to exactly one link.
@@ -43,6 +45,9 @@ public final class RailLink implements HasLinkId {
 	@Nullable
 	private final Id<Link> oppositeLinkId;
 
+	@Nullable
+	private final Set<Id<Link>> disallowedNextLinks;
+
 	public final double length;
 	public final double minimumHeadwayTime;
 
@@ -55,6 +60,10 @@ public final class RailLink implements HasLinkId {
 	RailResourceInternal resource;
 
 	public RailLink(Link link, Link opposite) {
+		this(link, opposite, null);
+	}
+
+	public RailLink(Link link, Link opposite, Set<Id<Link>> disallowedNextLinks) {
 		this.id = link.getId();
 		this.length = link.getLength();
 		this.tracks = RailsimUtils.getTrainCapacity(link);
@@ -64,6 +73,7 @@ public final class RailLink implements HasLinkId {
 		this.isExitLink = RailsimUtils.isExitLink(link);
 		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
 		this.oppositeLinkId = opposite != null ? opposite.getId() : null;
+		this.disallowedNextLinks = disallowedNextLinks;
 	}
 
 	@Override
@@ -125,6 +135,13 @@ public final class RailLink implements HasLinkId {
 	 */
 	public boolean isOppositeLink(Id<Link> linkId) {
 		return oppositeLinkId != null && oppositeLinkId.equals(linkId);
+	}
+
+	/**
+	 * Determines if the given link is disallowed to be used as the next link.
+	 */
+	public boolean isDisallowedNextLink(Id<Link> linkId) {
+		return disallowedNextLinks != null && disallowedNextLinks.contains(linkId);
 	}
 
 	@Override
