@@ -243,44 +243,37 @@ public class DrtRoutingModuleTest {
 
 	@Test
 	void testRouteDescriptionHandling() {
-		String oldRouteFormat = "600 400";
-		String newRouteFormatV1 = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
-
-		String newRouteFormatV2 = "{\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
-				"\"constraints\":{" +
-				"\"maxTravelTime\":\"Infinity\"," +
-				"\"maxRideTime\":\"Infinity\"," +
-				"\"maxWaitTime\":600.0," +
-				"\"maxPickupDelay\":\"Infinity\"," +
-				"\"lateDiversionThreshold\":0.0" +
-				"}}";
+		String newRouteFormatV3 =
+				"{" +
+					"\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
+					"\"constraints\":" +
+					"{" +
+						"\"allowRejection\":\"true\"," +
+						"\"maxPickupDelay\":\"120\"," +
+						"\"latestStartTime\":\"4200\"," +
+						"\"maxRideDuration\":\"900\"," +
+						"\"earliestStartTime\":\"3600\"," +
+						"\"lateDiversionThreshold\":\"200\"," +
+						"\"latestArrivalTime\":\"7200\"" +
+					"}" +
+				"}";
 
 		Scenario scenario = createTestScenario();
-		ActivityFacilities facilities = scenario.getActivityFacilities();
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
-		Facility hf = FacilitiesUtils.toFacility(h, facilities);
 
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
-		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
 		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
-		drtRoute.setRouteDescription(oldRouteFormat);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-
-		drtRoute.setRouteDescription(newRouteFormatV1);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
-
-		drtRoute.setRouteDescription(newRouteFormatV2);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
-
+		drtRoute.setRouteDescription(newRouteFormatV3);
+        Assertions.assertEquals(400, drtRoute.getDirectRideTime());
+        Assertions.assertEquals(drtRoute.getUnsharedPath(), Arrays.asList("a", "b", "c"));
+        Assertions.assertEquals(600., drtRoute.getConstraints().latestStartTime() - drtRoute.getConstraints().earliestStartTime());
+        Assertions.assertEquals(7200, drtRoute.getConstraints().latestArrivalTime());
+        Assertions.assertEquals(200, drtRoute.getConstraints().lateDiversionThreshold());
+        Assertions.assertEquals(120, drtRoute.getConstraints().maxPickupDelay());
 	}
 
 	/**

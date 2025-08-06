@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -156,8 +157,17 @@ public class DefaultUnplannedRequestInserterTest {
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
-						.latestStartTime(request1.getLatestStartTime() + retryInterval)
-						.latestArrivalTime(request1.getLatestArrivalTime() + retryInterval)
+						.constraints(
+								new DrtRouteConstraints(
+										request1.getEarliestStartTime(),
+										request1.getLatestStartTime() + retryInterval,
+										request1.getConstraints().latestArrivalTime() + retryInterval,
+										Double.POSITIVE_INFINITY,
+										Double.POSITIVE_INFINITY,
+										0.,
+										false
+								)
+						)
 						.build());
 
 		//ensure rejection event is NOT emitted
