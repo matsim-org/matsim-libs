@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A simple m x m matrix storing float values, using arbitrary objects to identify rows and columns. The list of identifying objects must be known before-hand when instantiating a matrix.
+ * A simple m x m matrix storing float values, using arbitrary objects to identify rows and columns. The list of identifying objects must be known beforehand when instantiating a matrix.
  *
  * @param &lt;T&gt; identifier type for matrix entries
  * @author mrieser / SBB
@@ -40,7 +40,7 @@ import java.util.Set;
  *         <p>
  *         So, as long as the matrix has entries in at least 1/16.5 = 6% or 1/25 = 4% of all cells, the simple float array should be more efficient.
  *         <p>
- *         For larger matrices the absolute volumes become even more impressive. For an 8000x8000 matrix, the float array will use 250MB, while the alternatives will use 4.5 or 6.5 GB respectively.
+ *         For larger matrices the absolute volumes become even more impressive. For a 8000x8000 matrix, the float array will use 250MB, while the alternatives will use 4.5 or 6.5 GB respectively.
  */
 public class FloatMatrix<T> {
 
@@ -48,19 +48,31 @@ public class FloatMatrix<T> {
     private final int size;
     private final float[] data;
 
-    public FloatMatrix(Set<T> zones, float defaultValue) {
-        this.size = zones.size();
-        this.id2index = new HashMap<>((int) (this.size * 1.5));
-        this.data = new float[this.size * this.size];
-        Arrays.fill(this.data, defaultValue);
-        int index = 0;
-        for (T t : zones) {
-            this.id2index.put(t, index);
-            index++;
-        }
-    }
+	/**
+	 * Creates a new FloatMatrix initialized with a default value for all cells.
+	 *
+	 * @param zones The unique identifiers for the rows and columns.
+	 * @param defaultValue The value to assign to every cell.
+	 * @return A new FloatMatrix instance.
+	 */
+	public static <T> FloatMatrix<T> createFloatMatrix(Set<T> zones, float defaultValue) {
+		return new FloatMatrix<>(zones, defaultValue);
+	}
 
-    public float set(T from, T to, float value) {
+
+	private FloatMatrix(Set<T> zones, float defaultValue) {
+		this.size = zones.size();
+		this.id2index = new HashMap<>((int) (this.size * 1.5));
+		this.data = new float[this.size * this.size];
+		Arrays.fill(this.data, defaultValue);
+		int index = 0;
+		for (T t : zones) {
+			this.id2index.put(t, index);
+			index++;
+		}
+	}
+
+	public float set(T from, T to, float value) {
         int index = getIndex(from, to);
         float oldValue = this.data[index];
         this.data[index] = value;
@@ -81,9 +93,9 @@ public class FloatMatrix<T> {
     }
 
     /**
-     * @param from
-     * @param to
-     * @param factor
+     * @param from from
+     * @param to to
+     * @param factor factor to multiply the value with
      * @return the new value
      */
     public float multiply(T from, T to, float factor) {

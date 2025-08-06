@@ -184,8 +184,8 @@ public final class NetworkSkimMatrices {
         final FloatMatrix<T> distanceMatrix;
 
         NetworkIndicators(Set<T> zones) {
-            this.travelTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.distanceMatrix = new FloatMatrix<>(zones, 0);
+            this.travelTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.distanceMatrix = FloatMatrix.createFloatMatrix(zones, 0);
         }
     }
 
