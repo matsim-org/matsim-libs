@@ -11,8 +11,8 @@ class FloatMatrixTest {
         Set<String> zones = new HashSet<>(Arrays.asList("A", "B", "C"));
         float defaultValue = 1.5f;
         FloatMatrix<String> matrix = FloatMatrix.createFloatMatrix(zones, defaultValue);
-        for (String from : zones) {
-            for (String to : zones) {
+        for (String from : matrix.getIdentifiers()) {
+            for (String to : matrix.getIdentifiers()) {
                 assertEquals(defaultValue, matrix.get(from, to), 1e-6);
             }
         }
