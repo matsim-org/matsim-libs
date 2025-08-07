@@ -15,7 +15,6 @@
 package org.matsim.contrib.ev.routing;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -33,7 +32,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
@@ -58,7 +56,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
     private static final double MIN_SOC_THRESHOLD = 0.15;            // Lower bound SOC threshold to trigger charging
     private static final double MAX_SOC_THRESHOLD = 0.4;             // Upper bound SOC threshold to trigger charging
 
-
+	private final String mode;
     private final Network network;
     private final RoutingModule delegate;
     private final ElectricFleetSpecification electricFleet;
@@ -83,6 +81,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         this.auxConsumptionFactory = auxConsumptionFactory;
         this.stageActivityModePrefix = mode + " charging";
         this.evConfigGroup = evConfigGroup;
+		this.mode = mode;
         this.vehicleSuffix = "_" + mode;
 
     }
@@ -93,15 +92,14 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
         List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
         Id<Vehicle> evId = Id.create(request.getPerson().getId() + vehicleSuffix, Vehicle.class);
 		// Skip if the main leg is not truck mode (e.g. access/egress walk)
-		List<Leg> nonWalkLegs = basicRoute.stream()
-			.filter(Leg.class::isInstance) // only Leg elements
-			.map(Leg.class::cast)
-			.filter(leg -> !leg.getMode().equals("walk"))
+		List<Leg> nonWalkLegs = TripStructureUtils.getLegs(basicRoute).stream()
+			.filter(leg -> !"walk".equals(leg.getMode()))
 			.toList();
-		Leg basicLeg = (Leg) nonWalkLegs.get(0);
+
+		Leg basicLeg = (Leg) nonWalkLegs.get(nonWalkLegs.size() - 1);
 
         // If person has no EV, return default route
-        if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
+		if (!this.mode.equals(basicLeg.getMode()) || !electricFleet.getVehicleSpecifications().containsKey(evId)) {
             return basicRoute;
         }
 
@@ -180,12 +178,11 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
             // Calculate route from current position (facility) to destination
             List<? extends PlanElement> routeSegment = delegate.calcRoute(
                     DefaultRoutingRequest.of(lastFacility, toFacility, departureTime, person, request.getAttributes()));
-			List<Leg> nonWalkLegs = routeSegment.stream()
-				.filter(Leg.class::isInstance) // only Leg elements
-				.map(Leg.class::cast)
-				.filter(leg -> !leg.getMode().equals("walk"))
+			List<Leg> nonWalkLegs = TripStructureUtils.getLegs(routeSegment).stream()
+				.filter(leg -> !"walk".equals(leg.getMode()))
 				.toList();
-			Leg nonWalkLeg = nonWalkLegs.get(0);
+
+			Leg nonWalkLeg = (Leg) nonWalkLegs.get(nonWalkLegs.size() - 1);
             Map<Link, Double> consumptionMap = estimateConsumption(evSpec, (Leg) nonWalkLeg);
             Map<Link, Double> timeMap = estimateTime((Leg) nonWalkLeg);
 
