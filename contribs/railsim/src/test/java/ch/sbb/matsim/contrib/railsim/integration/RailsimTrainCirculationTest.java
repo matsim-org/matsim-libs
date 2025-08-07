@@ -39,10 +39,10 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	void interruptedRoute() {
+	void nonContinuousSchedule() {
 
 		Consumer<Scenario> setup = scenario -> {
-			// Remove the backward line, so that the train cannot return to the start
+			// Remove the backward line, so that trains do not return to the start via the same route
 			scenario.getTransitSchedule().removeTransitLine(
 				scenario.getTransitSchedule().getTransitLines().get(Id.create("shuttle_line_backward", TransitLine.class))
 			);
@@ -52,6 +52,27 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 		assertThat(result)
 			.allTrainsHaveNumberOfStops(6)
 			.allTrainsArrived();
+	}
+
+	@Test
+	void errorNonReachableStops() {
+
+		Consumer<Scenario> setup = scenario -> {
+			// Remove the backward line, so that trains do not return to the start via the same route
+			scenario.getTransitSchedule().removeTransitLine(
+				scenario.getTransitSchedule().getTransitLines().get(Id.create("shuttle_line_backward", TransitLine.class))
+			);
+
+			scenario.getNetwork().removeLink(Id.createLinkId("link_BM"));
+			scenario.getNetwork().removeLink(Id.createLinkId("link_MA"));
+		};
+
+		// There will be no route for the circulation
+		Assertions.
+			assertThatCode(() -> runSimulation(new File(utils.getPackageInputDirectory(), "shuttle"), setup))
+			.isInstanceOf(RuntimeException.class)
+			.hasMessageContaining("No route found from node node_B_stop to node node_A");
+
 	}
 
 	@Test
