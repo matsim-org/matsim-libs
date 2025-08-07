@@ -178,6 +178,7 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
             // Calculate route from current position (facility) to destination
             List<? extends PlanElement> routeSegment = delegate.calcRoute(
                     DefaultRoutingRequest.of(lastFacility, toFacility, departureTime, person, request.getAttributes()));
+
 			List<Leg> nonWalkLegs = TripStructureUtils.getLegs(routeSegment).stream()
 				.filter(leg -> !"walk".equals(leg.getMode()))
 				.toList();
@@ -312,7 +313,9 @@ final class TruckEvNetworkRoutingModule implements RoutingModule {
     private Map<Link, Double> estimateConsumption(ElectricVehicleSpecification evSpec, Leg leg) {
         Map<Link, Double> consumptionMap = new LinkedHashMap<>();
         NetworkRoute route = (NetworkRoute) leg.getRoute();
-		List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
+		    List<Link> links = NetworkUtils.getLinks(this.network, route.getLinkIds());
+
         double departureTime = leg.getDepartureTime().seconds();
 
         // Create a temporary electric vehicle instance to use its energy models

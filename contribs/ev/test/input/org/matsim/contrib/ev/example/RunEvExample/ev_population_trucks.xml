@@ -218,6 +218,7 @@
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:26:54">
             </activity>
             <leg mode="truck">
+            <leg mode="car">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
