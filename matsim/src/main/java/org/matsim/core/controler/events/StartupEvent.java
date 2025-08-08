@@ -27,7 +27,7 @@ import org.matsim.core.controler.MatsimServices;
  *
  * @author dgrether
  */
-public final class StartupEvent extends ControlerEvent {
+public final class StartupEvent extends ControllerEvent {
 
 	public StartupEvent(final MatsimServices controler) {
 		super(controler);

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
@@ -49,7 +50,20 @@ import com.google.common.collect.ImmutableList;
 public class InsertionCostCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
+	private final DrtRequest drtRequest = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.constraints(new DrtRouteConstraints(
+					0,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					0,
+					true
+					)
+			)
+			.build();
 
 	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
@@ -60,22 +74,22 @@ public class InsertionCostCalculatorTest {
 
 		//feasible solution
 		final DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 11), new DropoffDetourInfo(0, 22)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 11), new DropoffDetourInfo(0, 0, 22)),
 				11 + 22, drtRequest, drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//feasible solution - longest possible pickup and dropoff time losses
 		final DrtConfigGroup drtConfigGroup1 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 30)),
 				20 + 30, drtRequest, drtConfigGroup1.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - time constraints at stop 0
 		final DrtConfigGroup drtConfigGroup2 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 21), new DropoffDetourInfo(0, 29)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 21), new DropoffDetourInfo(0, 0, 29)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup2.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - vehicle time constraints
 		final DrtConfigGroup drtConfigGroup3 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 31)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 31)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup3.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 	}
 
@@ -105,40 +119,54 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(180)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								180.,
+								true
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		DrtOptimizationConstraintsSet drtOptimizationConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtOptimizationConstraintsSet);
 
 		// new insertion before dropoff of boarded passenger, inside of threshold but no additional delay - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 0), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 120, 0), new DropoffDetourInfo(300, 300, 30)),
 				30, drtRequest, drtOptimizationConstraintsSet);
 
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(120)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								120.,
+								false
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger, but outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest2, drtOptimizationConstraintsSet);
 
 
 		// new insertion after dropoff of boarded passenger - feasible solution
 		insertion = insertion(entry, 1, 1);
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest, drtOptimizationConstraintsSet);
 	}
 
@@ -172,36 +200,50 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(300)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								300.,
+								true
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
 		DrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, constraintsSet);
 
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(200)
+				.constraints(
+						new DrtRouteConstraints(
+								Double.POSITIVE_INFINITY,
+								120,
+								300,
+								Double.POSITIVE_INFINITY,
+								Double.POSITIVE_INFINITY,
+								200.,
+								true
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				120, drtRequest2, constraintsSet);
 	}
 
 	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost, DrtRequest drtRequest, DrtOptimizationConstraintsSet constraintsSet) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
-				new CostCalculationStrategy.RejectSoftConstraintViolations(), constraintsSet);
+				new CostCalculationStrategy.DefaultCostCalculationStrategy(), constraintsSet);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, null, detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);

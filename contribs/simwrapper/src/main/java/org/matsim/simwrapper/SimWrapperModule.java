@@ -30,7 +30,7 @@ public final class SimWrapperModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		addControlerListenerBinding().to(SimWrapperListener.class);
+		addControllerListenerBinding().to(SimWrapperListener.class);
 
 		// Construct the binder one time, even through nothing is added
 		// otherwise the injection will not work

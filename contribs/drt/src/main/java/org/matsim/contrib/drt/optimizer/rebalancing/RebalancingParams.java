@@ -18,6 +18,11 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
@@ -63,6 +68,16 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	@NotNull
 	private RebalancingStrategyParams rebalancingStrategyParams;
 
+	public enum TargetLinkSelection {random, mostCentral}
+
+	@Parameter("zoneTargetLinkSelection")
+	@Comment("Defines how the target link of a zone is determined (e.g. for rebalancing)."
+			+ " Possible values are [random,mostCentral]. Default behavior is mostCentral, where all vehicles are sent to the same link.")
+	@NotNull
+	private TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
+
+	private ZoneSystemParams zoneSystemParams;
+
 	public RebalancingParams() {
 		super(SET_NAME);
 		initSingletonParameterSets();
@@ -82,6 +97,22 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 		addDefinition(CustomRebalancingStrategyParams.SET_NAME, CustomRebalancingStrategyParams::new,
 			() -> (ConfigGroup)rebalancingStrategyParams,
 			params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> zoneSystemParams,
+				params -> zoneSystemParams = (GeometryFreeZoneSystemParams)params);
 	}
 
 	@Override
@@ -121,5 +152,17 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 
 	public void setMaxTimeBeforeIdle(@PositiveOrZero double maxTimeBeforeIdle) {
 		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
+	}
+
+	public @NotNull TargetLinkSelection getTargetLinkSelection() {
+		return targetLinkSelection;
+	}
+
+	public void setTargetLinkSelection(@NotNull TargetLinkSelection targetLinkSelection) {
+		this.targetLinkSelection = targetLinkSelection;
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }

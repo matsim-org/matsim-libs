@@ -86,7 +86,7 @@ public class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupL
 		Link dropoff = drtRequest.getToLink();
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
+		double latestDropoffTime = drtRequest.getConstraints().latestArrivalTime(); // pessimistic
 
 		// TODO use times from InsertionWithDetourData<Double> as approximate departure times for Dijkstra (will require
 		//  passing it as an argument, instead of Insertion)
@@ -129,7 +129,7 @@ public class SingleInsertionDetourPathCalculator implements MobsimBeforeCleanupL
 			return PathData.EMPTY;
 		}
 
-		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+		Path path = router.calcLeastCostPath(fromLink, toLink, departureTime + FIRST_LINK_TT,
 				null, null);
 		double firstAndLastLinkTT = FIRST_LINK_TT + VrpPaths.getLastLinkTT(travelTime, toLink,
 				departureTime + FIRST_LINK_TT + path.travelTime);

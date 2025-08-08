@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
@@ -37,9 +38,17 @@ public class DrtRequestInsertionRetryQueueTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.id(Id.create("r", Request.class))
 			.submissionTime(SUBMISSION_TIME)
-			.earliestStartTime(SUBMISSION_TIME)
-			.latestStartTime(SUBMISSION_TIME + MAX_WAIT_TIME)
-			.latestArrivalTime(SUBMISSION_TIME + MAX_TRAVEL_TIME)
+			.constraints(
+					new DrtRouteConstraints(
+							SUBMISSION_TIME,
+							SUBMISSION_TIME + MAX_WAIT_TIME,
+							SUBMISSION_TIME + MAX_TRAVEL_TIME,
+							Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY,
+							0,
+							false
+					)
+			)
 			.build();
 
 	@Test
@@ -68,8 +77,17 @@ public class DrtRequestInsertionRetryQueueTest {
 		double now = SUBMISSION_TIME + 2;
 		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
-						.latestStartTime(now + MAX_WAIT_TIME)
-						.latestArrivalTime(now + MAX_TRAVEL_TIME)
+						.constraints(
+								new DrtRouteConstraints(
+										request.getEarliestStartTime(),
+										now + MAX_WAIT_TIME,
+										now + MAX_TRAVEL_TIME,
+										request.getConstraints().maxRideDuration(),
+										request.getConstraints().maxPickupDelay(),
+										request.getConstraints().lateDiversionThreshold(),
+										false
+								)
+						)
 						.build());
 
 		//empty queue
@@ -85,8 +103,17 @@ public class DrtRequestInsertionRetryQueueTest {
 		double now = 999999;// no guarantee the method is called every second, so let's make a very late call
 		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
-						.latestStartTime(now + MAX_WAIT_TIME)
-						.latestArrivalTime(now + MAX_TRAVEL_TIME)
+						.constraints(
+								new DrtRouteConstraints(
+										request.getEarliestStartTime(),
+										now + MAX_WAIT_TIME,
+										now + MAX_TRAVEL_TIME,
+										request.getConstraints().maxRideDuration(),
+										request.getConstraints().maxPickupDelay(),
+										request.getConstraints().lateDiversionThreshold(),
+										false
+								)
+						)
 						.build());
 	}
 

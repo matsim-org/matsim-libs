@@ -216,7 +216,9 @@ public final class LSPUtils {
 		//		}
 		// never used.  Thus disabling it.  kai, jul'22
 
+		@Deprecated // see comment below method name.
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
+			// yy maybe one could use the first plan by default, and then get rid of this method here?  kai, jul'25
 			this.initialPlan = plan;
 			for (LogisticChain solution : plan.getLogisticChains()) {
 				for (LogisticChainElement element : solution.getLogisticChainElements()) {
@@ -261,6 +263,16 @@ public final class LSPUtils {
 
 		public LogisticChain build() {
 			//TODO: Prüfe of das alle Elemente Verbunden sind (in irgendeiner Art). Plus Hinweis auf die Änderung.
+			// yyyyyy was ist mit "Hinweis auf Änderung" gemeint???
+
+			// connect all elements:
+			LogisticChainElement prev = null;
+			for( LogisticChainElement logisticChainElement : this.elements ){
+				if ( prev != null ) {
+					prev.connectWithNextElement( logisticChainElement );
+				}
+				prev = logisticChainElement;
+			}
 
 			return new LogisticChainImpl(this);
 		}

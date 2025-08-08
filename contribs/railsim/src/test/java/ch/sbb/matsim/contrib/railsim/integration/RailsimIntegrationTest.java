@@ -275,6 +275,77 @@ public class RailsimIntegrationTest {
 	@Test
 	void testMicroJunctionCross() {
 		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCross"));
+		// check if the train arrives at the stop
+		boolean vehicleArrivesAtFacilityEventFound1 = false;
+		boolean vehicleArrivesAtFacilityEventFound2 = false;
+
+		for (Event event : collector.getEvents()) {
+			if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
+
+				VehicleArrivesAtFacilityEvent vehicleArrivesEvent = (VehicleArrivesAtFacilityEvent) event;
+
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train1") && vehicleArrivesEvent.getFacilityId().toString()
+					.equals("stop_A5")) {
+					vehicleArrivesAtFacilityEventFound1 = true;
+					// TODO: also test the arrival time
+//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
+				}
+
+				if (vehicleArrivesEvent.getVehicleId().toString().equals("train2") && vehicleArrivesEvent.getFacilityId().toString()
+						.equals("stop_B5")) {
+						vehicleArrivesAtFacilityEventFound2 = true;
+					// TODO: also test the arrival time
+//					Assertions.assertEquals(29594., event.getTime(), MatsimTestUtils.EPSILON, "The arrival time of train1 at stop_3-4 has changed.");
+				}
+			}
+		}
+		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound1, "VehicleArrivesAtFacilityEvent for train1 at stop_A5 not found.");
+		Assertions.assertTrue(vehicleArrivesAtFacilityEventFound2, "VehicleArrivesAtFacilityEvent for train2 at stop_B5 not found.");
+
+	}
+
+	@Test
+	void testMicroJunctionFlat() {
+		EventsCollector collector = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionFlat"));
+
+		Map<Id<Vehicle>, Double> actualArrivals = new HashMap<>();
+		for (Event event : collector.getEvents()) {
+			if (event instanceof VehicleArrivesAtFacilityEvent e) {
+				actualArrivals.put(e.getVehicleId(), e.getTime());
+			}
+		}
+
+		// check that all 32 trains arrived and were not stuck.
+		Assertions.assertEquals(32, actualArrivals.size(),
+			"Expected 32 trains to arrive, but some seem to be stuck or did not complete their routes.");
+
+		// check the arrival times for the most critical trains.
+		Map<Id<Vehicle>, Double> expectedArrivals = new HashMap<>();
+
+		// first trains of each line
+		expectedArrivals.put(Id.createVehicleId("trainAB0"), 30877.0);
+		expectedArrivals.put(Id.createVehicleId("trainBA0"), 30869.0);
+		expectedArrivals.put(Id.createVehicleId("trainAC0"), 33135.0);
+		expectedArrivals.put(Id.createVehicleId("trainCA0"), 31543.0);
+
+		// last trains of each line
+		expectedArrivals.put(Id.createVehicleId("trainAB7"), 31042.0);
+		expectedArrivals.put(Id.createVehicleId("trainBA7"), 32099.0);
+		expectedArrivals.put(Id.createVehicleId("trainAC7"), 31197.0);
+		expectedArrivals.put(Id.createVehicleId("trainCA7"), 32946.0);
+
+		for (Map.Entry<Id<Vehicle>, Double> entry : expectedArrivals.entrySet()) {
+			Id<Vehicle> vehicleId = entry.getKey();
+			double expectedTime = entry.getValue();
+
+			Assertions.assertTrue(actualArrivals.containsKey(vehicleId), "Critical train " + vehicleId + " did not arrive.");
+
+			double actualTime = actualArrivals.get(vehicleId);
+
+			Assertions.assertEquals(expectedTime, actualTime, MatsimTestUtils.EPSILON,
+				"Arrival time for critical train " + vehicleId + " has changed.");
+		}
+
 	}
 
 	@Test

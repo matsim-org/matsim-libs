@@ -20,14 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Design decisions:
@@ -152,7 +147,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	// ---
 
-	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration";
+	@Deprecated private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration";
 
 	/**
 	 * can't set this from outside java since for the time being it is not
@@ -437,7 +432,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			Set<String> activities = new HashSet<>();
 			getScoringParametersPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
 			return activities;
-	}
+		}
 	}
 
 	/*
@@ -576,22 +571,18 @@ public final class ScoringConfigGroup extends ConfigGroup {
 	}
 
 	public enum TypicalDurationScoreComputation {
-		uniform, relative
+		@Deprecated uniform, relative
 	}
 
 	/* parameter set handling */
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
-		switch (type) {
-		case ActivityParams.SET_TYPE:
-			return new ActivityParams();
-		case ModeParams.SET_TYPE:
-			return new ModeParams();
-		case ScoringParameterSet.SET_TYPE:
-			return new ScoringParameterSet();
-		default:
-			throw new IllegalArgumentException(type);
-		}
+		return switch( type ){
+			case ActivityParams.SET_TYPE -> new ActivityParams();
+			case ModeParams.SET_TYPE -> new ModeParams();
+			case ScoringParameterSet.SET_TYPE -> new ScoringParameterSet();
+			default -> throw new IllegalArgumentException( type );
+		};
 	}
 
 	@Override
@@ -784,6 +775,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
 	}
 
+	@Deprecated
 	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
 	}
@@ -884,7 +876,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		public static final String ACVITITY_TYPE_CMT = "all activity types that occur in the plans file need to be defined by their own sections here";
 
 		/**
-		 * {@value -- ACVITITY_TYPE_CMT}
+		 * {@value ACVITITY_TYPE_CMT}
 		 */
 		@StringGetter(ACTIVITY_TYPE)
 		public String getActivityType() {
@@ -892,7 +884,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		/**
-		 * {@value -- ACVITITY_TYPE_CMT}
+		 * {@value ACVITITY_TYPE_CMT}
 		 */
 		@StringSetter(ACTIVITY_TYPE)
 		public void setActivityType(final String type) {
@@ -940,11 +932,13 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		}
 
 		@StringGetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		@Deprecated
 		public TypicalDurationScoreComputation getTypicalDurationScoreComputation() {
 			return this.typicalDurationScoreComputation;
 		}
 
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		@Deprecated
 		public ActivityParams setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
 			testForLocked();
 			this.typicalDurationScoreComputation = str;
@@ -1262,6 +1256,8 @@ public final class ScoringConfigGroup extends ConfigGroup {
 
 	}
 
+	public enum ScoringConfigInterpretation { fromLogit }
+
 	public static class ScoringParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_TYPE = "scoringParameters";
 
@@ -1387,14 +1383,12 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		/* parameter set handling */
 		@Override
 		public ConfigGroup createParameterSet(final String type) {
-			switch (type) {
-			case ActivityParams.SET_TYPE:
-				return new ActivityParams();
-			case ModeParams.SET_TYPE:
-				return new ModeParams();
-			default:
-				throw new IllegalArgumentException(type);
-			}
+			return switch (type) {
+				case ActivityParams.SET_TYPE -> new ActivityParams();
+				case ModeParams.SET_TYPE -> new ModeParams();
+				case TasteVariationsConfigParameterSet.SET_TYPE -> new TasteVariationsConfigParameterSet();
+				default -> throw new IllegalArgumentException(type);
+			};
 		}
 
 		@Override
@@ -1416,6 +1410,14 @@ public final class ScoringConfigGroup extends ConfigGroup {
 				final String m = ((ModeParams) module).getMode();
 				if (getModes().get(m) != null) {
 					throw new IllegalStateException("already a parameter set for mode " + m);
+				}
+				break;
+			case TasteVariationsConfigParameterSet.SET_TYPE:
+				if (!(module instanceof TasteVariationsConfigParameterSet)) {
+					throw new RuntimeException("wrong class for " + module);
+				}
+				if (getTasteVariationsParams() != null) {
+					throw new IllegalStateException("already a parameter set for taste variations");
 				}
 				break;
 			default:
@@ -1528,6 +1530,44 @@ public final class ScoringConfigGroup extends ConfigGroup {
 			super.addParameterSet(params);
 		}
 
+		public void setTasteVariationsParams(TasteVariationsConfigParameterSet set) {
+			Collection<? extends ConfigGroup> toRemove = new ArrayList<>(getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE));
+			toRemove.forEach(this::removeParameterSet);
+			super.addParameterSet(set);
+		}
+
+		/**
+		 * Get existing or add a {@link TasteVariationsConfigParameterSet} to the config.
+		 */
+		public TasteVariationsConfigParameterSet getOCreateTasteVariationsParams() {
+
+			Collection<? extends ConfigGroup> existing = getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE);
+			if (existing.size() > 1) {
+				throw new RuntimeException("more than one TasteVariationsConfigParameterSet found");
+			}
+
+			Optional<? extends ConfigGroup> first = existing.stream().findFirst();
+
+			if (first.isPresent()) {
+				return (TasteVariationsConfigParameterSet) first.get();
+			}
+
+			TasteVariationsConfigParameterSet created = new TasteVariationsConfigParameterSet();
+			addParameterSet(created);
+			return created;
+		}
+
+		/**
+		 * Get the {@link TasteVariationsConfigParameterSet} from the config. Null if not present.
+		 */
+		@Nullable
+		public TasteVariationsConfigParameterSet getTasteVariationsParams() {
+			return getParameterSets(TasteVariationsConfigParameterSet.SET_TYPE).stream()
+				.map(TasteVariationsConfigParameterSet.class::cast)
+				.findFirst()
+				.orElse(null);
+		}
+
 		/**
 		 * Checks whether all the settings make sense or if there are some
 		 * problems with the parameters currently set. Currently, this checks
@@ -1592,7 +1632,7 @@ public final class ScoringConfigGroup extends ConfigGroup {
 		private double brainExpBeta = 1.0;
 		private double pathSizeLogitBeta = 1.0;
 
-		private boolean writeExperiencedPlans = false;
+		private boolean writeExperiencedPlans = true;
 
 		private Double fractionOfIterationsToStartScoreMSA = null;
 

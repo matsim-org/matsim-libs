@@ -149,7 +149,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration());
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPStatLight.FILENAME));
+				this.write(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), GexfPStatLight.FILENAME));
 			}
 		}
 	}
@@ -157,7 +157,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getServices().getControlerIO().getOutputFilename(GexfPStatLight.FILENAME));
+			this.write(event.getServices().getControllerIO().getOutputFilename(GexfPStatLight.FILENAME));
 		}
 	}
 

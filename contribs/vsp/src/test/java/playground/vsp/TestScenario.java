@@ -16,7 +16,7 @@ import org.matsim.modechoice.estimators.FixedCostsEstimator;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.contrib.vsp.pt.fare.PtTripWithDistanceBasedFareEstimator;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.util.List;
 

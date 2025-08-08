@@ -119,13 +119,19 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		MatsimServices controler = new Controler(config);
 		try {
-			controler.getConfig().setParam("eventsManager", "numberOfThreads", "2");
+			controler.getConfig().eventsManager().setNumberOfThreads(2);// setParam("eventsManager", "numberOfThreads", "2");
 			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
 		}
 		try {
-			controler.getConfig().setParam("eventsManager", "estimatedNumberOfEvents", "200000");
+			controler.getConfig().eventsManager().addParam("numberOfThreads", "2");
+			Assertions.fail("Expected exception");
+		} catch (Exception e) {
+			log.info("catched expected exception", e);
+		}
+		try {
+			controler.getConfig().eventsManager().setEstimatedNumberOfEvents(200000L);
 			Assertions.fail("Expected exception");
 		} catch (Exception e) {
 			log.info("catched expected exception", e);
@@ -508,15 +514,15 @@ public class ControlerIT {
 		});
 		controler.run();
 
-		File iterationEvents = new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events));
+		File iterationEvents = new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events));
 		assertTrue(iterationEvents.getName().endsWith("0.events.xml.zst"));
 		assertTrue(iterationEvents.exists());
 
-		File outputEvents = new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.events));
+		File outputEvents = new File(controler.getControllerIO().getOutputFilename(Controler.DefaultFiles.events));
 		assertTrue(outputEvents.getName().endsWith("output_events.xml.zst"));
 		assertTrue(outputEvents.exists());
 
-		File outputPlans = new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population));
+		File outputPlans = new File(controler.getControllerIO().getOutputFilename(Controler.DefaultFiles.population));
 		assertTrue(outputPlans.getName().endsWith("output_plans.xml.zst"));
 		assertTrue(outputPlans.exists());
 	}
@@ -552,17 +558,17 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controller().getLastIteration(), Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(controler.getConfig().controller().getLastIteration(), Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -593,17 +599,17 @@ public class ControlerIT {
 		controler.run();
 		assertEquals(4, controler.getConfig().controller().getWriteEventsInterval());
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controller().getLastIteration(), Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(2, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(3, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(4, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(5, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(6, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(7, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(8, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(9, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(controler.getConfig().controller().getLastIteration(), Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -635,8 +641,8 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertFalse(new File(controler.getControllerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -666,8 +672,8 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(1, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -698,7 +704,7 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, Controler.DefaultFiles.events)).exists());
 	}
 
 	/**
@@ -728,7 +734,7 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(true);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
+		assertTrue(new File(controler.getControllerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
 	}
 
 	/**
@@ -759,7 +765,7 @@ public class ControlerIT {
 		controler.run();
 
 
-		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
+		assertFalse(new File(controler.getControllerIO().getOutputFilename(Controler.DefaultFiles.population)).exists());
 	}
 
 	@Test
@@ -900,7 +906,7 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, "T.veh.gz")).exists());
 	}
 
 	@Test
@@ -920,9 +926,9 @@ public class ControlerIT {
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "T.veh.gz")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(0, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(1, "T.veh.gz")).exists());
+		assertTrue(new File(controler.getControllerIO().getIterationFilename(2, "T.veh.gz")).exists());
 	}
 
 	/**

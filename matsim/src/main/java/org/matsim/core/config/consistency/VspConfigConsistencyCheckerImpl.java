@@ -90,31 +90,35 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		problem = checkLocationChoiceConfigGroup( config, problem );
 
-		// === planCalcScore:
-
-		problem = checkPlanCalcScoreConfigGroup( config, lvl, problem );
-
 		// === plans:
 
 		problem = checkPlansConfigGroup( config, lvl, problem );
-
-		// === plansCalcRoute:
-
-		checkPlansCalcScoreConfigGroup( config, lvl );
 
 		// === qsim:
 
 		problem = checkQsimConfigGroup( config, lvl, problem );
 
+		// === routing:
+
+		problem = checkRoutingConfigGroup( config, lvl, problem );
+
+		// === scoring:
+
+		problem = checkScoringConfigGroup( config, lvl, problem );
+
 		// === strategy:
 
 		problem = checkStrategyConfigGroup( config, lvl, problem );
 
+		// === timeAllocationMutator:
+
+		problem = checkTimeAllocationMutatorConfigGroup( config, lvl, problem);
+
 		// === travelTimeCalculator:
 
-		checkTravelTimeCalculatorConfigGroup( config, lvl );
+		problem = checkTravelTimeCalculatorConfigGroup( config, lvl, problem );
 
-		// === interaction between config groups:
+		// ### interaction between config groups:
 		boolean containsModeChoice = false ;
 		for ( StrategySettings settings : config.replanning().getStrategySettings() ) {
 			if ( settings.getStrategyName().contains("Mode") ) {
@@ -165,13 +169,23 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		return problem;
 	}
-	private static void checkTravelTimeCalculatorConfigGroup( Config config, Level lvl ){
+	private static boolean checkTimeAllocationMutatorConfigGroup( Config config, Level lvl, boolean problem ){
+		// added may'25
+		if ( !config.timeAllocationMutator().isAffectingDuration() ) {
+			System.out.flush() ;
+			log.log( lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  Reason is that the upstream demand generation uses activityEndTimes " +
+								  "for long activity types and duration for short activity types.  However, for a short activity of, say, 10min, a mutation of plus/minus the time mutation range leads to problems.") ;
+		}
+		return problem;
+	}
+	private static boolean checkTravelTimeCalculatorConfigGroup( Config config, Level lvl, boolean problem ){
 		// added feb'19
 		if ( !config.travelTimeCalculator().getSeparateModes() ) {
 			System.out.flush() ;
 			log.log( lvl, "travelTimeCalculator is not analyzing different modes separately; vsp default is to do that.  Otherwise, you are using the same travel times " +
-						    "for, say, bike and car.") ;
+								  "for, say, bike and car.") ;
 		}
+		return problem;
 	}
 	private static boolean checkStrategyConfigGroup( Config config, Level lvl, boolean problem ){
 		boolean found = false ;
@@ -286,8 +300,6 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 		return problem;
 	}
-	private static void checkPlansCalcScoreConfigGroup( Config config, Level lvl ){
-	}
 	private static boolean checkPlansConfigGroup( Config config, Level lvl, boolean problem ){
 		// added before nov'12
 		if ( !config.plans().isRemovingUnneccessaryPlanAttributes() ) {
@@ -323,7 +335,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		return problem;
 	}
-	private static boolean checkPlanCalcScoreConfigGroup( Config config, Level lvl, boolean problem ){
+	private static boolean checkRoutingConfigGroup( Config config, Level lvl, boolean problem ) {
+		// added feb'16
+		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
+					      "some other value or talk to Kai." ) ;
+		}
+		return problem;
+	}
+	private static boolean checkScoringConfigGroup( Config config, Level lvl, boolean problem ){
 		// use beta_brain=1 // added as of nov'12
 		if ( config.scoring().getBrainExpBeta() != 1. ) {
 			problem = true ;
@@ -386,11 +406,6 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
 
-		// added feb'16
-		if ( config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none ) ) {
-			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or " +
-						      "some other value or talk to Kai." ) ;
-		}
 		// added oct'17:
 		if ( config.scoring().getFractionOfIterationsToStartScoreMSA() == null || config.scoring().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
@@ -425,6 +440,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 							      + ".  Values different from zero cause problems here because the ASC is also used for access/egress modes" );
 			}
 		}
+		// added jun'25:
+		if ( !config.scoring().isWriteExperiencedPlans() ) {
+			log.log( lvl, "You are not writing experienced plans.  Vsp default is to do so." );
+		}
 		return problem;
 	}
 	private static boolean checkLocationChoiceConfigGroup( Config config, boolean problem ){
@@ -434,7 +453,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		if ( usingLocationChoice ) {
-			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent" );
+			final String samplePercent = config.getModule("locationchoice").getParams().get("destinationSamplePercent");
 			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
 				problem = true ;
 				System.out.flush() ;

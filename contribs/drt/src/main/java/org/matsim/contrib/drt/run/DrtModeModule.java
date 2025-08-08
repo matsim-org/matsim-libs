@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
-import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
@@ -79,7 +78,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				null :
 				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.getVehiclesFile()),
 				drtCfg.isChangeStartLinkToLastLinkInSchedule(), drtCfg.addOrGetLoadParams()));
-		install(new DrtModeZonalSystemModule(drtCfg));
 		install(new RebalancingModule(drtCfg));
 		install(new DrtModeRoutingModule(drtCfg));
 
@@ -94,7 +92,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controller(),
 							getter.get(Network.class), getter.getModal(FleetSpecification.class),
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
+			addControllerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 
 		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {

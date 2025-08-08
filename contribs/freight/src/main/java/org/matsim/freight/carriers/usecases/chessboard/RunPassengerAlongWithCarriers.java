@@ -121,10 +121,10 @@ final class RunPassengerAlongWithCarriers {
 
 		eventsManager.addHandler(withoutFreight);
 		eventsManager.addHandler(freightOnly);
-		controller.addControlerListener(scores);
-		controller.addControlerListener((IterationEndsListener) event -> {
+		controller.addControllerListener(scores);
+		controller.addControllerListener((IterationEndsListener) event -> {
 			//write plans
-			String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+			String dir = event.getServices().getControllerIO().getIterationPath(event.getIteration());
 			CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 			//write stats

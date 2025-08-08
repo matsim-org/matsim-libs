@@ -12,37 +12,40 @@ public class CumulativeStopTimeCalculator implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// pickup takes the indicated duration
-		return beginTime + provider.calcPickupDuration(vehicle, request);
+		double endTime = beginTime + provider.calcPickupDuration(vehicle, request);
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
 		// pickup extends the stop duration
-		return stop.getEndTime() + provider.calcPickupDuration(vehicle, request);
+		insertionTime = Math.max(stop.getEndTime(), insertionTime);
+		double endTime = insertionTime + provider.calcPickupDuration(vehicle, request);
+		return new Pickup(endTime, endTime);
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
 		// dropoff takes the indicated duration
-		return beginTime + provider.calcDropoffDuration(vehicle, request);
+		double endTime = beginTime + provider.calcDropoffDuration(vehicle, request);
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		// stop may have been shifted
+		double initialDuration = stop.getEndTime() - stop.getBeginTime();
+		double endTime = Math.max(stop.getEndTime(), insertionTime + initialDuration);
 
-		if (insertionTime > stop.getBeginTime()) {
-			// insertion has shifted the stop
-			double initialDuration = stop.getEndTime() - stop.getBeginTime();
-			return insertionTime + initialDuration + stopDuration;
-		} else {
-			// no shift, we simply add the new duration
-			return stop.getEndTime() + stopDuration;
-		}
+		// add dropoff
+		double stopDuration = provider.calcDropoffDuration(vehicle, request);
+		endTime += stopDuration;
+
+		return new Dropoff(endTime, endTime);
 	}
 
 	@Override

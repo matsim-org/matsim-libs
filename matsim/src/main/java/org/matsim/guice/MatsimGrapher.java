@@ -171,6 +171,9 @@ public class MatsimGrapher extends AbstractInjectorGrapher {
 			if (node.getId().getKey().getTypeLiteral().toString().contains("ControlerListener")) {
 				return true;
 			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("ControllerListener")) {
+				return true;
+			}
 			if (node.getId().getKey().getTypeLiteral().toString().contains("EventsToActivities")) {
 				return true;
 			}
