@@ -37,21 +37,24 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class NoiseOfflineCalculationExample {
 
-	private static String runDirectory = "pathTo/RunDirectory/";
-	private static String outputDirectory = "pathTo/analysis-output-directory/";
-	private static String runId = "runXYZ";
+	private static String runDirectory = "/Users/jakob/git/public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy/";
+	private static String outputDirectory = "/Users/jakob/git/public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy/analysis/";
+	private static String runId = "berlin-v6.3";
 
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
+		config.global().setCoordinateSystem("EPSG:25832");
 		config.controller().setRunId(runId);
 		config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
+		config.facilities().setInputFile(runDirectory + runId + ".output_facilities.xml.gz");
 		config.controller().setOutputDirectory(runDirectory);
 
 		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
-		noiseParameters.setReceiverPointGap(12345789.);
+		noiseParameters.setReceiverPointGap(10000);
+//		noiseParameters.setReceiverPointGap(12345789.);
 		// ...
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

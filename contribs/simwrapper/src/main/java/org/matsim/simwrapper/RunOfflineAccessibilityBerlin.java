@@ -23,14 +23,6 @@ import org.matsim.application.ApplicationUtils;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityFromEvents;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
-import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
-import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -43,17 +35,14 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.simwrapper.SimWrapper;
-import org.matsim.simwrapper.SimWrapperConfigGroup;
-import org.matsim.simwrapper.dashboard.AccessibilityDashboard;
+import org.matsim.simwrapper.dashboard.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,32 +52,58 @@ import java.util.Set;
 
 
 public class RunOfflineAccessibilityBerlin {
+	private enum ageScenario{base, child, elderly};
+	private enum economicStatusScenario{base, lowIncome, highIncome};
 
-	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/base";
+	//		static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
+	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
+
+	private static final ageScenario age = ageScenario.elderly;
+	private static final economicStatusScenario economicStatus = economicStatusScenario.base;
+
 	private static final String crs = "EPSG:25832";
 	private static final String poiFile = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/poi/poi_bb.csv";
+
+	private static final String shpFile = "../public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/shp/Berlin_25832.shp";
+
+//		Coordinate leftBottomWgs84 = new Coordinate(12.745, 52.179);
+//		Coordinate topRightWgs84 = new Coordinate(13.816, 52.805);
+
+
+	public static double xMin;
+	public static double yMin;
+	public static double yMax;
+	public static double xMax;
+
+
 
 	public static void main(String[] args) throws FactoryException, TransformException {
 
 		// CONFIGURATION
 //		List<String> relevantPois = List.of("train_station", "supermarket");
-		List<String> relevantPois = List.of("ber_airport", "school");
-//		List<String> relevantPois = List.of("ber_airport");
+//		List<String> relevantPois = List.of("ber_airport", "school");
+		List<String> relevantPois = List.of("spa");
 
 
 		AccessibilityConfigGroup accConfig = new AccessibilityConfigGroup();
-		accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox);
+		accConfig.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile);
 
-		Coordinate leftBottomWgs84 = new Coordinate(12.745, 52.179);
-		Coordinate topRightWgs84 = new Coordinate(13.816, 52.805);
-		String mapCenterString = (leftBottomWgs84.x + topRightWgs84.x) / 2 + "," + (leftBottomWgs84.y + topRightWgs84.y) / 2;
-		Coordinate leftBottom = transformCoordinate(CRS.decode("EPSG:4326",true),CRS.decode(crs), leftBottomWgs84);
-		Coordinate rightTop = transformCoordinate(CRS.decode("EPSG:4326",true), CRS.decode(crs), topRightWgs84);
-		accConfig.setBoundingBoxLeft(leftBottom.x);
-		accConfig.setBoundingBoxBottom(leftBottom.y);
-		accConfig.setBoundingBoxRight(rightTop.x);
-		accConfig.setBoundingBoxTop(rightTop.y);
-		accConfig.setTileSize_m(500);//250
+
+//		Coordinate leftBottomWgs84 = new Coordinate(13.31, 52.32);
+//		Coordinate topRightWgs84 = new Coordinate(13.77, 52.53);
+//		String mapCenterString = (leftBottomWgs84.x + topRightWgs84.x) / 2 + "," + (leftBottomWgs84.y + topRightWgs84.y) / 2;
+//		Coordinate leftBottom = transformCoordinate(CRS.decode("EPSG:4326",true),CRS.decode(crs), leftBottomWgs84);
+//		Coordinate rightTop = transformCoordinate(CRS.decode("EPSG:4326",true), CRS.decode(crs), topRightWgs84);
+//		xMin = leftBottom.x;
+//		yMin = leftBottom.y;
+//		xMax = rightTop.x;
+//		yMax = rightTop.y;
+//		accConfig.setBoundingBoxLeft(xMin);
+//		accConfig.setBoundingBoxBottom(yMin);
+//		accConfig.setBoundingBoxRight(xMax);
+//		accConfig.setBoundingBoxTop(yMax);
+		accConfig.setShapeFileCellBasedAccessibility(shpFile);
+		accConfig.setTileSize_m(5000);//250
 
 		List<Double> timesHour = List.of(6.0);
 //		List<Double> timesHour = List.of(0.0, 3.0, 6.0, 8.0);
@@ -97,9 +112,9 @@ public class RunOfflineAccessibilityBerlin {
 
 		accConfig.setTimeOfDay(timesSeconds);
 //		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.car, Modes4Accessibility.pt,Modes4Accessibility.walk, Modes4Accessibility.bike, Modes4Accessibility.teleportedWalk);
-		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.car, Modes4Accessibility.pt,Modes4Accessibility.walk, Modes4Accessibility.teleportedWalk);
+//		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.car, Modes4Accessibility.pt, Modes4Accessibility.teleportedWalk);
 //		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.car, Modes4Accessibility.pt);
-//		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.pt);
+		List<Modes4Accessibility> accModes = List.of(Modes4Accessibility.car);
 
 		for(Modes4Accessibility mode : Modes4Accessibility.values()) {
 			accConfig.setComputingAccessibilityForMode(mode, accModes.contains(mode));
@@ -111,7 +126,7 @@ public class RunOfflineAccessibilityBerlin {
 		step2_calculateAccessibility(null, relevantPois, accConfig);
 
 		// Part 2: Create Dashboard
-		step3_createDashboard(relevantPois, accModes, mapCenterString);
+		step3_createDashboard(relevantPois, accModes, null); //mapCenterString
 
 
 	}
@@ -130,19 +145,29 @@ public class RunOfflineAccessibilityBerlin {
 
 		config.global().setCoordinateSystem(crs);
 
-
-
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 
 		//simwrapper
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
-		group.defaultParams().mapCenter = mapCenterString;
+//		group.sampleSize = 1.0;
+
+		group.sampleSize = 0.01;
+//		group.defaultParams().mapCenter = mapCenterString;
 		group.defaultDashboards = SimWrapperConfigGroup.Mode.disabled;
 
 
-		SimWrapper sw = SimWrapper.create(config).addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), relevantPois, accModes));
-		boolean append = true;
+		String[] args = new String[]{"--xMin", String.valueOf(xMin), "--xMax", String.valueOf(xMax), "--yMin", String.valueOf(yMin), "--yMax", String.valueOf(yMax)};
+
+		String coordinateSystem = config.global().getCoordinateSystem();
+		SimWrapper sw = SimWrapper.create(config)
+			.addDashboard(new OverviewDashboardHeart(relevantPois, coordinateSystem))
+			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.car))
+			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.pt))
+			.addDashboard(new EquityBerlinDashboard(coordinateSystem, relevantPois));
+//			.addDashboard(new NoiseDashboard(coordinateSystem, shpFile));
+
+
+		boolean append = false;
 		try {
 			sw.generate(Path.of(OUTPUT_DIR), append);
 		} catch (IOException e) {
@@ -231,6 +256,8 @@ public class RunOfflineAccessibilityBerlin {
 		// input files
 //		String stopsFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/kelheim/kelheim-drt-accessibility-JB-master/input/drt-stops-land.xml";
 
+
+		String configFile = ApplicationUtils.matchInput("output_config.xml", Path.of(OUTPUT_DIR)).toString();
 		String eventsFile = ApplicationUtils.matchInput("output_events.xml.gz", Path.of(OUTPUT_DIR)).toString();
 		String networkFile = ApplicationUtils.matchInput("output_network.xml.gz", Path.of(OUTPUT_DIR)).toString();
 		String transportScheduleFile = ApplicationUtils.matchInput("output_transitSchedule.xml.gz", Path.of(OUTPUT_DIR)).toString();
@@ -238,6 +265,7 @@ public class RunOfflineAccessibilityBerlin {
 
 		// CONFIG
 		//global
+		final Config configFromScenario = ConfigUtils.loadConfig(configFile);
 		final Config config = ConfigUtils.createConfig();
 
 
@@ -265,12 +293,45 @@ public class RunOfflineAccessibilityBerlin {
 //		drtParams.setMarginalUtilityOfTraveling(0.0);
 //		config.scoring().addModeParams(drtParams);
 
+
+		// scoring:
+
+		for (ScoringConfigGroup.ModeParams modeParams : configFromScenario.scoring().getModes().values()) {
+			config.scoring().addModeParams(modeParams);
+		}
+
 		ScoringConfigGroup.ModeParams walkParams = config.scoring().getModes().get(TransportMode.walk);
+		ScoringConfigGroup.ModeParams carParams = config.scoring().getModes().get(TransportMode.car);
+		ScoringConfigGroup.ModeParams ptParams = config.scoring().getModes().get(TransportMode.pt);
+
 		walkParams.setMarginalUtilityOfTraveling(0.0);
 		config.scoring().addModeParams(walkParams);
 
-		// accessibility config
+		// income dependence
+		if(economicStatus == economicStatusScenario.highIncome){
+			config.scoring().setMarginalUtilityOfMoney(config.scoring().getMarginalUtilityOfMoney() * 0.5);
 
+
+//			carParams.getMarginalUtilityOfTraveling(); //see RandomizingTimeDistanceTravelDisutilityFactory.java
+//			carParams.getMonetaryDistanceRate();
+
+		} else if (economicStatus == economicStatusScenario.lowIncome) {
+			config.scoring().setMarginalUtilityOfMoney(config.scoring().getMarginalUtilityOfMoney() * 2.0);
+		}
+
+		// age dependence
+
+		if(age == ageScenario.child){
+			carParams.setConstant(carParams.getConstant() - 3);
+		} else if (age == ageScenario.elderly) {
+			carParams.setConstant(carParams.getConstant() - 3);
+			config.routing().getTeleportedModeParams().get(TransportMode.walk).setTeleportedModeSpeed(config.routing().getTeleportedModeParams().get(TransportMode.walk).getTeleportedModeSpeed() * 0.5);
+//			config.routing().getTeleportedModeParams().getTeleportedModeParamset(TransportMode.non_network_walk	).setTeleportedModeSpeed(config.routing().getTeleportedModeParams().get(TransportMode.walk).getTeleportedModeSpeed() * 0.5);
+		}
+
+
+
+		// accessibility config
 		config.addModule(accConfig);
 
 		// drt config
@@ -312,6 +373,15 @@ public class RunOfflineAccessibilityBerlin {
 		airport.addActivityOption(ao);
 		activityFacilities.addActivityFacility(airport);
 
+
+		ActivityOption aoSpa = af.createActivityOption("spa");
+		ActivityFacility vabali = af.createActivityFacility(Id.create("vabali", ActivityFacility.class), new Coord(795634.64,5828763.74));
+		vabali.addActivityOption(aoSpa);
+		activityFacilities.addActivityFacility(vabali);
+
+		ActivityFacility liquidrom = af.createActivityFacility(Id.create("liquidrom", ActivityFacility.class), new Coord(797312.78, 5825825.94));
+		liquidrom.addActivityOption(aoSpa);
+		activityFacilities.addActivityFacility(liquidrom);
 
 
 

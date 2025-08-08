@@ -2,6 +2,8 @@ package org.matsim.application.analysis.accessibility;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.ApplicationUtils;
@@ -10,6 +12,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.GridUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
@@ -201,6 +204,28 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 					Scenario scenario = ScenarioUtils.createScenario(config);
 					new PopulationReader(scenario).readFile(populationPath);
 
+
+					double boundingBoxLeft;
+					double boundingBoxRight;
+					double boundingBoxBottom;
+					double boundingBoxTop;
+					if (acg.getAreaOfAccessibilityComputation().equals(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox)) {
+						boundingBoxRight = acg.getBoundingBoxRight();
+						boundingBoxLeft = acg.getBoundingBoxLeft();
+						boundingBoxTop = acg.getBoundingBoxTop();
+						boundingBoxBottom = acg.getBoundingBoxBottom();
+					} else if (acg.getAreaOfAccessibilityComputation().equals(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile)) {
+						Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
+						Envelope envelope = boundary.getEnvelopeInternal();
+
+						boundingBoxLeft = envelope.getMinX();
+						boundingBoxRight = envelope.getMaxX();
+						boundingBoxBottom = envelope.getMinY();
+						boundingBoxTop = envelope.getMaxY();
+					} else {
+						throw new RuntimeException("Unsupported area of accessibility computation: " + acg.getAreaOfAccessibilityComputation());
+					}
+
 					for (Person person : scenario.getPopulation().getPersons().values()) {
 						Double homeX = (Double) person.getAttributes().getAttribute("home_x");
 						Double homeY = (Double) person.getAttributes().getAttribute("home_y");
@@ -209,7 +234,8 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 							continue; // Skip this person if home coordinates are not available
 						}
 
-						if(homeX > acg.getBoundingBoxRight() || homeX < acg.getBoundingBoxLeft() || homeY > acg.getBoundingBoxTop() || homeY < acg.getBoundingBoxBottom()) {
+
+							if(homeX > boundingBoxRight || homeX < boundingBoxLeft || homeY > boundingBoxTop || homeY < boundingBoxBottom) {
 							continue;
 						}
 
