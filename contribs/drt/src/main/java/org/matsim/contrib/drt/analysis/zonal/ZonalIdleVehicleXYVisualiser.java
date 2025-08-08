@@ -89,7 +89,7 @@ public class ZonalIdleVehicleXYVisualiser
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String filename = services.getControlerIO()
+		String filename = services.getControllerIO()
 				.getIterationFilename(services.getIterationNumber(), mode + "_idleVehiclesPerZoneXY.csv");
 
 		try {

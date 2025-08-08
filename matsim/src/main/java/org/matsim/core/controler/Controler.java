@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -99,6 +99,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
         ;
 
 		final String filename;
+
+		public String getFilename() {
+			return filename;
+		}
 
 		DefaultFiles(String filename) {
 			this.filename = filename;
@@ -427,7 +431,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	}
 
 	@Override
-	public OutputDirectoryHierarchy getControlerIO() {
+	public OutputDirectoryHierarchy getControllerIO() {
 		return injector.getInstance(OutputDirectoryHierarchy.class);
 	}
 
@@ -441,11 +445,11 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	// ******** --------- *******
 
 	@Override
-	public void addControlerListener(final ControlerListener controlerListener) {
+	public void addControllerListener(final ControllerListener controllerListener) {
 		addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().toInstance(controlerListener);
+				addControllerListenerBinding().toInstance(controllerListener);
 			}
 		});
 	}

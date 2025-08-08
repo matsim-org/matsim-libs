@@ -22,11 +22,7 @@ package org.matsim.contrib.drt.extension.services.optimizer;
 import org.matsim.contrib.drt.extension.services.dispatcher.ServiceTaskDispatcher;
 import org.matsim.contrib.drt.extension.services.schedule.DrtServiceDynActionCreator;
 import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTaskFactoryImpl;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
-import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
-import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -34,12 +30,12 @@ import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -76,9 +72,10 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 			getter -> {
-				var delegate = new DefaultDrtOptimizer(drtConfigGroup, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+				var delegate = new DefaultDrtOptimizer(
+					getter.getModal(QsimScopeForkJoinPool.class) ,drtConfigGroup, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 					getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-					getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+					getter.getModal(ScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 					getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 					getter.getModal(DrtRequestInsertionRetryQueue.class));
 				return new DrtServiceTaskOptimizer(getter.getModal(ServiceTaskDispatcher.class),

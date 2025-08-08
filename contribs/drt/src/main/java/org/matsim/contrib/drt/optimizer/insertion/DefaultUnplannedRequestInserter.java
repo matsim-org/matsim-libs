@@ -19,16 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.DoubleSupplier;
-import java.util.stream.Collectors;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,8 +37,12 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.DoubleSupplier;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -70,27 +66,27 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final RequestFleetFilter requestFleetFilter;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
-                                           EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-                                           VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch insertionSearch,
-                                           DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
-                                           ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter) {
+										   EventsManager eventsManager, Provider<RequestInsertionScheduler> insertionScheduler,
+										   VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
+										   DrtRequestInsertionRetryQueue insertionRetryQueue, DrtOfferAcceptor drtOfferAcceptor,
+										   ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter) {
 		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
 				insertionRetryQueue, insertionSearch, drtOfferAcceptor, forkJoinPool, stopDurationProvider, requestFleetFilter);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
-                                    RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
-                                    DrtRequestInsertionRetryQueue insertionRetryQueue, DrtInsertionSearch insertionSearch,
+                                    Provider<RequestInsertionScheduler> insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
+                                    DrtRequestInsertionRetryQueue insertionRetryQueue, Provider<DrtInsertionSearch> insertionSearch,
                                     DrtOfferAcceptor drtOfferAcceptor, ForkJoinPool forkJoinPool, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter) {
 		this.mode = mode;
 		this.fleet = fleet;
 		this.timeOfDay = timeOfDay;
 		this.eventsManager = eventsManager;
-		this.insertionScheduler = insertionScheduler;
+		this.insertionScheduler = insertionScheduler.get();
 		this.vehicleEntryFactory = vehicleEntryFactory;
 		this.insertionRetryQueue = insertionRetryQueue;
-		this.insertionSearch = insertionSearch;
+		this.insertionSearch = insertionSearch.get();
 		this.drtOfferAcceptor = drtOfferAcceptor;
 		this.forkJoinPool = forkJoinPool;
 		this.stopDurationProvider = stopDurationProvider;
@@ -133,14 +129,30 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		} else {
 			InsertionWithDetourData insertion = best.get();
 
+			double dropoffDuration =
+				insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime -
+				insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime;
+
 			// accept offered drt ride
 			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
-					insertion.detourTimeInfo.pickupDetourInfo.departureTime,
-					insertion.detourTimeInfo.dropoffDetourInfo.arrivalTime);
+					insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
+					insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
+					dropoffDuration);
 
 			if(acceptedRequest.isPresent()) {
 				var vehicle = insertion.insertion.vehicleEntry.vehicle;
 				var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
+
+				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
+				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
+				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+
+				// if the stop task ends earlier, it means that it was decided that the stop duration
+				// is shorter, which can happen if a request is merged with an existing stop
+				expectedPickupTime = Math.min(expectedPickupTime, pickupDropoffTaskPair.pickupTask.getEndTime());
+
+				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
+				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 				if (newVehicleEntry != null) {
@@ -148,13 +160,6 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				} else {
 					vehicleEntries.remove(vehicle.getId());
 				}
-
-				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
-				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
-				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
-
-				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
-				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerIds(), vehicle.getId(),
@@ -177,5 +182,25 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 					+ " fromLinkId="
 					+ req.getFromLink().getId());
 		}
+	}
+
+	@Override
+	public void onPrepareSim() {
+
+	}
+
+	@Override
+	public void afterSim() {
+
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+
+	}
+
+	@Override
+	public void doSimStep(double time) {
+
 	}
 }

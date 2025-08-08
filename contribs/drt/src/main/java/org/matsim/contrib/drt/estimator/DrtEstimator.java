@@ -2,7 +2,7 @@ package org.matsim.contrib.drt.estimator;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import static org.matsim.contrib.dvrp.passenger.TeleportingEstimationPassengerEngine.*;
@@ -10,7 +10,7 @@ import static org.matsim.contrib.dvrp.passenger.TeleportingEstimationPassengerEn
 /**
  * Interface to estimate a DRT service's detour, waiting time and costs.
  */
-public interface DrtEstimator extends ControlerListener {
+public interface DrtEstimator extends ControllerListener {
 	/**
 	 * Provide an estimate for a drt route with specific pickup and dropoff point.
 	 *

@@ -344,17 +344,17 @@ public class PTSkimMatrices {
         public final FloatMatrix<T> dataCountMatrix; // how many values/routes were taken into account to calculate the averages
 
         PtIndicators(Set<T> zones) {
-            this.adaptionTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.frequencyMatrix = new FloatMatrix<>(zones, 0);
+            this.adaptionTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.frequencyMatrix = FloatMatrix.createFloatMatrix(zones, 0);
 
-            this.distanceMatrix = new FloatMatrix<>(zones, 0);
-            this.travelTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.accessTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.egressTimeMatrix = new FloatMatrix<>(zones, 0);
-            this.transferCountMatrix = new FloatMatrix<>(zones, 0);
-            this.dataCountMatrix = new FloatMatrix<>(zones, 0);
-            this.trainTravelTimeShareMatrix = new FloatMatrix<>(zones, 0);
-            this.trainDistanceShareMatrix = new FloatMatrix<>(zones, 0);
+            this.distanceMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.travelTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.accessTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.egressTimeMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.transferCountMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.dataCountMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.trainTravelTimeShareMatrix = FloatMatrix.createFloatMatrix(zones, 0);
+            this.trainDistanceShareMatrix = FloatMatrix.createFloatMatrix(zones, 0);
         }
     }
 

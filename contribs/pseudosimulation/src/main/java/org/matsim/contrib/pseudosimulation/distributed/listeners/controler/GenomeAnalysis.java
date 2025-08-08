@@ -32,7 +32,7 @@ public class GenomeAnalysis implements IterationEndsListener {
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        outputPath = event.getServices().getControlerIO().getOutputPath();
+        outputPath = event.getServices().getControllerIO().getOutputPath();
         Map<String, Integer> fullGeneCount = new HashMap<>();
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();

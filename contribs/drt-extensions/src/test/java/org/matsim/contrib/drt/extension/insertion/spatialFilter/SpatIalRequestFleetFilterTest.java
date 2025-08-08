@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +19,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -47,7 +51,52 @@ public class SpatIalRequestFleetFilterTest {
 
     private static final IntegersLoadType loadType = new IntegersLoadType("passengers");
 
-    @Test
+	@Test
+	void testConcurrentFiltering() throws InterruptedException {
+		Link link = prepareNetworkAndLink();
+		MobsimTimer timer = new MobsimTimer(1);
+		timer.setTime(0);
+
+		Fleet fleet = getFleet(link);
+		var vehicleEntry = getVehicleEntry(link, fleet);
+		Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries = Map.of(V_1_ID, vehicleEntry);
+
+		DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
+
+		DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
+		params.setUpdateInterval(0.1); // very frequent updates
+		params.setExpansionFactor(2);
+		params.setMinExpansion(1);
+		params.setMaxExpansion(10);
+		params.setReturnAllIfEmpty(true);
+
+		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, timer, params);
+
+		int threadCount = 10;
+		int iterationsPerThread = 100;
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		CountDownLatch latch = new CountDownLatch(threadCount);
+
+		for (int i = 0; i < threadCount; i++) {
+			executor.submit(() -> {
+				try {
+					for (int j = 0; j < iterationsPerThread; j++) {
+						timer.setTime(j * 0.1); // simulate time progression
+						Collection<VehicleEntry> result = filter.filter(dummyRequest, vehicleEntries, timer.getTimeOfDay());
+						Assertions.assertThat(result).isNotNull();
+					}
+				} finally {
+					latch.countDown();
+				}
+			});
+		}
+
+		latch.await();
+		executor.shutdown();
+	}
+
+
+	@Test
     void test() {
 
         Link link = prepareNetworkAndLink();
@@ -145,10 +194,18 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .constraints(
+                        new DrtRouteConstraints(
+                                submissionTime,
+                                earliestStartTime,
+                                latestStartTime,
+                                latestArrivalTime,
+                                Double.POSITIVE_INFINITY,
+                                Double.POSITIVE_INFINITY,
+                                false
+                        )
+                )
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode("drt")

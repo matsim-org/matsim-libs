@@ -87,7 +87,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
 		if (shiftsParams.getShiftInputFile() != null) {
-			new DrtShiftsReader(drtShiftsSpecification).readURL(shiftsParams.getShiftInputUrl(getConfig().getContext()));
+			new DrtShiftsReader(drtShiftsSpecification).parse(shiftsParams.getShiftInputUrl(getConfig().getContext()));
 		}
 
 		bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(drtShiftsSpecification)));
@@ -108,10 +108,10 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		addEventHandlerBinding().to(modalKey(BreakCorridorXY.class));
 		addEventHandlerBinding().to(modalKey(MultiTypeShiftHistogram.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> new ShiftHistogramListener(drtConfigGroup,
 						getter.get(MatsimServices.class), getter.getModal(MultiTypeShiftHistogram.class)))).asEagerSingleton();
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> new ShiftAnalysisControlerListener(getConfig(), drtConfigGroup,
 						getter.getModal(ShiftDurationXY.class), getter.getModal(BreakCorridorXY.class),
 						getter.get(MatsimServices.class)))).asEagerSingleton();
@@ -124,7 +124,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				))
 		).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(DumpShiftDataAtEndImpl.class)
 		));
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
@@ -133,11 +133,11 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
 						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE), getter.getModal(DvrpLoadType.class)))).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+		addControllerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_occupancy_time_profiles"))).in(Singleton.class);
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+		addControllerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_task_time_profiles"))).in(Singleton.class);
 
@@ -148,7 +148,7 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				))
 		).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(RegularShiftDump.class)
 		));
 	}

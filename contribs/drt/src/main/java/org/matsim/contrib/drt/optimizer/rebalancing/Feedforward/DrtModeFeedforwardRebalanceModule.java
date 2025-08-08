@@ -97,6 +97,6 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 						getter.getModal(DrtZoneTargetLinkSelector.class))));
 
 		addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
-		addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
+		addControllerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
 	}
 }
