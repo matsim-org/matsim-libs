@@ -103,7 +103,9 @@ public class RunOfflineAccessibilityBerlin {
 //		accConfig.setBoundingBoxRight(xMax);
 //		accConfig.setBoundingBoxTop(yMax);
 		accConfig.setShapeFileCellBasedAccessibility(shpFile);
-		accConfig.setTileSize_m(5000);//250
+		accConfig.setTileSize_m(500);//250
+		// 5000 - 4 minutes
+		// 500 - 5 min
 
 		List<Double> timesHour = List.of(6.0);
 //		List<Double> timesHour = List.of(0.0, 3.0, 6.0, 8.0);
