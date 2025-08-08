@@ -50,7 +50,7 @@ public final class CarrierModule extends AbstractModule {
 		// this is probably ok
 
 		bind(CarrierControllerListener.class).in( Singleton.class );
-		addControlerListenerBinding().to(CarrierControllerListener.class);
+		addControllerListenerBinding().to(CarrierControllerListener.class);
 
 		bind(CarrierAgentTracker.class).in( Singleton.class );
 		addEventHandlerBinding().to( CarrierAgentTracker.class );
@@ -97,7 +97,7 @@ public final class CarrierModule extends AbstractModule {
 		bind( CarrierStrategyManager.class ).toProvider( () -> null );
 		// (the null binding means that a zeroth iteration will run. kai, jul'22)
 
-		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
+		this.addControllerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControllerIO(), event.getServices().getConfig(), CarriersUtils.getCarriers( event.getServices().getScenario() ) ));
 
 	}
 
@@ -142,6 +142,8 @@ public final class CarrierModule extends AbstractModule {
 		if (!carriers.getCarriers().isEmpty() && config.controller().getDumpDataAtEnd()) {
 			CarriersAnalysis carriersAnalysis = new CarriersAnalysis(controllerIO.getOutputPath());
 			carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
+			carriers.getCarriers().values().forEach(carrier -> carrier.getAttributes().removeAttribute("jspritComputationTime")); // remove jspritComputationTime because it is written to the carrier analysis output and this value is not deterministic which fails the test
+			CarriersUtils.writeCarriers( carriers, controllerIO.getOutputFilename("output_carriers.xml" + compression));
 		}
 	}
 

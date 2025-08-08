@@ -1,55 +1,43 @@
 package org.matsim.contrib.drt.scheduler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
+import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
 
 /**
  * @author nkuehnel / MOIA
@@ -198,7 +186,7 @@ public class DefaultRequestInsertionSchedulerTest {
 
     private static DefaultRequestInsertionScheduler getDefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer) {
         MinimumStopDurationAdapter stopDuration = new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(StaticPassengerStopDurationProvider.of(STOP_DURATION, 0.0)), 60.);
-        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
+        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdaterImpl(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
         DefaultRequestInsertionScheduler insertionScheduler = new DefaultRequestInsertionScheduler(fleet, timer, TRAVEL_TIME, scheduleTimingUpdater,
                 new DrtTaskFactoryImpl(), stopDuration, true);
         return insertionScheduler;
@@ -244,9 +232,17 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                earliestStartTime,
+                                latestStartTime,
+                                latestArrivalTime,
+                                Double.POSITIVE_INFINITY,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode(mode)

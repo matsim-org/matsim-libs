@@ -65,13 +65,13 @@ public class ScoreStatsModuleTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(MyControlerListener.class);
+				addControllerListenerBinding().to(MyControllerListener.class);
 			}
 		});
 		controler.run();
 	}
 
-	private static class MyControlerListener implements ShutdownListener {
+	private static class MyControllerListener implements ShutdownListener {
 
 		@Inject
 		ScoreStats scoreStats;

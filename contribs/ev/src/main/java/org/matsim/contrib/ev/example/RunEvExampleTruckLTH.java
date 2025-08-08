@@ -96,7 +96,7 @@ public class RunEvExampleTruckLTH {
 				public void install() {
 					bind(EvLowSocPenaltyHandler.class).asEagerSingleton();
 					addEventHandlerBinding().toInstance(penaltyHandler);
-					addControlerListenerBinding().toInstance(penaltyHandler);
+					addControllerListenerBinding().toInstance(penaltyHandler);
 				}
 			});
 

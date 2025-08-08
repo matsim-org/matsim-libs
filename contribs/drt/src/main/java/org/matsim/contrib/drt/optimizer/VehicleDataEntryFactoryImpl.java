@@ -25,6 +25,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtCapacityChangeTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -118,20 +119,40 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, currentTime);
 	}
 
-	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start, List<Double> precedingStayTimes) {
+	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start,
+									  List<Double> precedingStayTimes) {
 		double[] slackTimes = new double[stops.length + 2];
 
 		//vehicle
 		double slackTime = calcVehicleSlackTime(vehicle, now);
 		slackTimes[stops.length + 1] = slackTime;
 
+		List<AcceptedDrtRequest> onboard = new ArrayList<>();
+
 		//stops
 		for (int i = stops.length - 1; i >= 0; i--) {
+
 			var stop = stops[i];
+
+			onboard.addAll(stop.task.getDropoffRequests().values());
+
 			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
 			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
+
+			for (AcceptedDrtRequest req : onboard) {
+				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
+						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
+				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
+						-> new IllegalStateException("Accepted request should have a (planned) dropoff time at this point."));
+				double currentRideDuration = plannedDropoffTime - plannedPickupTime;
+				double currentRideSlack = Math.max(0, req.getMaxRideDuration() - currentRideDuration);
+				slackTime = Math.min(slackTime, currentRideSlack);
+			}
+
 			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
 			slackTimes[i + 1] = slackTime;
+
+			onboard.removeAll(stop.task.getPickupRequests().values());
 		}
 
 		// start

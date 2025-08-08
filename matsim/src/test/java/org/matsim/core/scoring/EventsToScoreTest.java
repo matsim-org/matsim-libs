@@ -220,7 +220,7 @@ public class EventsToScoreTest {
 			@Override
 			public void install() {
 				final int[] iteration = new int[1];
-				this.addControlerListenerBinding().toInstance(new IterationStartsListener() {
+				this.addControllerListenerBinding().toInstance(new IterationStartsListener() {
 					@Override
 					public void notifyIterationStarts(IterationStartsEvent event) {
 						iteration[0] = event.getIteration();
@@ -234,7 +234,7 @@ public class EventsToScoreTest {
 				});
 			}
 		});
-		controler.addControlerListener(new IterationEndsListener() {
+		controler.addControllerListener(new IterationEndsListener() {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				System.out.println( "score: " + person.getSelectedPlan().getScore() ) ;

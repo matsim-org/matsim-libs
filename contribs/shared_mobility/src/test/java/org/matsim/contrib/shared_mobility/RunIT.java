@@ -155,7 +155,7 @@ public class RunIT {
 
 		controller.run();
 
-		OutputData data = countLegs(controller.getControlerIO().getOutputPath() + "/output_events.xml.gz");
+		OutputData data = countLegs(controller.getControllerIO().getOutputPath() + "/output_events.xml.gz");
 
 		Assertions.assertEquals(82629, (long) data.counts.get("car"));
 		Assertions.assertEquals(29739, (long) data.counts.get("walk"));

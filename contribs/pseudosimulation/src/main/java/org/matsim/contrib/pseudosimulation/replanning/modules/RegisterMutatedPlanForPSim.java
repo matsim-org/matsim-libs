@@ -21,7 +21,7 @@ public class RegisterMutatedPlanForPSim implements PlanStrategyModule, Iteration
         this.slave = slave;
         this.gene=gene;
         this.trackGenome = trackGenome;
-        controler.addControlerListener(this);
+        controler.addControllerListener(this);
     }
 
     private PlanCatcher slave;
