@@ -121,67 +121,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.marginalUtilityOfGradient;
 	}
 
-	/**
-	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
-	 * */
-	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
-	@Deprecated
-	public BicycleConfigGroup setMarginalUtilityOfUserDefinedNetworkAttribute_m(final double value) {
-		this.marginalUtilityOfUserDefinedNetworkAttribute = value;
-		return this;
-	}
-	/**
-	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
-	 * */
-	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY)
-	@Deprecated
-	public double getMarginalUtilityOfUserDefinedNetworkAttribute_m() {
-		return this.marginalUtilityOfUserDefinedNetworkAttribute;
-	}
 
-	/**
-	 * @deprecated
-	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
-	 * Please have a look at getCyclewaytype(link) as an example.
-	 */
-	@Deprecated
-	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
-	public BicycleConfigGroup setUserDefinedNetworkAttributeName(String value) {
-		this.userDefinedNetworkAttributeName = value;
-		return this;
-	}
-
-	/**
-	 * @deprecated
-	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
-	 * Please have a look at getCyclewaytype(link) as an example.
-	 */
-	@Deprecated
-	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_NAME)
-	public String getUserDefinedNetworkAttributeName() {
-		return this.userDefinedNetworkAttributeName;
-	}
-	/**
-	 * @deprecated
-	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
-	 * Please have a look at getCyclewaytype(link) as an example.
-	 */
-	@Deprecated
-	@StringSetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
-	public BicycleConfigGroup setUserDefinedNetworkAttributeDefaultValue(double value) {
-		this.userDefinedNetworkAttributeDefaultValue = value;
-		return this;
-	}
-	/**
-	 * @deprecated
-	 * This method is no longer acceptable rather define explicit network attributes then using this generic method.
-	 * Please have a look at getCyclewaytype(link) as an example.
-	 */
-	@Deprecated
-	@StringGetter(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE)
-	public double getUserDefinedNetworkAttributeDefaultValue() {
-		return this.userDefinedNetworkAttributeDefaultValue;
-	}
 //	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
 //		this.bicycleScoringType = value;
 //		return this;
