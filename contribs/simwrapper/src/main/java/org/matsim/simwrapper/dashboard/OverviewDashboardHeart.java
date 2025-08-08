@@ -18,7 +18,7 @@ import java.util.List;
 public class OverviewDashboardHeart implements Dashboard {
 
 	private final List<String> pois;
-	private String coordinateSystem;
+	private final String coordinateSystem;
 	private double[] globalCenter;
 
 	public OverviewDashboardHeart(List<String> pois, String coordinateSystem) {
@@ -58,7 +58,7 @@ public class OverviewDashboardHeart implements Dashboard {
 					Transportation System Planning and Telematics<br>
 					http://tu.berlin/vsp<br>
 					""";
-			});;
+			});
 
 //		 TAB 0: Population Density and POIs
 		{

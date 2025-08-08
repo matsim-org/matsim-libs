@@ -1,14 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
-import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
 import org.matsim.application.analysis.accessibility.AccessibilityDistributionAnalysis;
-import org.matsim.application.analysis.accessibility.PrepareDrtStops;
-import org.matsim.application.analysis.accessibility.PrepareTransitSchedule;
-import org.matsim.application.analysis.traffic.TrafficAnalysis;
-import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Data;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;

@@ -58,7 +58,7 @@ public class RunOfflineAccessibilityBerlin {
 	//		static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
 	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
 
-	private static final ageScenario age = ageScenario.elderly;
+	private static final ageScenario age = ageScenario.base;
 	private static final economicStatusScenario economicStatus = economicStatusScenario.base;
 
 	private static final String crs = "EPSG:25832";

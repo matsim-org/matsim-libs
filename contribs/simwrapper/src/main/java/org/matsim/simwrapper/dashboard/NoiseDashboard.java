@@ -11,8 +11,8 @@ import org.matsim.simwrapper.viz.*;
 public class NoiseDashboard implements Dashboard {
 
 	private final String shpFile;
-	private double minDb = 40;
-	private double maxDb = 80;
+	private final double minDb = 40;
+	private final double maxDb = 80;
 
 	private final String coordinateSystem;
 

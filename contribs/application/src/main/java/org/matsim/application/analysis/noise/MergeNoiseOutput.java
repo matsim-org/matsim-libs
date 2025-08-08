@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.application.avro.XYTData;
 import org.matsim.application.options.CsvOptions;
-import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import tech.tablesaw.api.*;
