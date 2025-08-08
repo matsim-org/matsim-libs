@@ -85,9 +85,6 @@ public class RunBicycleExample {
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002 );
-		bicycleConfigGroup.setMarginalUtilityOfUserDefinedNetworkAttribute_m(-0.0000); // always needs to be negative
-		bicycleConfigGroup.setUserDefinedNetworkAttributeName("quietness"); // needs to be defined as a value from 0 to 1, 1 being best, 0 being worst
-		bicycleConfigGroup.setUserDefinedNetworkAttributeDefaultValue(0.1); // used for those links that do not have a value for the user-defined attribute
 
 //		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 
