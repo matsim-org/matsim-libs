@@ -20,7 +20,7 @@
 
 package org.matsim.pt.fakes;
 
-import java.util.List;
+import java.util.function.ToIntFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -64,7 +63,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 
 	@Override
 	public boolean getEnterTransitRoute(TransitLine line,
-			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+										TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
 		return true;
 	}
 
@@ -77,7 +76,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		return null;
 	}
-	
+
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		return null;

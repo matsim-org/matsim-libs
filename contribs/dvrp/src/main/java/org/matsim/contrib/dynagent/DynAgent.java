@@ -34,11 +34,10 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
+import java.util.function.ToIntFunction;
 
 public final class DynAgent implements MobsimDriverPassengerAgent {
 	private final DynAgentLogic agentLogic;
@@ -225,9 +224,9 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// PTPassengerAgent
 	@Override
-	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
+	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop,
 										TransitVehicle transitVehicle) {
-		return ((PTPassengerDynLeg) dynLeg).getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
+		return ((PTPassengerDynLeg) dynLeg).getEnterTransitRoute(line, transitRoute, arrivesAtStop, transitVehicle);
 	}
 
 	// PTPassengerAgent

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToIntFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,7 +40,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -74,10 +74,11 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	 * @return should be 0.0 or 1.0, values greater than 1.0 may lead to buggy behavior, dependent on TransitStopHandler used
 	 */
 	/*package*/ double calculateStopTimeAndTriggerBoarding(TransitRoute transitRoute, TransitLine transitLine, final TransitVehicle vehicle,
-			final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, final double now) {
-		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
+														   final TransitStopFacility stop, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, final double now) {
+
+		List<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
 		int freeCapacity = vehicle.getPassengerCapacity() -  vehicle.getPassengers().size() + passengersLeaving.size();
-		List<PTPassengerAgent> passengersEntering = findPassengersEntering(transitRoute, transitLine, vehicle, stop, stopsToCome, freeCapacity, now);
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(transitRoute, transitLine, vehicle, stop, arrivesAtStop, freeCapacity, now);
 
 		TransitStopHandler stopHandler = vehicle.getStopHandler();
 		double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, this, vehicle);
@@ -102,13 +103,13 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 
 	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-			final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
+														  final TransitStopFacility stop, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, int freeCapacity, double now) {
 		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
 
 		if (this.isGeneratingDeniedBoardingEvents) {
 
 			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
-				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, arrivesAtStop, vehicle)) {
 					if (freeCapacity >= 1) {
 						passengersEntering.add(agent);
 						freeCapacity--;
@@ -124,7 +125,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				if (freeCapacity == 0) {
 					break;
 				}
-				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, arrivesAtStop, vehicle)) {
 					passengersEntering.add(agent);
 					freeCapacity--;
 				}

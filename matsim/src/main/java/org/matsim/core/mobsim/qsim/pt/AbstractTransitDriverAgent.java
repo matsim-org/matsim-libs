@@ -41,11 +41,7 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
@@ -174,12 +170,12 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		processEventVehicleArrives(stop, now);
 
 		TransitRoute route = this.getTransitRoute();
-		List<TransitRouteStop> stopsToCome = route.getStops().subList(stopIterator.nextIndex(), route.getStops().size());
+
 		/*
 		 * If there are passengers leaving or entering, the stop time must be not greater than 1.0 in order to let them (de-)board every second.
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
-		double stopTime = this.accessEgress.calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
+		double stopTime = this.accessEgress.calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, this::arrivesAtStop, now);
 
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
@@ -188,6 +184,27 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			depart(now);
 		}
 		return stopTime;
+	}
+
+	/**
+	 * Predicate to check if the egress stop is on the route.
+	 * @return the index of the egress stop on the route, or -1 if the egress stop is not on the route.
+	 */
+	private int arrivesAtStop(Id<TransitStopFacility> egressStopId) {
+		List<TransitRouteStop> stopsToCome = this.getTransitRoute().getStops().subList(stopIterator.nextIndex(),
+			this.getTransitRoute().getStops().size());
+
+		for (int i = 0; i < stopsToCome.size(); i++) {
+			TransitRouteStop stop = stopsToCome.get(i);
+			if (egressStopId.equals(stop.getStopFacility().getId())) {
+				return i;
+			}
+		}
+
+		// TODO: needs to be updated for chained routes
+		// TODO: transit driver needs to know chained departures and routes
+
+		return -1;
 	}
 
 	final void sendTransitDriverStartsEvent(final double now) {

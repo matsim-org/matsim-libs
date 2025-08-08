@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -607,7 +608,7 @@ public class UmlaufDriverTest {
 
 		@Override
 		public boolean getEnterTransitRoute(TransitLine line,
-				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+											TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
 			this.offeredLine = line;
 			return false;
 		}

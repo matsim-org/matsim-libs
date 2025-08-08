@@ -21,7 +21,7 @@
 package org.matsim.pt.fakes;
 
 
-import java.util.List;
+import java.util.function.ToIntFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,7 +42,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -71,9 +70,9 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 			Route route = new DefaultTransitPassengerRoute(enterStop, null, null, exitStop);
 			route.setStartLinkId(enterStop.getLinkId());
 			route.setEndLinkId(exitStop.getLinkId());
-			route.setRouteDescription("{" + 
+			route.setRouteDescription("{" +
 					"\"accessFacilityId\":\"" + enterStop.getId().toString() + "\"," +
-					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," + 
+					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," +
 					"\"transitLineId\":\"T1\"" +
 			"}");
 			this.dummyLeg.setRoute(route);
@@ -83,7 +82,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	@Override
 	public void endActivityAndComputeNextState(final double now) {
 	}
-	
+
 	@Override
 	public void setStateToAbort(final double now){
 	}
@@ -113,12 +112,12 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public String getMode() {
 		return this.dummyLeg.getMode();
 	}
-	
+
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
 		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId(); // not sure if this is very clever.  kai, jun'11
 	}
-	
+
 	@Override
 	public double getActivityEndTime() {
 		return 0;
@@ -147,7 +146,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
 		return true;
 	}
 
@@ -199,5 +198,5 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public Facility getDestinationFacility() {
 		throw new RuntimeException("not implemented") ;
 	}
-	
+
 }

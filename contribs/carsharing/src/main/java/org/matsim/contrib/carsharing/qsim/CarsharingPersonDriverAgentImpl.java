@@ -1,6 +1,7 @@
 package org.matsim.contrib.carsharing.qsim;
 
 import java.util.List;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
@@ -33,13 +34,12 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
-	
+
 
 	private CarsharingManagerInterface carsharingManager;
 
@@ -59,7 +59,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();
 		//this should work with multiple qsim threads now since different instances of router are used sep '17 mb
 		//if ( scenario.getConfig().qsim().getNumberOfThreads() != 1 ) {
-		//	throw new RuntimeException("does not work with multiple qsim threads (will use same instance of router)") ; 
+		//	throw new RuntimeException("does not work with multiple qsim threads (will use same instance of router)") ;
 		//}
 	}
 
@@ -78,32 +78,32 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				if (pe2 instanceof Leg && carsharingLeg(pe2))
 					countCSLegs++;
 				if (countCSLegs > this.carsharingTrips) {
-					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.originalPlan, legToBerouted.getMode(), 
+					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.originalPlan, legToBerouted.getMode(),
 							(Leg)(pe2), now);
 					carsharingTrips++;
 					break;
 				}
 			}
-			
+
 			if (newTrip == null) {
 				this.setStateToAbort(now);
 			}
 			else {
-				
-				Plan plan = this.getModifiablePlan() ; 
+
+				Plan plan = this.getModifiablePlan() ;
 				pe = this.getNextPlanElement();
 
 				List<PlanElement> planElements = plan.getPlanElements();
 
 				// Replace InteractionActivity with ActivityImply since the Mobsim needs to be able to set the start time.
 				newTrip = newTrip.stream().map(e -> e instanceof Activity ? PopulationUtils.createActivity((Activity) e) : e).collect(Collectors.toList());
-				
+
 				planElements.remove(pe);
 				planElements.addAll(nextElementIndex, newTrip);
 			}
-		}	
-		
-		
+		}
+
+
 		if (!this.getState().equals(State.ABORT))
 			this.basicAgentDelegate.endActivityAndComputeNextState(now);
 
@@ -113,19 +113,19 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		String mode = ((Leg)pe).getMode();
 		if (mode.equals("freefloating") || mode.equals("oneway") || mode.equals("twoway"))
 			return true;
-		
+
 		return false;
 	}
-	
-	
-	
+
+
+
 	@Override
-	public final void endLegAndComputeNextState(final double now) {			
+	public final void endLegAndComputeNextState(final double now) {
 
 		this.basicAgentDelegate.endLegAndComputeNextState(now);
 
 	}
-	//the end of added methods	
+	//the end of added methods
 
 	void resetCaches() {
 		WithinDayAgentUtils.resetCaches(this.basicAgentDelegate);
@@ -137,7 +137,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 
 
-		if (route.getVehicleId() != null) 
+		if (route.getVehicleId() != null)
 			return route.getVehicleId();
 
 		else
@@ -146,10 +146,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	public final Plan getModifiablePlan() {
-		
+
 		return this.basicAgentDelegate.getModifiablePlan();
 	}
-	
+
 	// ####################################################################
 	// only pure delegate methods below this line
 
@@ -220,8 +220,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
-		return this.transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle) ;
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
+		return this.transitAgentDelegate.getEnterTransitRoute(line, transitRoute, arrivesAtStop, transitVehicle) ;
 	}
 
 	@Override
