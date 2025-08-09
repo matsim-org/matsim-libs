@@ -329,7 +329,9 @@ import com.google.inject.Inject;
 				this.curract = PopulationUtils.createActivityFromCoord(actType, coord);
 			}
 		} else {
-			throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords must be specified for an Act.");
+			if(isValidating) {
+				throw new IllegalArgumentException("In this version of MATSim either the facility, the link or the coords must be specified for an Act.");
+			}
 		}
 
 		final OptionalTime startTime = Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME));
