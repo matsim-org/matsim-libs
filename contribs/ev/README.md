@@ -30,11 +30,11 @@ When following the life cycle of the charging agents, they generate `StartChargi
 
 ```
 StartChargingProcessEvent 
-> StartChargingAttemptEvent 
-> ChargingStartEvent 
-> ChargingEndEvent 
-> EndChargingAttemptEvent
-> EndChargingProcessEvent
+   > StartChargingAttemptEvent 
+      > ChargingStartEvent 
+         > ChargingEndEvent 
+            > EndChargingAttemptEvent
+               > EndChargingProcessEvent
 ```
 
 #### Analysis
