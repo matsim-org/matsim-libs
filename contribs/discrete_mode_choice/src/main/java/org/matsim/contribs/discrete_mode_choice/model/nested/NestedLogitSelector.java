@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilityCandidate;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
@@ -63,7 +65,7 @@ public class NestedLogitSelector implements UtilitySelector {
 
 			if (!Double.isFinite(probability)) {
 				probability = 0.0; // Revise this, maybe it is better to cosntruct the process so we don't have
-									// them at all. TODO.
+				// them at all. TODO.
 			}
 
 			density.add(probability);
@@ -97,7 +99,7 @@ public class NestedLogitSelector implements UtilitySelector {
 		}
 
 		@Override
-		public NestedLogitSelector createUtilitySelector() {
+		public NestedLogitSelector createUtilitySelector(Person person, List<DiscreteModeChoiceTrip> tourTrips) {
 			return new NestedLogitSelector(structure, minimumUtility, maximumUtility);
 		}
 	}

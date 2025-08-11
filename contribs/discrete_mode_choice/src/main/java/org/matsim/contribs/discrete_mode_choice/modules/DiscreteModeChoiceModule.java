@@ -23,14 +23,14 @@ public class DiscreteModeChoiceModule extends AbstractModule {
 	@Override
 	public void install() {
 		addPlanStrategyBinding(STRATEGY_NAME).toProvider(DiscreteModeChoiceStrategyProvider.class);
-		addControllerListenerBinding().to(UtilitiesWriterHandler.class);
+		addControlerListenerBinding().to(UtilitiesWriterHandler.class);
 
 		if (getConfig().replanning().getPlanSelectorForRemoval().equals(NonSelectedPlanSelector.NAME)) {
 			bindPlanSelectorForRemoval().to(NonSelectedPlanSelector.class);
 		}
 
 		if (dmcConfig.getEnforceSinglePlan()) {
-			addControllerListenerBinding().to(ModeChoiceInTheLoopChecker.class);
+			addControlerListenerBinding().to(ModeChoiceInTheLoopChecker.class);
 		}
 
 		install(new ModelModule());

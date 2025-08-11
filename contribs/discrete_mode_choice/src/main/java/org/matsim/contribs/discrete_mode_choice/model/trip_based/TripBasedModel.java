@@ -1,9 +1,6 @@
 package org.matsim.contribs.discrete_mode_choice.model.trip_based;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +18,7 @@ import org.matsim.core.utils.timing.TimeTracker;
 
 /**
  * This class defines a trip-based discrete choice model.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -37,8 +34,8 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 	private final TimeInterpretation timeInterpretation;
 
 	public TripBasedModel(TripEstimator estimator, TripFilter tripFilter, ModeAvailability modeAvailability,
-			TripConstraintFactory constraintFactory, UtilitySelectorFactory selectorFactory,
-			FallbackBehaviour fallbackBehaviour, TimeInterpretation timeInterpretation) {
+						  TripConstraintFactory constraintFactory, UtilitySelectorFactory selectorFactory,
+						  FallbackBehaviour fallbackBehaviour, TimeInterpretation timeInterpretation) {
 		this.estimator = estimator;
 		this.tripFilter = tripFilter;
 		this.modeAvailability = modeAvailability;
@@ -50,7 +47,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 
 	@Override
 	public List<TripCandidate> chooseModes(Person person, List<DiscreteModeChoiceTrip> trips, Random random)
-			throws NoFeasibleChoiceException {
+		throws NoFeasibleChoiceException {
 		List<String> modes = new ArrayList<>(modeAvailability.getAvailableModes(person, trips));
 		TripConstraint constraint = constraintFactory.createConstraint(person, trips, modes);
 
@@ -67,7 +64,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 			TripCandidate finalTripCandidate = null;
 
 			if (tripFilter.filter(person, trip)) {
-				UtilitySelector selector = selectorFactory.createUtilitySelector();
+				UtilitySelector selector = selectorFactory.createUtilitySelector(person, List.of(trip));
 				tripIndex++;
 
 				for (String mode : modes) {
@@ -93,14 +90,14 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 
 				if (!selectedCandidate.isPresent()) {
 					switch (fallbackBehaviour) {
-					case INITIAL_CHOICE:
-						logger.info(buildFallbackMessage(tripIndex, person, "Setting trip back to initial mode."));
-						selectedCandidate = Optional.of(createFallbackCandidate(person, trip, tripCandidates));
-						break;
-					case IGNORE_AGENT:
-						return handleIgnoreAgent(tripIndex, person, trips);
-					case EXCEPTION:
-						throw new NoFeasibleChoiceException(buildFallbackMessage(tripIndex, person, ""));
+						case INITIAL_CHOICE:
+							logger.info(buildFallbackMessage(tripIndex, person, "Setting trip back to initial mode."));
+							selectedCandidate = Optional.of(createFallbackCandidate(person, trip, tripCandidates));
+							break;
+						case IGNORE_AGENT:
+							return handleIgnoreAgent(tripIndex, person, trips);
+						case EXCEPTION:
+							throw new NoFeasibleChoiceException(buildFallbackMessage(tripIndex, person, ""));
 					}
 				}
 
@@ -119,7 +116,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 	}
 
 	private TripCandidate createFallbackCandidate(Person person, DiscreteModeChoiceTrip trip,
-			List<TripCandidate> tripCandidates) {
+												  List<TripCandidate> tripCandidates) {
 		return estimator.estimateTrip(person, trip.getInitialMode(), trip, tripCandidates);
 	}
 
@@ -136,11 +133,11 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 
 	private String buildFallbackMessage(int tripIndex, Person person, String appendix) {
 		return String.format("No feasible mode choice candidate for trip %d of agent %s. %s", tripIndex,
-				person.getId().toString(), appendix);
+			person.getId().toString(), appendix);
 	}
 
 	private String buildIllegalUtilityMessage(int tripIndex, Person person, TripCandidate candidate) {
 		return String.format("Received illegal utility for trip %d (%s) of agent %s. Continuing with next candidate.",
-				tripIndex, candidate.getMode(), person.getId().toString());
+			tripIndex, candidate.getMode(), person.getId().toString());
 	}
 }

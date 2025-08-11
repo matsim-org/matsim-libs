@@ -17,7 +17,7 @@ import com.google.inject.Singleton;
 
 /**
  * Internal module that manages all built-in selectors.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -37,14 +37,14 @@ public class SelectorModule extends AbstractDiscreteModeChoiceExtension {
 
 	@Provides
 	public UtilitySelectorFactory provideTourSelectorFactory(DiscreteModeChoiceConfigGroup dmcConfig,
-			Map<String, Provider<UtilitySelectorFactory>> components) {
+															 Map<String, Provider<UtilitySelectorFactory>> components) {
 		Provider<UtilitySelectorFactory> provider = components.get(dmcConfig.getSelector());
 
 		if (provider != null) {
 			return provider.get();
 		} else {
 			throw new IllegalStateException(String
-					.format("There is no UtilitySelector component for tours called '%s',", dmcConfig.getSelector()));
+				.format("There is no UtilitySelector component for tours called '%s',", dmcConfig.getSelector()));
 		}
 	}
 
@@ -57,10 +57,10 @@ public class SelectorModule extends AbstractDiscreteModeChoiceExtension {
 	@Provides
 	@Singleton
 	public MultinomialLogitSelector.Factory provideMultinomialLogitTripSelector(
-			DiscreteModeChoiceConfigGroup dmcConfig) {
+		DiscreteModeChoiceConfigGroup dmcConfig) {
 		MultinomialLogitSelectorConfigGroup config = dmcConfig.getMultinomialLogitSelectorConfig();
 		return new MultinomialLogitSelector.Factory(config.getMinimumUtility(), config.getMaximumUtility(),
-				config.getConsiderMinimumUtility());
+			config.getConsiderMinimumUtility(), config.getWriteDetailedUtilities());
 	}
 
 	@Provides

@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Config group for the MultinomialLogitSelector
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -13,10 +13,12 @@ public class MultinomialLogitSelectorConfigGroup extends ComponentConfigGroup {
 	private double minimumUtility = -700.0;
 	private double maximumUtility = 700.0;
 	private boolean considerMinimumUtility = false;
+	private boolean writeDetailedUtilities = false;
 
 	public static final String MINIMUM_UTILITY = "minimumUtility";
 	public static final String MAXIMUM_UTILITY = "maximumUtility";
 	public static final String CONSIDER_MINIMUM_UTILITY = "considerMinimumUtility";
+	public static final String WRITE_DETAILED_UTILITIES = "writeDetailedUtilities";
 
 	public MultinomialLogitSelectorConfigGroup(String componentType, String componentName) {
 		super(componentType, componentName);
@@ -27,11 +29,12 @@ public class MultinomialLogitSelectorConfigGroup extends ComponentConfigGroup {
 		Map<String, String> comments = new HashMap<>();
 
 		comments.put(MINIMUM_UTILITY,
-				"Candidates with a utility lower than that threshold will not be considered by default.");
+			"Candidates with a utility lower than that threshold will not be considered by default.");
 		comments.put(MAXIMUM_UTILITY, "Candidates with a utility above that threshold will be cut off to this value.");
 		comments.put(CONSIDER_MINIMUM_UTILITY,
-				"Defines whether candidates with a utility lower than the minimum utility should be filtered out.");
-
+			"Defines whether candidates with a utility lower than the minimum utility should be filtered out.");
+		comments.put(WRITE_DETAILED_UTILITIES,
+			"If True, the selector writes the utilities of the tour candidates to a csv file called detailed config." );
 		return comments;
 	}
 
@@ -63,5 +66,13 @@ public class MultinomialLogitSelectorConfigGroup extends ComponentConfigGroup {
 	@StringGetter(CONSIDER_MINIMUM_UTILITY)
 	public boolean getConsiderMinimumUtility() {
 		return considerMinimumUtility;
+	}
+
+	@StringSetter(WRITE_DETAILED_UTILITIES)
+	public void setWriteDetailedUtilities(boolean writeDetailedUtilities) {this.writeDetailedUtilities = writeDetailedUtilities;}
+
+	@StringGetter(WRITE_DETAILED_UTILITIES)
+	public boolean getWriteDetailedUtilities() {
+		return writeDetailedUtilities;
 	}
 }

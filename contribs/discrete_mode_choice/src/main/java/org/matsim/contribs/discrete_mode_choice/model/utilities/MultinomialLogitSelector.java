@@ -8,6 +8,9 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 
 /**
  * The MultinomialLogitSelector collects a set of candidates with given
@@ -30,15 +33,21 @@ public class MultinomialLogitSelector implements UtilitySelector {
 	private final double maximumUtility;
 	private final double minimumUtility;
 	private final boolean considerMinimumUtility;
-
+	private final boolean writeDetailedUtilities;
+	private final Id<Person> personId;
+	private final List<DiscreteModeChoiceTrip> tourTrips;
 	/**
 	 * Creates a MultinomialSelector. The utility cutoff value defines the maximum
 	 * utility possible.
 	 */
-	public MultinomialLogitSelector(double maximumUtility, double minimumUtility, boolean considerMinimumUtility) {
+	public MultinomialLogitSelector(double maximumUtility, double minimumUtility, boolean considerMinimumUtility, boolean writeDetailedUtilities,
+									Person person, List<DiscreteModeChoiceTrip> tourTrips) {
 		this.maximumUtility = maximumUtility;
 		this.minimumUtility = minimumUtility;
 		this.considerMinimumUtility = considerMinimumUtility;
+		this.writeDetailedUtilities = writeDetailedUtilities;
+		this.personId = person.getId();
+		this.tourTrips = tourTrips;
 	}
 
 	@Override
@@ -58,13 +67,13 @@ public class MultinomialLogitSelector implements UtilitySelector {
 
 		if (considerMinimumUtility) {
 			filteredCandidates = candidates.stream() //
-					.filter(c -> c.getUtility() > minimumUtility) //
-					.toList();
+				.filter(c -> c.getUtility() > minimumUtility) //
+				.toList();
 
 			if (filteredCandidates.isEmpty()) {
 				logger.warn(String.format(
-						"Encountered choice where all utilities were smaller than %f (minimum configured utility)",
-						minimumUtility));
+					"Encountered choice where all utilities were smaller than %f (minimum configured utility)",
+					minimumUtility));
 				return Optional.empty();
 			}
 		}
@@ -78,12 +87,13 @@ public class MultinomialLogitSelector implements UtilitySelector {
 			// Warn if there is a utility that is exceeding the feasible range
 			if (utility > maximumUtility) {
 				logger.warn(String.format(
-						"Encountered choice where a utility (%f) is larger than %f (maximum configured utility)",
-						utility, maximumUtility));
+					"Encountered choice where a utility (%f) is larger than %f (maximum configured utility)",
+					utility, maximumUtility));
 				utility = maximumUtility;
 			}
 
 			density.add(Math.exp(utility));
+			//For better Numerical stability, one could use exp(utilities - max(utilities)) which in used in ML
 		}
 
 		// IV) Build a cumulative density of the distribution
@@ -99,23 +109,38 @@ public class MultinomialLogitSelector implements UtilitySelector {
 		double pointer = random.nextDouble() * totalDensity;
 
 		int selection = (int) cumulativeDensity.stream().filter(f -> f < pointer).count();
-		return Optional.of(filteredCandidates.get(selection));
+		UtilityCandidate selectedCandidate = filteredCandidates.get(selection);
+
+		// ===== WRITE TO CSV HERE IF REQUESTED IN THE CONFIG =====
+		if (writeDetailedUtilities && UtilityWriter.isWriterInitialized()) {
+			UtilityWriter.writeCandidate(personId, tourTrips, filteredCandidates, selection);
+		}
+		// ================== END OF CSV WRITING ==================
+
+		return Optional.of(selectedCandidate);
 	}
 
 	public static class Factory implements UtilitySelectorFactory {
 		private final double minimumUtility;
 		private final double maximumUtility;
 		private final boolean considerMinimumUtility;
+		private final boolean writeDetailedUtilities;
 
-		public Factory(double minimumUtility, double maximumUtility, boolean considerMinimumUtility) {
+		public Factory(double minimumUtility, double maximumUtility,
+					   boolean considerMinimumUtility, boolean writeDetailedUtilities) {
 			this.minimumUtility = minimumUtility;
 			this.maximumUtility = maximumUtility;
 			this.considerMinimumUtility = considerMinimumUtility;
+			this.writeDetailedUtilities = writeDetailedUtilities;
+		}
+
+		public Factory(double minimumUtility, double maximumUtility, boolean considerMinimumUtility) {
+			this(minimumUtility, maximumUtility, considerMinimumUtility, false);
 		}
 
 		@Override
-		public MultinomialLogitSelector createUtilitySelector() {
-			return new MultinomialLogitSelector(maximumUtility, minimumUtility, considerMinimumUtility);
+		public MultinomialLogitSelector createUtilitySelector(Person person, List<DiscreteModeChoiceTrip> tourTrips) {
+			return new MultinomialLogitSelector(maximumUtility, minimumUtility, considerMinimumUtility, writeDetailedUtilities, person, tourTrips);
 		}
 	}
 }

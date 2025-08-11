@@ -47,332 +47,332 @@ import java.util.stream.Collectors;
  */
 
 public class EfficientTourBasedModel implements DiscreteModeChoiceModel {
-    final private static Logger logger = LogManager.getLogger(EfficientTourBasedModel.class);
+	final private static Logger logger = LogManager.getLogger(EfficientTourBasedModel.class);
 
-    final private TourFinder tourFinder;
-    final private TourFilter tourFilter;
-    final private CumulativeTourEstimator estimator;
-    final private ModeAvailability modeAvailability;
-    final private CompositeTourConstraintFactory constraintFactory;
-    final private UtilitySelectorFactory selectorFactory;
+	final private TourFinder tourFinder;
+	final private TourFilter tourFilter;
+	final private CumulativeTourEstimator estimator;
+	final private ModeAvailability modeAvailability;
+	final private CompositeTourConstraintFactory constraintFactory;
+	final private UtilitySelectorFactory selectorFactory;
 	final private FallbackBehaviour fallbackBehaviour;
-    final private TimeInterpretation timeInterpretation;
+	final private TimeInterpretation timeInterpretation;
 
-    public EfficientTourBasedModel(CumulativeTourEstimator estimator, ModeAvailability modeAvailability,
+	public EfficientTourBasedModel(CumulativeTourEstimator estimator, ModeAvailability modeAvailability,
 								   CompositeTourConstraintFactory constraintFactory, TourFinder tourFinder, TourFilter tourFilter,
-                                   UtilitySelectorFactory selectorFactory, ModeChainGeneratorFactory modeChainGeneratorFactory,
-                                   FallbackBehaviour fallbackBehaviour, TimeInterpretation timeInterpretation) {
-        this.estimator = estimator;
-        this.modeAvailability = modeAvailability;
-        this.constraintFactory = constraintFactory;
-        this.tourFinder = tourFinder;
-        this.tourFilter = tourFilter;
-        this.selectorFactory = selectorFactory;
+								   UtilitySelectorFactory selectorFactory, ModeChainGeneratorFactory modeChainGeneratorFactory,
+								   FallbackBehaviour fallbackBehaviour, TimeInterpretation timeInterpretation) {
+		this.estimator = estimator;
+		this.modeAvailability = modeAvailability;
+		this.constraintFactory = constraintFactory;
+		this.tourFinder = tourFinder;
+		this.tourFilter = tourFilter;
+		this.selectorFactory = selectorFactory;
 		this.fallbackBehaviour = fallbackBehaviour;
-        this.timeInterpretation = timeInterpretation;
-    }
+		this.timeInterpretation = timeInterpretation;
+	}
 
-    @Override
-    public List<TripCandidate> chooseModes(Person person, List<DiscreteModeChoiceTrip> trips, Random random) throws NoFeasibleChoiceException {
-        List<String> modes = new ArrayList<>(modeAvailability.getAvailableModes(person, trips));
-        CompositeTourConstraint constraint = constraintFactory.createConstraint(person, trips, modes);
+	@Override
+	public List<TripCandidate> chooseModes(Person person, List<DiscreteModeChoiceTrip> trips, Random random) throws NoFeasibleChoiceException {
+		List<String> modes = new ArrayList<>(modeAvailability.getAvailableModes(person, trips));
+		CompositeTourConstraint constraint = constraintFactory.createConstraint(person, trips, modes);
 
-        List<TourCandidate> tourCandidates = new LinkedList<>();
+		List<TourCandidate> tourCandidates = new LinkedList<>();
 
-        int tripIndex = 1;
-        TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+		int tripIndex = 1;
+		TimeTracker timeTracker = new TimeTracker(timeInterpretation);
 
-        for (List<DiscreteModeChoiceTrip> tourTrips : tourFinder.findTours(trips)) {
-            timeTracker.addActivity(tourTrips.getFirst().getOriginActivity());
+		for (List<DiscreteModeChoiceTrip> tourTrips : tourFinder.findTours(trips)) {
+			timeTracker.addActivity(tourTrips.getFirst().getOriginActivity());
 
-            // We pass the departure time through the first origin activity
-            tourTrips.getFirst().setDepartureTime(timeTracker.getTime().seconds());
+			// We pass the departure time through the first origin activity
+			tourTrips.getFirst().setDepartureTime(timeTracker.getTime().seconds());
 
-            TourCandidate finalTourCandidate = null;
+			TourCandidate finalTourCandidate = null;
 
-            if (tourFilter.filter(person, tourTrips)) {
+			if (tourFilter.filter(person, tourTrips)) {
 				ModeChoiceModelTree modeChoiceModelTree = new ModeChoiceModelTree(person, tourTrips, constraint, estimator.getDelegate(), modes, tourCandidates, timeInterpretation);
-                UtilitySelector selector = selectorFactory.createUtilitySelector();
-                modeChoiceModelTree.build();
-                for(TourCandidate tourCandidate: modeChoiceModelTree.getTourCandidates()) {
-                    selector.addCandidate(tourCandidate);
-                }
-                Optional<UtilityCandidate> selectedCandidate = selector.select(random);
+				UtilitySelector selector = selectorFactory.createUtilitySelector(person, tourTrips);
+				modeChoiceModelTree.build();
+				for(TourCandidate tourCandidate: modeChoiceModelTree.getTourCandidates()) {
+					selector.addCandidate(tourCandidate);
+				}
+				Optional<UtilityCandidate> selectedCandidate = selector.select(random);
 
-                if (selectedCandidate.isEmpty()) {
-                    switch (fallbackBehaviour) {
-                        case INITIAL_CHOICE:
-                            logger.warn(
-                                    buildFallbackMessage(tripIndex, person, "Setting tour modes back to initial choice."));
-                            selectedCandidate = Optional.of(createFallbackCandidate(person, tourTrips, tourCandidates));
-                            break;
-                        case IGNORE_AGENT:
-                            return handleIgnoreAgent(tripIndex, person, tourTrips);
-                        case EXCEPTION:
-                            throw new NoFeasibleChoiceException(buildFallbackMessage(tripIndex, person, ""));
-                    }
-                }
+				if (selectedCandidate.isEmpty()) {
+					switch (fallbackBehaviour) {
+						case INITIAL_CHOICE:
+							logger.warn(
+								buildFallbackMessage(tripIndex, person, "Setting tour modes back to initial choice."));
+							selectedCandidate = Optional.of(createFallbackCandidate(person, tourTrips, tourCandidates));
+							break;
+						case IGNORE_AGENT:
+							return handleIgnoreAgent(tripIndex, person, tourTrips);
+						case EXCEPTION:
+							throw new NoFeasibleChoiceException(buildFallbackMessage(tripIndex, person, ""));
+					}
+				}
 
-                finalTourCandidate = (TourCandidate) selectedCandidate.get();
-            } else {
-                finalTourCandidate = createFallbackCandidate(person, tourTrips, tourCandidates);
-            }
+				finalTourCandidate = (TourCandidate) selectedCandidate.get();
+			} else {
+				finalTourCandidate = createFallbackCandidate(person, tourTrips, tourCandidates);
+			}
 
-            tourCandidates.add(finalTourCandidate);
+			tourCandidates.add(finalTourCandidate);
 
-            tripIndex += tourTrips.size();
+			tripIndex += tourTrips.size();
 
-            for (int i = 0; i < tourTrips.size(); i++) {
-                if (i > 0) { // Our time object is already at the end of the first activity
-                    timeTracker.addActivity(tourTrips.get(i).getOriginActivity());
-                }
+			for (int i = 0; i < tourTrips.size(); i++) {
+				if (i > 0) { // Our time object is already at the end of the first activity
+					timeTracker.addActivity(tourTrips.get(i).getOriginActivity());
+				}
 
-                timeTracker.addDuration(finalTourCandidate.getTripCandidates().get(i).getDuration());
-            }
-        }
+				timeTracker.addDuration(finalTourCandidate.getTripCandidates().get(i).getDuration());
+			}
+		}
 
-        return createTripCandidates(tourCandidates);
-    }
+		return createTripCandidates(tourCandidates);
+	}
 
-    private TourCandidate createFallbackCandidate(Person person, List<DiscreteModeChoiceTrip> tourTrips,
-                                                  List<TourCandidate> tourCandidates) {
-        List<String> initialModes = tourTrips.stream().map(DiscreteModeChoiceTrip::getInitialMode)
-                .collect(Collectors.toList());
-        return estimator.estimateTour(person, initialModes, tourTrips, tourCandidates);
-    }
+	private TourCandidate createFallbackCandidate(Person person, List<DiscreteModeChoiceTrip> tourTrips,
+												  List<TourCandidate> tourCandidates) {
+		List<String> initialModes = tourTrips.stream().map(DiscreteModeChoiceTrip::getInitialMode)
+			.collect(Collectors.toList());
+		return estimator.estimateTour(person, initialModes, tourTrips, tourCandidates);
+	}
 
-    private List<TripCandidate> createTripCandidates(List<TourCandidate> tourCandidates) {
-        return tourCandidates.stream().map(TourCandidate::getTripCandidates).flatMap(List::stream)
-                .collect(Collectors.toList());
-    }
+	private List<TripCandidate> createTripCandidates(List<TourCandidate> tourCandidates) {
+		return tourCandidates.stream().map(TourCandidate::getTripCandidates).flatMap(List::stream)
+			.collect(Collectors.toList());
+	}
 
-    private List<TripCandidate> handleIgnoreAgent(int tripIndex, Person person, List<DiscreteModeChoiceTrip> trips) {
-        List<TourCandidate> tourCandidates = new LinkedList<>();
+	private List<TripCandidate> handleIgnoreAgent(int tripIndex, Person person, List<DiscreteModeChoiceTrip> trips) {
+		List<TourCandidate> tourCandidates = new LinkedList<>();
 
-        for (List<DiscreteModeChoiceTrip> tourTrips : tourFinder.findTours(trips)) {
-            List<String> tourModes = tourTrips.stream().map(DiscreteModeChoiceTrip::getInitialMode)
-                    .collect(Collectors.toList());
-            tourCandidates.add(estimator.estimateTour(person, tourModes, tourTrips, tourCandidates));
-        }
+		for (List<DiscreteModeChoiceTrip> tourTrips : tourFinder.findTours(trips)) {
+			List<String> tourModes = tourTrips.stream().map(DiscreteModeChoiceTrip::getInitialMode)
+				.collect(Collectors.toList());
+			tourCandidates.add(estimator.estimateTour(person, tourModes, tourTrips, tourCandidates));
+		}
 
-        logger.warn(buildFallbackMessage(tripIndex, person, "Setting whole plan back to initial modes."));
-        return createTripCandidates(tourCandidates);
-    }
+		logger.warn(buildFallbackMessage(tripIndex, person, "Setting whole plan back to initial modes."));
+		return createTripCandidates(tourCandidates);
+	}
 
-    private String buildFallbackMessage(int tripIndex, Person person, String appendix) {
-        return String.format("No feasible mode choice candidate for tour starting at trip %d of agent %s. %s",
-                tripIndex, person.getId().toString(), appendix);
-    }
+	private String buildFallbackMessage(int tripIndex, Person person, String appendix) {
+		return String.format("No feasible mode choice candidate for tour starting at trip %d of agent %s. %s",
+			tripIndex, person.getId().toString(), appendix);
+	}
 
-    private String buildIllegalUtilityMessage(int tripIndex, Person person, TourCandidate candidate) {
-        TripCandidate trip = candidate.getTripCandidates().get(tripIndex);
+	private String buildIllegalUtilityMessage(int tripIndex, Person person, TourCandidate candidate) {
+		TripCandidate trip = candidate.getTripCandidates().get(tripIndex);
 
-        return String.format(
-                "Received illegal utility for for tour starting at trip %d (%s) of agent %s. Continuing with next candidate.",
-                tripIndex, trip.getMode(), person.getId().toString());
-    }
+		return String.format(
+			"Received illegal utility for for tour starting at trip %d (%s) of agent %s. Continuing with next candidate.",
+			tripIndex, trip.getMode(), person.getId().toString());
+	}
 
-    public static class ModeChoiceModelTree {
-        public List<DiscreteModeChoiceTrip> getTourTrips() {
-            return tourTrips;
-        }
+	public static class ModeChoiceModelTree {
+		public List<DiscreteModeChoiceTrip> getTourTrips() {
+			return tourTrips;
+		}
 
-        public List<TourConstraint> getTourConstraints() {
-            return tourConstraints;
-        }
+		public List<TourConstraint> getTourConstraints() {
+			return tourConstraints;
+		}
 
-        public List<TripConstraint> getTripConstraints() {
-            return tripConstraints;
-        }
+		public List<TripConstraint> getTripConstraints() {
+			return tripConstraints;
+		}
 
-        public TripEstimator getTripEstimator() {
-            return tripEstimator;
-        }
+		public TripEstimator getTripEstimator() {
+			return tripEstimator;
+		}
 
-        public Collection<String> getModes() {
-            return modes;
-        }
+		public Collection<String> getModes() {
+			return modes;
+		}
 
-        private final List<DiscreteModeChoiceTrip> tourTrips;
-        private final List<TourConstraint> tourConstraints;
-        private final List<TripConstraint> tripConstraints;
-        private final TripEstimator tripEstimator;
-        private final Collection<String> modes;
-        private final List<TourCandidate> previousTourCandidates;
-        private final Person person;
-        private final TimeInterpretation timeInterpretation;
-        private ModeChoiceModelTreeNode root;
-        private final Set<String> restrictedModes = new HashSet<>();
-        private Id<? extends BasicLocation> vehicleLocationId;
+		private final List<DiscreteModeChoiceTrip> tourTrips;
+		private final List<TourConstraint> tourConstraints;
+		private final List<TripConstraint> tripConstraints;
+		private final TripEstimator tripEstimator;
+		private final Collection<String> modes;
+		private final List<TourCandidate> previousTourCandidates;
+		private final Person person;
+		private final TimeInterpretation timeInterpretation;
+		private ModeChoiceModelTreeNode root;
+		private final Set<String> restrictedModes = new HashSet<>();
+		private Id<? extends BasicLocation> vehicleLocationId;
 
-        public List<TourCandidate> getPreviousTourCandidates() {
-            return previousTourCandidates;
-        }
+		public List<TourCandidate> getPreviousTourCandidates() {
+			return previousTourCandidates;
+		}
 
-        public Person getPerson() {
-            return person;
-        }
+		public Person getPerson() {
+			return person;
+		}
 
-        public TimeInterpretation getTimeInterpretation() {
-            return this.timeInterpretation;
-        }
+		public TimeInterpretation getTimeInterpretation() {
+			return this.timeInterpretation;
+		}
 
-        public ModeChoiceModelTree(Person person, List<DiscreteModeChoiceTrip> tourTrips, CompositeTourConstraint tourConstraint, TripEstimator tripEstimator, Collection<String> modes, List<TourCandidate> previousTourCandidates, TimeInterpretation timeInterpretation) {
-            this.person = person;
-            this.tourTrips = tourTrips;
-            this.previousTourCandidates = previousTourCandidates;
-            this.tourConstraints = new ArrayList<>();
-            this.tripEstimator = tripEstimator;
-            this.modes = modes;
-            this.tripConstraints = new ArrayList<>();
-            for(TourConstraint innerTourConstraint: tourConstraint.getConstraints()) {
-                if(innerTourConstraint instanceof TourFromTripConstraint tourFromTripConstraint) {
-                    this.tripConstraints.add(tourFromTripConstraint.getConstraint());
-                } else if (innerTourConstraint instanceof VehicleTourConstraint vehicleTourConstraint){
-                    if(this.vehicleLocationId != null) {
-                        throw new IllegalStateException("Two EqasimVehicleTourConstraints");
-                    }
-                    this.restrictedModes.addAll(vehicleTourConstraint.getRestrictedModes());
-                    this.vehicleLocationId = vehicleTourConstraint.getVehicleLocationId();
-                } else {
-                    this.tourConstraints.add(innerTourConstraint);
-                }
-            }
-            this.timeInterpretation = timeInterpretation;
-        }
+		public ModeChoiceModelTree(Person person, List<DiscreteModeChoiceTrip> tourTrips, CompositeTourConstraint tourConstraint, TripEstimator tripEstimator, Collection<String> modes, List<TourCandidate> previousTourCandidates, TimeInterpretation timeInterpretation) {
+			this.person = person;
+			this.tourTrips = tourTrips;
+			this.previousTourCandidates = previousTourCandidates;
+			this.tourConstraints = new ArrayList<>();
+			this.tripEstimator = tripEstimator;
+			this.modes = modes;
+			this.tripConstraints = new ArrayList<>();
+			for(TourConstraint innerTourConstraint: tourConstraint.getConstraints()) {
+				if(innerTourConstraint instanceof TourFromTripConstraint tourFromTripConstraint) {
+					this.tripConstraints.add(tourFromTripConstraint.getConstraint());
+				} else if (innerTourConstraint instanceof VehicleTourConstraint vehicleTourConstraint){
+					if(this.vehicleLocationId != null) {
+						throw new IllegalStateException("Two EqasimVehicleTourConstraints");
+					}
+					this.restrictedModes.addAll(vehicleTourConstraint.getRestrictedModes());
+					this.vehicleLocationId = vehicleTourConstraint.getVehicleLocationId();
+				} else {
+					this.tourConstraints.add(innerTourConstraint);
+				}
+			}
+			this.timeInterpretation = timeInterpretation;
+		}
 
-        public void build() {
-            TimeTracker timeTracker = new TimeTracker(timeInterpretation);
-            timeTracker.setTime(this.tourTrips.getFirst().getDepartureTime());
-            this.root = new ModeChoiceModelTreeNode(this, this.previousTourCandidates.stream().flatMap(tourCandidate -> tourCandidate.getTripCandidates().stream()).toList(), new ArrayList<>(), this.tourTrips, timeTracker, this.modes, 0, new HashMap<>());
-            root.expand();
-        }
+		public void build() {
+			TimeTracker timeTracker = new TimeTracker(timeInterpretation);
+			timeTracker.setTime(this.tourTrips.getFirst().getDepartureTime());
+			this.root = new ModeChoiceModelTreeNode(this, this.previousTourCandidates.stream().flatMap(tourCandidate -> tourCandidate.getTripCandidates().stream()).toList(), new ArrayList<>(), this.tourTrips, timeTracker, this.modes, 0, new HashMap<>());
+			root.expand();
+		}
 
-        public List<TourCandidate> getTourCandidates() {
-            return this.root.getTourCandidates();
-        }
-    }
-    public static class ModeChoiceModelTreeNode {
-        private final List<TripCandidate> allPreviousTrips;
-        private final List<TripCandidate> currentTourPreviousTrips;
-        private final List<DiscreteModeChoiceTrip> remainingTrips;
-        private final TimeTracker currentTimeTracker;
-        private final Collection<String> modes;
-        private final double currentUtility;
-        private final ModeChoiceModelTree tree;
-        private final Map<String, Id<? extends BasicLocation>> currentVehicleLocations;
-        private final Collection<ModeChoiceModelTreeNode> children;
-        private TourCandidate tourCandidate;
+		public List<TourCandidate> getTourCandidates() {
+			return this.root.getTourCandidates();
+		}
+	}
+	public static class ModeChoiceModelTreeNode {
+		private final List<TripCandidate> allPreviousTrips;
+		private final List<TripCandidate> currentTourPreviousTrips;
+		private final List<DiscreteModeChoiceTrip> remainingTrips;
+		private final TimeTracker currentTimeTracker;
+		private final Collection<String> modes;
+		private final double currentUtility;
+		private final ModeChoiceModelTree tree;
+		private final Map<String, Id<? extends BasicLocation>> currentVehicleLocations;
+		private final Collection<ModeChoiceModelTreeNode> children;
+		private TourCandidate tourCandidate;
 
-        public ModeChoiceModelTreeNode(ModeChoiceModelTree tree, List<TripCandidate> allPreviousTrips, List<TripCandidate> currentTourPreviousTrips, List<DiscreteModeChoiceTrip> remainingTrips, TimeTracker currentTimeTracker, Collection<String> modes, double currentUtility, Map<String, Id<? extends BasicLocation>> currentVehicleLocations) {
-            this.allPreviousTrips = allPreviousTrips;
-            this.currentTourPreviousTrips = currentTourPreviousTrips;
-            this.remainingTrips = remainingTrips;
-            this.currentUtility = currentUtility;
-            this.currentTimeTracker = currentTimeTracker;
-            this.modes = modes;
-            this.tree = tree;
-            this.children = new ArrayList<>();
-            this.tourCandidate = null;
-            this.currentVehicleLocations = currentVehicleLocations;
-        }
+		public ModeChoiceModelTreeNode(ModeChoiceModelTree tree, List<TripCandidate> allPreviousTrips, List<TripCandidate> currentTourPreviousTrips, List<DiscreteModeChoiceTrip> remainingTrips, TimeTracker currentTimeTracker, Collection<String> modes, double currentUtility, Map<String, Id<? extends BasicLocation>> currentVehicleLocations) {
+			this.allPreviousTrips = allPreviousTrips;
+			this.currentTourPreviousTrips = currentTourPreviousTrips;
+			this.remainingTrips = remainingTrips;
+			this.currentUtility = currentUtility;
+			this.currentTimeTracker = currentTimeTracker;
+			this.modes = modes;
+			this.tree = tree;
+			this.children = new ArrayList<>();
+			this.tourCandidate = null;
+			this.currentVehicleLocations = currentVehicleLocations;
+		}
 
-        public boolean expand() {
-            this.children.clear();
+		public boolean expand() {
+			this.children.clear();
 			// No trip remains, the actual node is actually a leave
-            if(this.remainingTrips.isEmpty()) {
-                return true;
-            }
-            DiscreteModeChoiceTrip currentTrip = this.remainingTrips.getFirst();
-            this.currentTimeTracker.addActivity(currentTrip.getOriginActivity());
-            currentTrip.setDepartureTime(currentTimeTracker.getTime().seconds());
+			if(this.remainingTrips.isEmpty()) {
+				return true;
+			}
+			DiscreteModeChoiceTrip currentTrip = this.remainingTrips.getFirst();
+			this.currentTimeTracker.addActivity(currentTrip.getOriginActivity());
+			currentTrip.setDepartureTime(currentTimeTracker.getTime().seconds());
 
 			List<String> allPreviousModes = this.allPreviousTrips.stream().map(TripCandidate::getMode).toList();
-            List<String> currentTourPreviousModes = this.currentTourPreviousTrips.stream().map(TripCandidate::getMode).toList();
+			List<String> currentTourPreviousModes = this.currentTourPreviousTrips.stream().map(TripCandidate::getMode).toList();
 
-            for(String mode: modes)  {
-                Map<String, Id<? extends BasicLocation>> vehiclesLocations = new HashMap<>(this.currentVehicleLocations);
+			for(String mode: modes)  {
+				Map<String, Id<? extends BasicLocation>> vehiclesLocations = new HashMap<>(this.currentVehicleLocations);
 				Id<? extends BasicLocation> currentTripOriginLocationId = LocationUtils.getLocationId(currentTrip.getOriginActivity());
 
-                if(this.tree.restrictedModes.contains(mode)) {
+				if(this.tree.restrictedModes.contains(mode)) {
 					// If the current mode is concerned by a vehicle tour constraint
-                    if(!currentTourPreviousModes.isEmpty()) {
-                        if(!currentTripOriginLocationId.equals(this.currentVehicleLocations.get(mode))) {
-                            continue;
-                        }
+					if(!currentTourPreviousModes.isEmpty()) {
+						if(!currentTripOriginLocationId.equals(this.currentVehicleLocations.get(mode))) {
+							continue;
+						}
 
-                    }
-                    vehiclesLocations.put(mode, LocationUtils.getLocationId(currentTrip.getDestinationActivity()));
-                }
+					}
+					vehiclesLocations.put(mode, LocationUtils.getLocationId(currentTrip.getDestinationActivity()));
+				}
 				// Checking trip constraints for the current trip
-                if(this.tree.tripConstraints.stream().anyMatch(tripConstraint -> !tripConstraint.validateBeforeEstimation(currentTrip, mode, allPreviousModes))) {
-                    continue;
-                }
+				if(this.tree.tripConstraints.stream().anyMatch(tripConstraint -> !tripConstraint.validateBeforeEstimation(currentTrip, mode, allPreviousModes))) {
+					continue;
+				}
 
-                List<DiscreteModeChoiceTrip> remainingTrips = new ArrayList<>(this.remainingTrips);
-                remainingTrips.removeFirst();
-                if(remainingTrips.isEmpty()) {
-                    boolean breakingVehicleContinuity = false;
-                    for(String restrictedMode: this.tree.restrictedModes) {
+				List<DiscreteModeChoiceTrip> remainingTrips = new ArrayList<>(this.remainingTrips);
+				remainingTrips.removeFirst();
+				if(remainingTrips.isEmpty()) {
+					boolean breakingVehicleContinuity = false;
+					for(String restrictedMode: this.tree.restrictedModes) {
 						// If it is the last trip, we make sure that all vehicles are where they are supposed to be at the end of the day
-                        Id<? extends BasicLocation> lastVehicleLocation = vehiclesLocations.get(restrictedMode);
-                        if(lastVehicleLocation != null && !lastVehicleLocation.equals(LocationUtils.getLocationId(currentTrip.getDestinationActivity())) && !lastVehicleLocation.equals(tree.vehicleLocationId)) {
-                            breakingVehicleContinuity = true;
-                            break;
-                        }
-                    }
-                    if(breakingVehicleContinuity) {
-                        continue;
-                    }
-                }
-                TripCandidate tripCandidate = this.tree.getTripEstimator().estimateTrip(this.tree.getPerson(), mode, currentTrip, this.allPreviousTrips);
-                TimeTracker timeTracker = new TimeTracker(this.tree.getTimeInterpretation());
-                timeTracker.setTime(currentTimeTracker.getTime().seconds());
-                timeTracker.addDuration(tripCandidate.getDuration());
-                double utility = currentUtility + tripCandidate.getUtility();
-                if(this.tree.tripConstraints.stream().anyMatch(tripConstraint -> !tripConstraint.validateAfterEstimation(currentTrip, tripCandidate, allPreviousTrips))) {
-                    continue;
-                }
-                List<TripCandidate> allPreviousTrips = new ArrayList<>(this.allPreviousTrips);
-                allPreviousTrips.add(tripCandidate);
-                List<TripCandidate> currentTourPreviousTrips = new ArrayList<>(this.currentTourPreviousTrips);
-                currentTourPreviousTrips.add(tripCandidate);
-                List<String> newPreviousModes = currentTourPreviousTrips.stream().map(TripCandidate::getMode).toList();
-                ModeChoiceModelTreeNode child = new ModeChoiceModelTreeNode(this.tree, allPreviousTrips, currentTourPreviousTrips, remainingTrips, timeTracker, this.modes, utility, vehiclesLocations);
+						Id<? extends BasicLocation> lastVehicleLocation = vehiclesLocations.get(restrictedMode);
+						if(lastVehicleLocation != null && !lastVehicleLocation.equals(LocationUtils.getLocationId(currentTrip.getDestinationActivity())) && !lastVehicleLocation.equals(tree.vehicleLocationId)) {
+							breakingVehicleContinuity = true;
+							break;
+						}
+					}
+					if(breakingVehicleContinuity) {
+						continue;
+					}
+				}
+				TripCandidate tripCandidate = this.tree.getTripEstimator().estimateTrip(this.tree.getPerson(), mode, currentTrip, this.allPreviousTrips);
+				TimeTracker timeTracker = new TimeTracker(this.tree.getTimeInterpretation());
+				timeTracker.setTime(currentTimeTracker.getTime().seconds());
+				timeTracker.addDuration(tripCandidate.getDuration());
+				double utility = currentUtility + tripCandidate.getUtility();
+				if(this.tree.tripConstraints.stream().anyMatch(tripConstraint -> !tripConstraint.validateAfterEstimation(currentTrip, tripCandidate, allPreviousTrips))) {
+					continue;
+				}
+				List<TripCandidate> allPreviousTrips = new ArrayList<>(this.allPreviousTrips);
+				allPreviousTrips.add(tripCandidate);
+				List<TripCandidate> currentTourPreviousTrips = new ArrayList<>(this.currentTourPreviousTrips);
+				currentTourPreviousTrips.add(tripCandidate);
+				List<String> newPreviousModes = currentTourPreviousTrips.stream().map(TripCandidate::getMode).toList();
+				ModeChoiceModelTreeNode child = new ModeChoiceModelTreeNode(this.tree, allPreviousTrips, currentTourPreviousTrips, remainingTrips, timeTracker, this.modes, utility, vehiclesLocations);
 
 				if(remainingTrips.isEmpty()) {
-                    child.tourCandidate = new DefaultTourCandidate(utility, currentTourPreviousTrips);
-                    if(this.tree.tourConstraints.stream().anyMatch(tourConstraint ->
-                    {
-                        if(!tourConstraint.validateBeforeEstimation(tree.tourTrips, newPreviousModes, this.tree.previousTourCandidates.stream().map(tourCandidate -> tourCandidate.getTripCandidates().stream().map(TripCandidate::getMode).toList()).toList())) {
-                            return true;
-                        }
+					child.tourCandidate = new DefaultTourCandidate(utility, currentTourPreviousTrips);
+					if(this.tree.tourConstraints.stream().anyMatch(tourConstraint ->
+					{
+						if(!tourConstraint.validateBeforeEstimation(tree.tourTrips, newPreviousModes, this.tree.previousTourCandidates.stream().map(tourCandidate -> tourCandidate.getTripCandidates().stream().map(TripCandidate::getMode).toList()).toList())) {
+							return true;
+						}
 						return !tourConstraint.validateAfterEstimation(tree.tourTrips, child.tourCandidate, this.tree.previousTourCandidates);
 					})) {
-                        continue;
-                    }
+						continue;
+					}
 
-                }
-                if(child.expand()) {
-                    this.children.add(child);
-                }
-            }
-            return !children.isEmpty();
-        }
+				}
+				if(child.expand()) {
+					this.children.add(child);
+				}
+			}
+			return !children.isEmpty();
+		}
 
-        public List<TourCandidate> getTourCandidates() {
-            List<TourCandidate> tourCandidates = new ArrayList<>();
-            getTourCandidates(tourCandidates);
-            return tourCandidates;
-        }
+		public List<TourCandidate> getTourCandidates() {
+			List<TourCandidate> tourCandidates = new ArrayList<>();
+			getTourCandidates(tourCandidates);
+			return tourCandidates;
+		}
 
-        private void getTourCandidates(List<TourCandidate> candidatesList) {
-            if(this.tourCandidate == null) {
-                this.children.forEach(child -> child.getTourCandidates(candidatesList));
-            } else {
-                candidatesList.add(this.tourCandidate);
-            }
-        }
-    }
+		private void getTourCandidates(List<TourCandidate> candidatesList) {
+			if(this.tourCandidate == null) {
+				this.children.forEach(child -> child.getTourCandidates(candidatesList));
+			} else {
+				candidatesList.add(this.tourCandidate);
+			}
+		}
+	}
 
 }
