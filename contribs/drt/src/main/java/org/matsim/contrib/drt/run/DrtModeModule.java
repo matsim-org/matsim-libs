@@ -92,7 +92,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controller(),
 							getter.get(Network.class), getter.getModal(FleetSpecification.class),
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
+			addControllerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 
 		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {

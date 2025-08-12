@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * OverrideCarTraveltimeTest.java
@@ -43,16 +42,16 @@ import java.util.Map;
         final Config config = ConfigUtils.createConfig();
         config.controller().setLastIteration(1);
         config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        Controler controler = new Controler(ScenarioUtils.createScenario(config));
-        controler.addOverridingModule(new AbstractModule() {
+        Controler controller = new Controler(ScenarioUtils.createScenario(config));
+        controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bindCarTravelDisutilityFactory().to(InterestingTravelDisutilityFactory.class);
                 bindNetworkTravelTime().to(InterestingTravelTime.class);
-                addControlerListenerBinding().to(InterestingControlerListener.class);
+                addControllerListenerBinding().to(InterestingControllerListener.class);
             }
         });
-        controler.run();
+        controller.run();
     }
 
     private static class InterestingTravelTime implements TravelTime {
@@ -79,7 +78,7 @@ import java.util.Map;
         }
     }
 
-    private static class InterestingControlerListener implements ReplanningListener {
+    private static class InterestingControllerListener implements ReplanningListener {
 
         @Inject
         Config config;

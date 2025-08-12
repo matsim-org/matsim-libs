@@ -27,12 +27,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.ControlerListenerManagerImpl;
+import org.matsim.core.controler.ControllerListenerManager;
+import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -70,7 +70,7 @@ public class ListenersInjectionTest {
 		testIsSingleton( PlansScoring.class );
 	}
 
-	private void testIsSingleton( final Class<? extends ControlerListener> klass ) {
+	private void testIsSingleton( final Class<? extends ControllerListener> klass ) {
 		final Config config = ConfigUtils.createConfig();
 		final String outputDir = utils.getOutputDirectory();
 		config.controller().setOutputDirectory( outputDir );
@@ -83,7 +83,7 @@ public class ListenersInjectionTest {
                     @Override
                     public void install() {
 						// put dummy dependencies to get the listenners happy
-						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
+						bind(ControllerListenerManager.class).to(ControllerListenerManagerImpl.class);
 						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
 								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
 								config.controller().getCompressionType()));
@@ -95,8 +95,8 @@ public class ListenersInjectionTest {
 				new ControlerDefaultCoreListenersModule());
 
 
-		final ControlerListener o1 = injector.getInstance( klass );
-		final ControlerListener o2 = injector.getInstance( klass );
+		final ControllerListener o1 = injector.getInstance( klass );
+		final ControllerListener o2 = injector.getInstance( klass );
 
 		Assertions.assertSame(
 				o1,

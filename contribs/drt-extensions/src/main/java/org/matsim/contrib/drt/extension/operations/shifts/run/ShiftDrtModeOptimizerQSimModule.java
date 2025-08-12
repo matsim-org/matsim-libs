@@ -32,7 +32,6 @@ import org.matsim.contrib.drt.schedule.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
@@ -47,6 +46,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
@@ -81,9 +81,10 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> {
 					return new ShiftDrtOptimizer(
-							new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
+							new DefaultDrtOptimizer(
+									getter.getModal(QsimScopeForkJoinPool.class), drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 									getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-									getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+									getter.getModal(ScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 									getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 									getter.getModal(DrtRequestInsertionRetryQueue.class)
 							),
@@ -126,7 +127,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), shiftsParams))
 		).asEagerSingleton();
 
-		bindModal(DrtScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
+		bindModal(ScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new DrtScheduleTimingUpdater(new ScheduleTimingUpdaterImpl(getter.get(MobsimTimer.class),

@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+package org.matsim.contrib.drt.optimizer.insertion.parallel;/* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion.parallel;
+
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Verify;
@@ -65,7 +65,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter.NO_INSERTION_FOUND_CAUSE;
@@ -197,7 +196,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		int requests = this.tmpQueue.size();
 		// Do not create more requestPartitions than available vehicles
 		// e.g. 60 req / 20 req/min --> 3 active partitions but only 2 available veh right now
-		int maxPartitions = Math.min(this.workers.size(), entries.size());
+		int maxPartitions = Math.max(1, Math.min(this.workers.size(), entries.size())); // at least one partition
 
 		List<Collection<RequestData>> requestsPartitions = requestsPartitioner.partition(this.tmpQueue, maxPartitions, this.collectionPeriod);
 		if (drtParallelInserterParams.isLogThreadActivity()) {
@@ -223,14 +222,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 			var worker = this.workers.get(i);
 			Collection<RequestData> requestDataPartition = requestsPartitions.get(i);
 			Map<Id<DvrpVehicle>, VehicleEntry> vehiclePartition = vehiclePartitions.get(i);
-
-			if (vehiclePartition.isEmpty()) {
-				// If one is in low demand, vehiclePartition could be empty,
-				// but than there should be also no requests in the corresponding requestDataPartition
-				Verify.verify(requestDataPartition.isEmpty());
-				continue;
-			}
-
 			tasks.add(inserterExecutorService.submit(() -> worker.process(now, requestDataPartition, vehiclePartition)));
 		}
 
@@ -492,7 +483,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		var chart = new JFreeChart("Active Partitions Over Time", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
 
 
-		String filename = matsimServices.getControlerIO().getIterationFilename(
+		String filename = matsimServices.getControllerIO().getIterationFilename(
 			matsimServices.getIterationNumber(), mode + "_partitionActivity.png"
 		);
 
@@ -508,7 +499,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 		String sep = matsimServices.getConfig().global().getDefaultDelimiter();
 		String header = String.join(sep, "time", "requestsDensityPerMinute", "activePartitions");
-		String filename = matsimServices.getControlerIO().getIterationFilename(
+		String filename = matsimServices.getControllerIO().getIterationFilename(
 			matsimServices.getIterationNumber(), mode + "_dataRecordsLog.csv.gz"
 		);
 

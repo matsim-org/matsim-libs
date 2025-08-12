@@ -24,7 +24,6 @@ import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import net.jpountz.lz4.LZ4FrameInputStream;
 import net.jpountz.lz4.LZ4FrameOutputStream;
-import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -251,12 +250,13 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			new URL(url).toURI();
 			return true;
-		} catch (MalformedURLException e) {
-			return false;
-		} catch (URISyntaxException e) {
+		} catch (MalformedURLException | URISyntaxException e) {
+			if(url.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib startup hook.");
+			}
 			return false;
 		}
-	}
+    }
 
 	/**
 	 * Gets the compression of a certain URL by file extension. May return null if
@@ -305,7 +305,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (CompressorException | GeneralSecurityException e) {
+		} catch (GeneralSecurityException e) {
 			throw new UncheckedIOException(new IOException(e));
 		}
 	}
@@ -375,7 +375,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 			return new BufferedOutputStream(outputStream);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (CompressorException | URISyntaxException e) {
+		} catch (URISyntaxException e) {
 			throw new UncheckedIOException(new IOException(e));
 		}
 	}
@@ -521,6 +521,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			return new URL(context, extension);
 		} catch (MalformedURLException e) {
+			if(extension.startsWith("s3:")) {
+				logger.warn("S3 URI detected, please check if you properly initialized the AWS contrib");
+			}
 			// We cannot construct a URL for some reason (see respective unit test)
 			return getFileUrl(extension);
 		}

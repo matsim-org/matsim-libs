@@ -93,7 +93,7 @@ public final class PBox implements POperators {
 	void notifyStartup(StartupEvent event) {
 		// This is the first iteration
 
-		TimeProvider timeProvider = new TimeProvider(this.pConfig, event.getServices().getControlerIO().getOutputPath());
+		TimeProvider timeProvider = new TimeProvider(this.pConfig, event.getServices().getControllerIO().getOutputPath());
 		event.getServices().getEvents().addHandler(timeProvider);
 
 		// initialize strategy manager
@@ -105,13 +105,13 @@ public final class PBox implements POperators {
 		// init fare collector
 		this.stageCollectorHandler.init(event.getServices().getScenario().getNetwork());
 		event.getServices().getEvents().addHandler(this.stageCollectorHandler);
-		event.getServices().addControlerListener(this.stageCollectorHandler);
+		event.getServices().addControllerListener(this.stageCollectorHandler);
 		this.stageCollectorHandler.addStageContainerHandler(this.scorePlansHandler);
 
 		// init operator cost collector
 		this.operatorCostCollectorHandler.init(event.getServices().getScenario().getNetwork());
 		event.getServices().getEvents().addHandler(this.operatorCostCollectorHandler);
-		event.getServices().addControlerListener(this.operatorCostCollectorHandler);
+		event.getServices().addControllerListener(this.operatorCostCollectorHandler);
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
 
 		// init fare2moneyEvent
@@ -191,7 +191,7 @@ public final class PBox implements POperators {
 			this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
 		}
 
-		writeScheduleToFile(this.pTransitSchedule, event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));
+		writeScheduleToFile(this.pTransitSchedule, event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));
 	}
 
 	private void handleBankruptOperators(int iteration) {

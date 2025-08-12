@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtCapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
@@ -77,8 +78,30 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = customLoadType.fromArray(4, 0);
 	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = customLoadType.fromArray(0, 4);
-	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).load(customLoadType.fromArray(1, 0)).build();
-	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).load(customLoadType.fromArray(0, 1)).build();
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(List.of(Id.createPersonId("personA")))
+			.load(customLoadType.fromArray(1, 0))
+			.constraints(
+					new DrtRouteConstraints(
+							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
+					)
+			)
+			.build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(List.of(Id.createPersonId("personB")))
+			.load(customLoadType.fromArray(0, 1))
+			.constraints(
+					new DrtRouteConstraints(
+							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
+					)
+			)
+			.build();
 
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {

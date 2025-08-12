@@ -36,7 +36,7 @@ public class ShiftHistogramListener implements IterationEndsListener, IterationS
     @Override
     public void notifyIterationEnds(final IterationEndsEvent event) {
         this.shiftHistogram.applyToAll((type, shiftHistogram) -> {
-            String filename = matsimServices.getControlerIO()
+            String filename = matsimServices.getControllerIO()
                     .getIterationFilename(event.getIteration(),
                             drtConfigGroup.getMode() +  (type == null? "": "_" + type) + "_shiftHistogram.txt");
             shiftHistogram.write(filename);
@@ -48,7 +48,7 @@ public class ShiftHistogramListener implements IterationEndsListener, IterationS
 
         if (createGraphs) {
             this.shiftHistogram.applyToAll((type, shiftHistogram) -> {
-                String filename = matsimServices.getControlerIO()
+                String filename = matsimServices.getControllerIO()
                         .getIterationFilename(event.getIteration(),
                                 drtConfigGroup.getMode() +  (type == null? "": "_" + type) + "_shiftHistogram.png");
                 ShiftHistogramChart.writeGraphic(shiftHistogram, filename);

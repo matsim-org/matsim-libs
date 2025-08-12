@@ -42,7 +42,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.selective.RequestDataCo
 public class RequestInsertWorker {
 	private final RequestFleetFilter requestFleetFilter;
 	private final DrtInsertionSearch insertionSearch;
-	private final Queue<RequestData> unplannedRequests = new ConcurrentLinkedQueue<>();
+	private final Queue<RequestData> unplannedRequests = new ArrayDeque<>();
 	private final Map<Id<DvrpVehicle>, SortedSet<RequestData>> solutions;
 	private final SortedSet<DrtRequest> noSolutions;
 
@@ -89,10 +89,6 @@ public class RequestInsertWorker {
 
 	void process(double now, Collection<RequestData> requestDataPartition, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
 		this.unplannedRequests.addAll(requestDataPartition);
-
-		if (!requestDataPartition.isEmpty()) {
-			Verify.verify(!vehicleEntries.isEmpty(), "Requests have been assigned to a worker without vehicleEntries.");
-		}
 
 		while (!unplannedRequests.isEmpty()) {
 			findInsertion(unplannedRequests.poll(), vehicleEntries, now);
