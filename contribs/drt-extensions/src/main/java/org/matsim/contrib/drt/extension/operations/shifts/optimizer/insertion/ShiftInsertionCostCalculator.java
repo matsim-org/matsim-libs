@@ -141,6 +141,8 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				final Task task = tasks.get(tasks.indexOf(stopTask) - 1);
 
 				if (task instanceof DrtStayTask) {
+					//check if stay slack is large enough
+					// will not be necessary anymore once slack is correctly accounted for in waypoints
 					final double refTime;
 					if (task.getStatus().equals(Task.TaskStatus.STARTED)) {
 						refTime = this.timer.getTimeOfDay();
@@ -153,9 +155,6 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				} else {
 					return false;
 				}
-			} else if(stopTask instanceof WaitForShiftTask) {
-				// there still is a wait for shift task that needs to finish before the insertion
-				return false;
 			}
 
 			if (stopTask.getBeginTime() + totalTimeLoss > stop.getLatestArrivalTime()
