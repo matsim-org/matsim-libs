@@ -82,7 +82,7 @@ public class PerceivedSafetyScoringTest {
 
 //      add perceivedSafetyCfgGroup and configure
             PerceivedSafetyConfigGroup perceivedSafetyConfigGroup = ConfigUtils.addOrGetModule(config, PerceivedSafetyConfigGroup.class);
-            PerceivedSafetyUtils.fillConfigWithBicyclePerceivedSafetyDefaultValues(perceivedSafetyConfigGroup);
+            PerceivedSafetyUtils.fillConfigWithPerceivedSafetyDefaultValues(perceivedSafetyConfigGroup);
 
             MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
             createAndAddTestPopulation(scenario, mode);
@@ -126,7 +126,7 @@ public class PerceivedSafetyScoringTest {
         }
     }
 
-    private void createAndAddTestPopulation(MutableScenario scenario, String mode) {
+    static void createAndAddTestPopulation(MutableScenario scenario, String mode) {
         Population pop = PopulationUtils.createPopulation(scenario.getConfig());
         PopulationFactory fac = pop.getFactory();
 
