@@ -100,7 +100,7 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 # Generated pinput file plot
 {
   index <- 9
-  fuel <- "petrol"
+  fuel <- "diesel"
 
   # Get the point
   sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
@@ -147,3 +147,144 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 
 }
 
+# Memory test 1
+{
+  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+
+  wltp_slice <- sumo_input[250:500,]
+
+  set.seed(42)
+
+  for (x in 0:5){
+    random_vel <- sample.int(130, 1)
+    random_acc <- runif(1)
+
+    part1 <- data.frame(
+      time = 1:250,
+      velocity = rep(random_vel, 250),
+      acceleration = rep(random_acc, 250)
+    )
+
+    test_input <- rbind(part1, wltp_slice)
+
+    write_delim(test_input, glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_test_{x}.csv"), delim=";", col_names=FALSE)
+  }
+}
+
+# Memory test 2
+{
+  fuel <- "petrol"
+
+  # Clear old data
+  rm(list = ls(pattern = "^data\\."))
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_0 <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_test_0.csv"),
+                          delim = ";",
+                          col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                          col_types = cols(
+                            time = col_integer(),
+                            velocity = col_double(),
+                            acceleration = col_double(),
+                            slope = col_double(),
+                            CO = col_double(),
+                            CO2 = col_double(),
+                            HC = col_double(),
+                            PMx = col_double(),
+                            NOx = col_double(),
+                            fuel = col_double(),
+                            electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_0", value=value/1000)
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_1 <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_test_1.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_1", value=value/1000)
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_2 <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_test_2.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_2", value=value/1000)
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_3 <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_test_3.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_3", value=value/1000)
+
+  # Load data from SUMO with PHEMLight and summarize for each interval
+  data.SUMO_4 <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_test_4.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_4", value=value/1000)
+
+    # Append all datasets together
+    data_list <- mget(ls(pattern = "^data\\."), envir = .GlobalEnv)
+
+    # recalc: gram -> gram per kilometer
+    data <- do.call(rbind, data_list)
+
+    # Line-Plot (for scenarios with more links)
+    ggplot(data) +
+      geom_line(aes(x=time, y=value, color=model), size=2) +
+      #geom_point(aes(x=velocity, y=value, color=model), size=1) +
+      facet_wrap(~component, scales="free") +
+      ylab("emissions in g/km") +
+      theme(text = element_text(size=22)) +
+      ggtitle(glue("5 artifical trajecotires with WLTPsSlice beginning at second 250"))
+}
