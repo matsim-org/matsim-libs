@@ -68,7 +68,8 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		})).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl(getter.getModal(DvrpLoadType.class))))).asEagerSingleton();
+			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl(getter.getModal(DvrpLoadType.class),
+					getter.getModal(StopWaypointFactory.class))))).asEagerSingleton();
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 			getter -> {
