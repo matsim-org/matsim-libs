@@ -46,7 +46,7 @@ public class MultinomialLogitSelector implements UtilitySelector {
 		this.minimumUtility = minimumUtility;
 		this.considerMinimumUtility = considerMinimumUtility;
 		this.writeDetailedUtilities = writeDetailedUtilities;
-		this.personId = person.getId();
+		this.personId = (person!=null)? person.getId(): Id.create("unknown", Person.class);
 		this.tourTrips = tourTrips;
 	}
 
