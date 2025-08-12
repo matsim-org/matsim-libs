@@ -12,6 +12,8 @@ public class PerceivedSafetyUtils {
     public static final String E_BIKE = "eBike";
     public static final String E_SCOOTER = "eScooter";
 
+	private PerceivedSafetyUtils() {}
+
     public static void fillConfigWithBicyclePerceivedSafetyDefaultValues(PerceivedSafetyConfigGroup perceivedSafetyConfigGroup) {
         Map<String, Double> mode2MarginalUtilities = Map.of(TransportMode.car, 0.44, E_BIKE,0.84,
                 E_SCOOTER,0.76, TransportMode.walk, 0.33);
