@@ -34,7 +34,7 @@ public class MultinomialLogitSelectorConfigGroup extends ComponentConfigGroup {
 		comments.put(CONSIDER_MINIMUM_UTILITY,
 				"Defines whether candidates with a utility lower than the minimum utility should be filtered out.");
 		comments.put(WRITE_DETAILED_UTILITIES,
-			"If True, the selector writes the utilities of the tour candidates to a csv file called detailed config." );
+			"If True, the selector writes the utilities of the tour candidates to a csv file called detailed_utilities.csv." );
 		return comments;
 	}
 
