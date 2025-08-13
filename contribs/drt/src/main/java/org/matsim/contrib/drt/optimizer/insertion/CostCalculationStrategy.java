@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
@@ -145,8 +146,8 @@ public interface CostCalculationStrategy {
     private static double lateDiversionViolationBetweenStopIndices(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
         double violation = 0;
         for (int s = start; s < end; s++) {
-            Waypoint.Stop stop = vehicleEntry.stops.get(s);
-            if (!stop.task.getDropoffRequests().isEmpty()) {
+            StopWaypoint stop = vehicleEntry.stops.get(s);
+            if (!stop.getTask().getDropoffRequests().isEmpty()) {
                 double remainingRideDuration = stop.getArrivalTime() - vehicleEntry.start.getDepartureTime();
                 if (remainingRideDuration < lateDiversionThreshold) {
                     violation += lateDiversionThreshold - remainingRideDuration;

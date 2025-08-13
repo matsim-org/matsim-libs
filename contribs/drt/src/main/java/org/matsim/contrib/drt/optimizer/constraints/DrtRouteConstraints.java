@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.constraints;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Sebastian Hörl, IRT SystemX
  * @author nkuehnel / MOIA
@@ -44,6 +46,7 @@ public record DrtRouteConstraints(
 					false
 			);
 
+	@JsonIgnore
 	public double getMaxWaitTime() {
 		return latestStartTime - earliestStartTime;
 	}

@@ -120,9 +120,11 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter -> new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class))));
+
 		bindModal(VehicleDataEntryFactoryImpl.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
-			return new VehicleDataEntryFactoryImpl(loadType);
+			return new VehicleDataEntryFactoryImpl(loadType, getter.getModal(StopWaypointFactory.class));
 		}));
 
 		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(VehicleDataEntryFactoryImpl.class)).in(Singleton.class);

@@ -90,10 +90,6 @@ public class RequestInsertWorker {
 	void process(double now, Collection<RequestData> requestDataPartition, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
 		this.unplannedRequests.addAll(requestDataPartition);
 
-		if (!requestDataPartition.isEmpty()) {
-			Verify.verify(!vehicleEntries.isEmpty(), "Requests have been assigned to a worker without vehicleEntries.");
-		}
-
 		while (!unplannedRequests.isEmpty()) {
 			findInsertion(unplannedRequests.poll(), vehicleEntries, now);
 		}

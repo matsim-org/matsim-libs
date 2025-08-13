@@ -26,6 +26,8 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
@@ -69,7 +71,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<Waypoint.Stop>builder().build(), null);
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<StopWaypoint>builder().build(), null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -108,8 +110,8 @@ public class InsertionCostCalculatorTest {
 		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
-		Waypoint.Stop[] stops = new Waypoint.Stop[1];
-		stops[0] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
+		StopWaypoint[] stops = new StopWaypoint[1];
+		stops[0] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
 		var insertion = insertion(entry, 0, 1);
@@ -187,9 +189,9 @@ public class InsertionCostCalculatorTest {
 		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
-		Waypoint.Stop[] stops = new Waypoint.Stop[2];
-		stops[0] = new Waypoint.Stop(existingPickupTask, loadType.fromInt(2), loadType);
-		stops[1] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
+		StopWaypoint[] stops = new StopWaypoint[2];
+		stops[0] = new StopWaypointImpl(existingPickupTask, loadType.fromInt(2), loadType);
+		stops[1] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 60, 300}, ImmutableList.copyOf(stops), start);
 
@@ -249,7 +251,7 @@ public class InsertionCostCalculatorTest {
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);
 	}
 
-	private VehicleEntry entry(double[] slackTimes, ImmutableList<Waypoint.Stop> stops, Waypoint.Start start) {
+	private VehicleEntry entry(double[] slackTimes, ImmutableList<StopWaypoint> stops, Waypoint.Start start) {
 		return new VehicleEntry(null, start, stops, slackTimes, stops.stream().map(s -> 0.).toList(), 0);
 	}
 
