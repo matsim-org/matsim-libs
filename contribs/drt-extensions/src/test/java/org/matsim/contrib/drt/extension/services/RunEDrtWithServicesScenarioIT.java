@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.extension.services.trackers.ChargingTracker;
 import org.matsim.contrib.drt.extension.services.trackers.ServiceTracker;
 import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
 import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
@@ -81,8 +82,9 @@ public class RunEDrtWithServicesScenarioIT {
 			@Override
 			public void install() {
 
+				boolean scheduleWaitBeforeDrive = drtConfigGroup.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
 				bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter ->
-						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class))));
+						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
 
 				bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
 					new EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider(getMode(), MINIMUM_RELATIVE_SOC)

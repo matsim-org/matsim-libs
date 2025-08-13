@@ -36,6 +36,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
@@ -119,7 +120,7 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
 
 		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter -> new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
 
