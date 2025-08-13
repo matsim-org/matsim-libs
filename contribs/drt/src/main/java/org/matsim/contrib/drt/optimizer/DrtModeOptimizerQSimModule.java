@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.optimizer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.*;
@@ -120,7 +119,9 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter -> new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class))));
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
+
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter -> new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
 
 		bindModal(VehicleDataEntryFactoryImpl.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
@@ -151,7 +152,6 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(ScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 			getter -> new DefaultRequestInsertionScheduler(getter.getModal(Fleet.class),
 				getter.get(MobsimTimer.class), getter.getModal(TravelTime.class),

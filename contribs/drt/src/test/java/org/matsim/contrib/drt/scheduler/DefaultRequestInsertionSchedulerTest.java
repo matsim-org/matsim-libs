@@ -224,7 +224,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
     private StopWaypoint stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
-        return new StopWaypointImpl(stopTask, outgoingOccupancy, integerLoadType);
+        return new StopWaypointImpl(stopTask, outgoingOccupancy, integerLoadType, false);
     }
 
 
