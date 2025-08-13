@@ -17,6 +17,7 @@ import org.matsim.contrib.drt.extension.operations.operationFacilities.Operation
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
@@ -80,7 +81,12 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
 
-		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter -> new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
+				getter -> new ShiftStopWaypointFactory(
+						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class)),
+						getter.getModal(DvrpLoadType.class)
+				)
+		));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
 				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),
