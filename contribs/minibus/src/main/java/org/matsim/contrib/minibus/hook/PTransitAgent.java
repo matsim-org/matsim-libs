@@ -73,7 +73,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
 
 		int egressIndex = arrivesAtStop.applyAsInt(route.getEgressStopId());
-		if(egressIndex > 0) {
+		if(egressIndex >= 0) {
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
 				int accessIndex = arrivesAtStop.applyAsInt(route.getAccessStopId());
 				if (accessIndex == -1) {

@@ -66,8 +66,8 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	public final boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
 		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
 		return switch (boardingAcceptance) {
-			case checkLineAndStop -> line.getId().equals(route.getLineId()) && arrivesAtStop.applyAsInt(route.getEgressStopId()) > 0;
-			case checkStopOnly -> arrivesAtStop.applyAsInt(route.getEgressStopId()) > 0;
+			case checkLineAndStop -> line.getId().equals(route.getLineId()) && arrivesAtStop.applyAsInt(route.getEgressStopId()) >= 0;
+			case checkStopOnly -> arrivesAtStop.applyAsInt(route.getEgressStopId()) >= 0;
 		};
 	}
 
