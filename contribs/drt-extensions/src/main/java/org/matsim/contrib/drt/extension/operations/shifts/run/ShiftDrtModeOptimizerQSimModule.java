@@ -10,6 +10,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftDrtOptimizer;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
@@ -111,6 +112,13 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						getter.getModal(OperationFacilities.class),
 						getter.getModal(Network.class),
 						getter.getModal(TravelTimeMatrix.class))));
+
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
+				getter -> new ShiftStopWaypointFactory(
+						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class)),
+						getter.getModal(DvrpLoadType.class)
+				)
+		));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
