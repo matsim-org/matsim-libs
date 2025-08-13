@@ -780,7 +780,7 @@ public class TrafficVolumeGenerationTest {
 
 		TrafficVolumeKey newKey = TrafficVolumeGeneration.makeTrafficVolumeKey(zone, mode);
 
-		Assertions.assertEquals(zone, newKey.getZone());
-		Assertions.assertEquals(mode, newKey.getModeORvehType());
+		Assertions.assertEquals(zone, newKey.zone());
+		Assertions.assertEquals(mode, newKey.modeORvehType());
 	}
 }
