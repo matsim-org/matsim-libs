@@ -79,16 +79,19 @@ public final class EventsFileComparator {
 
 		try {
 			w1.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		try {
 			w2.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
+			log.warn("Interrupted while waiting for workers.", e);
 		}
 
 		ComparisonResult retCode = comparator.retCode;
+
+		if (retCode == null) {
+			log.warn("Comparison aborted due to I/O or setup error.");
+			return ComparisonResult.FILE_ERROR;
+		}
+
 		if (retCode == ComparisonResult.FILES_ARE_EQUAL) {
 			log.info("Event files are semantically equivalent.");
 		} else {

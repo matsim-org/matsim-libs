@@ -26,6 +26,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 /**
  * @author mrieser
  * @author laemmel
@@ -79,5 +85,43 @@ public class EventsFileComparatorTest {
 		assertEquals(WRONG_EVENT_COUNT, EventsFileComparator.compare(f1, f2), "return val = " + WRONG_EVENT_COUNT);
 
 		assertEquals(WRONG_EVENT_COUNT, EventsFileComparator.compare(f2, f1), "return val = " + WRONG_EVENT_COUNT);
+	}
+
+	/** Missing file should lead to IO_ERROR (no hang). */
+	@Test
+	void testMissingFile_returnsIoError() throws IOException {
+		// valid minimal events file on one side
+		Path valid = Path.of(utils.getClassInputDirectory(), "valid.xml");
+		write(valid, "<events></events>");
+
+		// non-existent file on the other side
+		Path missing = Path.of(utils.getClassInputDirectory(), "does-not-exist.xml");
+
+		assertEquals(FILE_ERROR, EventsFileComparator.compare(missing.toString(), valid.toString()),
+				"missing file should yield IO_ERROR");
+		// also try flipped order
+		assertEquals(FILE_ERROR, EventsFileComparator.compare(valid.toString(), missing.toString()),
+				"missing file should yield IO_ERROR");
+	}
+
+	/** Empty/corrupted file should lead to IO_ERROR (no hang). */
+	@Test
+	void testCorruptedFile_returnsIoError() throws IOException {
+		Path valid = Path.of(utils.getClassInputDirectory(), "valid2.xml");
+		write(valid, "<events></events>");
+
+		// empty file (could also write malformed XML like "<events>" to simulate corruption)
+		Path corrupted = Path.of(utils.getClassInputDirectory(), "corrupted.xml");
+		write(corrupted, "");
+
+		assertEquals(FILE_ERROR, EventsFileComparator.compare(valid.toString(), corrupted.toString()),
+				"empty/corrupted file should yield IO_ERROR");
+		assertEquals(FILE_ERROR, EventsFileComparator.compare(corrupted.toString(), valid.toString()),
+				"empty/corrupted file should yield IO_ERROR");
+	}
+
+	private static void write(Path p, String content) throws IOException {
+		Files.createDirectories(p.getParent());
+		Files.write(p, content.getBytes(StandardCharsets.UTF_8));
 	}
 }
