@@ -24,11 +24,18 @@ public class PromisedTimeWindowOfferAcceptor implements DrtOfferAcceptor {
 				request.getLatestStartTime());
 
 		double updatedDropoffTimeWindow = Math.min(arrivalTime + promisedDropoffTimeWindow,
-				request.getLatestArrivalTime());
+				request.getConstraints().latestArrivalTime());
 
 		return Optional
-				.of(AcceptedDrtRequest.newBuilder().request(request).earliestStartTime(request.getEarliestStartTime())
-						.latestArrivalTime(updatedDropoffTimeWindow).latestStartTime(updatedPickupTimeWindow)
-						.dropoffDuration(dropoffDuration).build());
+				.of(AcceptedDrtRequest.newBuilder()
+						.request(request)
+						.earliestStartTime(request.getEarliestStartTime())
+						.latestArrivalTime(updatedDropoffTimeWindow)
+						.latestStartTime(updatedPickupTimeWindow)
+						.maxRideDuration(request.getConstraints().maxRideDuration())
+						.dropoffDuration(dropoffDuration)
+						.plannedPickupTime(departureTime)
+						.plannedDropoffTime(arrivalTime)
+						.build());
 	}
 }

@@ -38,9 +38,9 @@ public class RailsimModule extends AbstractModule {
 		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
 
 		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
-		addControlerListenerBinding().to(RailsimLinkStateControlerListener.class);
+		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);
 
 		bind(RailsimTrainStateControlerListener.class).in(Singleton.class);
-		addControlerListenerBinding().to(RailsimTrainStateControlerListener.class);
+		addControllerListenerBinding().to(RailsimTrainStateControlerListener.class);
 	}
 }

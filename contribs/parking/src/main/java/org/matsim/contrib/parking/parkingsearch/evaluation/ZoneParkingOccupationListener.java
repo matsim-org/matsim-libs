@@ -70,7 +70,7 @@ public class ZoneParkingOccupationListener implements MobsimBeforeCleanupListene
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		String fileName = services.getControlerIO().getIterationFilename(iteration, "OccupationStats.csv");
+		String fileName = services.getControllerIO().getIterationFilename(iteration, "OccupationStats.csv");
 		writeStatsVertical(fileName);
 		double lastOcc;
 		for(String zone : zoneManager.getZones()){

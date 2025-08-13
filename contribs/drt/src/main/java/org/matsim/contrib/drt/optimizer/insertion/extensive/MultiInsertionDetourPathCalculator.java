@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -65,11 +66,16 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 	MultiInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		SpeedyGraph graph = SpeedyGraphBuilder.build(network);
-		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
-		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
-		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
-		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, true);
+		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility, allowsLazyPathCreation(drtCfg));
+		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
+		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
+		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, travelTime, travelDisutility,  allowsLazyPathCreation(drtCfg));
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+	}
+
+	private boolean allowsLazyPathCreation(DrtConfigGroup drtConfigGroup)
+	{
+		return drtConfigGroup.getDrtParallelInserterParams().isEmpty();
 	}
 
 	@VisibleForTesting
@@ -116,7 +122,7 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 
 	private Map<Link, PathData> calcPathsToDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc backward dijkstra from dropoff to ends of selected stops
-		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
+		double latestDropoffTime = drtRequest.getConstraints().latestArrivalTime(); // pessimistic
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup)),
 				insertion -> insertion.dropoff.previousWaypoint.getLink());
@@ -125,7 +131,7 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 
 	private Map<Link, PathData> calcPathsFromDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc forward dijkstra from dropoff to beginnings of selected stops
-		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
+		double latestDropoffTime = drtRequest.getConstraints().latestArrivalTime(); // pessimistic
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.nextWaypoint instanceof Waypoint.End)),
 				insertion -> insertion.dropoff.nextWaypoint.getLink());

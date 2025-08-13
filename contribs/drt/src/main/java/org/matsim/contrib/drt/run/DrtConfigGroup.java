@@ -41,6 +41,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSe
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -272,6 +273,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
+	@Nullable
+	private DrtParallelInserterParams drtParallelInserterParams;
+
 	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
@@ -323,6 +327,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		addDefinition(PrebookingParams.SET_NAME, PrebookingParams::new,
 				() -> prebookingParams,
 				params -> prebookingParams = (PrebookingParams)params);
+
+		//parallel inserter (optional)
+		addDefinition(DrtParallelInserterParams.SET_NAME, DrtParallelInserterParams::new,
+			() -> drtParallelInserterParams,
+			params -> drtParallelInserterParams = (DrtParallelInserterParams)params);
 
 		// estimator (optional)
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
@@ -454,6 +463,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public Optional<RebalancingParams> getRebalancingParams() {
 		return Optional.ofNullable(rebalancingParams);
+	}
+
+	public Optional<DrtParallelInserterParams> getDrtParallelInserterParams() {
+		return Optional.ofNullable(drtParallelInserterParams);
 	}
 
 	public Optional<DrtFareParams> getDrtFareParams() {

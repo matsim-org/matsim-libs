@@ -129,7 +129,7 @@ public class WithinDayTravelTimeTest {
 
 		Controler controler = new Controler(scenario);
 		controler.getEvents().addHandler(travelTime);
-		controler.addControlerListener(new StartupListener() {
+		controler.addControllerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				double t1 = 0.0;

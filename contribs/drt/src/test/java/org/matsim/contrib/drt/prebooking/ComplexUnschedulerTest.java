@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -36,11 +37,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.network.NetworkUtils;
@@ -630,9 +627,9 @@ public class ComplexUnschedulerTest {
 			drtConfig.setStopDuration(30.0);
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
-			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);
+			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType, new StopWaypointFactoryImpl(integerLoadType));
 
-			this.timingUpdater = Mockito.mock(ScheduleTimingUpdater.class);
+			this.timingUpdater = Mockito.mock(ScheduleTimingUpdaterImpl.class);
 		}
 
 		AcceptedDrtRequest createRequest() {

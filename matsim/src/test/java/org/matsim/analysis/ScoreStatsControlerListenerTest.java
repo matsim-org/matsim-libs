@@ -477,46 +477,46 @@ public class ScoreStatsControlerListenerTest {
 
 	private void performTest(String outputDirectory, Population population) throws IOException {
 		ControllerConfigGroup controllerConfigGroup = new ControllerConfigGroup();
-		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(outputDirectory,
+		OutputDirectoryHierarchy controllerIO = new OutputDirectoryHierarchy(outputDirectory,
 				OverwriteFileSetting.overwriteExistingFiles, CompressionType.gzip);
 		controllerConfigGroup.setCreateGraphs(true);
 		controllerConfigGroup.setFirstIteration(0);
 		controllerConfigGroup.setLastIteration(10);
-		ScoreStatsControlerListener scoreStatsControlerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controlerIO, new GlobalConfigGroup());
+		ScoreStatsControlerListener scoreStatsControllerListener = new ScoreStatsControlerListener(controllerConfigGroup, population, controllerIO, new GlobalConfigGroup());
 
 		String outDir = utils.getOutputDirectory() + "/ScoreStatsControlerListener";
 
 		StartupEvent eventStart = new StartupEvent(null);
-		scoreStatsControlerListener.notifyStartup(eventStart);
+		scoreStatsControllerListener.notifyStartup(eventStart);
 
 		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
-		scoreStatsControlerListener.notifyIterationEnds(event0);
+		scoreStatsControllerListener.notifyIterationEnds(event0);
 
 		readAndValidateValues(outDir, 0, population);
 
 		population.getPersons().remove(Id.create("2", Person.class));
 
 		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
-		scoreStatsControlerListener.notifyIterationEnds(event1);
+		scoreStatsControllerListener.notifyIterationEnds(event1);
 
 		readAndValidateValues(outDir, 1, population);
 
 		population.getPersons().remove(Id.create("3", Person.class));
 
 		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
-		scoreStatsControlerListener.notifyIterationEnds(event2);
+		scoreStatsControllerListener.notifyIterationEnds(event2);
 
 		readAndValidateValues(outDir, 2, population);
 
 		population.getPersons().remove(Id.create("4", Person.class));
 
 		IterationEndsEvent event3 = new IterationEndsEvent(null, 3, true);
-		scoreStatsControlerListener.notifyIterationEnds(event3);
+		scoreStatsControllerListener.notifyIterationEnds(event3);
 
 		readAndValidateValues(outDir,3, population);
 
 		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3, null);
-		scoreStatsControlerListener.notifyShutdown(eventShutdown);
+		scoreStatsControllerListener.notifyShutdown(eventShutdown);
 
 	}
 
