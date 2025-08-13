@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.function.ToIntFunction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,9 +43,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
- *
+ * 
  * Own implementation of boarding behavior. Note, that this behavior may be (more) inconsistent with the transit router as the default implementation.
- *
+ * 
  * @author aneumann
  */
 class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
@@ -69,50 +69,54 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
-
-		int egressIndex = arrivesAtStop.applyAsInt(route.getEgressStopId());
-		if(egressIndex >= 0) {
+		
+		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
-				int accessIndex = arrivesAtStop.applyAsInt(route.getAccessStopId());
-				if (accessIndex == -1) {
-					// nothing wrong, e.g. not looping and it's the route planned - just board
-					return true;
+				LinkedList<TransitRouteStop> tempStopsToCome = new LinkedList<>(stopsToCome);
+				tempStopsToCome.removeLast(); // yy why?
+				boolean egressStopFound = false;
+				for (TransitRouteStop stop : tempStopsToCome) {
+					if (route.getEgressStopId().equals(stop.getStopFacility().getId())) {
+						egressStopFound = true;
+					} else if (route.getAccessStopId().equals(stop.getStopFacility().getId())) {
+						// route is looping - decide whether to board now or later
+						if (egressStopFound) {
+							// egress stop found - so the agent will be able to reach its destination before the vehicle returns to this stop
+							// boarding now should be faster
+							return true;
+						} else {
+							// egress stop not found - the vehicle will return before reaching the agent's destination
+							// boarding now or the next the vehicle passes by will not change the arrival time
+							// although people tend to board the first vehicle arriving, lines looping may impose extra costs, e.g. increased ticket costs due to more kilometer or hours traveled
+							// thus, board as late as possible
+							return false;
+						}
+					}
 				}
-
-				// route is looping - decide whether to board now or later
-				// egress stop found - so the agent will be able to reach its destination before the vehicle returns to this stop
-				// boarding now should be faster
-				if (egressIndex < accessIndex) {
-					return true;
-				} else {
-					// egress stop not found - the vehicle will return before reaching the agent's destination
-					// boarding now or the next the vehicle passes by will not change the arrival time
-					// although people tend to board the first vehicle arriving, lines looping may impose extra costs, e.g. increased ticket costs due to more kilometer or hours traveled
-					// thus, board as late as possible
-					return false;
-				}
+				// nothing wrong, e.g. not looping and it's the route planned - just board
+				return true;
 			}
-
+			
 			if (this.transitSchedule.getTransitLines().get(route.getLineId()) == null) {
 				// agent is still on an old line, which probably went bankrupt - enter anyway
 				return true;
 			}
-
+			
 			TransitRoute transitRoutePlanned = this.transitSchedule.getTransitLines().get(route.getLineId()).getRoutes().get(route.getRouteId());
 			if (transitRoutePlanned == null) {
 				// agent is still on an old route, which probably got dropped - enter anyway
 				return true;
 			}
-
+			
 			TransitRoute transitRouteOffered = this.transitSchedule.getTransitLines().get(line.getId()).getRoutes().get(transitRoute.getId());
 
 			double travelTimePlanned = getTravelTimeFromAccessStopToEgressStop(
 					transitRoutePlanned, route.getAccessStopId(), route.getEgressStopId());
 			double travelTimeOffered = getTravelTimeFromAccessStopToEgressStop(
 					transitRouteOffered, route.getAccessStopId(), route.getEgressStopId());
-
+			
 			if (travelTimeOffered <= travelTimePlanned) {
 				// transit route offered is faster the the one planned - enter
 				return true;
@@ -182,7 +186,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
             return route.getAccessStopId();
 		}
 	}
-
+	
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		Leg leg = getCurrentLeg();

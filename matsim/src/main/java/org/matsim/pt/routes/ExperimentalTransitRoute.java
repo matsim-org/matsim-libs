@@ -75,6 +75,12 @@ public class ExperimentalTransitRoute extends AbstractRoute implements TransitPa
 		return this.egressStopId;
 	}
 
+	@Override
+	public Id<TransitStopFacility> getChainedEgressStopId() {
+		// Chained routes are not supported
+		return getEgressStopId();
+	}
+
 	public Id<TransitLine> getLineId() {
 		return this.lineId;
 	}

@@ -25,8 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.function.ToIntFunction;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -115,23 +113,10 @@ public class TransitAgentTest {
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, arrivesAtStop(route1a), null));
-		assertFalse(agent.getEnterTransitRoute(line1, route1b, arrivesAtStop(route1b), null));
-		assertFalse(agent.getEnterTransitRoute(line2, route2a, arrivesAtStop(route2a), null));
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, arrivesAtStop(route1a), null)); // offering the same line again should yield "true"
-	}
-
-	private ToIntFunction<Id<TransitStopFacility>> arrivesAtStop(final TransitRoute route) {
-		return (Id<TransitStopFacility> id) -> {
-			List<TransitRouteStop> stops = route.getStops();
-			for (int i = 0; i < stops.size(); i++) {
-				if (stops.get(i).getStopFacility().getId().equals(id)) {
-					return i + 1;
-				}
-			}
-
-			return -1;
-		};
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null));
+		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops(), null));
+		assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops(), null));
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null)); // offering the same line again should yield "true"
 	}
 
 	@Test

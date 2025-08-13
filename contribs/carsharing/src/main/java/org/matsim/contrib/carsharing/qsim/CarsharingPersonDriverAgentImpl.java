@@ -1,7 +1,6 @@
 package org.matsim.contrib.carsharing.qsim;
 
 import java.util.List;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
@@ -34,6 +33,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -220,13 +220,18 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
-		return this.transitAgentDelegate.getEnterTransitRoute(line, transitRoute, arrivesAtStop, transitVehicle) ;
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+		return this.transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle) ;
 	}
 
 	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
 		return this.transitAgentDelegate.getExitAtStop(stop) ;
+	}
+
+	@Override
+	public boolean getArrivalAtStop(TransitStopFacility stop) {
+		return this.transitAgentDelegate.getArrivalAtStop(stop) ;
 	}
 
 	@Override

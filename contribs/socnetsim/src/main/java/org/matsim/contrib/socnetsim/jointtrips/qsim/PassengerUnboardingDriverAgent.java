@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.jointtrips.qsim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.ToIntFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -51,6 +50,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent, HasPerson {
@@ -286,10 +286,10 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 	public boolean getEnterTransitRoute(
 			final TransitLine line,
 			final TransitRoute transitRoute,
-			final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop,
+			final List<TransitRouteStop> stopsToCome,
 			final TransitVehicle transitVehicle) {
 		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
-		return ptDelegate.getEnterTransitRoute( line , transitRoute , arrivesAtStop, transitVehicle );
+		return ptDelegate.getEnterTransitRoute( line , transitRoute , stopsToCome , transitVehicle );
 	}
 
 	@Override

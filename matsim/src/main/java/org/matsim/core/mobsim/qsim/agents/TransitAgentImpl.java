@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.function.ToIntFunction;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +33,7 @@ import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -63,12 +64,33 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	}
 
 	@Override
-	public final boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
+	public boolean getArrivalAtStop(TransitStopFacility stop) {
 		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
-		return switch (boardingAcceptance) {
-			case checkLineAndStop -> line.getId().equals(route.getLineId()) && arrivesAtStop.applyAsInt(route.getEgressStopId()) >= 0;
-			case checkStopOnly -> arrivesAtStop.applyAsInt(route.getEgressStopId()) >= 0;
-		};
+		return route.getAccessStopId().equals(stop.getId());
+	}
+
+	@Override
+	public final boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
+		switch ( boardingAcceptance ) {
+			case checkLineAndStop:
+				return line.getId().equals(route.getLineId()) && containsId(stopsToCome, route.getEgressStopId());
+			case checkStopOnly:
+				return containsId(stopsToCome, route.getEgressStopId());
+			default:
+				throw new RuntimeException("not implemented");
+		}
+	}
+
+	@SuppressWarnings("static-method")
+	private final boolean containsId(List<TransitRouteStop> stopsToCome,
+			Id<TransitStopFacility> egressStopId) {
+		for (TransitRouteStop stop : stopsToCome) {
+			if (egressStopId.equals(stop.getStopFacility().getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

@@ -19,17 +19,18 @@
 
 package org.matsim.contrib.dynagent;
 
-import java.util.function.ToIntFunction;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public interface PTPassengerDynLeg extends PassengerDynLeg {
 	boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute,
-								 final ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle);
+			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle);
 
 	boolean getExitAtStop(final TransitStopFacility stop);
 

@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.ToIntFunction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -635,8 +634,13 @@ public class TransitDriverTest {
 		}
 
 		@Override
+		public boolean getArrivalAtStop(TransitStopFacility stop) {
+			return getExitAtStop(stop);
+		}
+
+		@Override
 		public boolean getEnterTransitRoute(TransitLine line,
-											TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop, TransitVehicle transitVehicle) {
+				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 			this.offeredLine = line;
 			return false;
 		}

@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.function.ToIntFunction;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +40,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -162,10 +163,13 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	public final boolean getExitAtStop(TransitStopFacility stop) {
 		return transitAgentDelegate.getExitAtStop(stop);
 	}
+	public final boolean getArrivalAtStop(TransitStopFacility stop) {
+		return transitAgentDelegate.getArrivalAtStop(stop);
+	}
 	@Override
-	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, ToIntFunction<Id<TransitStopFacility>> arrivesAtStop,
-											  TransitVehicle transitVehicle) {
-		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, arrivesAtStop, transitVehicle);
+	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
+			TransitVehicle transitVehicle) {
+		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
 	}
 	@Override
 	public final double getWeight() {
