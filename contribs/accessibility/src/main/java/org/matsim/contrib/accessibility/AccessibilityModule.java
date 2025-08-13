@@ -27,10 +27,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -178,6 +181,20 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				LOG.info("Using measuring points from facilities object.");
 
+			} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromPopulation) {
+				boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+				measuringPoints = new ActivityFacilitiesImpl();
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					double homeX = (Double) person.getAttributes().getAttribute("homeX");
+					double homeY = (Double) person.getAttributes().getAttribute("homeY");
+					ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(
+						Id.create(person.getId().toString(), ActivityFacility.class),
+						new Coord(homeX, homeY),
+						null
+					);
+
+					measuringPoints.addActivityFacility(facility);
+				}
 			} else { // This covers also the "fromNetwork" case
 				LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 				LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");

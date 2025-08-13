@@ -19,13 +19,7 @@
 
 package org.matsim.contrib.accessibility.run;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -33,10 +27,6 @@ import java.util.*;
 
 import com.google.inject.multibindings.MapBinder;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.math3.stat.inference.TestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -86,7 +76,7 @@ public class TinyAccessibilityTest {
 
 	private static final Logger LOG = LogManager.getLogger(TinyAccessibilityTest.class);
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private static MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void runFromEvents() {
@@ -373,7 +363,7 @@ public class TinyAccessibilityTest {
 	}
 
 
-	private Config createTestConfig() {
+	static Config createTestConfig() {
 		final Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
@@ -391,7 +381,7 @@ public class TinyAccessibilityTest {
 	}
 
 
-	private static Scenario createTestScenario(final Config config) {
+	static Scenario createTestScenario(final Config config) {
 //		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		Network network = createLessSymmetricTestNetwork();
