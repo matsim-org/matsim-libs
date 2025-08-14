@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +35,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerRelocation;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
@@ -163,9 +165,13 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	public final boolean getExitAtStop(TransitStopFacility stop) {
 		return transitAgentDelegate.getExitAtStop(stop);
 	}
-	public final boolean getArrivalAtStop(TransitStopFacility stop) {
-		return transitAgentDelegate.getArrivalAtStop(stop);
+
+	@Nullable
+	@Override
+	public PTPassengerRelocation getNextRelocation() {
+		return transitAgentDelegate.getNextRelocation();
 	}
+
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {

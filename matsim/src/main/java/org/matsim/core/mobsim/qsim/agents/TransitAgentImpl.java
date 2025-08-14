@@ -20,6 +20,7 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerRelocation;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
 import org.matsim.pt.routes.TransitPassengerRoute;
@@ -63,10 +65,15 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
+	@Nullable
 	@Override
-	public boolean getArrivalAtStop(TransitStopFacility stop) {
+	public PTPassengerRelocation getNextRelocation() {
 		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
-		return route.getAccessStopId().equals(stop.getId());
+
+		if (route.getChainedRoute() == null)
+			return null;
+
+		return new PTPassengerRelocation(route.getEgressStopId(), route.getChainedRoute().getEgressStopId());
 	}
 
 	@Override

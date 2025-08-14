@@ -163,15 +163,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	}
 
 	@Override
-	public Id<TransitStopFacility> getChainedEgressStopId() {
-		if (this.chainedRoute != null) {
-			return chainedRoute.getChainedEgressStopId();
-		}
-
-		return getEgressStopId();
-	}
-
-	@Override
 	public DefaultTransitPassengerRoute getChainedRoute() {
 		return chainedRoute;
 	}

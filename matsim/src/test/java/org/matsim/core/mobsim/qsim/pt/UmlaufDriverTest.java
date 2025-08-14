@@ -606,11 +606,6 @@ public class UmlaufDriverTest {
 		}
 
 		@Override
-		public boolean getArrivalAtStop(TransitStopFacility stop) {
-			return getExitAtStop(stop);
-		}
-
-		@Override
 		public boolean getEnterTransitRoute(TransitLine line,
 				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 			this.offeredLine = line;

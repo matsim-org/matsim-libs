@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -59,9 +60,12 @@ public interface PTPassengerAgent extends PassengerAgent {
 	public boolean getExitAtStop(final TransitStopFacility stop);
 
 	/**
-	 * Check whether this is the last stop of a chained trip.
+	 * Check whether the agent needs to relocate to another vehicle as part of a chained leg.
 	 */
-	public boolean getArrivalAtStop(final TransitStopFacility stop);
+	@Nullable
+	default public PTPassengerRelocation getNextRelocation() {
+		return null;
+	}
 
 	/**
 	 * Asks a passenger which is departing on a transit leg about the stop it wants to use for accessing the transit line.

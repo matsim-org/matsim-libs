@@ -156,8 +156,10 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		Iterator<PTPassengerAgent> it = passengersLeaving.iterator();
 		while (it.hasNext()) {
 			PTPassengerAgent passenger = it.next();
+
+			PTPassengerRelocation rl = passenger.getNextRelocation();
 			// this is not the last stop of a chained trip, so we relocate
-			if (!passenger.getArrivalAtStop(stop)) {
+			if (rl != null && stop.getId().equals(rl.stop())) {
 				// the agent will not be handled as leaving, but as relocating
 				it.remove();
 				relocatingPassengers.add(passenger);
@@ -205,8 +207,23 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerRelocating(PTPassengerAgent agent, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
-		throw new UnsupportedOperationException("TODO");
+	public boolean handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
+
+		boolean handled = vehicle.removePassenger(passenger);
+		if (handled) {
+
+			// TODO: no events here
+			// Store agent?
+
+			System.err.println("TODO: Relocating passenger " + passenger.getId() + " from vehicle " + vehicle.getId() + " to link " + toLinkId + " at time " + time);
+
+
+
+		} else
+			throw new IllegalStateException("Agent " + passenger.getId() + " was not removed from vehicle " + vehicle.getId() + " when relocating.");
+
+
+		return true;
 	}
 
 

@@ -32,11 +32,6 @@ public interface TransitPassengerRoute extends Route {
 
 	Id<TransitStopFacility> getEgressStopId();
 
-	/**
-	 * The very last stop of all chained routes (if any).
-	 */
-	Id<TransitStopFacility> getChainedEgressStopId();
-
 	Id<TransitLine> getLineId();
 
 	Id<TransitRoute> getRouteId();

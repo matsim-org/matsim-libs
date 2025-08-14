@@ -147,11 +147,6 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public boolean getArrivalAtStop(TransitStopFacility stop) {
-		return stop == this.exitStop;
-	}
-
-	@Override
 	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		return true;
 	}
