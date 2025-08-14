@@ -96,7 +96,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			.allowPositionalArguments(false)
 			.build();
 
-		//TODO: TryOut cmdLine arguments
 		//Muss noch weiter auf die anderen Optionen angepasst werden.
 		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1); // I know that MATSim-iters can be set more directly.
 		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it");
