@@ -8,10 +8,14 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 
+/**
+ * @author nkuehnel / MOIA
+ */
 public class ShiftChangeoverStopWaypoint implements StopWaypoint {
 
     private final ShiftChangeOverTask shiftChangeOverTask;
     private final double latestArrivalTime;
+    private final double earliestArrivalTime;
     private final double latestDepartureTime;
 
     private final DvrpLoad emptyLoad;
@@ -19,8 +23,9 @@ public class ShiftChangeoverStopWaypoint implements StopWaypoint {
 
     public ShiftChangeoverStopWaypoint(ShiftChangeOverTask shiftChangeOverTask, DvrpLoadType loadType) {
         this.shiftChangeOverTask = shiftChangeOverTask;
-        this.latestArrivalTime = calcLatestArrivalTime();
-        this.latestDepartureTime = calcLatestDepartureTime();
+        this.latestArrivalTime = this.shiftChangeOverTask.getShift().getEndTime();
+        this.earliestArrivalTime = this.shiftChangeOverTask.getShift().getEndTime();
+        this.latestDepartureTime = Double.POSITIVE_INFINITY;
         this.emptyLoad = loadType.getEmptyLoad();
     }
 
@@ -32,6 +37,11 @@ public class ShiftChangeoverStopWaypoint implements StopWaypoint {
     @Override
     public double getLatestDepartureTime() {
         return latestDepartureTime;
+    }
+
+    @Override
+    public double getEarliestArrivalTime() {
+        return earliestArrivalTime;
     }
 
     @Override
@@ -52,6 +62,11 @@ public class ShiftChangeoverStopWaypoint implements StopWaypoint {
     }
 
     @Override
+    public boolean scheduleWaitBeforeDrive() {
+        return true;
+    }
+
+    @Override
     public Link getLink() {
         return shiftChangeOverTask.getLink();
     }
@@ -69,15 +84,6 @@ public class ShiftChangeoverStopWaypoint implements StopWaypoint {
     @Override
     public DvrpLoad getOutgoingOccupancy() {
         return emptyLoad;
-    }
-
-
-    private double calcLatestArrivalTime() {
-        return shiftChangeOverTask.getShift().getEndTime();
-    }
-
-    private double calcLatestDepartureTime() {
-        return Double.POSITIVE_INFINITY;
     }
 }
 

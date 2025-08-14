@@ -111,7 +111,7 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[1];
-		stops[0] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType);
+		stops[0] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType, false);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
 		var insertion = insertion(entry, 0, 1);
@@ -190,8 +190,8 @@ public class InsertionCostCalculatorTest {
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[2];
-		stops[0] = new StopWaypointImpl(existingPickupTask, loadType.fromInt(2), loadType);
-		stops[1] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType);
+		stops[0] = new StopWaypointImpl(existingPickupTask, loadType.fromInt(2), loadType, false);
+		stops[1] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType, false);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 60, 300}, ImmutableList.copyOf(stops), start);
 
