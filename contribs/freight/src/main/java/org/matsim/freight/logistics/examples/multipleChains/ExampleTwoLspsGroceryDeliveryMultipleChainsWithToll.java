@@ -452,7 +452,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			.setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 		CarriersUtils.setJspritIterations(distributionCarrier, jspritIterationsDistributionCarrier);
 
-		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.serviceBased);
+		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
 		for (VehicleType vehicleType : vehicleTypesDistributionRun.getVehicleTypes().values()) {
 			CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck_" + vehicleType.getId()), hubLinkId, vehicleType));

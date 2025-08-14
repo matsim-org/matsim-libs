@@ -30,7 +30,7 @@ package org.matsim.freight.logistics.examples.multipleChains;
 public class RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	public static void main(String[] args) throws Exception {
 		String[] argsToSet = {
-			"--outputDirectory=output/groceryDelivery_kmt_banDieselVehiclesFromScript",
+			"--outputDirectory=output/groceryDelivery_kmt_banDieselVehiclesFromScript2",
 			"--matsimIterations=1",
 			"--jspritIterationsMain=1",
 			"--jspritIterationsDirect=1",
