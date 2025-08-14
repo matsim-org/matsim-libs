@@ -12,8 +12,12 @@ public interface StopWaypoint extends Waypoint {
 
     double getLatestDepartureTime();
 
+    double getEarliestArrivalTime();
+
     DrtStopTask getTask();
 
     DvrpLoad getOccupancyChange();
     DvrpLoad getChangedCapacity();
+
+    boolean scheduleWaitBeforeDrive();
 }

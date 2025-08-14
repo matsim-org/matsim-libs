@@ -123,7 +123,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	private StopWaypoint stop(double endTime) {
-		return new StopWaypointImpl(new DefaultDrtStopTask(endTime - 10, endTime, null), loadType.fromInt(0), loadType);
+		return new StopWaypointImpl(new DefaultDrtStopTask(endTime - 10, endTime, null), loadType.fromInt(0), loadType, false);
 	}
 
 	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, StopWaypoint... stops) {

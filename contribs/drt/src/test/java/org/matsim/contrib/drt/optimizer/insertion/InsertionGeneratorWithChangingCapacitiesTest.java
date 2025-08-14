@@ -57,7 +57,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	@SuppressWarnings("SameParameterValue")
 	private StopWaypoint stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
-		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, customLoadType);
+		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, customLoadType, false);
 	}
 
 	@SuppressWarnings("SameParameterValue")

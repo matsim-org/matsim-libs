@@ -627,7 +627,7 @@ public class ComplexUnschedulerTest {
 			drtConfig.setStopDuration(30.0);
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
-			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType, new StopWaypointFactoryImpl(integerLoadType));
+			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType, new StopWaypointFactoryImpl(integerLoadType, false));
 
 			this.timingUpdater = Mockito.mock(ScheduleTimingUpdaterImpl.class);
 		}

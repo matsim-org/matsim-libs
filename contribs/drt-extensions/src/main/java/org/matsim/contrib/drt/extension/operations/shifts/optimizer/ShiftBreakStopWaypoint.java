@@ -16,6 +16,7 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
 
     private final ShiftBreakTask shiftBreakTask;
     private final double latestArrivalTime;
+    private final double earliestArrivalTime;
     private final double latestDepartureTime;
 
     private final DvrpLoad emptyLoad;
@@ -23,9 +24,15 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
 
     public ShiftBreakStopWaypoint(ShiftBreakTask shiftBreakTask, DvrpLoadType loadType) {
         this.shiftBreakTask = shiftBreakTask;
+        this.earliestArrivalTime = calcEarliestArrivalTime();
         this.latestArrivalTime = calcLatestArrivalTime();
         this.latestDepartureTime = calcLatestDepartureTime();
         this.emptyLoad = loadType.getEmptyLoad();
+    }
+
+    @Override
+    public double getEarliestArrivalTime() {
+        return earliestArrivalTime;
     }
 
     @Override
@@ -56,6 +63,11 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
     }
 
     @Override
+    public boolean scheduleWaitBeforeDrive() {
+        return true;
+    }
+
+    @Override
     public Link getLink() {
         return shiftBreakTask.getLink();
     }
@@ -75,6 +87,9 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
         return emptyLoad;
     }
 
+    private double calcEarliestArrivalTime() {
+        return shiftBreakTask.getShiftBreak().getEarliestBreakStartTime();
+    }
 
     private double calcLatestArrivalTime() {
         DrtShiftBreak shiftBreak = shiftBreakTask.getShiftBreak();
@@ -82,7 +97,6 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
     }
 
     private double calcLatestDepartureTime() {
-        DrtShiftBreak shiftBreak = shiftBreakTask.getShiftBreak();
-        return shiftBreak.getLatestBreakEndTime();
+        return shiftBreakTask.getShiftBreak().getLatestBreakEndTime();
     }
 }

@@ -602,7 +602,7 @@ public class InsertionGeneratorTest {
 	}
 
 	private StopWaypoint stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
-		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, LOAD_TYPE);
+		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, LOAD_TYPE, false);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, StopWaypoint... stops) {
