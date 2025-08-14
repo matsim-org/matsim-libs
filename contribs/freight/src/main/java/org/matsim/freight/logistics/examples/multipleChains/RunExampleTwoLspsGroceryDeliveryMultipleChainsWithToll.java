@@ -38,7 +38,7 @@ public class RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			"--tollValue=1000.0",
 			"--tolledVehicleTypes=heavy40t,heavy40t_electro",
 			"--HubCostsFix=100.0",
-			"--typeOfLsps=ONE_CHAIN_DIRECT",
+			"--typeOfLsps=TWO_CHAINS_DIRECT_AND_TWO_ECHELON",
 			"--EdekaCarrierId=edeka_SUPERMARKT_TROCKEN",
 			"--HubLinkIdEdeka=91085",
 			"--KauflandCarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",

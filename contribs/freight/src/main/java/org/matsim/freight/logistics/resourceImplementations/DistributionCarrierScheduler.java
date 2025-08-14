@@ -212,13 +212,9 @@ import org.matsim.vehicles.VehicleType;
 	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
 	 */
 	private void scheduleCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
-		//Todo: implement it.
-//		throw new NotImplementedException("This method is not implemented yet. KMT feb'25");
-
 		Carrier auxCarrier = CarriersUtils.createCarrier(Id.create("auxCarrier", Carrier.class));
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance();
 		ccBuilder.setFleetSize(FleetSize.INFINITE);
-
 
 		//add all shipments.
 		for (LspShipment lspShipment : shipmentsToSchedule) {
@@ -231,10 +227,13 @@ import org.matsim.vehicles.VehicleType;
 		double earliestStartTime = Double.MAX_VALUE;
 		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
 			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
-			assert lpsShipmentPlan != null;
-			var endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
-			if (endtime < earliestStartTime) {
-				earliestStartTime = endtime;
+			if (lpsShipmentPlan == null) throw new AssertionError();
+			if (! lpsShipmentPlan.getPlanElements().isEmpty()) {
+				// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
+				double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
+				if (endtime < earliestStartTime) {
+					earliestStartTime = endtime;
+				}
 			}
 		}
 		if (earliestStartTime == Double.MAX_VALUE) {
@@ -242,7 +241,6 @@ import org.matsim.vehicles.VehicleType;
 				"Setting earliest start time to 0.", auxCarrier.getId());
 			earliestStartTime = 0;
 		}
-
 
 		for (CarrierVehicle carrierVehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			var cv = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLinkId(), carrierVehicle.getType())
@@ -301,33 +299,49 @@ import org.matsim.vehicles.VehicleType;
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
 		Id<CarrierShipment> carrierShipmentId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
 		LspShipmentPlan lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
-		if (lspShipmentPlan == null) throw new AssertionError("");
-		LspShipmentPlanElement latestEntry = lspShipmentPlan.getMostRecentEntry();
-		Id<LSPResource> ressourceIdOfLatestEntry = latestEntry.getResourceId();
 
-		Id<Link> fromLinkId = null;
-		// Since this is a shipment, the carrier would want to pick it up at its overall origin.  However, the shipment may already be at an intermediate hub.
-		// "getMostRecentEntry()" (see above) works since we are in the process of constructing the plan.  Possible, latestEntry might already
-		// directly contain the necessary information.
-		for (LSPResource resource : this.lspPlan.getLSP().getResources()) {
-			if (resource instanceof TransshipmentHubResource hubResource) {
-				if (hubResource.getId().equals(ressourceIdOfLatestEntry)) {
-					fromLinkId  = hubResource.getEndLinkId();
+		CarrierShipment carrierShipment;
+
+		if (lspShipmentPlan != null && !lspShipmentPlan.getPlanElements().isEmpty()) {
+			// This should be the case, if there was a hub before.
+			LspShipmentPlanElement latestEntry = lspShipmentPlan.getMostRecentEntry();
+			Id<LSPResource> ressourceIdOfLatestEntry = latestEntry.getResourceId();
+			Id<Link> fromLinkId = null;
+			// Since this is a shipment, the carrier would want to pick it up at its overall origin.  However, the shipment may already be at an intermediate hub.
+			// "getMostRecentEntry()" (see above) works since we are in the process of constructing the plan.  Possible, latestEntry might already
+			// directly contain the necessary information.
+			for (LSPResource resource : this.lspPlan.getLSP().getResources()) {
+				if (resource instanceof TransshipmentHubResource hubResource) {
+					if (hubResource.getId().equals(ressourceIdOfLatestEntry)) {
+						fromLinkId = hubResource.getEndLinkId();
+					}
 				}
 			}
+
+			if (fromLinkId == null) { // Not coming from a hub... use from location of the shipment. This is the case when we have a direct Carrier only for the distribution.
+				log.info("shipment {}: Did not find a hub resource for the latest entry of the LSPShipmentPlan. Using from location of the shipment instead.", lspShipment.getId());
+				fromLinkId = lspShipment.getFrom();
+			}
+
+			assert fromLinkId != null;
+			carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(latestEntry.getEndTime(), Double.MAX_VALUE)) //Can be picked up at hub once its handling there is done.
+				.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
+				//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
+				.build();
+		} else {
+			//This is the case, if only a driectCarrier is build for the LSP.
+			Id<Link> fromLinkId = lspShipment.getFrom();
+			carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
+				.setPickupStartingTimeWindow(lspShipment.getPickupTimeWindow())
+				.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
+				//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
+				.build();
 		}
 
-		if (fromLinkId == null) { // Not coming from a hub... use from location of the shipment. TODO: Can this happen?
-			fromLinkId = lspShipment.getFrom();
-		}
 
-		assert fromLinkId != null;
-		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
-			.setPickupStartingTimeWindow(TimeWindow.newInstance(latestEntry.getEndTime(), Double.MAX_VALUE)) //Can be picked up at hub once its handling there is done.
-			.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
-			//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
-			.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
-			.build();
 		//ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
 		if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
 			log.error("Id of LspShipment: {} and CarrierShipment: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
