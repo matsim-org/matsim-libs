@@ -568,6 +568,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 						createResourcesListFromLSPPlans(List.of(lspPlan))))
 				.build();
 
+
 		LSPUtils.splitShipmentsIfNeeded(lsp);
 
 		log.info("assign the shipments to the LSP");
@@ -598,7 +599,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
 				.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
 				.build();
-		CarrierSchedulerUtils.setVrpLogic(directCarrier, LSPUtils.LogicOfVrp.serviceBased);
+		CarrierSchedulerUtils.setVrpLogic(directCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
 		LogisticChainElement singleCarrierElement =
 			LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierElement", LogisticChainElement.class))
