@@ -301,7 +301,7 @@ import org.matsim.vehicles.VehicleType;
 	private CarrierShipment convertToCarrierShipment(LspShipment lspShipment) {
 		Id<CarrierShipment> carrierShipmentId = Id.create(lspShipment.getId().toString(), CarrierShipment.class);
 		LspShipmentPlan lspShipmentPlan = LSPUtils.findLspShipmentPlan(this.lspPlan, lspShipment.getId());
-		assert lspShipmentPlan != null;
+		if (lspShipmentPlan == null) throw new AssertionError("");
 		LspShipmentPlanElement latestEntry = lspShipmentPlan.getMostRecentEntry();
 		Id<LSPResource> ressourceIdOfLatestEntry = latestEntry.getResourceId();
 
