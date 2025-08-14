@@ -53,7 +53,7 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 				accessEgress.handlePassengerEntering(passenger, vehicle, stop.getId(), now);
 			}
 			for (PTPassengerAgent passenger : relocatingPassengers) {
-				accessEgress.handlePassengerRelocating(passenger, vehicle, stop.getLinkId(), now);
+				accessEgress.handlePassengerRelocating(passenger, vehicle, stop.getId(), now);
 			}
 		}
 		this.lastHandledStop = stop;

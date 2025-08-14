@@ -35,15 +35,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.core.mobsim.qsim.pt.*;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -126,7 +119,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         return removed;
     }
 
-    @Override
+	@Override
     public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
         boolean entered = vehicle.addPassenger(passenger);
         if (entered) {
@@ -139,6 +132,16 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         }
         return entered;
     }
+
+	@Override
+	public void handlePassengerRelocating(PTPassengerAgent agent, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+		throw new UnsupportedOperationException("TODO");
+	}
+
+	@Override
+	public void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> chain, double time) {
+		throw new UnsupportedOperationException("TODO");
+	}
 
     private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
             final TransitStopFacility stop) {

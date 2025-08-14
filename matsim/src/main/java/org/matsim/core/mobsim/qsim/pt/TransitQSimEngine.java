@@ -20,10 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,6 +40,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -145,7 +143,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
+				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, umlaufCache.getDeparturesDependingOnChains());
 				drivers.add(driver);
 			}
 		}
@@ -161,7 +159,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return umlaufCache;
 	}
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle) {
+	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle, Set<Id<Departure>> departuresDependingOnChains) {
+
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
 		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
 		veh.setDriver(driver);
@@ -171,6 +170,13 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
 		this.qSim.addParkedVehicle(veh, startLinkId);
 		this.qSim.insertAgentIntoMobsim(driver);
+
+		// A departure that depends on a previous chain cannot depart before the first connecting leg has ended
+		if (departuresDependingOnChains.contains(umlauf.getUmlaufStuecke().getFirst().getDeparture().getId())) {
+			// TODO: not working as intended yet
+			// driver.setWaitForDeparture();
+		}
+
 		return driver;
 	}
 

@@ -20,15 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-
-import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 
 /**
@@ -62,9 +61,8 @@ public interface PTPassengerAgent extends PassengerAgent {
 	/**
 	 * Check whether the agent needs to relocate to another vehicle as part of a chained leg.
 	 */
-	@Nullable
-	default public PTPassengerRelocation getNextRelocation() {
-		return null;
+	default public boolean getRelocationAtStop(final TransitStopFacility stop) {
+		return false;
 	}
 
 	/**

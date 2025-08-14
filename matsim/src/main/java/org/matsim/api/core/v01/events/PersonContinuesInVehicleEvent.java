@@ -35,12 +35,12 @@ import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeKeyValue;
  */
 public class PersonContinuesInVehicleEvent extends Event implements HasPersonId, HasVehicleId {
 
-	public static final String EVENT_TYPE = "PersonLeavesVehicle";
+	public static final String EVENT_TYPE = "PersonContinuesInVehicle";
 	public static final String ATTRIBUTE_FROM_VEHICLE = "fromVehicle";
 
 	private final Id<Person> personId;
-	private Id<Vehicle> fromVehicleId;
-	private Id<Vehicle> vehicleId;
+	private final Id<Vehicle> fromVehicleId;
+	private final Id<Vehicle> vehicleId;
 
 	/*package*/ public PersonContinuesInVehicleEvent(final double time, final Id<Person> personId,
 													 final Id<Vehicle> fromVehicleId, final Id<Vehicle> vehicleId) {
@@ -57,10 +57,6 @@ public class PersonContinuesInVehicleEvent extends Event implements HasPersonId,
 
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
-	}
-
-	public void setVehicleId(Id<Vehicle> vehicleId) {
-		this.vehicleId = vehicleId;
 	}
 
 	@Override

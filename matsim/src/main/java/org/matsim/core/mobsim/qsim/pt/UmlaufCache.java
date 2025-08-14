@@ -20,19 +20,33 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.Umlauf;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.*;
 
 class UmlaufCache {
 	public static final String ELEMENT_NAME = "umlaufCache";
 
 	private final TransitSchedule transitSchedule;
 	private final Collection<Umlauf> umlaeufe;
+	private final Set<Id<Departure>> departuresDependingOnChains = new LinkedHashSet<>();
 
 	public UmlaufCache(TransitSchedule transitSchedule, Collection<Umlauf> umlaeufe) {
 		this.transitSchedule = transitSchedule;
 		this.umlaeufe = umlaeufe;
+
+		for (TransitLine line : transitSchedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					for (ChainedDeparture c : departure.getChainedDepartures()) {
+						this.departuresDependingOnChains.add(c.getChainedDepartureId());
+					}
+				}
+			}
+		}
 	}
 
 	public TransitSchedule getTransitSchedule() {
@@ -43,4 +57,7 @@ class UmlaufCache {
 		return this.umlaeufe;
 	}
 
+	public Set<Id<Departure>> getDeparturesDependingOnChains() {
+		return departuresDependingOnChains;
+	}
 }

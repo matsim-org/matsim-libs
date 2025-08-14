@@ -210,6 +210,8 @@ public final class RaptorUtils {
 		ptRoute.setBoardingTime(part.boardingTime);
 		ptRoute.setTravelTime(part.arrivalTime - part.depTime);
 		ptRoute.setDistance(part.distance);
+		// End link is always set to the last destination
+		ptRoute.setEndLinkId(part.getChainedEgressStop().getLinkId());
 
 		return ptRoute;
 	}

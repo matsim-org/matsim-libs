@@ -197,7 +197,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 		}
 
 		for (PTPassengerAgent relocatingPassenger : relocatingPassengers) {
-			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getLinkId(), now);
+			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getId(), now);
 		}
 
 		return stopTime;
@@ -328,7 +328,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 		}
 
 		for (PTPassengerAgent relocatingPassenger : relocatingPassengers) {
-			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getLinkId(), now);
+			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getId(), now);
 		}
 
 		return stopTime;
