@@ -21,6 +21,9 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -51,6 +54,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   private LSP lsp;
   private int bufferTime;
 
+  Logger log = LogManager.getLogger(SimpleForwardLogisticChainScheduler.class);
+
   SimpleForwardLogisticChainScheduler(List<LSPResource> resources) {
     this.resources = resources;
   }
@@ -73,12 +78,18 @@ import org.matsim.freight.logistics.shipment.LspShipment;
   }
 
   private void insertShipmentsAtBeginning() {
-    for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-      LogisticChainElement firstElement = getFirstElement(solution);
-      assert firstElement != null;
-      for (Id<LspShipment> lspShipmentId : solution.getLspShipmentIds()) {
+    for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+      LogisticChainElement firstElement = getFirstElement(logisticChain);
+		if (firstElement == null)
+		{
+			throw new AssertionError("The first element of the logistic chain " + logisticChain.getId() + " is null. This should not happen.");
+		}
+      for (Id<LspShipment> lspShipmentId : logisticChain.getLspShipmentIds()) {
         var shipment = LSPUtils.findLspShipment(lsp, lspShipmentId);
-        assert shipment != null;
+        if (shipment == null) {
+			log.error("Shipment with id {} not found in LSP {}. This should not happen.", lspShipmentId, lsp.getId());
+			throw new AssertionError("Shipment with id " + lspShipmentId + " not found in LSP " + lsp.getId() + ". This should not happen.");
+		}
         firstElement
             .getIncomingShipments()
             .addShipment(shipment.getPickupTimeWindow().getStart(), shipment);

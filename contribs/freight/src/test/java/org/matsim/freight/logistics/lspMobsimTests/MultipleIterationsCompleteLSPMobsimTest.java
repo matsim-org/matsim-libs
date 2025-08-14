@@ -289,7 +289,7 @@ public class MultipleIterationsCompleteLSPMobsimTest {
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
-			completeLSP.assignShipmentToLSP(shipment);
+			completeLSP.assignShipmentToLspPlan(shipment);
 		}
 		completeLSP.scheduleLogisticChains();
 

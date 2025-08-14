@@ -40,7 +40,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private final double capacityNeedLinear;
   private final double capacityNeedFixed;
   private TransshipmentHubResource transshipmentHubResource;
-  private TransshipmentHubTourEndEventHandler eventHandler;
+  private TransshipmentHubEventHandler eventHandler;
 
   TransshipmentHubScheduler(TranshipmentHubSchedulerBuilder builder) {
     this.lspShipmentsToSchedule = new ArrayList<>();
@@ -117,7 +117,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   public void setTransshipmentHubTourEndEventHandler(
-      TransshipmentHubTourEndEventHandler eventHandler) {
+      TransshipmentHubEventHandler eventHandler) {
     this.eventHandler = eventHandler;
   }
 }
