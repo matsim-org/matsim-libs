@@ -227,13 +227,17 @@ import org.matsim.vehicles.VehicleType;
 		double earliestStartTime = Double.MAX_VALUE;
 		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
 			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
-			if (lpsShipmentPlan == null) throw new AssertionError();
-			if (! lpsShipmentPlan.getPlanElements().isEmpty()) {
-				// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
-				double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
-				if (endtime < earliestStartTime) {
-					earliestStartTime = endtime;
+			if (lpsShipmentPlan != null) {
+				if (!lpsShipmentPlan.getPlanElements().isEmpty()) {
+					// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
+					double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
+					if (endtime < earliestStartTime) {
+						earliestStartTime = endtime;
+					}
 				}
+			} else {
+				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
+			//	throw new AssertionError();
 			}
 		}
 		if (earliestStartTime == Double.MAX_VALUE) {

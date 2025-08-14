@@ -316,13 +316,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		//TODO: Maybe move this out and do this after creating all the LSPs?
 		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		LSPUtils.splitShipmentsIfNeeded(lsp);
-
-		//TODO: Maybe move this out and do this after creating all the LSPs?
-		log.info("assign the shipments to the LSP");
-		for (LspShipment lspShipment : lspShipments) {
-			lsp.assignShipmentToLspPlan(lspShipment);
-		}
+		assignLspShipments(lspShipments, lsp);
 
 		return lsp;
 	}
@@ -359,16 +353,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(List.of(lspPlan))))
 			.build();
 
-		//TODO: Maybe move this out and do this after creating all the LSPs?
-		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		LSPUtils.splitShipmentsIfNeeded(lsp);
-
-		//TODO: Maybe move this out and do this after creating all the LSPs?
-		log.info("assign the shipments to the LSP");
-		for (LspShipment lspShipment : lspShipments) {
-			lsp.assignShipmentToLspPlan(lspShipment);
-		}
-
+		assignLspShipments(lspShipments, lsp);
 
 		return lsp;
 	}
@@ -411,13 +396,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		//TODO: Maybe move this out and do this after creating all the LSPs?
 		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		LSPUtils.splitShipmentsIfNeeded(lsp);
-
-		//TODO: Maybe move this out and do this after creating all the LSPs?
-		log.info("assign the shipments to the LSP");
-		for (LspShipment lspShipment : lspShipments) {
-			lsp.assignShipmentToLspPlan(lspShipment);
-		}
+		assignLspShipments(lspShipments, lsp);
 
 		return lsp;
 	}
@@ -542,6 +521,24 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static Id<Link> getDepotLinkFromVehicle(Carrier carrier) {
 		log.info("Please note: that this method assumes that all vehicles are located at the same depot link.");
 		return carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next().getLinkId();
+	}
+
+	/**
+	 * Assigns the LSP shipments to the LSP.
+	 * Splits the shipments if needed.
+	 *
+	 * @param lspShipments
+	 * @param lsp
+	 */
+	private static void assignLspShipments(Collection<LspShipment> lspShipments, LSP lsp) {
+		//TODO: Maybe move this out and do this after creating all the LSPs?
+		log.info("assign the shipments to the LSP");
+		for (LspShipment lspShipment : lspShipments) {
+			lsp.assignShipmentToLspPlan(lspShipment);
+		}
+
+		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
+		LSPUtils.splitShipmentsIfNeeded(lsp);
 	}
 
 	private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
