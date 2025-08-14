@@ -87,11 +87,11 @@ public class EmptyVehicleRelocatorTest {
         // --- Verify schedule shape:
         // After relocation we expect:
         // 0: STAY(AB) shortened to depart at 1000 (relocate departure)
-        // 1: DRIVE(RELOCATE) AB->CD, arr 1201
-        // 2: STAY(CD) for slack (should be 999s): 1201..2200
-        // 3: DRIVE(CD-> BC) depart 2200
-        // 4: STOP(BC) begin 2501 end 2511 (unchanged begin)
-        // 5: STAY(BC) begin 2511 end 10000
+        // 1: DRIVE(RELOCATE)
+        // 2: STAY(CD)
+        // 3: DRIVE(CD-> BC)
+        // 4: STOP(BC)
+        // 5: STAY(BC)
 
         Assertions.assertThat(schedule.getTaskCount()).isEqualTo(6);
         Assertions.assertThat(verifyTaskContinuity(schedule));
@@ -101,13 +101,13 @@ public class EmptyVehicleRelocatorTest {
         Task t0 = schedule.getTasks().get(0);
         Assertions.assertThat(t0).isInstanceOf(DrtStayTask.class);
         Assertions.assertThat(t0.getBeginTime()).isEqualTo(1000.0);
-        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0); // finished at relocate departure
+        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0);
 
         // 1: relocate DRIVE to CD
         Task t1 = schedule.getTasks().get(1);
         Assertions.assertThat(t1).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB()); // A
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD()); // B
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB());
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD());
         Assertions.assertThat(t1.getBeginTime()).isEqualTo(1000);
         Assertions.assertThat(t1.getEndTime()).isEqualTo(1201);
 
@@ -121,8 +121,8 @@ public class EmptyVehicleRelocatorTest {
         // 3: follow-up DRIVE B->C
         Task t3 = schedule.getTasks().get(3);
         Assertions.assertThat(t3).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t3).getPath().getFromLink()).isSameAs(networkAndLinks.lCD()); // B node
-        Assertions.assertThat(((DrtDriveTask) t3).getPath().getToLink()).isSameAs(networkAndLinks.lBC()); // to C
+        Assertions.assertThat(((DrtDriveTask) t3).getPath().getFromLink()).isSameAs(networkAndLinks.lCD());
+        Assertions.assertThat(((DrtDriveTask) t3).getPath().getToLink()).isSameAs(networkAndLinks.lBC());
         Assertions.assertThat(t3.getBeginTime()).isEqualTo(2200);
         Assertions.assertThat(t3.getEndTime()).isEqualTo(2501);
 
@@ -153,7 +153,6 @@ public class EmptyVehicleRelocatorTest {
         MobsimTimer timer = Mockito.mock(MobsimTimer.class);
         when(timer.getTimeOfDay()).thenReturn(1000.);
 
-        // --- Vehicle & schedule
         double serviceBegin = 0.0;
         double serviceEnd = 10_000.0;
 
@@ -191,11 +190,11 @@ public class EmptyVehicleRelocatorTest {
 
         // --- Verify schedule shape:
         // After relocation we expect:
-        // 0: STAY(AB) shortened to depart at 1000 (relocate departure)
-        // 1: DRIVE(RELOCATE) AB-> CD, arr 1201
-        // 2: STAY(CD) for slack (should be 999s): 1201..2200
-        // 3: DRIVE(CD->AB) depart 2200
-        // 4: STOP(AB) begin 2501 end 2511 (unchanged begin)
+        // 0: STAY(AB) shortened to depart at 1000
+        // 1: DRIVE(RELOCATE) AB-> CD
+        // 2: STAY(CD)
+        // 3: DRIVE(CD->AB)
+        // 4: STOP(AB) (unchanged begin)
 
         Assertions.assertThat(schedule.getTaskCount()).isEqualTo(6);
         Assertions.assertThat(verifyTaskContinuity(schedule));
@@ -205,13 +204,13 @@ public class EmptyVehicleRelocatorTest {
         Task t0 = schedule.getTasks().get(0);
         Assertions.assertThat(t0).isInstanceOf(DrtStayTask.class);
         Assertions.assertThat(t0.getBeginTime()).isEqualTo(1000.0);
-        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0); // finished at relocate departure
+        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0);
 
         // 1: relocate DRIVE to CD
         Task t1 = schedule.getTasks().get(1);
         Assertions.assertThat(t1).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB()); // A
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD()); // B
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB());
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD());
         Assertions.assertThat(t1.getBeginTime()).isEqualTo(1000);
         Assertions.assertThat(t1.getEndTime()).isEqualTo(1201);
 
@@ -226,25 +225,25 @@ public class EmptyVehicleRelocatorTest {
         // 3: follow-up DRIVE CD->AB
         Task t3 = schedule.getTasks().get(3);
         Assertions.assertThat(t3).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t3).getPath().getFromLink()).isSameAs(networkAndLinks.lCD()); // B node
-        Assertions.assertThat(((DrtDriveTask) t3).getPath().getToLink()).isSameAs(networkAndLinks.lAB()); // to C
+        Assertions.assertThat(((DrtDriveTask) t3).getPath().getFromLink()).isSameAs(networkAndLinks.lCD());
+        Assertions.assertThat(((DrtDriveTask) t3).getPath().getToLink()).isSameAs(networkAndLinks.lAB());
         Assertions.assertThat(t3.getBeginTime()).isEqualTo(1999);
         Assertions.assertThat(t3.getEndTime()).isEqualTo(2400);
 
-        // 4: original STOP at BC
+        // 4: original STOP at AB
         Task t4 = schedule.getTasks().get(4);
         Assertions.assertThat(t4).isSameAs(fixedStop);
         Assertions.assertThat(t4.getBeginTime()).isEqualTo(2400);
         Assertions.assertThat(t4.getEndTime()).isEqualTo(2410);
-        Assertions.assertThat(((DrtStopTask)t4).getLink()).isSameAs(networkAndLinks.lBC());
+        Assertions.assertThat(((DrtStopTask)t4).getLink()).isSameAs(networkAndLinks.lAB());
 
 
-        // 5: final STAY at BC
+        // 5: final STAY at AB
         Task t5 = schedule.getTasks().get(5);
         Assertions.assertThat(t5).isSameAs(finalStay);
         Assertions.assertThat(t5.getBeginTime()).isEqualTo(2410);
         Assertions.assertThat(t5.getEndTime()).isEqualTo(veh.getServiceEndTime());
-        Assertions.assertThat(((DrtStayTask)t5).getLink()).isSameAs(networkAndLinks.lBC());
+        Assertions.assertThat(((DrtStayTask)t5).getLink()).isSameAs(networkAndLinks.lAB());
 
     }
 
@@ -303,10 +302,10 @@ public class EmptyVehicleRelocatorTest {
         // --- Verify schedule shape:
         // After relocation we expect:
         // 0: STAY(AB) shortened to depart at 1000 (relocate departure)
-        // 1: DRIVE(RELOCATE) AB->CD, arr 1201
-        // 2: STAY(CD) for slack (should be 999s): 1201..2200
-        // 3: STOP(CD) begin 2501 end 2511 (unchanged begin)
-        // 4: STAY(CD) begin 2511 end 10000
+        // 1: DRIVE(RELOCATE) AB->CD
+        // 2: STAY(CD)
+        // 3: STOP(CD)
+        // 4: STAY(CD)
 
         Assertions.assertThat(schedule.getTaskCount()).isEqualTo(5);
         Assertions.assertThat(verifyTaskContinuity(schedule));
@@ -315,13 +314,13 @@ public class EmptyVehicleRelocatorTest {
         Task t0 = schedule.getTasks().get(0);
         Assertions.assertThat(t0).isInstanceOf(DrtStayTask.class);
         Assertions.assertThat(t0.getBeginTime()).isEqualTo(1000.0);
-        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0); // finished at relocate departure
+        Assertions.assertThat(t0.getEndTime()).isEqualTo(1000.0);
 
         // 1: relocate DRIVE to CD
         Task t1 = schedule.getTasks().get(1);
         Assertions.assertThat(t1).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB()); // A
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD()); // B
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB());
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lCD());
         Assertions.assertThat(t1.getBeginTime()).isEqualTo(1000);
         Assertions.assertThat(t1.getEndTime()).isEqualTo(1201);
 
@@ -417,13 +416,13 @@ public class EmptyVehicleRelocatorTest {
         Task t0 = schedule.getTasks().get(0);
         Assertions.assertThat(t0).isInstanceOf(DrtStayTask.class);
         Assertions.assertThat(t0.getBeginTime()).isEqualTo(1000.0);
-        Assertions.assertThat(t0.getEndTime()).isEqualTo(1200); // finished at relocate departure
+        Assertions.assertThat(t0.getEndTime()).isEqualTo(1200);
 
         // 1: DRIVE AB->BC
         Task t1 = schedule.getTasks().get(1);
         Assertions.assertThat(t1).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB()); // B node
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lBC()); // to C
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB());
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lBC());
         Assertions.assertThat(t1.getBeginTime()).isEqualTo(1200);
         Assertions.assertThat(t1.getEndTime()).isEqualTo(1301);
 
@@ -511,13 +510,13 @@ public class EmptyVehicleRelocatorTest {
         Task t0 = schedule.getTasks().get(0);
         Assertions.assertThat(t0).isInstanceOf(DrtStayTask.class);
         Assertions.assertThat(t0.getBeginTime()).isEqualTo(1000.0);
-        Assertions.assertThat(t0.getEndTime()).isEqualTo(1100); // finished at relocate departure
+        Assertions.assertThat(t0.getEndTime()).isEqualTo(1100);
 
         // 1: DRIVE AB->BC
         Task t1 = schedule.getTasks().get(1);
         Assertions.assertThat(t1).isInstanceOf(DrtDriveTask.class);
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB()); // B node
-        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lBC()); // to C
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getFromLink()).isSameAs(networkAndLinks.lAB());
+        Assertions.assertThat(((DrtDriveTask) t1).getPath().getToLink()).isSameAs(networkAndLinks.lBC());
         Assertions.assertThat(t1.getBeginTime()).isEqualTo(1100);
         Assertions.assertThat(t1.getEndTime()).isEqualTo(1201);
 
