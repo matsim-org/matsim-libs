@@ -99,7 +99,7 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 
 # Generated pinput file plot
 {
-  index <- 9
+  index <- 2
   fuel <- "diesel"
 
   # Get the point
@@ -143,11 +143,11 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
     theme(text = element_text(size=22)) +
-    ggtitle(glue("Original acceleration vs. Derivated acceleration vs. SUMO acceleration for {fuel} cars ({index})"))
+    ggtitle(glue("Constant acceleration scenario with acc={point$acceleration} for {fuel} cars ({index})"))
 
 }
 
-# Memory test 1
+# Memory test Trajectory
 {
   sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
 
@@ -171,7 +171,7 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
   }
 }
 
-# Memory test 2
+# Memory test Plot
 {
   fuel <- "petrol"
 
@@ -287,4 +287,102 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
       ylab("emissions in g/km") +
       theme(text = element_text(size=22)) +
       ggtitle(glue("5 artifical trajecotires with WLTPsSlice beginning at second 250"))
+}
+
+# HeatMap Trajectory
+{
+  length <- 1000
+  velocity_low <- 8
+  velocity_high <- 13
+  acceleration_low <- -0.5
+  acceleration_high <- 2
+
+  vels <- seq(from=velocity_low*3.6, to=velocity_high*3.6, length.out = length)
+  accs <- seq(from=acceleration_low, to=acceleration_high, length.out = length)
+  combinations <- expand.grid(velocity=vels, acceleration=accs)
+  combinations$time <- 0:(length*length-1)
+  combinations <- combinations %>% select(time, velocity, acceleration)
+
+  write_delim(combinations, "/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_heatmap.csv", delim=";", col_names=FALSE)
+}
+
+# HeatMap Plot
+{
+  fuel <- "petrol"
+  selected_component <- "NOx"
+  velocity_low <- 8
+  velocity_high <- 13
+  acceleration_low <- -0.5
+  acceleration_high <- 2
+
+  # Read in the default wltp-cycle
+  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration")) %>%
+    filter(velocity_low < velocity/3.6 & velocity/3.6 < velocity_high & acceleration_low < acceleration & acceleration < acceleration_high)
+  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration")) %>%
+    filter(velocity_low < velocity/3.6 & velocity/3.6 < velocity_high & acceleration_low < acceleration & acceleration < acceleration_high)
+
+  sumo_output <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_heatmap.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    filter(component == selected_component, velocity_low < velocity & velocity < velocity_high & acceleration_low < acceleration & acceleration < acceleration_high) %>%
+    mutate(model = "SUMO_0", value=value/1000)
+
+  ggplot() +
+    geom_tile(data=sumo_output, aes(x = velocity, y = acceleration, fill = value, color = value)) +
+    labs(fill = "Emission", title = glue("Simulation Heatmap for {selected_component}")) +
+    #scale_fill_viridis_c(trans="log") +
+    scale_fill_viridis_c() +
+    scale_color_viridis_c() +
+    geom_point(data = sumo_input[0:100,], aes(x = velocity/3.6, y = acceleration)) +
+    geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red") +
+    theme_minimal()
+
+  # Compute gradient of the output
+  sumo_grad <- sumo_output %>%
+    arrange(velocity, acceleration) %>%
+    group_by(acceleration) %>%
+    mutate(dv = velocity - lag(velocity),
+           df_dv = (value - lag(value)) / dv) %>%
+    ungroup() %>%
+    group_by(velocity) %>%
+    mutate(da = acceleration - lag(acceleration),
+           df_da = (value - lag(value)) / da) %>%
+    ungroup() %>%
+    #filter(df_da != NaN & df_dv != NaN) %>%
+    mutate(grad_mag = sqrt(df_dv^2 + df_da^2),
+           grad_dir = tan(df_dv/df_da))
+
+  # Second approach with gradient-length
+  ggplot() +
+    geom_tile(data=sumo_grad, aes(x = velocity, y = acceleration, fill = grad_mag, color = grad_mag)) +
+    labs(fill = "Emission", title = glue("Simulation Heatmap with gradient magnitudes for {selected_component}")) +
+    scale_fill_gradient(trans="log", low="black", high="white") +
+    scale_color_gradient(trans="log", low="black", high="white") +
+    geom_point(data = sumo_input[0:100,], aes(x = velocity/3.6, y = acceleration), size=0.01) +
+    geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red", size=0.01) +
+    theme_minimal()
+
+  # Third approach with gradient directions?
+  ggplot() +
+    geom_tile(data=sumo_grad, aes(x = velocity, y = acceleration, fill = grad_dir, color = grad_dir)) +
+    labs(fill = "Emission", title = glue("Simulation Heatmap with gradient directions for {selected_component}")) +
+    #scale_fill_viridis_c(trans="log") +
+    scale_fill_gradient(trans="log", low="black", high="white") +
+    scale_color_gradient(trans="log", low="black", high="white") +
+    geom_point(data = sumo_input, aes(x = velocity/3.6, y = acceleration), size=0.01) +
+    geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red", size=0.01) +
+    theme_minimal()
 }
