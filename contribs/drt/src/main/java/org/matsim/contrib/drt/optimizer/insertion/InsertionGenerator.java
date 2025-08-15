@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
@@ -172,10 +169,10 @@ public class InsertionGenerator {
 		boolean compatibleWithOneCapacity = drtRequest.getLoad().fitsIn(vehicleCapacity);
 		if (!compatibleWithOneCapacity) {
 			for(StopWaypoint stop: vEntry.stops) {
-				DvrpLoad changedCapacity = stop.getChangedCapacity();
+				Optional<DvrpLoad> changedCapacity = stop.getChangedCapacity();
 
-				if(changedCapacity != null) {
-					if(drtRequest.getLoad().fitsIn(changedCapacity)) {
+				if(changedCapacity.isPresent()) {
+					if(drtRequest.getLoad().fitsIn(changedCapacity.get())) {
 						compatibleWithOneCapacity = true;
 						break;
 					}
@@ -231,7 +228,9 @@ public class InsertionGenerator {
 			}
 
 			// update capacity
-			vehicleCapacity = Objects.requireNonNullElse(nextStop.getChangedCapacity(), vehicleCapacity);
+			if(nextStop.getChangedCapacity().isPresent()) {
+				vehicleCapacity = nextStop.getChangedCapacity().get();
+			}
 
 			occupancy = nextStop.getOutgoingOccupancy();
 		}
@@ -310,7 +309,9 @@ public class InsertionGenerator {
 			StopWaypoint currentStop = currentStop(vEntry, j);
 
 			// update capacity
-			capacity = Objects.requireNonNullElse(currentStop.getChangedCapacity(), capacity);
+			if(currentStop.getChangedCapacity().isPresent()) {
+				capacity = currentStop.getChangedCapacity().get();
+			}
 
 			if (!request.getLoad().fitsIn(capacity) || !currentStop.getOutgoingOccupancy().add(request.getLoad()).fitsIn(capacity)) {
 				if (request.getToLink() == currentStop.getTask().getLink()) {
@@ -342,7 +343,10 @@ public class InsertionGenerator {
 		}
 
 		// if the last stop changes the vehicle's capacity, we'll need to take it into account
-		capacity = Objects.requireNonNullElse(currentStop(vEntry, stopCount).getChangedCapacity(), capacity);
+		Optional<DvrpLoad> changedCapacity = currentStop(vEntry, stopCount).getChangedCapacity();
+		if(changedCapacity.isPresent()) {
+			capacity = changedCapacity.get();
+		}
 
 		if(request.getLoad().fitsIn(capacity)) {
 			addInsertion(insertions,
@@ -389,7 +393,10 @@ public class InsertionGenerator {
 		DvrpLoad vehicleCapacity = vEntry.vehicle.getCapacity();
 
 		for(int i = 0; i <= stopIndex; i++) {
-			vehicleCapacity = Objects.requireNonNullElse(vEntry.stops.get(i).getChangedCapacity(), vehicleCapacity);
+			Optional<DvrpLoad> changedCapacity = vEntry.stops.get(i).getChangedCapacity();
+			if(changedCapacity.isPresent()) {
+				vehicleCapacity = changedCapacity.get();
+			}
 		}
 
 		return vehicleCapacity;
