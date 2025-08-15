@@ -19,6 +19,7 @@ public interface StopWaypoint extends Waypoint {
     DrtStopTask getTask();
 
     DvrpLoad getOccupancyChange();
+
     Optional<DvrpLoad> getChangedCapacity();
 
     boolean scheduleWaitBeforeDrive();

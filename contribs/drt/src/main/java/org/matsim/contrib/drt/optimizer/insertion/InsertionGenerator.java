@@ -172,7 +172,7 @@ public class InsertionGenerator {
 				Optional<DvrpLoad> changedCapacity = stop.getChangedCapacity();
 
 				if(changedCapacity.isPresent()) {
-					if(drtRequest.getLoad().fitsIn(changedCapacity.orElse(null))) {
+					if(drtRequest.getLoad().fitsIn(changedCapacity.get())) {
 						compatibleWithOneCapacity = true;
 						break;
 					}

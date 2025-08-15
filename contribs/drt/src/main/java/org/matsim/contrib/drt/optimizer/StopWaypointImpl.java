@@ -115,7 +115,7 @@ public class StopWaypointImpl implements StopWaypoint {
         return pickedUp.subtract(droppedOff);
     }
 
-    @Nullable
+    @Override
     public Optional<DvrpLoad> getChangedCapacity() {
         return Optional.ofNullable(changedCapacity);
     }
@@ -133,7 +133,7 @@ public class StopWaypointImpl implements StopWaypoint {
 
     private double calcEarliestArrivalTime() {
 
-        if(getChangedCapacity() != null) {
+        if(getChangedCapacity().isPresent()) {
             return task.getBeginTime();
         }
 
