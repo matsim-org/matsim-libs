@@ -76,7 +76,10 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 														   final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, final double now) {
 
 		List<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
-		List<PTPassengerAgent> passengersRelocating = filterPassengersRelocating(passengersLeaving, stop);
+
+		// Relocating passengers are only determined at the very last stop.
+		List<PTPassengerAgent> passengersRelocating = stopsToCome.isEmpty() ? findPassengersRelocating(vehicle, stop) : List.of();
+
 
 		int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
 
@@ -138,9 +141,9 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		return passengersEntering;
 	}
 
-	private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
+	private List<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
 															  final TransitStopFacility stop) {
-		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
+		List<PTPassengerAgent> passengersLeaving = new ArrayList<>();
 		for (PassengerAgent passenger : vehicle.getPassengers()) {
 			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
 				passengersLeaving.add((PTPassengerAgent) passenger);
@@ -149,18 +152,12 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		return passengersLeaving;
 	}
 
-	private List<PTPassengerAgent> filterPassengersRelocating(List<PTPassengerAgent> passengersLeaving, final TransitStopFacility stop) {
+	private List<PTPassengerAgent> findPassengersRelocating(TransitVehicle vehicle, final TransitStopFacility stop) {
 
 		List<PTPassengerAgent> relocatingPassengers = new ArrayList<>();
-
-		Iterator<PTPassengerAgent> it = passengersLeaving.iterator();
-		while (it.hasNext()) {
-			PTPassengerAgent passenger = it.next();
-
-			if (passenger.getRelocationAtStop(stop)) {
-				// the agent will not be handled as leaving, but as relocating
-				it.remove();
-				relocatingPassengers.add(passenger);
+		for (PassengerAgent passenger : vehicle.getPassengers()) {
+			if (((PTPassengerAgent) passenger).getRelocationAtStop(stop)) {
+				relocatingPassengers.add((PTPassengerAgent) passenger);
 			}
 		}
 
@@ -256,14 +253,6 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 					continue;
 
 				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle));
-
-				// TODO: debug info
-				System.err.println("Passenger " + passenger.getId() + " is relocated from vehicle " + vehicle.getVehicle().getId() +
-					" to vehicle " + nextVehicle.getId() + " at stop " + stop.getStopFacility().getId());
-				System.err.println("Access stop: " + passenger.getDesiredAccessStopId() +
-					", destination stop: " + passenger.getDesiredDestinationStopId());
-
-				System.err.println(((Leg) ((TransitAgent) passenger).getCurrentPlanElement()).getRoute());
 
 				nextVehicle.addPassenger(passenger);
 				passenger.setVehicle(nextVehicle);

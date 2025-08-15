@@ -162,6 +162,16 @@ public class RaptorRoute {
 			return this.chainedPart.getChainedEgressStop();
 		}
 
+		/**
+		 * The total distance of this and all chained parts.
+		 */
+		public double getChainedDistance() {
+			if (this.chainedPart == null)
+				return this.distance;
+
+			return this.distance + this.chainedPart.getChainedDistance();
+		}
+
 		@Override
 		public String toString() {
 			return "RoutePart{" +
