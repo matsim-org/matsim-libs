@@ -8,6 +8,7 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 
+import java.util.Optional;
 import java.util.stream.DoubleStream;
 
 /**
@@ -115,8 +116,8 @@ public class StopWaypointImpl implements StopWaypoint {
     }
 
     @Nullable
-    public DvrpLoad getChangedCapacity() {
-        return changedCapacity;
+    public Optional<DvrpLoad> getChangedCapacity() {
+        return Optional.ofNullable(changedCapacity);
     }
 
     @Override
