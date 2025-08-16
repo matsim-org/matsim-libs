@@ -64,22 +64,32 @@ class Worker extends Thread implements BasicEventHandler{
 		return this.eFile;
 	}
 
+
 	@Override
 	public void run() {
 		try {
 			new MatsimEventsReader(this.eventsManager).readFile(this.eFile);
 			this.finished = true;
-			try {
-				this.doComparison.await();
 
-			} catch (InterruptedException e1) {
-				throw new ComparatorInterruptedException(e1);
-			} catch (BrokenBarrierException e1) {
-				throw new ComparatorInterruptedException(e1);
-			}
+			// Final sync at EOF: if peer failed and reset the barrier, this will throw immediately.
+			awaitBarrier();
 		} catch (ComparatorInterruptedException e1) {
-//			log.info("events-comparator got interrupted", e1);
 			log.info("events-comparator got interrupted");
+		} catch (Throwable t) {
+			// Any I/O or parse error: break the barrier so the peer won't hang.
+			log.warn("Error while reading events file '{}': {}", this.eFile, t.toString());
+			try {
+				doComparison.reset();   // causes the peer's await() to throw BrokenBarrierException
+			} catch (Throwable ignored) {}
+			this.finished = true;       // signal end for completeness
+		}
+	}
+
+	private void awaitBarrier() {
+		try {
+			doComparison.await();       // no timeout
+		} catch (InterruptedException | BrokenBarrierException e) {
+			throw new ComparatorInterruptedException(e);
 		}
 	}
 
@@ -102,19 +112,13 @@ class Worker extends Thread implements BasicEventHandler{
 	@Override
 	public void handleEvent(Event event) {
 		if (this.time != event.getTime()) {
-			try {
-				doComparison.await();
-			} catch (InterruptedException e1) {
-				throw new ComparatorInterruptedException(e1);
-			} catch (BrokenBarrierException e1) {
-				throw new ComparatorInterruptedException(e1);
-			}
+			// If the peer failed and reset() was called, awaitBarrier() throws immediately.
+			awaitBarrier();
 
 			this.events.clear();
 			this.time = event.getTime();
 			this.numEvents = 0;
 		}
-
 		addEvent(event);
 	}
 
