@@ -223,7 +223,7 @@ class DAryMinHeap {
 
 		@Override
 		public boolean hasNext() {
-			return this.pos > DAryMinHeap.this.size;
+			return this.pos < DAryMinHeap.this.size;
 		}
 
 		@Override

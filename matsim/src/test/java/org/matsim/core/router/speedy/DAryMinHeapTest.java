@@ -115,4 +115,38 @@ public class DAryMinHeapTest {
 		}
 
 	}
+
+	@Test
+	void testIterator() {
+		DAryMinHeap pq = new DAryMinHeap(10, 3);
+
+		// Insert elements with different costs
+		pq.insert(0, 5.0);
+		pq.insert(1, 3.0);
+		pq.insert(2, 7.0);
+		pq.insert(3, 1.0);
+
+		// Get the iterator
+		DAryMinHeap.IntIterator it = pq.iterator();
+
+		// Track visited nodes
+		boolean[] seen = new boolean[4];
+		int count = 0;
+
+		while (it.hasNext()) {
+			int node = it.next();
+			Assertions.assertTrue(node >= 0 && node < 4, "Unexpected node value: " + node);
+			Assertions.assertFalse(seen[node], "Duplicate node returned by iterator: " + node);
+			seen[node] = true;
+			count++;
+		}
+
+		// Ensure all inserted nodes were visited
+		for (int i = 0; i < 4; i++) {
+			Assertions.assertTrue(seen[i], "Node " + i + " was not returned by the iterator.");
+		}
+
+		Assertions.assertEquals(4, count, "Iterator did not return all elements.");
+	}
+
 }
