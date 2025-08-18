@@ -39,11 +39,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
-/*package-private*/ class DistributionJobEventHandler
-        implements AfterMobsimListener,
-        CarrierServiceStartEventHandler,
-        CarrierShipmentDeliveryStartEventHandler,
-        LSPSimulationTracker<LspShipment> {
+/*package-private*/ class DistributionJobEventHandler implements AfterMobsimListener, CarrierServiceStartEventHandler, CarrierShipmentDeliveryStartEventHandler, LSPSimulationTracker<LspShipment> {
 
   private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
@@ -64,8 +60,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierServiceStartEvent event) {
-    if (event.getServiceId() == carrierJob.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getServiceId() == carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }
@@ -73,8 +68,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-    if (event.getShipmentId() == this.carrierJob.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getShipmentId() == this.carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }

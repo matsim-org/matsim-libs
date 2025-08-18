@@ -333,32 +333,19 @@ import org.matsim.vehicles.VehicleType;
 			.addPlanElement(id, unload);
 	}
 
-	private void addMainTourRunStartEventHandler(
-		CarrierService carrierService,
-		LspShipment lspShipment,
-		LSPCarrierResource resource,
-		Tour tour) {
-
+	private void addMainTourRunStartEventHandler(CarrierService carrierService,	LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				LSPTourStartEventHandler handler =
-            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
-				lspShipment.addSimulationTracker(handler);
+				lspShipment.addSimulationTracker(new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour, scenario));
 				break;
 			}
 		}
 	}
 
-	private void addMainRunTourEndEventHandler(
-		CarrierService carrierService,
-		LspShipment lspShipment,
-		LSPCarrierResource resource,
-		Tour tour) {
+	private void addMainRunTourEndEventHandler(	CarrierService carrierService, LspShipment lspShipment,	LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
-				LSPTourEndEventHandler handler =
-					new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour);
-				lspShipment.addSimulationTracker(handler);
+				lspShipment.addSimulationTracker(new LSPTourEndEventHandler(lspShipment, carrierService, element, resource, tour));
 				break;
 			}
 		}

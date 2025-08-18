@@ -23,16 +23,14 @@ package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.Objects;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.Tour.ServiceActivity;
 import org.matsim.freight.carriers.Tour.TourElement;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierTourStartEventHandler;
-import org.matsim.freight.logistics.LSPCarrierResource;
-import org.matsim.freight.logistics.LSPResource;
-import org.matsim.freight.logistics.LSPSimulationTracker;
-import org.matsim.freight.logistics.LogisticChainElement;
+import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentLeg;
 import org.matsim.freight.logistics.shipment.LspShipmentPlanElement;
@@ -40,18 +38,20 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 /*package-private*/ class LSPTourStartEventHandler implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
 
-  private final Tour tour;
+  private Tour tour;
   private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
+  private final Scenario scenario;
 
-  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour) {
+  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour, Scenario scenario) {
     this.lspShipment = lspShipment;
     this.carrierJob = carrierJob;
     this.logisticChainElement = logisticChainElement;
     this.resource = resource;
-    this.tour = tour;
+    this.tour = null;
+	this.scenario = scenario;
   }
 
   @Override
@@ -61,10 +61,18 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   @Override
   public void handleEvent(CarrierTourStartEvent event) {
+	  var lsps = LSPUtils.getLSPs(scenario);
+	  Carrier carrier = CarriersUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
+	  for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+		 if (scheduledTour.getTour().getId().equals(event.getTourId())){
+			 this.tour = scheduledTour.getTour();
+			 break;
+		 }
+	  }
     if (event.getTourId().equals(tour.getId())  && event.getCarrierId() == resource.getCarrier().getId()) {
       for (TourElement tourElement : tour.getTourElements()) {
         switch (tourElement) {
-          //This could even be short, if the Id would be available already on the level of Tour.TourActivity. KMT Oct'24
+          //This could even be shorter, if the Id would be available already on the level of Tour.TourActivity. KMT Oct'24
           case ServiceActivity serviceActivity -> {
             if (serviceActivity.getService().getId() == carrierJob.getId()) {
               logLoadAndTransport(event);
@@ -89,8 +97,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void logLoad(Id<Carrier> carrierId, Id<Link> linkId, double startTime, double endTime) {
-    LspShipmentUtils.LoggedShipmentLoadBuilder builder =
-            LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentLoadBuilder builder = LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);
@@ -98,19 +105,12 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     builder.setStartTime(startTime);
     builder.setEndTime(endTime);
     LspShipmentPlanElement loggedShipmentLoad = builder.build();
-    String idString =
-            loggedShipmentLoad.getResourceId()
-                    + ""
-                    + loggedShipmentLoad.getLogisticChainElement().getId()
-                    + loggedShipmentLoad.getElementType();
-    Id<LspShipmentPlanElement> loadId = Id.create(idString, LspShipmentPlanElement.class);
-    lspShipment.getShipmentLog().addPlanElement(loadId, loggedShipmentLoad);
+    String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getLogisticChainElement().getId() + loggedShipmentLoad.getElementType();
+	  lspShipment.getShipmentLog().addPlanElement(Id.create(idString, LspShipmentPlanElement.class), loggedShipmentLoad);
   }
 
-  private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId,
-                            Id<Link> toLinkId, double startTime) {
-    LspShipmentUtils.LoggedShipmentTransportBuilder builder =
-            LspShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
+  private void logTransport(Id<Carrier> carrierId, Id<Link> fromLinkId, Id<Link> toLinkId, double startTime) {
+    LspShipmentUtils.LoggedShipmentTransportBuilder builder = LspShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setFromLinkId(fromLinkId);
     builder.setToLinkId(toLinkId);
@@ -118,13 +118,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     builder.setResourceId(resource.getId());
     builder.setStartTime(startTime);
     LspShipmentLeg transport = builder.build();
-    String idString =
-            transport.getResourceId()
-                    + ""
-                    + transport.getLogisticChainElement().getId()
-                    + transport.getElementType();
-    Id<LspShipmentPlanElement> transportId = Id.create(idString, LspShipmentPlanElement.class);
-    lspShipment.getShipmentLog().addPlanElement(transportId, transport);
+    String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
+	  lspShipment.getShipmentLog().addPlanElement(Id.create(idString, LspShipmentPlanElement.class), transport);
   }
 
   private double getCumulatedLoadingTime(Tour tour) {

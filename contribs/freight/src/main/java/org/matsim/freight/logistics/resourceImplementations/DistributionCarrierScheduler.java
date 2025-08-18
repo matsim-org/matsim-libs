@@ -500,11 +500,11 @@ import org.matsim.vehicles.VehicleType;
 				switch (tourActivity) {
 					case Tour.ServiceActivity serviceActivity -> {
 						serviceHandler = new DistributionJobEventHandler(serviceActivity.getService(), lspShipment, element, resource);
-						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, serviceActivity.getService(), element, resource, tour, scenario);
 					}
 					case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
 						serviceHandler = new DistributionJobEventHandler(shipmentBasedActivity.getShipment(), lspShipment, element, resource);
-						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour);
+						tourHandler = new LSPTourStartEventHandler(lspShipment, shipmentBasedActivity.getShipment(), element, resource, tour, scenario);
 					}
 					default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
 				}
