@@ -82,7 +82,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static int jspritIterationsMainCarrier = 1;
 	private static int jspritIterationsDirectCarrier = 10;
 
-	private enum TypeOfLsps {
+	enum TypeOfLsps {
 		ONE_CHAIN_DIRECT, ONE_CHAIN_TWO_ECHELON, TWO_CHAINS_DIRECT_AND_TWO_ECHELON, ALL
 	}
 
@@ -98,9 +98,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		//Muss noch weiter auf die anderen Optionen angepasst werden.
 		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1); // I know that MATSim-iters can be set more directly.
-		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it");
+		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it"); // Todo: replace with the central setting: --config:controller.outputDirectory
 
-		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1);
 		jspritIterationsMainCarrier = cmd.getOption("jspritIterationsMain").map(Integer::parseInt).orElse(1);
 		jspritIterationsDirectCarrier = cmd.getOption("jspritIterationsDirect").map(Integer::parseInt).orElse(1);
 		jspritIterationsDistributionCarrier = cmd.getOption("jspritIterationsDistribution").map(Integer::parseInt).orElse(1);
@@ -209,8 +208,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
 		controller.run();
 
-		runCarrierAnalysis(controller.getControllerIO().getOutputPath(), config);
-
 		log.info("Done.");
 	}
 
@@ -287,10 +284,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * TODO Adapt settings
 	 */
 
-	private static void runCarrierAnalysis(String outputPath, Config config) {
-		CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
-		carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
-	}
 
 	/**
 	 * Creates an LSP with direct chains:
