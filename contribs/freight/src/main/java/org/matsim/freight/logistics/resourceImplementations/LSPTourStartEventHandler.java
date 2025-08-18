@@ -39,18 +39,15 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 /*package-private*/ class LSPTourStartEventHandler implements CarrierTourStartEventHandler, LSPSimulationTracker<LspShipment> {
 
   private Tour tour;
-  private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
-  private final LSPCarrierResource resource;
+  private LSPCarrierResource resource;
   private LspShipment lspShipment;
   private final Scenario scenario;
 
-  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Tour tour, Scenario scenario) {
+  public LSPTourStartEventHandler(LspShipment lspShipment, CarrierJob carrierJob, LogisticChainElement logisticChainElement, LSPCarrierResource resource, Scenario scenario) {
     this.lspShipment = lspShipment;
-    this.carrierJob = carrierJob;
     this.logisticChainElement = logisticChainElement;
-    this.resource = resource;
-    this.tour = null;
+    this.resource = null;
 	this.scenario = scenario;
   }
 
@@ -62,6 +59,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   @Override
   public void handleEvent(CarrierTourStartEvent event) {
 	  var lsps = LSPUtils.getLSPs(scenario);
+
+	  //get the tour from the carrier
 	  Carrier carrier = CarriersUtils.getCarriers(scenario).getCarriers().get(event.getCarrierId());
 	  for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 		 if (scheduledTour.getTour().getId().equals(event.getTourId())){
@@ -69,17 +68,32 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 			 break;
 		 }
 	  }
+
+	  //Get the resource from the LSPs
+	  for (LSP lsp : LSPUtils.getLSPs(scenario).getLSPs().values()) {
+		  for (LSPResource lspResource : lsp.getResources()) {
+			  if (lspResource.getId().toString().equals(event.getCarrierId().toString())) {
+				  if (lspResource instanceof LSPCarrierResource lspCarrierResource) {
+					  resource = lspCarrierResource;
+					  break;
+				  }
+			  }
+		  }
+	  }
+
     if (event.getTourId().equals(tour.getId())  && event.getCarrierId() == resource.getCarrier().getId()) {
       for (TourElement tourElement : tour.getTourElements()) {
         switch (tourElement) {
           //This could even be shorter, if the Id would be available already on the level of Tour.TourActivity. KMT Oct'24
           case ServiceActivity serviceActivity -> {
-            if (serviceActivity.getService().getId() == carrierJob.getId()) {
+//            if (Objects.equals(serviceActivity.getService().getId(), carrierJob.getId()))
+            {
               logLoadAndTransport(event);
             }
           }
           case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierJob.getId().toString())) {
+//            if (Objects.equals(shipmentBasedActivity.getShipment().getId().toString(), carrierJob.getId().toString()))
+            {
               logLoadAndTransport(event);
             }
           }
@@ -132,21 +146,21 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     return cumulatedLoadingTime;
   }
 
-  public CarrierJob getCarrierJob() {
-    return carrierJob;
-  }
+//  public CarrierJob getCarrierJob() {
+//    return carrierJob;
+//  }
 
-  public LspShipment getLspShipment() {
-    return lspShipment;
-  }
+//  public LspShipment getLspShipment() {
+//    return lspShipment;
+//  }
 
-  public LogisticChainElement getLogisticChainElement() {
-    return logisticChainElement;
-  }
+//  public LogisticChainElement getLogisticChainElement() {
+//    return logisticChainElement;
+//  }
 
-  public Id<LSPResource> getResourceId() {
-    return resource.getId();
-  }
+//  public Id<LSPResource> getResourceId() {
+//    return resource.getId();
+//  }
 
   @Override
   public void setEmbeddingContainer(LspShipment pointer) {

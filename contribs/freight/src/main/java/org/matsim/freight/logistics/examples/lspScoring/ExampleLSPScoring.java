@@ -82,25 +82,21 @@ import org.matsim.vehicles.VehicleUtils;
     // The Resource i.e. the Resource is created
     // The scheduler for the Resource is created and added. This is where jsprit comes into play.
     LSPResource lspResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(
-                carrier)
-            .setCollectionScheduler(
-                ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
+        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(carrier)
+            .setCollectionScheduler(ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
             .build();
 
     // The adapter is now inserted into the only LogisticsSolutionElement of the only
     // LogisticsSolution of the LSP
     LogisticChainElement logisticChainElement =
-        LSPUtils.LogisticChainElementBuilder.newInstance(
-                Id.create("CollectionElement", LogisticChainElement.class))
+        LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("CollectionElement", LogisticChainElement.class))
             .setResource(lspResource)
             .build();
 
     // The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
     LogisticChain logisticChain =
-        LSPUtils.LogisticChainBuilder.newInstance(
-                Id.create("CollectionSolution", LogisticChain.class))
+        LSPUtils.LogisticChainBuilder.newInstance(Id.create("CollectionSolution", LogisticChain.class))
             .addLogisticChainElement(logisticChainElement)
             .build();
 
