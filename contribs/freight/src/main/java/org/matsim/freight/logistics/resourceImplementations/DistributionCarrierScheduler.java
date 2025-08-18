@@ -114,13 +114,10 @@ import org.matsim.vehicles.VehicleType;
 						}
 					}
 					case shipmentBased -> {
-						log.warn("Not sure, if everything of the shipment<load|transport|Unload> element is implemented properly at the moment for the shipment-based VRP.!");
-						//TODO needs to get fixed. KMT'Aug'24
 						for (TourElement element : tour.getTourElements()) {
 							if (element instanceof Tour.Delivery deliveryActivity) {
 								if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
-									//Todo: Nachdenken, was hier nun wie eingetragen werden muss. Nutzung Pickup und Delivery?
-									// Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
+									// Todo Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
 									addShipmentLoadElement(lspShipment, tour);
 									addShipmentTransportElement(lspShipment, tour, deliveryActivity);
 									addShipmentUnloadElement(lspShipment, deliveryActivity);
