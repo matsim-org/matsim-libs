@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
@@ -212,7 +213,7 @@ public class SpatIalRequestFleetFilterTest {
                 .build();
     }
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }

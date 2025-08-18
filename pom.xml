@@ -352,13 +352,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
+                <version>5.19.0</version>
                 <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>5.18.0</version>
+				<version>5.19.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -383,7 +383,7 @@
 			<dependency>
 			    <groupId>com.google.j2objc</groupId>
 			    <artifactId>j2objc-annotations</artifactId>
-			    <version>3.0.0</version>
+			    <version>3.1</version>
 			</dependency>
 
 			<dependency>

@@ -204,7 +204,8 @@ public class LanduseBuildingAnalysis {
 						"Key " + zoneID + " already exists in the zone map. This should not happen. Please check if the data in the column " + shapeFileZoneNameColumn + " is unique.");
 				}
 				zoneIdRegionConnection.put(zoneID, regionName);
-			}
+			} else
+				log.warn("The zone {} has no region assigned. This may lead to problems in the analysis.", (String) singleZone.getAttribute(shapeFileZoneNameColumn));
 		}
 
 		if (usedLanduseConfiguration.equals("useOSMBuildingsAndLanduse")) {
@@ -220,8 +221,11 @@ public class LanduseBuildingAnalysis {
 							String[] buildingTypes = ((String) building.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 							for (String singleCategoryOfBuilding : buildingTypes) {
 								int area = calculateAreaPerBuildingCategory(building, buildingTypes);
-								landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
+								if (landuseCategoriesPerZone.get(zone) != null)
+									landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
 										Double::sum);
+								else
+									log.warn("The zone {} was not set as part of the regions. So this zone is skipped", zone);
 							}
 						}
 		} else if (usedLanduseConfiguration.equals("useOnlyOSMLanduse"))
@@ -314,7 +318,7 @@ public class LanduseBuildingAnalysis {
 		log.info("Analyzing buildings types. This may take some time...");
 		for (SimpleFeature singleBuildingFeature : buildingsFeatures) {
 			countOSMObjects++;
-			if (countOSMObjects % 10000 == 0)
+			if ((countOSMObjects % (int) (buildingsFeatures.size() * 0.05)) == 0)
 				log.info("Investigate Building {} of {} buildings: {} %", countOSMObjects, buildingsFeatures.size(),
 					Math.round((double) countOSMObjects / buildingsFeatures.size() * 100));
 
