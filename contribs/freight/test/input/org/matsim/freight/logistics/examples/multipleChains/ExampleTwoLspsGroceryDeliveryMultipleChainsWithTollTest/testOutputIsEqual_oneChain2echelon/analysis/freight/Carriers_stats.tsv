@@ -1,0 +1,5 @@
+carrierId	nuOfJspritIterations	fleetSize	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations_planned	nuOfPickupLocations_planned	nuOfDeliveryLocations_planned	MATSimScoreSelectedPlan	jSpritScoreSelectedPlan	nuOfTours	jobType	nuOfJobs_planned	nuOfJobs_handled	noOfJobs_notHandled	demandSize_planned	demandSize_handled	jspritComputationTime
+Edeka_2echelon_distributionCarrier	1	INFINITE	1	1	0	1	68	-33646.18831533861	-33919.283804785264	10	shipments	72	72	0	895	895	null
+Edeka_2echelon_mainCarrier	1	INFINITE	1	1	1	0	0	-7078.381117511007	null	35	services	72	72	0	895	895	null
+Kaufland_2echelon_distributionCarrier	1	INFINITE	1	1	0	1	16	-2145.3599350239897	-22165.070170882063	8	shipments	43	43	0	347	347	null
+Kaufland_2echelon_mainCarrier	1	INFINITE	1	1	1	0	0	-3756.7698290270687	null	12	services	43	43	0	347	347	null
