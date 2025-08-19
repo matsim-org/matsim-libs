@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -19,6 +20,11 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * an event handler, which throws additional scoring events for perceived safety.
@@ -33,6 +39,7 @@ public class PerceivedSafetyScoreEventsCreator implements LinkLeaveEventHandler,
     private final AdditionalPerceivedSafetyLinkScore additionalPerceivedSafetyLinkScore;
 
     private final Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
+	private final Map<Id<Vehicle>,Id<Link>> firstLinkIdMap = new LinkedHashMap<>();
 
     @Inject
     PerceivedSafetyScoreEventsCreator(Scenario scenario, EventsManager eventsManager, AdditionalPerceivedSafetyLinkScore additionalPerceivedSafetyLinkScore) {
@@ -45,6 +52,7 @@ public class PerceivedSafetyScoreEventsCreator implements LinkLeaveEventHandler,
     public void handleEvent(VehicleEntersTrafficEvent event) {
 //        register driver and vehicle
         vehicle2driver.handleEvent(event);
+		this.firstLinkIdMap.put(event.getVehicleId(), event.getLinkId());
     }
 
     @Override
@@ -52,9 +60,12 @@ public class PerceivedSafetyScoreEventsCreator implements LinkLeaveEventHandler,
         if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
             double amount = additionalPerceivedSafetyLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()), event.getVehicleId());
 
-            final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
-            Gbl.assertNotNull(driverOfVehicle);
-            this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, "perceivedSafetyAdditionalLinkScore"));
+//			only throw PersonScoreEvent if amount != NaN = there are perceived safety mode params for the used mode. -sm0825
+			if (!Double.isNaN(amount)) {
+				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
+				Gbl.assertNotNull(driverOfVehicle);
+				this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, "perceivedSafetyAdditionalLinkScore"));
+			}
         } else {
             log.fatal("no driver found for vehicleId={}; not clear why this could happen. Perceived safety is not scored in this case!", event.getVehicleId());
         }
@@ -62,7 +73,19 @@ public class PerceivedSafetyScoreEventsCreator implements LinkLeaveEventHandler,
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-        vehicle2driver.handleEvent(event);
+		if (!Objects.equals(this.firstLinkIdMap.get(event.getVehicleId()), event.getLinkId())) {
+//			if link is first link of route, we do not want to score
+			double amount = additionalPerceivedSafetyLinkScore.computeLinkBasedScore(network.getLinks().get(event.getLinkId()), event.getVehicleId());
+
+			//	only throw PersonScoreEvent if amount != NaN = there are perceived safety mode params for the used mode. -sm0825
+			if (!Double.isNaN(amount)) {
+				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
+				Gbl.assertNotNull(driverOfVehicle);
+				this.eventsManager.processEvent(new PersonScoreEvent(event.getTime(), driverOfVehicle, amount, "perceivedSafetyAdditionalLinkScore"));
+			}
+		}
+		// Needs to be called last, because it will remove driver information
+		vehicle2driver.handleEvent(event);
     }
 
     @Override

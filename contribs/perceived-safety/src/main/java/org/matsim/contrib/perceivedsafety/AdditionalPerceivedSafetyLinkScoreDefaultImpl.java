@@ -54,10 +54,9 @@ public class AdditionalPerceivedSafetyLinkScoreDefaultImpl implements Additional
 
         String currentMode = vehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
 
-        if (perceivedSafetyConfigGroup.getModes().get(currentMode) == null) {
-            log.fatal("Trying to compute perceived safety score for mode {}," +
-                    "but there are no perceived safety parameters for this mode in {}. Aborting!", currentMode, perceivedSafetyConfigGroup.getName());
-            throw new NullPointerException();
+//        if params for mode are not specified, we do not want to calculate the perceived safety score. -sm0825
+		if (perceivedSafetyConfigGroup.getModes().get(currentMode) == null) {
+            return Double.NaN;
         }
 
         PerceivedSafetyConfigGroup.PerceivedSafetyModeParams params = perceivedSafetyConfigGroup.getModes().get(currentMode);
