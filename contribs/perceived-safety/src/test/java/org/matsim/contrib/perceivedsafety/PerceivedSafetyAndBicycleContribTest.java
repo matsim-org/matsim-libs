@@ -17,6 +17,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,6 +52,32 @@ public class PerceivedSafetyAndBicycleContribTest {
 		actualLegScores.put(BASIC, null);
 		actualLegScores.put(BICYCLE, null);
 		actualLegScores.put(BICYCLE_AND_PSAFE, null);
+
+//		expected scores are calculated manually:
+//		travel_dist: 2 links a 10km
+//		travel_time: 6min
+//		BIKE SCORE: infrastructureScore + comfortScore + gradientScore
+//		infrastructureScore = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance_m;
+//		= -0.0002 * (1-0.4) * 10000 = -1.2
+//		comfortScore = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance_m;
+//		= -0.0002 * (1-0.4) * 10000 = -1.2
+//		gradientScore = marginalUtilityOfGradient_pct_m * gradient_pct * distance_m;
+//		= -0.0002 * 0 * 10000 = 0
+//		= -2.4 * 2 = -4.8
+//		PERCEIVED SAFETY SCORE: (betaPerceivedSafety + randomGaussian * sdPerceivedSafety) * distanceBasedPerceivedSafety;
+//		distanceBasedPerceivedSafety = perceivedSafetyValueOnLink * distance / dMax
+//		perceivedSafetyValueOnLink = varPerceivedSafety - threshold
+//		= 1 - 4 = -3
+//		= -3 * 10000 / 10000 = 10000; dMax = 0. (see above), so dMax will be set to linkLength
+//		= (0.84 + 1.1419053154730547 * 0.22) * -3
+//		= -3.2736575082122163; for first link
+//		= -3.12680924632864; for second link (random double of 0.9194079489827879 is different to first link (see above) because the computeLinkBasedScore is called from different method (probably).
+//		RESULTING IN A FINAL SCORE WITH BIKE CONTRIB + PERCEIVED SAFETY CONTRIB
+//		= -11.200466754540857
+		Map<String, Double> expectedLegScores = new HashMap<>();
+		expectedLegScores.put(BASIC, 0.);
+		expectedLegScores.put(BICYCLE, -4.8);
+		expectedLegScores.put(BICYCLE_AND_PSAFE, -11.200466754540857);
 
 		for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
 			String setup = e.getKey();
@@ -138,8 +165,8 @@ public class PerceivedSafetyAndBicycleContribTest {
 
 //							add surface and speedfactor link attrs
 							l.getAttributes().putAttribute(BicycleUtils.SURFACE, "cobblestone");
-//							TODO: set to above or below 1 after testing with just surface
 							BicycleUtils.setBicycleInfrastructureFactor(l, 1.0);
+							NetworkUtils.setType(l, "tertiary");
 						});
 				}
 				case BICYCLE_AND_PSAFE -> {
@@ -153,8 +180,8 @@ public class PerceivedSafetyAndBicycleContribTest {
 
 //							add surface and speedfactor link attrs
 							l.getAttributes().putAttribute(BicycleUtils.SURFACE, "cobblestone");
-//							TODO: set to above or below 1 after testing with just surface
 							BicycleUtils.setBicycleInfrastructureFactor(l, 1.0);
+							NetworkUtils.setType(l, "tertiary");
 
 //                        add perceived safety link attr to link
 							l.getAttributes().putAttribute(TransportMode.bike + "PerceivedSafety", 1);
@@ -197,9 +224,9 @@ public class PerceivedSafetyAndBicycleContribTest {
 			actualLegScores.put(setup, experiencedPlans.getPersons().get(PERSON_ID).getSelectedPlan().getScore());
 		}
 
-//		for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
-//			Assertions.assertEquals(expectedLegScores.get(e.getKey()), e.getValue());
-//		}
+		for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
+			Assertions.assertEquals(expectedLegScores.get(e.getKey()), e.getValue());
+		}
 
 //		activation of bicycle contrib should decrease the score as we implement surface cobblestone
 		Assertions.assertTrue(actualLegScores.get(BASIC) > actualLegScores.get(BICYCLE));
