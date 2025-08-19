@@ -2,8 +2,6 @@
 
 The Perceived Safety Module extends MATSim's typical scoring function such that perceived safety rates are considered. As can be seen in the Equation below, travel disutility now depends on time, distance (i.e., cost), and safety. The beta coefficient ($\beta_{psafe,m(q)}$ parameter) represents the overall weight of safety perceptions in the plan selection process, influencing mode or route choice. It is inspired by the MATSim Bicycle Contrib. 
 
-This is an updated version of the [MATSim Psafe Module](https://github.com/panogjuras/Psafe) by Panagiotis Tzouras (@panogjuras). The update and integration into matsim-libs was done by Simon Meinhardt (@simei94).
-
 **The MATSim Perceived Safety Contrib repository contains:**
 - perceivedsafety package: includes all necessary classes to extend the MATSim scoring such that perceived safety is considered.
 - PerceivedSafetyScoringTest: contains a test, which ensures that the updated scoring functionality delivers the same scores as the one from the [old approach](https://github.com/panogjuras/Psafe).
@@ -37,7 +35,7 @@ $cd_{m(q)}$: the distance threshold of mode \(m).
 
 All necessary dependencies are included in the [pom.xml](pom.xml) file.
 
-The tools contained in this repository were developed within various research project of [Laboratory of Transportation Engineering](http://lte.survey.ntua.gr/main/en/) of National Technical University of Athens.
+This is an updated version of the [MATSim Psafe Module](https://github.com/panogjuras/Psafe) by Panagiotis Tzouras (@panogjuras). The update and integration into matsim-libs was done by Simon Meinhardt (@simei94).
 
 When referencing the contrib, please use the following papers:
 > Tzouras, P.G., Mitropoulos, L., Karolemeas, C., Stravropoulou, E., Vlahogianni, E.I., Kepaptsoglou, K., 2024. Agent-based simulation model of micro-mobility trips in heterogeneous and perceived unsafe road environments. Journal of Cycling and Micromobility Research 2, 100042. [https://doi.org/10.1016/j.jcmr.2024.100042]
