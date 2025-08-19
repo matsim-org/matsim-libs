@@ -145,7 +145,11 @@ class BicycleScoreEventsCreator implements
 
 				// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
 
-//				TODO: I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
+//				I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
+//				because when an agent gets to the final link of a route the sequence is NOT LinkEnter - LinkLeave
+//				but LinkEnter - VehicleLeavesTraffic. If we didn't throw the score here, the last link would be omitted. -sm0825
+
+//				yyyy still, the last link is not counted in for e.g. trip distance in output_trips nor trip distance in experienced_plans??
 
 				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
 
