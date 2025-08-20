@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityFromEvents;
@@ -263,7 +264,7 @@ public class RunOfflineAccessibilityBerlin {
 		String eventsFile = ApplicationUtils.matchInput("output_events.xml.gz", Path.of(OUTPUT_DIR)).toString();
 		String networkFile = ApplicationUtils.matchInput("output_network.xml.gz", Path.of(OUTPUT_DIR)).toString();
 		String transportScheduleFile = ApplicationUtils.matchInput("output_transitSchedule.xml.gz", Path.of(OUTPUT_DIR)).toString();
-
+		// todo: do same with population
 
 		// CONFIG
 		//global
@@ -288,6 +289,8 @@ public class RunOfflineAccessibilityBerlin {
 
 		// change walk speed to match kelheim scenario
 		config.routing().getTeleportedModeParams().get(TransportMode.walk).setTeleportedModeSpeed(3.8 / 3.6);
+
+		// todo add population to config file
 
 		// change scoring default to match kelheim scenario
 //		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
@@ -363,6 +366,14 @@ public class RunOfflineAccessibilityBerlin {
 			}
 
 		}
+
+		// todo filter population to only include person's within a kiez
+		//e.g. between 790994.4,5826895.8 &
+		// 791547.5,5827399.8
+
+//		for (Person person : scenario.getPopulation().getPersons().values()) {
+//			person.getAttributes().getAttribute("homeX") <
+//		}
 
 		// add pois to scenario as facilities
 		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
