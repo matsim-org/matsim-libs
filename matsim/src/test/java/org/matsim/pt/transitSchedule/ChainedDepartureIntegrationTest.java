@@ -22,10 +22,12 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+import org.matsim.vehicles.VehicleType;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +40,7 @@ public class ChainedDepartureIntegrationTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	private List<Event> runScenario(Consumer<Scenario> f) throws MalformedURLException {
+	private Scenario createScenario() throws MalformedURLException {
 		Config config = ConfigUtils.createConfig();
 		config.setContext(new File("test/input/ch/sbb/matsim/routing/pt/raptor/").toURI().toURL());
 
@@ -50,12 +52,23 @@ public class ChainedDepartureIntegrationTest {
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
+		config.controller().setWritePlansInterval(1);
+		config.scoring().setWriteExperiencedPlans(true);
 		config.qsim().setEndTime(Time.parseTime("36:00:00"));
 
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return ScenarioUtils.loadScenario(config);
+	}
+
+	private List<Event> runScenario(Consumer<Scenario> f) throws MalformedURLException {
+
+		Scenario scenario = createScenario();
+
+		if (f != null) {
+			f.accept(scenario);
+		}
 
 		Controler controler = new Controler(scenario);
 		controler.run();
@@ -86,45 +99,43 @@ public class ChainedDepartureIntegrationTest {
 		List<Event> events = runScenario(removeChainedDepartures);
 
 		ActivityStartEvent p1 = new ActivityStartEvent(
-			77899, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
+			76961, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
 			"home", new Coord(679623, 5811182)
 		);
 
 		ActivityStartEvent p2 = new ActivityStartEvent(
-			71722, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
+			71213, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
 			"home", new Coord(970034, 6017382)
 		);
 
 		assertThat(events)
 			.contains(p1)
 			.contains(p2);
-
 	}
 
 	@Test
 	void withChainedDepartures() throws Exception {
 
-		List<Event> events = runScenario(scenario -> {
-		});
+		List<Event> events = runScenario(scenario -> {});
 
 		ActivityStartEvent p1 = new ActivityStartEvent(
-			77899, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
+			76902, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
 			"home", new Coord(679623, 5811182)
 		);
 
 		ActivityStartEvent p2 = new ActivityStartEvent(
-			71722, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
+			71213, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
 			"home", new Coord(970034, 6017382)
 		);
 
 		// Same arrival times as without chains, but different events
 		assertThat(events)
 			.contains(new PersonContinuesInVehicleEvent(
-				33592, Id.createPersonId("person1"),
+				32581, Id.createPersonId("person1"),
 				Id.createVehicleId("351761"), Id.createVehicleId("351714")
 			))
 			.contains(new PersonContinuesInVehicleEvent(
-				36727, Id.createPersonId("person2"),
+				36362, Id.createPersonId("person2"),
 				Id.createVehicleId("351871"), Id.createVehicleId("351874")
 			))
 			.contains(p1)
@@ -135,7 +146,27 @@ public class ChainedDepartureIntegrationTest {
 	@Test
 	void withDelays() throws Exception {
 
-		// TODO: test with introduced delays, persons should arrive late as well
+		// Reduce the maximum speed of the vehicle type to 20 m/s
+		Consumer<Scenario> reduceSpeed = scenario -> {
+			Map<Id<VehicleType>, VehicleType> vehicleTypes = scenario.getTransitVehicles().getVehicleTypes();
+			vehicleTypes.get(Id.create("pt", VehicleType.class)).setMaximumVelocity(20);
+		};
+
+		List<Event> events = runScenario(reduceSpeed);
+
+		ActivityStartEvent p1 = new ActivityStartEvent(
+			83744, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
+			"home", new Coord(679623, 5811182)
+		);
+
+		ActivityStartEvent p2 = new ActivityStartEvent(
+			72797, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
+			"home", new Coord(970034, 6017382)
+		);
+
+		assertThat(events)
+			.contains(p1)
+			.contains(p2);
 
 	}
 

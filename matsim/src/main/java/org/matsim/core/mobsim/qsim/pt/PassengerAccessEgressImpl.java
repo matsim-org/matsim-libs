@@ -19,15 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,10 +32,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 
 /**
@@ -52,21 +50,18 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	/**
 	 * These agents are at the stop and relocate to another vehicle.
 	 */
-	private Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
-	private Set<PTPassengerAgent> agentsDeniedToBoard = null;
-	private Scenario scenario;
-	private EventsManager eventsManager;
+	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
+	private final Set<PTPassengerAgent> agentsDeniedToBoard;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
 
 	PassengerAccessEgressImpl(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
 		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker;
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-		this.isGeneratingDeniedBoardingEvents =
-			this.scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
-		if (this.isGeneratingDeniedBoardingEvents) {
-			this.agentsDeniedToBoard = new HashSet<>();
-		}
+		this.isGeneratingDeniedBoardingEvents = this.scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
+		this.agentsDeniedToBoard = isGeneratingDeniedBoardingEvents ? new HashSet<>() : null;
 	}
 
 	/**
@@ -234,12 +229,14 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 			MobsimVehicle nextVehicle = internalInterface.getMobsim().getVehicles().get(newVehicle);
 
 			if (!sameVehicle) {
-				MobsimDriverAgent driver = nextVehicle.getDriver();
 
-				// TODO: This is not yet working correctly
-
-				//driver.endActivityAndComputeNextState(time);
-				//internalInterface.arrangeNextAgentState(driver);
+				int left = agentTracker.trackVehicleArrival(chain.getChainedDepartureId());
+				// Depart if all required trains for this departure have arrived
+				if (left <= 0) {
+					AbstractTransitDriverAgent driver = (AbstractTransitDriverAgent) nextVehicle.getDriver();
+					driver.setReadyForDeparture(time);
+					internalInterface.getMobsim().rescheduleActivityEnd(driver);
+				}
 			}
 
 			Iterator<PTPassengerAgent> it = passengers.iterator();

@@ -164,6 +164,10 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		departureTime = Double.POSITIVE_INFINITY;
 	}
 
+	void setReadyForDeparture(double now) {
+		departureTime = now;
+	}
+
 	/**
 	 * Called when one TransitRoute ends, the driver might continue with another as part of the Umlauf.
 	 */

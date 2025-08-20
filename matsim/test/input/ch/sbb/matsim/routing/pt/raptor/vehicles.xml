@@ -6,7 +6,7 @@
 		<capacity seats="500" standingRoomInPersons="500"/>
 		<length meter="200.0"/>
 		<width meter="3"/>
-		<maximumVelocity meterPerSecond="30"/>
+		<maximumVelocity meterPerSecond="50"/>
 		<networkMode networkMode="pt"/>
 	</vehicleType>
 

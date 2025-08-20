@@ -103,9 +103,14 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	/**
-	 * When set, the driver will wait for its first departure, until {@link #endActivityAndComputeNextState(double)} is called externally.
+	 * When set, the driver will wait for its first departure, until {@link #setReadyForDeparture(double)} is called externally.
 	 */
 	abstract void setWaitForDeparture();
+
+	/**
+	 * Sets the driver to a state where it is ready to start its route.
+	 */
+	abstract void setReadyForDeparture(double now);
 
 	@Override
 	public final Id<Link> chooseNextLinkId() {

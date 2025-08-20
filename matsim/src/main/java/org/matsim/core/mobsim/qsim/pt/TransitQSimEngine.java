@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.pt;
 import java.util.*;
 import java.util.Map.Entry;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -90,7 +91,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	TransitQSimEngine(QSim queueSimulation) {
 		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
 			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
-			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
+			new TransitStopAgentTracker(queueSimulation.getEventsManager(), queueSimulation.getScenario().getTransitSchedule()),
 			new DefaultTransitDriverAgentFactory());
 	}
 
@@ -159,7 +160,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return umlaufCache;
 	}
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle, Set<Id<Departure>> departuresDependingOnChains) {
+	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle, Object2IntMap<Id<Departure>> departuresDependingOnChains) {
 
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
 		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
@@ -172,9 +173,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		this.qSim.insertAgentIntoMobsim(driver);
 
 		// A departure that depends on a previous chain cannot depart before the first connecting leg has ended
-		if (departuresDependingOnChains.contains(umlauf.getUmlaufStuecke().getFirst().getDeparture().getId())) {
-			// TODO: not working as intended yet
-			// driver.setWaitForDeparture();
+		if (departuresDependingOnChains.containsKey(umlauf.getUmlaufStuecke().getFirst().getDeparture().getId())) {
+			driver.setWaitForDeparture();
 		}
 
 		return driver;
