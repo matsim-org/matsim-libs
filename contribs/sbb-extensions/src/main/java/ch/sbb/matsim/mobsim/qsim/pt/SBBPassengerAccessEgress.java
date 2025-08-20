@@ -69,11 +69,15 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
      */
     double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
         ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
+
+		// Relocating passengers are only determined at the very last stop.
+		List<PTPassengerAgent> passengersRelocating = upcomingStops.isEmpty() ? findPassengersRelocating(vehicle, stop) : List.of();
+
         int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
         List<PTPassengerAgent> passengersEntering = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
 
         TransitStopHandler stopHandler = vehicle.getStopHandler();
-        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, this, vehicle);
+        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersRelocating, passengersEntering, this, vehicle);
         if (stopTime == 0.0) { // (de-)boarding is complete when the additional stopTime is 0.0
             if (this.isGeneratingDeniedBoardingEvents) {
                 List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
@@ -94,6 +98,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         }
 
         int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size();
+
+
 
         List<PTPassengerAgent> boardingPassengers = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
         for (PTPassengerAgent passenger : boardingPassengers) {
@@ -153,6 +159,18 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         }
         return passengersLeaving;
     }
+
+	private List<PTPassengerAgent> findPassengersRelocating(TransitVehicle vehicle, final TransitStopFacility stop) {
+
+		List<PTPassengerAgent> relocatingPassengers = new ArrayList<>();
+		for (PassengerAgent passenger : vehicle.getPassengers()) {
+			if (((PTPassengerAgent) passenger).getRelocationAtStop(stop)) {
+				relocatingPassengers.add((PTPassengerAgent) passenger);
+			}
+		}
+
+		return relocatingPassengers;
+	}
 
     /**
      * Finds all agents that want to enter the specified line.

@@ -230,11 +230,6 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	@Override
-	public boolean getArrivalAtStop(TransitStopFacility stop) {
-		return this.transitAgentDelegate.getArrivalAtStop(stop) ;
-	}
-
-	@Override
 	public double getWeight() {
 		return this.transitAgentDelegate.getWeight() ;
 	}
