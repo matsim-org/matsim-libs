@@ -55,6 +55,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
@@ -93,7 +94,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(QsimScopeForkJoinPool.class),
 						drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+						getter.getModal(ScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 						getter.getModal(DrtRequestInsertionRetryQueue.class));
 				})).asEagerSingleton();
@@ -148,12 +149,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(EDrtVehicleDataEntryFactory.class));
 
-		DrtOptimizationConstraintsSet defaultConstraintsSet = drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		bindModal(CostCalculationStrategy.class)
-				.to(defaultConstraintsSet.isRejectRequestIfMaxWaitOrTravelTimeViolated()
-						?
-				CostCalculationStrategy.RejectSoftConstraintViolations.class :
-				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+		bindModal(CostCalculationStrategy.class).to(CostCalculationStrategy.DefaultCostCalculationStrategy.class).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 
@@ -173,7 +169,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 					}
 				}).asEagerSingleton();
 
-		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
+		bindModal(ScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(p -> p.isScheduleWaitBeforeDrive()).orElse(false);
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(

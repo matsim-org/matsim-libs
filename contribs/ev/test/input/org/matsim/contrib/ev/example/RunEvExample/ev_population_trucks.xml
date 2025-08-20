@@ -47,7 +47,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:55:50">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -64,7 +64,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:21:41">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -81,7 +81,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:00:41">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -98,7 +98,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:11:48">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -115,7 +115,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:05:02">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -132,7 +132,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:27:02">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -149,7 +149,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:42:51">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -166,7 +166,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:32:05">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -183,7 +183,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:53:17">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -200,7 +200,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:40:55">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -217,6 +217,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="08:26:54">
             </activity>
+            <leg mode="truck">
             <leg mode="car">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
@@ -234,7 +235,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:42:31">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>
@@ -251,7 +252,7 @@
         <plan selected="yes">
             <activity type="h" x="290625.48113156157" y="5885518.622230196" end_time="07:08:01">
             </activity>
-            <leg mode="car">
+            <leg mode="truck">
             </leg>
             <activity type="h" x="468532.721161525" y="5728751.474117422">
             </activity>

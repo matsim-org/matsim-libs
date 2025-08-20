@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 public class RunEvExampleTruckLTH {
-	static final String DEFAULT_CONFIG_FILE = "contribs/ev/test/input/org/matsim/contrib/ev/example/RunEvExample/config_trucks.xml";
+	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config_trucks.xml";
 	private static final Logger log = LogManager.getLogger(RunEvExampleTruckLTH.class);
 
 	public static void main(String[] args) throws IOException {
@@ -45,7 +45,7 @@ public class RunEvExampleTruckLTH {
 			} else {
 				// I couldn't check if this works as the config_trucks-file didn't exist already
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+				args = new String[]{"https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/ev"
 					+ DEFAULT_CONFIG_FILE};
 			}
 		}

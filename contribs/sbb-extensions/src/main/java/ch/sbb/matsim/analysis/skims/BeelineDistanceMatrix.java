@@ -41,7 +41,7 @@ public final class BeelineDistanceMatrix {
 
     public static <T> FloatMatrix<T> calculateBeelineDistanceMatrix(Set<T> zoneIds, Map<T, Coord[]> coordsPerZone, int numberOfThreads) {
         // prepare calculation
-        FloatMatrix<T> matrix = new FloatMatrix<>(zoneIds, 0.0f);
+        FloatMatrix<T> matrix = FloatMatrix.createFloatMatrix(zoneIds, 0.0f);
 
         int numberOfPointsPerZone = coordsPerZone.values().iterator().next().length;
 

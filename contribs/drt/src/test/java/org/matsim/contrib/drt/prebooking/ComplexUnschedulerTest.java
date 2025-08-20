@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -626,7 +627,7 @@ public class ComplexUnschedulerTest {
 			drtConfig.setStopDuration(30.0);
 			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
-			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType);
+			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType, new StopWaypointFactoryImpl(integerLoadType, false));
 
 			this.timingUpdater = Mockito.mock(ScheduleTimingUpdaterImpl.class);
 		}
