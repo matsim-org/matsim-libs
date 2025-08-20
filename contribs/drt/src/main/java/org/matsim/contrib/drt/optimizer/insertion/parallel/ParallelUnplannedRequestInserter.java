@@ -418,7 +418,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 					|| (lastUnsolvedConflicts != null && toBeRejected.size() == lastUnsolvedConflicts) // not getting better
 					|| i == this.maxIter - 1) { // reached iter limit
 					LOG.debug("Stopped with rejections #{} ", toBeRejected.size());
-					toBeRejected.forEach(s -> retryOrReject(s, time, NO_INSERTION_FOUND_CAUSE));
 					break;
 				}
 
