@@ -11,9 +11,11 @@ import org.matsim.contrib.dvrp.load.DvrpLoadType;
 public class StopWaypointFactoryImpl implements StopWaypointFactory {
 
     private final DvrpLoadType loadType;
+    private final boolean scheduleWaitBeforeDrive;
 
-    public StopWaypointFactoryImpl(DvrpLoadType loadType) {
+    public StopWaypointFactoryImpl(DvrpLoadType loadType, boolean scheduleWaitBeforeDrive) {
         this.loadType = loadType;
+        this.scheduleWaitBeforeDrive = scheduleWaitBeforeDrive;
     }
 
     @Override
@@ -22,7 +24,7 @@ public class StopWaypointFactoryImpl implements StopWaypointFactory {
             assert outgoingOccupancy.isEmpty() : "occupancy SHOULD be empty at this point.";
             return new StopWaypointImpl(capacityChangeTask, loadType);
         } else {
-            return new StopWaypointImpl(task, outgoingOccupancy, loadType);
+            return new StopWaypointImpl(task, outgoingOccupancy, loadType, scheduleWaitBeforeDrive);
         }
     }
 }

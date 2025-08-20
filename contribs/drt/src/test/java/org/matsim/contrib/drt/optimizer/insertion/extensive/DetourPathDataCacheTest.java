@@ -140,6 +140,6 @@ public class DetourPathDataCacheTest {
 	}
 
 	private StopWaypoint stop(Link link) {
-		return new StopWaypointImpl(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE);
+		return new StopWaypointImpl(new DefaultDrtStopTask(0, 60, link), LOAD_TYPE.getEmptyLoad(), LOAD_TYPE, false);
 	}
 }
