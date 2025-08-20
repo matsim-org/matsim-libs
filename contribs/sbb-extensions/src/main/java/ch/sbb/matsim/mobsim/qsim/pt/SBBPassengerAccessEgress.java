@@ -77,7 +77,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         List<PTPassengerAgent> passengersEntering = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
 
         TransitStopHandler stopHandler = vehicle.getStopHandler();
-        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersRelocating, passengersEntering, this, vehicle);
+        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, passengersRelocating, this, vehicle);
         if (stopTime == 0.0) { // (de-)boarding is complete when the additional stopTime is 0.0
             if (this.isGeneratingDeniedBoardingEvents) {
                 List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
