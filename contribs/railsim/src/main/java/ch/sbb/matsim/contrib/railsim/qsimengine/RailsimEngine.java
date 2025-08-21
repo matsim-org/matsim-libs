@@ -446,6 +446,7 @@ final class RailsimEngine implements Steppable {
 
 			// Same event is re-scheduled after stopping,
 			event.plannedTime = time + stopTime;
+			event.lastArrivalTime = time;
 			state.speed = 0;
 
 			return;
@@ -513,15 +514,16 @@ final class RailsimEngine implements Steppable {
 			if (state.train.reversible() < 0)
 				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to enter the opposite link " + nextLink.getLinkId() + " with a non-reversible train.");
 
-			if (state.train.length() > nextLink.length) {
-				throw new IllegalStateException("Train " + state.driver.getId() + " is trying to reverse on link " + nextLink.getLinkId() + " with a train that is longer than the link. This is currently not supported.");
-			}
-
 			// Reverse the increment
 			state.routeIdx -= 1;
 
 			// Reschedule the event
-			event.plannedTime = time + state.train.reversible();
+			if (event.lastArrivalTime > -1) {
+				// The time used for stopping is used for reversing
+				event.plannedTime = Math.max(time, event.lastArrivalTime + state.train.reversible());
+			} else
+				event.plannedTime = time + state.train.reversible();
+
 			event.type = UpdateEvent.Type.REVERSE_TRAIN;
 			return;
 		}
@@ -536,12 +538,12 @@ final class RailsimEngine implements Steppable {
 
 		// Swap head and tail position
 		if (event.type == UpdateEvent.Type.REVERSE_TRAIN) {
-			state.headPosition = state.tailPosition;
-			state.tailPosition = 0;
+			reverseTrain(time, event);
 		}
 
 		// Reset waiting flag
 		event.waitingForLink = false;
+		event.lastArrivalTime = -1;
 		event.type = UpdateEvent.Type.ENTER_LINK;
 
 		state.driver.notifyMoveOverNode(state.headLink);
@@ -552,6 +554,46 @@ final class RailsimEngine implements Steppable {
 		createEvent(state.asEvent(time));
 
 		decideNextUpdate(event);
+	}
+
+	/**
+	 * Reverse the train.
+	 */
+	private void reverseTrain(double time, UpdateEvent event) {
+		TrainState state = event.state;
+
+		// Train is on one link, only need to swap positions
+		if (state.tailLink == state.headLink) {
+			state.headPosition = state.tailPosition;
+			state.tailPosition = 0;
+			return;
+		}
+
+		// The head link trying to is the first reverse link
+		RailLink headReverse = resources.getLink(state.headLink);
+		RailLink tailReverse = null;
+
+		int i = state.routeIdx;
+		for (; i < state.route.size(); i++) {
+			RailLink link = state.route.get(i);
+			if (link.isOppositeLink(state.tailLink)) {
+				tailReverse = link;
+				break;
+			}
+		}
+
+		if (tailReverse == null) {
+			throw new IllegalStateException("Train " + state.driver.getId() + " is trying to reverse on a route that does not contain all opposites links. " +
+				"Make sure that a single transit line contains all links and stops needed for reversing.");
+		}
+
+		state.routeIdx = i + 1;
+
+		// Head is now at the previous tail position
+		state.headLink = tailReverse.getLinkId();
+		state.tailLink = headReverse.getLinkId();
+		state.headPosition = state.tailPosition;
+		state.tailPosition = 0;
 	}
 
 	private void leaveLink(double time, UpdateEvent event) {

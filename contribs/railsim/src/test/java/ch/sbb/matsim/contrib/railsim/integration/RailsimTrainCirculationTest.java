@@ -39,6 +39,17 @@ public class RailsimTrainCirculationTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	void shuttleMicro() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "shuttleMicro"));
+
+		// There are 3 stops per direction, and the trips is done twice
+		assertThat(result)
+			.allTrainsHaveNumberOfStops(14)
+			.allTrainsArrived();
+	}
+
+	@Test
 	void nonContinuousSchedule() {
 
 		Consumer<Scenario> setup = scenario -> {
