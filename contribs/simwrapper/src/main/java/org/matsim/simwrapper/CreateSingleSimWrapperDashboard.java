@@ -127,7 +127,7 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 					if (simwrapperCfg.getBasePath() == null) {
 						throw new IllegalArgumentException("ScenarioComparisonDashboard requires a base run to be set in the config.");
 					}
-					sw.addDashboard(new DifferenceDashboard(simwrapperCfg.getBasePath(), null));
+					sw.addDashboard(new ScenarioComparisonDashboard(simwrapperCfg.getBasePath()));
 				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}

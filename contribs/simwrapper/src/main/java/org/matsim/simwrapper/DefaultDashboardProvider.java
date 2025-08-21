@@ -23,10 +23,6 @@ public class DefaultDashboardProvider implements DashboardProvider {
 			new TrafficDashboard(Set.copyOf(config.qsim().getMainModes()))
 		));
 
-		if (simWrapper.getConfigGroup().getBasePath() != null) {
-			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath(), config.controller().getOutputDirectory()));
-		}
-
 		if (config.transit().isUseTransit()) {
 			result.add(new PublicTransitDashboard());
 		}
@@ -42,6 +38,10 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		if (ConfigUtils.hasModule(config, NoiseConfigGroup.class)) {
 			result.add(new NoiseDashboard(config.global().getCoordinateSystem()));
+		}
+
+		if (simWrapper.getConfigGroup().getBasePath() != null) {
+			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath()));
 		}
 
 		result.add(new StuckAgentDashboard());
