@@ -14,12 +14,16 @@ import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -150,6 +154,14 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 
 		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(RegularShiftDump.class)
+		));
+
+		boolean scheduleWaitBeforeDrive = drtConfigGroup.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
+			getter -> new ShiftStopWaypointFactory(
+				new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive),
+				getter.getModal(DvrpLoadType.class)
+			)
 		));
 	}
 }
