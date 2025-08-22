@@ -423,12 +423,12 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		assertThat(collector)
 			.trainHasLastArrival("trainAB0", 30884.0)
 			.trainHasLastArrival("trainBA0", 30875.0)
-			.trainHasLastArrival("trainAC0", 31443.0)
+			.trainHasLastArrival("trainAC0", 31213.0)
 			.trainHasLastArrival("trainCA0", 31027.0)
 			.trainHasLastArrival("trainAB7", 31061.0)
-			.trainHasLastArrival("trainBA7", 32221.0)
-			.trainHasLastArrival("trainAC7", 32184.0)
-			.trainHasLastArrival("trainCA7", 33122.0)
+			.trainHasLastArrival("trainBA7", 32971.0)
+			.trainHasLastArrival("trainAC7", 31447.0)
+			.trainHasLastArrival("trainCA7", 31332.0)
 			.allTrainsArrived();
 	}
 

@@ -179,18 +179,25 @@ public final class RailResourceManager {
 			List<RailLink> links = new LinkedList<>();
 			boolean allFree = true;
 
+			// After the non-blocking segment, reserve enough area for the train to hold if needed
+			double avoidanceDist = 0;
+
 			for (int i = idx; i < route.size(); i++) {
 				RailLink l = route.get(i);
 
 				// Note that the deadlock avoidance is not checked here on the single links
 				// It will be invoked later on the whole segment of links
-				if (l.isNonBlockingArea()) {
-					allFree = l.resource.hasCapacity(time, l, track, position);
-					if (!allFree)
-						break;
+				allFree = l.resource.hasCapacity(time, l, track, position);
+				if (!allFree)
+					break;
 
-					links.addFirst(l);
-				} else
+				links.addFirst(l);
+
+				// Accumulate the distance after the non-blocking area
+				if (!l.isNonBlockingArea())
+					avoidanceDist += l.length;
+
+				if (avoidanceDist > position.getTrain().length())
 					break;
 			}
 

@@ -84,8 +84,6 @@
         <link id="Abzw1-ToC" from="Abzw1" to="ToC" length="42.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
             <attributes>
                 <attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-                <attribute name="railsimResourceId" class="java.lang.String">R1</attribute>
-				<attribute name="railsimNonBlockingArea" class="java.lang.Boolean">true</attribute>
             </attributes>
         </link>
         <link id="Abzw1Post-Abzw3" from="Abzw1Post" to="Abzw3" length="17.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
@@ -98,8 +96,6 @@
         <link id="Abzw2-ToA" from="Abzw2" to="ToA" length="200.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
             <attributes>
                 <attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-                <attribute name="railsimResourceId" class="java.lang.String">R3</attribute>
-				<attribute name="railsimNonBlockingArea" class="java.lang.Boolean">true</attribute>
             </attributes>
         </link>
         <link id="Abzw3-Abzw3Post" from="Abzw3" to="Abzw3Post" length="22.4" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
@@ -112,8 +108,6 @@
         <link id="Abzw3-ToB" from="Abzw3" to="ToB" length="200.5" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
             <attributes>
                 <attribute name="railsimTrainCapacity" class="java.lang.Integer">1</attribute>
-                <attribute name="railsimResourceId" class="java.lang.String">R2</attribute>
-				<attribute name="railsimNonBlockingArea" class="java.lang.Boolean">true</attribute>
             </attributes>
         </link>
         <link id="Abzw3Post-Abzw2" from="Abzw3Post" to="Abzw2" length="24.6" freespeed="20" capacity="3600.0" permlanes="1.0" oneway="1" modes="rail">
