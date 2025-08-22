@@ -562,15 +562,15 @@ final class RailsimEngine implements Steppable {
 	private void reverseTrain(double time, UpdateEvent event) {
 		TrainState state = event.state;
 
+		RailLink headReverse = resources.getLink(state.headLink);
+
 		// Train is on one link, only need to swap positions
-		if (state.tailLink == state.headLink) {
+		if (headReverse.isOppositeLink(state.tailLink)) {
 			state.headPosition = state.tailPosition;
 			state.tailPosition = 0;
 			return;
 		}
 
-		// The head link trying to is the first reverse link
-		RailLink headReverse = resources.getLink(state.headLink);
 		RailLink tailReverse = null;
 
 		int i = state.routeIdx;
@@ -591,8 +591,9 @@ final class RailsimEngine implements Steppable {
 
 		// Head is now at the previous tail position
 		state.headLink = tailReverse.getLinkId();
-		state.tailLink = headReverse.getLinkId();
 		state.headPosition = state.tailPosition;
+
+		state.tailLink = headReverse.getLinkId();
 		state.tailPosition = 0;
 	}
 
