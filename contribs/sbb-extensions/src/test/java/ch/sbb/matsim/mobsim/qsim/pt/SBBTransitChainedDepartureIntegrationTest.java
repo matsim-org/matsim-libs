@@ -63,10 +63,7 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 
 		SBBTransitConfigGroup sbb = ConfigUtils.addOrGetModule(config, SBBTransitConfigGroup.class);
-		sbb.setDeterministicServiceModes(Set.of(TransportMode.pt));
-
-		// Don't simulate these modes
-		config.transit().setTransitModes(Set.of());
+		sbb.setDeterministicServiceModes(Set.of("rail"));
 
 		return ScenarioUtils.loadScenario(config);
 	}
