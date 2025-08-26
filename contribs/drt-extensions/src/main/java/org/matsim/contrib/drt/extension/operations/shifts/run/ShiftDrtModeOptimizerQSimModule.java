@@ -114,14 +114,6 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						getter.getModal(Network.class),
 						getter.getModal(TravelTimeMatrix.class))));
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
-		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
-				getter -> new ShiftStopWaypointFactory(
-						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive),
-						getter.getModal(DvrpLoadType.class)
-				)
-		));
-
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
 			return new ShiftVehicleDataEntryFactory(new VehicleDataEntryFactoryImpl(loadType, getter.getModal(StopWaypointFactory.class)),
