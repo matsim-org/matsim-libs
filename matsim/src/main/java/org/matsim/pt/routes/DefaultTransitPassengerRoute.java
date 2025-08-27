@@ -159,6 +159,11 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	@Override
 	public Id<TransitStopFacility> getEgressStopId() {
+		// Egress is always the very last stop if the route is chained
+		if (this.chainedRoute != null) {
+			return this.chainedRoute.getEgressStopId();
+		}
+
 		return this.egressFacilityIndex >= 0 ? Id.get(this.egressFacilityIndex, TransitStopFacility.class) : null;
 	}
 

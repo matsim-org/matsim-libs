@@ -53,11 +53,12 @@ public interface TransitStopHandler {
 	 * @param now the current time
 	 * @param leavingPassengers the list of passengers that want to exit
 	 * @param enteringPassengers the list of passengers that want to board
+	 * @param relocatingPassengers the list of passengers that want to relocate to another chained vehicle
 	 * @param handler provides methods for actually removing/adding passengers to the vehicle
 	 * @return the time (in seconds) how long the vehicle will stay at least at this stop.
 	 */
 	public double handleTransitStop(final TransitStopFacility stop, final double now,
 			final List<PTPassengerAgent> leavingPassengers, final List<PTPassengerAgent> enteringPassengers,
-			final PassengerAccessEgress handler, MobsimVehicle vehicle);
+			final List<PTPassengerAgent> relocatingPassengers, final PassengerAccessEgress handler, MobsimVehicle vehicle);
 
 }

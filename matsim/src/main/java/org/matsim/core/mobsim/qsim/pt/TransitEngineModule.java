@@ -53,6 +53,6 @@ public class TransitEngineModule extends AbstractQSimModule {
 	@Provides
 	@Singleton
 	public TransitStopAgentTracker transitStopAgentTracker(QSim qSim) {
-		return new TransitStopAgentTracker(qSim.getEventsManager());
+		return new TransitStopAgentTracker(qSim.getEventsManager(), qSim.getScenario().getTransitSchedule());
 	}
 }
