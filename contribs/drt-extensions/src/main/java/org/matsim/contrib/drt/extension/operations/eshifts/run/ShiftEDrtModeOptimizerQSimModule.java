@@ -82,13 +82,6 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
 
-		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
-		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
-				getter -> new ShiftStopWaypointFactory(
-						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive),
-						getter.getModal(DvrpLoadType.class)
-				)
-		));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
 				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),

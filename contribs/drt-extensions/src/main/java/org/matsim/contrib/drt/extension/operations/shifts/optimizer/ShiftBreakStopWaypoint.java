@@ -9,6 +9,8 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 
+import java.util.Optional;
+
 /**
  * @author nkuehnel / MOIA
  */
@@ -58,8 +60,8 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
     }
 
     @Override
-    public DvrpLoad getChangedCapacity() {
-        return null;
+    public Optional<DvrpLoad> getChangedCapacity() {
+        return Optional.empty();
     }
 
     @Override
