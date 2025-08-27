@@ -60,5 +60,5 @@ public interface PassengerAccessEgress {
 	/**
 	 * Relocate all passengers to the new vehicle.
 	 */
-	void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> chain, double time);
+	void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> departures, double time);
 }

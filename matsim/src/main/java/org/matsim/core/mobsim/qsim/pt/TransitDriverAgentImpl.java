@@ -171,7 +171,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	/**
 	 * Called when one TransitRoute ends, the driver might continue with another as part of the Umlauf.
 	 */
-	private void handleEndRoute(double now) {
+	protected void handleEndRoute(double now) {
 
 		accessEgress.relocatePassengers( this, departure.getChainedDepartures(), now);
 

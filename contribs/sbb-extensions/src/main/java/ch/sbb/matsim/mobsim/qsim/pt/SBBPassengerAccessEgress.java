@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -51,12 +51,15 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
     private final TransitStopAgentTracker agentTracker;
     private final EventsManager eventsManager;
     private final boolean isGeneratingDeniedBoardingEvents;
+	private final TransitSchedule transitSchedule;
+	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
 
     SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
         this.internalInterface = internalInterface;
         this.agentTracker = agentTracker;
         this.eventsManager = eventsManager;
         this.isGeneratingDeniedBoardingEvents = scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
+		this.transitSchedule = scenario.getTransitSchedule();
     }
 
     /**
@@ -140,13 +143,61 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
     }
 
 	@Override
-	public void handlePassengerRelocating(PTPassengerAgent agent, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
-		throw new UnsupportedOperationException("TODO");
+	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+
+		boolean handled = vehicle.removePassenger(passenger);
+		if (handled) {
+			// Store passengers wanting to relocate at the stop facility
+			agentRelocating.computeIfAbsent(stopFacilityId, k -> new ArrayList<>()).add(passenger);
+
+		} else
+			throw new IllegalStateException("Agent " + passenger.getId() + " was not removed from vehicle " + vehicle.getId() + " when relocating.");
+
 	}
 
 	@Override
-	public void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> chain, double time) {
-		throw new UnsupportedOperationException("TODO");
+	public void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> departures, double time) {
+
+		TransitRouteStop stop = vehicle.getTransitRoute().getStops().getLast();
+		List<PTPassengerAgent> passengers = agentRelocating.getOrDefault(stop.getStopFacility().getId(), List.of());
+
+		for (ChainedDeparture chain : departures) {
+			TransitLine line = transitSchedule.getTransitLines().get(chain.getChainedTransitLineId());
+			TransitRoute route = line.getRoutes().get(chain.getChainedRouteId());
+			Departure departure = route.getDepartures().get(chain.getChainedDepartureId());
+
+			Id<Person> newDriver = Id.createPersonId("pt_" + SBBTransitQSimEngine.createId(line, route, departure));
+			Id<Vehicle> newVehicle = departure.getVehicleId();
+			boolean sameVehicle = newVehicle.equals(vehicle.getVehicle().getId());
+
+			MobsimDriverAgent nextDriver = (MobsimDriverAgent) internalInterface.getMobsim().getAgents().get(newDriver);
+
+			Iterator<PTPassengerAgent> it = passengers.iterator();
+
+			while (it.hasNext()) {
+
+				PTPassengerAgent passenger = it.next();
+
+				// Use the chained departure if it contains a stop the passenger uses as exit stop
+				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
+					continue;
+
+				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle));
+
+				// Chains can be defined on the same vehicle, only need to move the passenger if vehicle is different
+				if (!sameVehicle) {
+					nextDriver.getVehicle().addPassenger(passenger);
+					passenger.setVehicle(nextDriver.getVehicle());
+				}
+
+				it.remove();
+			}
+		}
+
+		if (!passengers.isEmpty()) {
+			throw new IllegalStateException("There are still passengers at stop " + stop.getStopFacility().getId() + " that were not relocated to the next vehicle: " + passengers);
+		}
+
 	}
 
     private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,

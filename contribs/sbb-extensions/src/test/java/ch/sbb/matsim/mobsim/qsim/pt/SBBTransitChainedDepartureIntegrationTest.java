@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -119,32 +119,51 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		List<Event> events = runScenario(removeChainedDepartures);
 
 		ActivityStartEvent p1 = new ActivityStartEvent(
-			76961, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
+			80822, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
 			"home", new Coord(679623, 5811182)
 		);
 
 		ActivityStartEvent p2 = new ActivityStartEvent(
-			71213, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
+			71522, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
 			"home", new Coord(970034, 6017382)
 		);
+
+		assert events.contains(p1) : "person 1 did not arrive at specified time";
+		assert events.contains(p2) : "person 2 did not arrive at specified time";
 
 	}
 
 	@Test
 	void withChainedDepartures() throws Exception {
 
-		List<Event> events = runScenario(scenario -> {});
+		List<Event> events = runScenario(scenario -> {
+		});
 
+		PersonContinuesInVehicleEvent c1 = new PersonContinuesInVehicleEvent(
+			32580, Id.createPersonId("person1"),
+			Id.createVehicleId("351761"), Id.createVehicleId("351714")
+		);
+		PersonContinuesInVehicleEvent c2 = new PersonContinuesInVehicleEvent(
+			36720, Id.createPersonId("person2"),
+			Id.createVehicleId("351871"), Id.createVehicleId("351874")
+		);
+
+		assert events.contains(c1) : "person 1 did not continue in vehicle";
+		assert events.contains(c2) : "person 2 did not continue in vehicle";
+
+		// This person is actual person faster, because of a different connection
 		ActivityStartEvent p1 = new ActivityStartEvent(
-			76902, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
+			77222, Id.createPersonId("person1"), Id.createLinkId("15m_8x41a_pt"), null,
 			"home", new Coord(679623, 5811182)
 		);
 
 		ActivityStartEvent p2 = new ActivityStartEvent(
-			71213, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
+			71522, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"), null,
 			"home", new Coord(970034, 6017382)
 		);
 
+		assert events.contains(p1) : "person 1 did not arrive at specified time";
+		assert events.contains(p2) : "person 2 did not arrive at specified time";
 	}
 
 }
