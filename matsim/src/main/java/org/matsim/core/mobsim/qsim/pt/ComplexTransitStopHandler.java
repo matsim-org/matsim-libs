@@ -31,12 +31,12 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  * Continuous queue model like transit stop handler using either serial or parallel doors operation mode.
- * 
- * 
+ *
+ *
  * @author aneumann
  */
 public class ComplexTransitStopHandler implements TransitStopHandler {
-	
+
 	private final static Logger log = LogManager.getLogger(ComplexTransitStopHandler.class);
 
 	private boolean doorsOpen = false;
@@ -46,7 +46,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private final double personEntersTime;
 	private final double personLeavesTime;
 	private final VehicleType.DoorOperationMode doorOperationMode;
-	
+
 	// TODO make it dynamic
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
@@ -59,20 +59,22 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
-		
+			List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
+									PassengerAccessEgress handler, MobsimVehicle vehicle) {
+
 		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){
-			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);			
+			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, relocatingPassengers, handler, vehicle);
 		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial){
-			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
+			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, relocatingPassengers, handler, vehicle);
 		} else {
 			log.info("Unimplemented door operation mode " + this.doorOperationMode + " set. Using parralel mode as default.");
-			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
-		}		
+			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, relocatingPassengers, handler, vehicle);
+		}
 	}
-	
-	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, 
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
+
+	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
+			List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
+			PassengerAccessEgress handler, MobsimVehicle vehicle){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -96,7 +98,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 			if ((cntAccess > 0) || (cntEgress > 0)) {
 				// somebody wants to leave or enter the veh
-				
+
 				if (cntEgress > 0) {
 
 					if (this.passengersLeavingTimeFraction < 1.0) {
@@ -128,7 +130,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 				} else {
 					this.passengersLeavingTimeFraction -= 1.0;
 					this.passengersLeavingTimeFraction = Math.max(0, this.passengersLeavingTimeFraction);
-					
+
 					if (cntAccess > 0) {
 
 						if (this.passengersEnteringTimeFraction < 1.0) {
@@ -162,7 +164,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 						this.passengersEnteringTimeFraction -= 1.0;
 						this.passengersEnteringTimeFraction = Math.max(0, this.passengersEnteringTimeFraction);
 					}
-				}				
+				}
 
 			} else {
 
@@ -194,11 +196,16 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 		}
 
+		for (PTPassengerAgent relocatingPassenger : relocatingPassengers) {
+			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getId(), now);
+		}
+
 		return stopTime;
 	}
-	
+
 	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
+			List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
+		  PassengerAccessEgress handler, MobsimVehicle vehicle){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -318,6 +325,10 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 			}
 
+		}
+
+		for (PTPassengerAgent relocatingPassenger : relocatingPassengers) {
+			handler.handlePassengerRelocating(relocatingPassenger, vehicle, stop.getId(), now);
 		}
 
 		return stopTime;
