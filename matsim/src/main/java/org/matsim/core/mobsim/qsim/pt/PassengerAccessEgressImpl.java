@@ -249,7 +249,8 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
 					continue;
 
-				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle));
+				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle,
+					route.getStops().getFirst().getStopFacility().getId()));
 
 				nextVehicle.addPassenger(passenger);
 				passenger.setVehicle(nextVehicle);

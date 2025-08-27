@@ -26,6 +26,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
@@ -141,11 +142,14 @@ public class SBBTransitChainedDepartureIntegrationTest {
 
 		PersonContinuesInVehicleEvent c1 = new PersonContinuesInVehicleEvent(
 			32580, Id.createPersonId("person1"),
-			Id.createVehicleId("351761"), Id.createVehicleId("351714")
+			Id.createVehicleId("351761"), Id.createVehicleId("351714"),
+			Id.create("f15", TransitStopFacility.class)
+
 		);
 		PersonContinuesInVehicleEvent c2 = new PersonContinuesInVehicleEvent(
 			36720, Id.createPersonId("person2"),
-			Id.createVehicleId("351871"), Id.createVehicleId("351874")
+			Id.createVehicleId("351871"), Id.createVehicleId("351874"),
+			Id.create("f74", TransitStopFacility.class)
 		);
 
 		assert events.contains(c1) : "person 1 did not continue in vehicle";

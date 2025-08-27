@@ -182,7 +182,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
 					continue;
 
-				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle));
+				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(),
+					vehicle.getVehicle().getId(), newVehicle, route.getStops().getFirst().getStopFacility().getId()));
 
 				// Chains can be defined on the same vehicle, only need to move the passenger if vehicle is different
 				if (!sameVehicle) {

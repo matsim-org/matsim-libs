@@ -20,6 +20,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.VehicleType;
@@ -132,11 +133,13 @@ public class ChainedDepartureIntegrationTest {
 		assertThat(events)
 			.contains(new PersonContinuesInVehicleEvent(
 				32581, Id.createPersonId("person1"),
-				Id.createVehicleId("351761"), Id.createVehicleId("351714")
+				Id.createVehicleId("351761"), Id.createVehicleId("351714"),
+				Id.create("f15", TransitStopFacility.class)
 			))
 			.contains(new PersonContinuesInVehicleEvent(
 				36362, Id.createPersonId("person2"),
-				Id.createVehicleId("351871"), Id.createVehicleId("351874")
+				Id.createVehicleId("351871"), Id.createVehicleId("351874"),
+				Id.create("f74", TransitStopFacility.class)
 			))
 			.contains(p1)
 			.contains(p2);
