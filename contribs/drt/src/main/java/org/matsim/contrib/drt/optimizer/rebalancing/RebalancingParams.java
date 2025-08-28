@@ -30,8 +30,6 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
-import com.google.common.base.Preconditions;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -48,6 +46,19 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 			+ " Must be positive. Default is 1800 s. Expects an Integer Value")
 	@Positive
 	private int interval = 1800;// [s]
+
+	@Parameter
+	@Comment("Specifies the minimum duration (seconds) a vehicle needs to be idle in order to be available for relocation.")
+	@PositiveOrZero
+	private double rebalancingTimeout = 0;
+
+	@Parameter
+	@Comment("Specifies the _remaining_ duration (seconds) a vehicle needs to be idle before the next task in order to be rebalanced. " +
+			"This can be used to avoid rebalancing vehicles within smaller time gaps, e.g. before a prebooked stop. " +
+			"This only applies to idle times that are followed by additional tasks (i.e., inter-task gaps). " +
+			"Idle times at the end of the schedule are not affected by this threshold. Default is 3600 [s].")
+	@PositiveOrZero
+	private double rebalancingMinIdleGap = 3600;
 
 	@Parameter
 	@Comment(
@@ -118,9 +129,6 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-
-		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
-				"minServiceTime must be greater than maxTimeBeforeIdle");
 	}
 
 	public RebalancingStrategyParams getRebalancingStrategyParams() {
@@ -160,6 +168,22 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 
 	public void setTargetLinkSelection(@NotNull TargetLinkSelection targetLinkSelection) {
 		this.targetLinkSelection = targetLinkSelection;
+	}
+
+	public double getRebalancingTimeout() {
+		return rebalancingTimeout;
+	}
+
+	public void setRebalancingTimeout(double rebalancingTimeout) {
+		this.rebalancingTimeout = rebalancingTimeout;
+	}
+
+	public double getRebalancingMinIdleGap() {
+		return rebalancingMinIdleGap;
+	}
+
+	public void setRebalancingMinIdleGap(double rebalancingMinIdleGap) {
+		this.rebalancingMinIdleGap = rebalancingMinIdleGap;
 	}
 
 	public ZoneSystemParams getZoneSystemParams() {
