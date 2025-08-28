@@ -542,6 +542,10 @@ import org.matsim.vehicles.VehicleType;
 		return auxiliaryCarrier;
 	}
 
+	//TODO: Im am really sure, that this is totally inefficient. We add a lot of eventsHandlers -.-
+	//It should be possible to just have a few eventsHandler doing the job for all Shipments, etc.
+	//This was I think different in the past, where we had not have the events and thus had to pass a lot of information through for the shipmentLog.
+	//During refactoring this has moved to the eventshandler stuff  -.- KMT Aug'25
 	private void addDistributionEventHandlers(Tour.TourActivity tourActivity, LspShipment lspShipment, LSPCarrierResource resource, Tour tour) {
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
