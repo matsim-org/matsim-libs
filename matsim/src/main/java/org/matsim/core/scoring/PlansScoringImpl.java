@@ -32,12 +32,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 
 
 /**
- * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
+ * A {@link ControllerListener} that manages the
  * scoring of plans in every iteration. Basically it integrates the
  * {@link org.matsim.core.scoring.ScoringFunctionsForPopulation} with the
  * {@link org.matsim.core.controler.Controler}.
@@ -87,8 +88,8 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 		if (scoringConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controllerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && (event.getIteration() % writePlansInterval == 0 || event.isLastIteration())) {
-				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml.gz"));
-				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.txt.gz"));
+				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml", controllerConfigGroup.getCompressionType()));
+				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.txt", controllerConfigGroup.getCompressionType()));
 			}
 		}
 		if (scoringConfigGroup.isMemorizingExperiencedPlans()) {

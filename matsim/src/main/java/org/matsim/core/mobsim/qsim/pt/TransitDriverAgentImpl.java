@@ -43,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Iterator;
 import java.util.ListIterator;
 
 /**
@@ -163,6 +164,9 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 		eventsManager.processEvent(
 			new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
+
+		handleEndRoute(now);
+
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();
 			if (this.departureTime < now) {
@@ -182,8 +186,27 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 
 			this.state = MobsimAgent.State.ACTIVITY;
 			this.departureTime = Double.POSITIVE_INFINITY;
-
 		}
+	}
+
+	@Override
+	void setWaitForDeparture() {
+		// The activity end time is set to infinity, so the agent will not be handled by the activity engine.
+		// endActivity needs to be called by other means to let the agent depart
+		departureTime = Double.POSITIVE_INFINITY;
+	}
+
+	void setReadyForDeparture(double now) {
+		departureTime = now;
+	}
+
+	/**
+	 * Called when one TransitRoute ends, the driver might continue with another as part of the Umlauf.
+	 */
+	protected void handleEndRoute(double now) {
+
+		accessEgress.relocatePassengers( this, departure.getChainedDepartures(), now);
+
 	}
 
 	private void setNextLeg() {

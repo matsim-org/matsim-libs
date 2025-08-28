@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  * MatsimServices.java
@@ -30,7 +29,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -72,10 +71,22 @@ public interface MatsimServices extends IterationCounter {
 
 	StrategyManager getStrategyManager();
 
-	OutputDirectoryHierarchy getControlerIO();
+	OutputDirectoryHierarchy getControllerIO();
+
+	@Deprecated(since = "2025-07-19")
+	default OutputDirectoryHierarchy getControlerIO() {
+		return this.getControllerIO();
+	}
 
 	ExecutionContext getSimulationContext();
 
 	void addControlerListener(ControlerListener controlerListener);
+
+	void addControllerListener(ControllerListener controllerListener);
+
+	@Deprecated(since = "2025-07-19")
+	default void addControlerListener(ControllerListener controllerListener) {
+		this.addControllerListener(controllerListener);
+	}
 
 }

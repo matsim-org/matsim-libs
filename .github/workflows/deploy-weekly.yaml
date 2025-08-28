@@ -1,6 +1,7 @@
 name: deploy-weekly
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '30 0 * * 1' # Mon 0:30 UTC
 

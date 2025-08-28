@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
@@ -132,7 +132,7 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public OutputDirectoryHierarchy getControlerIO() {
+	public OutputDirectoryHierarchy getControllerIO() {
 		return injector.getInstance(OutputDirectoryHierarchy.class);
 	}
 
@@ -142,8 +142,8 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public void addControlerListener(ControlerListener controlerListener) {
-		((NewControler) injector.getInstance(ControlerI.class)).addControlerListener(controlerListener);
+	public void addControllerListener(ControllerListener controllerListener) {
+		((NewControler) injector.getInstance(ControlerI.class)).addControllerListener(controllerListener);
 	}
 
 	@Override

@@ -25,7 +25,10 @@ import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
 import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
@@ -92,7 +95,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controller(),
 							getter.get(Network.class), getter.getModal(FleetSpecification.class),
 							getter.getModal(DrtEventSequenceCollector.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
+			addControllerListenerBinding().to(modalKey(DrtSpeedUp.class));
 		});
 
 		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
@@ -130,6 +133,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
 			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().getDefaultRequestDimension());
 		})).asEagerSingleton();
+
+		boolean scheduleWaitBeforeDrive = drtCfg.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter ->
+			new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
 
 	}
 }

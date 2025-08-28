@@ -148,7 +148,7 @@ public final class ExampleWithinDayController implements StartupListener {
 			@Override
 			public void install() {
 				install(new WithinDayModule());
-				addControlerListenerBinding().to(ExampleWithinDayController.class);
+				addControllerListenerBinding().to(ExampleWithinDayController.class);
 
 				addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 

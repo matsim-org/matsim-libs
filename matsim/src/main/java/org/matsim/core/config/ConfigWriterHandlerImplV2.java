@@ -130,7 +130,7 @@ class ConfigWriterHandlerImplV2 extends ConfigWriterHandler {
 					} else if ( pSet instanceof ActivityParams ) {
 						comparisonPSet = ((ScoringParameterSet) comparisonModule).getOrCreateActivityParams(((ActivityParams) pSet).getActivityType());
 					} else if ( pSet instanceof RoutingConfigGroup.TeleportedModeParams ) {
-						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams(((RoutingConfigGroup.TeleportedModeParams) pSet).getMode() ) ;
+						comparisonPSet = ((RoutingConfigGroup) comparisonModule).getOrCreateModeRoutingParams( ((RoutingConfigGroup.TeleportedModeParams) pSet).getMode(), verbosity ) ;
 					} else {
 						try {
 							comparisonPSet = pSet.getClass().newInstance();

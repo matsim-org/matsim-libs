@@ -27,15 +27,13 @@ import gnu.trove.list.array.TDoubleArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
-import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
@@ -84,16 +82,16 @@ final class ScoringFunctionsForPopulation implements BasicEventHandler {
 	}
 
 	@Inject
-	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, ComputeNode computeNode,
+	ScoringFunctionsForPopulation(ControllerListenerManager controllerListenerManager, ComputeNode computeNode,
 								  EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 								  Population population, ScoringFunctionFactory scoringFunctionFactory, Config config) {
 		this.computeNode = computeNode;
 		ControllerConfigGroup controllerConfigGroup = config.controller();
 
 		if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.IterationStarts) {
-			controlerListenerManager.addControlerListener((IterationStartsListener) event -> init());
+			controllerListenerManager.addControllerListener((IterationStartsListener) event -> init());
 		} else if (controllerConfigGroup.getEventTypeToCreateScoringFunctions() == ControllerConfigGroup.EventTypeToCreateScoringFunctions.BeforeMobsim) {
-			controlerListenerManager.addControlerListener((BeforeMobsimListener) event -> init());
+			controllerListenerManager.addControllerListener((BeforeMobsimListener) event -> init());
 		} else {
 			throw new RuntimeException("Unknown approach when to create the scoring functions for population. Aborting...");
 		}
@@ -185,6 +183,7 @@ final class ScoringFunctionsForPopulation implements BasicEventHandler {
 		if (o instanceof TeleportationArrivalEvent) this.legsDelegate.handleEvent((TeleportationArrivalEvent) o);
 		if (o instanceof TransitDriverStartsEvent) this.legsDelegate.handleEvent((TransitDriverStartsEvent) o);
 		if (o instanceof PersonEntersVehicleEvent) this.legsDelegate.handleEvent((PersonEntersVehicleEvent) o);
+		if (o instanceof PersonContinuesInVehicleEvent e) this.legsDelegate.handleEvent(e);
 		if (o instanceof VehicleArrivesAtFacilityEvent) this.legsDelegate.handleEvent((VehicleArrivesAtFacilityEvent) o);
 		if (o instanceof VehicleEntersTrafficEvent) this.legsDelegate.handleEvent((VehicleEntersTrafficEvent) o);
 		if (o instanceof VehicleLeavesTrafficEvent) this.legsDelegate.handleEvent((VehicleLeavesTrafficEvent) o);

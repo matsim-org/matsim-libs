@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 

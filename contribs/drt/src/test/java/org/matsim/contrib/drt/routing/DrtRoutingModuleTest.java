@@ -82,16 +82,16 @@ public class DrtRoutingModuleTest {
 		final double networkTravelSpeed = 0.83333;
 		final double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
-				networkTravelSpeed, beelineFactor);
+				networkTravelSpeed, beelineFactor, null);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
 		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
                 drtCfg.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-		defaultConstraintsSet.maxTravelTimeBeta = 5 * 60;
-		defaultConstraintsSet.maxWaitTime = 5 * 60;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+		defaultConstraintsSet.setMaxTravelTimeBeta(5 * 60);
+		defaultConstraintsSet.setMaxWaitTime(5 * 60);
 
 		DvrpLoadType loadType = new IntegerLoadType("passengers");
 		DvrpLoadFromTrip loadCreator = new DefaultDvrpLoadFromTrip(loadType, "passengers");
@@ -104,7 +104,7 @@ public class DrtRoutingModuleTest {
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(
-				defaultConstraintsSet.maxWalkDistance,
+				defaultConstraintsSet.getMaxWalkDistance(),
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
 		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
 				new SpeedyDijkstraFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
@@ -243,44 +243,37 @@ public class DrtRoutingModuleTest {
 
 	@Test
 	void testRouteDescriptionHandling() {
-		String oldRouteFormat = "600 400";
-		String newRouteFormatV1 = "{\"maxWaitTime\":600.0,\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]}";
-
-		String newRouteFormatV2 = "{\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
-				"\"constraints\":{" +
-				"\"maxTravelTime\":\"Infinity\"," +
-				"\"maxRideTime\":\"Infinity\"," +
-				"\"maxWaitTime\":600.0," +
-				"\"maxPickupDelay\":\"Infinity\"," +
-				"\"lateDiversionThreshold\":0.0" +
-				"}}";
+		String newRouteFormatV3 =
+				"{" +
+					"\"directRideTime\":400.0,\"unsharedPath\":[\"a\",\"b\",\"c\"]," +
+					"\"constraints\":" +
+					"{" +
+						"\"allowRejection\":\"true\"," +
+						"\"maxPickupDelay\":\"120\"," +
+						"\"latestStartTime\":\"4200\"," +
+						"\"maxRideDuration\":\"900\"," +
+						"\"earliestStartTime\":\"3600\"," +
+						"\"lateDiversionThreshold\":\"200\"," +
+						"\"latestArrivalTime\":\"7200\"" +
+					"}" +
+				"}";
 
 		Scenario scenario = createTestScenario();
-		ActivityFacilities facilities = scenario.getActivityFacilities();
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
-		Facility hf = FacilitiesUtils.toFacility(h, facilities);
 
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
-		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
 		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
-		drtRoute.setRouteDescription(oldRouteFormat);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-
-		drtRoute.setRouteDescription(newRouteFormatV1);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
-
-		drtRoute.setRouteDescription(newRouteFormatV2);
-		Assertions.assertTrue(drtRoute.getConstraints().maxWaitTime() == 600.);
-		Assertions.assertTrue(drtRoute.getDirectRideTime() == 400);
-		Assertions.assertTrue(drtRoute.getUnsharedPath().equals(Arrays.asList("a", "b", "c")));
-
+		drtRoute.setRouteDescription(newRouteFormatV3);
+        Assertions.assertEquals(400, drtRoute.getDirectRideTime());
+        Assertions.assertEquals(drtRoute.getUnsharedPath(), Arrays.asList("a", "b", "c"));
+        Assertions.assertEquals(600., drtRoute.getConstraints().latestStartTime() - drtRoute.getConstraints().earliestStartTime());
+        Assertions.assertEquals(7200, drtRoute.getConstraints().latestArrivalTime());
+        Assertions.assertEquals(200, drtRoute.getConstraints().lateDiversionThreshold());
+        Assertions.assertEquals(120, drtRoute.getConstraints().maxPickupDelay());
 	}
 
 	/**
@@ -289,7 +282,7 @@ public class DrtRoutingModuleTest {
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(200);
 		drtConfigGroup.setTransitStopFile(utils.getClassInputDirectory() + "testCottbus/drtstops.xml.gz");
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);

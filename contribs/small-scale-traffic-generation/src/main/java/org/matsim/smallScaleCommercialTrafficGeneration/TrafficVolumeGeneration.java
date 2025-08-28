@@ -32,10 +32,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ricardo Ewert
@@ -51,52 +48,7 @@ public class TrafficVolumeGeneration {
 	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
 	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
 
-	public static class TrafficVolumeKey {
-		private final String zone;
-		private final String modeORvehType;
-
-		public TrafficVolumeKey(String zone, String modeORvehType) {
-			super();
-			this.zone = zone;
-			this.modeORvehType = modeORvehType;
-		}
-
-		public String getZone() {
-			return zone;
-		}
-
-		public String getModeORvehType() {
-			return modeORvehType;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((zone == null) ? 0 : zone.hashCode());
-			result = prime * result + ((modeORvehType == null) ? 0 : modeORvehType.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			TrafficVolumeKey other = (TrafficVolumeKey) obj;
-			if (zone == null) {
-				if (other.zone != null)
-					return false;
-			} else if (!zone.equals(other.zone))
-				return false;
-			if (modeORvehType == null) {
-				return other.modeORvehType == null;
-			} else return modeORvehType.equals(other.modeORvehType);
-		}
-	}
+	public record TrafficVolumeKey(String zone, String modeORvehType) {}
 
 	static TrafficVolumeKey makeTrafficVolumeKey(String zone, String modeORvehType) {
 		return new TrafficVolumeKey(zone, modeORvehType);
@@ -220,10 +172,20 @@ public class TrafficVolumeGeneration {
 			String[] header = new String[] { "zoneID", "mode/vehType", "1", "2", "3", "4", "5" };
 			JOIN.appendTo(writer, header);
 			writer.write("\n");
-			for (TrafficVolumeKey trafficVolumeKey : trafficVolume.keySet()) {
+			// Sort the entries by zone and mode/vehType to ensure a consistent order in the output file
+			List<Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>>> sortedEntries =
+				trafficVolume.entrySet()
+					.stream()
+					.sorted(
+						Comparator.comparing((Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>> entry) -> entry.getKey().zone())
+							.thenComparing(entry -> entry.getKey().modeORvehType())
+					)
+					.toList();
+			for (Map.Entry<TrafficVolumeKey, Object2DoubleMap<Integer>> entry : sortedEntries) {
+				TrafficVolumeKey trafficVolumeKey = entry.getKey();
 				List<String> row = new ArrayList<>();
-				row.add(trafficVolumeKey.getZone());
-				row.add(trafficVolumeKey.getModeORvehType());
+				row.add(trafficVolumeKey.zone());
+				row.add(trafficVolumeKey.modeORvehType());
 				int count = 1;
 				while (count < 6) {
 					row.add(String.valueOf((int) trafficVolume.get(trafficVolumeKey).getDouble(count)));

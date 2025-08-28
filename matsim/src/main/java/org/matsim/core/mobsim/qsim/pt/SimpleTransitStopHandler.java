@@ -42,7 +42,8 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-									List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress accessEgress, MobsimVehicle vehicle) {
+									List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
+									PassengerAccessEgress accessEgress, MobsimVehicle vehicle) {
 		int cntEgress = leavingPassengers.size();
 		int cntAccess = enteringPassengers.size();
 		double stopTime = 0;
@@ -56,6 +57,9 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 			}
 			for (PTPassengerAgent passenger : enteringPassengers) {
 				accessEgress.handlePassengerEntering(passenger, vehicle, stop.getId(), now);
+			}
+			for (PTPassengerAgent passenger : relocatingPassengers) {
+				accessEgress.handlePassengerRelocating(passenger, vehicle, stop.getId(), now);
 			}
 		}
 		this.lastHandledStop = stop;

@@ -32,7 +32,7 @@ import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.CommandLine;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;

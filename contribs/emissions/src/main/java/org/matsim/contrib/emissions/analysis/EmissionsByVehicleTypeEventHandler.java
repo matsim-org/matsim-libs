@@ -13,7 +13,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 

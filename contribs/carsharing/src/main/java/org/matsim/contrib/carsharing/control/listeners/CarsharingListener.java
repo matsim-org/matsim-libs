@@ -40,7 +40,7 @@ public class CarsharingListener implements IterationEndsListener {
 
 		Map<Id<Person>, AgentRentals> agentRentalsMap = demandHandler.getAgentRentalsMap();
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(
-				this.controler.getControlerIO().getIterationFilename(event.getIteration(), "CS.txt"));
+				this.controler.getControllerIO().getIterationFilename(event.getIteration(), "CS.txt"));
 		try {
 			outLink.write(
 					"personID,carsharingType,startTime,endTIme,startLink,pickupLink,dropoffLink,endLink,startCoordX,startCoordY,"
@@ -71,7 +71,7 @@ public class CarsharingListener implements IterationEndsListener {
 
 		if (event.getIteration() == controler.getConfig().controller().getLastIteration()) {
 			final BufferedWriter outLinkStats = IOUtils
-					.getBufferedWriter(this.controler.getControlerIO().getOutputFilename("CS.txt"));
+					.getBufferedWriter(this.controler.getControllerIO().getOutputFilename("CS.txt"));
 			try {
 				outLinkStats.write("iteration,numberOfRentals");
 

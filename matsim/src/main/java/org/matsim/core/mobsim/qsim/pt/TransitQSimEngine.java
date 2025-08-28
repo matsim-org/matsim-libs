@@ -20,7 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import jakarta.inject.Inject;
+import java.util.*;
+import java.util.Map.Entry;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
@@ -46,6 +49,7 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -102,7 +106,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	TransitQSimEngine(Netsim queueSimulation) {
 		this(queueSimulation, new SimpleTransitStopHandlerFactory(),
 			new ReconstructingUmlaufBuilder(queueSimulation.getScenario()),
-			new TransitStopAgentTracker(queueSimulation.getEventsManager()),
+			new TransitStopAgentTracker(queueSimulation.getEventsManager(), queueSimulation.getScenario().getTransitSchedule()),
 			TimeInterpretation.create(queueSimulation.getScenario().getConfig()),
 			new DefaultTransitDriverAgentFactory());
 	}
@@ -159,7 +163,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				Id<Link> startLinkId = umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId();
 				if (partition.containsLink(startLinkId)) {
-					createAndScheduleVehicleAndDriver(mobsim, umlauf, basicVehicle);
+					createAndScheduleVehicleAndDriver(mobsim, umlauf, basicVehicle, umlaufCache.getDeparturesDependingOnChains());
 				}
 			}
 		}
@@ -185,7 +189,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		return umlaeufe;
 	}
 
-	private void createAndScheduleVehicleAndDriver(InsertableMobsim mobsim, Umlauf umlauf, Vehicle vehicle) {
+	private void createAndScheduleVehicleAndDriver(InsertableMobsim mobsim, Umlauf umlauf, Vehicle vehicle, Object2IntMap<Id<Departure>> departuresDependingOnChains) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
 		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, internalInterface, agentTracker);
 		veh.setDriver(driver);
@@ -195,6 +199,11 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
 		mobsim.addParkedVehicle(veh, startLinkId);
 		mobsim.insertAgentIntoMobsim(driver);
+
+		// A departure that depends on a previous chain cannot depart before the first connecting leg has ended
+		if (departuresDependingOnChains.containsKey(umlauf.getUmlaufStuecke().getFirst().getDeparture().getId())) {
+			driver.setWaitForDeparture();
+		}
 	}
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {

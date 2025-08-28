@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
  * @author Michal Maciejewski (michalm)
  */
 @NodeSingleton
-public class QSimScopeForkJoinPoolHolder implements MobsimBeforeCleanupListener {
+public class QSimScopeForkJoinPoolHolder implements QsimScopeForkJoinPool {
 	private final ForkJoinPool forkJoinPool;
 
 	public QSimScopeForkJoinPoolHolder(int numberOfThreads) {

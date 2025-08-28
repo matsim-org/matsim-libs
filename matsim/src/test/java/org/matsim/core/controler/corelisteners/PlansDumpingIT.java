@@ -48,17 +48,17 @@ public class PlansDumpingIT {
 
         c.run();
 
-		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
-		assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
+		assertFalse(new File(c.getControllerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(10, "plans.xml.gz")).exists());
 	}
 
 	@Test
@@ -72,17 +72,17 @@ public class PlansDumpingIT {
 
         c.run();
 
-		assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
-		assertFalse(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertFalse(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
+		assertFalse(new File(c.getControllerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+		assertFalse(new File(c.getControllerIO().getIterationFilename(10, "plans.xml.gz")).exists());
 	}
 
 	@Test
@@ -96,16 +96,16 @@ public class PlansDumpingIT {
 
         c.run();
 
-		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
-		assertTrue(new File(c.getControlerIO().getIterationFilename(2, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(3, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(4, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(5, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(6, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(7, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(8, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(9, "plans.xml.gz")).exists());
-		assertTrue(new File(c.getControlerIO().getIterationFilename(10, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(0, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
+		assertTrue(new File(c.getControllerIO().getIterationFilename(2, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(3, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(4, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(5, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(6, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(7, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(8, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(9, "plans.xml.gz")).exists());
+		assertTrue(new File(c.getControllerIO().getIterationFilename(10, "plans.xml.gz")).exists());
 	}
 }

@@ -2,7 +2,7 @@ package org.matsim.core.network.turnRestrictions;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -88,11 +88,11 @@ public final class TurnRestrictionsContext {
      * Builds a graph from a network considering all links without caring about
      * allowedModes but considering {@link DisallowedNextLinks} (aka turn
      * restrictions) of the given {@code mode}.
-     * 
+     *
      * If mode == null and network contains turn restrictions, turn
      * restrictions of all modes are merged. This could result in a network which
      * is more restrictive than necessary for routing.
-     * 
+     *
      * @param network
      * @param mode
      * @return
@@ -157,6 +157,7 @@ public final class TurnRestrictionsContext {
             // see if there are already colored link copies available for this starting link
             List<ColoredLink> coloredLinks = context.coloredLinksPerLinkMap.get(startingLink.getId());
             if (coloredLinks != null) {
+                coloredLinks = new ArrayList<>(coloredLinks);
                 for (ColoredLink coloredLink : coloredLinks) {
                     // optimization: re-point toNode instead of re-applying full turn restrictions
                     if (coloredLink.toColoredNode == null) {
@@ -284,8 +285,16 @@ public final class TurnRestrictionsContext {
                     ColoredNode toNode = newlyColoredNodes.get(outLink.getToNode().getId());
                     newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, toNode, null);
                 } else {
-                    Node toNode = outLink.getToNode();
-                    newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, null, toNode);
+                    if(replacedOutLink != null) {
+                        // we are on a link exiting the current colored subgraph (to node is real) but the link is also
+                        // a replaced one, which means we should directly enter into the next turn restriction by entering
+                        // the respective subgraph through the existing colored node. hrewald & nkuehnel, May 2025
+                        ColoredNode toNode = replacedOutLink.toColoredNode;
+                        newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, toNode, null);
+                    } else {
+                        Node toNode = outLink.getToNode();
+                        newlyColoredLink = new ColoredLink(linkIndex, outLink, fromNode, null, null, toNode);
+                    }
                 }
                 fromNode.outLinks.add(newlyColoredLink);
                 context.coloredLinks.add(newlyColoredLink);

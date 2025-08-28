@@ -39,10 +39,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
@@ -123,7 +120,6 @@ public final class TransitAgent implements DistributedMobsimAgent, MobsimDriverP
 	public Double getExpectedTravelDistance() {
 		return basicAgentDelegate.getExpectedTravelDistance();
 	}
-
 	@Override
 	public PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
@@ -197,6 +193,11 @@ public final class TransitAgent implements DistributedMobsimAgent, MobsimDriverP
 	@Override
 	public boolean getExitAtStop(TransitStopFacility stop) {
 		return transitAgentDelegate.getExitAtStop(stop);
+	}
+
+	@Override
+	public boolean getRelocationAtStop(TransitStopFacility stop) {
+		return transitAgentDelegate.getRelocationAtStop(stop);
 	}
 
 	@Override

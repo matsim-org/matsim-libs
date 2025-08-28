@@ -24,6 +24,7 @@ import com.google.common.base.MoreObjects;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -37,12 +38,6 @@ import java.util.stream.Collectors;
 public class DrtRequest implements PassengerRequest {
 	private final Id<Request> id;
 	private final double submissionTime;
-	private final double earliestStartTime;
-	private final double latestStartTime;
-	private final double latestArrivalTime;
-	private final double maxRideDuration;
-	private final double maxPickupDelay;
-	private final double lateDiversionThreshold;
 
 	private final List<Id<Person>> passengerIds = new ArrayList<>();
 	private final String mode;
@@ -51,19 +46,16 @@ public class DrtRequest implements PassengerRequest {
 	private final Link toLink;
 	private final DvrpLoad load;
 
+	private final DrtRouteConstraints constraints;
+
 	private DrtRequest(Builder builder) {
 		id = builder.id;
 		submissionTime = builder.submissionTime;
-		earliestStartTime = builder.earliestStartTime;
-		latestStartTime = builder.latestStartTime;
-		latestArrivalTime = builder.latestArrivalTime;
-		maxRideDuration = builder.maxRideDuration;
+		constraints = builder.constraints;
 		passengerIds.addAll(builder.passengerIds);
 		mode = builder.mode;
 		fromLink = builder.fromLink;
 		toLink = builder.toLink;
-		maxPickupDelay = builder.maxPickupDelay;
-		lateDiversionThreshold = builder.lateDiversionThreshold;
 		this.load = builder.load;
 	}
 
@@ -75,16 +67,11 @@ public class DrtRequest implements PassengerRequest {
 		Builder builder = new Builder();
 		builder.id = copy.getId();
 		builder.submissionTime = copy.getSubmissionTime();
-		builder.earliestStartTime = copy.getEarliestStartTime();
-		builder.latestStartTime = copy.getLatestStartTime();
-		builder.latestArrivalTime = copy.getLatestArrivalTime();
-		builder.maxRideDuration = copy.getMaxRideDuration();
 		builder.passengerIds = new ArrayList<>(copy.getPassengerIds());
 		builder.mode = copy.getMode();
 		builder.fromLink = copy.getFromLink();
 		builder.toLink = copy.getToLink();
-		builder.maxPickupDelay = copy.getMaxPickupDelay();
-		builder.lateDiversionThreshold = copy.getLateDiversionThreshold();
+		builder.constraints = copy.constraints;
 		builder.load = copy.load;
 		return builder;
 	}
@@ -101,25 +88,17 @@ public class DrtRequest implements PassengerRequest {
 
 	@Override
 	public double getEarliestStartTime() {
-		return earliestStartTime;
+		return constraints.earliestStartTime();
 	}
 
 	@Override
 	public double getLatestStartTime() {
-		return latestStartTime;
+		return constraints.latestStartTime();
 	}
 
-	public double getLatestArrivalTime() {
-		return latestArrivalTime;
+	public DrtRouteConstraints getConstraints() {
+		return constraints;
 	}
-
-	public double getMaxRideDuration() {
-		return maxRideDuration;
-	}
-
-	public double getMaxPickupDelay() {return maxPickupDelay;}
-
-	public double getLateDiversionThreshold() {return lateDiversionThreshold;}
 
 	@Override
 	public Link getFromLink() {
@@ -151,10 +130,10 @@ public class DrtRequest implements PassengerRequest {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
 				.add("submissionTime", submissionTime)
-				.add("earliestStartTime", earliestStartTime)
-				.add("latestStartTime", latestStartTime)
-				.add("latestArrivalTime", latestArrivalTime)
-				.add("maxRideDuration", maxRideDuration)
+				.add("earliestStartTime", constraints.earliestStartTime())
+				.add("latestStartTime", constraints.latestStartTime())
+				.add("latestArrivalTime", constraints.latestArrivalTime())
+				.add("maxRideDuration", constraints.maxRideDuration())
 				.add("passengerIds", passengerIds.stream().map(Object::toString).collect(Collectors.joining(",")))
 				.add("mode", mode)
 				.add("fromLink", fromLink)
@@ -165,13 +144,10 @@ public class DrtRequest implements PassengerRequest {
 	public static final class Builder {
 		private Id<Request> id;
 		private double submissionTime;
-		private double earliestStartTime;
-		private double latestStartTime;
-		private double latestArrivalTime;
-		private double maxRideDuration;
-		private double maxPickupDelay;
-		private double lateDiversionThreshold;
+
+		private DrtRouteConstraints constraints = DrtRouteConstraints.UNDEFINED;
 		private List<Id<Person>> passengerIds = new ArrayList<>();
+
 		private String mode;
 		private Link fromLink;
 		private Link toLink;
@@ -190,33 +166,8 @@ public class DrtRequest implements PassengerRequest {
 			return this;
 		}
 
-		public Builder earliestStartTime(double val) {
-			earliestStartTime = val;
-			return this;
-		}
-
-		public Builder latestStartTime(double val) {
-			latestStartTime = val;
-			return this;
-		}
-
-		public Builder latestArrivalTime(double val) {
-			latestArrivalTime = val;
-			return this;
-		}
-
-		public Builder maxRideDuration(double maxRideDuration) {
-			this.maxRideDuration = maxRideDuration;
-			return this;
-		}
-
-		public Builder maxPickupDelay(double maxPickupDelay) {
-			this.maxPickupDelay = maxPickupDelay;
-			return this;
-		}
-
-		public Builder lateDiversionThreshold(double lateDiversionThreshold) {
-			this.lateDiversionThreshold = lateDiversionThreshold;
+		public Builder constraints(DrtRouteConstraints val) {
+			constraints = val;
 			return this;
 		}
 

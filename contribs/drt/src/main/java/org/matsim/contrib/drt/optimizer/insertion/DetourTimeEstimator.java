@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.common.util.DistanceUtils;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -45,6 +46,15 @@ public interface DetourTimeEstimator {
 			duration += matrix.getTravelTime(from.getToNode(), to.getFromNode(), departureTime + duration);
 			duration += VrpPaths.getLastLinkTT(travelTime, to, departureTime + duration);
 			return duration / speedFactor;
+		};
+	}
+
+	static DetourTimeEstimator createExactEstimator(LeastCostPathCalculator router, TravelTime travelTime) {
+		return (from, to, departureTime) -> {
+			synchronized(router) {
+				return VrpPaths.calcAndCreatePath(from, to, departureTime,
+					router, travelTime).getTravelTime();
+			}
 		};
 	}
 

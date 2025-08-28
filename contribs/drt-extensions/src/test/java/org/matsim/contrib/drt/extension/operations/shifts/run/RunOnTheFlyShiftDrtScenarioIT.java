@@ -57,11 +57,11 @@ public class RunOnTheFlyShiftDrtScenarioIT {
                 drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
         drtWithShiftsConfigGroup.setStopDuration(30.);
-        defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-        defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-        defaultConstraintsSet.maxWaitTime = 600.;
-        defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-        defaultConstraintsSet.maxWalkDistance = 1000.;
+        defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+        defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+        defaultConstraintsSet.setMaxWaitTime(600.);
+        defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+        defaultConstraintsSet.setMaxWalkDistance(1000.);
         drtWithShiftsConfigGroup.setUseModeFilteredSubnetwork(false);
         drtWithShiftsConfigGroup.setVehiclesFile(fleetFile);
         drtWithShiftsConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
@@ -163,7 +163,7 @@ public class RunOnTheFlyShiftDrtScenarioIT {
                 this.bindModal(OnTheFlyScheduler.class).toProvider(modalProvider(getter ->
                         new OnTheFlyScheduler())).asEagerSingleton();
                 this.bindModal(ShiftScheduler.class).toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
-                this.addControlerListenerBinding().toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
+                this.addControllerListenerBinding().toProvider(modalProvider(getter -> getter.getModal(OnTheFlyScheduler.class)));
             }
         });
 

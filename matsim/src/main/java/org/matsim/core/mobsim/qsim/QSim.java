@@ -548,7 +548,7 @@ public final class QSim implements Netsim {
 					.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time)
-					+ " : #Veh=" + this.agentCounter.getLiving() + " lost="
+					+ " : #active agents=" + this.agentCounter.getLiving() + " lost="
 					+ this.agentCounter.getLost() + " simT=" + diffsim
 					+ "s realT=" + (diffreal) + "s; (s/r): "
 					+ (diffsim / (diffreal + Double.MIN_VALUE)));
