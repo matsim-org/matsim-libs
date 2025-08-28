@@ -78,7 +78,8 @@ public class SBBTransitDriverAgent extends TransitDriverAgentImpl {
 	protected void handleEndRoute(double now) {
 
 		// Delegates call to the correct access egress
-		accessEgress.relocatePassengers( this, getDeparture().getChainedDepartures(), now);
+		if (getDeparture() != null)
+			accessEgress.relocatePassengers( this, getDeparture().getChainedDepartures(), now);
 
 	}
 
