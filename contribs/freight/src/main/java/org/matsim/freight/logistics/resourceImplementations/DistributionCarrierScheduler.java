@@ -96,17 +96,38 @@ import org.matsim.vehicles.VehicleType;
 
 	@Override
 	protected void updateShipments() {
+		//collect all shipmentIds and the tourId they are assigned to.
+		Map<Id<LspShipment>, Id<Tour>> shipmentId2TourId = new HashMap<>();
+		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+			var tourId = scheduledTour.getTour().getId();
+			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+				if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
+					shipmentId2TourId.put(Id.create(serviceActivity.getService().getId().toString(), LspShipment.class), tourId);
+				} else if (tourElement instanceof Tour.Pickup pickupActivity) {
+					shipmentId2TourId.put(Id.create(pickupActivity.getShipment().getId().toString(), LspShipment.class), tourId);
+				}
+			}
+		}
+
+		if (shipmentId2TourId.size() != lspShipmentsToSchedule.size()) {
+			log.error("Number of scheduled shipments ({}) is different from the number of shipments to schedule ({}). " +
+				"This should not be!", shipmentId2TourId.size(), lspShipmentsToSchedule.size());
+		}
+
 		for (LspShipment lspShipment : lspShipmentsToSchedule) {
-			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-				Tour tour = scheduledTour.getTour();
+//			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+//				Tour tour = scheduledTour.getTour();
+				//fixme: Muss natürlich die Tour zum shipment sein!
+
+				Tour tour = carrier.getSelectedPlan().getScheduledTour(shipmentId2TourId.get(lspShipment.getId()));
 
 				switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
 					case serviceBased -> {
 						for (TourElement element : tour.getTourElements()) {
 							if (element instanceof Tour.ServiceActivity serviceActivity) {
 								if (Objects.equals(lspShipment.getId().toString(), serviceActivity.getService().getId().toString())) {
-									addShipmentLoadElement(lspShipment, tour);
-									addShipmentTransportElement(lspShipment, tour, serviceActivity);
+									addShipmentLoadElementServiceBased(lspShipment, tour);
+									addShipmentTransportElementServiceBased(lspShipment, tour, serviceActivity);
 									addShipmentUnloadElement(lspShipment, serviceActivity);
 									addDistributionEventHandlers(serviceActivity, lspShipment, resource, tour);
 								}
@@ -114,12 +135,21 @@ import org.matsim.vehicles.VehicleType;
 						}
 					}
 					case shipmentBased -> {
+						double beginOfTransport =0.;
 						for (TourElement element : tour.getTourElements()) {
+							if (element instanceof Tour.Pickup pickupActivity) {
+								if (Objects.equals(lspShipment.getId().toString(), pickupActivity.getShipment().getId().toString())) {
+									// Todo Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
+									addShipmentLoadElementShipmentBased(lspShipment, tour, pickupActivity);
+									beginOfTransport = pickupActivity.getExpectedArrival()+pickupActivity.getDuration();
+								}
+							}
+
 							if (element instanceof Tour.Delivery deliveryActivity) {
 								if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
 									// Todo Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
-									addShipmentLoadElement(lspShipment, tour);
-									addShipmentTransportElement(lspShipment, tour, deliveryActivity);
+//									addShipmentLoadElementServiceBased(lspShipment, tour);
+									addShipmentTransportElementShipmentBased(lspShipment, tour, deliveryActivity, beginOfTransport);
 									addShipmentUnloadElement(lspShipment, deliveryActivity);
 									addDistributionEventHandlers(deliveryActivity, lspShipment, resource, tour);
 								}
@@ -129,7 +159,7 @@ import org.matsim.vehicles.VehicleType;
 					default -> throw new IllegalStateException("Unexpected value: " + CarrierSchedulerUtils.getVrpLogic(carrier));
 				}
 			}
-		}
+//		}
 	}
 
 	/**
@@ -138,6 +168,7 @@ import org.matsim.vehicles.VehicleType;
 	 * In the end all of these tours are just added unified, and added to the carrier
 	 * <p>
 	 * It is the design by Tilmann Matteis.
+	 *
 	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
 	 */
 	private void scheduleCarrierBasedOnServices(ArrayList<LspShipment> shipmentsToSchedule) {
@@ -206,6 +237,7 @@ import org.matsim.vehicles.VehicleType;
 	 * This method builds the tours based on the {@link CarrierShipment}s.
 	 * This is the new (KMT) approach: Add all jobs and run one VRP.
 	 * <p>
+	 *
 	 * @param shipmentsToSchedule List of all shipments that needs to get schedules.s
 	 */
 	private void scheduleCarrierBasedOnShipments(ArrayList<LspShipment> shipmentsToSchedule) {
@@ -234,7 +266,7 @@ import org.matsim.vehicles.VehicleType;
 				}
 			} else {
 				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
-			//	throw new AssertionError();
+				//	throw new AssertionError();
 			}
 		}
 		if (earliestStartTime == Double.MAX_VALUE) {
@@ -261,7 +293,6 @@ import org.matsim.vehicles.VehicleType;
 		CarriersUtils.setJspritIterations(auxCarrier, jspritIterations);
 
 
-
 		CarrierSchedulerUtils.solveVrpWithJsprit(auxCarrier, scenario);
 
 		//Copy infos over to the Carrier.
@@ -283,7 +314,7 @@ import org.matsim.vehicles.VehicleType;
 			.setServiceDuration(lspShipment.getDeliveryServiceTime())
 			.build();
 		//ensure that the ids of the lspShipment and the carrierService are the same. This is needed for updating the LSPShipmentPlan
-		if (! Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
+		if (!Objects.equals(lspShipment.getId().toString(), carrierService.getId().toString())) {
 			log.error("Id of LspShipment: {} and CarrierService: {} do not match", lspShipment.getId().toString(), carrierService.getId().toString(),
 				new IllegalStateException("Id of LspShipment and CarrierService do not match"));
 		}
@@ -293,7 +324,7 @@ import org.matsim.vehicles.VehicleType;
 	/**
 	 * This method converts a LspShipment to a CarrierShipment.
 	 * Please note: This method may get removed in the future, in case that the LSPShipment and the CarrierShipment are merged. KMT'Aug'24
-
+	 *
 	 * @param lspShipment the LspShipment to convert
 	 * @return a CarrierShipment
 	 */
@@ -345,7 +376,7 @@ import org.matsim.vehicles.VehicleType;
 
 
 		//ensure that the ids of the lspShipment and the carrierShipment are the same. This is needed for updating the LSPShipmentPlan
-		if (! Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
+		if (!Objects.equals(lspShipment.getId().toString(), carrierShipment.getId().toString())) {
 			log.error("Id of LspShipment: {} and CarrierShipment: {} do not match", lspShipment.getId().toString(), carrierShipment.getId().toString(),
 				new IllegalStateException("Id of LspShipment and CarrierShipment do not match"));
 		}
@@ -353,7 +384,7 @@ import org.matsim.vehicles.VehicleType;
 	}
 
 
-	private void addShipmentLoadElement(LspShipment lspShipment, Tour tour) {
+	private void addShipmentLoadElementServiceBased(LspShipment lspShipment, Tour tour) {
 		LspShipmentUtils.ScheduledShipmentLoadBuilder builder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
 		builder.setResourceId(resource.getId());
 
@@ -362,7 +393,6 @@ import org.matsim.vehicles.VehicleType;
 				builder.setLogisticChainElement(element);
 			}
 		}
-
 
 		int startIndex = tour.getTourElements().indexOf(tour.getTourElements().indexOf(tour.getStart()));
 		Leg legAfterStart = (Leg) tour.getTourElements().get(startIndex + 1);
@@ -383,7 +413,49 @@ import org.matsim.vehicles.VehicleType;
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, load);
 	}
 
-	private void addShipmentTransportElement(LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
+	private void addShipmentLoadElementShipmentBased(LspShipment lspShipment, Tour tour, Tour.TourActivity pickupActivity) {
+		LspShipmentUtils.ScheduledShipmentLoadBuilder builder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
+		builder.setResourceId(resource.getId());
+
+		for (LogisticChainElement element : resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				builder.setLogisticChainElement(element);
+			}
+		}
+
+		builder.setStartTime(pickupActivity.getExpectedArrival());
+		builder.setEndTime(pickupActivity.getExpectedArrival() + pickupActivity.getDuration());
+
+		LspShipmentPlanElement load = builder.build();
+		String idString = load.getResourceId() + "" + load.getLogisticChainElement().getId() + load.getElementType();
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(Id.create(idString, LspShipmentPlanElement.class), load);
+	}
+
+	private void addShipmentTransportElementShipmentBased(LspShipment lspShipment, Tour tour, Tour.ShipmentBasedActivity tourActivity, double beginOfTransport) {
+
+		LspShipmentUtils.ScheduledShipmentTransportBuilder builder = LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
+		builder.setResourceId(resource.getId());
+
+		for (LogisticChainElement element : resource.getClientElements()) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
+				builder.setLogisticChainElement(element);
+			}
+		}
+
+		builder.setStartTime(beginOfTransport);
+		builder.setEndTime(tourActivity.getExpectedArrival());
+		builder.setCarrierId(carrier.getId());
+		builder.setFromLinkId(tour.getStartLinkId());
+		builder.setToLinkId(tourActivity.getLocation());
+		builder.setCarrierShipment(tourActivity.getShipment());
+
+		LspShipmentPlanElement transport = builder.build();
+		String idString = transport.getResourceId() + "" + transport.getLogisticChainElement().getId() + transport.getElementType();
+		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, transport);
+	}
+
+	private void addShipmentTransportElementServiceBased(LspShipment lspShipment, Tour tour, Tour.TourActivity tourActivity) {
 
 		LspShipmentUtils.ScheduledShipmentTransportBuilder builder = LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
 		builder.setResourceId(resource.getId());
@@ -408,10 +480,10 @@ import org.matsim.vehicles.VehicleType;
 		builder.setCarrierId(carrier.getId());
 		builder.setFromLinkId(tour.getStartLinkId());
 		builder.setToLinkId(tourActivity.getLocation());
-		switch( tourActivity ){
-			case Tour.ServiceActivity serviceActivity -> builder.setCarrierService( serviceActivity.getService() );
-			case Tour.ShipmentBasedActivity shipment -> builder.setCarrierShipment( shipment.getShipment() );
-			default ->  throw new IllegalStateException("Unexpected value: " + tourActivity);
+		switch (tourActivity) {
+			case Tour.ServiceActivity serviceActivity -> builder.setCarrierService(serviceActivity.getService());
+			case Tour.ShipmentBasedActivity shipment -> builder.setCarrierShipment(shipment.getShipment());
+			default -> throw new IllegalStateException("Unexpected value: " + tourActivity);
 			// yyyy: At the jsprit level, it makes sense to have these different since services run about 10x faster than shipments.  However,
 			// at the matsim level we could consider to either only have shipments (from depot to xx for what used to be services), or only have
 			// services. See also MATSim issue #3510  kai/kai, oct'24
@@ -422,12 +494,12 @@ import org.matsim.vehicles.VehicleType;
 		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, transport);
 	}
 
-	private void addShipmentUnloadElement(LspShipment tuple, Tour.TourActivity tourActivity) {
+	private void addShipmentUnloadElement(LspShipment lspShipment, Tour.TourActivity tourActivity) {
 		LspShipmentUtils.ScheduledShipmentUnloadBuilder builder = LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
 		builder.setResourceId(resource.getId());
 
 		for (LogisticChainElement element : resource.getClientElements()) {
-			if (element.getIncomingShipments().getLspShipmentsWTime().contains(tuple)) {
+			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
 				builder.setLogisticsChainElement(element);
 			}
 		}
@@ -435,23 +507,6 @@ import org.matsim.vehicles.VehicleType;
 		final double startTime = tourActivity.getExpectedArrival();
 		final double endTime = startTime + tourActivity.getDuration();
 		//Todo: Check if it also works with shipmentBased activity, or if we in that case need the way with the switch-case and the data from the shipmentBasedActivity. KMT Oct'24
-
-//    switch( tourActivity ){
-//      case Tour.ServiceActivity serviceActivity -> {
-//        startTime = tourActivity.getExpectedArrival();
-//        endTime = startTime + tourActivity.getDuration();
-//
-////        startTime = serviceActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
-////        endTime = startTime + serviceActivity.getDuration();
-//      }
-//      case Tour.ShipmentBasedActivity shipmentBasedActivity -> {
-//        //Todo: Not tested ; maybe we need to take the data from the shipment itself (as is was originally done with the service: serviceActivity.getService() ,..... KMT Oct'24
-//        startTime = shipmentBasedActivity.getExpectedArrival(); //Why is there also a arrivalTime in the Tour.ServiceActivity? Why do not take the date in TourActivity.getExpectedArrivalTime()? KMT Oct'24
-//        endTime = startTime + shipmentBasedActivity.getDuration();
-//
-//      }
-//      default -> {}
-//    }
 
 		Assert.isTrue(endTime >= startTime, "latest End must be later than earliest start. start: " + startTime + " ; end: " + endTime);
 
@@ -461,7 +516,7 @@ import org.matsim.vehicles.VehicleType;
 		LspShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + String.valueOf(unload.getLogisticChainElement().getId()) + unload.getElementType();
 		Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, tuple.getId()).addPlanElement(id, unload);
+		LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(id, unload);
 	}
 
 	private Carrier createAuxiliaryCarrierServiceBased(ArrayList<LspShipment> shipmentsInCurrentTour, double startTime) {
