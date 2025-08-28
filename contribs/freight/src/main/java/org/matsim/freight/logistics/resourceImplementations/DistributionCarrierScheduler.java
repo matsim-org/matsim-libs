@@ -115,10 +115,6 @@ import org.matsim.vehicles.VehicleType;
 		}
 
 		for (LspShipment lspShipment : lspShipmentsToSchedule) {
-//			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-//				Tour tour = scheduledTour.getTour();
-				//fixme: Muss natürlich die Tour zum shipment sein!
-
 				Tour tour = carrier.getSelectedPlan().getScheduledTour(shipmentId2TourId.get(lspShipment.getId()));
 
 				switch (CarrierSchedulerUtils.getVrpLogic(carrier)) {
@@ -141,7 +137,7 @@ import org.matsim.vehicles.VehicleType;
 								if (Objects.equals(lspShipment.getId().toString(), pickupActivity.getShipment().getId().toString())) {
 									// Todo Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
 									addShipmentLoadElementShipmentBased(lspShipment, tour, pickupActivity);
-									beginOfTransport = pickupActivity.getExpectedArrival()+pickupActivity.getDuration();
+									beginOfTransport = pickupActivity.getExpectedArrival()+pickupActivity.getDuration(); //assume that transport starts after pickup. Most probably there are other pickups coming after. One can discuss if that waiting is part of the transport or not. kmt aug'25
 								}
 							}
 
