@@ -327,17 +327,16 @@
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 		</dependency>
-		<!-- These are not needed -->
+
+		<!-- These are for distributed simulation -->
 		<dependency>
 			<groupId>org.apache.fury</groupId>
 			<artifactId>fury-core</artifactId>
-			<version>${fury.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.fury</groupId>
 			<artifactId>fury-format</artifactId>
-			<version>${fury.version}</version>
 			<optional>true</optional>
 		</dependency>
 
