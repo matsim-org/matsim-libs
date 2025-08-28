@@ -89,8 +89,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void logLoad(Id<Carrier> carrierId, Id<Link> linkId, double startTime, double endTime) {
-    LspShipmentUtils.LoggedShipmentLoadBuilder builder =
-            LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentLoadBuilder builder = LspShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
     builder.setCarrierId(carrierId);
     builder.setLinkId(linkId);
     builder.setLogisticsChainElement(logisticChainElement);

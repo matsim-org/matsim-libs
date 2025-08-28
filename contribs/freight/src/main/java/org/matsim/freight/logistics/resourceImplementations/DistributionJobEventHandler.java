@@ -64,8 +64,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierServiceStartEvent event) {
-    if (event.getServiceId() == carrierJob.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getServiceId() == carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }
@@ -73,8 +72,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-    if (event.getShipmentId() == this.carrierJob.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getShipmentId() == this.carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }

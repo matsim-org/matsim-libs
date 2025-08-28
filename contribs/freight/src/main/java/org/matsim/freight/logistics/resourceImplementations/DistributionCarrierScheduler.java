@@ -143,8 +143,6 @@ import org.matsim.vehicles.VehicleType;
 
 							if (element instanceof Tour.Delivery deliveryActivity) {
 								if (Objects.equals(lspShipment.getId().toString(), deliveryActivity.getShipment().getId().toString())) {
-									// Todo Und geht das dann nicht kürzer einfacher als dieses ganze selbst zurückrechnen aus den Services und den lspShipments??
-//									addShipmentLoadElementServiceBased(lspShipment, tour);
 									addShipmentTransportElementShipmentBased(lspShipment, tour, deliveryActivity, beginOfTransport);
 									addShipmentUnloadElement(lspShipment, deliveryActivity);
 									addDistributionEventHandlers(deliveryActivity, lspShipment, resource, tour);
