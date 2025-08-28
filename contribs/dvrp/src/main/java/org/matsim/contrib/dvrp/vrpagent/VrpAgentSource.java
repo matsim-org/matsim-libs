@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +43,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public class VrpAgentSource implements AgentSource, DistributedAgentSource {

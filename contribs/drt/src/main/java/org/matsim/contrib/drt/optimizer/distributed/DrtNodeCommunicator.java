@@ -61,12 +61,10 @@ public class DrtNodeCommunicator implements MobsimAfterSimStepListener {
 			.mode(message.mode())
 			.id(message.id())
 			.submissionTime(message.submissionTime())
-			.earliestStartTime(message.earliestStartTime())
-			.latestStartTime(message.latestStartTime())
+			.constraints(message.constraints())
 			.fromLink(network.getLinks().get(Id.createLinkId(message.fromLink())))
 			.toLink(network.getLinks().get(Id.createLinkId(message.toLink())))
 			.passengerIds(message.passengerIds())
-			.maxRideDuration(message.maxRideDuration())
 			.build()
 		);
 	}

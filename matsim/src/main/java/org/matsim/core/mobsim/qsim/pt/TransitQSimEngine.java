@@ -20,10 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
@@ -96,7 +94,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	private InternalInterface internalInterface = null;
 
-	private Map<Id<Umlauf>, Umlauf> umlaeufe = null;
+	private UmlaufCache umlaeufe = null;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -156,9 +154,9 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	private void createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
 		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
-		Map<Id<Umlauf>, Umlauf> umlaufCache = getOrCreateUmlaufe();
+		UmlaufCache umlaufCache = getOrCreateUmlaufe();
 
-		for (Umlauf umlauf : umlaufCache.values()) {
+		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
 				Id<Link> startLinkId = umlauf.getUmlaufStuecke().getFirst().getCarRoute().getStartLinkId();
@@ -169,22 +167,14 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 		}
 	}
 
-	private Map<Id<Umlauf>, Umlauf> getOrCreateUmlaufe() {
+	private UmlaufCache getOrCreateUmlaufe() {
 
 		if (umlaeufe != null)
 			return umlaeufe;
 
 		Collection<Umlauf> result = umlaufBuilder.build();
 
-		umlaeufe = new IdMap<>(Umlauf.class);
-
-		for (Umlauf umlauf : result) {
-			if (umlaeufe.containsKey(umlauf.getId())) {
-				throw new RuntimeException("Duplicate Umlauf ID: " + umlauf.getId());
-			}
-
-			umlaeufe.put(umlauf.getId(), umlauf);
-		}
+		umlaeufe = new UmlaufCache(this.schedule, result);
 
 		return umlaeufe;
 	}
@@ -270,7 +260,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 			return TransitAgent.createTransitAgent(delegate, qSim.getScenario());
 		} else if (type == TransitDriverAgentImpl.class) {
 			TransitDriverAgentImpl.TransitDriverMessage driverMessage = (TransitDriverAgentImpl.TransitDriverMessage) message;
-			Umlauf umlauf = umlaeufe.get(driverMessage.umlaufId());
+			Umlauf umlauf = umlaeufe.getUmlauf(driverMessage.umlaufId());
 			// The transport mode here does not seem to matter
 			return new TransitDriverAgentImpl(driverMessage, umlauf, TransportMode.car, agentTracker, internalInterface);
 		}

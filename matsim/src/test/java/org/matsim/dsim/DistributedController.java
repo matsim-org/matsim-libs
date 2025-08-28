@@ -20,6 +20,7 @@ import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
@@ -92,11 +93,11 @@ public class DistributedController implements ControlerI {
 		ComputeNode computeNode = injector.getInstance(ComputeNode.class);
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 
-		ControlerListenerManagerImpl listenerManager = (ControlerListenerManagerImpl) injector.getInstance(ControlerListenerManager.class);
+		ControllerListenerManagerImpl listenerManager = (ControllerListenerManagerImpl) injector.getInstance(ControllerListenerManager.class);
 
 		addCoreControllers(listenerManager, injector);
 
-		listenerManager.fireControlerStartupEvent();
+		listenerManager.fireControllerStartupEvent();
 
 		PrepareForSim prepareForSim = injector.getInstance(PrepareForSim.class);
 		prepareForSim.run();
@@ -104,19 +105,19 @@ public class DistributedController implements ControlerI {
 		injector.getInstance(IterationStopWatch.class).beginIteration(0);
 		io.createIterationDirectory(0);
 
-		listenerManager.fireControlerIterationStartsEvent(0, false);
+		listenerManager.fireControllerIterationStartsEvent(0, false);
 
-		listenerManager.fireControlerBeforeMobsimEvent(0, false);
+		listenerManager.fireControllerBeforeMobsimEvent(0, false);
 
 		// Run the mobsim
 		DSim dsim = injector.getInstance(DSim.class);
 		dsim.run();
 
-		listenerManager.fireControlerAfterMobsimEvent(0, false);
-		listenerManager.fireControlerScoringEvent(0, false);
-		listenerManager.fireControlerIterationEndsEvent(0, false);
+		listenerManager.fireControllerAfterMobsimEvent(0, false);
+		listenerManager.fireControllerScoringEvent(0, false);
+		listenerManager.fireControllerIterationEndsEvent(0, false);
 
-		listenerManager.fireControlerShutdownEvent(false, 0);
+		listenerManager.fireControllerShutdownEvent(false, 0);
 
 		if (computeNode.getRank() == 0) {
 			// TODO: hard-coded to write network output for easier testing
@@ -130,17 +131,17 @@ public class DistributedController implements ControlerI {
 	/**
 	 * Add some default controllers to replicate behaviour of {@link NewControler}.
 	 */
-	private void addCoreControllers(ControlerListenerManager listenerManager, Injector injector) {
+	private void addCoreControllers(ControllerListenerManager listenerManager, Injector injector) {
 
-		listenerManager.addControlerListener(injector.getInstance(DumpDataAtEnd.class));
-		listenerManager.addControlerListener(injector.getInstance(PlansScoring.class));
-		listenerManager.addControlerListener(injector.getInstance(PlansDumping.class));
-		listenerManager.addControlerListener(injector.getInstance(EventsHandling.class));
+		listenerManager.addControllerListener(injector.getInstance(DumpDataAtEnd.class));
+		listenerManager.addControllerListener(injector.getInstance(PlansScoring.class));
+		listenerManager.addControllerListener(injector.getInstance(PlansDumping.class));
+		listenerManager.addControllerListener(injector.getInstance(EventsHandling.class));
 
-		Set<ControlerListener> listeners = injector.getInstance(Key.get(new TypeLiteral<>() {
+		Set<ControllerListener> listeners = injector.getInstance(Key.get(new TypeLiteral<>() {
 		}));
-		for (ControlerListener l : listeners) {
-			listenerManager.addControlerListener(l);
+		for (ControllerListener l : listeners) {
+			listenerManager.addControllerListener(l);
 		}
 	}
 }

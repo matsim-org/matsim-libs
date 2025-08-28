@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -265,6 +266,13 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public Map<Id<Person>, MobsimAgent> getAgents() {
 		// TODO: Few engines might need this, but did not occurred yet
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
+		// TODO: Chained departure will need this feature
+		// Should be possible via network traffic engine
 		throw new UnsupportedOperationException();
 	}
 

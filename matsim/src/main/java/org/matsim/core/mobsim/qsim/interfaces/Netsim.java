@@ -28,9 +28,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.AgentTracker;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Interface that combines the most important interfaces of the QSim.
@@ -46,6 +48,8 @@ public interface Netsim extends ObservableMobsim, InsertableMobsim, ActivityEndR
 	Scenario getScenario();
 
 	MobsimTimer getSimTimer();
+
+	Map<Id<Vehicle>, MobsimVehicle> getVehicles();
 
 	Collection<AgentTracker> getAgentTrackers();
 }

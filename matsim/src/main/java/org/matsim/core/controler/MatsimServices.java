@@ -80,8 +80,6 @@ public interface MatsimServices extends IterationCounter {
 
 	ExecutionContext getSimulationContext();
 
-	void addControlerListener(ControlerListener controlerListener);
-
 	void addControllerListener(ControllerListener controllerListener);
 
 	@Deprecated(since = "2025-07-19")

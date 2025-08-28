@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.optimizer.distributed;
 
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.schedule.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
@@ -13,6 +14,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -53,11 +55,9 @@ public class SecondaryOptimizerModule extends AbstractDvrpModeQSimModule {
 		})).in(Singleton.class);
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-			getter -> new ScheduleTimingUpdater(
-				getter.get(MobsimTimer.class),
-				new DrtStayTaskEndTimeCalculator(getter.getModal(StopTimeCalculator.class)),
-				getter.get(DriveTaskUpdater.class)
-				))).asEagerSingleton();
-
+			_ ->  {
+				throw new UnsupportedOperationException("TODO: Not supported due to API changes.");
+			}
+		));
 	}
 }

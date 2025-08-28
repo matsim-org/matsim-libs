@@ -77,10 +77,7 @@ public class SecondaryNodeOptimizer implements DrtOptimizer, MobsimAfterSimStepL
 		return new RequestMessage(
 			request.getId(),
 			request.getSubmissionTime(),
-			request.getEarliestStartTime(),
-			request.getLatestStartTime(),
-			request.getLatestArrivalTime(),
-			request.getMaxRideDuration(),
+			request.getConstraints(),
 			request.getPassengerIds(),
 			request.getMode(),
 			request.getFromLink().getId(),
