@@ -85,12 +85,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 	public String getRouteDescription() {
 
 		try {
-			RouteDescription routeDescription = new RouteDescription();
-			routeDescription.boardingTime = this.boardingTime;
-			routeDescription.accessFacilityId = this.accessFacility;
-			routeDescription.egressFacilityId = this.egressFacility;
-			routeDescription.transitLineId = this.transitLine;
-			routeDescription.transitRouteId = this.transitRoute;
+			RouteDescription routeDescription = new RouteDescription(this);
 			return OBJECT_MAPPER.writeValueAsString(routeDescription);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
