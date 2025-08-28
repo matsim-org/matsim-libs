@@ -329,6 +329,7 @@ import org.matsim.vehicles.VehicleType;
 				.setPickupStartingTimeWindow(TimeWindow.newInstance(latestEntry.getEndTime(), Double.MAX_VALUE)) //Can be picked up at hub once its handling there is done.
 				.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
 				//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+				.setPickupDuration(lspShipment.getPickupServiceTime())
 				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 				.build();
 		} else {
