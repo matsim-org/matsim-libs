@@ -9,6 +9,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOv
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
@@ -16,6 +17,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -84,8 +86,8 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 
 
 		for (int s = 0; s < pickupIdx; s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			if (stop.task instanceof ShiftChangeOverTask) {
+			StopWaypoint stop = vEntry.stops.get(s);
+			if (stop.getTask() instanceof ShiftChangeOverTask) {
 				//no stop _after_ shift change over
 				return false;
 			}
@@ -99,18 +101,19 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 		// all stops after the new (potential) pickup but before the new dropoff are delayed by pickupDetourTimeLoss
 		// check if this delay satisfies the time constraints at these stops
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			if (stop.task instanceof ShiftBreakTask) {
-				final DrtShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
+			StopWaypoint stop = vEntry.stops.get(s);
+			DrtStopTask task = stop.getTask();
+			if (task instanceof ShiftBreakTask) {
+				final DrtShiftBreak shiftBreak = ((ShiftBreakTask) task).getShiftBreak();
 				if (shiftBreak != null) {
-					if (stop.task.getBeginTime() + pickupDetourTimeLoss > shiftBreak.getScheduledLatestArrival()) {
+					if (task.getBeginTime() + pickupDetourTimeLoss > shiftBreak.getScheduledLatestArrival()) {
 						return false;
 					}
 				}
-			} else if (stop.task instanceof ShiftChangeOverTask) {
+			} else if (task instanceof ShiftChangeOverTask) {
 				//no stop _after_ shift change over
 				return false;
-			} else if(stop.task instanceof WaitForShiftTask) {
+			} else if(task instanceof WaitForShiftTask) {
 				// there still is a wait for shift task that needs to finish before the insertion
 				return false;
 			}
@@ -122,21 +125,24 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 		// all stops after the new (potential) dropoff are delayed by totalTimeLoss
 		// check if this delay satisfies the time constraints at these stops
 		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
-			Waypoint.Stop stop = vEntry.stops.get(s);
-			if (stop.task instanceof ShiftBreakTask) {
-				final DrtShiftBreak shiftBreak = ((ShiftBreakTask)stop.task).getShiftBreak();
+			StopWaypoint stop = vEntry.stops.get(s);
+			DrtStopTask stopTask = stop.getTask();
+			if (stopTask instanceof ShiftBreakTask) {
+				final DrtShiftBreak shiftBreak = ((ShiftBreakTask) stopTask).getShiftBreak();
 				if (shiftBreak != null) {
-					final double beginTime = stop.task.getBeginTime();
+					final double beginTime = stopTask.getBeginTime();
 					if (beginTime + totalTimeLoss > shiftBreak.getScheduledLatestArrival()) {
 						return false;
 					}
 				}
-			} else if (stop.task instanceof ShiftChangeOverTask) {
+			} else if (stopTask instanceof ShiftChangeOverTask) {
 				shiftEndScheduled = true;
 				final List<? extends Task> tasks = vEntry.vehicle.getSchedule().getTasks();
-				final Task task = tasks.get(tasks.indexOf(stop.task) - 1);
+				final Task task = tasks.get(tasks.indexOf(stopTask) - 1);
 
 				if (task instanceof DrtStayTask) {
+					//check if stay slack is large enough
+					// will not be necessary anymore once slack is correctly accounted for in waypoints
 					final double refTime;
 					if (task.getStatus().equals(Task.TaskStatus.STARTED)) {
 						refTime = this.timer.getTimeOfDay();
@@ -149,13 +155,10 @@ public class ShiftInsertionCostCalculator implements InsertionCostCalculator {
 				} else {
 					return false;
 				}
-			} else if(stop.task instanceof WaitForShiftTask) {
-				// there still is a wait for shift task that needs to finish before the insertion
-				return false;
 			}
 
-			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime
-					|| stop.task.getEndTime() + totalTimeLoss > stop.latestDepartureTime) {
+			if (stopTask.getBeginTime() + totalTimeLoss > stop.getLatestArrivalTime()
+					|| stopTask.getEndTime() + totalTimeLoss > stop.getLatestDepartureTime()) {
 				return false;
 			}
 		}

@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
@@ -133,9 +136,9 @@ public class DefaultRequestInsertionSchedulerTest {
 
         // vehicle entry
         Waypoint.Start start = start(null, CURRENT_TIME, startLink, integerLoadType.fromInt(1));//not a STOP -> pickup cannot be appended
-        Waypoint.Stop stop0 = stop(stopTask0, integerLoadType.fromInt(2));
-        Waypoint.Stop stop1 = stop(stopTask1, integerLoadType.fromInt(1));
-        Waypoint.Stop stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
+        StopWaypoint stop0 = stop(stopTask0, integerLoadType.fromInt(2));
+        StopWaypoint stop1 = stop(stopTask1, integerLoadType.fromInt(1));
+        StopWaypoint stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
         var vehicleEntry = entry(vehicle, start, stop0, stop1, stop2);
 
         InsertionWithDetourData.InsertionDetourData detour = detourData(0, 10, 10, 10.);
@@ -211,7 +214,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
@@ -220,8 +223,8 @@ public class DefaultRequestInsertionSchedulerTest {
         return new Waypoint.Start(task, link, time, occupancy);
     }
 
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy, integerLoadType);
+    private StopWaypoint stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
+        return new StopWaypointImpl(stopTask, outgoingOccupancy, integerLoadType, false);
     }
 
 
@@ -231,9 +234,17 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                earliestStartTime,
+                                latestStartTime,
+                                latestArrivalTime,
+                                Double.POSITIVE_INFINITY,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode(mode)

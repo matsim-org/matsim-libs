@@ -47,6 +47,34 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		int startNumberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 		log.info("Starting with carrier-replanning loop.");
 
+		// get the needed attributes from the carrier without this data (perhaps an existing carrier file was read)
+		for (Carrier carrier : nonCompleteSolvedCarriers) {
+			if(generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
+				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(carrier.getAttributes().getAttribute("purpose").toString());
+				String carierId = carrier.getId().toString();
+				String smallScaleCommercialTrafficType;
+				String modeORvehType;
+				if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("commercialPersonTraffic")) {
+					smallScaleCommercialTrafficType = "commercialPersonTraffic";
+					modeORvehType = "total";
+				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
+					smallScaleCommercialTrafficType = "goodsTraffic";
+					String[] split = carierId.split("_");
+					modeORvehType = split[split.length - 1];
+				}
+				else {
+					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
+					continue;
+				}
+
+				VehicleSelection.OdMatrixEntryInformation odMatrixEntry = generator.vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
+				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute("tourStartArea").toString();
+				String selectedStartCategory = generator.getSelectedStartCategory(startZone,odMatrixEntry);
+				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
+					smallScaleCommercialTrafficType, null, odMatrixEntry);
+				generator.getCarrierId2carrierAttributes().putIfAbsent(carrier.getId(), carrierAttributes);
+			}
+			}
 		Path outputPath = Path.of(scenario.getConfig().controller().getOutputDirectory(),
 			"analysis/freight/Carriers_SolvingLoop_stats.tsv");
 

@@ -181,10 +181,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                             eventsManager.processEvent(new DrtShiftBreakScheduledEvent(timer.getTimeOfDay(), mode, shift.getId(),
                                     activeShift.vehicle().getId(), facility.getLinkId(),
                                     shift.getBreak().orElseThrow().getScheduledLatestArrival(), activeShift.shift().getShiftType().orElse(null)));
-                            return;
                         }
                     }
-                    throw new RuntimeException("Could not schedule break!");
                 }
             }
         }
