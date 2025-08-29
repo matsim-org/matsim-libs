@@ -176,7 +176,7 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 */
 	@Test
-	public void testOutputIsEqual_OnePlanBothChains() {
+	public void testOutputIsEqual_onePlanBothChains() {
 
 		try {
 			String[] argsToSet = {
