@@ -191,12 +191,17 @@ public final class LSPUtils {
 	 * This method will create new shipments with adjusted sizes and service times.
 	 * It will also clear the existing shipments and plans in the LSP before adding the new shipments.
 	 * The new shipments will be assigned to the LSP's plans.
-	 * @param lsp the lsp for which the shipments should be split if needed
+	 * <p></p>
+	 * To avoid any issues, this method works with a copy of the original LSP that was handed over.
+	 *
+	 * @param lspOrig the lsp for which the shipments should be split if needed
+	 * @return the lsp with the updated shipments
 	 */
-	public static void splitShipmentsIfNeeded(LSP lsp) {
+	public static LSP splitShipmentsIfNeeded(LSP lspOrig) {
+		LSP lsp = lspOrig;
 		if (lsp.getLspShipments().isEmpty()) {
 			log.warn("LSP {} has no shipments. No splitting will be done. ", lsp.getId());
-			return;
+			return lsp;
 		}
 
 		double lowestCapacity = Double.MAX_VALUE;
@@ -212,15 +217,13 @@ public final class LSPUtils {
 		}
 
 		if (lowestCapacity == Double.MAX_VALUE) {
-			log.error("LSP: {}: Did not find the capacities of the vehicles from the CarrierRessources. Aborting", lsp.getId());
+			log.error("LSP: {}: Did not find the capacities of the vehicles from the CarrierResources. Aborting", lsp.getId());
 			throw new IllegalStateException();
 		} else {
 			lowestCapacity = (int) lowestCapacity; // ensure that the capacity is an integer value
 		}
 
 		List<LspShipment> newShipments = new LinkedList<>();
-
-
 
 		for (LspShipment lspShipment : lsp.getLspShipments()) {
 			int sizeOfShipment = lspShipment.getSize();
@@ -276,11 +279,12 @@ public final class LSPUtils {
 
 		// Add the new shipments to the LSP and assign them to the lspPlans
 		// Todo: Now, this is done with the some algorithm as in the InitialShipmentAssigner.
-		// so it may be that the splitted shipments are not assigned to the same plans as before and/or that some parts of the same original shipment are assigned to different plans.
+		// so it may be that the (split) shipments are not assigned to the same plans as before and/or that some parts of the same original shipment are assigned to different plans.
 		for (LspShipment newLspShipment : newShipments) {
 			lsp.assignShipmentToLspPlan(newLspShipment);
 		}
 
+		return lsp;
 	}
 
 	/**
@@ -327,33 +331,6 @@ public final class LSPUtils {
 			this.logisticChainScheduler = logisticChainScheduler;
 			return this;
 		}
-
-		//		/**
-		//		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage
-		// with this approach, however, is that
-		//		 * 		we cannot use injection ... since we cannot inject as many scorers as we have agents.
-		// (At least this is what I think.) Which means
-		//		 * 		that the approach in matsim core and in carriers to have XxxScoringFunctionFactory is
-		// better for what we are doing here.  yyyyyy So
-		//		 * 		this needs to be changed.  kai, jul'22
-		//		 */
-		//		public LSPBuilder setSolutionScorer(LSPScorer scorer) {
-		//			this.scorer = scorer;
-		//			return this;
-		//		}
-
-		//		/**
-		//		 * @deprecated -- It feels attractive to attach this to the "agent".  A big disadvantage
-		// with this approach, however, is that
-		//		 * 		we cannot use injection ... since we cannot inject as many replanners as we have
-		// agents.  (At least this is what I think.)  yyyyyy So
-		//		 * 		this needs to be changed.  kai, jul'22
-		//		 */
-		//		public LSPBuilder setReplanner(LSPReplanner replanner) {
-		//			this.replanner = replanner;
-		//			return this;
-		//		}
-		// never used.  Thus disabling it.  kai, jul'22
 
 		@Deprecated // see comment below method name.
 		public LSPBuilder setInitialPlan(LSPPlan plan) {
