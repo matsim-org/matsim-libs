@@ -24,8 +24,7 @@ package org.matsim.freight.logistics.resourceImplementations;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.freight.carriers.CarrierService;
-import org.matsim.freight.carriers.CarrierShipment;
+import org.matsim.freight.carriers.CarrierJob;
 import org.matsim.freight.carriers.events.CarrierServiceStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierServiceStartEventHandler;
@@ -40,26 +39,19 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
-/*package-private*/ class DistributionServiceStartEventHandler
+/*package-private*/ class DistributionJobEventHandler
         implements AfterMobsimListener,
         CarrierServiceStartEventHandler,
         CarrierShipmentDeliveryStartEventHandler,
         LSPSimulationTracker<LspShipment> {
 
-  private final CarrierService carrierService;
-  private final CarrierShipment carrierShipment;
+  private final CarrierJob carrierJob;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;
   private LspShipment lspShipment;
 
-  DistributionServiceStartEventHandler(
-          CarrierService carrierService,
-          LspShipment lspShipment,
-          LogisticChainElement element,
-          LSPCarrierResource resource,
-          CarrierShipment carrierShipment) {
-    this.carrierShipment = carrierShipment;
-    this.carrierService = carrierService;
+  DistributionJobEventHandler(CarrierJob carrierJob, LspShipment lspShipment, LogisticChainElement element, LSPCarrierResource resource) {
+    this.carrierJob = carrierJob;
     this.lspShipment = lspShipment;
     this.logisticChainElement = element;
     this.resource = resource;
@@ -68,13 +60,11 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
   @Override
   public void reset(int iteration) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void handleEvent(CarrierServiceStartEvent event) {
-    if (event.getServiceId() == carrierService.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getServiceId() == carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }
@@ -82,8 +72,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   @Override
   public void handleEvent(CarrierShipmentDeliveryStartEvent event) {
-    if (event.getShipmentId() == this.carrierShipment.getId()
-            && event.getCarrierId() == resource.getCarrier().getId()) {
+    if (event.getShipmentId() == this.carrierJob.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
       logTransport(event);
       logUnload(event);
     }
@@ -92,8 +81,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
   private void logTransport(CarrierServiceStartEvent event) {
     String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentPlanElement abstractPlanElement =
-            lspShipment.getShipmentLog().getPlanElements().get(id);
+    LspShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
     if (abstractPlanElement instanceof LspShipmentLeg transport) {
       transport.setEndTime(event.getTime());
     }
@@ -103,16 +91,14 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
   private void logTransport(CarrierShipmentDeliveryStartEvent event) {
     String idString = resource.getId() + "" + logisticChainElement.getId() + TRANSPORT;
     Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentPlanElement abstractPlanElement =
-            lspShipment.getShipmentLog().getPlanElements().get(id);
+    LspShipmentPlanElement abstractPlanElement = lspShipment.getShipmentLog().getPlanElements().get(id);
     if (abstractPlanElement instanceof LspShipmentLeg transport) {
       transport.setEndTime(event.getTime());
     }
   }
 
   private void logUnload(CarrierServiceStartEvent event) {
-    LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
-            LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentUnloadBuilder builder = LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
     builder.setCarrierId(event.getCarrierId());
     builder.setLinkId(event.getLinkId());
     builder.setLogisticChainElement(logisticChainElement);
@@ -131,8 +117,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   //TODO: Inhaltlich ansehen, was hier passiert. Ist aktuell nur Copy und Paste aus Service-Variante
   private void logUnload(CarrierShipmentDeliveryStartEvent event) {
-    LspShipmentUtils.LoggedShipmentUnloadBuilder builder =
-            LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
+    LspShipmentUtils.LoggedShipmentUnloadBuilder builder = LspShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
     builder.setCarrierId(event.getCarrierId());
     builder.setLinkId(event.getLinkId());
     builder.setLogisticChainElement(logisticChainElement);
@@ -151,9 +136,7 @@ import static org.matsim.freight.logistics.LSPConstants.TRANSPORT;
 
   //Todo: Wird das auch inhaltlich irgendwo genutzt,oder ist das nur für die Tests da?
   //todo ctd. Brauchen wir den CarrierService hier eigentlich wirklich oder kann das zurück gebaut werden? KMT Okt'24
-  public CarrierService getCarrierService() {
-    return carrierService;
-  }
+  public CarrierJob getCarrierJob() {return carrierJob;  }
 
   public LspShipment getLspShipment() {
     return lspShipment;

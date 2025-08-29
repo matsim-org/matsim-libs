@@ -13,6 +13,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskF
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
+import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskBaseType;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -190,8 +191,9 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                         path = path.withDepartureTime(departureTime + slack);
                     }
                 }
-                schedule.addTask(taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE));
-                final double startTime = Math.max(shift.getEndTime(), path.getArrivalTime());
+                DrtDriveTask driveTask = taskFactory.createDriveTask(vehicle, path, RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE);
+                schedule.addTask(driveTask);
+                final double startTime = driveTask.getEndTime();
                 final double endTime = Math.min(startTime + shiftsParams.getChangeoverDuration(), vehicle.getServiceEndTime());
                 if (path.getArrivalTime() > shift.getEndTime()) {
                     logger.warn("Shift changeover of shift " + shift.getId() + " will probably be delayed by "

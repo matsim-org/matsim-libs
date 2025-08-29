@@ -85,7 +85,7 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	/**
 	 * Calculate the geh value for simulated and reference count
 	 */
-	private static double geh(double simulated, double observed) {
+	private static double calc_geh(double simulated, double observed) {
 		final double diff = simulated - observed;
 		final double sum = simulated + observed;
 
@@ -95,20 +95,26 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 	/**
 	 * Calculate the sqv value for simulated and reference count
 	 */
-	private static double sqv_daily(double simulated, double observed) {
+	private static double calc_sqv_daily(double simulated, double observed, Set<String> modes) {
 		final double diff = simulated - observed;
 		final double scale_factor_for_daily_volumes = 10000.;
 
-		return 1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
+		return getSQV_value(observed, diff, scale_factor_for_daily_volumes, modes);
 	}
 
 	/**
 	 * Calculate the sqv value for hourly count numbers for simulated and reference count
 	 */
-	private static double sqv_hourly(double simulated, double observed) {
+	private static double calc_sqv_hourly(double simulated, double observed, Set<String> modes) {
 		final double diff = simulated - observed;
 		final double scale_factor_for_daily_volumes = 1000.;
 
+		return getSQV_value(observed, diff, scale_factor_for_daily_volumes, modes);
+	}
+
+	private static double getSQV_value(double observed, double diff, double scale_factor_for_daily_volumes, Set<String> modes) {
+		if (modes.contains(TransportMode.truck)  && !modes.contains(TransportMode.car))
+			scale_factor_for_daily_volumes = scale_factor_for_daily_volumes * 0.1; // see p. 183: https://fops.de/wp-content/uploads/2021/02/FE-70.0919-2015-Anf-an-staedt-Verkehrsnachfragemodelle-Schlussbericht.pdf
 		return 1 / (1 + Math.sqrt(diff * diff / (scale_factor_for_daily_volumes * observed)));
 	}
 
@@ -211,8 +217,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 					row.setInt("hour", hour);
 					row.setDouble("observed_traffic_volume", observedTrafficVolumeAtHour);
 					row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeAtHour);
-					row.setDouble("geh", geh(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
-					row.setDouble("sqv", sqv_hourly(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
+					row.setDouble("geh", calc_geh(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour));
+					row.setDouble("sqv", calc_sqv_hourly(simulatedTrafficVolumeAtHour, observedTrafficVolumeAtHour, modes));
 				}
 			} else {
 				// Get the daily values
@@ -226,8 +232,8 @@ public class CountComparisonAnalysis implements MATSimAppCommand {
 			row.setString("road_type", type);
 			row.setDouble("observed_traffic_volume", observedTrafficVolumeByDay);
 			row.setDouble("simulated_traffic_volume", simulatedTrafficVolumeByDay);
-			row.setDouble("geh", geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
-			row.setDouble("sqv", sqv_daily(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("geh", calc_geh(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay));
+			row.setDouble("sqv", calc_sqv_daily(simulatedTrafficVolumeByDay, observedTrafficVolumeByDay, modes));
 			row.setDouble("sqv_threshold", 0.75);
 		}
 

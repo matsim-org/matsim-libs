@@ -62,8 +62,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 	private final InternalInterface internalInterface;
-
-	private final PassengerAccessEgressImpl accessEgress;
+	protected final PassengerAccessEgress accessEgress;
 
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ;
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
@@ -102,6 +101,16 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	final void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
 	}
+
+	/**
+	 * When set, the driver will wait for its first departure, until {@link #setReadyForDeparture(double)} is called externally.
+	 */
+	abstract void setWaitForDeparture();
+
+	/**
+	 * Sets the driver to a state where it is ready to start its route.
+	 */
+	abstract void setReadyForDeparture(double now);
 
 	@Override
 	public final Id<Link> chooseNextLinkId() {
@@ -179,7 +188,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		 * If there are passengers leaving or entering, the stop time must be not greater than 1.0 in order to let them (de-)board every second.
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
-		double stopTime = this.accessEgress.calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
+		double stopTime = ((PassengerAccessEgressImpl) this.accessEgress).calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
 
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
@@ -321,7 +330,6 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	 * for junit tests in same package
 	 */
 	abstract /*package*/ Leg getCurrentLeg() ;
-
 
 	/**
 	 * A simple wrapper that delegates all get-Methods to another instance, blocks set-methods
