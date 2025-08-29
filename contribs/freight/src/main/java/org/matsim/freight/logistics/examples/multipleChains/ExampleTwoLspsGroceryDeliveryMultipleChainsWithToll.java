@@ -86,10 +86,14 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		ONE_CHAIN_DIRECT, ONE_CHAIN_TWO_ECHELON, TWO_CHAINS_DIRECT_AND_TWO_ECHELON, ALL
 	}
 
+	private record LspDefinition(String name, String carrierId, Id<Link> hubLinkId) {}
+
 
 	private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
 
 	public static void main(String[] args) throws CommandLine.ConfigurationException {
+
+		List<LspDefinition> lspDefinitionList = new LinkedList<>();
 
 		CommandLine cmd = new CommandLine.Builder(args) //
 			.allowAnyOption(true)
@@ -114,20 +118,26 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			.map(TypeOfLsps::valueOf)
 			.orElse(TypeOfLsps.TWO_CHAINS_DIRECT_AND_TWO_ECHELON); // Default is DIRECT_AND_TWO_ECHELON
 
-		//lsp1CarrierId and lsp1HubLinkId
-		final String lsp1Name = cmd.getOption("lsp1Name").orElse("Edeka");
-		final String lsp1CarrierId = cmd.getOption("lsp1CarrierId").orElse("edeka_SUPERMARKT_TROCKEN");
-		final Id<Link> HUB_LINK_ID_CARRIER1 = cmd.getOption("lsp1HubLinkId")
-			.map(Id::createLinkId)
-			.orElse(Id.createLinkId("91085")); // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+		//lsp1
+		LspDefinition lsp1Definition = new LspDefinition(
+			cmd.getOption("lsp1Name").orElse("Edeka"),
+			cmd.getOption("lsp1CarrierId").orElse("edeka_SUPERMARKT_TROCKEN"),
+			cmd.getOption("lsp1HubLinkId")
+				.map(Id::createLinkId)
+				.orElse(Id.createLinkId("91085")) // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+		);
+		lspDefinitionList.add(lsp1Definition);
 
-		//lsp2CarrierId and lsp2HubLinkId
-		final String lsp2Name = cmd.getOption("lsp2Name").orElse("Kaufland");
-		final String lsp2CarrierId = cmd.getOption("lsp2CarrierId").orElse("kaufland_VERBRAUCHERMARKT_TROCKEN");
-		final Id<Link> HUB_LINK_ID_CARRIER2 = cmd.getOption("lsp2HubLinkId")
-			.map(Id::createLinkId)
-			.orElse(Id.createLinkId("91085")); // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 
+		//lsp2
+		LspDefinition lsp2Definition = new LspDefinition(
+			cmd.getOption("lsp2Name").orElse("Kaufland"),
+			cmd.getOption("lsp2CarrierId").orElse("kaufland_VERBRAUCHERMARKT_TROCKEN"),
+			cmd.getOption("lsp2HubLinkId")
+				.map(Id::createLinkId)
+				.orElse(Id.createLinkId("91085")) // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+		);
+		lspDefinitionList.add(lsp2Definition);
 
 
 		log.info("Prepare config");
@@ -148,8 +158,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
 		carrierReader.readFile(CARRIER_PLAN_FILE);
 
-		Carrier carrier1 = carriers.getCarriers().get(Id.create(lsp1CarrierId, CarrierImpl.class));
-		Carrier carrier2 = carriers.getCarriers().get(Id.create(lsp2CarrierId, CarrierImpl.class));
+
+//		Carrier carrier2 = carriers.getCarriers().get(Id.create(lsp2CarrierId, CarrierImpl.class));
 
 		RoadPricingScheme rpScheme = setUpRoadpricing(scenario);
 
@@ -171,29 +181,66 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
 
-		switch (typeOfLsps) {
-			case ONE_CHAIN_DIRECT -> {
-				lsps.add(createLspWithOneChain_Direct(scenario, lsp1Name + "_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), vehTypeLarge));
-				lsps.add(createLspWithOneChain_Direct(scenario, lsp2Name + "_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), vehTypeLarge));
+		for (LspDefinition lspDefinition : lspDefinitionList) {
+			Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId, CarrierImpl.class));
+			switch (typeOfLsps) {
+				case ONE_CHAIN_DIRECT -> {
+					lsps.add(createLspWithOneChain_Direct(
+						scenario,
+						lspDefinition.name + "_DIRECT",
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						vehTypeLarge
+					));
+				}
+				case ONE_CHAIN_TWO_ECHELON -> {
+					lsps.add(createLspWithOneChain_2echelon(scenario,
+						lspDefinition.name + "_2echelon",
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						lspDefinition.hubLinkId, vehTypeLarge, vehTypeLarge
+					));
+				}
+				case TWO_CHAINS_DIRECT_AND_TWO_ECHELON -> {
+					lsps.add(createLspWithTwoChains(scenario,
+						lspDefinition.name,
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						lspDefinition.hubLinkId,
+						vehTypeLarge,
+						vehTypeLarge,
+						vehTypeLarge)
+					);
+				}
+				case ALL -> {
+					lsps.add(createLspWithOneChain_Direct(scenario,
+						lspDefinition.name + "_DIRECT",
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						vehTypeLarge
+					));
+					lsps.add(createLspWithOneChain_2echelon(scenario,
+						lspDefinition.name + "_2echelon",
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						lspDefinition.hubLinkId,
+						vehTypeLarge,
+						vehTypeLarge
+					));
+					lsps.add(createLspWithTwoChains(scenario,
+						lspDefinition.name,
+						MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier),
+						getDepotLinkFromVehicle(carrier),
+						lspDefinition.hubLinkId,
+						vehTypeLarge,
+						vehTypeLarge,
+						vehTypeLarge
+					));
+				}
+				default -> throw new IllegalStateException("Unexpected value: " + typeOfLsps);
 			}
-			case ONE_CHAIN_TWO_ECHELON -> {
-				lsps.add(createLspWithOneChain_2echelon(scenario, lsp1Name + "_2echelon", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), HUB_LINK_ID_CARRIER1, vehTypeLarge, vehTypeLarge));
-				lsps.add(createLspWithOneChain_2echelon(scenario, lsp2Name + "_2echelon", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), HUB_LINK_ID_CARRIER2, vehTypeLarge, vehTypeSmallBEV));
-			}
-			case TWO_CHAINS_DIRECT_AND_TWO_ECHELON -> {
-				lsps.add(createLspWithTwoChains(scenario, lsp1Name, MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), HUB_LINK_ID_CARRIER1, vehTypeLarge, vehTypeLarge, vehTypeLarge));
-				lsps.add(createLspWithTwoChains(scenario, lsp2Name, MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), HUB_LINK_ID_CARRIER2, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
-			}
-			case ALL -> {
-				lsps.add(createLspWithOneChain_Direct(scenario, lsp1Name + "_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), vehTypeLarge));
-				lsps.add(createLspWithOneChain_Direct(scenario, lsp2Name + "_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), vehTypeLarge));
-				lsps.add(createLspWithOneChain_2echelon(scenario, lsp1Name + "_2echelon", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), HUB_LINK_ID_CARRIER1, vehTypeLarge, vehTypeLarge));
-				lsps.add(createLspWithOneChain_2echelon(scenario, lsp2Name + "_2echelon", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), HUB_LINK_ID_CARRIER2, vehTypeLarge, vehTypeSmallBEV));
-				lsps.add(createLspWithTwoChains(scenario, lsp1Name, MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier1), getDepotLinkFromVehicle(carrier1), HUB_LINK_ID_CARRIER1, vehTypeLarge, vehTypeLarge, vehTypeLarge));
-				lsps.add(createLspWithTwoChains(scenario, lsp2Name, MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier2), getDepotLinkFromVehicle(carrier2), HUB_LINK_ID_CARRIER2, vehTypeLarge, vehTypeSmallBEV, vehTypeLargeBEV));
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + typeOfLsps);
 		}
+
 
 		LSPUtils.loadLspsIntoScenario(scenario, lsps);
 		LSPUtils.scheduleLsps(LSPUtils.getLSPs(scenario));
@@ -225,7 +272,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		config.controller().setOutputDirectory(OUTPUT_DIRECTORY);
 		config.controller().setLastIteration(MATSIM_ITERATIONS);
 
-//		config.network().setInputFile("../../git-and-svn/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 		config.network().setInputFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5.5-network.xml.gz");
 		config.global().setCoordinateSystem("EPSG:31468");
 		config.global().setRandomSeed(4177);
