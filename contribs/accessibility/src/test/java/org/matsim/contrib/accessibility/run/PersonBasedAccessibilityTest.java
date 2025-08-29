@@ -35,7 +35,7 @@ public class PersonBasedAccessibilityTest {
 
 
 	@Test
-	void runFromEvents() {
+	void testAgeBasedAccessibilityForTeleportedWalk() {
 		final Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
