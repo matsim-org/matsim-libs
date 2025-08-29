@@ -707,12 +707,14 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 */
 	private static CarrierVehicleTypes extractVehicleTypes(List<String> typeNames, CarrierVehicleTypes availableTypes) {
 		CarrierVehicleTypes result = new CarrierVehicleTypes();
-		typeNames.forEach(type ->
-			result.getVehicleTypes().put(
-				Id.createVehicleTypeId(type),
-				availableTypes.getVehicleTypes().get(Id.createVehicleTypeId(type))
-			)
-		);
+		if (typeNames != null) {
+			typeNames.forEach(type ->
+				result.getVehicleTypes().put(
+					Id.createVehicleTypeId(type),
+					availableTypes.getVehicleTypes().get(Id.createVehicleTypeId(type))
+				)
+			);
+		}
 		return result;
 	}
 
