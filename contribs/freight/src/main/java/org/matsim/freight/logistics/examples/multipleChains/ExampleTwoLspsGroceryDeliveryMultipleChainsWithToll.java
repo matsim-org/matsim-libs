@@ -159,7 +159,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesMain")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t_electro")),
+				.orElse(List.of("heavy40t")),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesDelivery")
 				.map(s -> Arrays.asList(s.split(",")))
