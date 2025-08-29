@@ -1,16 +1,20 @@
 package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.Facility;
+import org.matsim.facilities.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +31,7 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 	private final double betaTT_h;
 	private final double betaDist_m;
 	private final double asc;
-	TripRouter tripRouter ;
+	TripRouter tripRouter;
 	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
 	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 	private ScoringConfigGroup scoringConfigGroup;
@@ -49,7 +53,7 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 		this.aggregatedMeasurePoints = new ConcurrentHashMap<>();
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> facilityId = measuringPoint.getId();
-			if(!aggregatedMeasurePoints.containsKey(facilityId)) {
+			if (!aggregatedMeasurePoints.containsKey(facilityId)) {
 				aggregatedMeasurePoints.put(facilityId, new ArrayList<>());
 			}
 			aggregatedMeasurePoints.get(facilityId).add(measuringPoint);
@@ -90,6 +94,31 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 
 	}
 
+	public double computeContributionOfOpportunityPerson(Person person, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+
+		double expSum = 0.;
+
+		for (AggregationObject destination : aggregatedOpportunities.values()) {
+
+			Facility opportunity = (Facility) destination.getNearestBasicLocation();
+
+			Facility homeFacility = FacilitiesUtils.wrapActivity((Activity) person.getSelectedPlan().getPlanElements().get(0));
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(mode, homeFacility, opportunity, departureTime, null, null);
+			Leg walkLeg = extractLeg(planElements, mode);
+			double teleportTime_h = walkLeg.getTravelTime().seconds() / 3600;
+			double teleportDist_m = walkLeg.getRoute().getDistance();
+			double utilityTeleport = teleportTime_h * betaTT_h + teleportDist_m * betaDist_m + asc;
+
+			if(PersonUtils.getAge(person) > 60) {
+				utilityTeleport -= 10.0;
+			}
+
+			expSum += Math.exp(this.scoringConfigGroup.getBrainExpBeta() * utilityTeleport);
+		}
+
+		return expSum;
+	}
+
 	@Override
 	public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
 		return aggregatedMeasurePoints;
@@ -107,4 +136,5 @@ public class TeleportedModeContributionCalculator implements AccessibilityContri
 		copy.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		return copy;
 	}
+
 }

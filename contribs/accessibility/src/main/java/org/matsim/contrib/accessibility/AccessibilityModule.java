@@ -20,7 +20,6 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
@@ -65,7 +63,7 @@ public final class AccessibilityModule extends AbstractModule {
 	public static final String CONFIG_FILENAME_ACCESSIBILITY = "configUsedForAccessibilityComputation.xml";
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
-	private final List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
+	private final List<DataExchangeInterface> dataListeners = new ArrayList<>() ;
 	private ActivityFacilities measuringPoints;
 	private final Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
@@ -89,8 +87,8 @@ public final class AccessibilityModule extends AbstractModule {
 		this.createQGisOutput = createQGisOutput;
 	}
 
-	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
-		this.facilityDataListeners.add(listener) ;
+	public final void addFacilityDataExchangeListener(DataExchangeInterface listener) {
+		this.dataListeners.add(listener) ;
 	}
 
 	/**
@@ -283,7 +281,7 @@ public final class AccessibilityModule extends AbstractModule {
 				accessibilityShutdownListener.addAdditionalFacilityData(fac);
 			}
 
-			for (FacilityDataExchangeInterface listener : facilityDataListeners) {
+			for (DataExchangeInterface listener : dataListeners) {
 				accessibilityShutdownListener.addFacilityDataExchangeListener(listener);
 			}
 

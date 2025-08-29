@@ -42,6 +42,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.accessibility.DataExchangeInterface;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;

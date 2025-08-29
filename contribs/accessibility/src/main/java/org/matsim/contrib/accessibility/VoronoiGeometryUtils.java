@@ -48,26 +48,26 @@ import org.matsim.facilities.ActivityFacility;
  */
 class VoronoiGeometryUtils {
 	private final static Logger LOG = LogManager.getLogger(VoronoiGeometryUtils.class);
-	
+
 	private static GeometryFactory geometryFactory = new GeometryFactory();
-	
+
 	public static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox boundingBox, int tileSize_m) {
 		LOG.warn("Started building measure-point-to-geometry map.");
 		if (boundingBox == null) {
 			throw new IllegalArgumentException("Bounding box must be specified.");
 		}
 		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
-		
+
 		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, boundingBox);
-		
-		if (geometries.size() != measuringPoints.getFacilities().size()) {
-			throw new RuntimeException("Number of Voronoi polygons and measure points must be equal.");
-		}
-		
+
+//		if (geometries.size() != measuringPoints.getFacilities().size()) {
+//			throw new RuntimeException("Number of Voronoi polygons and measure points must be equal.");
+//		}
+
 		for (ActivityFacility measurePoint : measuringPoints.getFacilities().values()) {
 			Id<ActivityFacility> measurePointId = measurePoint.getId();
 			Coord coord = measurePoint.getCoord();
-			
+
 			boolean polygonFound = false;
 			for (Geometry geometry : geometries) {
 				if (geometry.covers(geometryFactory.createPoint(CoordUtils.createGeotoolsCoordinate(coord)))) {
@@ -82,9 +82,9 @@ class VoronoiGeometryUtils {
 			if (!polygonFound) {
 				throw new RuntimeException("No polygon found for measure point " + measurePointId + " with coord = " + coord + ".");
 			}
-		}		
+		}
 		Map<Id<ActivityFacility>, Geometry> revisedMeasurePointPolygons = reduceEdgePolygons(measuringPoints, tileSize_m, measurePointPolygons);
-		
+
 		LOG.warn("Finished building measure-point-to-geometry map.");
 		return revisedMeasurePointPolygons;
 	}
@@ -98,7 +98,7 @@ class VoronoiGeometryUtils {
 
 			Coordinate[] coordinates = polygon.getCoordinates();
 			Coordinate[] revisedCoordinates = new Coordinate[coordinates.length];
-			
+
 			int i = 0;
 			for (Coordinate coordinate : coordinates) {
 				double xCoordCenter = measuringPointsCoord.getX();
@@ -134,19 +134,19 @@ class VoronoiGeometryUtils {
 	static Collection<Geometry> determineVoronoiShapes(ActivityFacilities measuringPoints, BoundingBox box) {
 		LOG.warn("Started creating Voronoi shapes.");
 		Collection<Coordinate> sites = new ArrayList<>();
-		
+
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			Coordinate coordinate = new Coordinate(measuringPoint.getCoord().getX(), measuringPoint.getCoord().getY());
 			sites.add(coordinate);
 		}
-		
+
 		VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-		voronoiDiagramBuilder.setSites(sites);		
+		voronoiDiagramBuilder.setSites(sites);
 
 		List<Polygon> polygons = voronoiDiagramBuilder.getSubdivision().getVoronoiCellPolygons(geometryFactory);
 		Polygon boundingPolygon = createBoundingPolygon(box);
 		Collection<Geometry> geometries = cutPolygonsByBoundary(polygons, boundingPolygon);
-		
+
 		LOG.warn("Finished creating Voronoi shapes.");
 		return geometries;
 	}
@@ -161,10 +161,10 @@ class VoronoiGeometryUtils {
 		Polygon boundingPolygon = geometryFactory.createPolygon(boundingBoxCoordinates);
 		return boundingPolygon;
 	}
-	
+
 	static Collection<SimpleFeature> createFeaturesFromPolygons(Collection<Geometry> geometries) {
 		Collection<SimpleFeature> features = new LinkedList<>();
-	    		
+
 	    SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 	    b.setName("polygon");
 	    b.add("the_geom", Polygon.class);

@@ -52,6 +52,8 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public static final String GROUP_NAME = "accessibility";
 
 	private static final String ACCESSIBILITY_MEASURE_TYPE = "accessibilityMeasureType";
+	private static final String PERSON_BASED = "personBased";
+
 	public static enum AccessibilityMeasureType{logSum, rawSum, gravity}
 	private AccessibilityMeasureType accessibilityMeasureType = AccessibilityMeasureType.logSum;
 
@@ -74,6 +76,19 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private double boundingBoxLeft;
     private double boundingBoxRight;
     private double boundingBoxBottom;
+
+	private boolean personBased = false;
+	@StringGetter(PERSON_BASED)
+	public boolean isPersonBased(){
+		return this.personBased;
+	}
+
+	@StringSetter(PERSON_BASED)
+	public void setPersonBased(boolean personBased){
+		this.personBased = personBased;
+	}
+
+
 
 	private Integer tileSize_m;
 	private String shapeFileCellBasedAccessibility;
