@@ -32,7 +32,11 @@ import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLsp
 
 public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
     private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest.class);
-    @RegisterExtension
+	private static final String HEAVY_40T = "heavy40t";
+	private static final String HEAVY_40T_ELECTRO = HEAVY_40T + "_electro";
+	private static final String LIGHT_8T_ELECTRO = "light8t_electro";
+
+	@RegisterExtension
     public final MatsimTestUtils utils = new MatsimTestUtils();
 
 
@@ -52,19 +56,19 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 					"--jspritIterationsDirect=1",
 					"--jspritIterationsDistribution=1",
 					"--tollValue=1000.0",
-					"--tolledVehicleTypes=heavy40t,heavy40t_electro",
+					"--tolledVehicleTypes=" + HEAVY_40T + "," + HEAVY_40T_ELECTRO,
 					"--HubCostsFix=100.0",
 					"--typeOfLsps="+ ONE_PLAN_ONLY_DIRECT_CHAIN,
 					"--lsp1Name=Edeka",
 					"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 					"--lsp1HubLinkId=91085",
-					"--lsp1vehTypesDirect=heavy40t",
+					"--lsp1vehTypesDirect=" + HEAVY_40T,
 //					"--lsp1vehTypesMain=heavy40t",
 //					"--lsp1vehTypesDelivery=heavy40t",
 					"--lsp2Name=Kaufland",
 					"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 					"--lsp2HubLinkId=91085",
-					"--lsp2vehTypesDirect=heavy40t",
+					"--lsp2vehTypesDirect=" + HEAVY_40T,
 //					"--lsp2vehTypesMain=heavy40t",
 //					"--lsp2vehTypesDelivery=light8t_electro"
 				};
@@ -98,21 +102,21 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--jspritIterationsDirect=1",
 				"--jspritIterationsDistribution=1",
 				"--tollValue=1000.0",
-				"--tolledVehicleTypes=heavy40t,heavy40t_electro",
+				"--tolledVehicleTypes=" + HEAVY_40T + "," + HEAVY_40T_ELECTRO,
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_PLAN_ONLY_TWO_ECHELON_CHAIN,
 				"--lsp1Name=Edeka",
 				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 				"--lsp1HubLinkId=91085",
 //				"--lsp1vehTypesDirect=heavy40t",
-				"--lsp1vehTypesMain=heavy40t",
-				"--lsp1vehTypesDelivery=heavy40t",
+				"--lsp1vehTypesMain=" + HEAVY_40T,
+				"--lsp1vehTypesDelivery=" + HEAVY_40T,
 				"--lsp2Name=Kaufland",
 				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 				"--lsp2HubLinkId=91085",
 //				"--lsp2vehTypesDirect=heavy40t",
-				"--lsp2vehTypesMain=heavy40t",
-				"--lsp2vehTypesDelivery=light8t_electro"
+				"--lsp2vehTypesMain=" + HEAVY_40T,
+				"--lsp2vehTypesDelivery=" + LIGHT_8T_ELECTRO
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
@@ -144,21 +148,21 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--jspritIterationsDirect=1",
 				"--jspritIterationsDistribution=1",
 				"--tollValue=1000.0",
-				"--tolledVehicleTypes=heavy40t,heavy40t_electro",
+				"--tolledVehicleTypes=" + HEAVY_40T + "," + HEAVY_40T_ELECTRO,
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_PLAN_BOTH_CHAINS,
 				"--lsp1Name=Edeka",
 				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 				"--lsp1HubLinkId=91085",
-				"--lsp1vehTypesDirect=heavy40t",
-				"--lsp1vehTypesMain=heavy40t",
-				"--lsp1vehTypesDelivery=heavy40t",
+				"--lsp1vehTypesDirect=" + HEAVY_40T,
+				"--lsp1vehTypesMain=" + HEAVY_40T,
+				"--lsp1vehTypesDelivery=" + HEAVY_40T,
 				"--lsp2Name=Kaufland",
 				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 				"--lsp2HubLinkId=91085",
-				"--lsp2vehTypesDirect=heavy40t_electro", //Note this was electro in my reference case, when creating the IT.
-				"--lsp2vehTypesMain=heavy40t",
-				"--lsp2vehTypesDelivery=light8t_electro"
+				"--lsp2vehTypesDirect=" + HEAVY_40T_ELECTRO, //Note this was electro in my reference case, when creating the IT.
+				"--lsp2vehTypesMain=" + HEAVY_40T,
+				"--lsp2vehTypesDelivery=" + LIGHT_8T_ELECTRO
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
