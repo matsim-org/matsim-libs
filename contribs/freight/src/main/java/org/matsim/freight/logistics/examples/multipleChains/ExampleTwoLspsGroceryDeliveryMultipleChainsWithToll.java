@@ -177,27 +177,13 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		RoadPricingScheme rpScheme = setUpRoadpricing(scenario);
 
-//		CarrierVehicleTypes vehTypeLarge = new CarrierVehicleTypes();
-//		List.of("heavy40t").forEach(type ->
-//			vehTypeLarge.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-//		);
-//		CarrierVehicleTypes vehTypeLargeBEV = new CarrierVehicleTypes();
-//		List.of("heavy40t_electro").forEach(type ->
-//			vehTypeLargeBEV.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-//		);
-//
-//		CarrierVehicleTypes vehTypeSmallBEV = new CarrierVehicleTypes();
-//		List.of("light8t_electro").forEach(type ->
-//			vehTypeSmallBEV.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-//		);
-
 
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
 
 		for (LspDefinition lspDefinition : lspDefinitionList) {
-			Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId, CarrierImpl.class));
-			final Collection<LspShipment> lspShipmentsFromCarrierShipments = MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier);
+			Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId(), CarrierImpl.class));
+			Collection<LspShipment> lspShipmentsFromCarrierShipments = MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier);
 
 			CarrierVehicleTypes vehTypesDirect = new CarrierVehicleTypes();
 			(lspDefinition.vehTypesDirect()).forEach(type ->
@@ -211,8 +197,9 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 			CarrierVehicleTypes vehTypesDelivery = new CarrierVehicleTypes();
 			(lspDefinition.vehicleTypesDelivery()).forEach(type ->
-				vehTypesDirect.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypesAvailable.getVehicleTypes().get(Id.createVehicleTypeId(type)))
+				vehTypesDelivery.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypesAvailable.getVehicleTypes().get(Id.createVehicleTypeId(type)))
 			);
+
 			switch (typeOfLsps) {
 				case ONE_CHAIN_DIRECT -> {
 					LSP lsp = createLspWithOneChain_Direct(
