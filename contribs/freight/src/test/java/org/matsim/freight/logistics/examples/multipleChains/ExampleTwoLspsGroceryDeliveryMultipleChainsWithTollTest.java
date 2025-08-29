@@ -38,11 +38,11 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 
 /**
  * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
- * It is **not** meat to get never chanced. In contrast, it will prevent me from unintended changes.
+ * It is **not** meant to get never chanced. In contrast, it will prevent me from unintended changes.
  * I assume that with ongoing work, I will adapt the test input regularly.
  */
     @Test
-    public void testOutputIsEqual_OneChainDirect() {
+    public void testOutputIsEqual_onePlanOnlyDirectChain() {
 
         try {
 				String[] argsToSet = {
@@ -78,11 +78,11 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 
 	/**
 	 * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
-	 * It is **not** meat to get never chanced. In contrast, it will prevent me from unintended changes.
+	 * It is **not** meant to get never chanced. In contrast, it will prevent me from unintended changes.
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 */
 	@Test
-	public void testOutputIsEqual_oneChain2echelon() {
+	public void testOutputIsEqual_onePlanOnly2echelonChain() {
 
 		try {
 			String[] argsToSet = {
@@ -118,11 +118,11 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 
 	/**
 	 * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
-	 * It is **not** meat to get never chanced. In contrast, it will prevent me from unintended changes.
+	 * It is **not** meant to get never chanced. In contrast, it will prevent me from unintended changes.
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 */
 	@Test
-	public void testOutputIsEqual_twoChains() {
+	public void testOutputIsEqual_OnePlanBothChains() {
 
 		try {
 			String[] argsToSet = {
