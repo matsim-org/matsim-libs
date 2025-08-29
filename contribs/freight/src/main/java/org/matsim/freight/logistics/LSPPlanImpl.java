@@ -87,8 +87,9 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public void setType(final String type) {
+  public LSPPlan setType(final String type) {
     this.type = type;
+	  return null;
   }
 
   @Override

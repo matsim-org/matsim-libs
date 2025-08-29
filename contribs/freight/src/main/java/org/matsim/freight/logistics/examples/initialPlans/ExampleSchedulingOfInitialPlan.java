@@ -99,8 +99,7 @@ import org.matsim.vehicles.VehicleUtils;
     // The initial plan of the lsp is generated and the assigner and the solution from above are
     // added
     LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-    InitialShipmentAssigner assigner =
-        ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+    InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
     collectionPlan.setInitialShipmentAssigner(assigner);
     collectionPlan.addLogisticChain(collectionSolution);
 
