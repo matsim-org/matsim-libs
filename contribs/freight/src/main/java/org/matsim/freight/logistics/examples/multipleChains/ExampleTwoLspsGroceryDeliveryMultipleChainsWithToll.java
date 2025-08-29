@@ -123,13 +123,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp1HubLinkId")
 				.map(Id::createLinkId)
 				.orElse(Id.createLinkId("91085")), // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
-			cmd.getOption("lsp1vehTypesDirect")//Vehicle types for direct chain
+			//Vehicle types for direct chain
+			cmd.getOption("lsp1vehTypesDirect")
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(List.of("heavy40t")),
-			cmd.getOption("lsp1vehTypesMain")//Vehicle types for main run of 2-echelon chain
+			//Vehicle types for main run of 2-echelon chain
+			cmd.getOption("lsp1vehTypesMain")
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(List.of("heavy40t")),
-			cmd.getOption("lsp1vehTypesDelivery")//Vehicle types for delivery run of 2-echelon chain
+			//Vehicle types for delivery run of 2-echelon chain
+			cmd.getOption("lsp1vehTypesDelivery")
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(List.of("heavy40t"))
 		);
@@ -143,13 +146,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp2HubLinkId")
 				.map(Id::createLinkId)
 				.orElse(Id.createLinkId("91085")), // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
-			cmd.getOption("lsp2vehTypesDirect")//Vehicle types for direct chain
-				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t_electro")),
-			cmd.getOption("lsp2vehTypesMain")//Vehicle types for main run of 2-echelon chain
+			//Vehicle types for direct chain
+			cmd.getOption("lsp2vehTypesDirect")
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(List.of("heavy40t")),
-			cmd.getOption("lsp2vehTypesDelivery")//Vehicle types for delivery run of 2-echelon chain
+			//Vehicle types for main run of 2-echelon chain
+			cmd.getOption("lsp2vehTypesMain")
+				.map(s -> Arrays.asList(s.split(",")))
+				.orElse(List.of("heavy40t_electro")),
+			//Vehicle types for delivery run of 2-echelon chain
+			cmd.getOption("lsp2vehTypesDelivery")
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(List.of("light8t_electro"))
 		);
