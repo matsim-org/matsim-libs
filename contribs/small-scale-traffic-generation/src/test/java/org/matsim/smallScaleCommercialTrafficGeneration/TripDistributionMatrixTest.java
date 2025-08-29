@@ -84,7 +84,7 @@ public class TripDistributionMatrixTest {
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		ArrayList<String> listOfZones = new ArrayList<>( List.of("area1", "area2", "area3"));
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
+				.newInstance(getZoneIndex(inputDataDirectory), shapeFileZoneNameColumn, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
                         listOfZones).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
@@ -101,13 +101,14 @@ public class TripDistributionMatrixTest {
 					for (Integer purpose : trafficVolumePerTypeAndZone_start
 							.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).keySet()) {
 						odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, usedTrafficType,
-								network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
+								network, regionLinksMap, resistanceFactor);
 					}
 				}
 			}
 		}
 		odMatrix.clearRoundingError();
 
+		odMatrix.writeODMatrices(Path.of(utils.getOutputDirectory()), usedTrafficType);
 		//tests
 		Assertions.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);
 		for (String zone : resultingDataPerZone.keySet()) {
@@ -179,7 +180,7 @@ public class TripDistributionMatrixTest {
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 		final TripDistributionMatrix odMatrix = TripDistributionMatrix.Builder
-				.newInstance(getZoneIndex(inputDataDirectory), trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
+				.newInstance(getZoneIndex(inputDataDirectory), shapeFileZoneNameColumn, trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop, usedTrafficType,
                         listOfZones).build();
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = new HashMap<>();
@@ -196,7 +197,7 @@ public class TripDistributionMatrixTest {
 					for (Integer purpose : trafficVolumePerTypeAndZone_start
 							.get(TrafficVolumeGeneration.makeTrafficVolumeKey(startZone, modeORvehType)).keySet()) {
 						odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, usedTrafficType,
-								network, regionLinksMap, resistanceFactor, shapeFileZoneNameColumn);
+								network, regionLinksMap, resistanceFactor);
 					}
 				}
 			}

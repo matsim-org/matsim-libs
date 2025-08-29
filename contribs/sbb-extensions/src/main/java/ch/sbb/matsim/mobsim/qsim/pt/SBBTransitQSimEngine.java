@@ -120,6 +120,13 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
         checkSettings();
     }
 
+	/**
+	 * Tha agent id for an umlauf.
+	 */
+	static String createId(TransitLine line, TransitRoute route, Departure departure) {
+		return line.getId().toString() + "_" + route.getId().toString() + "_" + departure.getId().toString();
+	}
+
     private void checkSettings() {
         if (this.config.getDeterministicServiceModes().isEmpty()) {
             log.warn("There are no modes registered for the deterministic transit simulation, so no transit vehicle will be handled by this engine.");
@@ -261,7 +268,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     }
 
     private Umlauf createUmlauf(TransitLine line, TransitRoute route, Departure departure) {
-        Id<Umlauf> id = Id.create(line.getId().toString() + "_" + route.getId().toString() + "_" + departure.getId().toString(), Umlauf.class);
+        Id<Umlauf> id = Id.create(createId(line, route, departure), Umlauf.class);
         UmlaufImpl umlauf = new UmlaufImpl(id);
         UmlaufStueck part = new UmlaufStueck(line, route, departure);
         umlauf.getUmlaufStuecke().add(part);

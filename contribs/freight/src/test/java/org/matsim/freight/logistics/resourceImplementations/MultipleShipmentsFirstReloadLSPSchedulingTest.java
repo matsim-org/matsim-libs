@@ -21,6 +21,7 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.matsim.freight.logistics.LSPConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -181,7 +182,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			builder.setStartTimeWindow(startTimeWindow);
 			builder.setDeliveryServiceTime(capacityDemand * 60);
 			LspShipment shipment = builder.build();
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 		lsp.scheduleLogisticChains();
 
@@ -206,7 +207,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertEquals(4, LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().size());
 			ArrayList<LspShipmentPlanElement> planElements = new ArrayList<>(LspShipmentUtils.getOrCreateShipmentPlan(lsp.getSelectedPlan(), shipment.getId()).getPlanElements().values());
 			planElements.sort(LspShipmentUtils.createShipmentPlanElementComparator());
-			assertEquals("HANDLING", planElements.get(3).getElementType());
+			assertEquals(HANDLING, planElements.get(3).getElementType());
 			assertTrue(planElements.get(3).getEndTime() >= (0));
 			assertTrue(planElements.get(3).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(3).getStartTime() <= planElements.get(3).getEndTime());
@@ -217,7 +218,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 
 			assertEquals(planElements.get(3).getStartTime(), planElements.get(2).getEndTime() + 300, 0.0);
 
-			assertEquals("UNLOAD", planElements.get(2).getElementType());
+			assertEquals(UNLOAD, planElements.get(2).getElementType());
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(2).getStartTime() <= planElements.get(2).getEndTime());
@@ -228,7 +229,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 
 			assertEquals(planElements.get(2).getStartTime(), planElements.get(1).getEndTime(), 0.0);
 
-			assertEquals("TRANSPORT", planElements.get(1).getElementType());
+			assertEquals(TRANSPORT, planElements.get(1).getElementType());
 			assertTrue(planElements.get(1).getEndTime() >= (0));
 			assertTrue(planElements.get(1).getEndTime() <= (24*3600));
 			assertTrue(planElements.get(1).getStartTime() <= planElements.get(1).getEndTime());
@@ -239,7 +240,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 
 			assertEquals(planElements.get(1).getStartTime(), planElements.get(0).getEndTime(), 0.0);
 
-			assertEquals("LOAD", planElements.get(0).getElementType());
+			assertEquals(LOAD, planElements.get(0).getElementType());
 			assertTrue(planElements.get(0).getEndTime() >= (0));
 			assertTrue(planElements.getFirst().getEndTime() <= (24*3600));
 			assertTrue(planElements.getFirst().getStartTime() <= planElements.getFirst().getEndTime());
@@ -252,10 +253,10 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 
 		assertEquals(1, firstTranshipmentHubResource.getSimulationTrackers().size());
 		ArrayList<EventHandler> eventHandlers = new ArrayList<>(firstTranshipmentHubResource.getSimulationTrackers());
-		assertInstanceOf(TransshipmentHubTourEndEventHandler.class, eventHandlers.getFirst());
-		TransshipmentHubTourEndEventHandler reloadEventHandler = (TransshipmentHubTourEndEventHandler) eventHandlers.getFirst();
+		assertInstanceOf(TransshipmentHubEventHandler.class, eventHandlers.getFirst());
+		TransshipmentHubEventHandler reloadEventHandler = (TransshipmentHubEventHandler) eventHandlers.getFirst();
 
-		for (Entry<CarrierService, TransshipmentHubTourEndEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
+		for (Entry<CarrierService, TransshipmentHubEventHandler.TransshipmentHubEventHandlerPair> entry : reloadEventHandler.getServicesWaitedFor().entrySet()) {
 			CarrierService service = entry.getKey();
 			LspShipment shipment = entry.getValue().lspShipment;
 			LogisticChainElement element = entry.getValue().logisticChainElement;
@@ -294,8 +295,8 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			assertSame(endHandler.getResourceId(), planElements.get(2).getResourceId());
 			assertSame(endHandler.getResourceId(), lsp.getResources().iterator().next().getId());
 
-			assertInstanceOf(CollectionServiceEndEventHandler.class, eventHandlers.get(1));
-			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
+			assertInstanceOf(CollectionJobEventHandler.class, eventHandlers.get(1));
+			CollectionJobEventHandler serviceHandler = (CollectionJobEventHandler) eventHandlers.get(1);
 			assertSame(serviceHandler.getCarrierService().getServiceLinkId(), shipment.getFrom());
             assertEquals(serviceHandler.getCarrierService().getCapacityDemand(), shipment.getSize());
 			assertEquals(serviceHandler.getCarrierService().getServiceDuration(), shipment.getDeliveryServiceTime(), 0.0);

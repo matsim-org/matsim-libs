@@ -129,7 +129,7 @@ public class RunEDrtScenarioIT {
 
 		controller.run();
 
-		assertEquals(1926, tracker.passengerPickupEvents);
+		assertEquals(1919, tracker.passengerPickupEvents);
 	}
 
 
@@ -145,6 +145,9 @@ public class RunEDrtScenarioIT {
 		PrebookingParams prebookingParams = new PrebookingParams();
 		prebookingParams.setAbortRejectedPrebookings(false);
 		drtConfig.addParameterSet(prebookingParams);
+
+		// do not schedule hub returns before prebooked stops
+		drtConfig.setReturnToDepotMinIdleGap(Double.MAX_VALUE);
 
 		Controler controller = RunEDrtScenario.createControler(config, false);
 		ProbabilityBasedPrebookingLogic.install(controller, drtConfig, 0.5, 4.0 * 3600.0);
