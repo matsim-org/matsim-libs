@@ -95,6 +95,13 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 	private ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll() {}
 
+
+	/**
+	 * The following is configured using command line option.
+	 * Please have a look to the {@link RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll} class and / or to the tests.
+	 * @param args
+	 * @throws CommandLine.ConfigurationException
+	 */
 	public static void main(String[] args) throws CommandLine.ConfigurationException {
 
 		List<LspDefinition> lspDefinitionList = new LinkedList<>();
@@ -106,66 +113,72 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		//Muss noch weiter auf die anderen Optionen angepasst werden.
 		MATSIM_ITERATIONS = cmd.getOption("matsimIterations").map(Integer::parseInt).orElse(1); // I know that MATSim-iters can be set more directly.
-		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDelivery_kmt_banDieselVehicles_"+MATSIM_ITERATIONS+"it"); // Todo: replace with the central setting: --config:controller.outputDirectory
+		OUTPUT_DIRECTORY = cmd.getOption("outputDirectory").orElse("output/groceryDeliveryWToll_"+MATSIM_ITERATIONS+"it"); // Todo: replace with the central setting: --config:controller.outputDirectory
 
 		jspritIterationsMainCarrier = cmd.getOption("jspritIterationsMain").map(Integer::parseInt).orElse(1);
 		jspritIterationsDirectCarrier = cmd.getOption("jspritIterationsDirect").map(Integer::parseInt).orElse(1);
 		jspritIterationsDistributionCarrier = cmd.getOption("jspritIterationsDistribution").map(Integer::parseInt).orElse(1);
-		TOLL_VALUE = cmd.getOption("tollValue").map(Double::parseDouble).orElse(1000.0);
+		TOLL_VALUE = cmd.getOption("tollValue").map(Double::parseDouble).orElse(0.0);
 		TOLLED_VEHICLE_TYPES = cmd.getOption("tolledVehicleTypes")
 			.map(s -> Arrays.asList(s.split(",")))
-			.orElse(List.of("heavy40t", "heavy40t_electro")); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
+			.orElse(new ArrayList<>()); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 		HUBCOSTS_FIX = cmd.getOption("HubCostsFix").map(Double::parseDouble).orElse(100.0);
 
-
+		// Which types of LSP(s) should be created?
 		final TypeOfLsps typeOfLsps = cmd.getOption("typeOfLsps")
 			.map(TypeOfLsps::valueOf)
-			.orElse(TypeOfLsps.ONE_PLAN_BOTH_CHAINS); // Default is DIRECT_AND_TWO_ECHELON
+			.orElse(null); // Default is DIRECT_AND_TWO_ECHELON
 
 		//lsp1
 		LspDefinition lsp1Definition = new LspDefinition(
-			cmd.getOption("lsp1Name").orElse("Edeka"),
-			cmd.getOption("lsp1CarrierId").orElse("edeka_SUPERMARKT_TROCKEN"),
+			cmd.getOption("lsp1Name").orElse(null),
+			cmd.getOption("lsp1CarrierId").orElse(null), //The carrier used to build the LSP from.
 			cmd.getOption("lsp1HubLinkId")
 				.map(Id::createLinkId)
-				.orElse(Id.createLinkId("91085")), // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+				.orElse(null), // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp1vehTypesDirect")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t")),
+				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesMain")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t")),
+				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesDelivery")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t"))
+				.orElse(null)
 		);
-		lspDefinitionList.add(lsp1Definition);
+		//these two values needs to be set for all uses. The others depend on the setting "typeOfLsps". Will not look at them here.
+		if (lsp1Definition.name()!=null && lsp1Definition.carrierId()!=null) {
+			lspDefinitionList.add(lsp1Definition);
+		}
 
 
 		//lsp2
 		LspDefinition lsp2Definition = new LspDefinition(
-			cmd.getOption("lsp2Name").orElse("Kaufland"),
-			cmd.getOption("lsp2CarrierId").orElse("kaufland_VERBRAUCHERMARKT_TROCKEN"),
+			cmd.getOption("lsp2Name").orElse(null),
+			cmd.getOption("lsp2CarrierId").orElse(null),
 			cmd.getOption("lsp2HubLinkId")
 				.map(Id::createLinkId)
-				.orElse(Id.createLinkId("91085")), // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
+				.orElse(null), // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp2vehTypesDirect")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t")),
+				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesMain")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("heavy40t")),
+				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesDelivery")
 				.map(s -> Arrays.asList(s.split(",")))
-				.orElse(List.of("light8t_electro"))
+				.orElse(null)
 		);
-		lspDefinitionList.add(lsp2Definition);
+		//these two values needs to be set for all uses. The others depend on the setting "typeOfLsps". Will not look at them here.
+		if (lsp2Definition.name()!=null && lsp2Definition.carrierId()!=null) {
+			lspDefinitionList.add(lsp2Definition);
+		}
 
 
 		log.info("Prepare config");
