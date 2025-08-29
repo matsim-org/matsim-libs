@@ -597,7 +597,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		}
 
 		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		LSPUtils.splitShipmentsIfNeeded(lsp);
+		lsp = LSPUtils.splitShipmentsIfNeeded(lsp);
 	}
 
 	private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
