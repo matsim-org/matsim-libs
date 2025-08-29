@@ -33,7 +33,7 @@ import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLsp
 public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
     private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest.class);
 	private static final String HEAVY_40T = "heavy40t";
-	private static final String HEAVY_40T_ELECTRO = HEAVY_40T + "_electro";
+	private static final String HEAVY_40T_ELECTRO = "heavy40t_electro";
 	private static final String LIGHT_8T_ELECTRO = "light8t_electro";
 
 	@RegisterExtension
@@ -85,6 +85,44 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
         //Compare events files
         MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
     }
+
+	/**
+	 * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
+	 * It is **not** meant to get never chanced. In contrast, it will prevent me from unintended changes.
+	 * I assume that with ongoing work, I will adapt the test input regularly.
+	 */
+	@Test
+	public void testOutputIsEqual_onePlanOnlyDirectChain_Edeka() {
+
+		try {
+			String[] argsToSet = {
+				"--outputDirectory=" + utils.getOutputDirectory(),
+				"--matsimIterations=1",
+				"--jspritIterationsMain=1",
+				"--jspritIterationsDirect=1",
+				"--jspritIterationsDistribution=1",
+				"--tollValue=1000.0",
+				"--tolledVehicleTypes=" + HEAVY_40T + "," + HEAVY_40T_ELECTRO,
+				"--HubCostsFix=100.0",
+				"--typeOfLsps="+ ONE_PLAN_ONLY_DIRECT_CHAIN,
+				"--lsp1Name=Edeka",
+				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1HubLinkId=91085",
+				"--lsp1vehTypesDirect=" + HEAVY_40T,
+			};
+			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
+
+		} catch (Exception ee) {
+			log.fatal(ee);
+			fail();
+		}
+
+		//Compare LSP files
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
+
+		//Compare events files
+		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+	}
 
 	/**
 	 * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
