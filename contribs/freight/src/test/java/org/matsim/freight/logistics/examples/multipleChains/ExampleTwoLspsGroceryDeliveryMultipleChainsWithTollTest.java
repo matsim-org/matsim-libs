@@ -58,9 +58,15 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 					"--lsp1Name=Edeka",
 					"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 					"--lsp1HubLinkId=91085",
+					"--lsp1vehTypesDirect=heavy40t",
+//					"--lsp1vehTypesMain=heavy40t",
+//					"--lsp1vehTypesDelivery=heavy40t",
 					"--lsp2Name=Kaufland",
 					"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-					"--lsp2HubLinkId=91085"
+					"--lsp2HubLinkId=91085",
+					"--lsp2vehTypesDirect=heavy40t",
+//					"--lsp2vehTypesMain=heavy40t",
+//					"--lsp2vehTypesDelivery=light8t_electro"
 				};
 				ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
@@ -98,9 +104,15 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--lsp1Name=Edeka",
 				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 				"--lsp1HubLinkId=91085",
+//				"--lsp1vehTypesDirect=heavy40t",
+				"--lsp1vehTypesMain=heavy40t",
+				"--lsp1vehTypesDelivery=heavy40t",
 				"--lsp2Name=Kaufland",
 				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-				"--lsp2HubLinkId=91085"
+				"--lsp2HubLinkId=91085",
+//				"--lsp2vehTypesDirect=heavy40t",
+				"--lsp2vehTypesMain=heavy40t",
+				"--lsp2vehTypesDelivery=light8t_electro"
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
@@ -138,9 +150,15 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--lsp1Name=Edeka",
 				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 				"--lsp1HubLinkId=91085",
+				"--lsp1vehTypesDirect=heavy40t",
+				"--lsp1vehTypesMain=heavy40t",
+				"--lsp1vehTypesDelivery=heavy40t",
 				"--lsp2Name=Kaufland",
 				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-				"--lsp2HubLinkId=91085"
+				"--lsp2HubLinkId=91085",
+				"--lsp2vehTypesDirect=heavy40t_electro", //Note this was electro in my reference case, when creating the IT.
+				"--lsp2vehTypesMain=heavy40t",
+				"--lsp2vehTypesDelivery=light8t_electro"
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
