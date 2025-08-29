@@ -55,10 +55,12 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 					"--tolledVehicleTypes=heavy40t,heavy40t_electro",
 					"--HubCostsFix=100.0",
 					"--typeOfLsps="+ONE_CHAIN_DIRECT,
-					"--EdekaCarrierId=edeka_SUPERMARKT_TROCKEN",
-					"--HubLinkIdEdeka=91085",
-					"--KauflandCarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-					"--HubLinkIdKaufland=91085"
+					"--lsp1Name=Edeka",
+					"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+					"--lsp1HubLinkId=91085",
+					"--lsp2Name=Kaufland",
+					"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
+					"--lsp2HubLinkId=91085"
 				};
 				ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
@@ -93,10 +95,12 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--tolledVehicleTypes=heavy40t,heavy40t_electro",
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ ONE_CHAIN_TWO_ECHELON,
-				"--EdekaCarrierId=edeka_SUPERMARKT_TROCKEN",
-				"--HubLinkIdEdeka=91085",
-				"--KauflandCarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-				"--HubLinkIdKaufland=91085"
+				"--lsp1Name=Edeka",
+				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1HubLinkId=91085",
+				"--lsp2Name=Kaufland",
+				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
+				"--lsp2HubLinkId=91085"
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
@@ -131,10 +135,12 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 				"--tolledVehicleTypes=heavy40t,heavy40t_electro",
 				"--HubCostsFix=100.0",
 				"--typeOfLsps="+ TWO_CHAINS_DIRECT_AND_TWO_ECHELON,
-				"--EdekaCarrierId=edeka_SUPERMARKT_TROCKEN",
-				"--HubLinkIdEdeka=91085",
-				"--KauflandCarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-				"--HubLinkIdKaufland=91085"
+				"--lsp1Name=Edeka",
+				"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
+				"--lsp1HubLinkId=91085",
+				"--lsp2Name=Kaufland",
+				"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
+				"--lsp2HubLinkId=91085"
 			};
 			ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 
