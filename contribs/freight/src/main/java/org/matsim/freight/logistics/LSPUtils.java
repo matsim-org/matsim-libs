@@ -194,7 +194,7 @@ public final class LSPUtils {
 	 * <p></p>
 	 * To avoid any issues, this method works with a copy of the original LSP that was handed over.
 	 *
-	 * @param lsp the lsp for which the shipments should be split if needed
+	 * @param lspOrig the lsp for which the shipments should be split if needed
 	 * @return the lsp with the updated shipments
 	 */
 	public static LSP splitShipmentsIfNeeded(LSP lspOrig) {
@@ -217,7 +217,7 @@ public final class LSPUtils {
 		}
 
 		if (lowestCapacity == Double.MAX_VALUE) {
-			log.error("LSP: {}: Did not find the capacities of the vehicles from the CarrierRessources. Aborting", lsp.getId());
+			log.error("LSP: {}: Did not find the capacities of the vehicles from the CarrierResources. Aborting", lsp.getId());
 			throw new IllegalStateException();
 		} else {
 			lowestCapacity = (int) lowestCapacity; // ensure that the capacity is an integer value
@@ -279,7 +279,7 @@ public final class LSPUtils {
 
 		// Add the new shipments to the LSP and assign them to the lspPlans
 		// Todo: Now, this is done with the some algorithm as in the InitialShipmentAssigner.
-		// so it may be that the splited shipments are not assigned to the same plans as before and/or that some parts of the same original shipment are assigned to different plans.
+		// so it may be that the (split) shipments are not assigned to the same plans as before and/or that some parts of the same original shipment are assigned to different plans.
 		for (LspShipment newLspShipment : newShipments) {
 			lsp.assignShipmentToLspPlan(newLspShipment);
 		}

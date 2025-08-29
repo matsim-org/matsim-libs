@@ -180,31 +180,18 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypesAvailable);
 		carrierReader.readFile(CARRIER_PLAN_FILE);
 
-
 		RoadPricingScheme rpScheme = setUpRoadpricing(scenario);
-
 
 		log.info("Add LSP(s) to the scenario");
 		Collection<LSP> lsps = new LinkedList<>();
 
 		for (LspDefinition lspDefinition : lspDefinitionList) {
-			Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId(), CarrierImpl.class));
-			Collection<LspShipment> lspShipmentsFromCarrierShipments = MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier);
+			final Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId(), CarrierImpl.class));
+			final Collection<LspShipment> lspShipmentsFromCarrierShipments = MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier);
 
-			CarrierVehicleTypes vehTypesDirect = new CarrierVehicleTypes();
-			(lspDefinition.vehTypesDirect()).forEach(type ->
-				vehTypesDirect.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypesAvailable.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-			);
-
-			CarrierVehicleTypes vehTypesMain = new CarrierVehicleTypes();
-			(lspDefinition.vehicleTypesMain()).forEach(type ->
-				vehTypesMain.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypesAvailable.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-			);
-
-			CarrierVehicleTypes vehTypesDelivery = new CarrierVehicleTypes();
-			(lspDefinition.vehicleTypesDelivery()).forEach(type ->
-				vehTypesDelivery.getVehicleTypes().put(Id.createVehicleTypeId(type), vehicleTypesAvailable.getVehicleTypes().get(Id.createVehicleTypeId(type)))
-			);
+			final CarrierVehicleTypes vehTypesDirect = extractVehicleTypes(lspDefinition.vehTypesDirect(), vehicleTypesAvailable);
+			final CarrierVehicleTypes vehTypesMain = extractVehicleTypes(lspDefinition.vehicleTypesMain(), vehicleTypesAvailable);
+			final CarrierVehicleTypes vehTypesDelivery = extractVehicleTypes(lspDefinition.vehicleTypesDelivery(), vehicleTypesAvailable);
 
 			switch (typeOfLsps) {
 				case ONE_CHAIN_DIRECT -> {
@@ -568,6 +555,24 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			}
 		}
 		return resourceList;
+	}
+
+	/**
+	 * Extract the vehicle types from the available types
+	 *
+	 * @param typeNames List of names of vehicle types to extract
+	 * @param availableTypes container with all available vehicle types
+	 * @return the extracted vehicle types
+	 */
+	private static CarrierVehicleTypes extractVehicleTypes(List<String> typeNames, CarrierVehicleTypes availableTypes) {
+		CarrierVehicleTypes result = new CarrierVehicleTypes();
+		typeNames.forEach(type ->
+			result.getVehicleTypes().put(
+				Id.createVehicleTypeId(type),
+				availableTypes.getVehicleTypes().get(Id.createVehicleTypeId(type))
+			)
+		);
+		return result;
 	}
 
 	private static Id<Link> getDepotLinkFromVehicle(Carrier carrier) {
