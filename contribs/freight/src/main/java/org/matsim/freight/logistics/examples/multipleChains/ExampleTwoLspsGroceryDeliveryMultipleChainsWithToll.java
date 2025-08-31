@@ -46,6 +46,7 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
+import org.matsim.freight.carriers.usecases.CarrierScorerEventBasedInclToll;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.freight.logistics.examples.MyLSPScorer;
@@ -359,7 +360,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			new AbstractModule() {
 				@Override
 				public void install() {
-					bind(CarrierScoringFunctionFactory.class).toInstance(new EventBasedCarrierScorer4MultipleChainsInclToll());
+					bind(CarrierScoringFunctionFactory.class).toInstance(new CarrierScorerEventBasedInclToll());
 					bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 					bind(CarrierStrategyManager.class)
 						.toProvider(
