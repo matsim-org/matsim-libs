@@ -1,25 +1,24 @@
 /*
- *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       :  (C) 2024 by the members listed in the COPYING,       *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * ***********************************************************************
+ *   *********************************************************************** *
+ *   project: org.matsim.*													 *
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C) 2025 by the members listed in the COPYING, 		 *
+ *                          LICENSE and WARRANTY file.  					 *
+ *   email           : info at matsim dot org   							 *
+ *                                                                         	 *
+ *   *********************************************************************** *
+ *                                                                        	 *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *      it under the terms of the GNU General Public License as published by *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.								     *
+ *     See also COPYING, LICENSE and WARRANTY file						 	 *
+ *                                                                           *
+ *   *********************************************************************** *
  */
 
-package org.matsim.freight.logistics.examples.multipleChains;
+package org.matsim.freight.carriers.usecases;
 
 import com.google.inject.Inject;
 import java.util.*;
@@ -52,12 +51,11 @@ import org.matsim.vehicles.VehicleUtils;
  *  - distance-dependent costs (using LinkEnterEvent)
  * 	- tolls (using PersonMoneyEvent)
  *
- * 	@todo Maybe move this up to the carrier package and make it public?
- * 	Can this be the new default scoring function for carriers?
+ * 	@todo 	Can this be the new default scoring function for carriers?
  * 	Discuss with RE/KN and write tests around it.
  *  @author Kai Martins-Turner (kturner)
  */
-class EventBasedCarrierScorer4MultipleChainsInclToll implements CarrierScoringFunctionFactory {
+public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory {
 
 	@Inject private Scenario scenario;
 
