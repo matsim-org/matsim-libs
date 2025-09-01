@@ -718,15 +718,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	private static CarrierVehicleTypes extractVehicleTypes(List<String> typeNames, CarrierVehicleTypes availableTypes) {
 		CarrierVehicleTypes result = new CarrierVehicleTypes();
 		if (typeNames != null) {
-			typeNames.forEach(type -> {
-					var typeId = Id.createVehicleTypeId(type);
-					var vehicleType = availableTypes.getVehicleTypes().get(typeId);
-					if (vehicleType != null) { //only add if type is there.
-						result.getVehicleTypes().put(typeId, vehicleType);
-					} else {
-						log.warn("No vehicle type with Id {} found in available types. Will ignore it. Available types are: {}", typeId, availableTypes.getVehicleTypes().keySet().toString());
-					}
-				}
+			typeNames.forEach(type ->
+				result.getVehicleTypes().put(
+					Id.createVehicleTypeId(type),
+					availableTypes.getVehicleTypes().get(Id.createVehicleTypeId(type))
+				)
 			);
 		}
 		return result;
