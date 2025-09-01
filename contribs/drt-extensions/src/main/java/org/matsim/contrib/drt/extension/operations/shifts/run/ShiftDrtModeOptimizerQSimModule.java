@@ -28,6 +28,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
@@ -112,13 +113,6 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 						getter.getModal(OperationFacilities.class),
 						getter.getModal(Network.class),
 						getter.getModal(TravelTimeMatrix.class))));
-
-		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
-				getter -> new ShiftStopWaypointFactory(
-						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class)),
-						getter.getModal(DvrpLoadType.class)
-				)
-		));
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter -> {
 			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);

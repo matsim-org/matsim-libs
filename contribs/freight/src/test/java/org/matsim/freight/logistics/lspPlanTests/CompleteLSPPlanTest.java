@@ -36,6 +36,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TranshipmentHubSchedulerBuilder;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils.TransshipmentHubBuilder;
@@ -153,7 +154,6 @@ public class CompleteLSPPlanTest {
 		secondHubElementBuilder.setResource(secondTransshipmentHubBuilder.build());
 		LogisticChainElement secondHubElement = secondHubElementBuilder.build();
 
-		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		org.matsim.vehicles.VehicleType distributionVehType = VehicleUtils.createVehicleType(distributionVehTypeId, TransportMode.car);
 		distributionVehType.getCapacity().setOther(10);
@@ -170,8 +170,10 @@ public class CompleteLSPPlanTest {
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarriersUtils.createCarrier(distributionCarrierId);
+
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("DistributionCarrier", Carrier.class));
 		carrier.setCarrierCapabilities(distributionCapabilities);
+		CarrierSchedulerUtils.setVrpLogic(carrier, LSPUtils.LogicOfVrp.serviceBased);
 
 
 		final LSPResource distributionCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrier)

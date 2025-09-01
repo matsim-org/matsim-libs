@@ -34,7 +34,7 @@
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
         <jogl.version>2.5.0</jogl.version>
 		<junit.version>5.13.4</junit.version>
     </properties>
@@ -352,13 +352,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.18.0</version>
+                <version>5.19.0</version>
                 <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>5.18.0</version>
+				<version>5.19.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -383,13 +383,13 @@
 			<dependency>
 			    <groupId>com.google.j2objc</groupId>
 			    <artifactId>j2objc-annotations</artifactId>
-			    <version>3.0.0</version>
+			    <version>3.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.17.6</version>
+				<version>1.17.7</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -481,7 +481,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.11.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

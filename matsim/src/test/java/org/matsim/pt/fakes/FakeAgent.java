@@ -71,9 +71,9 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 			Route route = new DefaultTransitPassengerRoute(enterStop, null, null, exitStop);
 			route.setStartLinkId(enterStop.getLinkId());
 			route.setEndLinkId(exitStop.getLinkId());
-			route.setRouteDescription("{" + 
+			route.setRouteDescription("{" +
 					"\"accessFacilityId\":\"" + enterStop.getId().toString() + "\"," +
-					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," + 
+					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," +
 					"\"transitLineId\":\"T1\"" +
 			"}");
 			this.dummyLeg.setRoute(route);
@@ -83,7 +83,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	@Override
 	public void endActivityAndComputeNextState(final double now) {
 	}
-	
+
 	@Override
 	public void setStateToAbort(final double now){
 	}
@@ -113,12 +113,12 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public String getMode() {
 		return this.dummyLeg.getMode();
 	}
-	
+
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
 		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId(); // not sure if this is very clever.  kai, jun'11
 	}
-	
+
 	@Override
 	public double getActivityEndTime() {
 		return 0;
@@ -199,5 +199,5 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public Facility getDestinationFacility() {
 		throw new RuntimeException("not implemented") ;
 	}
-	
+
 }

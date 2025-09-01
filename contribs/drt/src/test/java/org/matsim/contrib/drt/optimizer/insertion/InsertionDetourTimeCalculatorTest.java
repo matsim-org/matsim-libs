@@ -234,7 +234,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	private StopWaypoint stop(double beginTime, Link link) {
-		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), loadType.getEmptyLoad(), loadType);
+		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), loadType.getEmptyLoad(), loadType, false);
 	}
 
 	private VehicleEntry entry(Waypoint.Start start, StopWaypoint... stops) {
