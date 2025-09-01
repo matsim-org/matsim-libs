@@ -63,8 +63,8 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 					"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 					"--lsp1HubLinkId=91085",
 					"--lsp1vehTypesDirect=" + HEAVY_40T,
-//					"--lsp1vehTypesMain=heavy40t",
-//					"--lsp1vehTypesDelivery=heavy40t",
+					"--lsp1vehTypesMain=null",				//set to null
+					"--lsp1vehTypesDelivery=",				//not set -> should also get ignored later
 					"--lsp2Name=Kaufland",
 					"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 					"--lsp2HubLinkId=91085",
