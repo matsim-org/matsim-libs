@@ -121,6 +121,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		jspritIterationsDistributionCarrier = cmd.getOption("jspritIterationsDistribution").map(Integer::parseInt).orElse(1);
 		TOLL_VALUE = cmd.getOption("tollValue").map(Double::parseDouble).orElse(0.0);
 		TOLLED_VEHICLE_TYPES = cmd.getOption("tolledVehicleTypes")
+			.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non")) //Ignore empty strings or "null"-strings
 			.map(s -> Arrays.asList(s.split(",")))
 			.orElse(new ArrayList<>()); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 		HUBCOSTS_FIX = cmd.getOption("HubCostsFix").map(Double::parseDouble).orElse(100.0);
@@ -135,18 +136,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp1Name").orElse(null),
 			cmd.getOption("lsp1CarrierId").orElse(null), //The carrier used to build the LSP from.
 			cmd.getOption("lsp1HubLinkId")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non")) //Ignore empty strings or "null"-strings
 				.map(Id::createLinkId)
 				.orElse(null), // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp1vehTypesDirect")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesMain")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesDelivery")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null)
 		);
@@ -161,18 +166,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp2Name").orElse(null),
 			cmd.getOption("lsp2CarrierId").orElse(null),
 			cmd.getOption("lsp2HubLinkId")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(Id::createLinkId)
 				.orElse(null), // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp2vehTypesDirect")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesMain")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesDelivery")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null)
 		);
