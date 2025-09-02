@@ -2,6 +2,8 @@ package org.matsim.application.options;
 
 import picocli.CommandLine;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -19,7 +21,7 @@ public final class SampleOptions {
 	/**
 	 * Available sample sizes
 	 */
-	private final int[] sizes;
+	private final double[] sizes;
 	/**
 	 * Needs to be present or the mixin will not be processed at all.
 	 */
@@ -43,6 +45,11 @@ public final class SampleOptions {
 	 * @param sizes sizes in percent, e.g 1, 10, 25, etc..
 	 */
 	public SampleOptions(int... sizes) {
+		this.sizes = Arrays.stream(sizes).asDoubleStream().toArray();
+		this.sample = sizes[0];
+	}
+
+	public SampleOptions(double... sizes) {
 		this.sizes = sizes;
 		this.sample = sizes[0];
 	}
@@ -61,47 +68,47 @@ public final class SampleOptions {
 		// Build simple sample option without predefined sizes
 		if (sizes == null) {
 			CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-					builder("--sample-size")
-					.type(Double.class)
-					.description("Specify sample size fraction in (0, 1).")
-					.setter(new CommandLine.Model.ISetter() {
-						@Override
-						public <T> T set(T value) {
-							if (value == null)
-								return null;
+				builder("--sample-size")
+				.type(Double.class)
+				.description("Specify sample size fraction in (0, 1).")
+				.setter(new CommandLine.Model.ISetter() {
+					@Override
+					public <T> T set(T value) {
+						if (value == null)
+							return null;
 
-							setSize((double) value);
-							return value;
-						}
-					})
-					.required(true);
+						setSize((double) value);
+						return value;
+					}
+				})
+				.required(true);
 
 			spec.add(arg.build());
 
 		} else {
 
 			CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
-					.exclusive(true)
-					.heading("\nSample sizes:\n")
-					.multiplicity("0..1");
+				.exclusive(true)
+				.heading("\nSample sizes:\n")
+				.multiplicity("0..1");
 
 			for (int i = 0; i < sizes.length; i++) {
 
-				int size = sizes[i];
+				double size = sizes[i];
 
 				CommandLine.Model.OptionSpec.Builder arg = CommandLine.Model.OptionSpec.
-						builder(String.format("--%dpct", size))
-						.type(Boolean.class)
-						.order(i)
-						.description("Run scenario with " + size + " pct sample size")
-						.setter(new CommandLine.Model.ISetter() {
-							@Override
-							public <T> T set(T value) {
-								setSize(size / 100d);
-								return value;
-							}
-						})
-						.defaultValue(i == 0 ? "true" : "false");
+					builder("--" + getWithoutTrailingZeros(size) + "pct")
+					.type(Boolean.class)
+					.order(i)
+					.description("Run scenario with " + size + " pct sample size")
+					.setter(new CommandLine.Model.ISetter() {
+						@Override
+						public <T> T set(T value) {
+							setSize(size / 100d);
+							return value;
+						}
+					})
+					.defaultValue(i == 0 ? "true" : "false");
 
 				group.addArg(arg.build());
 			}
@@ -110,11 +117,15 @@ public final class SampleOptions {
 		}
 	}
 
+	private static String getWithoutTrailingZeros(double size) {
+		return new BigDecimal(String.valueOf(size)).stripTrailingZeros().toPlainString();
+	}
+
 	/**
-	 * Returns the specified sample size as percent between 1 and 100
+	 * Returns the specified sample size as percent
 	 */
-	public int getSize() {
-		return (int) (sample * 100);
+	public double getSize() {
+		return sample * 100;
 	}
 
 	/**
@@ -149,7 +160,7 @@ public final class SampleOptions {
 	public String adjustName(String name) {
 		if (!set) return name;
 
-		String postfix = getSize() + "pct";
+		String postfix = getWithoutTrailingZeros(getSize()) + "pct";
 
 		return PATTERN.matcher(name).replaceAll(postfix);
 	}
