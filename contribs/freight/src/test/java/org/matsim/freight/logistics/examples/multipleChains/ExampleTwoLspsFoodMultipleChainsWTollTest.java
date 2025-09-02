@@ -30,8 +30,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.TypeOfLsps.*;
 
-public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
-    private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest.class);
+public class ExampleTwoLspsFoodMultipleChainsWTollTest {
+    private static final Logger log = LogManager.getLogger(ExampleTwoLspsFoodMultipleChainsWTollTest.class);
 	private static final String HEAVY_40T = "heavy40t";
 	private static final String HEAVY_40T_ELECTRO = "heavy40t_electro";
 	private static final String LIGHT_8T_ELECTRO = "light8t_electro";
@@ -46,7 +46,7 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
  * I assume that with ongoing work, I will adapt the test input regularly.
  */
     @Test
-    public void testOutputIsEqual_onePlanOnlyDirectChain() {
+    public void testOutputIsEqual_1Plan_Direct() {
 
         try {
 				String[] argsToSet = {
@@ -92,7 +92,7 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 */
 	@Test
-	public void testOutputIsEqual_onePlanOnlyDirectChain_Edeka() {
+	public void testOutputIsEqual_1Plan_Direct_E() {
 
 		try {
 			String[] argsToSet = {
@@ -130,7 +130,7 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 	 * I assume that with ongoing work, I will adapt the test input regularly.
 	 */
 	@Test
-	public void testOutputIsEqual_onePlanOnly2echelonChain() {
+	public void testOutputIsEqual_1Plan_2e() {
 
 		try {
 			String[] argsToSet = {
@@ -174,9 +174,11 @@ public class ExampleTwoLspsGroceryDeliveryMultipleChainsWithTollTest {
 	 * This Test should ensure that the results are stable by checking for LSP File and events File to be equal to a previous run.
 	 * It is **not** meant to get never chanced. In contrast, it will prevent me from unintended changes.
 	 * I assume that with ongoing work, I will adapt the test input regularly.
+	 * <p></p>
+	 * 1 LSP-Plan with both chains (direct and 2-echelon)
 	 */
 	@Test
-	public void testOutputIsEqual_onePlanBothChains() {
+	public void testOutputIsEqual_1Plan_Both() {
 
 		try {
 			String[] argsToSet = {
