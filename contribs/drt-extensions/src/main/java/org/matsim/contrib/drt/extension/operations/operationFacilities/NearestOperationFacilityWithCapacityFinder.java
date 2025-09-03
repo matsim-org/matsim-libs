@@ -20,11 +20,11 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
     }
 
     @Override
-    public Optional<OperationFacility> findFacility(Coord coord, double fromInclusive, double toInclusive, Set<OperationFacilityType> types) {
+    public Optional<OperationFacility> findFacility(Coord coord, double fromInclusive, double toExclusive, Set<OperationFacilityType> types) {
         Predicate<OperationFacility> filter = typefilter(types);
         return operationFacilities.getFacilities().values().stream()
                 .filter(filter)
-                .filter(opFa -> opFa.hasCapacity(fromInclusive, toInclusive))
+                .filter(opFa -> opFa.hasCapacity(fromInclusive, toExclusive))
                 .min(Comparator.comparing(
                         f -> DistanceUtils.calculateSquaredDistance(coord, f.getCoord())));
     }

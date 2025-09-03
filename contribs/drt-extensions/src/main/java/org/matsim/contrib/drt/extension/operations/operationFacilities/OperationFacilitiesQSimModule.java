@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 
 	public static final int DEFAULT_CAPACITY_HORIZON = 30 * 3600;
+	public static final int TIME_BIN_SIZE = 300;
 
 	public OperationFacilitiesQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
@@ -61,15 +62,14 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 					List<OperationFacility> facilitiesList = new ArrayList<>(
 							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getFacilities().values());
 					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
-					int timeBinSize = 300; // seconds
 
-					ProfileCalculator profileCalculator = () ->
+                    ProfileCalculator profileCalculator = () ->
 							facilitiesList.stream().collect(
 									toImmutableMap(f -> f.getId().toString(),
 											f -> (double) f.getCheckedInVehicles().size()
 									)
 							);
-					return new TimeProfileCollector(header, profileCalculator, timeBinSize,
+					return new TimeProfileCollector(header, profileCalculator, TIME_BIN_SIZE,
 							"individual_operation_facility_capacity_time_profiles" + "_" + getMode(),
 							dvrpModeInstanceGetter.get(MatsimServices.class));
 				}));

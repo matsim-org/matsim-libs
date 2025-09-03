@@ -72,7 +72,7 @@ public class CapacityManagerTest {
         // request beyond horizon trimmed to [0,4]
         assertTrue(cm.registerVehicle(v1, -10, 10).isPresent());
         // any further reservation inside [0,4] should fail
-        assertFalse(cm.registerVehicle(v2, 2, 2).isPresent());
+        assertFalse(cm.registerVehicle(v2, 2, 3).isPresent());
     }
 
     @Test
