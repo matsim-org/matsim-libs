@@ -16,9 +16,9 @@ public class EDrtWaitForShiftTask extends WaitForShiftTask implements ETask {
     private final ChargingTask chargingTask;
 
     public EDrtWaitForShiftTask(double beginTime, double endTime, Link link,
-                                double consumedEnergy, OperationFacility facility,
+                                double consumedEnergy, OperationFacility.Registration facilityRegistration,
                                 ChargingTask chargingTask) {
-        super(beginTime, endTime, link, facility);
+        super(beginTime, endTime, link, facilityRegistration);
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;
     }

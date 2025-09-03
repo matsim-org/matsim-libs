@@ -15,6 +15,7 @@ import org.matsim.contrib.drt.extension.operations.operationFacilities.Operation
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
@@ -28,21 +29,27 @@ public class EDrtShiftChangeoverTaskImpl extends DefaultStayTask implements Shif
     private final DrtShift shift;
     private final double consumedEnergy;
     private final ChargingTask chargingTask;
-    private final OperationFacility facility;
 
 	private final DrtStopTask delegate;
+
+	private final OperationFacility.Registration operationFacilityRegistration;
 
 
 	public EDrtShiftChangeoverTaskImpl(double beginTime, double endTime, Link link,
                                        DrtShift shift, double consumedEnergy,
-                                       ChargingTask chargingTask, OperationFacility facility) {
+                                       ChargingTask chargingTask, OperationFacility.Registration operationFacilityRegistration) {
 		super(TYPE, beginTime, endTime, link);
 		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shift = shift;
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;
-        this.facility = facility;
+        this.operationFacilityRegistration = operationFacilityRegistration;
     }
+
+	@Override
+	public OperationFacility.Registration getFacilityRegistration() {
+		return operationFacilityRegistration;
+	}
 
     @Override
     public DrtShift getShift() {
@@ -58,10 +65,6 @@ public class EDrtShiftChangeoverTaskImpl extends DefaultStayTask implements Shif
         return chargingTask;
     }
 
-    @Override
-    public OperationFacility getFacility() {
-        return facility;
-    }
 
 	@Override
 	public Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests() {

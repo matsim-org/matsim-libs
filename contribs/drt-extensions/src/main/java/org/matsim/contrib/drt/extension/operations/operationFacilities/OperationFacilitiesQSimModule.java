@@ -14,21 +14,21 @@ import static org.matsim.contrib.common.timeprofile.TimeProfileCollector.Profile
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 
 import com.google.common.collect.ImmutableMap;
 
 public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
+
+	public static final int DEFAULT_CAPACITY_HORIZON = 30 * 3600;
 
 	public OperationFacilitiesQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
@@ -50,7 +50,7 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 						.values()
 						.stream()
 						.map(spec -> (OperationFacility)new OperationFacilityImpl(spec.getId(), spec.getLinkId(), spec.getCoord(), spec.getCapacity(),
-								spec.getChargers(), spec.getType()))
+								spec.getChargers(), spec.getType(), getConfig().qsim().getEndTime().orElse(DEFAULT_CAPACITY_HORIZON)))
 						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;
 			}
@@ -59,11 +59,17 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 		addModalQSimComponentBinding().toProvider(
 				modalProvider(dvrpModeInstanceGetter -> {
 					List<OperationFacility> facilitiesList = new ArrayList<>(
-							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getDrtOperationFacilities().values());
+							dvrpModeInstanceGetter.getModal(OperationFacilities.class).getFacilities().values());
 					var header = facilitiesList.stream().map(f -> f.getId() + "").collect(toImmutableList());
-					ProfileCalculator profileCalculator = () -> facilitiesList.stream()
-							.collect(toImmutableMap(f -> f.getId() + "", f -> (double)f.getRegisteredVehicles().size()));
-					return new TimeProfileCollector(header, profileCalculator, 300,
+					int timeBinSize = 300; // seconds
+
+					ProfileCalculator profileCalculator = () ->
+							facilitiesList.stream().collect(
+									toImmutableMap(f -> f.getId().toString(),
+											f -> (double) f.getCheckedInVehicles().size()
+									)
+							);
+					return new TimeProfileCollector(header, profileCalculator, timeBinSize,
 							"individual_operation_facility_capacity_time_profiles" + "_" + getMode(),
 							dvrpModeInstanceGetter.get(MatsimServices.class));
 				}));

@@ -80,28 +80,31 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public DefaultStayTask createInitialTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-        final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = operationFacilities.getDrtOperationFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
+        final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = operationFacilities.getFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
         final OperationFacility operationFacility;
         try {
             operationFacility = facilitiesByLink.get(vehicle.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        WaitForShiftTask waitForShiftTask = createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
-                vehicle.getStartLink(), operationFacility);
-        boolean success = operationFacility.register(vehicle.getId());
-        if (!success) {
+        Optional<OperationFacility.Registration> success = operationFacility.registerVehicle(vehicle.getId(), vehicle.getServiceBeginTime());
+        if (success.isPresent()) {
+            operationFacility.checkIn(success.get(), beginTime);
+            return createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+                    vehicle.getStartLink(), success.get());
+
+        } else {
             throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
                     "facility capacity and initial fleet distribution.", vehicle.getId().toString(), operationFacility.getId().toString()));
         }
-        return waitForShiftTask;
     }
 
     @Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                               DrtShiftBreak shiftBreak, OperationFacility facility) {
+                                               DrtShiftBreak shiftBreak, OperationFacility.Registration operationFacilityRegistration) {
         EvDvrpVehicle evVehicle = (EvDvrpVehicle) vehicle;
-        Optional<ChargerWithStrategy> charger = decideChargingAtBreak(facility, evVehicle.getElectricVehicle());
+        OperationFacility operationFacility = operationFacilities.getFacilities().get(operationFacilityRegistration.operationFacilityId());
+        Optional<ChargerWithStrategy> charger = decideChargingAtBreak(operationFacility, evVehicle.getElectricVehicle());
         if (charger.isPresent()) {
             final ChargerWithStrategy chargerImpl = charger.get();
             final double waitTime = ChargingEstimations.estimateMaxWaitTimeForNextVehicle(chargerImpl.charger);
@@ -115,35 +118,36 @@ public class ShiftEDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
                         .calcEnergyCharged(chargerImpl.charger.getSpecification(), endTime - beginTime);
                 ((ChargingWithAssignmentLogic) chargerImpl.charger.getLogic()).assignVehicle(evVehicle.getElectricVehicle(), strategy);
                 return createChargingShiftBreakTask(vehicle, beginTime,
-                        endTime, link, shiftBreak, chargerImpl.charger, -energyCharge, facility, strategy);
+                        endTime, link, shiftBreak, chargerImpl.charger, -energyCharge, operationFacilityRegistration, strategy);
             }
         }
-        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, 0, null, facility);
+        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, 0, null, operationFacilityRegistration);
     }
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                         Link link, DrtShift shift, OperationFacility facility) {
-        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, 0, null, facility);
+                                                         Link link, DrtShift shift, OperationFacility.Registration facilityRegistration) {
+        return new EDrtShiftChangeoverTaskImpl(beginTime, endTime, link, shift, 0, null, facilityRegistration);
     }
 
     @Override
     public WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                                       OperationFacility facility) {
-        return new EDrtWaitForShiftTask(beginTime, endTime, link, 0, facility, null);
+                                                       OperationFacility.Registration facilityRegistration) {
+        return new EDrtWaitForShiftTask(beginTime, endTime, link, 0, facilityRegistration, null);
     }
 
     public WaitForShiftTask createChargingWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime,
-                                                               double endTime, Link link, OperationFacility facility,
+                                                               double endTime, Link link, OperationFacility.Registration facilityRegistration,
                                                                double totalEnergy, Charger charger, ChargingStrategy strategy) {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy, strategy);
-        return new EDrtWaitForShiftTask(beginTime, endTime, link, totalEnergy, facility, chargingTask);
+        return new EDrtWaitForShiftTask(beginTime, endTime, link, totalEnergy, facilityRegistration, chargingTask);
     }
 
     private EDrtShiftBreakTaskImpl createChargingShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link,
-                                                                DrtShiftBreak shiftBreak, Charger charger, double totalEnergy, OperationFacility facility, ChargingStrategy strategy) {
+                                                                DrtShiftBreak shiftBreak, Charger charger, double totalEnergy,
+                                                                OperationFacility.Registration facilityRegistration, ChargingStrategy strategy) {
         ChargingTask chargingTask = new ChargingTaskImpl(EDrtChargingTask.TYPE, beginTime, endTime, charger, ((EvDvrpVehicle)vehicle).getElectricVehicle(), totalEnergy, strategy);
-        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facility);
+        return new EDrtShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, totalEnergy, chargingTask, facilityRegistration);
     }
 
     private record ChargerWithStrategy(Charger charger, ChargingStrategy strategy) {

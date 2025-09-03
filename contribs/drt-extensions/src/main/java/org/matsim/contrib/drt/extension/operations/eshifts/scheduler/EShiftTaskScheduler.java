@@ -8,6 +8,7 @@ import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehi
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.ShiftEDrtTaskFactoryImpl;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
@@ -18,6 +19,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftT
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -45,19 +47,21 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
     private final static Logger logger = LogManager.getLogger(EShiftTaskScheduler.class);
 
     private final ShiftTaskSchedulerImpl delegate;
-
     private final ShiftDrtTaskFactory taskFactory;
+    private final OperationFacilities facilities;
 
 
     public EShiftTaskScheduler(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-                               MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftsParams shiftsParams) {
-        this.delegate = new ShiftTaskSchedulerImpl(network, travelTime, travelDisutility, timer, taskFactory, shiftsParams);
+                               MobsimTimer timer, ShiftDrtTaskFactory taskFactory, ShiftsParams shiftsParams,
+                               OperationFacilities facilities) {
+        this.delegate = new ShiftTaskSchedulerImpl(network, facilities, travelTime, travelDisutility, timer, taskFactory, shiftsParams);
         this.taskFactory = taskFactory;
+        this.facilities = facilities;
     }
 
     @Override
     public boolean updateShiftChange(ShiftDvrpVehicle vehicle, Link link, DrtShift shift,
-                                     LinkTimePair start, OperationFacility facility, Task lastTask) {
+                                     LinkTimePair start, OperationFacility.Registration facility, Task lastTask) {
         // Check if a previous EV-specific changeover task exists and unassign the vehicle.
         Optional<ShiftChangeOverTask> oldChangeOver = ShiftSchedules.getNextShiftChangeover(vehicle.getSchedule());
         if (oldChangeOver.isPresent() && oldChangeOver.get() instanceof EDrtShiftChangeoverTaskImpl evTask) {
@@ -67,30 +71,6 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
             }
         }
         return delegate.updateShiftChange(vehicle, link, shift, start, facility, lastTask);
-    }
-
-
-    @Override
-    public void planAssignedShift(ShiftDvrpVehicle vehicle, double timeStep, DrtShift shift) {
-        Schedule schedule = vehicle.getSchedule();
-        StayTask stayTask = (StayTask) schedule.getCurrentTask();
-        if (stayTask instanceof EDrtWaitForShiftTask eTask) {
-            if (eTask.getChargingTask() != null) {
-                Task nextTask = Schedules.getNextTask(schedule);
-                if (nextTask instanceof WaitForShiftTask) {
-                    nextTask.setEndTime(Math.max(timeStep + 1, shift.getStartTime()));
-                    if (Schedules.getLastTask(schedule).equals(nextTask)) {
-                        schedule.addTask(taskFactory.createStayTask(vehicle, nextTask.getEndTime(), shift.getEndTime(),
-                                ((WaitForShiftTask) nextTask).getLink()));
-                    }
-                } else {
-                    throw new RuntimeException("Unexpected task type after charging task.");
-                }
-                return;
-            }
-        }
-        // Fallback to default behavior if not an EV-specific wait task.
-        delegate.planAssignedShift(vehicle, timeStep, shift);
     }
 
 
@@ -116,22 +96,14 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
         }
     }
 
-    @Override
-    public void relocateForBreak(ShiftDvrpVehicle vehicle, OperationFacility breakFacility, DrtShift shift) {
-        delegate.relocateForBreak(vehicle, breakFacility, shift);
-    }
-
-    @Override
-    public void relocateForShiftChange(DvrpVehicle vehicle, Link link, DrtShift shift, OperationFacility breakFacility) {
-        delegate.relocateForShiftChange(vehicle, link, shift, breakFacility);
-    }
 
     @Override
     public void startShift(ShiftDvrpVehicle vehicle, double now, DrtShift shift) {
         Schedule schedule = vehicle.getSchedule();
         StayTask stayTask = (StayTask) schedule.getCurrentTask();
         if (stayTask instanceof WaitForShiftTask) {
-            ((WaitForShiftTask) stayTask).getFacility().deregisterVehicle(vehicle.getId());
+            OperationFacility.Registration facilityRegistration = ((WaitForShiftTask) stayTask).getFacilityRegistration();
+            facilities.getFacilities().get(facilityRegistration.operationFacilityId()).deregisterVehicle(facilityRegistration.registrationId());
             stayTask.setEndTime(now);
             if (stayTask instanceof EDrtWaitForShiftTask eTask) {
                 if (eTask.getChargingTask() != null) {
@@ -169,9 +141,9 @@ public final class EShiftTaskScheduler implements ShiftTaskScheduler {
         ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(electricVehicle, strategy);
         final WaitForShiftTask chargingWaitForShiftTask = ((ShiftEDrtTaskFactoryImpl) taskFactory)
                 .createChargingWaitForShiftStayTask(vehicle, beginTime, endTime, currentTask.getLink(),
-                        currentTask.getFacility(), energy, charger, strategy);
+                        currentTask.getFacilityRegistration(), energy, charger, strategy);
         final WaitForShiftTask waitForShiftTask = taskFactory.createWaitForShiftStayTask(vehicle, endTime,
-                initialEndTime, currentTask.getLink(), currentTask.getFacility());
+                initialEndTime, currentTask.getLink(), currentTask.getFacilityRegistration());
         vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 1, chargingWaitForShiftTask);
         vehicle.getSchedule().addTask(currentTask.getTaskIdx() + 2, waitForShiftTask);
     }

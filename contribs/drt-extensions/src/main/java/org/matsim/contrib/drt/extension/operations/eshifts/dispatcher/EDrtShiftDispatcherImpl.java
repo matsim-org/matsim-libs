@@ -1,16 +1,15 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.dispatcher;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.eshifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.eshifts.schedule.EDrtWaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.eshifts.scheduler.EShiftTaskScheduler;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTask;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -21,6 +20,7 @@ import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.core.gbl.Gbl;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,35 +62,30 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 	}
 
 	@Override
+	public void startOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
+		delegate.startOperationalTask(vehicle, operationalStop);
+	}
+
+	@Override
+	public void endOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
+		delegate.endOperationalTask(vehicle, operationalStop);
+	}
+
+	@Override
 	public void dispatch(double timeStep) {
 		delegate.dispatch(timeStep);
 		checkChargingAtHub(timeStep);
 	}
 
-	@Override
-	public void endShift(ShiftDvrpVehicle vehicle, Id<Link> id, Id<OperationFacility> operationFacilityId) {
-		delegate.endShift(vehicle, id, operationFacilityId);
-	}
-
-	@Override
-	public void endBreak(ShiftDvrpVehicle vehicle, ShiftBreakTask task) {
-		delegate.endBreak(vehicle, task);
-	}
-
-	@Override
-	public void startBreak(ShiftDvrpVehicle vehicle, Id<Link> linkId) {
-		delegate.startBreak(vehicle, linkId);
-	}
-
 	private void checkChargingAtHub(double timeStep) {
-		for (OperationFacility operationFacility : operationFacilities.getDrtOperationFacilities().values()) {
+		for (OperationFacility operationFacility : operationFacilities.getFacilities().values()) {
 			List<Id<Charger>> chargerIds = operationFacility.getChargers();
 			if (chargerIds.isEmpty()) {
 				//facility does not have a charger
 				continue;
 			}
-			for (Id<DvrpVehicle> vehicle : operationFacility.getRegisteredVehicles()) {
-				DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicle);
+			for (Id<DvrpVehicle> vehicleId: operationFacility.getCheckedInVehicles()) {
+				DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicleId);
 				if (dvrpVehicle instanceof EvShiftDvrpVehicle eShiftVehicle) {
 					if (eShiftVehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {
 						if(!eShiftVehicle.getShifts().isEmpty()) {
