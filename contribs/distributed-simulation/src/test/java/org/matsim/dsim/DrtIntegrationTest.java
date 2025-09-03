@@ -5,8 +5,11 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.ParallelRequestInserterModule;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
@@ -159,6 +162,35 @@ public class DrtIntegrationTest {
 
 		controler.run();
 	}
+
+	@Test
+	@Order(2)
+	void runParallelInserter() {
+
+		Scenario scenario = createScenario();
+
+		scenario.getConfig().dsim().setThreads(4);
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(controler.getConfig());
+		DrtConfigGroup drtConfig = multiModeDrtConfigGroup.getModalElements().iterator().next();
+
+		DrtParallelInserterParams inserterParams = new DrtParallelInserterParams();
+		inserterParams.setCollectionPeriod(30.0);
+		inserterParams.setMaxIterations(5);
+		inserterParams.setMaxPartitions(8);
+		inserterParams.setInsertionSearchThreadsPerWorker(2);
+		inserterParams.setVehiclesPartitioner(DrtParallelInserterParams.VehiclesPartitioner.RoundRobinVehicleEntryPartitioner);
+		inserterParams.setRequestsPartitioner(DrtParallelInserterParams.RequestsPartitioner.RoundRobinRequestsPartitioner);
+
+		drtConfig.addParameterSet(inserterParams);
+
+		prepareController(controler);
+		controler.addOverridingQSimModule(new ParallelRequestInserterModule(drtConfig));
+
+		controler.run();
+	}
+
 
 	@Test
 	@Order(3)
