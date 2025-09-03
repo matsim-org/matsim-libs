@@ -205,7 +205,7 @@ public class LanduseBuildingAnalysis {
 				}
 				zoneIdRegionConnection.put(zoneID, regionName);
 			} else
-				log.warn("The zone {} has no region assigned. This may lead to problems in the analysis.", (String) singleZone.getAttribute(shapeFileZoneNameColumn));
+				log.warn("The zone {} has no region assigned. This may lead to problems in the analysis.", singleZone.getAttribute(shapeFileZoneNameColumn));
 		}
 
 		if (usedLanduseConfiguration.equals("useOSMBuildingsAndLanduse")) {
@@ -293,7 +293,7 @@ public class LanduseBuildingAnalysis {
 			log.error("Required input data file {} not found", pathToInvestigationAreaData);
 		}
 		try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToInvestigationAreaData),
-				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build())) {
+			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).get())) {
 
 			for (CSVRecord record : parser) {
 				Map<String, Integer> lookUpTable = new HashMap<>();
