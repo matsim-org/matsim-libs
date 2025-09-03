@@ -120,7 +120,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-			.setSkipHeaderRecord(true).build().parse(IOUtils.getBufferedReader(locationOfExistingModels));
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(locationOfExistingModels));
 		for (CSVRecord record : parse) {
 			String modelName = record.get("model");
 			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
