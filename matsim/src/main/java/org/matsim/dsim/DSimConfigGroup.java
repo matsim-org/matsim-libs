@@ -83,8 +83,8 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Parameter
-	@Comment("Determines how agents can access vehicles when starting a trip. Options=[teleport, wait (not implemented), exception], Default: exception")
-	private QSimConfigGroup.VehicleBehavior vehicleBehavior = QSimConfigGroup.VehicleBehavior.exception;
+	@Comment("Determines how agents can access vehicles when starting a trip. Options=[teleport, wait (not implemented), exception], Default: teleport")
+	private QSimConfigGroup.VehicleBehavior vehicleBehavior = QSimConfigGroup.VehicleBehavior.teleport;
 
 	public DSimConfigGroup() {
 		super(CONFIG_MODULE_NAME);
