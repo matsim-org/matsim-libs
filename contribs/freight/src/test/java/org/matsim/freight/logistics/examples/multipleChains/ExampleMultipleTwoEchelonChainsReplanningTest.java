@@ -44,17 +44,18 @@ class ExampleMultipleTwoEchelonChainsReplanningTest{
 					assertEquals(scoreReference, scoreCurrent, 0.001, "Scores of person=" + personId + " are different");
 				}
 
-
 //				boolean result = PopulationUtils.comparePopulations( expected, actual );
 //				Assert.assertTrue( result );
 				// (There are small differences in the score.  Seems that there were some floating point changes in Java 17, and the
 				// differ by JDK (e.g. oracle vs. ...).   So not testing this any more for the time being.  kai, jul'23
 			}
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-				assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+				MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "/output_events.xml.gz", utils.getOutputDirectory() + "/output_events.xml.gz");
+			}
+
+			{
+				//Compare LSP files
+				MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz");
 			}
 
 		} catch ( Exception ee ) {
