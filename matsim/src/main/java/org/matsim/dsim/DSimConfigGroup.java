@@ -3,6 +3,7 @@ package org.matsim.dsim;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -42,8 +43,8 @@ public class DSimConfigGroup extends ReflectiveConfigGroup {
 	private int threads = 0;
 
 	@Parameter
-	@Comment("Modes which are simulated on the network. All other modes, expect pt will be teleported. default: Empty collection")
-	private Set<String> networkModes = new HashSet<>();
+	@Comment("Modes which are simulated on the network. All other modes, expect pt will be teleported. Default: car")
+	private Set<String> networkModes = new HashSet<>(Set.of(TransportMode.car));
 
 	@Parameter
 	@Comment("Stuck time [s] after which a vehicle is pushed onto the next link regardless of available capacity. Default: 30")

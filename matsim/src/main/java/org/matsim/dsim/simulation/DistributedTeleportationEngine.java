@@ -51,6 +51,10 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		// the original engine has a travel time check. The default config parameter (qsim.usingTravelTimeCheckInTeleportation)
 		// is 'false' and is not settable from xml. This is usually an indicator that a feature is rarely used.
 		// calculate travel time
+		if (!person.getExpectedTravelTime().isDefined()) {
+			throw new IllegalStateException(String.format("Expected travel time is undefined for %s", agent.getId()));
+		}
+
 		var travelTime = person.getExpectedTravelTime().seconds();
 		var exitTime = now + travelTime;
 
