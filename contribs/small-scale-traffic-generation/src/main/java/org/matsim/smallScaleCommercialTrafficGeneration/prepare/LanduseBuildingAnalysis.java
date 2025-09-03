@@ -327,6 +327,9 @@ public class LanduseBuildingAnalysis {
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
 			String singleZone = indexZones.query(centroidPointOfBuildingPolygon);
+			// if the building is not in a zone, it is not considered
+			if (singleZone == null)
+				continue;
 			String buildingType = String.valueOf(singleBuildingFeature.getAttribute(shapeFileBuildingTypeColumn));
 			if (buildingType.isEmpty() || buildingType.equals("null") || buildingType.equals("yes")) {
 				buildingType = indexLanduse.query(centroidPointOfBuildingPolygon);
@@ -349,11 +352,10 @@ public class LanduseBuildingAnalysis {
 			}
 			if (isEmployeeCategory)
 				categoriesOfBuilding.add("Employee");
-			if (singleZone != null) {
-				categoriesOfBuilding.forEach(c -> buildingsPerZone
-						.computeIfAbsent(singleZone, k -> new HashMap<>())
-						.computeIfAbsent(c, k -> new ArrayList<>()).add(singleBuildingFeature));
-			}
+
+			categoriesOfBuilding.forEach(c -> buildingsPerZone
+				.computeIfAbsent(singleZone, k -> new HashMap<>())
+				.computeIfAbsent(c, k -> new ArrayList<>()).add(singleBuildingFeature));
 		}
 		log.info("Finished analyzing buildings types.");
 	}
