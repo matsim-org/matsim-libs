@@ -47,13 +47,14 @@ class InternalPassengerHandling {
 
 	private final String mode;
 	private final EventsManager eventsManager;
-	private final AtomicInteger currentRequestId = new AtomicInteger(-1);
+	private final DvrpPassengerTracker passengerTracker;
 
 	private InternalInterface internalInterface;
 
-	InternalPassengerHandling(String mode, EventsManager eventsManager) {
+	InternalPassengerHandling(String mode, EventsManager eventsManager, DvrpPassengerTracker passengerTracker) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
+		this.passengerTracker = passengerTracker;
 	}
 
 	void setInternalInterface(InternalInterface internalInterface) {
@@ -61,7 +62,7 @@ class InternalPassengerHandling {
 	}
 
 	Id<Request> createRequestId() {
-		return Id.create(mode + "_" + currentRequestId.incrementAndGet(), Request.class);
+		return passengerTracker.createRequestId();
 	}
 
 	boolean validateRequest(PassengerRequest request, PassengerRequestValidator requestValidator, double now) {

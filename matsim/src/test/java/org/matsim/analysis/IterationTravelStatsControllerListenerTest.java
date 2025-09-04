@@ -3,13 +3,6 @@
  */
 package org.matsim.analysis;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.zip.GZIPInputStream;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -26,6 +19,7 @@ import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.ControllerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouterModule;
@@ -35,9 +29,11 @@ import org.matsim.core.scoring.StandaloneExperiencedPlansModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.*;
+import java.util.zip.GZIPInputStream;
+
 /**
  * @author Aravind
- *
  */
 public class IterationTravelStatsControllerListenerTest {
 
@@ -51,7 +47,7 @@ public class IterationTravelStatsControllerListenerTest {
 	private int first_act_type;
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testIterationTravelStatsControllerListener() {
@@ -139,26 +135,26 @@ public class IterationTravelStatsControllerListenerTest {
 			String[] columnNames = firstRow.split(";");
 			decideColumns(columnNames);
 			while ((line = br.readLine()) != null) {
-					String[] column = line.split(";");
-					// checking if column number in greater than 0, because 0th column is always
-					// 'Iteration' and we don't need that --> see decideColumns() method
-					Double x = (first_act_x > 0) ? Double.valueOf(column[first_act_x]) : 0;
-					Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
-					Id<Person> personId = Id.create(column[person], Person.class);
+				String[] column = line.split(";");
+				// checking if column number in greater than 0, because 0th column is always
+				// 'Iteration' and we don't need that --> see decideColumns() method
+				Double x = (first_act_x > 0) ? Double.valueOf(column[first_act_x]) : 0;
+				Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
+				Id<Person> personId = Id.create(column[person], Person.class);
 
-					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
-					Activity firstActivity = identifyFirstActivity(personInScenario);
+				Person personInScenario = scenario.getPopulation().getPersons().get(personId);
+				Activity firstActivity = identifyFirstActivity(personInScenario);
 
-					Assertions.assertEquals(personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON, "wrong score");
-					Assertions.assertEquals(firstActivity.getCoord().getX(), x,
-							MatsimTestUtils.EPSILON,
-							"x coordinate does not match");
-					Assertions.assertEquals(firstActivity.getCoord().getY(), y,
-							MatsimTestUtils.EPSILON,
-							"y coordinate does not match");
-					Assertions.assertEquals(firstActivity.getType(), column[first_act_type], "type of first activity does not match");
+				Assertions.assertEquals(personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON, "wrong score");
+				Assertions.assertEquals(firstActivity.getCoord().getX(), x,
+					MatsimTestUtils.EPSILON,
+					"x coordinate does not match");
+				Assertions.assertEquals(firstActivity.getCoord().getY(), y,
+					MatsimTestUtils.EPSILON,
+					"y coordinate does not match");
+				Assertions.assertEquals(firstActivity.getType(), column[first_act_type], "type of first activity does not match");
 
-					break;
+				break;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -175,25 +171,25 @@ public class IterationTravelStatsControllerListenerTest {
 			String name = columnNames[i];
 			switch (name) {
 
-			case "person":
-				person = i;
-				break;
+				case "person":
+					person = i;
+					break;
 
-			case "executed_score":
-				executed_score = i;
-				break;
+				case "executed_score":
+					executed_score = i;
+					break;
 
-			case "first_act_x":
-				first_act_x = i;
-				break;
+				case "first_act_x":
+					first_act_x = i;
+					break;
 
-			case "first_act_y":
-				first_act_y = i;
-				break;
+				case "first_act_y":
+					first_act_y = i;
+					break;
 
-			case "first_act_type":
-				first_act_type = i;
-				break;
+				case "first_act_type":
+					first_act_type = i;
+					break;
 
 			}
 			i++;

@@ -82,7 +82,8 @@ public class MultiModalDrtLegEstimatorTest {
 
 		Config config = DrtTestScenario.loadConfig(utils);
 
-		config.controller().setLastIteration(3);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setLastIteration(0);
 
 		controler = MATSimApplication.prepare(new DrtTestScenario(MultiModalDrtLegEstimatorTest::prepare, MultiModalDrtLegEstimatorTest::prepare), config);
 	}

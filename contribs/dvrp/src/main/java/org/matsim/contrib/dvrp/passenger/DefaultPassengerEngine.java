@@ -54,7 +54,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	private final String mode;
 	private final Set<String> departureModes;
-	
+
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 
@@ -67,12 +67,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private final AdvanceRequestProvider advanceRequestProvider;
 
 	private InternalInterface internalInterface;
-
-	//accessed in doSimStep() and handleDeparture() (no need to sync)
-	private final Map<Id<Request>, List<MobsimPassengerAgent>> activePassengers = new HashMap<>();
-
-	// holds vehicle stop activities for requests that have not arrived at departure point yet
-	private final Map<Id<Request>, PassengerPickupActivity> waitingForPassenger = new HashMap<>();
+	private final DvrpPassengerTracker tracker;
 
 	//accessed in doSimStep() and handleEvent() (potential data races)
 	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
@@ -81,11 +76,14 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private final Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<MobsimPassengerAgent>> groupDepartureStage = new LinkedHashMap<>();
 
 
-	DefaultPassengerEngine(String mode, Set<String> departureModes, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator,
-						   VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator, AdvanceRequestProvider advanceRequestProvider, PassengerGroupIdentifier passengerGroupIdentifier) {
+	DefaultPassengerEngine(String mode, Set<String> departureModes, EventsManager eventsManager, MobsimTimer mobsimTimer,
+						   DvrpPassengerTracker passengerTracker, PassengerRequestCreator requestCreator,
+						   VrpOptimizer optimizer, Network network, PassengerRequestValidator requestValidator,
+						   AdvanceRequestProvider advanceRequestProvider, PassengerGroupIdentifier passengerGroupIdentifier) {
 		this.mode = mode;
 		this.departureModes = departureModes;
 		this.mobsimTimer = mobsimTimer;
+		this.tracker = passengerTracker;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
@@ -94,7 +92,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		this.advanceRequestProvider = advanceRequestProvider;
 		this.passengerGroupIdentifier = passengerGroupIdentifier;
 
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
+	}
+
+	@Override
+	public String getName() {
+		return "DefaultPassengerEngine{" + mode + "}";
 	}
 
 	@Override
@@ -127,7 +130,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 				break;
 			}
 
-			List<MobsimPassengerAgent> passengers = activePassengers.remove(event.getRequestId());
+			List<MobsimPassengerAgent> passengers = tracker.activePassengers.remove(event.getRequestId());
 
 			if (passengers != null) {
 				// not much else can be done for immediate requests
@@ -171,12 +174,12 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 		PassengerRequest request = advanceRequestProvider.retrieveRequest(representative, leg);
 
 		if (request == null) { // immediate request
-			request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+			request = requestCreator.createRequest(tracker.createRequestId(),
 					groupIds, routes, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 			// must come before validateAndSubmitRequest (to come before rejection event)
 			eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), groupIds));
-			activePassengers.put(request.getId(), group);
+			tracker.activePassengers.put(request.getId(), group);
 
 			validateAndSubmitRequest(group, request, now);
 		} else { // advance request
@@ -188,18 +191,14 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 				eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), List.of(agent.getId())));
 			}
 
-			activePassengers.put(request.getId(), group);
+			tracker.activePassengers.put(request.getId(), group);
 
-			PassengerPickupActivity pickupActivity = waitingForPassenger.remove(request.getId());
+			PassengerPickupActivity pickupActivity = tracker.waitingForPassenger.remove(request.getId());
 			if (pickupActivity != null) {
 				// the vehicle is already waiting for the request, notify it
 				pickupActivity.notifyPassengersAreReadyForDeparture(group, now);
 			}
 		}
-	}
-
-	@Override
-	public void afterSim() {
 	}
 
 	@Override
@@ -225,7 +224,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	}
 
 	private void validateAndSubmitRequest(List<MobsimPassengerAgent> passengers, PassengerRequest request, double now) {
-		activePassengers.put(request.getId(), passengers);
+		tracker.activePassengers.put(request.getId(), passengers);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			//need to synchronise to address cases where requestSubmitted() may:
 			// - be called from outside DepartureHandlers
@@ -264,8 +263,8 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	 */
 	@Override
 	public boolean notifyWaitForPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, Id<Request> requestId) {
-		if (!activePassengers.containsKey(requestId)) {
-			waitingForPassenger.put(requestId, pickupActivity);
+		if (!tracker.activePassengers.containsKey(requestId)) {
+			tracker.waitingForPassenger.put(requestId, pickupActivity);
 			return false;
 		}
 
@@ -275,7 +274,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	@Override
 	public boolean tryPickUpPassengers(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			Id<Request> requestId, double now) {
-		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, activePassengers.get(requestId),
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassengers(driver, tracker.activePassengers.get(requestId),
 				requestId, now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
@@ -283,7 +282,13 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void dropOffPassengers(MobsimDriverAgent driver, Id<Request> requestId, double now) {
-		internalPassengerHandling.dropOffPassengers(driver, activePassengers.remove(requestId), requestId, now);
+		internalPassengerHandling.dropOffPassengers(driver, tracker.activePassengers.remove(requestId), requestId, now);
+	}
+
+	@Override
+	public double getProcessInterval() {
+		// TODO: for now process events every second
+		return 1;
 	}
 
 	@Override
@@ -292,7 +297,6 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 			rejectedRequestsEvents.add(event);
 		}
 	}
-	
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return createProvider(mode, Collections.singleton(mode));
 	}
@@ -307,7 +311,8 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 			@Override
 			public DefaultPassengerEngine get() {
-				return new DefaultPassengerEngine(getMode(), departureModes, eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class),
+				return new DefaultPassengerEngine(getMode(), departureModes, eventsManager, mobsimTimer,
+					getModalInstance(DvrpPassengerTracker.class), getModalInstance(PassengerRequestCreator.class),
 					getModalInstance(VrpOptimizer.class), getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
 					getModalInstance(AdvanceRequestProvider.class), getModalInstance(PassengerGroupIdentifier.class));
 			}

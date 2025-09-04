@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.pt;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.transitSchedule.api.*;
 
@@ -31,7 +32,8 @@ class UmlaufCache {
 	public static final String ELEMENT_NAME = "umlaufCache";
 
 	private final TransitSchedule transitSchedule;
-	private final Collection<Umlauf> umlaeufe;
+
+	private final IdMap<Umlauf, Umlauf> umlaeufe;
 	private final Object2IntMap<Id<Departure>> departuresDependingOnChains;
 
 	static Object2IntMap<Id<Departure>> calculateDeparturesDependingOnChains(TransitSchedule transitSchedule) {
@@ -51,7 +53,16 @@ class UmlaufCache {
 
 	public UmlaufCache(TransitSchedule transitSchedule, Collection<Umlauf> umlaeufe) {
 		this.transitSchedule = transitSchedule;
-		this.umlaeufe = umlaeufe;
+		this.umlaeufe = new IdMap<>(Umlauf.class);
+
+		for (Umlauf umlauf : umlaeufe) {
+			if (this.umlaeufe.containsKey(umlauf.getId())) {
+				throw new RuntimeException("Duplicate Umlauf ID: " + umlauf.getId());
+			}
+
+			this.umlaeufe.put(umlauf.getId(), umlauf);
+		}
+
 		this.departuresDependingOnChains = calculateDeparturesDependingOnChains(transitSchedule);
 	}
 
@@ -60,7 +71,11 @@ class UmlaufCache {
 	}
 
 	public Collection<Umlauf> getUmlaeufe() {
-		return this.umlaeufe;
+		return this.umlaeufe.values();
+	}
+
+	public Umlauf getUmlauf(Id<Umlauf> id) {
+		return this.umlaeufe.get(id);
 	}
 
 	public Object2IntMap<Id<Departure>> getDeparturesDependingOnChains() {
