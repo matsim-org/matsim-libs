@@ -23,10 +23,8 @@ public class RunEvExampleTest {
 	@Test
 	public void runTest() {
 		try {
-			//ev contrib doesn't work with access/egress routing
 			String[] args = {RunEvExample.DEFAULT_CONFIG_FILE,
 				"--config:controler.outputDirectory", utils.getOutputDirectory(),
-				"--config:routing.accessEgressType=none"
 			};
 
 			new RunEvExample().run(args);
@@ -59,11 +57,9 @@ public class RunEvExampleTest {
 	@Test
 	public void runTestWithChargingDurationEnforcement() {
 		try {
-			//ev contrib doesn't work with access/egress routing
 			String[] args = {RunEvExample.DEFAULT_CONFIG_FILE,
 				"--config:controler.outputDirectory", utils.getOutputDirectory(),
 				"--config:ev.enforceChargingInteractionDuration", "true",
-				"--config:routing.accessEgressType=none"
 			};
 
 			new RunEvExample().run(args);

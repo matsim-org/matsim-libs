@@ -23,10 +23,8 @@ public class RunEvExampleWithLTHConsumptionModelTest {
 	@Test
 	void runTest() {
 		try {
-			//ev contrib doesn't work with access/egress routing
 			String[] args = {RunEvExampleWithLTHConsumptionModel.DEFAULT_CONFIG_FILE
 				, "--config:controler.outputDirectory", utils.getOutputDirectory(),
-				"--config:routing.accessEgressType=none"
 			};
 
 			new RunEvExampleWithLTHConsumptionModel().run(args);
