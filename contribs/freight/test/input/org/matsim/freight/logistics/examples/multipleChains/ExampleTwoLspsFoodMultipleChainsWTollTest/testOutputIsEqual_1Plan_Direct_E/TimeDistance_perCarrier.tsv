@@ -1,0 +1,2 @@
+carrierId	nuOfTours	tourDurations[s]	tourDurations[h]	travelDistances[m]	travelDistances[km]	travelTimes[s]	travelTimes[h]	fixedCosts[EUR]	varCostsTime[EUR]	varCostsDist[EUR]	totalCosts[EUR]
+Edeka_DIRECT_directCarrier	9	350897.0	97.4713888888889	3001334.4175837478	3001.334417583748	189654.0	52.681666666666665	1139.22	1961.51423	2070.9207481327862	5171.654978132787

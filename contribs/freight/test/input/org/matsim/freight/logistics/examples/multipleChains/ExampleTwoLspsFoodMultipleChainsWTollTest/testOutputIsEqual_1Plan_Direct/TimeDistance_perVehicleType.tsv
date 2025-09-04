@@ -1,0 +1,2 @@
+vehicleTypeId	nuOfVehicles	SumOfTourDuration[s]	SumOfTourDuration[h]	SumOfTravelDistances[m]	SumOfTravelDistances[km]	SumOfTravelTime[s]	SumOfTravelTime[h]	costPerSecond[EUR/s]	costPerMeter[EUR/m]	fixedCosts[EUR/veh]	varCostsTime[EUR]	varCostsDist[EUR]	fixedCosts[EUR]	totalCosts[EUR]
+heavy40t	14	548169.0	152.26916666666668	5647082.401895339	5647.082401895339	324389.0	90.10805555555555	0.00559	6.9E-4	126.58	3064.2647100000004	3896.4868573077833	1772.12	8732.871567307784

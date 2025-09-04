@@ -34,7 +34,7 @@
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
 		<fury.version>0.10.3</fury.version>
 		<jogl.version>2.5.0</jogl.version>
 		<junit.version>5.13.4</junit.version>

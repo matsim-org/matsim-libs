@@ -205,7 +205,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent implement
 	 */
 	protected void handleEndRoute(double now) {
 
-		accessEgress.relocatePassengers( this, departure.getChainedDepartures(), now);
+		if (departure != null)
+			accessEgress.relocatePassengers( this, departure.getChainedDepartures(), now);
 
 	}
 
