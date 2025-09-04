@@ -163,8 +163,8 @@ public final class DrtAnalysisPostProcessing implements MATSimAppCommand {
 		Table legs = Table.read().csv(CsvReadOptions.builder(legPath.toFile())
 			.separator(';')
 			.columnTypesPartial(Map.of(
-				"personId", ColumnType.TEXT, "vehicleId", ColumnType.TEXT,
-				"toLinkId", ColumnType.TEXT, "fromLinkId", ColumnType.TEXT
+				"personId", ColumnType.STRING, "vehicleId", ColumnType.STRING,
+				"toLinkId", ColumnType.STRING, "fromLinkId", ColumnType.STRING
 			)).build());
 
 		//read vehicle stats

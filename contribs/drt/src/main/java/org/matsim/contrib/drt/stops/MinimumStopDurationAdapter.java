@@ -14,27 +14,37 @@ public class MinimumStopDurationAdapter implements StopTimeCalculator {
 	}
 
 	@Override
-	public double initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		return Math.max(beginTime + minimumStopDuration, delegate.initEndTimeForPickup(vehicle, beginTime, request));
+	public Pickup initEndTimeForPickup(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		Pickup delegate = this.delegate.initEndTimeForPickup(vehicle, beginTime, request);
+		double endTime = Math.max(beginTime + minimumStopDuration, delegate.endTime());
+
+		return new Pickup(endTime, delegate.pickupTime());
 	}
 
 	@Override
-	public double updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Pickup updateEndTimeForPickup(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		return Math.max(stop.getBeginTime() + minimumStopDuration,
-				delegate.updateEndTimeForPickup(vehicle, stop, insertionTime, request));
+		Pickup delegate = this.delegate.updateEndTimeForPickup(vehicle, stop, insertionTime, request);
+		double endTime = Math.max(stop.getBeginTime() + minimumStopDuration, delegate.endTime());
+
+		return new Pickup(endTime, delegate.pickupTime());
 	}
 
 	@Override
-	public double initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
-		return Math.max(beginTime + minimumStopDuration, delegate.initEndTimeForDropoff(vehicle, beginTime, request));
+	public Dropoff initEndTimeForDropoff(DvrpVehicle vehicle, double beginTime, DrtRequest request) {
+		Dropoff delegate = this.delegate.initEndTimeForDropoff(vehicle, beginTime, request);
+		double endTime = Math.max(beginTime + minimumStopDuration, delegate.endTime());
+
+		return new Dropoff(endTime, delegate.dropoffTime());
 	}
 
 	@Override
-	public double updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
+	public Dropoff updateEndTimeForDropoff(DvrpVehicle vehicle, DrtStopTask stop, double insertionTime,
 			DrtRequest request) {
-		return Math.max(insertionTime + minimumStopDuration,
-				delegate.updateEndTimeForDropoff(vehicle, stop, insertionTime, request));
+		Dropoff delegate = this.delegate.updateEndTimeForDropoff(vehicle, stop, insertionTime, request);
+		double endTime = Math.max(stop.getBeginTime() + minimumStopDuration, delegate.endTime());
+		
+		return new Dropoff(endTime, delegate.dropoffTime());
 	}
 
 	@Override

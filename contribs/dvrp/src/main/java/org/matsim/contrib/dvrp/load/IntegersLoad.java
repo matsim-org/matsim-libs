@@ -69,6 +69,26 @@ public class IntegersLoad implements DvrpLoad {
     }
 
     @Override
+    public int compareTo(DvrpLoad other) {
+        if (other instanceof IntegersLoad otherLoad) {
+            if (values.length != otherLoad.values.length) {
+                return Integer.compare(values.length, otherLoad.values.length);
+            }
+
+            int result = 0;
+
+            for (int i = 0; i < values.length; i++) {
+                result = Integer.compare(values[i], otherLoad.values[i]);
+                if (result != 0) break;
+            }
+
+            return result;
+        }
+
+        throw new IllegalStateException();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other instanceof IntegersLoad otherLoad) {
             if (values.length == otherLoad.values.length) {

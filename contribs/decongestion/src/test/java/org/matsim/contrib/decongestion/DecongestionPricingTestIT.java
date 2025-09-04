@@ -116,7 +116,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -373,7 +373,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -515,7 +515,7 @@ public class DecongestionPricingTestIT {
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});
@@ -599,7 +599,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 			}
 		});
 
@@ -657,7 +657,7 @@ public class DecongestionPricingTestIT {
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControllerListenerBinding().to(DecongestionControllerListener.class);
 
 			}
 		});

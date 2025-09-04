@@ -49,6 +49,9 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	public enum UseHbefaConsistencyChecker {skip, check}
+	private UseHbefaConsistencyChecker useHbefaConsistencyChecker = UseHbefaConsistencyChecker.check;
+
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
@@ -311,6 +314,14 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
 	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
+	}
+	// ============================================
+	// ============================================
+	public UseHbefaConsistencyChecker getHbefaConsistencyChecker(){
+		return useHbefaConsistencyChecker;
+	}
+	public void setHbefaConsistencyChecker(UseHbefaConsistencyChecker use){
+		useHbefaConsistencyChecker = use;
 	}
 	// ============================================
 	// ============================================

@@ -295,7 +295,7 @@ public class SmallScaleCommercialTrafficUtils {
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-				.setSkipHeaderRecord(true).build().parse(reader);
+				.setSkipHeaderRecord(true).get().parse(reader);
 
 			for (CSVRecord record : parse) {
 				String zoneID = record.get("zoneID");

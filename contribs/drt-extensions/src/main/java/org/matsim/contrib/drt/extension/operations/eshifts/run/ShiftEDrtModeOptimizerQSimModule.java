@@ -17,12 +17,16 @@ import org.matsim.contrib.drt.extension.operations.operationFacilities.Operation
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
@@ -78,8 +82,10 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 						getter.getModal(Fleet.class), getter.getModal(ChargingStrategy.Factory.class)))
 		).asEagerSingleton();
 
+
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class)),
+				new ShiftVehicleDataEntryFactory(new EDrtVehicleDataEntryFactory(0, getter.getModal(DvrpLoadType.class),
+						getter.getModal(StopWaypointFactory.class)),
                         drtShiftParams.isConsiderUpcomingShiftsForInsertion()))).asEagerSingleton();
 
 

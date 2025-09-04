@@ -9,8 +9,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtCapacityChangeTask;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
@@ -53,21 +56,21 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	private Waypoint.Stop stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
-		return new Waypoint.Stop(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, customLoadType);
+	private StopWaypoint stop(double beginTime, Link link, DvrpLoad outgoingOccupancy) {
+		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION, link), outgoingOccupancy, customLoadType, false);
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	private Waypoint.Stop stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
-		return new Waypoint.Stop(new DefaultDrtCapacityChangeTask(beginTime, beginTime + STOP_DURATION, link, newCapacity), customLoadType);
+	private StopWaypoint stopWithCapacityChange(double beginTime, Link link, DvrpLoad newCapacity) {
+		return new StopWaypointImpl(new DefaultDrtCapacityChangeTask(beginTime, beginTime + STOP_DURATION, link, newCapacity), customLoadType);
 	}
 
-	private VehicleEntry entry(Waypoint.Start start, Waypoint.Stop... stops) {
+	private VehicleEntry entry(Waypoint.Start start, StopWaypoint... stops) {
 		List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
 		return entry(start, precedingStayTimes, stops);
 	}
 
-	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, Waypoint.Stop... stops) {
+	private VehicleEntry entry(Waypoint.Start start, List<Double> precedingStayTimes, StopWaypoint... stops) {
 		var slackTimes = new double[stops.length + 2];
 		Arrays.fill(slackTimes, Double.POSITIVE_INFINITY);
 		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, 0);
@@ -77,13 +80,35 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private static final DvrpLoad STARTING_VEHICLE_CAPACITY = customLoadType.fromArray(4, 0);
 	private static final DvrpLoad CHANGED_VEHICLE_CAPACITY = customLoadType.fromArray(0, 4);
-	private final DrtRequest drtRequestA = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personA"))).load(customLoadType.fromArray(1, 0)).build();
-	private final DrtRequest drtRequestB = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).passengerIds(List.of(Id.createPersonId("personB"))).load(customLoadType.fromArray(0, 1)).build();
+	private final DrtRequest drtRequestA = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(List.of(Id.createPersonId("personA")))
+			.load(customLoadType.fromArray(1, 0))
+			.constraints(
+					new DrtRouteConstraints(
+							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
+					)
+			)
+			.build();
+	private final DrtRequest drtRequestB = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.passengerIds(List.of(Id.createPersonId("personB")))
+			.load(customLoadType.fromArray(0, 1))
+			.constraints(
+					new DrtRouteConstraints(
+							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
+					)
+			)
+			.build();
 
 	@Test
 	void startEmpty_capacityChange_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
-		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
+		StopWaypoint stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);//pick up 4 pax (full)
 		VehicleEntry entry = entry(start, stop0);
 		assertInsertionsOnly(drtRequestA, entry,
 			//pickup after start
@@ -105,9 +130,9 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	@Test
 	void startOccupied_capacityChange_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
-		Waypoint.Stop stop0 = stop(0, link("stop0"), customLoadType.fromArray(1, 0)); //pickup
-		Waypoint.Stop stop1 = stop(0, link("stop1"), customLoadType.getEmptyLoad()); // dropoff
-		Waypoint.Stop stop2 = stopWithCapacityChange(0, link("stop2"), CHANGED_VEHICLE_CAPACITY);
+		StopWaypoint stop0 = stop(0, link("stop0"), customLoadType.fromArray(1, 0)); //pickup
+		StopWaypoint stop1 = stop(0, link("stop1"), customLoadType.getEmptyLoad()); // dropoff
+		StopWaypoint stop2 = stopWithCapacityChange(0, link("stop2"), CHANGED_VEHICLE_CAPACITY);
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 
@@ -126,9 +151,9 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 	@Test
 	void startEmpty_capacityChangeThenRequest_oneRequestPerCapacityType() {
 		Waypoint.Start start = new Waypoint.Start(null, link("start"), 0, customLoadType.getEmptyLoad()); //empty
-		Waypoint.Stop stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);
-		Waypoint.Stop stop1 = stop(0, link("stop1"), customLoadType.fromArray(0, 1)); //pickup
-		Waypoint.Stop stop2 = stop(0, link("stop2"), customLoadType.getEmptyLoad()); // dropoff
+		StopWaypoint stop0 = stopWithCapacityChange(0, link("stop0"), CHANGED_VEHICLE_CAPACITY);
+		StopWaypoint stop1 = stop(0, link("stop1"), customLoadType.fromArray(0, 1)); //pickup
+		StopWaypoint stop2 = stop(0, link("stop2"), customLoadType.getEmptyLoad()); // dropoff
 
 		VehicleEntry entry = entry(start, stop0, stop1, stop2);
 
@@ -146,7 +171,7 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 
 	private void assertInsertionsOnly(DrtRequest drtRequest, VehicleEntry entry, InsertionGenerator.Insertion... expectedInsertions) {
 		int stopCount = entry.stops.size();
-		DvrpLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).outgoingOccupancy : entry.start.occupancy;
+		DvrpLoad endOccupancy = stopCount > 0 ? entry.stops.get(stopCount - 1).getOutgoingOccupancy() : entry.start.occupancy;
 		Preconditions.checkArgument(endOccupancy.isEmpty());//make sure the input is valid
 
 		DetourTimeEstimator timeEstimator = (from, to, departureTime) -> 0;

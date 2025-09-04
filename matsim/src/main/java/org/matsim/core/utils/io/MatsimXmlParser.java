@@ -21,6 +21,8 @@
 package org.matsim.core.utils.io;
 
 import com.ctc.wstx.sax.WstxSAXParserFactory;
+import com.ctc.wstx.stax.WstxInputFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
@@ -185,7 +187,8 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			if (useWstxParser) {
 				// use Woodstox-library as XML parser when no validation or only DTD-validation is required, as it is much faster than the default (xerces)
 
-				WstxSAXParserFactory factory = new WstxSAXParserFactory();
+				WstxInputFactory staxFactory = new WstxInputFactory(); // https://github.com/FasterXML/woodstox/pull/212
+				WstxSAXParserFactory factory = new WstxSAXParserFactory(staxFactory);
 				factory.setValidating(validating);
 				factory.setNamespaceAware(this.isNamespaceAware);
 				factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack

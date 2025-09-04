@@ -190,7 +190,9 @@ public class DefaultTransitPassengerRouteTest {
 
 		// Check main route properties
 		assertEquals(accessId1, deserializedRoute.getAccessStopId());
-		assertEquals(egressId1, deserializedRoute.getEgressStopId());
+
+		// The last egress stop
+		assertEquals(egressId2, deserializedRoute.getEgressStopId());
 		assertEquals(lineId1, deserializedRoute.getLineId());
 		assertEquals(routeId1, deserializedRoute.getRouteId());
 		assertEquals(100.0, deserializedRoute.getBoardingTime().seconds(), 1e-3);
@@ -287,7 +289,8 @@ public class DefaultTransitPassengerRouteTest {
 
 		// Check main route properties
 		assertEquals(accessId1, clonedRoute.getAccessStopId());
-		assertEquals(egressId1, clonedRoute.getEgressStopId());
+		// The last egress stop
+		assertEquals(egressId2, clonedRoute.getEgressStopId());
 		assertEquals(lineId1, clonedRoute.getLineId());
 		assertEquals(routeId1, clonedRoute.getRouteId());
 		assertEquals(100.0, clonedRoute.getBoardingTime().seconds(), 1e-3);

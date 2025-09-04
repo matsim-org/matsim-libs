@@ -19,19 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -48,6 +40,9 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * @author michaz
@@ -94,7 +89,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	private TransitRoute transitRoute;
 	private Departure departure;
 	private Scenario scenario;
-	
+
 	public TransitDriverAgentImpl(Umlauf umlauf,
 			String transportMode,
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
@@ -123,8 +118,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	@Override
 	public void endActivityAndComputeNextState(final double now) {
 		this.currentPlanElement = iPlanElement.next();
-		sendTransitDriverStartsEvent(now);	
-		
+		sendTransitDriverStartsEvent(now);
+
 //		this.sim.arrangeAgentDeparture(this);
 		this.state = MobsimAgent.State.LEG ;
 //		this.sim.reInsertAgentIntoMobsim(this) ;
@@ -136,6 +131,9 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		eventsManager.processEvent(
 				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
+
+		handleEndRoute(now);
+
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();
 			if (this.departureTime < now) {
@@ -152,11 +150,32 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			// * in general, a MobsimAgent can construct its path through the day on the fly
 			// * in this particular instance, the agent pretends to have a plan
 			// kai, mar'12
-			
+
 			this.state = MobsimAgent.State.ACTIVITY ;
 			this.departureTime = Double.POSITIVE_INFINITY ;
-			
+
 		}
+	}
+
+	@Override
+	void setWaitForDeparture() {
+		// The activity end time is set to infinity, so the agent will not be handled by the activity engine.
+		// endActivity needs to be called by other means to let the agent depart
+		departureTime = Double.POSITIVE_INFINITY;
+	}
+
+	void setReadyForDeparture(double now) {
+		departureTime = now;
+	}
+
+	/**
+	 * Called when one TransitRoute ends, the driver might continue with another as part of the Umlauf.
+	 */
+	protected void handleEndRoute(double now) {
+
+		if (departure != null)
+			accessEgress.relocatePassengers( this, departure.getChainedDepartures(), now);
+
 	}
 
 	private void setNextLeg() {
@@ -188,7 +207,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	Leg getCurrentLeg() {
 		return (Leg) this.currentPlanElement;
 	}
-	
+
 	@Override
 	public OptionalTime getExpectedTravelTime() {
 		return ((Leg) this.currentPlanElement).getTravelTime();
@@ -203,11 +222,11 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	public String getMode() {
 		return ((Leg)this.currentPlanElement).getMode();
 	}
-	
+
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
 		Route route = ((Leg)this.currentPlanElement).getRoute() ;
-		return ((NetworkRoute)route).getVehicleId() ; 
+		return ((NetworkRoute)route).getVehicleId() ;
 	}
 
 //	@Override
@@ -217,7 +236,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	@Override
 	public PlanElement getCurrentPlanElement() {
-		return this.currentPlanElement; 
+		return this.currentPlanElement;
 	}
 
 	@Override
@@ -270,7 +289,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	public double getActivityEndTime() {
 		return this.departureTime;
 	}
-	
+
 	@Override
 	public Plan getCurrentPlan() {
 		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
@@ -317,7 +336,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		throw new RuntimeException("unexpected type of PlanElement") ;
 	}
 
-	
-	
+
+
 
 }
