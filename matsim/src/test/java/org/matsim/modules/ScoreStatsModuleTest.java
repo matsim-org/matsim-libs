@@ -22,9 +22,6 @@
 
 package org.matsim.modules;
 
-import java.util.Map;
-import java.util.stream.Stream;
-
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,6 +38,9 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
 public class ScoreStatsModuleTest {
 
 	public static final double DELTA = 0.0000000001;
@@ -48,7 +48,7 @@ public class ScoreStatsModuleTest {
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
-	public static Stream<Arguments> arguments () {
+	public static Stream<Arguments> arguments() {
 		return Stream.of(Arguments.of(false, false), Arguments.of(true, false));
 	}
 
@@ -58,7 +58,7 @@ public class ScoreStatsModuleTest {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		config.routing().setAccessEgressType(isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
+		config.routing().setAccessEgressType(isInsertingAccessEgressWalk ? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
 
 		config.controller().setLastIteration(1);
 		Controler controler = new Controler(config);
@@ -76,7 +76,8 @@ public class ScoreStatsModuleTest {
 		@Inject
 		ScoreStats scoreStats;
 
-		@Inject Config config ;
+		@Inject
+		Config config;
 
 		@Override
 		public void notifyShutdown(ShutdownEvent event) {
@@ -90,65 +91,51 @@ public class ScoreStatsModuleTest {
 			//            }
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
-			if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+
+			if (config.routing().getAccessEgressType().equals(AccessEgressType.none)) {
 				{
-					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.78366379257605, array[1], DELTA);
-				} {
-					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
-				}{
-					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.81273255910591, array[1], DELTA);
-				}{
-					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-					Assertions.assertEquals(64.75686659291274, array[0], DELTA);
-					Assertions.assertEquals(64.84180132563583, array[1], DELTA);
+					Double[] worst = result.get(ScoreItem.worst).values().toArray(new Double[0]);
+					Assertions.assertEquals(64.75686659291274, worst[0], DELTA);
+					Assertions.assertEquals(64.78366379257605, worst[1], DELTA);
 				}
-				} else {
-					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
-//					if(config.qsim().isUsingFastCapacityUpdate()) {
-						{
-						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 45.9741777194131}[1], array[1], DELTA);
-						}{
-						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[0], array[0], DELTA);
-						Assertions.assertEquals(new double[]{53.18953957492432, 38.73201822323088}[1], array[1], DELTA);
-						}
-//					} else {
-//						{
-//						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[1], array[1], DELTA);
-//						}{
-//						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
-//						Assert.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
-//						}
-//					}
+				{
+					Double[] best = result.get(ScoreItem.best).values().toArray(new Double[0]);
+					Assertions.assertEquals(64.75686659291274, best[0], DELTA);
+					Assertions.assertEquals(64.84180132563583, best[1], DELTA);
+				}
+				{
+					Double[] average = result.get(ScoreItem.average).values().toArray(new Double[0]);
+					Assertions.assertEquals(64.75686659291274, average[0], DELTA);
+					Assertions.assertEquals(64.81273255910591, average[1], DELTA);
+				}
+				{
+					Double[] executed = result.get(ScoreItem.executed).values().toArray(new Double[0]);
+					Assertions.assertEquals(64.75686659291274, executed[0], DELTA);
+					Assertions.assertEquals(64.84180132563583, executed[1], DELTA);
+				}
+			} else {
+				// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
+				{
+					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]);
+					Assertions.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
+					Assertions.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
+				}
+				{
+					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]);
+					Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[0], array[0], DELTA);
+					Assertions.assertEquals(new double[]{53.18953957492432, 53.2163372155953}[1], array[1], DELTA);
+				}
+				{
+					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]);
+					Assertions.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[0], array[0], DELTA);
+					Assertions.assertEquals(new double[]{53.18953957492432, 45.97376498301028}[1], array[1], DELTA);
+				}
+				{
+					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]);
+					Assertions.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);
+					Assertions.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[1], array[1], DELTA);
 				}
 			}
 		}
-
 	}
+}
