@@ -22,17 +22,11 @@ package ch.sbb.matsim.mobsim.qsim;
 import ch.sbb.matsim.config.SBBTransitConfigGroup;
 import ch.sbb.matsim.mobsim.qsim.pt.SBBTransitEngineQSimModule;
 import com.google.inject.Provides;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -40,76 +34,70 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author mrieser / SBB
  */
 public class SBBQSimModuleTest {
 
-    @RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
-    @BeforeEach
-    public void setUp() {
-        System.setProperty("matsim.preferLocalDtds", "true");
-    }
+	@BeforeEach
+	public void setUp() {
+		System.setProperty("matsim.preferLocalDtds", "true");
+	}
 
 	// https://github.com/SchweizerischeBundesbahnen/matsim-sbb-extensions/issues/3
 	@Test
 	void testIntegration() {
-        String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
-                "<config>\n" +
-                "\t<module name=\"controler\" >\n" +
-                "\t\t<param name=\"createGraphs\" value=\"false\" />\n" +
-                "\t\t<param name=\"dumpDataAtEnd\" value=\"false\" />\n" +
-                "\t\t<param name=\"lastIteration\" value=\"0\" />\n" +
-                "\t</module>\n" +
-                "\t<module name=\"SBBPt\" >\n" +
-                "\t\t<param name=\"deterministicServiceModes\" value=\"train,metro\" />\n" +
-                "\t\t<param name=\"createLinkEventsInterval\" value=\"10\" />\n" +
-                "\t</module>\n" +
-                "</config>";
+		String xmlConfig = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+			"<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/config_v2.dtd\">\n" +
+			"<config>\n" +
+			"\t<module name=\"controler\" >\n" +
+			"\t\t<param name=\"createGraphs\" value=\"false\" />\n" +
+			"\t\t<param name=\"dumpDataAtEnd\" value=\"false\" />\n" +
+			"\t\t<param name=\"lastIteration\" value=\"0\" />\n" +
+			"\t</module>\n" +
+			"\t<module name=\"SBBPt\" >\n" +
+			"\t\t<param name=\"deterministicServiceModes\" value=\"train,metro\" />\n" +
+			"\t\t<param name=\"createLinkEventsInterval\" value=\"10\" />\n" +
+			"\t</module>\n" +
+			"</config>";
 
-        Config config = ConfigUtils.createConfig();
-        new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
-        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
-        Scenario scenario = ScenarioUtils.createScenario(config);
+		Config config = ConfigUtils.createConfig();
+		new ConfigReader(config).parse(new ByteArrayInputStream(xmlConfig.getBytes(StandardCharsets.UTF_8)));
+		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Controler controler = new Controler(scenario);
 
-		// Add dummy network (otherwise the router will crash)
-		Node a = NetworkUtils.createNode(Id.createNodeId("a"), new Coord(0,0));
-		Node b = NetworkUtils.createNode(Id.createNodeId("b"), new Coord(0,0));
-		scenario.getNetwork().addNode(a);
-		scenario.getNetwork().addNode(b);
-		scenario.getNetwork().addLink(NetworkUtils.createLink(Id.createLinkId("l1"), a, b, scenario.getNetwork(), 1,1,1,1));
-		scenario.getNetwork().addLink(NetworkUtils.createLink(Id.createLinkId("l2"), b, a, scenario.getNetwork(), 1,1,1,1));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// To use the deterministic pt simulation (Part 1 of 2):
+				install(new SBBTransitModule());
+			}
 
-        Controler controler = new Controler(scenario);
+			// To use the deterministic pt simulation (Part 2 of 2):
+			@Provides
+			QSimComponentsConfig provideQSimComponentsConfig() {
+				QSimComponentsConfig components = new QSimComponentsConfig();
+				new StandardQSimComponentConfigurator(config).configure(components);
+				new SBBTransitEngineQSimModule().configure(components);
+				return components;
+			}
+		});
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                // To use the deterministic pt simulation (Part 1 of 2):
-                install(new SBBTransitModule());
-            }
+		controler.run();
 
-            // To use the deterministic pt simulation (Part 2 of 2):
-            @Provides
-            QSimComponentsConfig provideQSimComponentsConfig() {
-                QSimComponentsConfig components = new QSimComponentsConfig();
-                new StandardQSimComponentConfigurator(config).configure(components);
-                new SBBTransitEngineQSimModule().configure(components);
-                return components;
-            }
-        });
+		// this test mostly checks that no exception occurred
 
-        controler.run();
-
-        // this test mostly checks that no exception occurred
-
-        Assertions.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
-    }
+		Assertions.assertTrue(config.getModules().get(SBBTransitConfigGroup.GROUP_NAME) instanceof SBBTransitConfigGroup);
+	}
 
 }
