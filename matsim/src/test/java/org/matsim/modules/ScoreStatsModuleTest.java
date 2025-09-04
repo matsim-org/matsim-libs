@@ -91,9 +91,7 @@ public class ScoreStatsModuleTest {
 			//            }
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
-			// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
 
-			// TODO The values were changed to match the results of AccessEgressType.accessEgressModeToLink, check if the values are valid
 			if (config.routing().getAccessEgressType().equals(AccessEgressType.none)) {
 				{
 					Double[] worst = result.get(ScoreItem.worst).values().toArray(new Double[0]);
@@ -116,6 +114,7 @@ public class ScoreStatsModuleTest {
 					Assertions.assertEquals(64.84180132563583, executed[1], DELTA);
 				}
 			} else {
+				// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
 				{
 					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]);
 					Assertions.assertEquals(new double[]{53.18953957492432, 38.73119275042525}[0], array[0], DELTA);

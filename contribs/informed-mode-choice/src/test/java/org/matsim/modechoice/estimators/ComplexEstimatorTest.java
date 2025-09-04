@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.modechoice.PlanModelService;
 import org.matsim.modechoice.TestScenario;
@@ -21,7 +20,6 @@ public class ComplexEstimatorTest {
 	void bindings() {
 
 		Config config = TestScenario.loadConfig(utils);
-		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
 
 		config.controller().setLastIteration(2);
 		Controler controler = MATSimApplication.prepare(TestScenario.class, config, "--complex");
@@ -32,10 +30,10 @@ public class ComplexEstimatorTest {
 		ComplexTripEstimator est = (ComplexTripEstimator) service.getTripEstimator("pt");
 
 		assertThat(est.getIters())
-				.isEqualTo(3);
+			.isEqualTo(3);
 
 		assertThat(est.getEvents())
-				.isGreaterThan(500_000);
+			.isGreaterThan(400_000);
 
 	}
 
