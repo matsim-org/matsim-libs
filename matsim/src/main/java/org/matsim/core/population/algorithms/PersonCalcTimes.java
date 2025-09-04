@@ -20,14 +20,11 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+
+import java.util.List;
 
 /**
  * Calculates all time informations in all plans of a person<br>
@@ -47,7 +44,8 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
-	//////////////////////////////////////////////////////////////////////
+
+	/// ///////////////////////////////////////////////////////////////////
 
 	public PersonCalcTimes() {
 		super();
@@ -55,12 +53,13 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// run methods
-	//////////////////////////////////////////////////////////////////////
 
-  @Override
+	/// ///////////////////////////////////////////////////////////////////
+
+	@Override
 	public void run(Person person) {
 		List<? extends Plan> plans = person.getPlans();
-		for (int i=0; i<plans.size(); i++) {
+		for (int i = 0; i < plans.size(); i++) {
 			Plan plan = plans.get(i);
 
 			Activity act = null;
@@ -69,7 +68,8 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 			int max = plan.getPlanElements().size();
 			for (PlanElement pe : plan.getPlanElements()) {
 				cnt++;
-				if (pe instanceof Activity) {
+				//need to filter out stage activities, because their start and end time don't need to be set
+				if (pe instanceof Activity && !TripStructureUtils.isStageActivityType(((Activity) pe).getType())) {
 					act = (Activity) pe;
 
 					if (cnt == 1) {
@@ -79,13 +79,12 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 					} else if (cnt == max) {
 						double time = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
 						act.setStartTime(time);
-						if (time < 24*3600) {
-							time = 24*3600;
+						if (time < 24 * 3600) {
+							time = 24 * 3600;
 						}
 						act.setEndTime(time);
 						act.setMaximumDuration(time - act.getStartTime().seconds());
-					}
-					else {
+					} else {
 						act.setStartTime(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
 						act.setEndTime(act.getStartTime().seconds() + act.getMaximumDuration().seconds());
 					}
@@ -95,10 +94,10 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 					leg.setDepartureTime(act.getEndTime().seconds());
 					OptionalTime ttime = leg.getTravelTime();
-					leg.setTravelTime( leg.getDepartureTime().seconds() + ttime.orElse(0) - leg.getDepartureTime()
-							.seconds());
+					leg.setTravelTime(leg.getDepartureTime().seconds() + ttime.orElse(0) - leg.getDepartureTime()
+						.seconds());
 				}
 			}
 		}
-  }
+	}
 }

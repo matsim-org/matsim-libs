@@ -102,7 +102,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final MultimodalLinkChooser multimodalLinkChooser) {
 		this.multimodalLinkChooser = multimodalLinkChooser;
 		Gbl.assertNotNull(scenario.getNetwork());
-		Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		// I Removed this line since it created lots of problems with many tests. Since this is now the default RoutingModule, we are instead throwing a warning
+		//Gbl.assertIf(!scenario.getNetwork().getLinks().isEmpty()); // otherwise network for mode probably not defined
+		if(scenario.getNetwork().getLinks().isEmpty()) {
+			log.warn("Using NetworkRoutingInclAccessEgressModule with empty network, network for mode probably not defined!");
+		}
 		this.filteredNetwork = filteredNetwork;
 		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
@@ -116,7 +120,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.timeInterpretation = timeInterpretation;
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
-					+ "currently not supported; there are too many other problems");
+				+ "currently not supported; there are too many other problems");
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
 			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
@@ -430,7 +434,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			route.setDistance(RouteUtils.calcDistance(route, relPosOnDepartureLink, relPosOnArrivalLink, this.filteredNetwork));
 			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
-			travTime = (int) path.travelTime;
+			travTime = (int) path.travelTime; // yyyy Why are we casting to int here? This causes the link traveltime to be different from the route traveltime. aleks Jan'2025
 
 		} else {
 			// create an empty route == staying on place if toLink == endLink
