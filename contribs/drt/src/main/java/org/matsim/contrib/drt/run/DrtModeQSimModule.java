@@ -22,23 +22,13 @@ package org.matsim.contrib.drt.run;
 
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
-import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.distributed.DrtNodeCommunicator;
-import org.matsim.contrib.drt.optimizer.distributed.DrtOptimizerCommunicator;
-import org.matsim.contrib.drt.optimizer.distributed.SecondaryOptimizerModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.prebooking.PrebookingManager;
 import org.matsim.contrib.drt.prebooking.PrebookingModeQSimModule;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
-import org.matsim.contrib.dvrp.passenger.AdvanceRequestProvider;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
-import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRouteCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
@@ -90,17 +80,21 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 				if (getSimulationNode().isDistributed()) {
 
-					addModalComponent(DrtOptimizerCommunicator.class, modalProvider(
-						getter -> new DrtOptimizerCommunicator(
-							getter.get(DrtNodeCommunicator.class),
-							getMode(),
-							getter.getModal(Fleet.class),
-							getter.getModal(DrtOptimizer.class)
-						)));
+					throw new UnsupportedOperationException("Distributed DRT is not supported yet.");
+					//addModalComponent(DrtOptimizerCommunicator.class, modalProvider(
+					//	getter -> new DrtOptimizerCommunicator(
+					//		getter.get(DrtNodeCommunicator.class),
+					//		getMode(),
+					//		getter.getModal(Fleet.class),
+					//		getter.getModal(DrtOptimizer.class)
+					//	)));
 				}
 
-			} else
-				install(new SecondaryOptimizerModule(getMode()));
+			} else {
+				throw new UnsupportedOperationException("Distributed DRT is not supported yet.");
+				// install(new SecondaryOptimizerModule(getMode()));
+			}
+
 
 		}
 

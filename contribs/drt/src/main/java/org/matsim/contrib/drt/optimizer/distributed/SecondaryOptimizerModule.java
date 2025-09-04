@@ -1,20 +1,16 @@
 package org.matsim.contrib.drt.optimizer.distributed;
 
+import com.google.common.annotations.Beta;
 import com.google.inject.Singleton;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.schedule.DrtScheduleTimingUpdater;
-import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -24,6 +20,7 @@ import org.matsim.dsim.MessageBroker;
 /**
  * Install optimizer that exchanges messages with the head node.
  */
+@Beta
 public class SecondaryOptimizerModule extends AbstractDvrpModeQSimModule {
 
 	public SecondaryOptimizerModule(String mode) {
