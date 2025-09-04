@@ -155,6 +155,12 @@ public class SimProvider implements LPProvider {
 
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
+
+				// Skip component that is a node singleton, but this process is not the first
+				if (qSimComponent.getClass().isAnnotationPresent(NodeSingleton.class) && nodeSingletonInjector != null) {
+					continue;
+				}
+
 				simProcess.addMobsimComponent(qSimComponent);
 
 				if (qSimComponent instanceof DistributedAgentSource as) {

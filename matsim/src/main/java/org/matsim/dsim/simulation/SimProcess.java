@@ -74,6 +74,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			this.engines.add(d);
 			d.setInternalInterface(this);
 			engines.sort(Comparator.comparingDouble(DistributedMobsimEngine::getEnginePriority).reversed());
+		} else if (component instanceof MobsimEngine e) {
+			log.warn("Ignoring non-distributed mobsim engine : {}", e.getClass().getName());
 		}
 
 		if (component instanceof DistributedActivityHandler d) {
