@@ -385,6 +385,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentLoadBuilder() {}
 
@@ -399,6 +400,8 @@ public final class LspShipmentUtils {
     public void setEndTime(double endTime) {
       this.endTime = endTime;
     }
+
+	public void setLinkId(Id<Link> linkId) {this.linkId = linkId;}
 
     public void setLogisticChainElement(LogisticChainElement element) {
       this.element = element;
@@ -478,6 +481,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentUnloadBuilder() {}
 
@@ -501,6 +505,10 @@ public final class LspShipmentUtils {
       this.resourceId = resourceId;
     }
 
+	public void setLinkId(Id<Link> linkId) {
+		  this.linkId = linkId;
+	  }
+
     public ScheduledLspShipmentUnload build() {
       return new ScheduledLspShipmentUnload(this);
     }
@@ -512,6 +520,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentHandleBuilder() {}
 
@@ -534,6 +543,10 @@ public final class LspShipmentUtils {
     public void setResourceId(Id<LSPResource> resourceId) {
       this.resourceId = resourceId;
     }
+
+	public void setLinkId(Id<Link> linkId) {
+		  this.linkId = linkId;
+	  }
 
     public ScheduledLspShipmentHandling build() {
       return new ScheduledLspShipmentHandling(this);

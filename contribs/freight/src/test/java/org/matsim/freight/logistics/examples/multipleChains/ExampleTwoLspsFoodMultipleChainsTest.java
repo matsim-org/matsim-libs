@@ -29,8 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class ExampleTwoLspsGroceryDeliveryMultipleChainsTest {
-    private static final Logger log = LogManager.getLogger(ExampleTwoLspsGroceryDeliveryMultipleChainsTest.class);
+public class ExampleTwoLspsFoodMultipleChainsTest {
+    private static final Logger log = LogManager.getLogger(ExampleTwoLspsFoodMultipleChainsTest.class);
     @RegisterExtension
     public final MatsimTestUtils utils = new MatsimTestUtils();
 
