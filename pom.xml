@@ -35,7 +35,7 @@
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
         <jackson.version>2.20.0</jackson.version>
-        <jogl.version>2.5.0</jogl.version>
+        <jogl.version>2.6.0</jogl.version>
 		<junit.version>5.13.4</junit.version>
     </properties>
 
