@@ -18,8 +18,12 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	private final Map<String, ContextParams> params = new HashMap<>();
 
 	@Parameter
-	@Comment("Whether default dashboards are loaded via SPI.")
+	@Comment("Whether default dashboards are created.")
 	private Mode defaultDashboards = Mode.enabled;
+
+	@Parameter
+	@Comment("How dashboards are loaded")
+	private DashboardLoading loading = DashboardLoading.guice;
 
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
@@ -105,6 +109,14 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		this.defaultDashboards = defaultDashboards;
 	}
 
+	public DashboardLoading getLoading() {
+		return loading;
+	}
+
+	public void setLoading(DashboardLoading loading) {
+		this.loading = loading;
+	}
+
 	public Set<String> getPackages() {
 		return packages;
 	}
@@ -143,6 +155,11 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	public enum Mode {
 		enabled,
 		disabled
+	}
+
+	public enum DashboardLoading {
+		spiAndGuice,
+		guice
 	}
 
 	/**
