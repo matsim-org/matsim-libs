@@ -178,10 +178,11 @@ class LSPControllerListener
 			log.warn("Last iteration has been run. Make the best LSP plan the selected plan now.");
 			log.info("This is done until, a way is found to not do new jsprit runs in unmodified plans, e.g. after iteration switch off.");
 			LSPs lsps = LSPUtils.getLSPs(scenario);
-			assert !lsps.getLSPs().isEmpty();
-			for (LSP lsp : lsps.getLSPs().values()) {
-				var bestPlanSelector = new BestPlanSelector<LSPPlan,LSP>();
-				bestPlanSelector.selectPlan(lsp);
+			if( !lsps.getLSPs().isEmpty()) {
+				for (LSP lsp : lsps.getLSPs().values()) {
+					var bestPlanSelector = new BestPlanSelector<LSPPlan,LSP>();
+					bestPlanSelector.selectPlan(lsp);
+				}
 			}
 		}
 	}
