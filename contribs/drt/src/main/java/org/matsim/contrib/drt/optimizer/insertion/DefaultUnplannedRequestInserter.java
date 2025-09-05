@@ -94,7 +94,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
     }
 
 	@Override
-	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+	public void scheduleUnplannedRequests(double time, Collection<DrtRequest> unplannedRequests) {
 		double now = timeOfDay.getAsDouble();
 
 		List<DrtRequest> requestsToRetry = insertionRetryQueue.getRequestsToRetryNow(now);
@@ -182,25 +182,5 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 					+ " fromLinkId="
 					+ req.getFromLink().getId());
 		}
-	}
-
-	@Override
-	public void onPrepareSim() {
-
-	}
-
-	@Override
-	public void afterSim() {
-
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-
-	}
-
-	@Override
-	public void doSimStep(double time) {
-
 	}
 }
