@@ -165,7 +165,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		Map<String, Object2DoubleMap<String>> dataDistribution = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(calculatedFile)) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-				.setSkipHeaderRecord(true).build().parse(reader);
+				.setSkipHeaderRecord(true).get().parse(reader);
 			for (CSVRecord record : parse) {
 				System.out.println(record);
 				dataDistribution.computeIfAbsent(record.get(0), k -> new Object2DoubleOpenHashMap<>());
