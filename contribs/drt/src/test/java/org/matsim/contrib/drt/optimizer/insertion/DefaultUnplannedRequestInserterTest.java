@@ -92,7 +92,7 @@ public class DefaultUnplannedRequestInserterTest {
 		RequestInsertionScheduler insertionScheduler = null;//should not be used
 
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
-				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+				insertionScheduler).scheduleUnplannedRequests(0, unplannedRequests);
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//call insertion
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
-				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+				insertionScheduler).scheduleUnplannedRequests(0, unplannedRequests);
 
 		//request is removed from unplanned requests
 		assertThat(unplannedRequests).isEmpty();
@@ -148,7 +148,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//call insertion
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
-				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+				insertionScheduler).scheduleUnplannedRequests(0, unplannedRequests);
 
 		//request is removed from unplanned requests
 		assertThat(unplannedRequests).isEmpty();
@@ -195,7 +195,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//call insertion
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
-				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+				insertionScheduler).scheduleUnplannedRequests(0, unplannedRequests);
 
 		//request is removed from unplanned requests
 		assertThat(unplannedRequests).isEmpty();
@@ -249,7 +249,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		//call insertion
 		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
-				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+				insertionScheduler).scheduleUnplannedRequests(0, unplannedRequests);
 
 		//request is removed from unplanned requests
 		assertThat(unplannedRequests).isEmpty();
