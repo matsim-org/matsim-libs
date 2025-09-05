@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.RequestFleetFilter;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -16,11 +15,9 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.utils.geometry.GeometryUtils;
 
 import java.util.*;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -42,7 +39,6 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 	private final AtomicReference<STRtree> treeRef = new AtomicReference<>(new STRtree());
 
 	private final Fleet fleet;
-	private final MobsimTimer mobsimTimer;
 	private final double expansionIncrementFactor;
 	private final double maxExpansion;
 	private final double minExpansion;
@@ -50,10 +46,8 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 	private final int minCandidates;
 	private final double updateInterval;
 
-	public SpatialRequestFleetFilter(Fleet fleet, MobsimTimer mobsimTimer,
-									 DrtSpatialRequestFleetFilterParams params) {
+	public SpatialRequestFleetFilter(Fleet fleet, DrtSpatialRequestFleetFilterParams params) {
 		this.fleet = fleet;
-		this.mobsimTimer = mobsimTimer;
 		this.expansionIncrementFactor = params.getExpansionFactor();
 		this.minExpansion = params.getMinExpansion();
 		this.maxExpansion = params.getMaxExpansion();
@@ -121,10 +115,6 @@ public class SpatialRequestFleetFilter implements RequestFleetFilter {
 						var diversionPoint = ((OnlineDriveTaskTracker) driveTask.getTaskTracker()).getDiversionPoint();
 						var link = diversionPoint != null ? diversionPoint.link : driveTask.getPath().getToLink();
 						insertVehicleInTree(newTree, vehicle, link.getCoord());
-					}
-					case OperationalStop operationalStop -> {
-						var coord = operationalStop.getFacility().getCoord();
-						insertVehicleInTree(newTree, vehicle, coord);
 					}
 					case null -> throw new RuntimeException("Current task is null for schedule " + schedule + " for vehicle " + vehicle);
 					default -> throw new RuntimeException("Unknown task type: " + startTask.getClass());

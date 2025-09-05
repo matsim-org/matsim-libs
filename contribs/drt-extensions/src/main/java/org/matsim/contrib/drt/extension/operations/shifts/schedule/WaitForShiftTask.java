@@ -21,16 +21,16 @@ public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, Op
 
 	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_SHIFT", STOP);
 
-	private final OperationFacility facility;
+	private final OperationFacility.Registration operationFacilityRegistration;
 
-    public WaitForShiftTask(double beginTime, double endTime, Link link, OperationFacility facility) {
+    public WaitForShiftTask(double beginTime, double endTime, Link link, OperationFacility.Registration operationFacilityRegistration) {
         super(TYPE, beginTime, endTime, link);
-        this.facility = facility;
+        this.operationFacilityRegistration = operationFacilityRegistration;
     }
 
     @Override
-    public OperationFacility getFacility() {
-        return facility;
+    public OperationFacility.Registration getFacilityRegistration() {
+        return operationFacilityRegistration;
     }
 
     @Override

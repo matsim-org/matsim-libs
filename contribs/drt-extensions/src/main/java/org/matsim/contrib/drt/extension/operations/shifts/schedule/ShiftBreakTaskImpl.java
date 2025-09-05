@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
@@ -23,15 +24,15 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 	public static final DrtTaskType TYPE = new DrtTaskType("SHIFT_BREAK", STOP);
 
 	private final DrtShiftBreak shiftBreak;
-    private final OperationFacility facility;
+	private final OperationFacility.Registration operationFacilityRegistration;
 
 	private final DrtStopTask delegate;
 
-	public ShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak, OperationFacility facility) {
+	public ShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak, OperationFacility.Registration operationFacilityRegistration) {
 		super(TYPE, beginTime, endTime, link);
 		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shiftBreak = shiftBreak;
-        this.facility = facility;
+		this.operationFacilityRegistration = operationFacilityRegistration;
     }
 
     @Override
@@ -39,10 +40,10 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
         return shiftBreak;
     }
 
-    @Override
-    public OperationFacility getFacility() {
-        return facility;
-    }
+	@Override
+	public OperationFacility.Registration getFacilityRegistration() {
+		return operationFacilityRegistration;
+	}
 
 	@Override
 	public Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests() {

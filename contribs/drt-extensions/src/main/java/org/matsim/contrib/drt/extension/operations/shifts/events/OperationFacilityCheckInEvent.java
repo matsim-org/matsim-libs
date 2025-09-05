@@ -2,15 +2,15 @@ package org.matsim.contrib.drt.extension.operations.shifts.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import java.util.Map;
 
 /**
  * @author nkuehnel / MOIA
  */
-public class VehicleLeftOperationFacilityEvent extends Event {
+public class OperationFacilityCheckInEvent extends Event {
 
     private final String mode;
     private final Id<DvrpVehicle> vehicleId;
@@ -21,9 +21,9 @@ public class VehicleLeftOperationFacilityEvent extends Event {
     public static final String ATTRIBUTE_FACILITY = "facility";
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
-    public static final String EVENT_TYPE = "Vehicle left operation facility";
+    public static final String EVENT_TYPE = "Operation facility vehicle check-in";
 
-    public VehicleLeftOperationFacilityEvent(double time, String mode, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
+    public OperationFacilityCheckInEvent(double time, String mode, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
         super(time);
         this.mode = mode;
         this.facilityId = facilityId;

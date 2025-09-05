@@ -3,6 +3,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -24,15 +25,15 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	public static final DrtTaskType TYPE = new DrtTaskType("SHIFT_CHANGEOVER", STOP);
 
 	private final DrtShift shift;
-	private final OperationFacility facility;
+	private final OperationFacility.Registration facilityRegistration;
 
 	private final DrtStopTask delegate;
 
-	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift, OperationFacility facility) {
+	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift, OperationFacility.Registration facilityRegistration) {
 		super(TYPE, beginTime, endTime, link);
 		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shift = shift;
-		this.facility = facility;
+		this.facilityRegistration = facilityRegistration;
 	}
 
 	@Override
@@ -41,8 +42,8 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	}
 
 	@Override
-	public OperationFacility getFacility() {
-		return facility;
+	public OperationFacility.Registration getFacilityRegistration() {
+		return facilityRegistration;
 	}
 
 	@Override

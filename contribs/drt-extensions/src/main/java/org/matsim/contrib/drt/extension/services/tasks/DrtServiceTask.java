@@ -19,7 +19,6 @@
  */
 package org.matsim.contrib.drt.extension.services.tasks;
 
-import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
@@ -36,21 +35,20 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 public class DrtServiceTask extends DefaultStayTask implements OperationalStop {
 
 	public static final DrtTaskType TYPE = new DrtTaskType("SERVICE", STAY);
-	OperationFacility operationFacility;
+	OperationFacility.Registration facilityRegistration;
 	Id<DrtService> drtServiceId;
 	final double intendedDuration;
 
-	public DrtServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility operationFacility) {
+	public DrtServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility facility) {
 		super(TYPE,beginTime, endTime, link);
-		this.operationFacility = operationFacility;
+		this.facilityRegistration = facilityRegistration;
 		this.drtServiceId = drtServiceId;
 		this.intendedDuration = endTime-beginTime;
-		Verify.verify(link.getId().equals(operationFacility.getLinkId()));
 	}
 
 	@Override
-	public OperationFacility getFacility() {
-		return operationFacility;
+	public OperationFacility.Registration getFacilityRegistration() {
+		return facilityRegistration;
 	}
 
 	public Id<DrtService> getDrtServiceId() {
