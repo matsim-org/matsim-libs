@@ -101,7 +101,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		if (!unplannedRequests.isEmpty() || insertionRetryQueue.hasRequestsToRetryNow(e.getSimulationTime())) {
 			waitForAllTimingUpdates(); // Concurrent timing updates
 			scheduleTimingUpdated = true;
-			requestInserter.scheduleUnplannedRequests(unplannedRequests);
+			requestInserter.scheduleUnplannedRequests(e.getSimulationTime(), unplannedRequests);
 		}
 
 		relocateVehiclesToDepot(drtCfg.getReturnToDepotEvaluationInterval(), drtCfg.getReturnToDepotTimeout());

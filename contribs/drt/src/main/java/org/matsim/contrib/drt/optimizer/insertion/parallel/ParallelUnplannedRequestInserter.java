@@ -91,7 +91,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequest
  * @author Steffen Axer
  */
 @NodeSingleton
-public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, DistributedMobsimEngine, MobsimBeforeCleanupListener {
+public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
 	private static final Logger LOG = LogManager.getLogger(ParallelUnplannedRequestInserter.class);
 	private Double lastProcessingTime;
 	private static final Comparator<DrtRequest> drtRequestComparator = Comparator.comparingDouble(DrtRequest::getSubmissionTime).thenComparing(req -> req.getId().toString());
@@ -169,7 +169,14 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 	@Override
-	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+	public void scheduleUnplannedRequests(double time, Collection<DrtRequest> unplannedRequests) {
+
+		addToQueue(unplannedRequests);
+
+		doOptimizeStep(time);
+	}
+
+	private void addToQueue(Collection<DrtRequest> unplannedRequests) {
 		var it = unplannedRequests.iterator();
 		while (it.hasNext()) {
 			this.tmpQueue.add(it.next());
@@ -357,27 +364,11 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		}
 	}
 
-	@Override
-	public void onPrepareSim() {
-
-	}
-
-	@Override
-	public void afterSim() {
-
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-
-	}
-
 	void handleInsertionRetryQueue(double now) {
 		tmpQueue.addAll(insertionRetryQueue.getRequestsToRetryNow(now));
 	}
 
-	@Override
-	public void doSimStep(double time) {
+	public void doOptimizeStep(double time) {
 
 		if (this.lastProcessingTime == null) {
 			this.lastProcessingTime = time;
@@ -424,7 +415,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 				// Update vehicle entries for next round
 				vehicleEntries = updateVehicleEntries(time, vehicleEntries, scheduledVehicles);
 				lastUnsolvedConflicts = toBeRejected.size();
-				this.scheduleUnplannedRequests(toBeRejected);
+				this.addToQueue(toBeRejected);
 			}
 			// Clean workers ultimately
 			toBeRejected.forEach(s -> retryOrReject(s, time, NO_INSERTION_FOUND_CAUSE));

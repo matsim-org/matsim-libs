@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.Collection;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.dsim.NodeSingleton;
 
@@ -29,6 +30,6 @@ import org.matsim.core.mobsim.dsim.NodeSingleton;
  * @author michalm
  */
 @NodeSingleton
-public interface UnplannedRequestInserter extends MobsimEngine {
-	void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests);
+public interface UnplannedRequestInserter extends QSimComponent {
+	void scheduleUnplannedRequests(double time, Collection<DrtRequest> unplannedRequests);
 }
