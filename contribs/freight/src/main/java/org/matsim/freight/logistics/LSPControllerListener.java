@@ -174,17 +174,22 @@ class LSPControllerListener
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		if (event.isLastIteration()){
-			log.warn("Last iteration has been run. Make the best LSP plan the selected plan now.");
-			log.info("This is done until, a way is found to not do new jsprit runs in unmodified plans, e.g. after iteration switch off.");
-			LSPs lsps = LSPUtils.getLSPs(scenario);
-			if( !lsps.getLSPs().isEmpty()) {
-				for (LSP lsp : lsps.getLSPs().values()) {
-					var bestPlanSelector = new BestPlanSelector<LSPPlan,LSP>();
-					bestPlanSelector.selectPlan(lsp);
-				}
-			}
-		}
+		//Macht vermutlich doch keinen Sinn, weil dann ja die Events dennoch nicht zu diesem Plan passen.
+		//Prüfen, wann CarrierReplanning ist und wann Events-geschrieben werden.
+		//Vielleicht eher einen Wert setzen: RerunJsprit /rescheduleCarrier / replanCarrier ?
+		// Aber das muss dann abgesichert sein, damit im Fall einer veränderten zusammensetzung der Aufträge dennoch neuplanung erfolgt.
+		//KMT Sep 25
+//		if (event.isLastIteration()){
+//			log.warn("Last iteration has been run. Make the best LSP plan the selected plan now.");
+//			log.info("This is done until, a way is found to not do new jsprit runs in unmodified plans, e.g. after iteration switch off.");
+//			LSPs lsps = LSPUtils.getLSPs(scenario);
+//			if( !lsps.getLSPs().isEmpty()) {
+//				for (LSP lsp : lsps.getLSPs().values()) {
+//					var bestPlanSelector = new BestPlanSelector<LSPPlan,LSP>();
+//					bestPlanSelector.selectPlan(lsp); //Not sure if works -.-
+//				}
+//			}
+//		}
 	}
 
 	Carriers getCarriersFromLSP() {
