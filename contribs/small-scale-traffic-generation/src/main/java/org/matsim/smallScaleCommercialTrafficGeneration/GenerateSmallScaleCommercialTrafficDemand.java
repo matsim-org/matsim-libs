@@ -143,8 +143,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--shapeCRS", description = "CRS of the three input shape files (zones, landuse, buildings")
 	private String shapeCRS;
 
-	@CommandLine.Option(names = "--resistanceFactor", defaultValue = "0.005", description = "ResistanceFactor for the trip distribution")
-	private double resistanceFactor;
+	@CommandLine.Option(names = "--resistanceFactor_commercialPersonTraffic", description = "ResistanceFactor for the trip distribution")
+	private double resistanceFactor_commercialPersonTraffic;
+
+	@CommandLine.Option(names = "--resistanceFactor_goodsTraffic", description = "ResistanceFactor for the trip distribution")
+	private double resistanceFactor_goodsTraffic;
 
 	@CommandLine.Option(names = "--nameOutputPopulation", description = "Name of the output Population")
 	private String nameOutputPopulation;
@@ -162,6 +165,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	private static RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
+	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
 
 	private Map<String, EnumeratedDistribution<TourStartAndDuration>> tourDistribution = null;
 	private Map<ServiceDurationPerCategoryKey, EnumeratedDistribution<GenerateSmallScaleCommercialTrafficDemand.DurationsBounds>> serviceDurationTimeSelector = null;
@@ -237,6 +241,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
 		tourDistribution = commercialTourSpecifications.createTourDistribution(rng);
+
+		if ((usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.commercialPersonTraffic || usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic) && resistanceFactor_commercialPersonTraffic == 0.)
+			throw new Exception("You selected commercialPersonTraffic but did not set a resistanceFactor_commercialPersonTraffic. Please set it.");
+		if ((usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.goodsTraffic || usedSmallScaleCommercialTrafficType == SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic) && resistanceFactor_goodsTraffic == 0.)
+			throw new Exception("You selected goodsTraffic but did not set a resistanceFactor_goodsTraffic > 0. Please set it.");
+
+		resistanceFactorsPerModelType.put(SmallScaleCommercialTrafficType.commercialPersonTraffic, resistanceFactor_commercialPersonTraffic);
+		resistanceFactorsPerModelType.put(SmallScaleCommercialTrafficType.goodsTraffic, resistanceFactor_goodsTraffic);
+		log.info("Set resistance factor for commercialPersonTraffic to {} and for goodsTraffic to {}.", resistanceFactor_commercialPersonTraffic, resistanceFactor_goodsTraffic);
 
 		switch (usedCreationOption) {
 			case useExistingCarrierFileWithSolution, useExistingCarrierFileWithoutSolution -> {
@@ -514,7 +527,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (output == null || output.toString().isEmpty())
 			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
-					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactor)
+					+ LocalDate.now() + "_" + LocalTime.now().toSecondOfDay() + "_" + resistanceFactorsPerModelType)
 				.toString());
 		else
 			config.controller().setOutputDirectory(output.toString());
@@ -948,7 +961,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.newInstance(indexZones, shapeFileZoneNameColumn, trafficVolume_start, trafficVolume_stop, smallScaleCommercialTrafficType, listOfZones).build();
 		Network network = scenario.getNetwork();
 		int count = 0;
-
+		log.info("Create trip distribution for traffic type {} with resistance factor {}.", smallScaleCommercialTrafficType, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType).toString());
 		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : trafficVolume_start.keySet()) {
 			count++;
 			if (count % 50 == 0 || count == 1)
@@ -960,7 +973,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				Collections.shuffle(listOfZones, rnd);
 				for (String stopZone : listOfZones) {
 					odMatrix.setTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType,
-						network, linksPerZone, resistanceFactor);
+						network, linksPerZone, resistanceFactorsPerModelType.get(smallScaleCommercialTrafficType));
 				}
 			}
 		}

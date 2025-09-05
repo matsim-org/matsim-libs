@@ -94,7 +94,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			"--shapeCRS", shapeCRS,
 			"--nameOutputPopulation", resultPopulation,
 			"--pathOutput", output,
-			"--resistanceFactor", "0.005");
+			"--resistanceFactor_commercialPersonTraffic", "0.005",
+			"--resistanceFactor_goodsTraffic", "0.005");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
