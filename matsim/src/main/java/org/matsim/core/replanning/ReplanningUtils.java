@@ -27,6 +27,7 @@ import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 public final class ReplanningUtils {
 
@@ -63,7 +64,10 @@ public final class ReplanningUtils {
 	public static <P extends BasicPlan, R> boolean isOnlySelector(GenericPlanStrategy<P, R> planStrategy) {
 		if (planStrategy instanceof PlanStrategyImpl) {
 			return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
+		} else if (planStrategy instanceof PlanSelector) {
+			return true;
 		}
+		// else: we do not know what it is, so we assume it is innovative
 		return false;
 	}
 
