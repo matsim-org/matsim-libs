@@ -382,7 +382,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 						.toProvider(
 							() -> {
 								LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
+								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
 								strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
 								strategyManager.setMaxPlansPerAgent(5);
 								strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
