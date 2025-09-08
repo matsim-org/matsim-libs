@@ -83,16 +83,16 @@ class MultipleChainsUtils {
 	 * @param strategyManager
 	 * @param config
 	 */
-	static void applyInnovationDisable(LSPStrategyManager strategyManager, Config config) {
-		for (GenericPlanStrategy<LSPPlan, LSP> planStrategy : strategyManager.getStrategies(null)) {
+	static void applyInnovationDisable(LSPStrategyManager strategyManager, String subpopulation, Config config) {
+		for (GenericPlanStrategy<LSPPlan, LSP> planStrategy : strategyManager.getStrategies(subpopulation)) {
 			int globalInnovationDisableAfter = (int) ((config.controller().getLastIteration() - config.controller().getFirstIteration())
 				* config.replanning().getFractionOfIterationsToDisableInnovation() + config.controller().getFirstIteration());
 			int maxIter = -1;
-			if (!ReplanningUtils.isOnlySelector(planStrategy)) {
+			if (ReplanningUtils.isInnovativeStrategy(planStrategy)) {
 				maxIter = globalInnovationDisableAfter;
 			}
 			if (maxIter >= config.controller().getFirstIteration() && maxIter >= 0) {
-				strategyManager.addChangeRequest(maxIter + 1, planStrategy, null, 0.0);
+				strategyManager.addChangeRequest(maxIter + 1, planStrategy, subpopulation, 0.0);
 			}
 		}
 	}

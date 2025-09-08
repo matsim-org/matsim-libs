@@ -138,7 +138,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 							strategyManager.addStrategy(strategy, null, 1);
 
 						}
-						MultipleChainsUtils.applyInnovationDisable(strategyManager, config);
+						MultipleChainsUtils.applyInnovationDisable(strategyManager, null, config);
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
                       strategyManager.setMaxPlansPerAgent(5);
