@@ -42,7 +42,7 @@ import java.util.Random;
  */
 class LspRandomShipmentShiftingModule implements GenericPlanStrategyModule<LSPPlan> {
 
-	private Random random;
+	private final Random random;
 
 	public LspRandomShipmentShiftingModule() {
 		MatsimRandom.reset();
