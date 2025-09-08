@@ -1,5 +1,7 @@
 package org.matsim.simwrapper;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +13,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -59,9 +62,37 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	private void generate(Path output) {
 		SimWrapperConfigGroup config = simWrapper.getConfigGroup();
 
+		// Load provider from packages
+		for (String pack : config.getPackages()) {
+
+			log.info("Scanning package {}", pack);
+
+			try {
+				ImmutableSet<ClassPath.ClassInfo> classes = ClassPath.from(ClassLoader.getSystemClassLoader()).getTopLevelClasses(pack);
+
+				List<DashboardProvider> providers = loadProvider(classes);
+				addFromProvider(config, providers);
+
+			} catch (IOException e) {
+				log.error("Could not add providers from package {}", pack, e);
+			}
+		}
+
+		// Load providers via SPI
+		if (config.getLoading() == SimWrapperConfigGroup.DashboardLoading.spiAndGuice) {
+			ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
+			addFromProvider(config, loader);
+		}
+
+		// Load default dashboards
+		if (config.getDefaultDashboards() != SimWrapperConfigGroup.Mode.disabled) {
+			addFromProvider(config, List.of(new DefaultDashboardProvider()));
+		}
+
 		// Lambda provider which uses dashboards from bindings
 		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));
 
+		// Load providers from bindings
 		addFromProvider(config, providers);
 
 		try {
@@ -69,6 +100,23 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		} catch (IOException e) {
 			log.error("Could not create SimWrapper dashboard.");
 		}
+	}
+
+	private List<DashboardProvider> loadProvider(ImmutableSet<ClassPath.ClassInfo> classes) {
+		List<DashboardProvider> result = new ArrayList<>();
+		for (ClassPath.ClassInfo info : classes) {
+			Class<?> clazz = info.load();
+			if (DashboardProvider.class.isAssignableFrom(clazz)) {
+				try {
+					Constructor<?> c = clazz.getDeclaredConstructor();
+					DashboardProvider o = (DashboardProvider) c.newInstance();
+					result.add(o);
+				} catch (ReflectiveOperationException e) {
+					log.error("Could not create provider {}", info, e);
+				}
+			}
+		}
+		return result;
 	}
 
 	private void addFromProvider(SimWrapperConfigGroup config, Iterable<DashboardProvider> providers) {
