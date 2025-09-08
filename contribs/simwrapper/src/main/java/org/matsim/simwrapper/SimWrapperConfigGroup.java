@@ -23,7 +23,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("How dashboards are loaded")
-	private DashboardLoading loading = DashboardLoading.guice;
+	private DashboardLoading loading = DashboardLoading.spiAndGuice;
 
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
