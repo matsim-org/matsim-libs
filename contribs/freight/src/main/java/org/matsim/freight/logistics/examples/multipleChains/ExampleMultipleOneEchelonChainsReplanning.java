@@ -33,14 +33,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.core.replanning.selectors.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -139,10 +135,10 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
 							GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
 							strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
-							strategyManager.addStrategy(strategy, null, 9);
+							strategyManager.addStrategy(strategy, null, 1);
 
 						}
-						setInnoDisbale(strategyManager, config);
+						MultipleChainsUtils.applyInnovationDisable(strategyManager, config);
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
                       strategyManager.setMaxPlansPerAgent(5);
@@ -166,24 +162,6 @@ final class ExampleMultipleOneEchelonChainsReplanning {
 
     log.info("Done.");
   }
-
-	private static void setInnoDisbale(LSPStrategyManager strategyManager, Config config) {
-		// Take care of innovation control according to config.
-		// This is a modified copy from StrategyManager.
-		// It was necessary, because I was unable to bind that StrategyManger in a way, that it uses its internal stucture -.-.
-
-		for (GenericPlanStrategy<LSPPlan, LSP> planStrategy : strategyManager.getStrategies(null)) {
-			int globalInnovationDisableAfter = (int) ((config.controller().getLastIteration() - config.controller().getFirstIteration())
-				* config.replanning().getFractionOfIterationsToDisableInnovation() + config.controller().getFirstIteration());
-			int maxIter = -1;
-			if (!ReplanningUtils.isOnlySelector(planStrategy)) {
-				maxIter = globalInnovationDisableAfter;
-			}
-			if (maxIter >= config.controller().getFirstIteration()) {
-				strategyManager.addChangeRequest(maxIter + 1, planStrategy, null, 0.0);
-			}
-		}
-	}
 
 	private static Config prepareConfig(String[] args) {
     Config config = ConfigUtils.createConfig();
