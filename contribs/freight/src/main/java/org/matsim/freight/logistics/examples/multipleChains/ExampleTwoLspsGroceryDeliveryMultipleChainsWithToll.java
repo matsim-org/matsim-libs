@@ -33,13 +33,12 @@ import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
@@ -383,7 +382,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 							() -> {
 								LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
-								strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
+
+								GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+								strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+								strategyManager.addStrategy(strategy, null, 4);
 								strategyManager.setMaxPlansPerAgent(5);
 								strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
 								return strategyManager;

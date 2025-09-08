@@ -38,13 +38,9 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
@@ -115,8 +111,8 @@ final class ExampleMultipleOneEchelonChainsReplanning {
         new AbstractModule() {
           @Override
           public void install() {
-            final EventBasedCarrierScorer4MultipleChains carrierScorer =
-                new EventBasedCarrierScorer4MultipleChains();
+            final EventBasedCarrierScorer4MultipleChains carrierScorer = new EventBasedCarrierScorer4MultipleChains();
+
             bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
             bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
             bind(CarrierStrategyManager.class)
@@ -134,11 +130,14 @@ final class ExampleMultipleOneEchelonChainsReplanning {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 
 						{
-							strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 10);
+							strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 						}
 						{
-							GenericPlanStrategy<LSPPlan, LSP> myLspStrategy = RandomShiftingStrategyFactory.createStrategy();
-							strategyManager.addStrategy(myLspStrategy, null, 1);
+
+							GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+							strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+							GenericPlanStrategy<LSPPlan, LSP> myLspStrategy = strategy;
+							strategyManager.addStrategy(myLspStrategy, null, 9);
 						}
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
