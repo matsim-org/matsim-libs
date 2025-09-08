@@ -58,58 +58,59 @@ class RandomShiftingStrategyFactory {
         random = MatsimRandom.getLocalInstance();
 
         GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
-        GenericPlanStrategyModule<LSPPlan> randomModule = new GenericPlanStrategyModule<>() {
-
-            @Override
-            public void prepareReplanning(ReplanningContext replanningContext) {}
-
-            @Override
-            public void handlePlan(LSPPlan lspPlan) {
-
-                // Shifting lspShipments only makes sense for multiple chains
-                if (lspPlan.getLogisticChains().size() < 2) return;
-
-                LSP lsp = lspPlan.getLSP();
-
-                // Make a new list of lspShipments and pick a random lspShipment from it
-                List<LspShipment> lspShipments = new ArrayList<>(lsp.getLspShipments());
-                int shipmentIndex = random.nextInt(lsp.getLspShipments().size());
-                LspShipment lspShipment = lspShipments.get(shipmentIndex);
-
-                // Find and remove the random lspShipment from its current logistic chain
-                LogisticChain sourceLogisticChain = null;
-                for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
-                    if (logisticChain.getLspShipmentIds().remove(lspShipment.getId())) {
-                        sourceLogisticChain = logisticChain;
-                        break;
-                    }
-                }
-
-                // Find a new logistic chain for the lspShipment
-                // Ensure that the chain selected is not the same as the one it was removed from
-                int chainIndex;
-                LogisticChain targetLogisticChain = null;
-                do {
-                    chainIndex = random.nextInt(lsp.getSelectedPlan().getLogisticChains().size());
-                    Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
-                    for (int i = 0; iterator.hasNext(); i++) {
-                        targetLogisticChain = iterator.next();
-                        if (i == chainIndex) {
-                            break;
-                        }
-                    }
-                } while (targetLogisticChain == sourceLogisticChain);
-
-                // Add the lspShipment to the new logistic chain
-                assert targetLogisticChain != null;
-                targetLogisticChain.addShipmentToChain(lspShipment);
-            }
-
-            @Override
-            public void finishReplanning() {}
-        };
-
+        GenericPlanStrategyModule<LSPPlan> randomModule = new LSPPlanGenericPlanStrategyModule();
         strategy.addStrategyModule(randomModule);
         return strategy;
     }
+
+	private static class LSPPlanGenericPlanStrategyModule implements GenericPlanStrategyModule<LSPPlan> {
+
+		@Override
+		public void prepareReplanning(ReplanningContext replanningContext) {}
+
+		@Override
+		public void handlePlan(LSPPlan lspPlan) {
+
+			// Shifting lspShipments only makes sense for multiple chains
+			if (lspPlan.getLogisticChains().size() < 2) return;
+
+			LSP lsp = lspPlan.getLSP();
+
+			// Make a new list of lspShipments and pick a random lspShipment from it
+			List<LspShipment> lspShipments = new ArrayList<>(lsp.getLspShipments());
+			int shipmentIndex = random.nextInt(lsp.getLspShipments().size());
+			LspShipment lspShipment = lspShipments.get(shipmentIndex);
+
+			// Find and remove the random lspShipment from its current logistic chain
+			LogisticChain sourceLogisticChain = null;
+			for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+				if (logisticChain.getLspShipmentIds().remove(lspShipment.getId())) {
+					sourceLogisticChain = logisticChain;
+					break;
+				}
+			}
+
+			// Find a new logistic chain for the lspShipment
+			// Ensure that the chain selected is not the same as the one it was removed from
+			int chainIndex;
+			LogisticChain targetLogisticChain = null;
+			do {
+				chainIndex = random.nextInt(lsp.getSelectedPlan().getLogisticChains().size());
+				Iterator<LogisticChain> iterator = lsp.getSelectedPlan().getLogisticChains().iterator();
+				for (int i = 0; iterator.hasNext(); i++) {
+					targetLogisticChain = iterator.next();
+					if (i == chainIndex) {
+						break;
+					}
+				}
+			} while (targetLogisticChain == sourceLogisticChain);
+
+			// Add the lspShipment to the new logistic chain
+			assert targetLogisticChain != null;
+			targetLogisticChain.addShipmentToChain(lspShipment);
+		}
+
+		@Override
+		public void finishReplanning() {}
+	}
 }

@@ -36,12 +36,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
@@ -129,25 +132,25 @@ final class ExampleMultipleOneEchelonChainsReplanning {
                 .toProvider(
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-                      strategyManager.addStrategy(
-                          new GenericPlanStrategyImpl<>(
-                              new ExpBetaPlanSelector<>(new ScoringConfigGroup())),
-                          null,
-                          1);
-                        strategyManager.addStrategy(
-                          RandomShiftingStrategyFactory.createStrategy(), null, 1);
+
+						{
+							strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 10);
+						}
+						{
+							GenericPlanStrategy<LSPPlan, LSP> myLspStrategy = RandomShiftingStrategyFactory.createStrategy();
+							strategyManager.addStrategy(myLspStrategy, null, 1);
+						}
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
                       strategyManager.setMaxPlansPerAgent(5);
-                      strategyManager.setPlanSelectorForRemoval(
-                          new GenericWorstPlanForRemovalSelector<>());
+                      strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
                     });
           }
         });
 
-    // TODO: Innovation switch not working
-    config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
+//    // TODO: Innovation switch not working
+//    config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
 
     log.info("Run MATSim");
 
@@ -184,9 +187,9 @@ final class ExampleMultipleOneEchelonChainsReplanning {
         .setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     config.controller().setWriteEventsInterval(1);
+	config.replanning().setFractionOfIterationsToDisableInnovation(0.5);
 
-    FreightCarriersConfigGroup freightConfig =
-        ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
     return config;
