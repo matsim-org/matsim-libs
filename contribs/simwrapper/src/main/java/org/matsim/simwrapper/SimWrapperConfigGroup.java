@@ -22,10 +22,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	private Mode defaultDashboards = Mode.enabled;
 
 	@Parameter
-	@Comment("How dashboards are loaded")
-	private DashboardLoading loading = DashboardLoading.spiAndGuice;
-
-	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
 	private Set<String> packages = new HashSet<>();
 
@@ -109,14 +105,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		this.defaultDashboards = defaultDashboards;
 	}
 
-	public DashboardLoading getLoading() {
-		return loading;
-	}
-
-	public void setLoading(DashboardLoading loading) {
-		this.loading = loading;
-	}
-
 	public Set<String> getPackages() {
 		return packages;
 	}
@@ -155,11 +143,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	public enum Mode {
 		enabled,
 		disabled
-	}
-
-	public enum DashboardLoading {
-		spiAndGuice,
-		guice
 	}
 
 	/**

@@ -19,11 +19,10 @@ public class SimWrapperModuleTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void runScenario_guice() {
+	void runScenario_bindOnlyWithSpi() {
 		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(equil);
-		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setLoading(SimWrapperConfigGroup.DashboardLoading.guice);
 
 		config.controller().setLastIteration(5);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
@@ -32,20 +31,18 @@ public class SimWrapperModuleTest {
 		controler.addOverridingModule(new SimWrapperModule());
 		controler.run();
 
-		//default ones, but no other
-		assertDashboardFiles(4);
+		//default ones + TestDashboard
+		assertDashboardFiles(5);
 	}
 
 	@Test
-	void runWithTestDashboard_guice() {
+	void runWithTestDashboard_bindAlsoWithGuice() {
 		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(equil);
 
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-
-		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setLoading(SimWrapperConfigGroup.DashboardLoading.guice);
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new SimWrapperModule());
@@ -65,14 +62,13 @@ public class SimWrapperModuleTest {
 	}
 
 	@Test
-	void runWithoutDefault_guice() {
+	void runWithoutDefault_bindAlsoWithGuice() {
 		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(equil);
 
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setLoading(SimWrapperConfigGroup.DashboardLoading.guice);
 		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 
 		Controler controler = new Controler(config);
@@ -92,15 +88,13 @@ public class SimWrapperModuleTest {
 	}
 
 	@Test
-	void runWithDashboard_spiGuice() {
+	void runWithTestDashboard_bindOnlyWithSpi() {
 		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(equil);
 
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simWrapperConfigGroup.setLoading(SimWrapperConfigGroup.DashboardLoading.spiAndGuice);
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new SimWrapperModule());
@@ -110,7 +104,7 @@ public class SimWrapperModuleTest {
 	}
 
 	@Test
-	void runWithoutDefault_spiGuice() {
+	void runWithoutDefault_bindOnlyWithSpi() {
 		URL equil = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml");
 
 		Config config = ConfigUtils.loadConfig(equil);
@@ -118,7 +112,6 @@ public class SimWrapperModuleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simWrapperConfigGroup.setLoading(SimWrapperConfigGroup.DashboardLoading.spiAndGuice);
 		simWrapperConfigGroup.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 
 		Controler controler = new Controler(config);

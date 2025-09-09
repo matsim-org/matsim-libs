@@ -78,16 +78,19 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 			}
 		}
 
-		// Load providers via SPI
-		if (config.getLoading() == SimWrapperConfigGroup.DashboardLoading.spiAndGuice) {
-			ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
-			addFromProvider(config, loader);
+		// Load dashboards from SPI dashboards
+		ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
+		List<DashboardProvider> p = new ArrayList<>();
+
+		for (DashboardProvider dashboardProvider : loader) {
+			// Skip default providers if disabled
+			if (config.getDefaultDashboards() == SimWrapperConfigGroup.Mode.disabled && dashboardProvider.isDefault()) {
+				continue;
+			}
+			p.add(dashboardProvider);
 		}
 
-		// Load default dashboards
-		if (config.getDefaultDashboards() != SimWrapperConfigGroup.Mode.disabled) {
-			addFromProvider(config, List.of(new DefaultDashboardProvider()));
-		}
+		addFromProvider(config, p);
 
 		// Lambda provider which uses dashboards from bindings
 		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));

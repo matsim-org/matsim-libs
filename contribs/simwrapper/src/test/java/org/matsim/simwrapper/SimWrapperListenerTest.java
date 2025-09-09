@@ -63,7 +63,8 @@ class SimWrapperListenerTest {
 		ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
 		List<DashboardProvider> found = StreamSupport.stream(loader.spliterator(), false).toList();
 
-		assertEquals(1, found.size(), "No DashboardProvider found via SPI");
+		assertEquals(2, found.size(), "No DashboardProvider found via SPI");
 		assertTrue(found.getFirst() instanceof TestDashboardProvider, "TestDashboardProvider should be loaded via SPI");
+		assertTrue(found.getLast() instanceof DefaultDashboardProvider, "DefaultDashboardProvider should be loaded via SPI");
 	}
 }
