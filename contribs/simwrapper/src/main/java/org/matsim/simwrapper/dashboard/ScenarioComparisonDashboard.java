@@ -13,7 +13,7 @@ public class ScenarioComparisonDashboard implements Dashboard {
 //	priority is set to a lower number in order to force this class to be executed after population and emissions folders are already generated.
 	@Override
 	public double priority() {
-		return -7;
+		return -20;
 	}
 
 	@Override
