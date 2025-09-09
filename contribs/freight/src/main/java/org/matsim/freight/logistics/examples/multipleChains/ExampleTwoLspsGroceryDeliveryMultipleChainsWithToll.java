@@ -99,8 +99,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	/**
 	 * The following is configured using command line option.
 	 * Please have a look to the {@link RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll} class and / or to the tests.
-	 * @param args
-	 * @throws CommandLine.ConfigurationException
 	 */
 	public static void main(String[] args) throws CommandLine.ConfigurationException {
 
@@ -381,11 +379,17 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 						.toProvider(
 							() -> {
 								LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+								{
+									strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//									strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
+								}
+								{
+									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+									strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+									strategyManager.addStrategy(strategy, null, 4);
+								}
+								MultipleChainsUtils.applyInnovationDisable(strategyManager, null, scenario.getConfig());
 
-								GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
-								strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
-								strategyManager.addStrategy(strategy, null, 4);
 								strategyManager.setMaxPlansPerAgent(5);
 								strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
 								return strategyManager;
@@ -398,12 +402,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		}
 		return controller;
 	}
-
-	/*
-	 *  Set up roadpricing --- this is a copy paste from KMT lecture in GVSim --> need some adaptions
-	 * TODO Adapt settings
-	 */
-
 
 	/**
 	 * Creates an LSP with direct chains:
@@ -739,8 +737,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * Assigns the LSP shipments to the LSP.
 	 * Splits the shipments if needed.
 	 *
-	 * @param lsp
-	 * @param lspShipments
+	 * @param lsp the LSP
+	 * @param lspShipments lsp shipments to assign
 	 */
 	private static void assignLspShipments(LSP lsp, Collection<LspShipment> lspShipments) {
 		//TODO: Maybe move this out and do this after creating all the LSPs?
@@ -750,7 +748,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		}
 
 		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		lsp = LSPUtils.splitShipmentsIfNeeded(lsp);
+		LSPUtils.splitShipmentsIfNeeded(lsp);
 	}
 
 	private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {
