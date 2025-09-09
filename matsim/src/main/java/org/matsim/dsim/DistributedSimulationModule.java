@@ -35,7 +35,7 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
-		addControlerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
+		addControllerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
 		// Optional single threaded execution
 		if (getConfig().dsim().getThreads() > 1) {
@@ -48,7 +48,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx.isDistributed()) {
 			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 
-			addControlerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
+			addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
 
 		// Need to define the set binder, in case no other module uses it

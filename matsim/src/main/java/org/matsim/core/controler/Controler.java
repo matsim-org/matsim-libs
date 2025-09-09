@@ -25,6 +25,7 @@ import com.google.inject.name.Names;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.jspecify.annotations.Nullable;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -162,19 +163,19 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	 *             the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null, null, null, LocalContext.INSTANCE);
+		this(args.length > 0 ? args[0] : null, null, null, null);
 	}
 
 	public Controler(final String configFileName) {
-		this(configFileName, null, null, LocalContext.INSTANCE);
+		this(configFileName, null, null, null);
 	}
 
 	public Controler(final Config config) {
-		this(null, config, null, LocalContext.INSTANCE);
+		this(null, config, null, null);
 	}
 
 	public Controler(final Scenario scenario) {
-		this(null, null, scenario, LocalContext.INSTANCE);
+		this(null, null, scenario, null);
 	}
 
 	/**
@@ -184,7 +185,11 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		this(null, null, scenario, ctx);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario, final ExecutionContext ctx) {
+	/**
+	 * Create the controller.
+	 * @param ctx if no context is given, a local one is created.
+	 */
+	private Controler(final String configFileName, final Config config, final Scenario scenario, @Nullable ExecutionContext ctx) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
 			this.config = scenario.getConfig();
@@ -206,9 +211,10 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 			//scenario  = ScenarioUtils.createScenario(this.config);
 			//ScenarioUtils.loadScenario(scenario) ;
 		}
+
 		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
-		this.simCtx = ctx;
+		this.simCtx = ctx == null ? LocalContext.INSTANCE : ctx;
 		this.overrides = scenario == null ?
 			new ScenarioByConfigModule() :
 			new ScenarioByInstanceModule(this.scenario);

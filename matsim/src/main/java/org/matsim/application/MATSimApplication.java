@@ -1,6 +1,7 @@
 package org.matsim.application;
 
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -13,11 +14,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.dsim.DistributedContext;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
-import jakarta.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -87,9 +86,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 	@CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
 	protected int iterations;
-
-	@CommandLine.Option(names = "--dsim-threads", description = "Enable distributed simulation.", defaultValue = "0")
-	protected int threads;
 
 	@CommandLine.Option(names = "--runId", description = "Overwrite runId defined by the application")
 	protected String runId;
@@ -193,18 +189,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		prepareScenario(scenario);
 
-		Controler controler;
-		if (threads > 0) {
-
-			log.info("Enabling dsim with {} threads", threads);
-
-			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
-			config.dsim().setThreads(threads);
-
-			controler = new Controler(scenario, DistributedContext.createLocal(config));
-		} else
-			controler = new Controler(scenario);
-
+		Controler controler = new Controler(scenario);
 		prepareControler(controler);
 
 		// Check if simulation needs to be run
@@ -534,18 +519,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
 
-		Controler controler;
-		if (app.threads > 0) {
-
-			log.info("Enabling dsim with {} threads", app.threads);
-
-			config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
-			config.dsim().setThreads(app.threads);
-
-			controler = new Controler(scenario, DistributedContext.createLocal(config));
-		} else
-			controler = new Controler(scenario);
-
+		Controler controler = new Controler(scenario);
 		app.prepareControler(controler);
 
 		return controler;
