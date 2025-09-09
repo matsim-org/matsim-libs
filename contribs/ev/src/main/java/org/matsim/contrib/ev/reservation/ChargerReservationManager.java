@@ -17,7 +17,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, ElectricVehicle> implements IterationStartsListener {
 
 	@Override
-	public int getCapacity(ChargerSpecification charger) {
+	protected int getCapacity(ChargerSpecification charger) {
 		return charger.getPlugCount();
 	}
 

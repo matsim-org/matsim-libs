@@ -27,12 +27,11 @@ public abstract class AbstractReservationManager<
     private int counter = 0;
 
 
-    //Map<Id<T>, V>
     public AbstractReservationManager() {
         this.reservations = new HashMap<>();
     }
 
-    public abstract int getCapacity(R resource);
+    protected abstract int getCapacity(R resource);
 
     @Override
     public final boolean isAvailable(R resource, C consumer, double startTime, double endTime) {
