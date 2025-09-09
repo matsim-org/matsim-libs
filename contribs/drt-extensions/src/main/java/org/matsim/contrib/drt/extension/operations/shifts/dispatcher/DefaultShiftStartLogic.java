@@ -50,7 +50,7 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 			//check if optional location requirement is met
 			if(peek.shift().getOperationFacilityId().isPresent()) {
 				Id<OperationFacility> operationFacilityId = peek.shift().getOperationFacilityId().get();
-				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacilityRegistration().operationFacilityId())),
+				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacilityId())),
 						"Vehicle and shift start locations do not match.");
 			}
 			return true;

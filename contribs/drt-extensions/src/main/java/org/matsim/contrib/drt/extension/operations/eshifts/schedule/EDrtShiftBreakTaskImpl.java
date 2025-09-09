@@ -1,6 +1,9 @@
 package org.matsim.contrib.drt.extension.operations.eshifts.schedule;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
@@ -17,8 +20,9 @@ public class EDrtShiftBreakTaskImpl extends ShiftBreakTaskImpl implements ShiftB
     private final ChargingTask chargingTask;
 
     public EDrtShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak,
-                                  double consumedEnergy, ChargingTask chargingTask, OperationFacility.Registration operationFacilityRegistration) {
-        super(beginTime, endTime, link, shiftBreak, operationFacilityRegistration);
+                                  double consumedEnergy, ChargingTask chargingTask, Id<OperationFacility> facilityId,
+                                  Id<ReservationManager.Reservation> reservationId) {
+        super(beginTime, endTime, link, shiftBreak, facilityId, reservationId);
         this.consumedEnergy = consumedEnergy;
         this.chargingTask = chargingTask;
     }

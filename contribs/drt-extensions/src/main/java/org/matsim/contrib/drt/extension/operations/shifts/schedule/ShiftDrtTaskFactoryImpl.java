@@ -1,22 +1,22 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
+import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityReservationManager;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityUtils;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
-import org.matsim.facilities.Facility;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * @author nkuehnel, fzwick / MOIA
@@ -25,10 +25,13 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     private final DrtTaskFactory delegate;
     private final OperationFacilities operationFacilities;
+    private final OperationFacilityReservationManager reservationManager;
 
-    public ShiftDrtTaskFactoryImpl(DrtTaskFactory delegate, OperationFacilities operationFacilities) {
+    public ShiftDrtTaskFactoryImpl(DrtTaskFactory delegate, OperationFacilities operationFacilities,
+                                   OperationFacilityReservationManager reservationManager) {
         this.delegate = delegate;
         this.operationFacilities = operationFacilities;
+        this.reservationManager = reservationManager;
     }
 
     @Override
@@ -48,40 +51,41 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                               Link link, DrtShiftBreak shiftBreak, OperationFacility.Registration facilityRegistration) {
-        return new ShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, facilityRegistration);
+                                               Link link, DrtShiftBreak shiftBreak, Id<OperationFacility> facilityId,
+                                               Id<ReservationManager.Reservation> reservationId) {
+        return new ShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, facilityId, reservationId);
     }
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                         Link link, DrtShift shift, OperationFacility.Registration facilityRegistration) {
-        return new ShiftChangeoverTaskImpl(beginTime, endTime, link, shift, facilityRegistration);
+                                                         Link link, DrtShift shift, Id<OperationFacility> facilityId,
+                                                         Id<ReservationManager.Reservation> reservationId) {
+        return new ShiftChangeoverTaskImpl(beginTime, endTime, link, shift, facilityId, reservationId);
     }
 
     @Override
     public WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                       Link link, OperationFacility.Registration facilityRegistration) {
-        return new WaitForShiftTask(beginTime, endTime, link, facilityRegistration);
+                                                       Link link, Id<OperationFacility> facilityId,
+                                                       Id<ReservationManager.Reservation> reservationId) {
+        return new WaitForShiftTask(beginTime, endTime, link, facilityId, reservationId);
     }
 
     public DefaultStayTask createInitialTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
-        final Map<Id<Link>, List<OperationFacility>> facilitiesByLink = operationFacilities.getFacilities().values().stream().collect(Collectors.groupingBy(Facility::getLinkId));
-        final OperationFacility operationFacility;
         try {
-            operationFacility = facilitiesByLink.get(vehicle.getStartLink().getId()).stream().findFirst().orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
+            OperationFacility facility = OperationFacilityUtils.getFacilityForLink(operationFacilities, vehicle.getStartLink().getId())
+                    .orElseThrow((Supplier<Throwable>) () -> new RuntimeException("Vehicles must start at an operation facility!"));
+            Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation =
+                    reservationManager.addReservation(facility, vehicle, beginTime, endTime);
+
+            Verify.verify(reservation.isPresent(), "Could not register %s vehicle at facility %s during start up!", vehicle.getId(), facility.getId());
+
+            facility.register(vehicle.getId());
+            return createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+                    vehicle.getStartLink(), facility.getId(), reservation.get().reservationId());
+
+
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        Optional<OperationFacility.Registration> success = operationFacility.registerVehicle(vehicle.getId(), vehicle.getServiceBeginTime());
-        if (success.isPresent()) {
-            operationFacility.checkIn(success.get(), beginTime);
-            return createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
-                    vehicle.getStartLink(), success.get());
-
-        } else {
-            throw new RuntimeException(String.format("Cannot register vehicle %s at facility %s at start-up. Please check" +
-                    "facility capacity and initial fleet distribution.", vehicle.getId().toString(), operationFacility.getId().toString()));
-        }
     }
-
 }

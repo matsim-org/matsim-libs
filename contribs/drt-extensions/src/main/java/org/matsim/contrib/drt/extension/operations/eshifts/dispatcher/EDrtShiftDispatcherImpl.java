@@ -84,7 +84,7 @@ public class EDrtShiftDispatcherImpl implements DrtShiftDispatcher {
 				//facility does not have a charger
 				continue;
 			}
-			for (Id<DvrpVehicle> vehicleId: operationFacility.getCheckedInVehicles()) {
+			for (Id<DvrpVehicle> vehicleId: operationFacility.getRegisteredVehicles()) {
 				DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicleId);
 				if (dvrpVehicle instanceof EvShiftDvrpVehicle eShiftVehicle) {
 					if (eShiftVehicle.getSchedule().getStatus() == Schedule.ScheduleStatus.STARTED) {

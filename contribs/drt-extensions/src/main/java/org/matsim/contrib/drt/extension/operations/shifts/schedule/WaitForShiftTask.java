@@ -2,15 +2,18 @@ package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
@@ -21,16 +24,14 @@ public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, Op
 
 	public static final DrtTaskType TYPE = new DrtTaskType("WAIT_FOR_SHIFT", STOP);
 
-	private final OperationFacility.Registration operationFacilityRegistration;
+    private final Id<OperationFacility> facilityId;
+    private final Id<ReservationManager.Reservation> reservation;
 
-    public WaitForShiftTask(double beginTime, double endTime, Link link, OperationFacility.Registration operationFacilityRegistration) {
+    public WaitForShiftTask(double beginTime, double endTime, Link link, Id<OperationFacility> facilityId,
+                            Id<ReservationManager.Reservation> reservation) {
         super(TYPE, beginTime, endTime, link);
-        this.operationFacilityRegistration = operationFacilityRegistration;
-    }
-
-    @Override
-    public OperationFacility.Registration getFacilityRegistration() {
-        return operationFacilityRegistration;
+        this.facilityId = facilityId;
+        this.reservation = reservation;
     }
 
     @Override
@@ -61,5 +62,15 @@ public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, Op
     @Override
     public void removeDropoffRequest(Id<Request> requestId) {
         throw new RuntimeException("Not supported");
+    }
+
+    @Override
+    public Id<OperationFacility> getFacilityId() {
+        return facilityId;
+    }
+
+    @Override
+    public Optional<Id<ReservationManager.Reservation>> getReservationId() {
+        return Optional.ofNullable(reservation);
     }
 }

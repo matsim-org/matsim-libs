@@ -2,7 +2,6 @@ package org.matsim.contrib.ev.reservation;
 
 import org.matsim.contrib.common.util.reservation.AbstractReservationManager;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -15,11 +14,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, Charger, ElectricVehicle> implements IterationStartsListener {
-
-	public ChargerReservationManager() {
-		super(Charger.class);
-	}
+public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, ElectricVehicle> implements IterationStartsListener {
 
 	@Override
 	public int getCapacity(ChargerSpecification charger) {

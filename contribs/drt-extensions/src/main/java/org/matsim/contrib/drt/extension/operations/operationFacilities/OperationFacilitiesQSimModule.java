@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -25,6 +26,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
 
 import com.google.common.collect.ImmutableMap;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 
@@ -39,23 +43,27 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
 	protected void configureQSim() {
 
 		bindModal(OperationFacilityFinder.class).toProvider(
-						modalProvider(getter -> new NearestOperationFacilityWithCapacityFinder(getter.getModal(OperationFacilities.class))))
+						modalProvider(getter -> new NearestOperationFacilityWithCapacityFinder(
+								getter.getModal(OperationFacilities.class),
+								getter.getModal(OperationFacilityReservationManager.class),
+								getter.getModal(Network.class),
+								getter.getModal(TravelTime.class),
+								getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
+								getter.get(MobsimTimer.class)
+								)))
 				.asEagerSingleton();
 
-		bindModal(OperationFacilities.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
-
-			@Override
-			public OperationFacilities get() {
-				OperationFacilitiesSpecification operationFacilitiesSpecification = getModalInstance(OperationFacilitiesSpecification.class);
-				ImmutableMap<Id<OperationFacility>, OperationFacility> operationFacilities = operationFacilitiesSpecification.getOperationFacilitySpecifications()
+		bindModal(OperationFacilities.class).toProvider(modalProvider( getter -> {
+				OperationFacilitiesSpecification operationFacilitiesSpecification = getter.getModal(OperationFacilitiesSpecification.class);
+				ImmutableMap<Id<OperationFacility>, OperationFacility> operationFacilities =
+						operationFacilitiesSpecification.getOperationFacilitySpecifications()
 						.values()
 						.stream()
-						.map(spec -> (OperationFacility)new OperationFacilityImpl(spec.getId(), spec.getLinkId(), spec.getCoord(), spec.getCapacity(),
-								spec.getChargers(), spec.getType(), getConfig().qsim().getEndTime().orElse(DEFAULT_CAPACITY_HORIZON)))
-						.collect(ImmutableMap.toImmutableMap(OperationFacility::getId, s -> s));
+						.map(spec -> (OperationFacility) new OperationFacilityImpl(spec.getId(), spec.getLinkId(), spec.getCoord(), spec.getCapacity(),
+spec.getChargers(), spec.getType()))
+						.collect(toImmutableMap(OperationFacility::getId, s -> s));
 				return () -> operationFacilities;
-			}
-		}).asEagerSingleton();
+			})).asEagerSingleton();
 
 		addModalQSimComponentBinding().toProvider(
 				modalProvider(dvrpModeInstanceGetter -> {
@@ -66,7 +74,7 @@ public class OperationFacilitiesQSimModule extends AbstractDvrpModeQSimModule {
                     ProfileCalculator profileCalculator = () ->
 							facilitiesList.stream().collect(
 									toImmutableMap(f -> f.getId().toString(),
-											f -> (double) f.getCheckedInVehicles().size()
+											f -> (double) f.getRegisteredVehicles().size()
 									)
 							);
 					return new TimeProfileCollector(header, profileCalculator, TIME_BIN_SIZE,

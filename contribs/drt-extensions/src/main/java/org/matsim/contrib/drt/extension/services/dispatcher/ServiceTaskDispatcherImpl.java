@@ -156,9 +156,10 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			lastLink = ((DrtStayTask) schedule.getTasks()
 				.get(schedule.getTaskCount() - 1)).getLink();
 		}
-		Optional<OperationFacility> facility = operationFacilityFinder.findFacility(lastLink.getCoord(), timeStep, Set.of());
+		Optional<OperationFacilityFinder.FacilityWithPath> facility = operationFacilityFinder.findFacility(
+				lastLink, dvrpVehicle, Set.of());
 		if(facility.isPresent()) {
-			return facility.get();
+			return facility.get().operationFacility();
 		} else {
 			throw new RuntimeException("Could not find operation facility for vehicle " + dvrpVehicle.getId());
 		}

@@ -6,6 +6,7 @@ import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityReservationManager;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.*;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrpVehicle;
@@ -99,9 +100,9 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
 				getter -> new DrtShiftDispatcherImpl(getMode(), getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(OperationFacilities.class), getter.getModal(OperationFacilityFinder.class),
-						getter.getModal(ShiftTaskScheduler.class), getter.getModal(Network.class), getter.get(EventsManager.class),
+						getter.getModal(ShiftTaskScheduler.class), getter.get(EventsManager.class),
 						shiftsParams, new DefaultShiftStartLogic(), getter.getModal(AssignShiftToVehicleLogic.class),
-						getter.getModal(ShiftScheduler.class)))
+						getter.getModal(ShiftScheduler.class), getter.getModal(OperationFacilityReservationManager.class)))
 		).asEagerSingleton();
 
 		bindModal(InsertionCostCalculator.class).toProvider(modalProvider(
@@ -115,16 +116,20 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					shiftsParams.isConsiderUpcomingShiftsForInsertion());
 		}));
 
-		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(new DrtTaskFactoryImpl(), getter.getModal(OperationFacilities.class))));
+		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(
+				new DrtTaskFactoryImpl(),
+				getter.getModal(OperationFacilities.class),
+				getter.getModal(OperationFacilityReservationManager.class)
+		)));
+
 		bindModal(ShiftDrtTaskFactory.class).toProvider(modalProvider(getter -> ((ShiftDrtTaskFactory) getter.getModal(DrtTaskFactory.class))));
 
 		bindModal(ShiftTaskScheduler.class).toProvider(modalProvider(
 				getter -> new ShiftTaskSchedulerImpl(
-						getter.getModal(Network.class),
 						getter.getModal(OperationFacilities.class),
-						getter.getModal(TravelTime.class),
-						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
-						getter.get(MobsimTimer.class), getter.getModal(ShiftDrtTaskFactory.class), shiftsParams))
+						getter.getModal(ShiftDrtTaskFactory.class),
+						getter.getModal(OperationFacilityReservationManager.class),
+						shiftsParams))
 		).asEagerSingleton();
 
 		bindModal(ScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();

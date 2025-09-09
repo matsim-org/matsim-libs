@@ -2,6 +2,9 @@ package org.matsim.contrib.drt.extension.operations.eshifts.schedule;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
@@ -11,8 +14,6 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import org.matsim.contrib.evrp.ChargingTask;
 import org.matsim.contrib.evrp.ETask;
-import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOverTask;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,23 +33,21 @@ public class EDrtShiftChangeoverTaskImpl extends DefaultStayTask implements Shif
 
 	private final DrtStopTask delegate;
 
-	private final OperationFacility.Registration operationFacilityRegistration;
-
+	private final Id<OperationFacility> facilityId;
+	private final Id<ReservationManager.Reservation> reservationId;
 
 	public EDrtShiftChangeoverTaskImpl(double beginTime, double endTime, Link link,
                                        DrtShift shift, double consumedEnergy,
-                                       ChargingTask chargingTask, OperationFacility.Registration operationFacilityRegistration) {
+                                       ChargingTask chargingTask,
+									   Id<OperationFacility> facilityId,
+                                       Id<ReservationManager.Reservation> reservationId) {
 		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+        this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shift = shift;
-        this.consumedEnergy = consumedEnergy;
-        this.chargingTask = chargingTask;
-        this.operationFacilityRegistration = operationFacilityRegistration;
-    }
-
-	@Override
-	public OperationFacility.Registration getFacilityRegistration() {
-		return operationFacilityRegistration;
+		this.consumedEnergy = consumedEnergy;
+		this.chargingTask = chargingTask;
+		this.facilityId = facilityId;
+		this.reservationId = reservationId;
 	}
 
     @Override
@@ -94,5 +93,15 @@ public class EDrtShiftChangeoverTaskImpl extends DefaultStayTask implements Shif
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		delegate.removeDropoffRequest(requestId);
+	}
+
+	@Override
+	public Id<OperationFacility> getFacilityId() {
+		return facilityId;
+	}
+
+	@Override
+	public Optional<Id<ReservationManager.Reservation>> getReservationId() {
+		return Optional.ofNullable(reservationId);
 	}
 }

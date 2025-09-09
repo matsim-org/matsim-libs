@@ -1,12 +1,8 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
-
-import java.util.Map;
-import java.util.Optional;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -15,6 +11,11 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+
+import java.util.Map;
+import java.util.Optional;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 /**
  * A task representing stopping and waiting for a new shift.
@@ -25,25 +26,23 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	public static final DrtTaskType TYPE = new DrtTaskType("SHIFT_CHANGEOVER", STOP);
 
 	private final DrtShift shift;
-	private final OperationFacility.Registration facilityRegistration;
+	private final Id<OperationFacility> facilityId;
+	private final Id<ReservationManager.Reservation> reservationId;
 
 	private final DrtStopTask delegate;
 
-	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift, OperationFacility.Registration facilityRegistration) {
+	public ShiftChangeoverTaskImpl(double beginTime, double endTime, Link link, DrtShift shift,
+								   Id<OperationFacility> facilityId, Id<ReservationManager.Reservation> reservationId) {
 		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+        this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shift = shift;
-		this.facilityRegistration = facilityRegistration;
+        this.facilityId = facilityId;
+		this.reservationId = reservationId;
 	}
 
 	@Override
 	public DrtShift getShift() {
 		return shift;
-	}
-
-	@Override
-	public OperationFacility.Registration getFacilityRegistration() {
-		return facilityRegistration;
 	}
 
 	@Override
@@ -74,6 +73,16 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		delegate.removeDropoffRequest(requestId);
+	}
+
+	@Override
+	public Id<OperationFacility> getFacilityId() {
+		return facilityId;
+	}
+
+	@Override
+	public Optional<Id<ReservationManager.Reservation>> getReservationId() {
+		return Optional.ofNullable(reservationId);
 	}
 }
 

@@ -2,6 +2,7 @@ package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -24,26 +25,26 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 	public static final DrtTaskType TYPE = new DrtTaskType("SHIFT_BREAK", STOP);
 
 	private final DrtShiftBreak shiftBreak;
-	private final OperationFacility.Registration operationFacilityRegistration;
+
+	private final Id<OperationFacility> facilityId;
+	private final Id<ReservationManager.Reservation> reservationId;
 
 	private final DrtStopTask delegate;
 
-	public ShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak, OperationFacility.Registration operationFacilityRegistration) {
+	public ShiftBreakTaskImpl(double beginTime, double endTime, Link link, DrtShiftBreak shiftBreak,
+							  Id<OperationFacility> facilityId,
+							  Id<ReservationManager.Reservation> reservationId) {
 		super(TYPE, beginTime, endTime, link);
-		this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
+        this.facilityId = facilityId;
+        this.reservationId = reservationId;
+        this.delegate = new DefaultDrtStopTask(beginTime, endTime, link);
 		this.shiftBreak = shiftBreak;
-		this.operationFacilityRegistration = operationFacilityRegistration;
     }
 
     @Override
     public DrtShiftBreak getShiftBreak() {
         return shiftBreak;
     }
-
-	@Override
-	public OperationFacility.Registration getFacilityRegistration() {
-		return operationFacilityRegistration;
-	}
 
 	@Override
 	public Map<Id<Request>, AcceptedDrtRequest> getDropoffRequests() {
@@ -73,5 +74,15 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		delegate.removeDropoffRequest(requestId);
+	}
+
+	@Override
+	public Id<OperationFacility> getFacilityId() {
+		return facilityId;
+	}
+
+	@Override
+	public Optional<Id<ReservationManager.Reservation>> getReservationId() {
+		return Optional.ofNullable(reservationId);
 	}
 }
