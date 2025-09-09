@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
