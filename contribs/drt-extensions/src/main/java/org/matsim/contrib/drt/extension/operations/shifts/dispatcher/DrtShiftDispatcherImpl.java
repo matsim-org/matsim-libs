@@ -476,7 +476,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         final DrtShift shift = vehicle.getShifts().poll();
         logger.debug("Ended shift " + shift.getId());
         shift.end();
-        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(), mode, shift.getId(), vehicle.getId(), id, operationFacilityId, null));
+        eventsManager.processEvent(new DrtShiftEndedEvent(timer.getTimeOfDay(), mode, shift.getId(), vehicle.getId(), id, operationFacilityId, shift.getShiftType().orElse(null)));
         if (vehicle.getShifts().isEmpty()) {
             idleVehiclesQueues.get(operationFacilityId).add(vehicle);
         }
