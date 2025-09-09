@@ -1,6 +1,7 @@
 package org.matsim.contrib.perceivedsafety;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -12,6 +13,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
  * Perceived Safety Module, which enables the perceived safety scoring function.
  */
 public final class PerceivedSafetyModule extends AbstractModule {
+	@Inject private PerceivedSafetyConfigGroup perceivedSafetyConfigGroup;
 
 	/**
 	 * installs the module.
@@ -21,6 +23,14 @@ public final class PerceivedSafetyModule extends AbstractModule {
 //		this adds additional terms to the scoring function instead of replacing it! -sm0325
 		this.addEventHandlerBinding().to(PerceivedSafetyScoreEventsCreator.class);
 		this.bind(AdditionalPerceivedSafetyLinkScore.class).to(AdditionalPerceivedSafetyLinkScoreDefaultImpl.class);
+
+//		this lets the router consider perceived safety
+//		if you want to use a diffenent travelDisutility for perceived safety, you have to bind its Factory here.
+		for (String mode : perceivedSafetyConfigGroup.getModes().keySet()) {
+			addTravelDisutilityFactoryBinding(mode).toProvider(() ->
+				new PerceivedSafetyDisutilityFactory(mode)
+			).in(Singleton.class);
+		}
 
 		this.installOverridingQSimModule(new AbstractQSimModule() {
 			@Inject EventsManager events;
