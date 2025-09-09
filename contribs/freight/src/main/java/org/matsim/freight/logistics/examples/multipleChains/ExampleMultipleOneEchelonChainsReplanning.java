@@ -37,9 +37,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -112,8 +110,8 @@ final class ExampleMultipleOneEchelonChainsReplanning {
         new AbstractModule() {
           @Override
           public void install() {
-            final EventBasedCarrierScorer4MultipleChains carrierScorer =
-                new EventBasedCarrierScorer4MultipleChains();
+            final EventBasedCarrierScorer4MultipleChains carrierScorer = new EventBasedCarrierScorer4MultipleChains();
+
             bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
             bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
             bind(CarrierStrategyManager.class)
@@ -129,25 +127,25 @@ final class ExampleMultipleOneEchelonChainsReplanning {
                 .toProvider(
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-                      strategyManager.addStrategy(
-                          new GenericPlanStrategyImpl<>(
-                              new ExpBetaPlanSelector<>(new ScoringConfigGroup())),
-                          null,
-                          1);
-                        strategyManager.addStrategy(
-                          RandomShiftingStrategyFactory.createStrategy(), null, 1);
+						{
+							strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
+						}
+						{
+							GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+							strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+							strategyManager.addStrategy(strategy, null, 1);
+						}
+						MultipleChainsUtils.applyInnovationDisable(strategyManager, null, config);
                       //
                       //	strategyManager.addStrategy(ProximityStrategyFactory.createStrategy(scenario.getNetwork()), null, 1);
                       strategyManager.setMaxPlansPerAgent(5);
-                      strategyManager.setPlanSelectorForRemoval(
-                          new GenericWorstPlanForRemovalSelector<>());
+                      strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
+
                       return strategyManager;
                     });
           }
         });
 
-    // TODO: Innovation switch not working
-    config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
 
     log.info("Run MATSim");
 
@@ -162,7 +160,7 @@ final class ExampleMultipleOneEchelonChainsReplanning {
     log.info("Done.");
   }
 
-  private static Config prepareConfig(String[] args) {
+	private static Config prepareConfig(String[] args) {
     Config config = ConfigUtils.createConfig();
     if (args.length != 0) {
       for (String arg : args) {
@@ -184,9 +182,9 @@ final class ExampleMultipleOneEchelonChainsReplanning {
         .setOverwriteFileSetting(
             OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     config.controller().setWriteEventsInterval(1);
+	config.replanning().setFractionOfIterationsToDisableInnovation(0.5);
 
-    FreightCarriersConfigGroup freightConfig =
-        ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
     return config;

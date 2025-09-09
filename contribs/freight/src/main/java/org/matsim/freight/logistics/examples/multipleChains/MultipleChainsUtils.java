@@ -29,8 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPStrategyManager;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
@@ -67,6 +73,29 @@ class MultipleChainsUtils {
 			shipmentList.add(builder.build());
 		}
 		return shipmentList;
+	}
+
+	/**
+	 * Take care of innovation control according to config.
+	 * This is a modified copy from StrategyManager.
+	 * It was necessary, because I was unable to bind that StrategyManger in a way, that it uses its internal structure -.-.
+	 *
+	 * @param strategyManager
+	 * @param subpopulation
+	 * @param config
+	 */
+	static void applyInnovationDisable(LSPStrategyManager strategyManager, String subpopulation, Config config) {
+		for (GenericPlanStrategy<LSPPlan, LSP> planStrategy : strategyManager.getStrategies(subpopulation)) {
+			int globalInnovationDisableAfter = (int) ((config.controller().getLastIteration() - config.controller().getFirstIteration())
+				* config.replanning().getFractionOfIterationsToDisableInnovation() + config.controller().getFirstIteration());
+			int maxIter = -1;
+			if (ReplanningUtils.isInnovativeStrategy(planStrategy)) {
+				maxIter = globalInnovationDisableAfter;
+			}
+			if (maxIter >= config.controller().getFirstIteration() && maxIter >= 0) {
+				strategyManager.addChangeRequest(maxIter + 1, planStrategy, subpopulation, 0.0);
+			}
+		}
 	}
 
 	public enum LspPlanTypes {
