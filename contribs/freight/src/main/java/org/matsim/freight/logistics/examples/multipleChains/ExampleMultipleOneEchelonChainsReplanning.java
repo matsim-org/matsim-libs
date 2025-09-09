@@ -127,16 +127,13 @@ final class ExampleMultipleOneEchelonChainsReplanning {
                 .toProvider(
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-
 						{
 							strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 						}
 						{
-
 							GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
 							strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
 							strategyManager.addStrategy(strategy, null, 1);
-
 						}
 						MultipleChainsUtils.applyInnovationDisable(strategyManager, null, config);
                       //
