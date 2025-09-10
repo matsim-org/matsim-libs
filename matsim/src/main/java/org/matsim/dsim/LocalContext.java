@@ -44,21 +44,17 @@ public final class LocalContext implements ExecutionContext {
 	 */
 	private static Topology createTopology(int threads) {
 
+		int cores = threads == 0 ? Runtime.getRuntime().availableProcessors() : threads;
+		int parts = Math.max(1, cores);
+
 		ComputeNode node = ComputeNode.builder()
-			.cores(threads == 0 ? Runtime.getRuntime().availableProcessors() : threads)
+			.cores(cores)
 			.rank(0)
+			.parts(IntStream.range(0, parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll))
+			.distributed(false)
 			.build();
 
-		Topology.TopologyBuilder topology = Topology.builder();
-
-		ComputeNode.NodeBuilder n = node.toBuilder();
-		int parts = Math.max(1, node.getCores());
-
-		n.parts(IntStream.range(0, parts).collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll));
-		n.distributed(false);
-
-		// head nodes needs to build topology with all partition info
-		return topology
+		return Topology.builder()
 			.computeNodes(List.of(node))
 			.totalPartitions(parts)
 			.build();
