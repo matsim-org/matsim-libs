@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -161,8 +160,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--pathOutput", description = "Path for the output")
 	private Path output;
 
-	private static Random rnd;
-	private static RandomGenerator rng;
+	private Random rnd;
+	private RandomGenerator rng;
 	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
@@ -554,10 +553,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
-		MatsimRandom.getRandom().setSeed(config.global().getRandomSeed());
 
-		rnd = MatsimRandom.getRandom();
-		rng = new MersenneTwister(config.global().getRandomSeed());
+		this.rnd = new java.util.Random(config.global().getRandomSeed());
+		this.rng = new MersenneTwister(config.global().getRandomSeed());
 
 		if (config.network().getInputFile() == null)
 			throw new Exception("No network file in config");
@@ -837,8 +835,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		for (String singleDepot : carrierAttributes.vehicleDepots) {
 			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
-			int vehicleStartTime = t.getVehicleStartTime();
-			int tourDuration = t.getVehicleTourDuration();
+			int vehicleStartTime = t.getVehicleStartTime(this.rnd);
+			int tourDuration = t.getVehicleTourDuration(this.rnd);
 			int vehicleEndTime = vehicleStartTime + tourDuration;
 			for (String thisVehicleType : vehicleTypes) { //TODO Flottenzusammensetzung anpassen. Momentan pro Depot alle Fahrzeugtypen 1x erzeugen
 				VehicleType thisType = carrierVehicleTypes.getVehicleTypes()
@@ -977,7 +975,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 			}
 		}
-		odMatrix.clearRoundingError();
+		odMatrix.clearRoundingError(rnd);
 		odMatrix.writeODMatrices(output, smallScaleCommercialTrafficType);
 		return odMatrix;
 	}
@@ -1012,7 +1010,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		/**
 		 * Gives a duration for the created tour under the given probability.
 		 */
-		public int getVehicleTourDuration() {
+		public int getVehicleTourDuration(Random rnd) {
 			if (minDuration == 0.)
 				return (int) maxDuration() * 60;
 			else
@@ -1022,7 +1020,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		/**
 		 * Gives a tour start time for the created tour under the given probability.
 		 */
-		public int getVehicleStartTime() {
+		public int getVehicleStartTime(Random rnd) {
 			return rnd.nextInt(hourLower * 3600, hourUpper * 3600);
 		}
 	}

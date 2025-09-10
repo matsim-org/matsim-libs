@@ -195,8 +195,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				int vehicleEndTime = 0;
 				while (tourDuration < maxVehicleAvailability) {
 					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficType()).sample();
-					vehicleStartTime = t.getVehicleStartTime();
-					tourDuration = t.getVehicleTourDuration();
+					vehicleStartTime = t.getVehicleStartTime(rnd);
+					tourDuration = t.getVehicleTourDuration(rnd);
 					vehicleEndTime = vehicleStartTime + tourDuration;
 				}
 				newCarrierVehicle = CarrierVehicle.Builder.newInstance(carrierVehicleToChange.getId(), carrierVehicleToChange.getLinkId(),

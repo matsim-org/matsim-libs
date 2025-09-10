@@ -238,8 +238,7 @@ public class TripDistributionMatrix {
 	/**
 	 * Corrects missing trafficVolume in the OD because of roundingErrors based on trafficVolume_stop
 	 */
-	void clearRoundingError() {
-
+	void clearRoundingError(Random rnd) {
 		for (String stopZone : getListOfZones()) {
 			for (String modeORvehType : getListOfModesOrVehTypes()) {
 				loopForEachPurpose:
@@ -249,7 +248,7 @@ public class TripDistributionMatrix {
 					int generatedTrafficVolume = getSumOfServicesForStopZone(stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
 					if (trafficVolume > generatedTrafficVolume) {
 						ArrayList<String> shuffledZones = new ArrayList<>(getListOfZones());
-						Collections.shuffle(shuffledZones, MatsimRandom.getRandom());
+						Collections.shuffle(shuffledZones, rnd);
 						// find a startZone which has a trip to the stopZone and increase it by one
 						for (String startZone : shuffledZones) {
 							TripDistributionMatrixKey matrixKey = makeKey(startZone, stopZone, modeORvehType,
@@ -371,6 +370,7 @@ public class TripDistributionMatrix {
 			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
 				if (!listOfModesORvehTypes.contains(key.modeORvehType()))
 					listOfModesORvehTypes.add(key.modeORvehType());
+				Collections.sort(listOfModesORvehTypes);
 			}
 		}
 		return listOfModesORvehTypes;
@@ -386,6 +386,7 @@ public class TripDistributionMatrix {
 			for (TripDistributionMatrixKey key : matrixCache.keySet()) {
 				if (!listOfPurposes.contains(key.purpose()))
 					listOfPurposes.add(key.purpose());
+				Collections.sort(listOfPurposes);
 			}
 		}
 		return listOfPurposes;
