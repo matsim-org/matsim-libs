@@ -27,6 +27,7 @@ import org.matsim.core.utils.io.IOUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -73,7 +74,7 @@ public final class IterationStopWatch {
 	private int nextOperationPosition = 0;
 
 	/** A formatter for dates, used when writing out the data. */
-	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
 	private final DateTimeFormatter durationFormatter = formatter.withZone(ZoneOffset.UTC);
 
 	/** data structures to identify nested operations */
@@ -180,10 +181,12 @@ public final class IterationStopWatch {
 	}
 
 	/**
-	 * Tells the stop watch that an operation ends. The operation must have been started before with
+	 * Tells the stop watch that an operation ends.
+	 * The operation must have been started before with
 	 * {@link #beginOperation(String)}.
 	 *
 	 * @param identifier The name of the ending operation.
+	 * @param timestamp
 	 */
 	public void endOperation(final String identifier, long timestamp) {
 		String ident = "END " + identifier;
