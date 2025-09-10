@@ -55,7 +55,7 @@ public final class Injector {
 	private static final Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
-		return createInjector(config, LocalContext.INSTANCE, modules);
+		return createInjector(config, LocalContext.create(config), modules);
 	}
 
 	public static com.google.inject.Injector createInjector(final Config config, final ExecutionContext ctx, Module... modules) {

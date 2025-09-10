@@ -78,8 +78,7 @@ public abstract class AbstractModule implements Module {
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
 	private Config config;
-
-	private ExecutionContext ctx = LocalContext.INSTANCE;
+	private ExecutionContext ctx;
 
 	public AbstractModule() {
 		// config will be injected later
