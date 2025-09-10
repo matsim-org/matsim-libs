@@ -49,6 +49,18 @@ public class TripDashboard implements Dashboard {
 
 	private boolean choiceEvaluation;
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	/**
 	 * Default trip dashboard constructor.
 	 */
@@ -510,6 +522,12 @@ public class TripDashboard implements Dashboard {
 				});
 
 		}
+
+
+	}
+	@Override
+	public double priority() {
+		return 1;
 	}
 
 }

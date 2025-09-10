@@ -32,6 +32,18 @@ public class TrafficCountsDashboard implements Dashboard {
 
 	private String countsPath = null;
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	/**
 	 * Constructor with default arguments. Will analyze all modes
 	 */

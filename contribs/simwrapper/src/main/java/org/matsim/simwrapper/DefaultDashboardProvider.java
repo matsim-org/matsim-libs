@@ -40,7 +40,16 @@ public class DefaultDashboardProvider implements DashboardProvider {
 			result.add(new NoiseDashboard(config.global().getCoordinateSystem()));
 		}
 
+		if (simWrapper.getConfigGroup().getBasePath() != null) {
+			result.add(new ScenarioComparisonDashboard(simWrapper.getConfigGroup().getBasePath()));
+		}
+
 		result.add(new StuckAgentDashboard());
+
+		for (Dashboard dashboard : result) {
+			dashboard.setPathToBaseCase(simWrapper.getConfigGroup().getBasePath());
+			System.out.println("Path after setting: " + dashboard.getPathToBaseCase());
+		}
 
 		return result;
 	}

@@ -12,6 +12,19 @@ import org.matsim.simwrapper.viz.Tile;
  * Shows attributes distribution of the population.
  */
 public class PopulationAttributeDashboard implements Dashboard {
+
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 

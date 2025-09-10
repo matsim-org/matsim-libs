@@ -1,9 +1,12 @@
 package org.matsim.simwrapper;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 /**
  * Function interface that allows to construct dashboards.
  */
-@FunctionalInterface
+//@FunctionalInterface
 public interface Dashboard {
 
 	/**
@@ -33,6 +36,16 @@ public interface Dashboard {
 		return "";
 	}
 
+	Map<Dashboard, String> PATH_STORAGE = new WeakHashMap<>();
+
+	default String getPathToBaseCase() {
+		return PATH_STORAGE.get(this);
+	}
+
+	default void setPathToBaseCase(String path) {
+		PATH_STORAGE.put(this, path);
+	}
+
 	/**
 	 * Wrapper around an existing dashboard that allows to customize some of the attributes.
 	 */
@@ -44,7 +57,17 @@ public interface Dashboard {
 
 		private String title;
 		private String description;
+		private String pathToBaseCase;
 
+		@Override
+		public String getPathToBaseCase() {
+			return pathToBaseCase;
+		}
+
+		@Override
+		public void setPathToBaseCase(String path) {
+			this.pathToBaseCase = path;
+		}
 		private Customizable(Dashboard delegate) {
 			this.delegate = delegate;
 		}

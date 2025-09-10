@@ -23,6 +23,18 @@ public class TravelTimeComparisonDashboard implements Dashboard {
 		this.refData = refData;
 	}
 
+	private String pathToBaseCase;
+
+	@Override
+	public String getPathToBaseCase() {
+		return pathToBaseCase;
+	}
+
+	@Override
+	public void setPathToBaseCase(String path) {
+		this.pathToBaseCase = path;
+	}
+
 	@Override
 	public double priority() {
 		return -1;
