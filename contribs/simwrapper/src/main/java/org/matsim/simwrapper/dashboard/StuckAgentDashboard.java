@@ -16,19 +16,6 @@ import java.util.List;
  * Dashboard for stuck agents.
  */
 public class StuckAgentDashboard implements Dashboard {
-
-	private String pathToBaseCase;
-
-	@Override
-	public String getPathToBaseCase() {
-		return pathToBaseCase;
-	}
-
-	@Override
-	public void setPathToBaseCase(String path) {
-		this.pathToBaseCase = path;
-	}
-
 	@Override
 	public void configure(Header header, Layout layout) {
 

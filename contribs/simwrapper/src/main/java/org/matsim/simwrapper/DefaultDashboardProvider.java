@@ -46,10 +46,6 @@ public class DefaultDashboardProvider implements DashboardProvider {
 
 		result.add(new StuckAgentDashboard());
 
-		for (Dashboard dashboard : result) {
-			dashboard.setPathToBaseCase(simWrapper.getConfigGroup().getBasePath());
-			System.out.println("Path after setting: " + dashboard.getPathToBaseCase());
-		}
 
 		return result;
 	}

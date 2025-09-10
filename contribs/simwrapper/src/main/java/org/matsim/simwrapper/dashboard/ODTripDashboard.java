@@ -19,17 +19,6 @@ public class ODTripDashboard implements Dashboard {
 	private final Set<String> modes;
 	private final String crs;
 
-	private String pathToBaseCase;
-
-	@Override
-	public String getPathToBaseCase() {
-		return pathToBaseCase;
-	}
-
-	@Override
-	public void setPathToBaseCase(String path) {
-		this.pathToBaseCase = path;
-	}
 	/**
 	 * Create a dashboard to show aggregated OD information per mode.
 	 *

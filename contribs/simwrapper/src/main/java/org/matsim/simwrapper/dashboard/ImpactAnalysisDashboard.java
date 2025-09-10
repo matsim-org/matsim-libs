@@ -20,17 +20,6 @@ public class ImpactAnalysisDashboard implements Dashboard {
 
 	private final Collection<String> modes;
 
-	private String pathToBaseCase;
-
-	@Override
-	public String getPathToBaseCase() {
-		return pathToBaseCase;
-	}
-
-	@Override
-	public void setPathToBaseCase(String path) {
-		this.pathToBaseCase = path;
-	}
 	/**
 	 * Constructor.
 	 *

@@ -1,12 +1,13 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.scenarioComparison.ScenarioComparisonAnalysis;
+import org.matsim.simwrapper.ComparisonDashboard;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.Tile;
 
-public class ScenarioComparisonDashboard implements Dashboard {
+public class ScenarioComparisonDashboard implements ComparisonDashboard {
 
 	private String pathToBaseCase;
 
