@@ -178,7 +178,7 @@ public class SmallScaleCommercialTrafficUtils {
 	/**
 	 * Creates a population including the plans in preparation for the MATSim run. If a different name of the population is set, different plan variants per person are created
 	 */
-	static void createPlansBasedOnCarrierPlans(Scenario scenario, String smallScaleCommercialTrafficType, Path output,
+	static void createPlansBasedOnCarrierPlans(Scenario scenario, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType, Path output,
 											   String modelName, String sampleName, String nameOutputPopulation, int numberOfPlanVariantsPerAgent) {
 
 		Population population = scenario.getPopulation();
@@ -243,7 +243,7 @@ public class SmallScaleCommercialTrafficUtils {
 
 		String outputPopulationFile;
 		if (nameOutputPopulation == null)
-			if (smallScaleCommercialTrafficType.equals("completeSmallScaleCommercialTraffic"))
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.completeSmallScaleCommercialTraffic))
 				outputPopulationFile = output.toString() + "/" + modelName + "_" + "smallScaleCommercialTraffic" + "_" + sampleName + "pct_plans.xml.gz";
 			else
 				outputPopulationFile = output.toString() + "/" + modelName + "_" + smallScaleCommercialTrafficType + "_" + sampleName + "pct_plans.xml.gz";

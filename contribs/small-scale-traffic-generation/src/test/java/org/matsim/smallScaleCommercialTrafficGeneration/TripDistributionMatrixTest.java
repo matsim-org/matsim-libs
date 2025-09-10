@@ -72,7 +72,7 @@ public class TripDistributionMatrixTest {
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		String usedTrafficType = "commercialPersonTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
@@ -166,7 +166,7 @@ public class TripDistributionMatrixTest {
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		String usedTrafficType = "goodsTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 

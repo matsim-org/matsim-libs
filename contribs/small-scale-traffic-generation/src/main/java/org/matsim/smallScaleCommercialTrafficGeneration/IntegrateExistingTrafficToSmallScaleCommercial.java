@@ -13,7 +13,7 @@ public interface IntegrateExistingTrafficToSmallScaleCommercial {
 										Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception;
 
 	void reduceDemandBasedOnExistingCarriers(Scenario scenario,
-											 Map<String, Map<Id<Link>, Link>> linksPerZone, String smallScaleCommercialTrafficType,
+											 Map<String, Map<Id<Link>, Link>> linksPerZone, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
 											 Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 											 Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop);
 }
