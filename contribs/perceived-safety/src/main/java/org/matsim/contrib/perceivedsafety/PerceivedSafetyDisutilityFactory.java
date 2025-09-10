@@ -37,8 +37,7 @@ import org.matsim.core.router.util.TravelTime;
 public class PerceivedSafetyDisutilityFactory implements TravelDisutilityFactory {
 	// public-final is ok since ctor is package-private: can only be used through injection
 	private final String mode;
-	@Inject
-	Scenario scenario;
+	@Inject Scenario scenario;
 
 	/* package-private */PerceivedSafetyDisutilityFactory(String mode) {
 		this.mode = mode;

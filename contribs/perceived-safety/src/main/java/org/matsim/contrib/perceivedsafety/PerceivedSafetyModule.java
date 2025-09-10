@@ -25,11 +25,9 @@ public final class PerceivedSafetyModule extends AbstractModule {
 		this.bind(AdditionalPerceivedSafetyLinkScore.class).to(AdditionalPerceivedSafetyLinkScoreDefaultImpl.class);
 
 //		this lets the router consider perceived safety
-//		if you want to use a diffenent travelDisutility for perceived safety, you have to bind its Factory here.
+//		if you want to use a different travelDisutility for perceived safety, you have to bind its Factory here.
 		for (String mode : perceivedSafetyConfigGroup.getModes().keySet()) {
-			addTravelDisutilityFactoryBinding(mode).toProvider(() ->
-				new PerceivedSafetyDisutilityFactory(mode)
-			).in(Singleton.class);
+			addTravelDisutilityFactoryBinding(mode).toInstance(new PerceivedSafetyDisutilityFactory(mode));
 		}
 
 		this.installOverridingQSimModule(new AbstractQSimModule() {

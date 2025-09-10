@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.core.config.Config;
@@ -85,7 +86,7 @@ public class PerceivedSafetyScoringTest {
             PerceivedSafetyUtils.fillConfigWithPerceivedSafetyDefaultValues(perceivedSafetyConfigGroup);
 
             MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-            createAndAddTestPopulation(scenario, mode);
+            createAndAddTestPopulation(scenario, mode, Id.createLinkId("20"), Id.createLinkId("21"));
 
 //            add mode to network links
             scenario.getNetwork().getLinks().values()
@@ -126,14 +127,14 @@ public class PerceivedSafetyScoringTest {
         }
     }
 
-    static void createAndAddTestPopulation(MutableScenario scenario, String mode) {
+    static void createAndAddTestPopulation(MutableScenario scenario, String mode, Id<Link> startLinkId, Id<Link> endLinkId) {
         Population pop = PopulationUtils.createPopulation(scenario.getConfig());
         PopulationFactory fac = pop.getFactory();
 
-        Activity home = fac.createActivityFromLinkId("h", Id.createLinkId("20"));
+        Activity home = fac.createActivityFromLinkId("h", startLinkId);
         home.setEndTime(8 * 3600.);
         Leg leg = fac.createLeg(mode);
-        Activity work = fac.createActivityFromLinkId("w", Id.createLinkId("21"));
+        Activity work = fac.createActivityFromLinkId("w", endLinkId);
         work.setEndTime(9 * 3600.);
 
         Plan plan = fac.createPlan();

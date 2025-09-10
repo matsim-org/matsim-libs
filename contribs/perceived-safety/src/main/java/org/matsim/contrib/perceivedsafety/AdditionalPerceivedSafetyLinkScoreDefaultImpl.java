@@ -20,9 +20,9 @@ import java.util.Random;
 public class AdditionalPerceivedSafetyLinkScoreDefaultImpl implements AdditionalPerceivedSafetyLinkScore {
     private static final Logger log = LogManager.getLogger(AdditionalPerceivedSafetyLinkScoreDefaultImpl.class);
 
-    private static final int INITIAL_VAR_PERCEIVED_SAFETY = 4;
+    static final int INITIAL_VAR_PERCEIVED_SAFETY = 4;
 
-    private final int inputPerceivedSafetyThreshold;
+    final int inputPerceivedSafetyThreshold;
 
     // 0 if none of the modes below are provided, e.g PT
     private double betaPerceivedSafety = 0.;

@@ -14,7 +14,10 @@ public class PerceivedSafetyUtils {
 
 	private PerceivedSafetyUtils() {}
 
-    public static void fillConfigWithPerceivedSafetyDefaultValues(PerceivedSafetyConfigGroup perceivedSafetyConfigGroup) {
+//	I think it makes sense that the marginal utilities here are positive.
+//	We gain from additional perceived safety, just as we would gain from additional money.
+//	beta_money is positive, so the following marginal utilities should be, too. -sm0925
+	public static void fillConfigWithPerceivedSafetyDefaultValues(PerceivedSafetyConfigGroup perceivedSafetyConfigGroup) {
         Map<String, Double> mode2MarginalUtilities = Map.of(TransportMode.car, 0.44, E_BIKE,0.84,
                 E_SCOOTER,0.76, TransportMode.walk, 0.33);
         Map<String, Double> mode2MarginalUtilitiesSd = Map.of(TransportMode.car, 0.20, E_BIKE,0.22,
