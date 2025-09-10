@@ -1,6 +1,7 @@
 package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.config.Config;
@@ -30,8 +31,8 @@ public final class LocalContext implements ExecutionContext {
 	/**
 	 * Create a local context. Uses DSim config if available to determine the number of partitions.
 	 */
-	public static LocalContext create(Config config) {
-		if (ConfigUtils.hasModule(config, DSimConfigGroup.class)) {
+	public static LocalContext create(@Nullable Config config) {
+		if (config != null && ConfigUtils.hasModule(config, DSimConfigGroup.class)) {
 			return new LocalContext(createTopology(ConfigUtils.addOrGetModule(config, DSimConfigGroup.class).getThreads()));
 		}
 
