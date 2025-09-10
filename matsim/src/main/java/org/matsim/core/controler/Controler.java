@@ -214,7 +214,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
-		this.simCtx = ctx == null ? LocalContext.INSTANCE : ctx;
+		this.simCtx = ctx == null ? LocalContext.create(config) : ctx;
 		this.overrides = scenario == null ?
 			new ScenarioByConfigModule() :
 			new ScenarioByInstanceModule(this.scenario);

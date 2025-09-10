@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
+import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.DistributedScoringListener;
 import org.matsim.core.serialization.SerializationProvider;
@@ -25,9 +26,16 @@ public class DistributedSimulationModule extends AbstractModule {
 	public void install() {
 
 		ExecutionContext ctx = getSimulationContext();
+		DistributedContext dtx;
 
-		if (!(ctx instanceof DistributedContext dtx))
-			throw new RuntimeException("DistributedSimulationModule requires a DistributedContext");
+		// Use distributed config
+		if (ctx instanceof DistributedContext o) {
+			dtx = o;
+		} else {
+			// Create a distributed contex from the local one if none was given
+			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
+			ctx = dtx;
+		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageBroker.class).in(Singleton.class);

@@ -159,7 +159,7 @@ public class ComputeNode implements Message {
 		}
 
 		public String toString() {
-			return "Node.NodeBuilder(rank=" + this.rank + ", cores=" + this.cores + ", parts=" + this.parts + ", hostname=" + this.hostname + ")";
+			return "ComputeNode.NodeBuilder(rank=" + this.rank + ", cores=" + this.cores + ", parts=" + this.parts + ", hostname=" + this.hostname + ")";
 		}
 	}
 }

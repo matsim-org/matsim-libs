@@ -42,6 +42,24 @@ public final class DistributedContext implements ExecutionContext {
 	}
 
 	/**
+	 * Create a local distributed context with the given number of threads.
+	 */
+	public static DistributedContext createLocal(Communicator comm, Topology topology) {
+
+		try {
+			comm.connect();
+		} catch (Exception e) {
+			throw new RuntimeException("Local communication problem", e);
+		}
+
+		SerializationProvider serializer = new SerializationProvider();
+
+		log.info("Local topology has {} partitions.", topology.getTotalPartitions());
+
+		return new DistributedContext(comm, topology, serializer);
+	}
+
+	/**
 	 * Create distributed context with the given communicator and configuration.
 	 */
 	public static DistributedContext create(Communicator comm, Config config) {
