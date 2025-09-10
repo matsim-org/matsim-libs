@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -245,7 +246,10 @@ public class MultipleChainsReplanningTest {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy( RandomShiftingStrategyFactory.createStrategy(), null, 1);
+
+                    GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+                    strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+                    strategyManager.addStrategy(strategy, null, 1);
 					return strategyManager;
 				});
 			}

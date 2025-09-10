@@ -33,10 +33,7 @@ public class LSPStrategyManagerImpl implements LSPStrategyManager {
   }
 
   @Override
-  public void run(
-      Iterable<? extends HasPlansAndId<LSPPlan, LSP>> persons,
-      int iteration,
-      ReplanningContext replanningContext) {
+  public void run(Iterable<? extends HasPlansAndId<LSPPlan, LSP>> persons, int iteration, ReplanningContext replanningContext) {
     delegate.run(persons, iteration, replanningContext);
   }
 
@@ -46,11 +43,7 @@ public class LSPStrategyManagerImpl implements LSPStrategyManager {
   }
 
   @Override
-  public void addChangeRequest(
-      int iteration,
-      GenericPlanStrategy<LSPPlan, LSP> strategy,
-      String subpopulation,
-      double newWeight) {
+  public void addChangeRequest(int iteration, GenericPlanStrategy<LSPPlan, LSP> strategy, String subpopulation, double newWeight) {
     delegate.addChangeRequest(iteration, strategy, subpopulation, newWeight);
   }
 
