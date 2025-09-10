@@ -49,6 +49,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration combine.children="append">
 					<!-- Distributed Sim uses preview features -->
+					<!-- TODO: This should be removed when upgrade to JDK25 was performed -->
 					<compilerArgs>--enable-preview</compilerArgs>
 				</configuration>
 			</plugin>
@@ -64,6 +65,7 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
+					<!-- TODO: enable-preview flag should be removed once JDK25 is updated -->
 					<!-- avoid out of memory errors: -->
 					<argLine>@{argLine} -Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true --enable-preview</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.
