@@ -358,12 +358,13 @@ import org.matsim.vehicles.VehicleType;
 				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 				.build();
 		} else {
-			//This is the case, if only a driectCarrier is build for the LSP.
+			//This is the case, if only a directCarrier is build for the LSP.
 			Id<Link> fromLinkId = lspShipment.getFrom();
 			carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
 				.setPickupStartingTimeWindow(lspShipment.getPickupTimeWindow())
 				.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
 				//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+				.setPickupDuration(lspShipment.getPickupServiceTime())
 				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 				.build();
 		}
