@@ -248,21 +248,30 @@ import org.matsim.vehicles.VehicleType;
 		//Todo: maybe add a warning somewhere if time window does not match to the arrival of the LspShipments?
 		//Vehicle do not need to start before the first LspShipment is ready to be picked up.
 		double earliestStartTime = Double.MAX_VALUE;
-		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
-			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
-			if (lpsShipmentPlan != null) {
-				if (!lpsShipmentPlan.getPlanElements().isEmpty()) {
-					// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
-					double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
-					if (endtime < earliestStartTime) {
-						earliestStartTime = endtime;
-					}
-				}
-			} else {
-				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
-				//	throw new AssertionError();
+//		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
+//			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
+//			if (lpsShipmentPlan != null) {
+//				if (!lpsShipmentPlan.getPlanElements().isEmpty()) {
+//					// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
+//					double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
+//					if (endtime < earliestStartTime) {
+//						earliestStartTime = endtime;
+//					}
+//				}
+//			} else {
+//				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
+//				//	throw new AssertionError();
+//			}
+//		}
+		// We just need the earliest pickup start time of all shipments of this carrier, to make sure that the vehicle will starting not before that.
+		for (CarrierShipment carrierShipment : auxCarrier.getShipments().values()) {
+			var startPickup = carrierShipment.getPickupStartingTimeWindow().getStart();
+			if (startPickup < earliestStartTime) {
+				earliestStartTime = startPickup;
 			}
 		}
+
+
 		if (earliestStartTime == Double.MAX_VALUE) {
 			log.warn("Earliest start time is still set to Double.MAX_VALUE. This means that no LspShipment was found in the carrier {}. " +
 				"Setting earliest start time to 0.", auxCarrier.getId());
