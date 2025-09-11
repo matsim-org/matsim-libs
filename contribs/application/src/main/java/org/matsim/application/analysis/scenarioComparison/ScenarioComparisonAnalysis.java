@@ -5,8 +5,11 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandSpec;
+import org.matsim.application.Dependency;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.analysis.population.StuckAgentAnalysis;
+import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -23,8 +26,13 @@ import java.util.Map;
 
 @CommandLine.Command(name = "difference", description = "Calculates difference in amount of car hours traveled between base and policy case.")
 @CommandSpec(requireRunDirectory = true,
+	dependsOn = {
+		@Dependency(value = TripAnalysis.class, files = "trip_stats.csv", required = true),
+		@Dependency(value = AirPollutionAnalysis.class, files = "emissions_total.csv", required = true)
+	},
 	produces = {"difference_trips.csv", "difference_emissions.csv"}
 )
+
 public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 	private static final Logger log = LogManager.getLogger(StuckAgentAnalysis.class);
 
@@ -60,19 +68,17 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 	}
 	@Override
 	public Integer call() throws Exception {
-		File policyTripsFile = new File(input.getRunDirectory() + "/analysis/population/");
-		File[] matchingTripsPolicyFiles = policyTripsFile.listFiles((dir, name) -> name.matches("trip_stats.csv"));
+		File policyTripsFile = new File(input.getPath(TripAnalysis.class, "trip_stats.csv"));
 
 		File baseTripsFile = new File(constructorBasePath + "/analysis/population/");
 		File[] matchingTripsBaseFiles = baseTripsFile.listFiles((dir, name) -> name.matches("trip_stats.csv"));
 
-		File policyEmissionsFile = new File(input.getRunDirectory() + "/analysis/emissions/");
-		File[] matchingEmissionsPolicyFiles = policyEmissionsFile.listFiles((dir, name) -> name.matches("emissions_total.csv"));
+		File policyEmissionsFile = new File(input.getPath(AirPollutionAnalysis.class, "emissions_total.csv"));
 
 		File baseEmissionsFile = new File(constructorBasePath + "/analysis/emissions/");
 		File[] matchingEmissionsBaseFiles = baseEmissionsFile.listFiles((dir, name) -> name.matches("emissions_total.csv"));
 
-		if (matchingTripsPolicyFiles  == null || matchingTripsBaseFiles == null) {
+		if (!policyTripsFile.exists() || matchingTripsBaseFiles == null) {
 			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_trips.csv").toString()), CSVFormat.DEFAULT)) {
 				printer.printRecord("No trips files were found", 0, "user-group");
 				log.warn("At least one trips file was not found");
@@ -80,13 +86,13 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				log.error(ex);
 			}
 		} else {
-			Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingTripsBaseFiles [0].toURL()))
+			Table baseTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingTripsBaseFiles[0].toURL()))
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingTripsBaseFiles [0]))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingTripsBaseFiles[0]))).build());
 
-			Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingTripsPolicyFiles[0].toURL()))
+			Table policyTripsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(policyTripsFile.toURL()))
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingTripsPolicyFiles[0].toURL()))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(policyTripsFile.toURL()))).build());
 
 			String columnName;
 			Map<String, Double> tripsComparisonAllModes = new HashMap<>();
@@ -129,7 +135,7 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 		}
 
 
-		if (matchingEmissionsPolicyFiles == null || matchingEmissionsBaseFiles == null) {
+		if (!policyEmissionsFile .exists() || matchingEmissionsBaseFiles == null) {
 			try (CSVPrinter printer = new CSVPrinter(IOUtils.getBufferedWriter(output.getPath("difference_emissions.csv").toString()), CSVFormat.DEFAULT)) {
 				printer.printRecord("No emissions files were found", 0);
 				log.warn("At least one emissions file was not found");
@@ -142,10 +148,10 @@ public class ScenarioComparisonAnalysis implements MATSimAppCommand {
 				.sample(false)
 				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingEmissionsBaseFiles[0]))).build());
 
-			Table policyEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(matchingEmissionsPolicyFiles[0].toURL()))
+			Table policyEmissionsData = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(policyEmissionsFile.toURL()))
 				.columnTypesPartial(getEmissionsColumnTypes())
 				.sample(false)
-				.separator(CsvOptions.detectDelimiter(String.valueOf(matchingEmissionsPolicyFiles[0].toURL()))).build());
+				.separator(CsvOptions.detectDelimiter(String.valueOf(policyEmissionsFile.toURL()))).build());
 
 //			This is an assumption that the emissions_total.csv has emissions categories in the first column and values in the next one.
 //			It is then transposed to be able to utilize useful tablesaw methods that work best with columns.

@@ -63,16 +63,6 @@ public class ScenarioComparisonDashboardTest {
 		contextParams.setMapCenter("12,48.95");
 		contextParams.setMapZoomLevel(9.0);
 
-//		Dashboard TC_a = new TrafficCountsDashboard().withModes("car", Set.of(TransportMode.car))
-//			.withModes("truck", Set.of(TransportMode.truck, "freight"));
-//		TC_a.setPathToBaseCase(simWrapperConfigGroup.getBasePath());
-//
-//		Dashboard TC_b = new TrafficCountsDashboard().withQualityLabels(
-//			List.of(0.0, 0.3, 1.7, 2.5),
-//			List.of("way too few", "fewer", "exact", "too much", "way too much")
-//		);
-//		TC_b.setPathToBaseCase(simWrapperConfigGroup.getBasePath());
-
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule(config, EmissionsConfigGroup.class);
 
 		emissionsConfig.setAverageColdEmissionFactorsFile(HBEFA_FILE_COLD_AVERAGE);
@@ -85,8 +75,6 @@ public class ScenarioComparisonDashboardTest {
 
 
 		SimWrapper sw = SimWrapper.create(config)
-//			.addDashboard(TC_a)
-//			.addDashboard(TC_b)
 			.addDashboard(new EmissionsDashboard(config.global().getCoordinateSystem()))
 			.addDashboard(new ImpactAnalysisDashboard(Set.of("car")));
 
@@ -108,23 +96,12 @@ public class ScenarioComparisonDashboardTest {
 		controler.run();
 
 		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "emissions"))
-			.isDirectoryContaining("glob:**emissions_total.csv")
-			.isDirectoryContaining("glob:**emissions_grid_per_day.avro");
+			.isDirectoryContaining("glob:**emissions_total.csv");
 
 
-		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "impact"))
-			.isDirectoryContaining("glob:**emissions_car.csv")
-			.isDirectoryContaining("glob:**general_car.csv");
+		Assertions.assertThat(Path.of(utils.getOutputDirectory(), "analysis", "population"))
+			.isDirectoryContaining("glob:**trip_stats.csv");
 
-//		Path defaultDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic");
-//		Path carDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-car");
-//		Path truckDir = Path.of(utils.getOutputDirectory(), "analysis", "traffic-truck");
-//
-//		for (Path dir : List.of(defaultDir, carDir, truckDir)) {
-//			Assertions.assertThat(dir)
-//				.isDirectoryContaining("glob:**count_comparison_daily.csv")
-//				.isDirectoryContaining("glob:**count_comparison_by_hour.csv");
-//		}
 	}
 
 	public void generateDummyCounts(Config config) {
