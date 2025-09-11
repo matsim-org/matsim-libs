@@ -1,5 +1,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration.data;
 
+import org.matsim.smallScaleCommercialTrafficGeneration.GenerateSmallScaleCommercialTrafficDemand;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,8 +12,9 @@ public interface GetGenerationRates {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param generationType start or stop rates
 	 */
-	static Map<Integer, Map<String, Double>> setGenerationRates(String smallScaleCommercialTrafficType,
-																String generationType) {
+	static Map<Integer, Map<String, Double>> setGenerationRates(
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
+		String generationType) {
 
 		Map<Integer, Map<String, Double>> generationRates = new HashMap<>();
 		Map<String, Double> ratesPerPurpose1 = new HashMap<>();
@@ -20,7 +23,7 @@ public interface GetGenerationRates {
 		Map<String, Double> ratesPerPurpose4 = new HashMap<>();
 		Map<String, Double> ratesPerPurpose5 = new HashMap<>();
 		Map<String, Double> ratesPerPurpose6 = new HashMap<>();
-		if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+		if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
 				ratesPerPurpose1.put("Employee", 0.0);
@@ -113,7 +116,7 @@ public interface GetGenerationRates {
 				ratesPerPurpose5.put("Employee Tertiary Sector Rest", 0.015);
 
 			}
-		} else if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
+		} else if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic)) {
 			if (generationType.equals("start")) {
 				ratesPerPurpose1.put("Inhabitants", 0.0);
 				ratesPerPurpose1.put("Employee", 0.0);
@@ -242,11 +245,12 @@ public interface GetGenerationRates {
 	 * @param smallScaleCommercialTrafficType used trafficType (freight or business traffic)
 	 * @param commitmentType start or stop parameter
 	 */
-	static Map<String, Map<String, Double>> setCommitmentRates(String smallScaleCommercialTrafficType,
-															   String commitmentType) {
+	static Map<String, Map<String, Double>> setCommitmentRates(
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
+		String commitmentType) {
 		Map<String, Map<String, Double>> commitmentRates = new HashMap<>();
 
-		if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
+		if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic)) {
 
 			// the first number is the purpose; second number the vehicle type
 			Map<String, Double> ratesPerPurpose1_1 = new HashMap<>();
