@@ -281,8 +281,9 @@ import org.matsim.vehicles.VehicleType;
 		//Take the jsprit iterations from the DistributionCarrier and set it to the auxiliary carrier. If it was not set, set it to 1.
 		int jspritIterations = CarriersUtils.getJspritIterations(this.carrier);
 		if (jspritIterations < 0) {
-			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to 1.", carrier.getId(), jspritIterations);
-			jspritIterations = 1;
+			int jspritIterationsNew = 1;
+			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to {}.", carrier.getId(), jspritIterations, jspritIterationsNew);
+			jspritIterations = jspritIterationsNew;
 		}
 		CarriersUtils.setJspritIterations(auxCarrier, jspritIterations);
 
