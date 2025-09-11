@@ -37,6 +37,8 @@ public class RailsimModule extends AbstractModule {
 		installQSimModule(new RailsimQSimModule());
 		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
 
+		addControllerListenerBinding().to(RailsimControllerListener.class);
+
 		bind(RailsimLinkStateControlerListener.class).in(Singleton.class);
 		addControllerListenerBinding().to(RailsimLinkStateControlerListener.class);
 

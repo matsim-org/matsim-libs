@@ -501,6 +501,10 @@ final class RailsimEngine implements Steppable {
 		// Get link and increment
 		RailLink nextLink = state.route.get(state.routeIdx++);
 
+		if (Objects.equals(nextLink.getLinkId(), state.headLink)) {
+			throw new IllegalStateException("Train %s is trying to enter link %s from itself. Such Loop connections are not supported".formatted(state.driver.getId(), state.headLink));
+		}
+
 		// Check for disallowed links
 		if (state.routeIdx > 1) {
 			RailLink currentLink = state.route.get(state.routeIdx - 2);
@@ -583,8 +587,9 @@ final class RailsimEngine implements Steppable {
 		}
 
 		if (tailReverse == null) {
-			throw new IllegalStateException("Train " + state.driver.getId() + " is trying to reverse on a route that does not contain all opposites links. " +
-				"Make sure that a single transit line contains all links and stops needed for reversing.");
+			throw new IllegalStateException(("Train %s is trying to reverse on a route that does not contain the opposite link for %s. " +
+				"Make sure that a single transit line contains all links and stops needed for reversing.")
+				.formatted(state.driver.getVehicle().getId(), state.tailLink));
 		}
 
 		state.routeIdx = i + 1;
@@ -609,7 +614,9 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
-		Objects.requireNonNull(nextTailLink, "Could not find next link in route");
+		// TODO: when using umlauf (circulation) the id we are looking for might be present in the previous route
+
+		Objects.requireNonNull(nextTailLink, () -> "Could not find next link in route " + state.tailLink);
 
 		updatePosition(time, event);
 

@@ -23,12 +23,12 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.vehicles.VehicleType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
-import java.util.OptionalDouble;
+import java.util.*;
 
 
 /**
@@ -48,6 +48,7 @@ public final class RailsimUtils {
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
 	public static final String VEHICLE_ATTRIBUTE_REVERSIBLE = "railsimReversible";
 	public static final String RESOURCE_TYPE = "railsimResourceType";
+	public static final String FORMATION = "railsimFormation";
 
 	private RailsimUtils() {
 	}
@@ -180,7 +181,7 @@ public final class RailsimUtils {
 	/**
 	 * Sets whether the train is reversible.
 	 *
-	 * @param vehicle The vehicle type to set the attribute for.
+	 * @param vehicle    The vehicle type to set the attribute for.
 	 * @param reversible time in seconds it takes to reverse the train, or null if not reversible.
 	 */
 	public static void setTrainReversible(VehicleType vehicle, @Nullable Double reversible) {
@@ -216,6 +217,24 @@ public final class RailsimUtils {
 	 */
 	public static void setResourceType(Link link, ResourceType type) {
 		link.getAttributes().putAttribute(RESOURCE_TYPE, type.toString());
+	}
+
+
+	/**
+	 * Return the defined formation of vehicle units attached to departure.
+	 */
+	public static List<String> getFormation(Departure departure) {
+		Object attr = departure.getAttributes().getAttribute(FORMATION);
+		return attr instanceof String s
+			? List.of(s.split(","))
+			: List.of();
+	}
+
+	/**
+	 * Sets the formation of vehicle ids for a departure.
+	 */
+	public static void setFormation(Departure departure, List<String> formations) {
+		departure.getAttributes().putAttribute(FORMATION, String.join(",", formations));
 	}
 
 }
