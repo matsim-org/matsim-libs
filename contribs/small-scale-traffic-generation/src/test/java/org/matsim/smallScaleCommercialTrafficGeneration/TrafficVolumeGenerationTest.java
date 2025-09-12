@@ -76,7 +76,7 @@ public class TrafficVolumeGenerationTest {
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
 
-		String usedTrafficType = "commercialPersonTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				List.of("total"));
@@ -206,7 +206,7 @@ public class TrafficVolumeGenerationTest {
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		String usedTrafficType = "goodsTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 		double sample = 1.;
 		ArrayList<String> modesORvehTypes = new ArrayList<>(
 				Arrays.asList("vehTyp1", "vehTyp2", "vehTyp3", "vehTyp4", "vehTyp5"));
@@ -519,7 +519,7 @@ public class TrafficVolumeGenerationTest {
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		String usedTrafficType = "goodsTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 		double sample = 1.;
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";
@@ -685,7 +685,7 @@ public class TrafficVolumeGenerationTest {
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
 		String usedLanduseConfiguration = "useOSMBuildingsAndLanduse";
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
-		String usedTrafficType = "commercialPersonTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 		double sample = 1.;
 		String shapeFileZoneNameColumn = "name";
 		String shapeFileBuildingTypeColumn = "type";

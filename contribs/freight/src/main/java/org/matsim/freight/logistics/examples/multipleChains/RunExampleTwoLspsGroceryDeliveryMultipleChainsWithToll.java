@@ -20,6 +20,8 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
+import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.TypeOfLsps.*;
+
 /**
  * This class runs the example of two LSPs (Edeka and Kaufland) with grocery delivery,
  * where each LSP has multiple transport chains and tolls are applied to certain vehicle types.
@@ -38,9 +40,11 @@ public class RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			"--tollValue=1000.0",
 			"--tolledVehicleTypes=heavy40t,heavy40t_electro",
 			"--HubCostsFix=100.0",
-			"--typeOfLsps=ONE_CHAIN_DIRECT",
+			"--typeOfLsps="+ONE_PLAN_ONLY_DIRECT_CHAIN,
+			"--lsp1Name=Edeka",
 			"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 			"--lsp1HubLinkId=91085",
+			"--lsp2Name=Kaufland",
 			"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
 			"--lsp2HubLinkId=91085"
 		};
