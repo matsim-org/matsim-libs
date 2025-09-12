@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.operations.eshifts.charging;
+package org.matsim.contrib.drt.extension.operations.shifts.charging;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;

@@ -13,6 +13,4 @@ public interface DrtShiftBreak {
 
     void schedule();
 
-    boolean isScheduled();
-
 }

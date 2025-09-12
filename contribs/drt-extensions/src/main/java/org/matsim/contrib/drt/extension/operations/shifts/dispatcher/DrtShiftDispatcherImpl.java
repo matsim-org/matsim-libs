@@ -25,8 +25,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.util.reservation.ReservationManager;
+import org.matsim.contrib.drt.extension.operations.shifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.events.*;
@@ -37,6 +37,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeOv
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftSchedules;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftBreak;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -77,7 +78,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private final MobsimTimer timer;
 
     private final OperationFacilities operationFacilities;
-    private final OperationFacilityFinder breakFacilityFinder;
+    private final OperationFacilityFinder operationFacilityFinder;
     private final ShiftTaskScheduler shiftTaskScheduler;
 
     private final EventsManager eventsManager;
@@ -91,7 +92,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     private final OperationFacilityReservationManager facilityReservationManager;
 
     public DrtShiftDispatcherImpl(String mode, Fleet fleet, MobsimTimer timer, OperationFacilities operationFacilities,
-                                  OperationFacilityFinder breakFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
+                                  OperationFacilityFinder operationFacilityFinder, ShiftTaskScheduler shiftTaskScheduler,
                                   EventsManager eventsManager, ShiftsParams drtShiftParams,
                                   ShiftStartLogic shiftStartLogic, AssignShiftToVehicleLogic assignShiftToVehicleLogic,
                                   ShiftScheduler shiftScheduler, OperationFacilityReservationManager facilityReservationManager) {
@@ -99,7 +100,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         this.fleet = fleet;
         this.timer = timer;
         this.operationFacilities = operationFacilities;
-        this.breakFacilityFinder = breakFacilityFinder;
+        this.operationFacilityFinder = operationFacilityFinder;
         this.shiftTaskScheduler = shiftTaskScheduler;
         this.eventsManager = eventsManager;
         this.drtShiftParams = drtShiftParams;
@@ -183,9 +184,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (now % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
             updateShiftEnds(now);
         }
+        if (now % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
+            updateShiftBreaks(now);
+        }
         scheduleShifts(now, this.fleet);
         assignShifts(now);
         startShifts(now);
+        checkChargingAtHub(now);
     }
 
 
@@ -448,7 +453,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         } else {
             types = Set.of(OperationFacilityType.hub);
         }
-        maybeFacility = breakFacilityFinder.findFacilityForTime(start.link, endingShift.vehicle(), endingShift.shift().getEndTime(), endingShift.vehicle().getServiceEndTime(), types);
+        maybeFacility = operationFacilityFinder.findFacilityForTime(
+                start.link,
+                endingShift.vehicle(),
+                start.time,
+                endingShift.shift().getEndTime(),
+                endingShift.vehicle().getServiceEndTime() - timer.getTimeOfDay(),
+                types);
         if (maybeFacility.isPresent()) {
             OperationFacility shiftChangeFacility = maybeFacility.get().operationFacility();
             if (changeOverTask != null) {
@@ -461,16 +472,29 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
                         shiftTaskScheduler.updateShiftChange(endingShift.vehicle(), maybeFacility.get().path(),
                                 endingShift.shift(), reservation.get(), lastTask);
 
-                        // remove old resrvation
+                        // remove old reservation
                         Optional<Id<ReservationManager.Reservation>> reservationId = changeOverTask.getReservationId();
                         reservationId.ifPresent(id -> facilityReservationManager.removeReservation(existingFacilityId, id));
-                    }  else {
+                    } else {
                         logger.warn("Failed to update shift end.");
                     }
                 }
             }
         }
     }
+
+    private void updateShiftBreaks(double now) {
+        for (ShiftEntry activeShift : this.activeShifts) {
+            if (activeShift.shift().getBreak().isPresent()) {
+                DrtShiftBreak shiftBreak = activeShift.shift().getBreak().get();
+                if (shiftBreak.getEarliestBreakStartTime() > now
+                        && shiftBreak.getEarliestBreakStartTime() < now + drtShiftParams.getShiftEndRescheduleLookAhead()) {
+                    shiftTaskScheduler.updateShiftBreak(activeShift, now);
+                }
+            }
+        }
+    }
+
 
     private void endShift(ShiftDvrpVehicle vehicle, Id<Link> id, Id<OperationFacility> operationFacilityId) {
         final DrtShift shift = vehicle.getShifts().poll();
@@ -507,6 +531,38 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     private boolean isSchedulable(DrtShift shift, double now) {
         return shift.getStartTime() <= now + drtShiftParams.getShiftScheduleLookAhead();
+    }
+
+    /**
+     * Checks for vehicles waiting at hubs that might need charging and initiates charging if needed.
+     * This method only identifies candidate vehicles and delegates the actual charging logic to the scheduler.
+     *
+     * @param timeStep Current simulation time
+     */
+    private void checkChargingAtHub(double timeStep) {
+        for (OperationFacility operationFacility : operationFacilities.getFacilities().values()) {
+            // Skip facilities without chargers
+            if (operationFacility.getChargers().isEmpty()) {
+                continue;
+            }
+
+            // Check all vehicles at this facility
+            for (Id<DvrpVehicle> vehicleId : operationFacility.getRegisteredVehicles()) {
+                DvrpVehicle dvrpVehicle = fleet.getVehicles().get(vehicleId);
+
+                // Only consider electric shift vehicles
+                if (dvrpVehicle instanceof EvShiftDvrpVehicle eShiftVehicle) {
+                    // Skip vehicles that are assigned to shifts
+                    if (!eShiftVehicle.getShifts().isEmpty()) {
+                        continue;
+                    }
+
+                    // Try to update the vehicle with charging
+                    // The scheduler will handle all validation, charger selection and task updating
+                    shiftTaskScheduler.updateWaitingVehicleWithCharging(eShiftVehicle, timeStep);
+                }
+            }
+        }
     }
 }
 

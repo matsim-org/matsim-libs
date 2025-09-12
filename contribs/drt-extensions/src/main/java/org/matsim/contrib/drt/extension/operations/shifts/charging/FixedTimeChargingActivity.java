@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.operations.eshifts.charging;
+package org.matsim.contrib.drt.extension.operations.shifts.charging;
 
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;

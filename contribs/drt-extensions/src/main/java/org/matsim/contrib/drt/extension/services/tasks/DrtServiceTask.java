@@ -27,6 +27,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalSt
 import org.matsim.contrib.drt.extension.services.schedule.DrtService;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.evrp.ChargingTask;
 
 import java.util.Optional;
 
@@ -65,6 +66,16 @@ public class DrtServiceTask extends DefaultStayTask implements OperationalStop {
 	@Override
 	public Optional<Id<ReservationManager.Reservation>> getReservationId() {
 		return Optional.empty();
+	}
+
+	@Override
+	public Optional<ChargingTask> getChargingTask() {
+		return Optional.empty();
+	}
+
+	@Override
+	public boolean addCharging(ChargingTask chargingTask) {
+		return false;
 	}
 }
 

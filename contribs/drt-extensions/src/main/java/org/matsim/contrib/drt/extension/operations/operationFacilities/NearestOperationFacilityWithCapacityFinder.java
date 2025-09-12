@@ -28,7 +28,8 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
     private final MobsimTimer timer;
     private final TravelTime travelTime;
 
-    public NearestOperationFacilityWithCapacityFinder(OperationFacilities operationFacilities, OperationFacilityReservationManager reservationManager,
+    public NearestOperationFacilityWithCapacityFinder(OperationFacilities operationFacilities,
+                                                      OperationFacilityReservationManager reservationManager,
                                                       Network network,
                                                       TravelTime travelTime,
                                                       TravelDisutility travelDisutility, MobsimTimer timer) {
@@ -64,35 +65,24 @@ public class NearestOperationFacilityWithCapacityFinder implements OperationFaci
     }
 
     @Override
-    public Optional<FacilityWithPath> findFacilityForTime(Link fromLink, DvrpVehicle dvrpVehicle, double start, double end, Set<OperationFacilityType> types) {
+    public Optional<FacilityWithPath> findFacilityForTime(
+            Link fromLink,
+            DvrpVehicle dvrpVehicle,
+            double departureTime,
+            double latestArrival,
+            double reservationEndTime,
+            Set<OperationFacilityType> types) {
         Predicate<OperationFacility> filter = typefilter(types);
         Optional<FacilityWithPath> min = operationFacilities.getFacilities().values().stream()
                 .filter(filter)
                 .map(operationFacility -> {
                     Link toLink = network.getLinks().get(operationFacility.getLinkId());
-                    VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(fromLink, toLink, timer.getTimeOfDay(), router, travelTime);
+                    VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
                     return new FacilityWithPath(operationFacility, path);
                 })
-                .filter(facilityWithPath -> facilityWithPath.path().getArrivalTime() <= start)
+                .filter(facilityWithPath -> facilityWithPath.path().getArrivalTime() <= latestArrival)
                 .filter(facilityWithPath -> reservationManager.isAvailable(facilityWithPath.operationFacility(), dvrpVehicle,
-                        facilityWithPath.path().getArrivalTime(), end))
-                .min(Comparator.comparing(f -> f.path().getTravelTime()));
-        return min;
-    }
-
-    @Override
-    public Optional<FacilityWithPath> findFacilityForDuration(Link fromLink, DvrpVehicle dvrpVehicle, double latestArrival, double duration, Set<OperationFacilityType> types) {
-        Predicate<OperationFacility> filter = typefilter(types);
-        Optional<FacilityWithPath> min = operationFacilities.getFacilities().values().stream()
-                .filter(filter)
-                .map(operationFacility -> {
-                    Link toLink = network.getLinks().get(operationFacility.getLinkId());
-                    VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(fromLink, toLink, timer.getTimeOfDay(), router, travelTime);
-                    return new FacilityWithPath(operationFacility, path);
-                })
-                .filter(facilityWithPath -> facilityWithPath.path().getArrivalTime() < latestArrival)
-                .filter(facilityWithPath -> reservationManager.isAvailable(facilityWithPath.operationFacility(), dvrpVehicle,
-                        facilityWithPath.path().getArrivalTime(), facilityWithPath.path().getArrivalTime() + duration))
+                        facilityWithPath.path().getArrivalTime(), reservationEndTime))
                 .min(Comparator.comparing(f -> f.path().getTravelTime()));
         return min;
     }

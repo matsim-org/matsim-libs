@@ -43,10 +43,4 @@ public class DefaultShiftBreakImpl implements DrtShiftBreak {
     public void schedule() {
         scheduled = true;
     }
-
-    @Override
-    public boolean isScheduled() {
-        return scheduled;
-    }
-
 }

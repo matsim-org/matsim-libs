@@ -19,16 +19,20 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * @author nkuehnel, fzwick / MOIA
+ * Task factory that creates operations-related tasks (shifts, breaks, etc.) using unified task implementations
+ * that support both standard and electric vehicles. This implementation creates tasks without 
+ * charging capabilities initially, which can be added later by a scheduler or other components.
+ *
+ * @author nkuehnel / MOIA
  */
-public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
+public class DrtOperationsTaskFactory implements ShiftDrtTaskFactory {
 
     private final DrtTaskFactory delegate;
     private final OperationFacilities operationFacilities;
     private final OperationFacilityReservationManager reservationManager;
 
-    public ShiftDrtTaskFactoryImpl(DrtTaskFactory delegate, OperationFacilities operationFacilities,
-                                   OperationFacilityReservationManager reservationManager) {
+    public DrtOperationsTaskFactory(DrtTaskFactory delegate, OperationFacilities operationFacilities,
+                                 OperationFacilityReservationManager reservationManager) {
         this.delegate = delegate;
         this.operationFacilities = operationFacilities;
         this.reservationManager = reservationManager;
@@ -51,22 +55,25 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
 
     @Override
     public ShiftBreakTask createShiftBreakTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                               Link link, DrtShiftBreak shiftBreak, Id<OperationFacility> facilityId,
-                                               Id<ReservationManager.Reservation> reservationId) {
+                                           Link link, DrtShiftBreak shiftBreak, Id<OperationFacility> facilityId,
+                                           Id<ReservationManager.Reservation> reservationId) {
+        // Create a standard shift break task without charging capabilities
         return new ShiftBreakTaskImpl(beginTime, endTime, link, shiftBreak, facilityId, reservationId);
     }
 
     @Override
     public ShiftChangeOverTask createShiftChangeoverTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                         Link link, DrtShift shift, Id<OperationFacility> facilityId,
-                                                         Id<ReservationManager.Reservation> reservationId) {
+                                                     Link link, DrtShift shift, Id<OperationFacility> facilityId,
+                                                     Id<ReservationManager.Reservation> reservationId) {
+        // Create a standard shift changeover task without charging capabilities
         return new ShiftChangeoverTaskImpl(beginTime, endTime, link, shift, facilityId, reservationId);
     }
 
     @Override
     public WaitForShiftTask createWaitForShiftStayTask(DvrpVehicle vehicle, double beginTime, double endTime,
-                                                       Link link, Id<OperationFacility> facilityId,
-                                                       Id<ReservationManager.Reservation> reservationId) {
+                                                   Link link, Id<OperationFacility> facilityId,
+                                                   Id<ReservationManager.Reservation> reservationId) {
+        // Create a standard wait for shift task without charging capabilities
         return new WaitForShiftTask(beginTime, endTime, link, facilityId, reservationId);
     }
 
@@ -82,7 +89,6 @@ public class ShiftDrtTaskFactoryImpl implements ShiftDrtTaskFactory {
             facility.register(vehicle.getId());
             return createWaitForShiftStayTask(vehicle, vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
                     vehicle.getStartLink(), facility.getId(), reservation.get().reservationId());
-
 
         } catch (Throwable e) {
             throw new RuntimeException(e);

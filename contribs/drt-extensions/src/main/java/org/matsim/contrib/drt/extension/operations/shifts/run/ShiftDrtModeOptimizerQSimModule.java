@@ -13,10 +13,10 @@ import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrp
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftDrtOptimizer;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.optimizer.insertion.ShiftInsertionCostCalculator;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtActionCreator;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsActionCreator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactory;
-import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftDrtTaskFactoryImpl;
+import org.matsim.contrib.drt.extension.operations.shifts.schedule.DrtOperationsTaskFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftDrtScheduleInquiry;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskSchedulerImpl;
@@ -53,7 +53,6 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
-import org.matsim.contrib.zone.skims.TravelTimeMatrix;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.modal.ModalProviders;
@@ -94,7 +93,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				}));
 
 		bindModal(AssignShiftToVehicleLogic.class).toProvider(modalProvider(getter ->
-				(new DefaultAssignShiftToVehicleLogic(shiftsParams))
+				(new AssignShiftToVehicleLogicImpl(shiftsParams))
 		));
 
 		bindModal(DrtShiftDispatcher.class).toProvider(modalProvider(
@@ -116,7 +115,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					shiftsParams.isConsiderUpcomingShiftsForInsertion());
 		}));
 
-		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new ShiftDrtTaskFactoryImpl(
+		bindModal(DrtTaskFactory.class).toProvider(modalProvider(getter ->  new DrtOperationsTaskFactory(
 				new DrtTaskFactoryImpl(),
 				getter.getModal(OperationFacilities.class),
 				getter.getModal(OperationFacilityReservationManager.class)
@@ -128,8 +127,14 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 				getter -> new ShiftTaskSchedulerImpl(
 						getter.getModal(OperationFacilities.class),
 						getter.getModal(ShiftDrtTaskFactory.class),
+						getter.getModal(Network.class),
 						getter.getModal(OperationFacilityReservationManager.class),
-						shiftsParams))
+						shiftsParams,
+						getter.getModal(TravelDisutilityFactory.class).createTravelDisutility(getter.getModal(TravelTime.class)),
+						getter.getModal(TravelTime.class),
+						getter.getModal(OperationFacilityFinder.class),
+						getter.getModal(VehicleEntry.EntryFactory.class),
+						getter.getModal(ScheduleTimingUpdater.class)))
 		).asEagerSingleton();
 
 		bindModal(ScheduleInquiry.class).to(ShiftDrtScheduleInquiry.class).asEagerSingleton();
@@ -150,16 +155,16 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					timer);
 		})).in(Singleton.class);
 
-		bindModal(ShiftDrtActionCreator.class).toProvider(modalProvider((getter) -> {
+		bindModal(DrtOperationsActionCreator.class).toProvider(modalProvider((getter) -> {
 			VrpAgentLogic.DynActionCreator delegate = drtCfg.getPrebookingParams().isPresent()
 					? getter.getModal(PrebookingActionCreator.class)
 					: getter.getModal(DrtActionCreator.class);
 
 			// adds shift tasks
-			return new ShiftDrtActionCreator(getter.getModal(PassengerHandler.class), delegate);
+			return new DrtOperationsActionCreator(getter.getModal(PassengerHandler.class), delegate);
 		})).asEagerSingleton();
 
-		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(ShiftDrtActionCreator.class));
+		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtOperationsActionCreator.class));
 
 		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode(), DvrpModes::mode) {
 			@Override

@@ -17,14 +17,11 @@ public interface OperationFacilityFinder {
     Optional<FacilityWithPath> findFacility(Link fromLink, DvrpVehicle dvrpVehicle, Set<OperationFacilityType> types);
 
     /**
-     * @param start Time before the facility has to be reached and be available
-     * @param end Time until the facility has to be available
      */
-    Optional<FacilityWithPath> findFacilityForTime(Link fromLink, DvrpVehicle dvrpVehicle, double start, double end, Set<OperationFacilityType> types);
-
-    /**
-     * @param latestArrival latest time before the facility has to be reached and be available
-     * @param duration duration of required availability of the facility
-     */
-    Optional<FacilityWithPath> findFacilityForDuration(Link fromLink, DvrpVehicle dvrpVehicle, double latestArrival, double duration, Set<OperationFacilityType> types);
+    Optional<FacilityWithPath> findFacilityForTime(Link fromLink,
+                                                   DvrpVehicle dvrpVehicle,
+                                                   double departureTime,
+                                                   double latestArrival,
+                                                   double reservationEndTime,
+                                                   Set<OperationFacilityType> types);
 }
