@@ -241,7 +241,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 				final CarrierVehicleTypes vehTypesDelivery = extractVehicleTypes(lspDefinition.vehicleTypesDelivery(), vehicleTypesAvailable);
 				for (VehicleType vehicleType : vehTypesDelivery.getVehicleTypes().values()) {
-					var cv = CarrierVehicle.Builder.newInstance(Id.createVehicleId("distributionTruck_" + vehicleType.getId()), getDepotLinkFromVehicle(carrier), vehicleType)
+					var cv = CarrierVehicle.Builder.newInstance(Id.createVehicleId("distributionTruck_" + vehicleType.getId()), lspDefinition.hubLinkId(), vehicleType)
 						.setEarliestStart(getEarliestStartFromVehicle(carrier))
 						.setLatestEnd(getLatestEndFromVehicle(carrier))
 						.build();
