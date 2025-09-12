@@ -7,9 +7,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.contrib.profiling.aop.stopwatch.AopIterationJfrEvent;
 import org.matsim.contrib.profiling.events.IterationJfrEvent;
 
-import java.awt.*;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -135,34 +133,24 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	public static void main(String[] args) throws IOException {
 
-		var frame = new Frame();
-		try {
-			var fileChooser = new FileDialog(frame);
-			fileChooser.setDirectory(System.getProperty("user.dir"));
-			var testPath = Path.of(System.getProperty("user.dir"), "contribs", "profiling", "src", "test", "resources");
-			if (testPath.toFile().exists()) {
-				fileChooser.setDirectory(testPath.toString());
-			}
-			fileChooser.show();
-			var filePath = Path.of(fileChooser.getDirectory(), fileChooser.getFile());
-
-			System.out.println(filePath);
-			var stopwatch = new JfrSamplingStopwatch(EventStream.openFile(filePath));
-			try (stopwatch) {
-				System.out.println("start");
-				stopwatch.start();
-			}
-
-			System.out.println("--- done");
-			System.out.println(stopwatch.getStatistics());
-			stopwatch.stopwatch.writeSeparatedFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch.csv", ";");
-			stopwatch.stopwatch.writeGraphFile(fileChooser.getDirectory() + "/" + fileChooser.getFile() + ".sampling-stopwatch");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		} finally {
-			frame.dispose();
-			System.out.println("goodbye");
+		var optionalFilePath = JfrEventUtils.getFilePath(args, "contribs", "profiling", "src", "test", "resources");
+		if  (optionalFilePath.isEmpty()) {
+			System.err.println("No file provided");
+			return;
 		}
+		var filePath = optionalFilePath.get();
+
+		System.out.println(filePath);
+		var stopwatch = new JfrSamplingStopwatch(EventStream.openFile(filePath));
+		try (stopwatch) {
+			System.out.println("start");
+			stopwatch.start();
+		}
+
+		System.out.println("--- done");
+		System.out.println(stopwatch.getStatistics());
+		stopwatch.stopwatch.writeSeparatedFile(filePath + ".sampling-stopwatch.csv", ";");
+		stopwatch.stopwatch.writeGraphFile(filePath + ".sampling-stopwatch");
 	}
 
 	/**
