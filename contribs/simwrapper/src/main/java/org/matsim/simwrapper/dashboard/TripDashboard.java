@@ -511,5 +511,9 @@ public class TripDashboard implements Dashboard {
 
 		}
 	}
+	@Override
+	public double priority() {
+		return 1;
+	}
 
 }

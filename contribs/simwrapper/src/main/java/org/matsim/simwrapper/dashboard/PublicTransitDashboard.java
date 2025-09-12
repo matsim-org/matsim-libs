@@ -26,7 +26,6 @@ public class PublicTransitDashboard implements Dashboard {
 		customRouteTypes.addAll(List.of(custom));
 		return this;
 	}
-
 	@Override
 	public void configure(Header header, Layout layout) {
 

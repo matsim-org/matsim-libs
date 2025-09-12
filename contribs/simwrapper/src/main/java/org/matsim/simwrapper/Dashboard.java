@@ -1,9 +1,11 @@
 package org.matsim.simwrapper;
 
+
+
 /**
  * Function interface that allows to construct dashboards.
  */
-@FunctionalInterface
+//@FunctionalInterface
 public interface Dashboard {
 
 	/**
