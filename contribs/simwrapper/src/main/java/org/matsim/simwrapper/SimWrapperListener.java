@@ -3,6 +3,7 @@ package org.matsim.simwrapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -11,7 +12,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
@@ -31,19 +31,21 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	private final SimWrapper simWrapper;
 	private final Set<Dashboard> bindings;
 	private final Config config;
+	private final Set<DashboardProvider> providers;
 
 	@Inject
-	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config) {
+	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config, Set<DashboardProvider> providers) {
 		this.simWrapper = simWrapper;
 		this.bindings = bindings;
 		this.config = config;
+		this.providers = providers;
 	}
 
 	/**
 	 * Create a new listener with no default bindings.
 	 */
 	public SimWrapperListener(SimWrapper simWrapper, Config config) {
-		this(simWrapper, Collections.emptySet(), config);
+		this(simWrapper, Collections.emptySet(), config, Collections.emptySet());
 	}
 
 	@Override
@@ -76,20 +78,48 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 			}
 		}
 
+		// Load dashboards from SPI dashboards
+		ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
+		List<DashboardProvider> p = new ArrayList<>();
+
+		for (DashboardProvider dashboardProvider : loader) {
+			// Skip default providers if disabled
+			if (config.getDefaultDashboards() == SimWrapperConfigGroup.Mode.disabled && dashboardProvider.isDefault()) {
+				continue;
+			}
+			p.add(dashboardProvider);
+		}
+
+		addFromProvider(config, p);
+
 		// Lambda provider which uses dashboards from bindings
 		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));
 
-		// Dashboard provider services
-		if (config.getDefaultDashboards() != SimWrapperConfigGroup.Mode.disabled) {
-			ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
-			addFromProvider(config, loader);
-		}
+		// Load providers from bindings
+		addFromProvider(config, providers);
 
 		try {
 			simWrapper.generate(output);
 		} catch (IOException e) {
 			log.error("Could not create SimWrapper dashboard.");
 		}
+	}
+
+	private List<DashboardProvider> loadProvider(ImmutableSet<ClassPath.ClassInfo> classes) {
+		List<DashboardProvider> result = new ArrayList<>();
+		for (ClassPath.ClassInfo info : classes) {
+			Class<?> clazz = info.load();
+			if (DashboardProvider.class.isAssignableFrom(clazz)) {
+				try {
+					Constructor<?> c = clazz.getDeclaredConstructor();
+					DashboardProvider o = (DashboardProvider) c.newInstance();
+					result.add(o);
+				} catch (ReflectiveOperationException e) {
+					log.error("Could not create provider {}", info, e);
+				}
+			}
+		}
+		return result;
 	}
 
 	private void addFromProvider(SimWrapperConfigGroup config, Iterable<DashboardProvider> providers) {
@@ -116,23 +146,6 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 					log.warn("Skipping dashboard {} with context {}, because it is already present", d, d.context());
 			}
 		}
-	}
-
-	private List<DashboardProvider> loadProvider(ImmutableSet<ClassPath.ClassInfo> classes) {
-		List<DashboardProvider> result = new ArrayList<>();
-		for (ClassPath.ClassInfo info : classes) {
-			Class<?> clazz = info.load();
-			if (DashboardProvider.class.isAssignableFrom(clazz)) {
-				try {
-					Constructor<?> c = clazz.getDeclaredConstructor();
-					DashboardProvider o = (DashboardProvider) c.newInstance();
-					result.add(o);
-				} catch (ReflectiveOperationException e) {
-					log.error("Could not create provider {}", info, e);
-				}
-			}
-		}
-		return result;
 	}
 
 	/**
