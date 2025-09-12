@@ -1,7 +1,6 @@
 package org.matsim.contrib.perceivedsafety;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -24,7 +23,6 @@ import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
@@ -55,7 +53,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 	private static final String BICYCLE_AND_PSAFE = "matsimBicycleContribAndPerceivedSafetyContrib";
 
 	@Test
-	void testAndCompareRouting() {
+	void testAndCompareDisutilityAndRouting() {
 		Map<String, Set<Id<Link>>> actualLinksUsed = new HashMap<>();
 		actualLinksUsed.put(BASIC, null);
 		actualLinksUsed.put(BICYCLE, null);
