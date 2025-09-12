@@ -1,4 +1,4 @@
-# Profiling Contrib
+[# Profiling Contrib
 
 Modules and usage examples for integrating and enhancing profiling.
 
@@ -22,8 +22,8 @@ Add as dependency to the `pom.xml`:
 ## Using Profiling
 
 There are two ways to use profiling:
-- continuous for the full program execution
-- instrumenting start and stop of the profiler during execution
+
+- using the `org.matsim.contrib.profiling.instrument.EnableProfilingModule` to profile selected iterations
 
 <ul>
   <li>
@@ -41,23 +41,27 @@ Name and filename can be set to your liking. `repository` should be set to a fas
 </details>
   </li>
   <li>
-<details><summary>instrumenting profiler start/stop during execution</summary>
+<details><summary>using the `EnableProfilingModule` to profile selected iterations</summary>
 
-The `ProfilerInstrumentationModule` can be used to create a profiling recording only for a chosen number of iterations.
+The `org.matsim.contrib.profiling.instrument.EnableProfilingModule` can be used to create a profiling recording only for a chosen number of iterations.
 
 ```java
 controller.addOverridingModule(new ProfilerInstrumentationModule(10, 20, "profile");
 ```
+
 This will create a recording `profile.jfr` in the configured controller output directory,
 starts to record in iteration 10, and stop after iteration 20.  
 Omitting the name will default to including the iterations, i.e. `profile-10-20.jfr`.  
-The endIteration can be omitted to only record the given iteration.
+The endIteration can be omitted to only record the single given iteration.
 
 The following Java options should still be used additionally:
 
 ```
--XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:FlightRecorderOptions=stackdepth=2048,repository="/tmp"
+-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
 ```
+
+For more detailed stacktraces (and potentially more overhead): `-XX:FlightRecorderOptions=stackdepth=2048`. 
+
 
 </details>
   </li>
@@ -68,16 +72,64 @@ The following Java options should still be used additionally:
 Custom events can be created and recorded into the profiling recording.
 This allows to define additional info to be recorded with a timestamp or duration.
 
-### Use pre-defined Events from ProfilingEventsModule
+### Use pre-defined Events from FireDefaultProfilingEventsModule
 
-The `ProfilingEventsModule` defines some MATSim specific events and registers
+The `FireDefaultProfilingEventsModule` defines some MATSim-specific events and registers
 Listeners to trigger them during the execution.
 
-- JFRIterationEvent - For the duration of each iteration with the current iteration count
-- JFRMobsimEvent - For the duration of each mobsim execution
-- JFRMatsimEvent - Marker events for startup/shutdown, scoring, and replanning
+- IterationJfrEvent - For the duration of each iteration (including starts/ends listeners) with the current iteration count
+- IterationStartsListenersJfrEvent, IterationEndsListenersJfrEvent - for the duration of iteration starts/ends listeners respectively
+- BeforeMobsimListenersJfrEvent - Duration of before mobsim listeners per iteration
+- AfterMobsimListenersJfrEvent - Duration of after mobsim listeners per iteration
+- MobsimJfrEvent - For the duration of each mobsim execution
+- ReplanningListenersJfrEvent - Duration of replanning listeners
+- ScoringListenersJfrEvent - Duration of scoring listeners
+- MatsimStartupListenersJfrEvent, MatsimShutdownListenersJfrEvent - Duration of all startup/shutdown listeners
+- MatsimJfrEvent - unused, generic event for convenience to provide a type per string instead of defining your own event class
 
 To use, add the module via `controller.addOverridingModule(new ProfilingEventsModule());`.
 
+Using the listeners provided by MATSim is not the most accurate approach,
+as the ControlerListeners **won't measure the core listeners**
+and the mobsim initialized/cleanup listeners don't have a priority to control to include other listeners.
+
 ### Define custom Events
 
+Custom events can be defined easily:
+
+```java
+import jdk.jfr.*;
+
+/**
+ * Record Mobsim execution duration as a JFR profiling {@link Event}.
+ */
+@Name("matsim.Mobsim")
+@Label("Mobsim")
+@Description("Duration of a mobsim iteration")
+@Category({"MATSim", "MATSim Operation Listeners"})
+public class MobsimJfrEvent extends Event {}
+```
+
+The annotations provide metadata that will be included in the recording.
+
+To use the event:
+
+```java
+var event = new MobsimJfrEvent();
+event.begin(); // optional, only required to record a duration
+// do something
+event.end(); // optional, as commit will end the duration automatically
+event.commit(); // commit the event to the recording
+```
+
+If MATSim listeners are not enough and you don't want to or can't insert these instructions into existing library code,
+try aspect-oriented programming via aspectj.
+
+## Aspect-Oriented Programming via aspectj
+
+[AspectJ](https://eclipse.dev/aspectj/doc/latest/index.html) requires a bit more setup.
+The prototype at https://git.tu-berlin.de/stendler/matsim-berlin contains an example on how to include aspectj during build via a maven module.
+But you can also try the aspectj java runtime agent instead.
+
+This library provides aspects to create accurate events equivalent to those created by the FireDefaultProfilingEventsModule.  
+You can include those or refer to those as inspiration to create your own.
