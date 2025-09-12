@@ -615,11 +615,13 @@ final class RailsimEngine implements Steppable {
 		}
 
 		// CHeck element of previous route as well
-		for (int i = state.previousRoute.size() - 1; i >= 1 ; i--) {
-			if (state.previousRoute.get(i - 1).getLinkId().equals(state.tailLink)) {
-				nextTailLink = state.previousRoute.get(i);
+		if (nextTailLink == null)
+			for (int i = state.previousRoute.size() - 1; i >= 0; i--) {
+				if (state.previousRoute.get(i).getLinkId().equals(state.tailLink)) {
+					// Use next link from current route if it is the last
+					nextTailLink = i == state.previousRoute.size() - 1 ? state.route.getFirst() : state.previousRoute.get(i + 1);
+				}
 			}
-		}
 
 		Objects.requireNonNull(nextTailLink, () -> "Could not find next link in route " + state.tailLink);
 
