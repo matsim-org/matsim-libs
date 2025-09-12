@@ -116,6 +116,13 @@ public final class IterationStopWatch {
 		beginIteration(iteration, System.currentTimeMillis());
 	}
 
+	/**
+	 * Sets the current iteration and timestamp of its start, so that the times measured using {@link #beginOperation(String)},
+	 * {@link #endOperation(String)} and {@link #timestamp(String)} are assigned to the correct iteration for
+	 * the analysis.
+	 * @param iteration current iteration to set to
+	 * @param timestamp the iteration started
+	 */
 	public void beginIteration(final int iteration, final long timestamp) {
 		this.iteration = iteration;
 		if (this.iterations.get(this.iteration) == null) {

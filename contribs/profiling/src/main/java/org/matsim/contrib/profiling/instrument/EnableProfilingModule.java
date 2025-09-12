@@ -41,7 +41,15 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Create a JFR profiling recording for the duration of the configured MATSim iterations
+ * Create a JFR profiling recording for the duration of the configured MATSim iterations.
+ * <p>
+ * The recordings are written to a repository in /tmp by default.
+ * To use a different directory (e.g. for more space or faster storage)
+ * 	add the java option {@code -XX:FlightRecorderOptions=repository="/fast"}
+ * </p>
+ * <p>This relies on {@link IterationStartsListener} and {@link IterationEndsListener}, to start/stop the recording
+ * at the respective iterations, which is not fully accurate.
+ * Recordings of at least 3 iterations ensure that at least one iteration is fully recorded.
  */
 public class EnableProfilingModule extends AbstractModule {
 
@@ -124,7 +132,7 @@ public class EnableProfilingModule extends AbstractModule {
 
 			try {
 				log.info("Instantiating JFR Recording");
-				// todo default to profile for now, but could be configurable
+				// todo default to profile for now, but could be configurable in the future
 				recording = new Recording(Configuration.getConfiguration("profile"));
 				recording.setDestination(Path.of(ConfigUtils.addOrGetModule(getConfig(), ControllerConfigGroup.class).getOutputDirectory(), outputFilename + ".jfr"));
 				recording.setName("instrumented-profile-" + startIteration + "-" + endIteration);
@@ -139,7 +147,7 @@ public class EnableProfilingModule extends AbstractModule {
 			recording.setDumpOnExit(true); // in case the jvm exits prematurely?
 
 			// debug: dump all current JFR recoding settings
-			log.info("[PROFILING] Recording settings");
+			log.info("[PROFILING] Recording settings for {}", recording.getName());
 			for (Map.Entry<String,String> setting : recording.getSettings().entrySet()) {
 				log.info("{}: {}", setting.getKey(), setting.getValue());
 			}
@@ -174,12 +182,14 @@ public class EnableProfilingModule extends AbstractModule {
 		public double priority() {
 			// lowest priority to stop recording after all other endListeners
 			return Double.NEGATIVE_INFINITY;
+			// priority really should be an integer not double to avoid unexpected behavior due to IEEE precision
+			// or a totally different approach specifying to order before/after a another specific listener
 		}
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent iterationEndsEvent) {
 			if (iterationEndsEvent.getIteration() == settings.endIteration) {
-				// stop recording - automatically dumped since output path is set and then closed as well
+				// stop recording - automatically dumped since the output path is set and then closed as well
 				settings.recording.stop();
 				if (settings.trace) {
 					// todo if multiple recordings with trace are active, this might turn it off with another still running

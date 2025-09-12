@@ -172,9 +172,10 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 	public JfrSamplingStopwatch(EventStream eventStream) {
 		this.eventStream = eventStream;
 		eventStream.setOrdered(true); // this orders all events by their *commit* time
-		// JFRIterationEvents will occur *after* all the operations happening within them
+		// IterationJfrEvents or AopIterationJfrEvent will occur *after* all the operations happening within them
 		// Thus, we need to collect everything and only can add them to the Stopwatch *after* the iteration is added
-		eventStream.onEvent(getEventName(AopIterationJfrEvent.class), event -> {
+		// fixme: refactor to not rely on custom events to detect the iteration, but use an expected encounter order of operation methods instead.
+		eventStream.onEvent(getEventName(IterationJfrEvent.class), event -> {
 			// start iteration in stopwatch
 			if (event.hasField("iteration")) {
 				iterationCount = Math.max(event.getInt("iteration"), iterationCount);
@@ -207,8 +208,9 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 			iterationCount++;
 		});
 
-		eventStream.onEvent(this::handleAllEvents);
-		// todo switch to all or just the sample events
+		// using all events with stacktrace is way more accurate, but requires AopIterationJfrEvent to accurately detect a new iteration
+		//eventStream.onEvent(this::handleAllEvents);
+		// todo add a way to switch between all or just the sample events
 		eventStream.onEvent("jdk.ExecutionSample", this::handleSampleEvent);
 		eventStream.onEvent("jdk.NativeMethodSample", this::handleSampleEvent);
 
@@ -243,6 +245,10 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 
 	}
 
+	/**
+	 *  Using all events with stacktrace is way more accurate,
+	 *  but requires {@link AopIterationJfrEvent} to accurately detect a new iteration.
+	 */
 	protected void handleAllEvents(RecordedEvent recordedEvent) {
 		switch (recordedEvent.getEventType().getName()) {
 			case "jdk.ExecutionSample":
@@ -257,6 +263,10 @@ public class JfrSamplingStopwatch implements AutoCloseable {
 		handleSampleEvent(recordedEvent);
 	}
 
+	/**
+	 * Check the stacktrace of the given event to detect any configured {@link #operationMethods}
+	 * or if {@link #ongoingOperations} are missing from the stacktrace to consider them ended.
+	 */
 	protected void handleSampleEvent(RecordedEvent event) {
 		var stackTrace = event.getStackTrace();
 		if (stackTrace == null) {

@@ -18,7 +18,8 @@ import java.util.function.Consumer;
 import static org.matsim.contrib.profiling.analysis.JfrEventUtils.getEventName;
 
 /**
- * Service to generate a stopwatch.png from jfr profiling recording files using dedicated operation events.
+ * Service to generate a stopwatch.png from jfr profiling recording files using dedicated operation events,
+ * e.g. from {@link org.matsim.contrib.profiling.events} or {@link org.matsim.contrib.profiling.aop.stopwatch}.
  */
 public class JfrEventStopwatch implements AutoCloseable {
 
