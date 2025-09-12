@@ -27,6 +27,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import jakarta.annotation.Nullable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,6 +62,11 @@ final class TrainState implements TrainPosition {
 	 * Route of this train.
 	 */
 	final List<RailLink> route;
+
+	/**
+	 * Contain all links of previously driven route elements. Only filled when Umlauf is involved.
+	 */
+	final List<RailLink> previousRoute;
 
 	/**
 	 * Current index in the list of route links.
@@ -134,6 +141,7 @@ final class TrainState implements TrainPosition {
 		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
 		this.train = train;
 		this.route = route;
+		this.previousRoute = new ArrayList<>();
 		this.timestamp = timestamp;
 		this.headLink = linkId;
 		this.tailLink = linkId;
@@ -145,6 +153,10 @@ final class TrainState implements TrainPosition {
 	 */
 	void reset(double time, List<RailLink> route) {
 		this.nextStop = pt != null ? pt.getNextTransitStop() : null;
+
+		// Need to remember prev route
+		this.previousRoute.addAll(this.route);
+
 		this.route.clear();
 		this.route.addAll(route);
 		this.timestamp = time;

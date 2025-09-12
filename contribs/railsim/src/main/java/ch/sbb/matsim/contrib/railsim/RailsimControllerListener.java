@@ -166,6 +166,7 @@ public class RailsimControllerListener implements StartupListener {
 		combinedType.setWidth(baseType.getWidth());
 		combinedType.setMaximumVelocity(baseType.getMaximumVelocity());
 		combinedType.setPcuEquivalents(baseType.getPcuEquivalents());
+		combinedType.setNetworkMode(baseType.getNetworkMode());
 
 		// Copy capacity from first type
 		combinedType.getCapacity().setSeats(baseType.getCapacity().getSeats());

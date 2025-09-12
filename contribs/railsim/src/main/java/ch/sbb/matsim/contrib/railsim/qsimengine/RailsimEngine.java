@@ -614,7 +614,12 @@ final class RailsimEngine implements Steppable {
 			}
 		}
 
-		// TODO: when using umlauf (circulation) the id we are looking for might be present in the previous route
+		// CHeck element of previous route as well
+		for (int i = state.previousRoute.size() - 1; i >= 1 ; i--) {
+			if (state.previousRoute.get(i - 1).getLinkId().equals(state.tailLink)) {
+				nextTailLink = state.previousRoute.get(i);
+			}
+		}
 
 		Objects.requireNonNull(nextTailLink, () -> "Could not find next link in route " + state.tailLink);
 

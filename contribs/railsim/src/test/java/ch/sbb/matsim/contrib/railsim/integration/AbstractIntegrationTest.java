@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -52,6 +53,13 @@ abstract class AbstractIntegrationTest {
 			}
 		} else {
 			config = ConfigUtils.loadConfig(configPath.toString());
+		}
+
+		if (new File(scenarioDir, "population.xml").exists()) {
+			config.plans().setInputFile("./population.xml");
+
+			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(8 * 3600));
+			config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(8 * 3600));
 		}
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
