@@ -23,12 +23,13 @@ package org.matsim.analysis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -46,7 +47,7 @@ public final class IterationStopWatch {
 	 */
 	public static final String OPERATION_ITERATION = "iteration";
 
-	/*
+	/**
 	 * Time spent in operations which are not measured in detail.
 	 */
 	public static final String OPERATION_OTHER = "other";
@@ -73,7 +74,8 @@ public final class IterationStopWatch {
 	private int nextOperationPosition = 0;
 
 	/** A formatter for dates, used when writing out the data. */
-	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
+	private final DateTimeFormatter durationFormatter = formatter.withZone(ZoneOffset.UTC);
 
 	/** data structures to identify nested operations */
 	private Stack<String> currentMeasuredOperations;
@@ -111,6 +113,17 @@ public final class IterationStopWatch {
 	 * the analysis.
 	 */
 	public void beginIteration(final int iteration) {
+		beginIteration(iteration, System.currentTimeMillis());
+	}
+
+	/**
+	 * Sets the current iteration and timestamp of its start, so that the times measured using {@link #beginOperation(String)},
+	 * {@link #endOperation(String)} and {@link #timestamp(String)} are assigned to the correct iteration for
+	 * the analysis.
+	 * @param iteration current iteration to set to
+	 * @param timestamp the iteration started
+	 */
+	public void beginIteration(final int iteration, final long timestamp) {
 		this.iteration = iteration;
 		if (this.iterations.get(this.iteration) == null) {
 			this.currentIterationValues = new HashMap<>();
@@ -121,7 +134,7 @@ public final class IterationStopWatch {
 			this.currentIterationChildren = new HashMap<>();
 			this.children.put(this.iteration, this.currentIterationChildren);
 		}
-        this.beginOperation(OPERATION_ITERATION);
+        this.beginOperation(OPERATION_ITERATION, timestamp);
 	}
 
 	/**
@@ -130,6 +143,18 @@ public final class IterationStopWatch {
 	 * @param identifier The name of the beginning operation.
 	 */
 	public void beginOperation(final String identifier) {
+		beginOperation(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that an operation begins.
+	 *
+	 * @param identifier The name of the beginning operation.
+	 * @param timestamp timestamp of the start of the operation
+	 *
+	 * @see #beginOperation(String) for the current time
+	 */
+	public void beginOperation(final String identifier, long timestamp) {
 
 		if (identifier.equals(OPERATION_OTHER)) {
 			throw new RuntimeException("Identifier " + OPERATION_OTHER + " is reserved! Please use another one. Aborting!");
@@ -137,7 +162,7 @@ public final class IterationStopWatch {
 
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
-		this.currentIterationValues.put(ident, System.currentTimeMillis());
+		this.currentIterationValues.put(ident, timestamp);
 
 		this.currentIterationChildren.put(identifier, new ArrayList<>());
 
@@ -152,16 +177,30 @@ public final class IterationStopWatch {
 	}
 
 	/**
-	 * Tells the stop watch that an operation ends. The operation must have been started before with
+	 * Tells the stop watch that an operation ends.
+	 * The operation must have been started before with
 	 * {@link #beginOperation(String)}.
 	 *
 	 * @param identifier The name of the ending operation.
 	 */
 	public void endOperation(final String identifier) {
+		endOperation(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that an operation ends.
+	 * The operation must have been started before with
+	 * {@link #beginOperation(String)}.
+	 *
+	 * @param identifier The name of the ending operation.
+	 * @param timestamp
+	 */
+	public void endOperation(final String identifier, long timestamp) {
 		String ident = "END " + identifier;
 		ensureIdentifier(ident);
 		ensureOperation(identifier);
-		this.currentIterationValues.put(ident, System.currentTimeMillis());
+		// todo ensure the timestamp is not smaller than begin timestamp?
+		this.currentIterationValues.put(ident, timestamp);
 
 
 		this.currentMeasuredOperations.pop();
@@ -171,14 +210,27 @@ public final class IterationStopWatch {
         this.endOperation(OPERATION_ITERATION);
     }
 
+	public void endIteration(long timestamp) {
+		this.endOperation(OPERATION_ITERATION, timestamp);
+	}
+
 	/**
 	 * Tells the stop watch that a special event happened, for which the time should be remembered.
 	 *
 	 * @param identifier The name of the event.
 	 */
 	public void timestamp(final String identifier) {
+		timestamp(identifier, System.currentTimeMillis());
+	}
+
+	/**
+	 * Tells the stop watch that a special event happened, for which the time should be remembered.
+	 *
+	 * @param identifier The name of the event.
+	 */
+	public void timestamp(final String identifier, long timestamp) {
 		ensureIdentifier(identifier);
-		this.currentIterationValues.put(identifier, System.currentTimeMillis());
+		this.currentIterationValues.put(identifier, timestamp);
 	}
 
 	/**
@@ -223,8 +275,7 @@ public final class IterationStopWatch {
 					Long endTime = data.get("END " + identifier);
 					writer.write(delimiter);
 					if (startTime != null && endTime != null) {
-						double diff = (endTime - startTime) / 1000.0;
-						writer.write(Time.writeTime(diff));
+						writer.write(durationFormatter.format(Instant.ofEpochMilli(endTime - startTime)));
 					}
 				}
 
@@ -356,7 +407,7 @@ public final class IterationStopWatch {
 		if (millis == null) {
 			return "";
 		}
-		return this.formatter.format(new Date(millis));
+		return this.formatter.format(Instant.ofEpochMilli(millis));
 	}
 
 }
