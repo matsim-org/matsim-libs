@@ -4,6 +4,7 @@ import jdk.jfr.consumer.RecordingFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * JFR recordings record quite a lot from the system environment.
@@ -25,21 +26,27 @@ public final class ScrubJfrRecording {
 		var filePath = optionalFilePath.get();
 		System.out.println(filePath);
 
+		boolean scrubDestructible = Arrays.asList(args).contains("--all");
+
 		try (var rf = new RecordingFile(filePath)) {
 			rf.write(Path.of(filePath.toString().replace(".jfr", "_scrubbed.jfr")), e -> {
+				// return true to keep, false to discard event
 
 				var eventName = e.getEventType().getName();
-				// commented events exposing local file paths as removing them breaks tooling trying to read the scrubbed file
+				if (scrubDestructible) {
+					// removing these them breaks some tooling trying to read the scrubbed file
 					if (eventName.equals("jdk.InitialSystemProperty") && e.hasField("value") && e.hasField("key")) {
-						return true;
-						//return !"java.class.path".equals(e.getString("key")); // file paths
+						return !"java.class.path".equals(e.getString("key")); // file paths
 					}
-					return !eventName.equals("jdk.InitialEnvironmentVariable")
-						//&& !eventName.equals("jdk.JavaAgent") // file paths
-						//&& !eventName.equals("jdk.JVMInformation") // file paths
-						&& !eventName.equals("jdk.SystemProcess") // parallel running processes
-						//&& !eventName.equals("jdk.ActiveRecording") // file paths
-					;
+					return !eventName.equals("jdk.JavaAgent") // file paths
+						&& !eventName.equals("jdk.JVMInformation") // file paths
+						&& !eventName.equals("jdk.ActiveRecording") // file paths
+						;
+				}
+
+				return !eventName.equals("jdk.InitialEnvironmentVariable")
+					&& !eventName.equals("jdk.SystemProcess") // parallel running processes
+				;
 			});
 		}
 	}
