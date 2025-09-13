@@ -11,9 +11,6 @@ public interface DrtShiftBreak {
 
     double getDuration();
 
-    void schedule(double latestArrivalTime);
+    void schedule();
 
-    boolean isScheduled();
-
-    double getScheduledLatestArrival();
 }

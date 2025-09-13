@@ -24,7 +24,7 @@ public class ShiftStopWaypointFactory implements StopWaypointFactory {
     @Override
     public StopWaypoint createStopWaypoint(DrtStopTask task, DvrpLoad outgoingOccupancy) {
         return switch (task) {
-            case ShiftBreakTask shiftBreakTask -> new ShiftBreakStopWaypoint(shiftBreakTask, type);
+            case ShiftBreakTask shiftBreakTask -> new ShiftBreakStopWaypoint(shiftBreakTask, type, outgoingOccupancy);
             case ShiftChangeOverTask shiftChangeOverTask -> new ShiftChangeoverStopWaypoint(shiftChangeOverTask, type);
             default -> delegate.createStopWaypoint(task, outgoingOccupancy);
         };

@@ -1,4 +1,4 @@
-package org.matsim.contrib.drt.extension.operations.eshifts.fleet;
+package org.matsim.contrib.drt.extension.operations.shifts.fleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -8,8 +8,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.fleet.DefaultShiftDvrpVehicle;
-import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
 import org.matsim.vehicles.Vehicle;
 
