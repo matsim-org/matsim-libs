@@ -2,6 +2,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import static org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType.DEFAULT;
 
+import com.google.inject.Singleton;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 	protected void configureQSim() {
 		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
 		bindModal(PassengerGroupIdentifier.class).toInstance(agent -> Optional.empty());
+		bindModal(DvrpPassengerTracker.class).toProvider(modalProvider(dvrpModeInstanceGetter -> new DvrpPassengerTracker(getMode()))).in(Singleton.class);
 
 		// (PassengerEngine is a more powerful interface.)
 

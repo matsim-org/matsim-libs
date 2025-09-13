@@ -71,6 +71,17 @@ public abstract class MatsimRandom {
 	}
 
 	/**
+	 * Returns an instance of an RNG, which can be used in concurrent setups. In contrast to {@link #getLocalInstance()}, the caller is responsible
+	 * to supply distinct random seeds. The supplied seed is combined with the global seed. Since the global seed is changed each iteration, the
+	 * random number sequence of the returned RNG varies between MATSim iterations.
+	 */
+	public static Random getLocalInstance(final long seed) {
+		var random = new Random(lastUsedSeed + seed * 23l);
+		prepareRNG(random);
+		return random;
+	}
+
+	/**
 	 * Draw some random numbers to better initialize the pseudo-random number generator.
 	 *
 	 * @param rng the random number generator to initialize.

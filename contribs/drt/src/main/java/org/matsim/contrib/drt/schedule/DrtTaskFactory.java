@@ -22,10 +22,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author michalm
  */
+@NodeSingleton
 public interface DrtTaskFactory {
 	DrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path, DrtTaskType drtTaskType);
 

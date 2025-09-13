@@ -27,10 +27,12 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
+@NodeSingleton
 public class DrtRequestInsertionRetryQueue {
 	private final DrtRequestInsertionRetryParams params;
 
