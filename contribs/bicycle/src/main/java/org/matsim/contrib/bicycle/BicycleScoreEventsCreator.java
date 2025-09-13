@@ -115,7 +115,10 @@ class BicycleScoreEventsCreator implements
 			double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
 				event.getVehicleId(), this.bicycleMode );
 
-			// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode. -sm0825
+			// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+//			it would be more straight forward to do the mode check here,
+//			but we do not have the Vehicles Object in this class, which we need to retrieve the mode
+//			of the current vehicle. -sm0925
 			if (!Double.isNaN(amount)) {
 				if ( this.bicycleConfig.isMotorizedInteraction() ) {
 					// yyyy this is the place where instead a data structure would need to be build that counts interaction with every car
@@ -154,7 +157,10 @@ class BicycleScoreEventsCreator implements
 				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ),
 					event.getVehicleId(), this.bicycleMode);
 
-				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode. -sm0825
+				// only throw PersonScoreEvent if amount != NaN = mode of vehicle equals bicycleMode.
+//				it would be more straight forward to do the mode check here,
+//				but we do not have the Vehicles Object in this class, which we need to retrieve the mode
+//				of the current vehicle. -sm0925
 				if (!Double.isNaN(amount)) {
 					final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );
 					Gbl.assertNotNull( driverOfVehicle );
