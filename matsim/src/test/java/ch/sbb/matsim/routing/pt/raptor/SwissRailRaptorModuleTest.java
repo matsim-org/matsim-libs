@@ -46,7 +46,7 @@ import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.events.ControlerEvent;
+import org.matsim.core.controler.events.ControllerEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -298,7 +298,7 @@ public class SwissRailRaptorModuleTest {
             @Override
             public void install() {
                 install(new SwissRailRaptorModule());
-                addControlerListenerBinding().to(ScheduleModifierControlerListener.class);
+                addControllerListenerBinding().to(ScheduleModifierControllerListener.class);
             }
         });
 
@@ -382,7 +382,7 @@ public class SwissRailRaptorModuleTest {
         Assertions.assertEquals(-60.0, parameters.getRaptorParameters(personB).getMarginalUtilityOfWaitingPt_utl_s(), 1e-3);
     }
 
-    private static class ScheduleModifierControlerListener implements StartupListener, IterationStartsListener {
+    private static class ScheduleModifierControllerListener implements StartupListener, IterationStartsListener {
 
         @Override
         public void notifyIterationStarts(IterationStartsEvent event) {
@@ -397,7 +397,7 @@ public class SwissRailRaptorModuleTest {
             event.getServices().getEvents().processEvent(new TransitScheduleChangedEvent(0.0));
         }
 
-        private void addLineAndStop(ControlerEvent event, int iteration) {
+        private void addLineAndStop(ControllerEvent event, int iteration) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
             TransitScheduleFactory scheduleFactory = schedule.getFactory();
             Vehicles transitVehicles = event.getServices().getScenario().getTransitVehicles();
@@ -436,7 +436,7 @@ public class SwissRailRaptorModuleTest {
             schedule.addTransitLine(addedLine);
         }
 
-        private void removeGreenLineAndStop(ControlerEvent event) {
+        private void removeGreenLineAndStop(ControllerEvent event) {
             TransitSchedule schedule = event.getServices().getScenario().getTransitSchedule();
 
             // Remove a line and a stop only served by that line

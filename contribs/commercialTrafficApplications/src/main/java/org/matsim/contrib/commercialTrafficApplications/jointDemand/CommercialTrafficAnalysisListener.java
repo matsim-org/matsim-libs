@@ -75,7 +75,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
         format.setGroupingUsed(false);
 
         writeIterationCarrierStats(event);
-        writeJobStats(services.getControlerIO().getIterationFilename(event.getIteration(), "commercialJobStats.csv"));
+        writeJobStats(services.getControllerIO().getIterationFilename(event.getIteration(), "commercialJobStats.csv"));
         analyzeCarrierMarketShares(event.getIteration());
 
         firstIteration = false;
@@ -99,7 +99,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
                         .count());
             }
 
-            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
+            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControllerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
                 if (firstIteration) {
                     csvPrinter.printRecord(carrierDeliveries.keySet());
                 }
@@ -125,7 +125,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
                 chart.addSeries(carrier, history);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".png"), 800, 600);
+            chart.saveAsPng(services.getControllerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".png"), 800, 600);
 
         }
 
@@ -167,7 +167,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
                     .mapToDouble(ScoreCommercialJobs.DeliveryLogEntry::getTimeDifference)
                     .summaryStatistics();
 
-            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControlerIO().getOutputFilename("carrierStats." + carrier.getId() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
+            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControllerIO().getOutputFilename("carrierStats." + carrier.getId() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
                 if (firstIteration) {
                     csvPrinter.printRecord("Iteration", "Carrier", "Tours", "Total Distance (km)", "Average Tour Distance (km)", "Deliveries", "AverageScore", "TotalScore", "AverageDelay", "MaximumDelay");
                 }

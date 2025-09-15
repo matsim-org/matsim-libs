@@ -53,11 +53,11 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 		Object2DoubleMap<Integer> stopVolume = trafficVolumePerTypeAndZone_stop.get(trafficVolumeKey_stop);
 
 		if (startVolume != null && startVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_start, modeORvehType, purpose, "Start", trafficVolumeKey_start.zone());
 		else if (startVolume != null)
 			startVolume.mergeDouble(purpose, -1, Double::sum);
 		if (stopVolume != null && stopVolume.getDouble(purpose) == 0)
-			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.getZone());
+			reduceVolumeForOtherArea(trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, "Stop", trafficVolumeKey_stop.zone());
 		else if (stopVolume != null)
 			stopVolume.mergeDouble(purpose, -1, Double::sum);
 	}
@@ -92,12 +92,12 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			trafficVolumePerTypeAndZone.keySet());
 		Collections.shuffle(shuffledKeys, MatsimRandom.getRandom());
 		for (TrafficVolumeGeneration.TrafficVolumeKey trafficVolumeKey : shuffledKeys) {
-			if (trafficVolumeKey.getModeORvehType().equals(modeORvehType)
+			if (trafficVolumeKey.modeORvehType().equals(modeORvehType)
 				&& trafficVolumePerTypeAndZone.get(trafficVolumeKey).getDouble(purpose) > 0) {
 				trafficVolumePerTypeAndZone.get(trafficVolumeKey).mergeDouble(purpose, -1, Double::sum);
 				log.warn(
 					"{}-Volume of zone {} (mode '{}', purpose '{}') was reduced because the volume for the zone {}, where an existing model has a demand, has a generated demand of 0.",
-					volumeType, trafficVolumeKey.getZone(), modeORvehType, purpose, originalZone);
+					volumeType, trafficVolumeKey.zone(), modeORvehType, purpose, originalZone);
 				break;
 			}
 		}
@@ -120,7 +120,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-			.setSkipHeaderRecord(true).build().parse(IOUtils.getBufferedReader(locationOfExistingModels));
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(locationOfExistingModels));
 		for (CSVRecord record : parse) {
 			String modelName = record.get("model");
 			double sampleSizeExistingScenario = Double.parseDouble(record.get("sampleSize"));
@@ -343,15 +343,15 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 
 	@Override
 	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, Map<String, Map<Id<Link>, Link>> linksPerZone,
-													String smallScaleCommercialTrafficType,
+													GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
 													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
 			if (!carrier.getAttributes().getAsMap().containsKey("subpopulation")
-				|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType))
+				|| !carrier.getAttributes().getAttribute("subpopulation").equals(smallScaleCommercialTrafficType.toString()))
 				continue;
 			String modeORvehType;
-			if (smallScaleCommercialTrafficType.equals("goodsTraffic"))
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic))
 				modeORvehType = (String) carrier.getAttributes().getAttribute("vehicleType");
 			else
 				modeORvehType = "total";

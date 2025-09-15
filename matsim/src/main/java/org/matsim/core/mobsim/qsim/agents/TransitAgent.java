@@ -38,10 +38,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -61,7 +58,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	}
 
 	private TransitAgent(final Person p, final Netsim simulation, TimeInterpretation timeInterpretation) {
-		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
+		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(),
 				simulation.getSimTimer(), timeInterpretation ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
 		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate, simulation.getScenario().getConfig().transit().getBoardingAcceptance() );
@@ -102,7 +99,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	@Override
 	public final Double getExpectedTravelDistance() {
 		return basicAgentDelegate.getExpectedTravelDistance();
-	}	
+	}
 	@Override
 	public final PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
@@ -163,6 +160,12 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	public final boolean getExitAtStop(TransitStopFacility stop) {
 		return transitAgentDelegate.getExitAtStop(stop);
 	}
+
+	@Override
+	public boolean getRelocationAtStop(TransitStopFacility stop) {
+		return transitAgentDelegate.getRelocationAtStop(stop);
+	}
+
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {

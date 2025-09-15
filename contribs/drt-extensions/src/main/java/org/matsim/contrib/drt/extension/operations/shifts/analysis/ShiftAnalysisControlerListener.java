@@ -151,7 +151,7 @@ public class ShiftAnalysisControlerListener implements IterationEndsListener {
     }
 
     private String filename(IterationEndsEvent event, String prefix, String extension) {
-        return matsimServices.getControlerIO()
+        return matsimServices.getControllerIO()
                 .getIterationFilename(event.getIteration(), prefix + "_" + drtConfigGroup.getMode() + extension);
     }
 

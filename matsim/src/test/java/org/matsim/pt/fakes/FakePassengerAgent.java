@@ -77,7 +77,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		return null;
 	}
-	
+
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		return null;

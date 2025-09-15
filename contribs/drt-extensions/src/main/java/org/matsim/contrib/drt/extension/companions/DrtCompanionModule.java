@@ -50,7 +50,7 @@ public class DrtCompanionModule extends AbstractDvrpModeModule {
 					getter.get(Scenario.class), //
 					this.drtWithExtensionsConfigGroup)))
 			.asEagerSingleton();
-		addControlerListenerBinding().to(modalKey(DrtCompanionRideGenerator.class));
+		addControllerListenerBinding().to(modalKey(DrtCompanionRideGenerator.class));
 		installOverridingQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {

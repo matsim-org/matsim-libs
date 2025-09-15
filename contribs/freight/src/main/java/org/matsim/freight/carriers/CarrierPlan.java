@@ -22,6 +22,8 @@
 package org.matsim.freight.carriers;
 
 import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -117,6 +119,21 @@ public class CarrierPlan implements BasicPlan, Attributable {
 
 	public Collection<ScheduledTour> getScheduledTours() {
 		return scheduledTours;
+	}
+
+	/**
+	 * Returns a specific scheduledTour
+	 *
+	 * @param tourId
+	 * @return the scheduled tour with the tourId
+	 */
+	public Tour getScheduledTour(Id<Tour> tourId) {
+		//This can be even shorter, once the scheduledTours is a Map and no longer a Collection. KMT Aug'25
+		return scheduledTours.stream()
+			.filter(st -> st.getTour().getId().equals(tourId))
+			.findFirst()
+			.orElseThrow(() -> new IllegalStateException("Could not find scheduled tour for id " + tourId))
+			.getTour();
 	}
 
 	@Override

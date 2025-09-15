@@ -20,14 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 
 /**
@@ -45,7 +45,7 @@ public interface PTPassengerAgent extends PassengerAgent {
 	 * @param route the route being served
 	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
 	 */
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, 
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute,
 			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle);
 
 	/**
@@ -57,14 +57,21 @@ public interface PTPassengerAgent extends PassengerAgent {
 	 * @return <code>true</code> if the passenger wants to exit the vehicle, <code>false</code> otherwise
 	 */
 	public boolean getExitAtStop(final TransitStopFacility stop);
-	
+
+	/**
+	 * Check whether the agent needs to relocate to another vehicle as part of a chained leg.
+	 */
+	default public boolean getRelocationAtStop(final TransitStopFacility stop) {
+		return false;
+	}
+
 	/**
 	 * Asks a passenger which is departing on a transit leg about the stop it wants to use for accessing the transit line.
-	 * 
+	 *
 	 * @return The transit stop id.
 	 */
 	public Id<TransitStopFacility> getDesiredAccessStopId();
-	
+
 	public Id<TransitStopFacility> getDesiredDestinationStopId();
 
 	/**

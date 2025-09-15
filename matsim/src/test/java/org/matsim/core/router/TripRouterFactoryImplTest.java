@@ -18,8 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 package org.matsim.core.router;
+
+import jakarta.inject.Provider;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,7 +37,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.DefaultPrepareForSimModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -45,8 +50,6 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import jakarta.inject.Provider;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +57,7 @@ import java.util.Map;
 
 /**
  * Tests the router returned by the default factory.
+ *
  * @author thibautd
  */
 public class TripRouterFactoryImplTest {
@@ -62,45 +66,50 @@ public class TripRouterFactoryImplTest {
 	 * When not using PT but using a multimodal network, car should not be routed on links restricted to pt modes,
 	 * such as railways.
 	 */
-	@Test
-	void testRestrictedNetworkNoPt() throws Exception {
+	@ParameterizedTest
+	@EnumSource(value = RoutingConfigGroup.AccessEgressType.class, names = {"none", "accessEgressModeToLink"})
+	void testRestrictedNetworkNoPt(RoutingConfigGroup.AccessEgressType accessEgressType) throws Exception {
 		Config config = ConfigUtils.createConfig();
-		config.transit().setUseTransit( false );
+		config.transit().setUseTransit(false);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setAccessEgressType(accessEgressType);
 
-		testRestrictedNetwork( config );
+		testRestrictedNetwork(config);
 	}
 
 	private static void testRestrictedNetwork(final Config config) throws Exception {
 		// create a simple scenario, with two parallel links,
 		// a long one for cars, a short one for pt.
-		final Scenario scenario = ScenarioUtils.createScenario( config );
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
-		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class ) , new Coord((double) 0, (double) 0));
-		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class ) , new Coord((double) 0, (double) 0));
-		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class ) , new Coord((double) 0, (double) 0));
+		Node n1 = net.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = net.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 0, (double) 0));
+		Node n3 = net.getFactory().createNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node n4 = net.getFactory().createNode(Id.create(4, Node.class), new Coord((double) 0, (double) 0));
 
-		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
-		Link l2c = net.getFactory().createLink( Id.create( "l2c", Link.class ) , n2 , n3 );
-		Link l2pt = net.getFactory().createLink( Id.create( "l2pt", Link.class ) , n2 , n3 );
-		Link l3 = net.getFactory().createLink( Id.create( "l3", Link.class ) , n3 , n4 );
+		Link l1 = net.getFactory().createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2c = net.getFactory().createLink(Id.create("l2c", Link.class), n2, n3);
+		Link l2pt = net.getFactory().createLink(Id.create("l2pt", Link.class), n2, n3);
+		Link l3 = net.getFactory().createLink(Id.create("l3", Link.class), n3, n4);
 
-		l2c.setAllowedModes( Collections.singleton( TransportMode.car ) );
-		l2c.setLength( 1000 );
-		l2pt.setAllowedModes( Collections.singleton( TransportMode.pt ) );
-		l2pt.setLength( 10 );
+		l2c.setAllowedModes(Collections.singleton(TransportMode.car));
+		l2c.setLength(1000);
+		l2pt.setAllowedModes(Collections.singleton(TransportMode.pt));
+		l2pt.setLength(10);
 
-		net.addNode( n1 );
-		net.addNode( n2 );
-		net.addNode( n3 );
-		net.addNode( n4 );
+		net.addNode(n1);
+		net.addNode(n2);
+		net.addNode(n3);
+		net.addNode(n4);
 
-		net.addLink( l1 );
-		net.addLink( l2c );
-		net.addLink( l2pt );
-		net.addLink( l3 );
+		net.addLink(l1);
+		net.addLink(l2c);
+		net.addLink(l2pt);
+		net.addLink(l3);
+
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		scenario.getPopulation().addPerson(p);
 
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
@@ -110,12 +119,14 @@ public class TripRouterFactoryImplTest {
 					public void install() {
 						install(new ScenarioByInstanceModule(scenario));
 						install(new TimeInterpretationModule());
-						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+						install(new DefaultPrepareForSimModule());
 					}
 				}));
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		// create the factory, get a router, route.
 		Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
@@ -123,63 +134,68 @@ public class TripRouterFactoryImplTest {
 		TripRouter router = factory.get();
 
 		List<? extends PlanElement> trip = router.calcRoute(
-				TransportMode.car,
-				new LinkFacility( l1 ),
-				new LinkFacility( l3 ),
-				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
-
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
+			TransportMode.car,
+			new LinkFacility(l1),
+			new LinkFacility(l3),
+			0,
+			p, new AttributesImpl());
+		Leg l = (Leg) trip.get(0);
+		if (!scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+			l = (Leg) trip.get(2);
 		}
+
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
 
 		Assertions.assertEquals(
-				1,
-				r.getLinkIds().size(),
-				"unexpected route length "+r.getLinkIds() );
+			1,
+			r.getLinkIds().size(),
+			"unexpected route length " + r.getLinkIds());
 
 		Assertions.assertEquals(
-				l2c.getId(),
-				r.getLinkIds().get( 0 ),
-				"unexpected link");
+			l2c.getId(),
+			r.getLinkIds().get(0),
+			"unexpected link");
 	}
 
 	/**
 	 * Checks that routes are found when using a monomodal network (ie modes are not restricted)
 	 */
-	@Test
-	void testMonomodalNetwork() throws Exception {
+	@ParameterizedTest
+	@EnumSource(value = RoutingConfigGroup.AccessEgressType.class, names = {"none", "accessEgressModeToLink"})
+	void testMonomodalNetwork(RoutingConfigGroup.AccessEgressType accessEgressType) throws Exception {
 		final Config config = ConfigUtils.createConfig();
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-		final Scenario scenario = ScenarioUtils.createScenario( config );
+		config.routing().setAccessEgressType(accessEgressType);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class) , new Coord((double) 0, (double) 0));
-		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class) , new Coord((double) 0, (double) 0));
-		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class) , new Coord((double) 0, (double) 0));
-		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class) , new Coord((double) 0, (double) 0));
+		Node n1 = net.getFactory().createNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = net.getFactory().createNode(Id.create(2, Node.class), new Coord((double) 0, (double) 0));
+		Node n3 = net.getFactory().createNode(Id.create(3, Node.class), new Coord((double) 0, (double) 0));
+		Node n4 = net.getFactory().createNode(Id.create(4, Node.class), new Coord((double) 0, (double) 0));
 
-		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
-		Link l2long = net.getFactory().createLink( Id.create( "l2long", Link.class ) , n2 , n3 );
-		Link l2short = net.getFactory().createLink( Id.create( "l2short", Link.class ) , n2 , n3 );
-		Link l3 = net.getFactory().createLink( Id.create( "l3", Link.class ) , n3 , n4 );
+		Link l1 = net.getFactory().createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2long = net.getFactory().createLink(Id.create("l2long", Link.class), n2, n3);
+		Link l2short = net.getFactory().createLink(Id.create("l2short", Link.class), n2, n3);
+		Link l3 = net.getFactory().createLink(Id.create("l3", Link.class), n3, n4);
 
-		l2long.setLength( 1000 );
-		l2short.setLength( 10 );
+		l2long.setLength(1000);
+		l2short.setLength(10);
 
-		net.addNode( n1 );
-		net.addNode( n2 );
-		net.addNode( n3 );
-		net.addNode( n4 );
+		net.addNode(n1);
+		net.addNode(n2);
+		net.addNode(n3);
+		net.addNode(n4);
 
-		net.addLink( l1 );
-		net.addLink( l2long );
-		net.addLink( l2short );
-		net.addLink( l3 );
+		net.addLink(l1);
+		net.addLink(l2long);
+		net.addLink(l2short);
+		net.addLink(l3);
+
+		Person p = PopulationUtils.getFactory().createPerson(Id.createPersonId("toto"));
+		scenario.getPopulation().addPerson(p);
 
 		// create the factory, get a router, route.
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
@@ -190,39 +206,41 @@ public class TripRouterFactoryImplTest {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.scoring() ));
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.scoring()));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
 				}));
+				install(new DefaultPrepareForSimModule());
 			}
 		});
+		injector.getInstance(PrepareForSim.class).run();
 
 		TripRouter router = injector.getInstance(TripRouter.class);
 
 		List<? extends PlanElement> trip = router.calcRoute(
-				TransportMode.car,
-				new LinkFacility( l1 ),
-				new LinkFacility( l3 ),
-				0,
-				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)), new AttributesImpl());
+			TransportMode.car,
+			new LinkFacility(l1),
+			new LinkFacility(l3),
+			0,
+			p, new AttributesImpl());
 
-		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			l = (Leg) trip.get(2) ;
+		Leg l = (Leg) trip.get(0);
+		if (!scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+			l = (Leg) trip.get(2);
 		}
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
 
 		Assertions.assertEquals(
-				1,
-				r.getLinkIds().size(),
-				"unexpected route length "+r.getLinkIds() );
+			1,
+			r.getLinkIds().size(),
+			"unexpected route length " + r.getLinkIds());
 
 		Assertions.assertEquals(
-				l2short.getId(),
-				r.getLinkIds().get( 0 ),
-				"unexpected link");
+			l2short.getId(),
+			r.getLinkIds().get(0),
+			"unexpected link");
 	}
 
 	private static class LinkFacility implements Facility {

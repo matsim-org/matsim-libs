@@ -201,6 +201,18 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<Person> pId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON), Person.class);
 			Id<Vehicle> vId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 			this.events.processEvent(new PersonLeavesVehicleEvent(time, pId, vId));
+		} else if (PersonContinuesInVehicleEvent.EVENT_TYPE.equals(eventType)) {
+
+			Id<Person> personId = Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_PERSON), Person.class);
+			String fromVehicleValue = atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FROM_VEHICLE);
+			Id<Vehicle> fromVehicleId = fromVehicleValue != null ? Id.create(fromVehicleValue, Vehicle.class) : null;
+			Id<Vehicle> vehicleId = Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
+
+			String stopValue = atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FACILITY);
+			Id<TransitStopFacility> stopId = stopValue != null ? Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class) : null;
+
+			this.events.processEvent(new PersonContinuesInVehicleEvent(time, personId, fromVehicleId, vehicleId, stopId));
+
 		} else if (TeleportationArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TeleportationArrivalEvent(
 				time,

@@ -53,7 +53,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		generate(Path.of(event.getServices().getControlerIO().getOutputPath()));
+		generate(Path.of(event.getServices().getControllerIO().getOutputPath()));
 	}
 
 
@@ -140,7 +140,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		simWrapper.run(Path.of(event.getServices().getControlerIO().getOutputPath()));
+		simWrapper.run(Path.of(event.getServices().getControllerIO().getOutputPath()));
 	}
 
 	/**

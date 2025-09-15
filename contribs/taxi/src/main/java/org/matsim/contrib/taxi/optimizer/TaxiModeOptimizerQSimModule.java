@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdaterImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.taxi.analysis.TaxiEventSequenceCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -112,7 +113,7 @@ public class TaxiModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				});
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+				getter -> new ScheduleTimingUpdaterImpl(getter.get(MobsimTimer.class),
 						new TaxiStayTaskEndTimeCalculator(taxiCfg), DriveTaskUpdater.NOOP))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(

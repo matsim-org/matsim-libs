@@ -58,6 +58,7 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
@@ -134,7 +135,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     controller.run();
 
-    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controller.getControllerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
@@ -202,7 +203,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 () -> {
                                   LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                                   strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                                  strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
+
+									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+									strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+									strategyManager.addStrategy(strategy, null, 4);
                                   strategyManager.setMaxPlansPerAgent(5);
                                   strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                                   return strategyManager;
@@ -260,7 +264,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
@@ -399,7 +403,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");

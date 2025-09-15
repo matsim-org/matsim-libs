@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -88,10 +87,10 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 		this.delimiter = event.getServices().getConfig().global().getDefaultDelimiter().charAt(0);
 		// initialize all default writers
 		CompressionType compressionType = event.getServices().getConfig().controller().getCompressionType();
-		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
+		this.planInheritanceRecordWriter = new PlanInheritanceRecordWriter(event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + ".csv", compressionType));
 		this.strategies = this.getActiveStrategies(event.getServices().getConfig().replanning().getStrategySettings(), event.getServices().getStrategyManager());
-		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
-		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControlerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
+		this.selectedPlanStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares_selected.csv"));
+		this.planStrategyShareWriter = this.initializeDistributionWriter(this.strategies, event.getServices().getControllerIO().getOutputFilename(FILENAME_PLAN_INHERITANCE_RECORDS + "_shares.csv"));
 
 		// reset all plan attributes that might be present from a previously performed matsim run
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
@@ -265,6 +264,6 @@ public class PlanInheritanceModule extends AbstractModule implements StartupList
 
 	@Override
 	public void install() {
-		if (getConfig().planInheritance().getEnabled()) addControlerListenerBinding().to(PlanInheritanceModule.class);
+		if (getConfig().planInheritance().getEnabled()) addControllerListenerBinding().to(PlanInheritanceModule.class);
 	}
 }

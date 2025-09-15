@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 /**
  * Collects {@link StageContainer} and creates {@link PersonMoneyEvent} for
  * each (commuter) agent.
- * 
+ *
  * @author aneumann
  */
 final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
@@ -49,7 +49,7 @@ final class StageContainer2AgentMoneyEvent implements StageContainerHandler, Aft
 	private final TicketMachineI ticketMachine;
 
 	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
-		controler.addControlerListener(this);
+		controler.addControllerListener(this);
 		this.eventsManager = controler.getEvents();
 		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime().seconds();
 		this.ticketMachine = ticketMachine;
@@ -70,7 +70,7 @@ final class StageContainer2AgentMoneyEvent implements StageContainerHandler, Aft
 	@Override
 	public void handleFareContainer(StageContainer stageContainer) {
 		this.agentId2stageContainerListMap.computeIfAbsent(stageContainer.getAgentId(), k -> new LinkedList<>());
-		
+
 		this.agentId2stageContainerListMap.get(stageContainer.getAgentId()).add(stageContainer);
 	}
 

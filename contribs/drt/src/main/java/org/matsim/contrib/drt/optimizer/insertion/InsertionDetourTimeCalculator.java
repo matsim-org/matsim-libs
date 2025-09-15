@@ -176,7 +176,7 @@ public class InsertionDetourTimeCalculator {
 			}
 		} else {
 			// case 2: we have a preceding (planned) stop task
-			return (DrtStopTask) vEntry.stops.get(insertionIdx - 1).task;
+			return (DrtStopTask) vEntry.stops.get(insertionIdx - 1).getTask();
 		}
 
 		return null; // otherwise, there is no stop task before
@@ -194,7 +194,7 @@ public class InsertionDetourTimeCalculator {
 		}
 
 		double replacedDriveStartTime = vEntry.getWaypoint(insertionIdx).getDepartureTime();
-		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).task.getBeginTime();
+		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).getTask().getBeginTime();
 
 		// reduce by the idle time before the next stop, to get the actual drive time
 		return replacedDriveEndTime - replacedDriveStartTime - vEntry.getPrecedingStayTime(insertionIdx);
