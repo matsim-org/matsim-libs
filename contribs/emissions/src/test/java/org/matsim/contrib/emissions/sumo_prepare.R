@@ -293,8 +293,8 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 {
   length <- 1000
   velocity_low <- 0
-  velocity_high <- 30
-  acceleration_low <- -0.5
+  velocity_high <- 40
+  acceleration_low <- -1.5
   acceleration_high <- 2
 
   vels <- seq(from=velocity_low*3.6, to=velocity_high*3.6, length.out = length)
@@ -371,8 +371,8 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     labs(fill = "Emission", title = glue("Simulation Heatmap with gradient magnitudes for {selected_component}")) +
     scale_fill_gradient(trans="log", low="black", high="white") +
     scale_color_gradient(trans="log", low="black", high="white") +
-    geom_point(data = sumo_input[0:100,], aes(x = velocity/3.6, y = acceleration), size=0.01) +
-    geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red", size=0.01) +
+    geom_point(data = sumo_input, aes(x = velocity/3.6, y = acceleration), size=0.01) +
+    geom_point(data = sumo_input_inverted_time, aes(x = velocity/3.6, y = acceleration), color="red", size=0.01) +
     theme_minimal()
 
   # Third approach with gradient directions?
@@ -387,12 +387,14 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     theme_minimal()
 }
 
-# Gradient trajectory
+# Trend trajectory
 {
   d <- 0.1
 
-  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
-  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration")) %>%
+    filter(velocity >= d*5)
+  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration")) %>%
+    filter(velocity >= d*5)
 
   offsets <- expand.grid(
     step = seq(-5, 5),
@@ -406,9 +408,9 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
       acceleration = acceleration + step*da,
       velocity = velocity + step*dv
     ) %>%
-    filter(velocity >= 0) %>%
     mutate(i = time, time = row_number()-1, angle = ifelse(dv == 0 & da == 0, NaN, atan2(dv, da) * 180 / pi)) %>%
-    filter(!(is.nan(angle) & step != 1))
+    filter(!is.nan(angle))
+    #filter(!(is.nan(angle) & step != 1))
 
   sumo_input_inverted_time_offsets <- sumo_input_inverted_time %>%
     left_join(offsets %>% mutate(), by = character()) %>%
@@ -416,15 +418,15 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
       acceleration = acceleration + step*da,
       velocity = velocity + step*dv
     ) %>%
-    filter(velocity >= 0) %>%
     mutate(i = time, time = row_number()-1, angle = ifelse(dv == 0 & da == 0, NaN, atan2(dv, da) * 180 / pi)) %>%
-    filter(!(is.nan(angle) & step != 1))
+    filter(!is.nan(angle))
+    #filter(!(is.nan(angle) & step != 1))
 
   write_delim(sumo_input_offsets, "/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_offsets.csv", delim=";", col_names=FALSE)
   write_delim(sumo_input_inverted_time_offsets, "/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time_offsets.csv", delim=";", col_names=FALSE)
 }
 
-# Gradient analysis
+# Trend analysis
 {
   sumo_input_offsets <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_offsets.csv", delim=";", col_names=c("time", "velocity", "acceleration", "step", "da", "dv", "i", "angle"))
   sumo_input_inverted_time_offsets <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time_offsets.csv", delim=";", col_names=c("time", "velocity", "acceleration", "step", "da", "dv", "i", "angle"))
