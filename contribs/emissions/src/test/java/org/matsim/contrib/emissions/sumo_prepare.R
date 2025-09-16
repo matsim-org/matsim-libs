@@ -292,8 +292,8 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 # HeatMap Trajectory
 {
   length <- 1000
-  velocity_low <- 8
-  velocity_high <- 13
+  velocity_low <- 0
+  velocity_high <- 30
   acceleration_low <- -0.5
   acceleration_high <- 2
 
@@ -310,10 +310,10 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 {
   fuel <- "petrol"
   selected_component <- "NOx"
-  velocity_low <- 8
-  velocity_high <- 13
-  acceleration_low <- -0.5
-  acceleration_high <- 2
+  velocity_low <- 0
+  velocity_high <- 130
+  acceleration_low <- -4
+  acceleration_high <- 4
 
   # Read in the default wltp-cycle
   sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration")) %>%
@@ -346,8 +346,8 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     #scale_fill_viridis_c(trans="log") +
     scale_fill_viridis_c() +
     scale_color_viridis_c() +
-    geom_point(data = sumo_input[0:100,], aes(x = velocity/3.6, y = acceleration)) +
-    geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red") +
+    geom_path(data = sumo_input, aes(x = velocity/3.6, y = acceleration)) +
+    geom_path(data = sumo_input_inverted_time, aes(x = velocity/3.6, y = acceleration), color="red") +
     theme_minimal()
 
   # Compute gradient of the output
@@ -363,7 +363,7 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     ungroup() %>%
     #filter(df_da != NaN & df_dv != NaN) %>%
     mutate(grad_mag = sqrt(df_dv^2 + df_da^2),
-           grad_dir = tan(df_dv/df_da))
+           grad_dir = atan2(df_dv, df_da))
 
   # Second approach with gradient-length
   ggplot() +
@@ -385,4 +385,101 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
     geom_point(data = sumo_input, aes(x = velocity/3.6, y = acceleration), size=0.01) +
     geom_point(data = sumo_input_inverted_time[(nrow(sumo_input_inverted_time)-100):nrow(sumo_input_inverted_time),], aes(x = velocity/3.6, y = acceleration), color="red", size=0.01) +
     theme_minimal()
+}
+
+# Gradient trajectory
+{
+  d <- 0.1
+
+  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+
+  offsets <- expand.grid(
+    step = seq(-5, 5),
+    da = c(0, d, -d),
+    dv = c(0, d)
+  )
+
+  sumo_input_offsets <- sumo_input %>%
+    left_join(offsets %>% mutate(), by = character()) %>%
+    mutate(
+      acceleration = acceleration + step*da,
+      velocity = velocity + step*dv
+    ) %>%
+    filter(velocity >= 0) %>%
+    mutate(i = time, time = row_number()-1, angle = ifelse(dv == 0 & da == 0, NaN, atan2(dv, da) * 180 / pi)) %>%
+    filter(!(is.nan(angle) & step != 1))
+
+  sumo_input_inverted_time_offsets <- sumo_input_inverted_time %>%
+    left_join(offsets %>% mutate(), by = character()) %>%
+    mutate(
+      acceleration = acceleration + step*da,
+      velocity = velocity + step*dv
+    ) %>%
+    filter(velocity >= 0) %>%
+    mutate(i = time, time = row_number()-1, angle = ifelse(dv == 0 & da == 0, NaN, atan2(dv, da) * 180 / pi)) %>%
+    filter(!(is.nan(angle) & step != 1))
+
+  write_delim(sumo_input_offsets, "/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_offsets.csv", delim=";", col_names=FALSE)
+  write_delim(sumo_input_inverted_time_offsets, "/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time_offsets.csv", delim=";", col_names=FALSE)
+}
+
+# Gradient analysis
+{
+  sumo_input_offsets <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_offsets.csv", delim=";", col_names=c("time", "velocity", "acceleration", "step", "da", "dv", "i", "angle"))
+  sumo_input_inverted_time_offsets <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time_offsets.csv", delim=";", col_names=c("time", "velocity", "acceleration", "step", "da", "dv", "i", "angle"))
+
+  sumo_output_offsets <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_offsets.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_0", value=value/1000) %>%
+    inner_join(sumo_input_offsets, by = join_by(time, )) %>%
+    group_by(component, angle, step) %>%
+    summarize(mean = mean(value)) %>%
+    filter(!is.na(angle))
+
+  sumo_output_inverted_time_offsets <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_inverted_time_offsets.csv"),
+                                    delim = ";",
+                                    col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                    col_types = cols(
+                                      time = col_integer(),
+                                      velocity = col_double(),
+                                      acceleration = col_double(),
+                                      slope = col_double(),
+                                      CO = col_double(),
+                                      CO2 = col_double(),
+                                      HC = col_double(),
+                                      PMx = col_double(),
+                                      NOx = col_double(),
+                                      fuel = col_double(),
+                                      electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    mutate(model = "SUMO_0", value=value/1000) %>%
+    inner_join(sumo_input_inverted_time_offsets, by = join_by(time, )) %>%
+    group_by(component, angle, step) %>%
+    summarize(mean = mean(value)) %>%
+    filter(!is.na(angle))
+
+  ggplot(sumo_output_offsets) +
+    geom_line(aes(x=step, y=mean)) +
+    facet_wrap(component~angle, scales="free")
+
+  ggplot(sumo_output_inverted_time_offsets) +
+    geom_line(aes(x=step, y=mean)) +
+    facet_wrap(component~angle, scales="free")
+
+
 }
