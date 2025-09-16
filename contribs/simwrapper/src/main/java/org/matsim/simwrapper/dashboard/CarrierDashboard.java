@@ -5,6 +5,9 @@ import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.CarrierViewer;
+import org.matsim.simwrapper.viz.Table;
+
+import java.util.List;
 
 /**
  * Standard dashboard for the carrier viewer.
@@ -29,5 +32,18 @@ public class CarrierDashboard implements Dashboard  {
 			viz.carriers = data.output("(*.)?output_carriers.xml.gz");
 
 		});
+
+		layout.row("CSV")
+			.el(Table.class, (viz, data) -> {
+				viz.title = "Total Carrier Information";
+//				viz.description = "by pollutant";
+				viz.dataset = data.output ("analysis/freight/Carriers_stats.tsv");
+				viz.enableFilter = false;
+				viz.showAllRows = false;
+//				viz.width = 1d;
+				viz.style = "topsheet";
+				viz.show = List.of("carrierId", "nuOfTours", "jSpritScoreSelectedPlan", "nuOfJobs_planned", "demandSize_handled", "noOfJobs_notHandled", "jspritComputationTime");
+				viz.alignment = new String[]{"left"};
+			});
 	}
 }
