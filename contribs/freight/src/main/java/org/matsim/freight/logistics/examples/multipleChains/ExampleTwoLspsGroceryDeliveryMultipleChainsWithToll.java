@@ -33,10 +33,12 @@ import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -372,7 +374,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 //									strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
 								}
 								{
-									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
 									strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
 									strategyManager.addStrategy(strategy, null, 4);
 								}
@@ -471,9 +473,11 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDelivery);
 
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
+			.addLogisticChain(twoEchelonChain)  //make the 2-ech. chain the first one ....
 			.addLogisticChain(directChain)
-			.addLogisticChain(twoEchelonChain)
-			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
+			.setInitialShipmentAssigner(MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner()); //.. and assign all shipments to the first one.
+		// This will in the end ensure, that all shipments within a tolled zone are initially on the hub chain and avoid, that the ReplanningStrategy needs to move them from the direct chain to the 2-e chain.
+		// KMT sep'25
 
 		return LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
 			.setInitialPlan(lspPlan)
