@@ -19,11 +19,12 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
-import com.google.inject.Inject;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,8 +47,16 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import com.google.inject.Inject;
+
+import ch.sbb.matsim.contrib.railsim.RailsimFormationsManager;
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 
 /**
  * QSim Engine to integrate microscopically simulated train movement.
@@ -60,6 +69,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private final RailsimConfigGroup config;
 	private final RailResourceManager res;
 	private final TrainDisposition disposition;
+	private final RailsimFormationsManager formationsManager;
 	private final Set<String> modes;
 	private final Queue<NetworkChangeEvent> networkChangeEvents;
 	private final TransitStopAgentTracker agentTracker;
@@ -68,11 +78,12 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, RailsimFormationsManager formationsManager) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
+		this.formationsManager = formationsManager;
 		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
 		this.networkChangeEvents = new PriorityQueue<>(Comparator.comparing(NetworkChangeEvent::getStartTime));
@@ -154,6 +165,14 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 		if (link instanceof QLinkI qLink) {
 			qLink.unregisterAdditionalAgentOnLink(agent.getId());
 			qLink.removeParkedVehicle(driver.getVehicle().getId());
+		}
+
+		// Check if this vehicle has a formation and throw formation event
+		Id<Vehicle> vehicleId = driver.getVehicle().getId();
+		if (formationsManager.hasFormation(vehicleId)) {
+			List<String> units = formationsManager.getFormation(vehicleId);
+			RailsimFormationEvent formationEvent = new RailsimFormationEvent(now, vehicleId, units);
+			qsim.getEventsManager().processEvent(formationEvent);
 		}
 
 		return engine.handleDeparture(now, driver, linkId, networkRoute);

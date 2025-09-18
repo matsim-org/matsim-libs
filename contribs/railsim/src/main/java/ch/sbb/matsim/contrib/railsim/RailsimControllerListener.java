@@ -1,6 +1,9 @@
 package ch.sbb.matsim.contrib.railsim;
 
-import jakarta.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -16,9 +19,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import jakarta.inject.Inject;
 
 /**
  * General railsim listener
@@ -28,16 +29,21 @@ public class RailsimControllerListener implements StartupListener {
 	private static final Logger log = LogManager.getLogger(RailsimControllerListener.class);
 
 	private final Scenario scenario;
+	private final RailsimFormationsManager formationsManager;
 
 	@Inject
-	public RailsimControllerListener(Scenario scenario) {
+	public RailsimControllerListener(Scenario scenario, RailsimFormationsManager formationsManager) {
 		this.scenario = scenario;
+		this.formationsManager = formationsManager;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		createVehiclesForUnits(scenario.getTransitSchedule(), scenario.getTransitVehicles());
+		
+		// Initialize formations manager with the processed formations
+		formationsManager.initializeFormations(scenario.getTransitSchedule());
 
 	}
 
