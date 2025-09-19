@@ -52,11 +52,13 @@ public class RailsimEngineMovingBlockTest {
 				f.accept(link);
 			}
 		}
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance());
+
+		TrainManager trains = new TrainManager();
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance(), trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, speed, router)), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router)), net);
 	}
 
 	private RailsimTestUtils.Holder getTestEngine(String network) {

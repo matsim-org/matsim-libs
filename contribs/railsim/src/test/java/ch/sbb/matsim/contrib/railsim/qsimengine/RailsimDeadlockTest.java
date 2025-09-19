@@ -54,11 +54,12 @@ public class RailsimDeadlockTest {
 			}
 		}
 
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla);
+		TrainManager trains = new TrainManager();
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla, trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, speed, router)), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router)), net);
 	}
 
 	@Test

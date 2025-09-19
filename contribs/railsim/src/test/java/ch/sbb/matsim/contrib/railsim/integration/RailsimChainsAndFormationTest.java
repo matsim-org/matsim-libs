@@ -18,4 +18,12 @@ public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
 
 
 	}
+
+	@Test
+	void runSimple() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "simpleFormation"));
+
+
+	}
 }

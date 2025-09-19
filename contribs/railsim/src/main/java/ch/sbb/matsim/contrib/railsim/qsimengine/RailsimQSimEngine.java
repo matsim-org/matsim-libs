@@ -51,7 +51,6 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-import ch.sbb.matsim.contrib.railsim.RailsimFormationsManager;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
@@ -69,7 +68,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private final RailsimConfigGroup config;
 	private final RailResourceManager res;
 	private final TrainDisposition disposition;
-	private final RailsimFormationsManager formationsManager;
+	private final TrainManager trainManager;
 	private final Set<String> modes;
 	private final Queue<NetworkChangeEvent> networkChangeEvents;
 	private final TransitStopAgentTracker agentTracker;
@@ -78,12 +77,12 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, RailsimFormationsManager formationsManager) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, TrainManager trainManager) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
-		this.formationsManager = formationsManager;
+		this.trainManager = trainManager;
 		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
 		this.networkChangeEvents = new PriorityQueue<>(Comparator.comparing(NetworkChangeEvent::getStartTime));
@@ -114,7 +113,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 			networkChangeEvents.addAll(events);
 		}
 
-		engine = new RailsimEngine(qsim.getEventsManager(), config, res, disposition);
+		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition);
 	}
 
 	@Override
@@ -169,8 +168,8 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 		// Check if this vehicle has a formation and throw formation event
 		Id<Vehicle> vehicleId = driver.getVehicle().getId();
-		if (formationsManager.hasFormation(vehicleId)) {
-			List<String> units = formationsManager.getFormation(vehicleId);
+		if (trainManager.hasFormation(vehicleId)) {
+			List<String> units = trainManager.getFormation(vehicleId);
 			RailsimFormationEvent formationEvent = new RailsimFormationEvent(now, vehicleId, units);
 			qsim.getEventsManager().processEvent(formationEvent);
 		}

@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
@@ -63,6 +64,7 @@ public final class RailResourceManager {
 	private final Map<Id<RailResource>, RailResource> resources;
 
 	private final DeadlockAvoidance dla;
+	private final TrainManager trains;
 
 	/**
 	 * Retrieve source id of a link.
@@ -76,20 +78,21 @@ public final class RailResourceManager {
 	}
 
 	@Inject
-	public RailResourceManager(QSim qsim, DeadlockAvoidance dla) {
+	public RailResourceManager(QSim qsim, DeadlockAvoidance dla, TrainManager trainManager) {
 		this(qsim.getEventsManager(),
 			ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class),
 			qsim.getScenario().getNetwork(),
-			dla);
+			dla, trainManager);
 	}
 
 	/**
 	 * Construct resources from network.
 	 */
 	public RailResourceManager(EventsManager eventsManager, RailsimConfigGroup config,
-							   Network network, DeadlockAvoidance dla) {
+							   Network network, DeadlockAvoidance dla, TrainManager trainManager) {
 		this.eventsManager = eventsManager;
 		this.dla = dla;
+		this.trains = trainManager;
 		this.links = new IdMap<>(Link.class, network.getLinks().size());
 
 		// Mapping for resources to be created

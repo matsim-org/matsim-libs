@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -29,22 +30,16 @@ public class RailsimControllerListener implements StartupListener {
 	private static final Logger log = LogManager.getLogger(RailsimControllerListener.class);
 
 	private final Scenario scenario;
-	private final RailsimFormationsManager formationsManager;
 
 	@Inject
-	public RailsimControllerListener(Scenario scenario, RailsimFormationsManager formationsManager) {
+	public RailsimControllerListener(Scenario scenario) {
 		this.scenario = scenario;
-		this.formationsManager = formationsManager;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		createVehiclesForUnits(scenario.getTransitSchedule(), scenario.getTransitVehicles());
-		
-		// Initialize formations manager with the processed formations
-		formationsManager.initializeFormations(scenario.getTransitSchedule());
-
 	}
 
 	/**

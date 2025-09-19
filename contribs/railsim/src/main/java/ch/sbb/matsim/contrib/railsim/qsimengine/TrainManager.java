@@ -17,16 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package ch.sbb.matsim.contrib.railsim;
+package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -37,26 +36,57 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 /**
- * Manager for railsim formations information.
- * Maps vehicle IDs to their constituent unit IDs.
+ * Manager active trains and can access the state of all trains in the simulation.
  */
 @Singleton
-public class RailsimFormationsManager {
+public class TrainManager {
 
-	private static final Logger log = LogManager.getLogger(RailsimFormationsManager.class);
+	private static final Logger log = LogManager.getLogger(TrainManager.class);
 
-	private final Map<Id<Vehicle>, List<String>> formations = new ConcurrentHashMap<>();
+	/**
+	 * Current active trains in the simulation.
+	 */
+	private final List<TrainState> activeTrains = new ArrayList<>();
+
+	/**
+	 * Maps vehicle IDs to their constituent unit IDs.
+	 */
+	private final Map<Id<Vehicle>, List<String>> formations = new LinkedHashMap<>();
 
 	@Inject
-	public RailsimFormationsManager() {
-		// Empty constructor for dependency injection
+	public TrainManager(Scenario scenario) {
+		initializeFormations(scenario.getTransitSchedule());
+	}
+
+	/**
+	 * Empty constructor, not using formations.
+	 */
+	TrainManager() {
+	}
+
+	List<TrainState> getActiveTrains() {
+		return activeTrains;
+	}
+
+	/**
+	 * Remove state and return if it was removed.
+	 */
+	boolean removeActiveTrain(TrainState state) {
+		return activeTrains.remove(state);
+	}
+
+	/**
+	 * Add an active train to the simulation.
+	 */
+	void addActiveTrain(TrainState state) {
+		activeTrains.add(state);
 	}
 
 	/**
 	 * Initialize formations from the transit schedule.
 	 * This should be called during startup.
 	 */
-	public void initializeFormations(TransitSchedule schedule) {
+	private void initializeFormations(TransitSchedule schedule) {
 		formations.clear();
 
 		int formationsProcessed = 0;

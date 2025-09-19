@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
@@ -38,9 +39,6 @@ public class RailsimModule extends AbstractModule {
 	public void install() {
 		installQSimModule(new RailsimQSimModule());
 		ConfigUtils.addOrGetModule(getConfig(), RailsimConfigGroup.class);
-
-		// Bind formations manager as singleton
-		bind(RailsimFormationsManager.class).in(Singleton.class);
 
 		addControllerListenerBinding().to(RailsimControllerListener.class);
 

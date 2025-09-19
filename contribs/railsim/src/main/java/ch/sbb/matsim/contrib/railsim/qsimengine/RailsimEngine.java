@@ -19,15 +19,12 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.stream.Collectors;
-
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.DispositionResponse;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.apache.logging.log4j.LogManager;
@@ -46,10 +43,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleType;
 
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainLeavesLinkEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import java.util.List;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  * Engine to simulate train movement.
@@ -64,15 +62,16 @@ final class RailsimEngine implements Steppable {
 	private static final Logger log = LogManager.getLogger(RailsimEngine.class);
 	private final EventsManager eventsManager;
 	private final RailsimConfigGroup config;
-	private final List<TrainState> activeTrains = new ArrayList<>();
 	private final Queue<UpdateEvent> updateQueue = new PriorityQueue<>();
 	private final RailResourceManager resources;
+	private final TrainManager trainManager;
 	private final TrainDisposition disposition;
 
-	RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainDisposition disposition) {
+	RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainManager trainManager, TrainDisposition disposition) {
 		this.eventsManager = eventsManager;
 		this.config = config;
 		this.resources = resources;
+		this.trainManager = trainManager;
 		this.disposition = disposition;
 	}
 
@@ -140,7 +139,7 @@ final class RailsimEngine implements Steppable {
 
 		state.train.checkConsistency();
 
-		activeTrains.add(state);
+		trainManager.addActiveTrain(state);
 
 		disposition.onDeparture(now, state.driver, state.route);
 
@@ -221,7 +220,7 @@ final class RailsimEngine implements Steppable {
 	}
 
 	private void updateAllPositions(double time) {
-		for (TrainState train : activeTrains) {
+		for (TrainState train : trainManager.getActiveTrains()) {
 			if (train.timestamp < time)
 				updateState(time, new UpdateEvent(train, UpdateEvent.Type.POSITION));
 		}
@@ -478,7 +477,7 @@ final class RailsimEngine implements Steppable {
 					}
 				}
 
-				activeTrains.remove(state);
+				trainManager.removeActiveTrain(state);
 				event.type = UpdateEvent.Type.IDLE;
 			}
 
@@ -988,7 +987,7 @@ final class RailsimEngine implements Steppable {
 	 */
 	void clearTrains(double now) {
 
-		for (TrainState train : activeTrains) {
+		for (TrainState train : trainManager.getActiveTrains()) {
 			eventsManager.processEvent(new VehicleAbortsEvent(now, train.driver.getVehicle().getId(), train.headLink));
 			eventsManager.processEvent(new PersonStuckEvent(now, train.driver.getId(), train.headLink, train.driver.getMode()));
 		}
