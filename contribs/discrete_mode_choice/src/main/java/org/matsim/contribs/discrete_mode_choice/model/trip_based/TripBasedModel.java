@@ -21,7 +21,7 @@ import org.matsim.core.utils.timing.TimeTracker;
 
 /**
  * This class defines a trip-based discrete choice model.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -67,7 +67,7 @@ public class TripBasedModel implements DiscreteModeChoiceModel {
 			TripCandidate finalTripCandidate = null;
 
 			if (tripFilter.filter(person, trip)) {
-				UtilitySelector selector = selectorFactory.createUtilitySelector();
+				UtilitySelector selector = selectorFactory.createUtilitySelector(person, List.of(trip));
 				tripIndex++;
 
 				for (String mode : modes) {
