@@ -62,20 +62,16 @@ public class CarrierViewerDashboardTest {
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 		group.setSampleSize(0.001);
 
-		SimWrapper sw = SimWrapper.create(config);
-		sw.addDashboard(new CarrierDashboard());
-
 		// ## MATSim configuration:  ##
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new SimWrapperModule(sw));
+		controler.addOverridingModule(new SimWrapperModule());
 		controler.run();
 	}
 
 
 	@Test
 	void carrierViewer() {
-		CarrierDashboard cd = new CarrierDashboard();
 
 		runCarrierScenario();
 
