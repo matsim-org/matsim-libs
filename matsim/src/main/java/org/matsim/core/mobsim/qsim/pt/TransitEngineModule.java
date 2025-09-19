@@ -26,6 +26,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.UmlaufBuilder;
 
@@ -52,7 +53,7 @@ public class TransitEngineModule extends AbstractQSimModule {
 
 	@Provides
 	@Singleton
-	public TransitStopAgentTracker transitStopAgentTracker(QSim qSim) {
+	public TransitStopAgentTracker transitStopAgentTracker(Netsim qSim) {
 		return new TransitStopAgentTracker(qSim.getEventsManager(), qSim.getScenario().getTransitSchedule());
 	}
 }

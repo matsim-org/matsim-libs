@@ -1,6 +1,7 @@
 package org.matsim.application;
 
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -16,7 +17,6 @@ import org.matsim.core.utils.io.IOUtils;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
-import jakarta.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -49,20 +49,20 @@ import java.util.concurrent.atomic.AtomicReference;
  * @see Analysis
  */
 @CommandLine.Command(
-		name = MATSimApplication.DEFAULT_NAME,
-		description = {"", "Use the \"run\" command to execute the scenario, or any of the other available commands."},
-		headerHeading = MATSimApplication.HEADER,
-		parameterListHeading = "%n@|bold,underline Parameters:|@%n",
-		optionListHeading = "%n@|bold,underline Options:|@%n",
-		commandListHeading = "%n@|bold,underline Commands:|@%n",
-		footerHeading = "\n",
-		footer = "@|cyan If you would like to contribute or report an issue please go to https://github.com/matsim-org.|@",
-		usageHelpWidth = 120,
-		usageHelpAutoWidth = true,
-		showDefaultValues = true,
-		mixinStandardHelpOptions = true,
-		abbreviateSynopsis = true,
-		subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
+	name = MATSimApplication.DEFAULT_NAME,
+	description = {"", "Use the \"run\" command to execute the scenario, or any of the other available commands."},
+	headerHeading = MATSimApplication.HEADER,
+	parameterListHeading = "%n@|bold,underline Parameters:|@%n",
+	optionListHeading = "%n@|bold,underline Options:|@%n",
+	commandListHeading = "%n@|bold,underline Commands:|@%n",
+	footerHeading = "\n",
+	footer = "@|cyan If you would like to contribute or report an issue please go to https://github.com/matsim-org.|@",
+	usageHelpWidth = 120,
+	usageHelpAutoWidth = true,
+	showDefaultValues = true,
+	mixinStandardHelpOptions = true,
+	abbreviateSynopsis = true,
+	subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
 )
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
@@ -73,10 +73,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	public static final String COLOR = "@|bold,fg(81) ";
 	static final String DEFAULT_NAME = "MATSimApplication";
 	static final String HEADER = COLOR +
-			"  __  __   _ _____ ___ _       \n" +
-			" |  \\/  | /_\\_   _/ __(_)_ __  \n" +
-			" | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
-			" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
+		"  __  __   _ _____ ___ _       \n" +
+		" |  \\/  | /_\\_   _/ __(_)_ __  \n" +
+		" | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
+		" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
 
 	@CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
 	protected String configPath;
@@ -189,8 +189,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
-
+		Controler controler = new Controler(scenario);
 		prepareControler(controler);
 
 		// Check if simulation needs to be run
@@ -239,9 +238,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected List<ConfigGroup> getConfigurableModules() {
 		return Lists.newArrayList(
-				new ControllerConfigGroup(),
-				new GlobalConfigGroup(),
-				new QSimConfigGroup()
+			new ControllerConfigGroup(),
+			new GlobalConfigGroup(),
+			new QSimConfigGroup()
 		);
 	}
 
@@ -405,8 +404,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * 	</ul>
 	 * 	</p>
 	 *
-	 * @param clazz class of the scenario to run
-	 * @param args pass arguments from the main method
+	 * @param clazz       class of the scenario to run
+	 * @param args        pass arguments from the main method
 	 * @param defaultArgs predefined default arguments that will always be present
 	 */
 	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
@@ -427,7 +426,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			// run if no other command is present
 			if (args.length > 0) {
 				// valid command is present
-				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
+				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui")) {
 					// If this is a run command, the default args can be applied
 					if (args[0].equals("run"))
 						args = ApplicationUtils.mergeArgs(args, defaultArgs);
@@ -520,7 +519,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 		app.prepareControler(controler);
 
 		return controler;
@@ -668,8 +667,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		for (ConfigGroup module : modules) {
 
 			CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
-					.headingKey(module.getName())
-					.heading(module.getName() + "\n");
+				.headingKey(module.getName())
+				.heading(module.getName() + "\n");
 
 			for (Map.Entry<String, String> param : module.getParams().entrySet()) {
 
@@ -679,11 +678,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 					desc = desc.replace("%", "%%");
 
 				group.addArg(CommandLine.Model.OptionSpec.builder("--" + module.getName() + "-" + param.getKey())
-						.hideParamSyntax(true)
-						.hidden(false)
-						.description((desc != null ? desc + " " : "") + "Default: ${DEFAULT-VALUE}")
-						.defaultValue(param.getValue())
-						.build());
+					.hideParamSyntax(true)
+					.hidden(false)
+					.description((desc != null ? desc + " " : "") + "Default: ${DEFAULT-VALUE}")
+					.defaultValue(param.getValue())
+					.build());
 
 			}
 
@@ -692,10 +691,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	@CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See prepare help; \n" +
-									     "  needs to be ... \"prepare\", \"help\" ) if run from Java.)",
-			// (This used to be "help prepare", which works as well.  However, "prepare help <subcommand>" then also works while "help
-			// prepare <subcommand>" does not.  So I think that "prepare help" saves some time in understanding help options.  kai, nov'22)
-			subcommands = CommandLine.HelpCommand.class)
+		"  needs to be ... \"prepare\", \"help\" ) if run from Java.)",
+		// (This used to be "help prepare", which works as well.  However, "prepare help <subcommand>" then also works while "help
+		// prepare <subcommand>" does not.  So I think that "prepare help" saves some time in understanding help options.  kai, nov'22)
+		subcommands = CommandLine.HelpCommand.class)
 	public static class PrepareCommand implements Callable<Integer> {
 
 		@CommandLine.Spec
@@ -709,7 +708,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	@CommandLine.Command(name = "analysis", description = "Contains all commands for analysing the scenario. (See help analysis)",
-			subcommands = CommandLine.HelpCommand.class)
+		subcommands = CommandLine.HelpCommand.class)
 	public static class AnalysisCommand implements Callable<Integer> {
 
 		@CommandLine.Spec

@@ -81,14 +81,14 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
-		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, network, requestValidator,
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
+		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, tracker, network, requestValidator,
 				new DefaultTeleportationEngine(scenario, eventsManager, false));
 	}
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -97,8 +97,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		this.network = network;
 		this.requestValidator = requestValidator;
 		this.teleportationEngine = teleportationEngine;
-
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		this.internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
 	@Override
@@ -225,7 +224,9 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			public TeleportingPassengerEngine get() {
 				return new TeleportingPassengerEngine(getMode(), eventsManager, mobsimTimer,
 						getModalInstance(PassengerRequestCreator.class),
-						getModalInstance(TeleportedRouteCalculator.class), getModalInstance(Network.class),
+						getModalInstance(TeleportedRouteCalculator.class),
+						getModalInstance(DvrpPassengerTracker.class),
+						getModalInstance(Network.class),
 						getModalInstance(PassengerRequestValidator.class), scenario);
 			}
 		};

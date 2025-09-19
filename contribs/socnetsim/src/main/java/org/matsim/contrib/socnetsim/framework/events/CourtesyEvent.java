@@ -62,12 +62,12 @@ public class CourtesyEvent extends Event implements HasPersonId {
 	public Id<Person> getPersonId() {
 		return ego;
 	}
-	
+
 	public Id<Person> getAlterId() {
 		return alter;
 	}
 
-	public Type getType() {
+	public Type getTypeEnum() {
 		return type;
 	}
 

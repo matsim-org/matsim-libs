@@ -57,6 +57,7 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
@@ -158,6 +159,8 @@ public final class Config implements MatsimExtensionPoint {
 		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, new ChangeModeConfigGroup());
 
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
+
+		this.modules.put(DSimConfigGroup.CONFIG_MODULE_NAME, new DSimConfigGroup());
 
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
 
@@ -396,6 +399,10 @@ public final class Config implements MatsimExtensionPoint {
 
 	public HermesConfigGroup hermes() {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
+	}
+
+	public DSimConfigGroup dsim() {
+		return (DSimConfigGroup) this.getModule(DSimConfigGroup.CONFIG_MODULE_NAME);
 	}
 
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {

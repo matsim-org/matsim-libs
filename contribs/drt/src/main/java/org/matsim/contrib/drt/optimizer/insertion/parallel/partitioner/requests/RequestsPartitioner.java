@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.requests
 
 import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.RequestData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.List;
 /**
  * @author Steffen Axer
  */
+@NodeSingleton
 public interface RequestsPartitioner {
 	List<Collection<RequestData>> partition(Collection<DrtRequest> unplannedRequests, int n, double collectionPeriod);
 }

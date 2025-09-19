@@ -23,6 +23,8 @@ package org.matsim.core.events.algorithms;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
+import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,6 +35,7 @@ import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+@DistributedEventHandler(value = DistributedMode.NODE_SINGLETON)
 public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	private static final Logger LOG = LogManager.getLogger(EventWriterXML.class);

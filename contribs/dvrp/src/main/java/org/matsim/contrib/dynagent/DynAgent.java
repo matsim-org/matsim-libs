@@ -20,12 +20,14 @@
 package org.matsim.contrib.dynagent;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
@@ -40,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
 
-public final class DynAgent implements MobsimDriverPassengerAgent {
+public final class DynAgent implements DistributedMobsimAgent, MobsimDriverPassengerAgent {
 	private final DynAgentLogic agentLogic;
 
 	private final Id<Person> id;
@@ -71,6 +73,19 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		// initial activity
 		dynActivity = this.agentLogic.computeInitialActivity(this);
 		state = MobsimAgent.State.ACTIVITY;
+	}
+
+	public DynAgent(DynAgentMessage message, EventsManager events, DynAgentLogic agentLogic) {
+		this.id = message.id();
+		this.currentLinkId = message.currentLinkId();
+		this.agentLogic = agentLogic;
+		this.events = events;
+		this.state = message.state();
+
+		// Needed for initialization
+		this.agentLogic.computeInitialActivity(this);
+		this.dynLeg = message.dynLeg();
+		this.dynActivity = message.dynActivity();
 	}
 
 	private void computeNextAction(DynAction oldDynAction, double now) {
@@ -144,7 +159,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// VehicleUsingAgent
 	@Override
-	public final Id<Vehicle> getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		Id<Vehicle> vehId = ((DriverDynLeg) dynLeg).getPlannedVehicleId();
 		// according to BasicPlanAgentImpl
 		return vehId != null ? vehId : Id.create(id, Vehicle.class);
@@ -264,5 +279,10 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	@Override
 	public Facility getDestinationFacility() {
 		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
+	}
+
+	@Override
+	public Message toMessage() {
+		return new DynAgentMessage(id, currentLinkId, veh.getId(), state, dynLeg, dynActivity);
 	}
 }

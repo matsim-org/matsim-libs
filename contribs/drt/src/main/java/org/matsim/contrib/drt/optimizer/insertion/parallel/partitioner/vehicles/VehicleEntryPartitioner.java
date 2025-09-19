@@ -24,11 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.partitioner.RequestData;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@NodeSingleton
 public interface VehicleEntryPartitioner {
 	List<Map<Id<DvrpVehicle>, VehicleEntry>> partition(
 		Map<Id<DvrpVehicle>, VehicleEntry> entries, List<Collection<RequestData>> requestsPartitions);

@@ -19,8 +19,11 @@
  */
 package org.matsim.contrib.drt.passenger;
 
+import org.matsim.core.mobsim.dsim.NodeSingleton;
+
 import java.util.Optional;
 
+@NodeSingleton
 public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 
 	@Override
