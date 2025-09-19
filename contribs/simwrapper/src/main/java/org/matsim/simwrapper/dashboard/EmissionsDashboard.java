@@ -81,4 +81,9 @@ public class EmissionsDashboard implements Dashboard {
 		// TODO: emissions by vehicle type
 
 	}
+
+	@Override
+	public double priority() {
+		return 1;
+	}
 }
