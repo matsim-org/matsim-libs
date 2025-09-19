@@ -7,13 +7,12 @@ import org.matsim.core.gbl.Gbl;
  */
 public class DefaultShiftBreakImpl implements DrtShiftBreak {
 
-    private final static double UNSCHEDULED_ARRIVAL_TIME = Double.NaN;
 
     private final double earliestBreakStartTime;
     private final double latestBreakEndTime;
     private final double duration;
 
-    private double latestArrivalTime = UNSCHEDULED_ARRIVAL_TIME;
+    private boolean scheduled = false;
 
     public DefaultShiftBreakImpl(double earliestBreakStartTime, double latestBreakEndTime, double duration) {
         Gbl.assertIf(latestBreakEndTime - earliestBreakStartTime >= duration);
@@ -41,17 +40,7 @@ public class DefaultShiftBreakImpl implements DrtShiftBreak {
     }
 
     @Override
-    public void schedule(double latestArrivalTime) {
-        this.latestArrivalTime = latestArrivalTime;
-    }
-
-    @Override
-    public boolean isScheduled() {
-        return !Double.isNaN(latestArrivalTime);
-    }
-
-    @Override
-    public double getScheduledLatestArrival() {
-        return latestArrivalTime;
+    public void schedule() {
+        scheduled = true;
     }
 }

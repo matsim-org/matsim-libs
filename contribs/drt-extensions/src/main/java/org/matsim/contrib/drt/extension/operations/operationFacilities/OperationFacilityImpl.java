@@ -13,8 +13,6 @@ import java.util.*;
  */
 public class OperationFacilityImpl implements OperationFacility {
 
-    private static final int DEFAULT_CAPACITY = 50;
-
     private final Id<OperationFacility> id;
     private final Id<Link> linkId;
     private final Coord coord;
