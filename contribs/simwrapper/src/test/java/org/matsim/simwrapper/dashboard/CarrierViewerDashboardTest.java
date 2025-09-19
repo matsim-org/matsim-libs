@@ -55,9 +55,7 @@ public class CarrierViewerDashboardTest {
 		// Solving the VRP (generate carrier's tour plans)
 		try {
 			CarriersUtils.runJsprit(scenario);
-		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
+		} catch (ExecutionException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 
