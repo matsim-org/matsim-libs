@@ -30,23 +30,33 @@ import static org.matsim.freight.logistics.examples.multipleChains.ExampleTwoLsp
  * The hub costs and hub link IDs for both LSPs are also specified.
  */
 public class RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
+	private static final String HEAVY_40T = "heavy40t";
+	private static final String MEDIUM_26T = "medium26t";
+	private static final String LIGHT_8T = "light8t";
+
 	public static void main(String[] args) throws Exception {
 		String[] argsToSet = {
 			"--outputDirectory=output/groceryDelivery_kmt_banDieselVehiclesFromScript2",
-			"--matsimIterations=1",
+			"--matsimIterations=5",
 			"--jspritIterationsMain=1",
 			"--jspritIterationsDirect=1",
 			"--jspritIterationsDistribution=1",
 			"--tollValue=1000.0",
-			"--tolledVehicleTypes=heavy40t,heavy40t_electro",
+			"--tolledVehicleTypes=" + HEAVY_40T + "," + MEDIUM_26T,
 			"--HubCostsFix=100.0",
-			"--typeOfLsps="+ONE_PLAN_ONLY_DIRECT_CHAIN,
+			"--typeOfLsps="+ ONE_PLAN_BOTH_CHAINS,
 			"--lsp1Name=Edeka",
 			"--lsp1CarrierId=edeka_SUPERMARKT_TROCKEN",
 			"--lsp1HubLinkId=91085",
+			"--lsp1vehTypesDirect=" + MEDIUM_26T,
+			"--lsp1vehTypesMain=" + MEDIUM_26T,
+			"--lsp1vehTypesDelivery=" + LIGHT_8T,
 			"--lsp2Name=Kaufland",
 			"--lsp2CarrierId=kaufland_VERBRAUCHERMARKT_TROCKEN",
-			"--lsp2HubLinkId=91085"
+			"--lsp2HubLinkId=91085",
+			"--lsp2vehTypesDirect=" + HEAVY_40T,
+			"--lsp2vehTypesMain=" + HEAVY_40T,
+			"--lsp2vehTypesDelivery=" + LIGHT_8T
 		};
 		ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll.main(argsToSet);
 	}
