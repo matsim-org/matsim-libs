@@ -67,6 +67,7 @@ jobs:
           - contribs/sbb-extensions
           - contribs/simulatedannealing
           - contribs/small-scale-traffic-generation
+          - contribs/perceived-safety
           - benchmark
 
     steps:
