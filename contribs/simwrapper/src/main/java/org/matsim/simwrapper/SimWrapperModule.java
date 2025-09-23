@@ -5,11 +5,14 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Install the SimWrapper Extension into MATSim.
  */
 public final class SimWrapperModule extends AbstractModule {
+	private static final Logger log = LoggerFactory.getLogger(SimWrapperModule.class);
 
 	private final SimWrapper simWrapper;
 
@@ -35,7 +38,7 @@ public final class SimWrapperModule extends AbstractModule {
 		// Construct the binder one time, even through nothing is added
 		// otherwise the injection will not work
 		Multibinder.newSetBinder(binder(), Dashboard.class);
-
+		Multibinder.newSetBinder(binder(), DashboardProvider.class);
 	}
 
 	@Provides
