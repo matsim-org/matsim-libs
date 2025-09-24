@@ -40,6 +40,7 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.*;
@@ -100,8 +101,6 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	/**
 	 * The following is configured using command line option.
 	 * Please have a look to the {@link RunExampleTwoLspsGroceryDeliveryMultipleChainsWithToll} class and / or to the tests.
-	 * @param args
-	 * @throws CommandLine.ConfigurationException
 	 */
 	public static void main(String[] args) throws CommandLine.ConfigurationException {
 
@@ -121,6 +120,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		jspritIterationsDistributionCarrier = cmd.getOption("jspritIterationsDistribution").map(Integer::parseInt).orElse(1);
 		TOLL_VALUE = cmd.getOption("tollValue").map(Double::parseDouble).orElse(0.0);
 		TOLLED_VEHICLE_TYPES = cmd.getOption("tolledVehicleTypes")
+			.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non")) //Ignore empty strings or "null"-strings
 			.map(s -> Arrays.asList(s.split(",")))
 			.orElse(new ArrayList<>()); //  Für welche Fahrzeugtypen soll das MautSchema gelten?
 		HUBCOSTS_FIX = cmd.getOption("HubCostsFix").map(Double::parseDouble).orElse(100.0);
@@ -135,18 +135,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp1Name").orElse(null),
 			cmd.getOption("lsp1CarrierId").orElse(null), //The carrier used to build the LSP from.
 			cmd.getOption("lsp1HubLinkId")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non")) //Ignore empty strings or "null"-strings
 				.map(Id::createLinkId)
 				.orElse(null), // Default is the hub link of Edeka in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp1vehTypesDirect")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesMain")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp1vehTypesDelivery")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null)
 		);
@@ -161,18 +165,22 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			cmd.getOption("lsp2Name").orElse(null),
 			cmd.getOption("lsp2CarrierId").orElse(null),
 			cmd.getOption("lsp2HubLinkId")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(Id::createLinkId)
 				.orElse(null), // Default is the hub link of Kaufland in Berlin: 91085 = Neukölln nahe S-Bahn-Ring
 			//Vehicle types for direct chain
 			cmd.getOption("lsp2vehTypesDirect")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for main run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesMain")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null),
 			//Vehicle types for delivery run of 2-echelon chain
 			cmd.getOption("lsp2vehTypesDelivery")
+				.filter(s -> !s.isBlank() && !s.equalsIgnoreCase("null") && !s.equalsIgnoreCase("non"))
 				.map(s -> Arrays.asList(s.split(",")))
 				.orElse(null)
 		);
@@ -209,92 +217,78 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			final Carrier carrier = carriers.getCarriers().get(Id.create(lspDefinition.carrierId(), CarrierImpl.class));
 			final Collection<LspShipment> lspShipmentsFromCarrierShipments = MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrier);
 
-			final CarrierVehicleTypes vehTypesDirect = extractVehicleTypes(lspDefinition.vehTypesDirect(), vehicleTypesAvailable);
-			final CarrierVehicleTypes vehTypesMain = extractVehicleTypes(lspDefinition.vehicleTypesMain(), vehicleTypesAvailable);
-			final CarrierVehicleTypes vehTypesDelivery = extractVehicleTypes(lspDefinition.vehicleTypesDelivery(), vehicleTypesAvailable);
+
+			List<CarrierVehicle> carrierVehiclesDirect = new LinkedList<>();
+			List<CarrierVehicle> carrierVehiclesMain = new LinkedList<>();
+			List<CarrierVehicle> carrierVehiclesDelivery = new LinkedList<>();
+
+			{
+				final CarrierVehicleTypes vehTypesDirect = extractVehicleTypes(lspDefinition.vehTypesDirect(), vehicleTypesAvailable);
+				for (VehicleType vehicleType : vehTypesDirect.getVehicleTypes().values()) {
+					var cv = CarrierVehicle.Builder.newInstance(Id.createVehicleId("directCarrierTruck_" + vehicleType.getId()), getDepotLinkFromVehicle(carrier), vehicleType)
+						.setEarliestStart(getEarliestStartFromVehicle(carrier))
+						.setLatestEnd(getLatestEndFromVehicle(carrier))
+						.build();
+					carrierVehiclesDirect.add(cv);
+				}
+
+				final CarrierVehicleTypes vehTypesMain = extractVehicleTypes(lspDefinition.vehicleTypesMain(), vehicleTypesAvailable);
+				for (VehicleType vehicleType : vehTypesMain.getVehicleTypes().values()) {
+					var cv = CarrierVehicle.Builder.newInstance(Id.createVehicleId("mainTruck_" + vehicleType.getId()), getDepotLinkFromVehicle(carrier), vehicleType)
+						.setEarliestStart(getEarliestStartFromVehicle(carrier))
+						.setLatestEnd(getLatestEndFromVehicle(carrier))
+						.build();
+					carrierVehiclesMain.add(cv);
+				}
+
+				final CarrierVehicleTypes vehTypesDelivery = extractVehicleTypes(lspDefinition.vehicleTypesDelivery(), vehicleTypesAvailable);
+				for (VehicleType vehicleType : vehTypesDelivery.getVehicleTypes().values()) {
+					var cv = CarrierVehicle.Builder.newInstance(Id.createVehicleId("distributionTruck_" + vehicleType.getId()), lspDefinition.hubLinkId(), vehicleType)
+						.setEarliestStart(getEarliestStartFromVehicle(carrier))
+						.setLatestEnd(getLatestEndFromVehicle(carrier))
+						.build();
+					carrierVehiclesDelivery.add(cv);
+				}
+			}
 
 			switch (typeOfLsps) {
 				case ONE_PLAN_ONLY_DIRECT_CHAIN -> {
-					LSP lsp = createLsp1PlanWith1Chain_Direct(
-						scenario,
-						lspDefinition.name()+ "_DIRECT",
-						getDepotLinkFromVehicle(carrier),
-						vehTypesDirect);
+					LSP lsp = createLsp1PlanWith1Chain_Direct(scenario, lspDefinition.name()+ "_DIRECT", carrierVehiclesDirect);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 				}
 				case ONE_PLAN_ONLY_TWO_ECHELON_CHAIN -> {
-					LSP lsp = createLsp1PlanWith1Chain_2echelon(
-						scenario,
-						lspDefinition.name() + "_2echelon",
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesMain,
-						vehTypesDelivery);
+					LSP lsp = createLsp1PlanWith1Chain_2echelon(scenario, lspDefinition.name() + "_2echelon", getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesMain, carrierVehiclesDelivery);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 				}
 				case ONE_PLAN_BOTH_CHAINS -> {
-					LSP lsp = createLsp1Plan2Chains(
-						scenario,
-						lspDefinition.name(),
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesDirect,
-						vehTypesMain,
-						vehTypesDelivery
-					);
+					LSP lsp = createLsp1Plan2Chains(scenario, lspDefinition.name(), getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesDirect, carrierVehiclesMain, carrierVehiclesDelivery);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 				}
 				case ONE_PLAN_ALL_LSPS -> {
-					LSP lsp = createLsp1PlanWith1Chain_Direct(scenario,
-						lspDefinition.name() + "_DIRECT",
-						getDepotLinkFromVehicle(carrier),
-						vehTypesDirect);
+
+					LSP lsp = createLsp1PlanWith1Chain_Direct(scenario, lspDefinition.name() + "_DIRECT", carrierVehiclesDirect);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 
-					lsp = createLsp1PlanWith1Chain_2echelon(scenario,
-						lspDefinition.name() + "_2echelon",
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesMain,
-						vehTypesDelivery);
+					lsp = createLsp1PlanWith1Chain_2echelon(scenario, lspDefinition.name() + "_2echelon", getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesMain, carrierVehiclesDelivery);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 
-					lsp = createLsp1Plan2Chains(scenario,
-						lspDefinition.name(),
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesDirect,
-						vehTypesMain,
-						vehTypesDelivery
+					lsp = createLsp1Plan2Chains(scenario, lspDefinition.name(), getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesDirect, carrierVehiclesMain, carrierVehiclesDelivery
 					);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 				}
 				case TWO_PLANS_DIRECT_AND_2ECHELON -> {
-					LSP lsp = createLsp2PlansOneChainEach(scenario,
-						lspDefinition.name(),
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesDirect,
-						vehTypesMain,
-						vehTypesDelivery
-					);
+					LSP lsp = createLsp2PlansOneChainEach(scenario, lspDefinition.name(), getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesDirect, carrierVehiclesMain, carrierVehiclesDelivery);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
 				}
 				case THREE_PLANS_DIRECT_AND_2ECHELON_AND_BOTH -> {
-					LSP lsp = createLsp3PlansWithOneChainEach(scenario,
-						lspDefinition.name(),
-						getDepotLinkFromVehicle(carrier),
-						lspDefinition.hubLinkId(),
-						vehTypesDirect,
-						vehTypesMain,
-						vehTypesDelivery
+					LSP lsp = createLsp3PlansWithOneChainEach(scenario, lspDefinition.name(), getDepotLinkFromVehicle(carrier), lspDefinition.hubLinkId(), carrierVehiclesDirect, carrierVehiclesMain, carrierVehiclesDelivery
 					);
 					assignLspShipments(lsp, lspShipmentsFromCarrierShipments);
 					lsps.add(lsp);
@@ -320,6 +314,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		log.info("Done.");
 	}
+
+
 
 	private static Config prepareConfig(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -373,8 +369,17 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 						.toProvider(
 							() -> {
 								LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-								strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-								strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
+								{
+									strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+//									strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
+								}
+								{
+									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup()));
+									strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+									strategyManager.addStrategy(strategy, null, 4);
+								}
+								MultipleChainsUtils.applyInnovationDisable(strategyManager, null, scenario.getConfig());
+
 								strategyManager.setMaxPlansPerAgent(5);
 								strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
 								return strategyManager;
@@ -388,26 +393,20 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		return controller;
 	}
 
-	/*
-	 *  Set up roadpricing --- this is a copy paste from KMT lecture in GVSim --> need some adaptions
-	 * TODO Adapt settings
-	 */
-
-
 	/**
 	 * Creates an LSP with direct chains:
 	 *
-	 * @param scenario           the scenario, used e.g. for getting the network and register some stuff
-	 * @param lspName            String of LSP's Id
-	 * @param depotLinkId        Id of the depot link
-	 * @param vehicleTypesDirect vehicle types for the direct run (direct chain)
+	 * @param scenario        the scenario, used e.g. for getting the network and register some stuff
+	 * @param lspName         String of LSP's Id
+	 * @param carrierVehicles vehicle types for the direct run (direct chain)
 	 * @return the LSP
 	 */
-	private static LSP createLsp1PlanWith1Chain_Direct(Scenario scenario, String lspName, Id<Link> depotLinkId, CarrierVehicleTypes vehicleTypesDirect) {
+	private static LSP createLsp1PlanWith1Chain_Direct(Scenario scenario, String lspName, List<CarrierVehicle> carrierVehicles) {
 		log.info("create LSP with direct chain");
 
+
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
-			.addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
+			.addLogisticChain(createDirectChain(scenario, lspName, carrierVehicles))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
 
 		return  LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
@@ -428,15 +427,15 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * @param lspName                     String of LSP's Id
 	 * @param depotLinkId                 Id of the depot link
 	 * @param hubLinkId                   location of the hub
-	 * @param vehicleTypesMainRun         vehicle types for the main run (2e-chain)
-	 * @param vehicleTypesDistributionRun vehicle types for the distribution run (2e-chain)
+	 * @param carrierVehiclesMain         vehicle types for the main run (2e-chain)
+	 * @param carrierVehiclesDistribution vehicle types for the distribution run (2e-chain)
 	 * @return the LSP
 	 */
 	@SuppressWarnings("SameParameterValue")
-	private static LSP createLsp1PlanWith1Chain_2echelon(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun) {
+	private static LSP createLsp1PlanWith1Chain_2echelon(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, List<CarrierVehicle> carrierVehiclesMain, List<CarrierVehicle> carrierVehiclesDistribution) {
 		log.info("create LSP with 1 chains: 2-echelon");
 		//Chains
-		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun);
+		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDistribution);
 
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
 			.addLogisticChain(twoEchelonChain)
@@ -457,26 +456,28 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 *  Aktuell erfolgt die Auswahl ja noch hier. Das sollte dann aber nicht mehr so sein, sondern bereits weiter upstream definiert werden.
 	 *  kmt Jul'24
 	 *
-	 * @param scenario                    the scenario, used e.g. for getting the network and register some stuff
-	 * @param lspName                     String of LSP's Id
-	 * @param depotLinkId                 Id of the depot link
-	 * @param hubLinkId                   location of the hub
-	 * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
-	 * @param vehicleTypesMainRun         vehicle types for the main run (2e-chain)
-	 * @param vehicleTypesDistributionRun vehicle types for the distribution run (2e-chain)
+	 * @param scenario                the scenario, used e.g. for getting the network and register some stuff
+	 * @param lspName                 String of LSP's Id
+	 * @param depotLinkId             Id of the depot link
+	 * @param hubLinkId               location of the hub
+	 * @param carrierVehiclesDirect   vehicle types for the direct run (direct chain)
+	 * @param carrierVehiclesMain     vehicle types for the main run (2e-chain)
+	 * @param carrierVehiclesDelivery vehicle types for the distribution run (2e-chain)
 	 * @return the LSP
 	 */
 	@SuppressWarnings("SameParameterValue")
-	private static LSP createLsp1Plan2Chains(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesDirect, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun) {
+	private static LSP createLsp1Plan2Chains(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, List<CarrierVehicle> carrierVehiclesDirect, List<CarrierVehicle> carrierVehiclesMain, List<CarrierVehicle> carrierVehiclesDelivery) {
 		log.info("create LSP with 2 chains: direct and two-echelon");
 		//Chains
-		LogisticChain directChain = createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect);
-		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun);
+		LogisticChain directChain = createDirectChain(scenario, lspName, carrierVehiclesDirect);
+		LogisticChain twoEchelonChain = createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDelivery);
 
 		LSPPlan lspPlan = LSPUtils.createLSPPlan()
+			.addLogisticChain(twoEchelonChain)  //make the 2-ech. chain the first one ....
 			.addLogisticChain(directChain)
-			.addLogisticChain(twoEchelonChain)
-			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner());
+			.setInitialShipmentAssigner(MultipleChainsUtils.createPrimaryLogisticChainShipmentAssigner()); //.. and assign all shipments to the first one.
+		// This will in the end ensure, that all shipments within a tolled zone are initially on the hub chain and avoid, that the ReplanningStrategy needs to move them from the direct chain to the 2-e chain.
+		// KMT sep'25
 
 		return LSPUtils.LSPBuilder.getInstance(Id.create(lspName, LSP.class))
 			.setInitialPlan(lspPlan)
@@ -497,26 +498,26 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * @param lspName                     String of LSP's Id
 	 * @param depotLinkId                 Id of the depot link
 	 * @param hubLinkId                   location of the hub
-	 * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
-	 * @param vehicleTypesMainRun         vehicle types for the main run (2e-chain)
-	 * @param vehicleTypesDistributionRun vehicle types for the distribution run (2e-chain)
+	 * @param carrierVehiclesDirect       vehicle types for the direct run (direct chain)
+	 * @param carrierVehiclesMain         vehicle types for the main run (2e-chain)
+	 * @param carrierVehiclesDistribution vehicle types for the distribution run (2e-chain)
 	 * @return the LSP
 	 */
 	@SuppressWarnings("SameParameterValue")
-	private static LSP createLsp2PlansOneChainEach(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesDirect, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun) {
+	private static LSP createLsp2PlansOneChainEach(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, List<CarrierVehicle> carrierVehiclesDirect, List<CarrierVehicle> carrierVehiclesMain, List<CarrierVehicle> carrierVehiclesDistribution) {
 		log.info("create LSP with 2 plans, containing 1 chain each: direct and two-echelon");
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		//Plan 1 with direct chain
 		lspPlans.add(LSPUtils.createLSPPlan()
-			.addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
+			.addLogisticChain(createDirectChain(scenario, lspName, carrierVehiclesDirect))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner())
 			.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString())
 		);
 
 		//Plan 2 with 2-echelon chain
 		lspPlans.add(LSPUtils.createLSPPlan()
-			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun))
+			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDistribution))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner())
 			.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_TWO_ECHELON_CHAIN.toString())
 		);
@@ -541,33 +542,33 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * @param lspName                     String of LSP's Id
 	 * @param depotLinkId                 Id of the depot link
 	 * @param hubLinkId                   location of the hub
-	 * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
-	 * @param vehicleTypesMainRun         vehicle types for the main run (2e-chain)
-	 * @param vehicleTypesDistributionRun vehicle types for the distribution run (2e-chain)
+	 * @param carrierVehiclesDirect       vehicle types for the direct run (direct chain)
+	 * @param carrierVehiclesMain         vehicle types for the main run (2e-chain)
+	 * @param carrierVehiclesDistribution vehicle types for the distribution run (2e-chain)
 	 * @return the LSP
 	 */
 	@SuppressWarnings("SameParameterValue")
-	private static LSP createLsp3PlansWithOneChainEach(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesDirect, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun) {
+	private static LSP createLsp3PlansWithOneChainEach(Scenario scenario, String lspName, Id<Link> depotLinkId, Id<Link> hubLinkId, List<CarrierVehicle> carrierVehiclesDirect, List<CarrierVehicle> carrierVehiclesMain, List<CarrierVehicle> carrierVehiclesDistribution) {
 		log.info("create LSP with 3 plans containing 1 chain each: direct, two-echelon, both");
 
 		List<LSPPlan> lspPlans = new ArrayList<>();
 		//Plan 1 with direct chain
 		lspPlans.add(LSPUtils.createLSPPlan()
-			.addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
+			.addLogisticChain(createDirectChain(scenario, lspName, carrierVehiclesDirect))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner())
 			.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_ONE_ECHELON_CHAIN.toString())
 		);
 
 		//Plan 2 with 2-echelon chain
 		lspPlans.add(LSPUtils.createLSPPlan()
-			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun))
+			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDistribution))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner())
 			.setType(MultipleChainsUtils.LspPlanTypes.SINGLE_TWO_ECHELON_CHAIN.toString())
 		);
 
 		lspPlans.add(LSPUtils.createLSPPlan()
-			.addLogisticChain(createDirectChain(scenario, lspName, depotLinkId, vehicleTypesDirect))
-			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, vehicleTypesMainRun, vehicleTypesDistributionRun))
+			.addLogisticChain(createDirectChain(scenario, lspName, carrierVehiclesDirect))
+			.addLogisticChain(createTwoEchelonChain(scenario, lspName, hubLinkId, depotLinkId, carrierVehiclesMain, carrierVehiclesDistribution))
 			.setInitialShipmentAssigner(MultipleChainsUtils.createRandomLogisticChainShipmentAssigner())
 			.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_MIXED_ECHELON_CHAINS.toString())
 		);
@@ -591,14 +592,14 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	 * The vehicle types for the main run and distribution run are passed as parameters.
 	 * PLEASE NOTE: currently (may'25) the main run does not perform a tour planning. It just takes the first entry... see {MainRunCarrierScheduler.class}
 	 */
-	private static LogisticChain createTwoEchelonChain(Scenario scenario, String lspName, Id<Link> hubLinkId, Id<Link> depotLinkFromVehicles, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun) {
+	private static LogisticChain createTwoEchelonChain(Scenario scenario, String lspName, Id<Link> hubLinkId, Id<Link> depotLinkFromVehicles, List<CarrierVehicle> carrierVehiclesMain, List<CarrierVehicle> carrierVehiclesDistribution) {
 		LogisticChain hubChain;
 		Carrier mainCarrier = CarriersUtils.createCarrier(Id.create(lspName +"_mainCarrier", Carrier.class));
 		mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 		CarriersUtils.setJspritIterations(mainCarrier, jspritIterationsMainCarrier);
 
-		for (VehicleType vehicleType : vehicleTypesMainRun.getVehicleTypes().values()) {
-			CarriersUtils.addCarrierVehicle(mainCarrier, CarrierVehicle.newInstance(Id.createVehicleId("mainTruck_" + vehicleType.getId()), depotLinkFromVehicles, vehicleType));
+		for (CarrierVehicle carrierVehicle : carrierVehiclesMain) {
+			CarriersUtils.addCarrierVehicle(mainCarrier, carrierVehicle);
 		}
 
 		LSPResource mainCarrierResource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
@@ -635,8 +636,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 
 		CarrierSchedulerUtils.setVrpLogic(distributionCarrier, LSPUtils.LogicOfVrp.shipmentBased);
 
-		for (VehicleType vehicleType : vehicleTypesDistributionRun.getVehicleTypes().values()) {
-			CarriersUtils.addCarrierVehicle(distributionCarrier, CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck_" + vehicleType.getId()), hubLinkId, vehicleType));
+		for (CarrierVehicle carrierVehicle : carrierVehiclesDistribution) {
+			CarriersUtils.addCarrierVehicle(distributionCarrier, carrierVehicle);
 		}
 
 
@@ -660,15 +661,14 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 	}
 
 
-	private static LogisticChain createDirectChain(Scenario scenario, String lspName, Id<Link> depotLinkFromVehicles, CarrierVehicleTypes vehicleTypes) {
+	private static LogisticChain createDirectChain(Scenario scenario, String lspName, List<CarrierVehicle> carrierVehicles) {
 		LogisticChain directChain;
 		Carrier directCarrier = CarriersUtils.createCarrier(Id.create(lspName + "_directCarrier", Carrier.class));
 		directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 		CarriersUtils.setJspritIterations(directCarrier, jspritIterationsDirectCarrier);
 
-
-		for (VehicleType vehicleType : vehicleTypes.getVehicleTypes().values()) {
-			CarriersUtils.addCarrierVehicle(directCarrier, CarrierVehicle.newInstance(Id.createVehicleId("directCarrierTruck_" + vehicleType.getId()), depotLinkFromVehicles, vehicleType));
+		for (CarrierVehicle carrierVehicle : carrierVehicles) {
+			CarriersUtils.addCarrierVehicle(directCarrier, carrierVehicle);
 		}
 
 		LSPResource singleCarrierResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
@@ -724,12 +724,29 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		return carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next().getLinkId();
 	}
 
+	private static double getEarliestStartFromVehicle(Carrier carrier) {
+		log.info("Please note: This method returns the earliest start time of all vehicles of the carrier.");
+		return carrier.getCarrierCapabilities().getCarrierVehicles().values().stream()
+			.mapToDouble(CarrierVehicle::getEarliestStartTime)
+			.min()
+			.orElse(0.0);
+	}
+
+	private static double getLatestEndFromVehicle(Carrier carrier) {
+		log.info("Please note: This method returns the latest end time of all vehicles of the carrier.");
+		return carrier.getCarrierCapabilities().getCarrierVehicles().values().stream()
+			.mapToDouble(CarrierVehicle::getLatestEndTime)
+			.max()
+			.orElse(Double.MAX_VALUE);
+	}
+
+
 	/**
 	 * Assigns the LSP shipments to the LSP.
 	 * Splits the shipments if needed.
 	 *
-	 * @param lsp
-	 * @param lspShipments
+	 * @param lsp the LSP
+	 * @param lspShipments lsp shipments to assign
 	 */
 	private static void assignLspShipments(LSP lsp, Collection<LspShipment> lspShipments) {
 		//TODO: Maybe move this out and do this after creating all the LSPs?
@@ -739,7 +756,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		}
 
 		//If one of the carriers is not able to handle the shipments, it will be split into smaller shipments.
-		lsp = LSPUtils.splitShipmentsIfNeeded(lsp);
+		LSPUtils.splitShipmentsIfNeeded(lsp);
 	}
 
 	private static RoadPricingSchemeUsingTollFactor setUpRoadpricing(Scenario scenario) {

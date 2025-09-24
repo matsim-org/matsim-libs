@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
@@ -71,7 +72,7 @@ public class TripDistributionMatrixTest {
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		String usedTrafficType = "commercialPersonTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
@@ -106,7 +107,7 @@ public class TripDistributionMatrixTest {
 				}
 			}
 		}
-		odMatrix.clearRoundingError();
+		odMatrix.clearRoundingError(MatsimRandom.getRandom());
 
 		odMatrix.writeODMatrices(Path.of(utils.getOutputDirectory()), usedTrafficType);
 		//tests
@@ -165,7 +166,7 @@ public class TripDistributionMatrixTest {
 					getIndexLanduse(inputDataDirectory), getZoneIndex(inputDataDirectory), getIndexBuildings(inputDataDirectory),
 					SCTUtils.getIndexRegions(inputDataDirectory), shapeFileZoneNameColumn, buildingsPerZone, pathToInvestigationAreaData, shapeFileBuildingTypeColumn);
 
-		String usedTrafficType = "goodsTraffic";
+		GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType usedTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 		double sample = 1.;
 		double resistanceFactor = 0.005;
 
@@ -202,7 +203,7 @@ public class TripDistributionMatrixTest {
 				}
 			}
 		}
-		odMatrix.clearRoundingError();
+		odMatrix.clearRoundingError(MatsimRandom.getRandom());
 
 		//tests
 		Assertions.assertEquals(3, odMatrix.getListOfZones().size(), MatsimTestUtils.EPSILON);

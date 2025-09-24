@@ -13,39 +13,40 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
-public class RunEvExampleWithLTHConsumptionModelTest{
+public class RunEvExampleWithLTHConsumptionModelTest {
 
-	private static final Logger log = LogManager.getLogger(RunEvExample.class );
+	private static final Logger log = LogManager.getLogger(RunEvExample.class);
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void runTest(){
+	void runTest() {
 		try {
-			String [] args = { RunEvExampleWithLTHConsumptionModel.DEFAULT_CONFIG_FILE
-					,"--config:controler.outputDirectory", utils.getOutputDirectory()
+			String[] args = {RunEvExampleWithLTHConsumptionModel.DEFAULT_CONFIG_FILE
+				, "--config:controler.outputDirectory", utils.getOutputDirectory(),
 			};
 
-			new RunEvExampleWithLTHConsumptionModel().run( args );
+			new RunEvExampleWithLTHConsumptionModel().run(args);
 			{
-				Population expected = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
-				PopulationUtils.readPopulation( expected, utils.getInputDirectory() + "/output_plans.xml.gz" );
+				Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
 
-				Population actual = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
-				PopulationUtils.readPopulation( actual, utils.getOutputDirectory() + "/output_plans.xml.gz" );
+				Population actual = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+				PopulationUtils.readPopulation(actual, utils.getOutputDirectory() + "/output_plans.xml.gz");
 
 				PopulationComparison.Result result = PopulationComparison.compare(expected, actual);
 				Assertions.assertEquals(PopulationComparison.Result.equal, result);
 			}
 			{
-				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
-				String actual = utils.getOutputDirectory() + "/output_events.xml.gz" ;
-				ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+				String expected = utils.getInputDirectory() + "/output_events.xml.gz";
+				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
+				ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 			}
 
-		} catch ( Exception ee ) {
-			log.fatal("there was an exception: \n" + ee ) ;
+		} catch (Exception ee) {
+			log.fatal("there was an exception: \n" + ee);
 
 			// if one catches an exception, then one needs to explicitly fail the test:
 			Assertions.fail();

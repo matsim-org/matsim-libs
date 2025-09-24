@@ -11,7 +11,7 @@ public class CarrierViewer extends Viz {
 	public String carriers;
 
 	public CarrierViewer() {
-		super("carrier");
+		super("carriers");
 	}
 
 }

@@ -82,7 +82,7 @@ layout:
         x: toX
         "y": toY
   eleventh:
-  - type: carrier
+  - type: carriers
     title: carrierViewer
     network: analysis/network-all/network.avro
     carriers: output_carriers.xml.gz
