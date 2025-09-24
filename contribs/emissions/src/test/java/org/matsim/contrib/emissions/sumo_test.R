@@ -595,7 +595,7 @@
 
 # ==== Inverted Time axis ====
 {
-  fuel <- "petrol"
+  fuel <- "diesel"
 
   # Clear old data
   rm(list = ls(pattern = "^data\\."))
@@ -768,4 +768,53 @@
     ylab("emissions in g/km") +
     theme(text = element_text(size=22)) +
     ggtitle(glue("Original acceleration vs. Derivated acceleration vs. SUMO acceleration for {fuel} cars"))
+}
+
+# ==== Characteristic values of driving cycles ====
+{
+  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+
+  # Sections:
+  # Low: [0:589]
+  # Medium: [590:1022]
+  # High: [1023:1477]
+  # Extra High: [1478:1800]
+
+
+
+  all.st_dev <- sd(sumo_input$acceleration)
+
+  normal.st_dev_pos_acc <- sd(sumo_input$acceleration[sumo_input$acceleration > 0])
+  inverted.st_dev_pos_acc <- sd(sumo_input_inverted_time$acceleration[sumo_input_inverted_time$acceleration > 0])
+
+  normal.mean_acc <- mean(sumo_input$acceleration[sumo_input$acceleration > 0])
+  normal.low.mean_acc <- mean(sumo_input$acceleration[1:589][sumo_input$acceleration[1:589] > 0])
+  normal.medium.mean_acc <- mean(sumo_input$acceleration[590:1022][sumo_input$acceleration[590:1022] > 0])
+  normal.high.mean_acc <- mean(sumo_input$acceleration[1023:1477][sumo_input$acceleration[1023:1477] > 0])
+  normal.extra_high.mean_acc <- mean(sumo_input$acceleration[1478:1800][sumo_input$acceleration[1478:1800] > 0])
+
+  normal.mean_vel <- mean(sumo_input$velocity)
+  normal.low.mean_vel <- mean(sumo_input$velocity[1:589])
+  normal.medium.mean_vel <- mean(sumo_input$velocity[590:1022])
+  normal.high.mean_vel <- mean(sumo_input$velocity[1023:1477])
+  normal.extra_high.mean_vel <- mean(sumo_input$velocity[1478:1800])
+
+  inverted.mean_acc <- mean(sumo_input_inverted_time$acceleration[sumo_input_inverted_time$acceleration > 0])
+  inverted.low.mean_acc <- mean(sumo_input_inverted_time$acceleration[1211:1800][sumo_input_inverted_time$acceleration[1211:1800] > 0])
+  inverted.medium.mean_acc <- mean(sumo_input_inverted_time$acceleration[778:1210][sumo_input_inverted_time$acceleration[778:1210] > 0])
+  inverted.high.mean_acc <- mean(sumo_input_inverted_time$acceleration[323:777][sumo_input_inverted_time$acceleration[323:777] > 0])
+  inverted.extra_high.mean_acc <- mean(sumo_input_inverted_time$acceleration[1:322][sumo_input_inverted_time$acceleration[1:322] > 0])
+
+  inverted.mean_vel <- mean(sumo_input_inverted_time$velocity)
+  inverted.low.mean_vel <- mean(sumo_input_inverted_time$velocity[1211:1800])
+  inverted.medium.mean_vel <- mean(sumo_input_inverted_time$velocity[778:1210])
+  inverted.high.mean_vel <- mean(sumo_input_inverted_time$velocity[323:777])
+  inverted.extra_high.mean_vel <- mean(sumo_input_inverted_time$velocity[1:322])
+
+  print(glue("St.dev. normal: {normal.st_dev}; Mean normal: {normal.mean}"))
+  print(glue("St.dev. inverted: {inverted.st_dev}; inverted normal: {inverted.mean}"))
+
+  print(glue("ORIGINAL: Low mean: {normal.low.mean}; Medium mean: {normal.medium.mean}; High mean: {normal.high.mean}; Extra high mean: {normal.extra_high.mean}"))
+
 }
