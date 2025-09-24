@@ -19,9 +19,13 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,7 +35,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -46,16 +52,22 @@ public class TrainManager {
 	/**
 	 * Current active trains in the simulation.
 	 */
-	private final List<TrainState> activeTrains = new ArrayList<>();
+	private final Map<Id<Vehicle>, TrainState> activeTrains = new LinkedHashMap<>();
 
 	/**
 	 * Maps vehicle IDs to their constituent unit IDs.
 	 */
 	private final Map<Id<Vehicle>, List<String>> formations = new LinkedHashMap<>();
 
+	/**
+	 * Maps vehicles to related vehicles that contain the same units.
+	 */
+	private final Map<Id<Vehicle>, List<Id<Vehicle>>> relatedVehicles = new LinkedHashMap<>();
+
 	@Inject
 	public TrainManager(Scenario scenario) {
 		initializeFormations(scenario.getTransitSchedule());
+		initializeRelatedVehicles(scenario.getTransitVehicles());
 	}
 
 	/**
@@ -64,22 +76,29 @@ public class TrainManager {
 	TrainManager() {
 	}
 
-	List<TrainState> getActiveTrains() {
-		return activeTrains;
+	Collection<TrainState> getActiveTrains() {
+		return activeTrains.values();
 	}
 
 	/**
 	 * Remove state and return if it was removed.
 	 */
 	boolean removeActiveTrain(TrainState state) {
-		return activeTrains.remove(state);
+		return activeTrains.remove(state.driver.getVehicle().getId()) != null;
+	}
+
+	/**
+	 * Return current train state for one specific vehicle.
+	 */
+	public TrainPosition getActiveTrain(Id<Vehicle> id) {
+		return activeTrains.get(id);
 	}
 
 	/**
 	 * Add an active train to the simulation.
 	 */
 	void addActiveTrain(TrainState state) {
-		activeTrains.add(state);
+		activeTrains.put(state.driver.getVehicle().getId(), state);
 	}
 
 	/**
@@ -109,6 +128,106 @@ public class TrainManager {
 		}
 
 		log.info("Initialized {} formations for vehicles", formationsProcessed);
+	}
+
+	/**
+	 * Initialize the related vehicles map based on shared units in formations.
+	 * Vehicles are considered related if they:
+	 * 1. Share any unit IDs in their formations, OR
+	 * 2. A vehicle's ID appears as a unit in another vehicle's formation, OR
+	 * 3. A vehicle's formation contains other vehicle IDs as units, OR
+	 * 4. Vehicle IDs appear together as units in the same formation
+	 */
+	private void initializeRelatedVehicles(Vehicles transitVehicles) {
+		relatedVehicles.clear();
+
+		// First, create a mapping from unit IDs to vehicles that contain them
+		Map<String, List<Id<Vehicle>>> unitToVehicles = new LinkedHashMap<>();
+
+		for (Map.Entry<Id<Vehicle>, List<String>> entry : formations.entrySet()) {
+			Id<Vehicle> vehicleId = entry.getKey();
+			List<String> formation = entry.getValue();
+
+			for (String unitId : formation) {
+				unitToVehicles.computeIfAbsent(unitId, k -> new ArrayList<>()).add(vehicleId);
+			}
+		}
+
+		// Process all vehicles in the transit vehicles collection
+		for (Vehicle vehicle : transitVehicles.getVehicles().values()) {
+			Id<Vehicle> vehicleId = vehicle.getId();
+
+			// Skip vehicles with null IDs
+			if (vehicleId == null) {
+				continue;
+			}
+
+			List<Id<Vehicle>> related = new ArrayList<>();
+
+			// Case 1: If this vehicle has a formation, find vehicles that share units
+			if (formations.containsKey(vehicleId)) {
+				List<String> formation = formations.get(vehicleId);
+
+				for (Map.Entry<Id<Vehicle>, List<String>> otherEntry : formations.entrySet()) {
+					Id<Vehicle> otherVehicleId = otherEntry.getKey();
+					List<String> otherFormation = otherEntry.getValue();
+
+					// Skip self
+					if (vehicleId.equals(otherVehicleId)) {
+						continue;
+					}
+
+					// Check if formations share any units
+					if (formation.stream().anyMatch(otherFormation::contains)) {
+						related.add(otherVehicleId);
+					}
+				}
+			}
+
+			// Case 2: If this vehicle's ID appears as a unit in other formations
+			List<Id<Vehicle>> vehiclesContainingThisUnit = unitToVehicles.get(vehicleId.toString());
+			if (vehiclesContainingThisUnit != null) {
+				for (Id<Vehicle> containingVehicle : vehiclesContainingThisUnit) {
+					if (!vehicleId.equals(containingVehicle)) {
+						related.add(containingVehicle);
+					}
+				}
+			}
+
+			// Case 3: If this vehicle's formation contains other vehicle IDs as units
+			if (formations.containsKey(vehicleId)) {
+				List<String> formation = formations.get(vehicleId);
+				for (String unitId : formation) {
+					// Check if this unit ID corresponds to a vehicle ID
+					Id<Vehicle> unitAsVehicleId = Id.create(unitId, Vehicle.class);
+					if (transitVehicles.getVehicles().containsKey(unitAsVehicleId)) {
+						related.add(unitAsVehicleId);
+					}
+				}
+			}
+
+			// Case 4: If this vehicle appears as a unit in a formation, relate it to other units in the same formation
+			for (Map.Entry<Id<Vehicle>, List<String>> formationEntry : formations.entrySet()) {
+				List<String> formation = formationEntry.getValue();
+				if (formation.contains(vehicleId.toString())) {
+					// This vehicle appears as a unit in this formation
+					for (String unitId : formation) {
+						Id<Vehicle> unitAsVehicleId = Id.create(unitId, Vehicle.class);
+						// Add other units in the same formation as related (excluding self)
+						if (!vehicleId.equals(unitAsVehicleId) && transitVehicles.getVehicles().containsKey(unitAsVehicleId)) {
+							related.add(unitAsVehicleId);
+						}
+					}
+				}
+			}
+
+			// Only store if there are related vehicles
+			if (!related.isEmpty()) {
+				relatedVehicles.put(vehicleId, related);
+			}
+		}
+
+		log.info("Initialized {} related vehicles for vehicles", relatedVehicles.size());
 	}
 
 	/**
@@ -143,5 +262,12 @@ public class TrainManager {
 	 */
 	public int getFormationCount() {
 		return formations.size();
+	}
+
+	/**
+	 * Return list of vehicle related. See {@link #initializeRelatedVehicles(Vehicles)}.
+	 */
+	public List<Id<Vehicle>> getRelatedVehicles(Id<Vehicle> vehicleId) {
+		return relatedVehicles.getOrDefault(vehicleId, Collections.emptyList());
 	}
 }

@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
@@ -263,7 +264,21 @@ public final class RailResourceManager {
 	 * Whether a driver already reserved a link.
 	 */
 	public boolean isBlockedBy(RailLink link, TrainPosition position) {
-		return link.resource.getReservedDist(link, position) > RailResourceInternal.NO_RESERVATION;
+		boolean blocked = link.resource.getReservedDist(link, position) > RailResourceInternal.NO_RESERVATION;
+
+		if (!blocked) {
+			List<Id<Vehicle>> relatedVehicles = trains.getRelatedVehicles(position.getDriver().getVehicle().getId());
+
+			// Vehicle ids with the same units are allowed together on a track, they will effectively become the same vehicle when merging
+			for (Id<Vehicle> vehicle : relatedVehicles) {
+				TrainPosition state = trains.getActiveTrain(vehicle);
+				if (state != null && link.resource.getReservedDist(link, state) > RailResourceInternal.NO_RESERVATION) {
+					return true;
+				}
+			}
+		}
+
+		return blocked;
 	}
 
 	/**
