@@ -75,13 +75,14 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	private TurnRestriction turnRestrictionHandling;
 
 	private SumoNetworkConverter(List<Path> input, Path output, String fromCRS, String toCRS, double freeSpeedFactor,
-								 LaneRestriction laneRestriction) {
+								 LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
 		this.input = input;
 		this.output = output;
 		this.fromCRS = fromCRS;
 		this.toCRS = toCRS;
 		this.freeSpeedFactor = freeSpeedFactor;
 		this.laneRestriction = laneRestriction;
+		this.turnRestrictionHandling = turnRestriction;
 	}
 
 	private SumoNetworkConverter() {
@@ -96,7 +97,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @param toCRS   desired coordinate system of network
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String fromCRS, String toCRS) {
-		return new SumoNetworkConverter(input, output, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR, LaneRestriction.IGNORE);
+		return new SumoNetworkConverter(input, output, fromCRS, toCRS, LinkProperties.DEFAULT_FREESPEED_FACTOR, LaneRestriction.IGNORE, TurnRestriction.ADD_TURN_RESTRICTIONS);
 	}
 
 
@@ -106,7 +107,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @see #newInstance(List, Path, String, String, double)
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS, double freeSpeedFactor) {
-		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, LaneRestriction.IGNORE);
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, LaneRestriction.IGNORE, TurnRestriction.ADD_TURN_RESTRICTIONS);
 	}
 
 	/**
@@ -115,8 +116,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
 	 * @see #newInstance(List, Path, String, String, double)
 	 */
 	public static SumoNetworkConverter newInstance(List<Path> input, Path output, String inputCRS, String targetCRS,
-												   double freeSpeedFactor, LaneRestriction laneRestriction) {
-		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction);
+												   double freeSpeedFactor, LaneRestriction laneRestriction, TurnRestriction turnRestriction) {
+		return new SumoNetworkConverter(input, output, inputCRS, targetCRS, freeSpeedFactor, laneRestriction, turnRestriction);
 	}
 
 	/**
