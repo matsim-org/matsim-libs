@@ -42,6 +42,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
@@ -256,7 +257,7 @@ public class SmallScaleCommercialTrafficUtils {
 			log.warn(
 				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
 				numberOfPlanVariantsPerAgent);
-
+		ProjectionUtils.putCRS(population, scenario.getConfig().global().getCoordinateSystem());
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		scenario.getPopulation().getPersons().clear();
 	}
