@@ -47,10 +47,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -284,7 +281,7 @@ public class TripsAndLegsWriter {
 		Coord endCoord = getCoordFromActivity(nextAct);
 		record.add(Double.toString(startCoord.getX()));
 		record.add(Double.toString(startCoord.getY()));
-		record.add(leg.getRoute().getEndLinkId().toString());
+		record.add(Objects.toString(leg.getRoute().getEndLinkId()));
 		record.add(Double.toString(endCoord.getX()));
 		record.add(Double.toString(endCoord.getY()));
 		String transitLine = "";

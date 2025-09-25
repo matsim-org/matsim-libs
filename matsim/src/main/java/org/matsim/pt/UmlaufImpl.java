@@ -34,7 +34,7 @@ public class UmlaufImpl implements Umlauf {
 	private Id<Umlauf> id;
 	private Id<Vehicle> vehicleId;
 
-	private ArrayList<UmlaufStueckI> umlaufStuecke = new ArrayList<UmlaufStueckI>();
+	private List<UmlaufStueckI> umlaufStuecke = new ArrayList<>();
 
 	public UmlaufImpl(Id<Umlauf> id) {
 		super();

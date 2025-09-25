@@ -55,6 +55,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -246,7 +247,7 @@ public class RunExamplePtDisturbances {
 
 	static void replanPtPassengers(double now, final Id<TransitLine> disturbedLineId, Provider<TripRouter> tripRouterProvider, Scenario scenario, InternalInterface internalInterface) {
 
-		final QSim qsim = internalInterface.getMobsim() ;
+		final Netsim qsim = internalInterface.getMobsim() ;
 
 		// force new transit router:
 		final TripRouter tripRouter = tripRouterProvider.get();

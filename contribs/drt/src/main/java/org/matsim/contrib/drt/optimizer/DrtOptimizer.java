@@ -20,10 +20,12 @@
 package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 /**
  * @author michalm
  */
+@NodeSingleton
 public interface DrtOptimizer extends VrpOptimizer, MobsimBeforeSimStepListener {
 }

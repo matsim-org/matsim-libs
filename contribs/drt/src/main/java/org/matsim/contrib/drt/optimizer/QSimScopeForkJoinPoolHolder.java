@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer;
 
 import java.util.concurrent.ForkJoinPool;
 
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
@@ -30,6 +31,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
  *
  * @author Michal Maciejewski (michalm)
  */
+@NodeSingleton
 public class QSimScopeForkJoinPoolHolder implements QsimScopeForkJoinPool {
 	private final ForkJoinPool forkJoinPool;
 
