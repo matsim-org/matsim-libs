@@ -61,10 +61,10 @@ public final class ReplanningUtils {
 	}
 
 	public static <P extends BasicPlan, R> boolean isOnlySelector(GenericPlanStrategy<P, R> planStrategy) {
-		if (planStrategy instanceof PlanStrategyImpl) {
-			return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
+		if (planStrategy instanceof GenericPlanStrategyImpl) {
+			return ((GenericPlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
 		}
-		return false;
+		return false; //Return more expressive statement (log..) ?? Because now we cannot decide.
 	}
 
 }
