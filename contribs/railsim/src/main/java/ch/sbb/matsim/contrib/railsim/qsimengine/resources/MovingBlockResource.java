@@ -132,7 +132,7 @@ final class MovingBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(double time, RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position, boolean force) {
 
 		moving.get(link).add(position.getDriver());
 

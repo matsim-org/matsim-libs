@@ -29,9 +29,19 @@ interface RailResourceInternal extends RailResource {
 	/**
 	 * Reserves this resource for the given agent.
 	 *
+	 * @see #reserve(double, RailLink, int, TrainPosition, boolean)
+	 */
+	default double reserve(double time, RailLink link, int track, TrainPosition position) {
+		return reserve(time, link, track, position, false);
+	}
+
+	/**
+	 * Reserves this resource for the given agent.
+	 *
+	 * @param force force reservation even when no capacity is available.
 	 * @return the reserved distance on this link
 	 */
-	double reserve(double time, RailLink link, int track, TrainPosition position);
+	double reserve(double time, RailLink link, int track, TrainPosition position, boolean force);
 
 	/**
 	 * Releases the link on this resource for the given agent.

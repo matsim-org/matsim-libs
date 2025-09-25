@@ -155,7 +155,7 @@ final class FixedBlockResource implements RailResourceInternal {
 	}
 
 	@Override
-	public double reserve(double time, RailLink link, int track, TrainPosition position) {
+	public double reserve(double time, RailLink link, int track, TrainPosition position, boolean force) {
 
 		if (track >= 0)
 			throw new IllegalArgumentException("Fixed block does not support choosing individual tracks.");
@@ -166,8 +166,14 @@ final class FixedBlockResource implements RailResourceInternal {
 		if (!reservations.containsKey(position.getDriver()))
 			reservations.put(position.getDriver(), link);
 
-		if (reservations.size() > capacity) {
+		if (!force && reservations.size() > capacity) {
 			throw new IllegalStateException("Too many reservations. Capacity needs to be checked before calling reserve.");
+		} else if (force && reservations.size() > capacity) {
+			// Increase the internal array size without increasing capacity
+			MobsimDriverAgent[] tracks = this.tracks.get(link);
+			if (tracks.length < reservations.size()) {
+				this.tracks.put(link, Arrays.copyOf(tracks, reservations.size()));
+			}
 		}
 
 		MobsimDriverAgent[] state = tracks.get(link);

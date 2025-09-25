@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -221,7 +222,8 @@ public final class RailResourceManager {
 		}
 
 		// Check and reserve a single link
-		if (link.resource.hasCapacity(time, link, track, position)) {
+		boolean blockedByRelatedTrain = isBlockedByRelatedTrain(link, position);
+		if (link.resource.hasCapacity(time, link, track, position) || blockedByRelatedTrain) {
 
 			if (!dla.checkLink(time, link, position)) {
 				assert reservedDist == RailResourceInternal.NO_RESERVATION : "Link should not be reserved already.";
@@ -229,7 +231,7 @@ public final class RailResourceManager {
 				return RailResourceInternal.NO_RESERVATION;
 			}
 
-			double dist = link.resource.reserve(time, link, track, position);
+			double dist = link.resource.reserve(time, link, track, position, blockedByRelatedTrain);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
 				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
@@ -242,6 +244,28 @@ public final class RailResourceManager {
 
 		// may be previously reserved dist, or no reservation
 		return reservedDist;
+	}
+
+	/**
+	 * Vehicle ids with the same units are allowed together on a track, they will effectively become the same vehicle when merging.
+	 */
+	private boolean isBlockedByRelatedTrain(RailLink link, TrainPosition position) {
+		TransitStopFacility stop = position.getNextStop();
+
+		// Only transit stops
+		if (stop == null || !Objects.equals(link.getLinkId(), stop.getLinkId()))
+			return false;
+
+		List<Id<Vehicle>> relatedVehicles = trains.getRelatedVehicles(position.getDriver().getVehicle().getId());
+
+		for (Id<Vehicle> vehicle : relatedVehicles) {
+			TrainPosition state = trains.getActiveTrain(vehicle);
+			if (state != null && isBlockedBy(link, state)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -264,21 +288,7 @@ public final class RailResourceManager {
 	 * Whether a driver already reserved a link.
 	 */
 	public boolean isBlockedBy(RailLink link, TrainPosition position) {
-		boolean blocked = link.resource.getReservedDist(link, position) > RailResourceInternal.NO_RESERVATION;
-
-		if (!blocked) {
-			List<Id<Vehicle>> relatedVehicles = trains.getRelatedVehicles(position.getDriver().getVehicle().getId());
-
-			// Vehicle ids with the same units are allowed together on a track, they will effectively become the same vehicle when merging
-			for (Id<Vehicle> vehicle : relatedVehicles) {
-				TrainPosition state = trains.getActiveTrain(vehicle);
-				if (state != null && link.resource.getReservedDist(link, state) > RailResourceInternal.NO_RESERVATION) {
-					return true;
-				}
-			}
-		}
-
-		return blocked;
+		return link.resource.getReservedDist(link, position) > RailResourceInternal.NO_RESERVATION;
 	}
 
 	/**
