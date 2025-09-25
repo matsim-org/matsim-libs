@@ -137,6 +137,11 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
+	public void removeControllerListener(ControllerListener controllerListener) {
+		((NewControler) injector.getInstance(ControlerI.class)).removeControllerListener(controllerListener);
+	}
+
+	@Override
 	public Integer getIterationNumber() {
 		return injector.getInstance(ReplanningContext.class).getIteration();
 	}

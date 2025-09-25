@@ -50,9 +50,10 @@ class LSPControllerListener
 	private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
 	private final Scenario scenario;
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
+	private final List<LSPSimulationTracker<?>> simulationTrackersFromPrevIt = new ArrayList<>();
 
 	private static int addListenerCnt = 0;
-	private  static final int maxAddListenerCnt = 1;
+	private static final int maxAddListenerCnt = 1;
 
 	@Inject private EventsManager eventsManager;
 	@Inject private MatsimServices matsimServices;
@@ -77,8 +78,10 @@ class LSPControllerListener
 		}
 	}
 
+
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		simulationTrackersFromPrevIt.clear(); //resetten.
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		// TODO: Why do we add all simTrackers in every iteration beforeMobsim starts?
@@ -115,6 +118,8 @@ class LSPControllerListener
 		}
 	}
 
+
+
 	private void registerSimulationTrackers(HasSimulationTrackers<?> hasSimulationTrackers) {
 		// get all simulation trackers ...
 		for (LSPSimulationTracker<?> simulationTracker :
@@ -126,6 +131,7 @@ class LSPControllerListener
 				registeredHandlers.add(simulationTracker);
 				matsimServices.addControllerListener(simulationTracker);
 				simulationTracker.setEventsManager(eventsManager);
+				simulationTrackersFromPrevIt.add(simulationTracker); //remember for afterMobsim
 			} else if ( addListenerCnt < maxAddListenerCnt ){
 				log.warn("not adding eventsHandler since already added: {}", simulationTracker);
 				addListenerCnt++;
@@ -171,7 +177,14 @@ class LSPControllerListener
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {}
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		//remove all simulation trackers that were added before mobsim.
+		for (LSPSimulationTracker<?> lspSimulationTracker : simulationTrackersFromPrevIt) {
+			eventsManager.removeHandler(lspSimulationTracker);
+			registeredHandlers.remove(lspSimulationTracker);
+			matsimServices.removeControllerListener(lspSimulationTracker);
+		}
+	}
 
 	Carriers getCarriersFromLSP() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
