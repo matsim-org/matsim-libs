@@ -68,7 +68,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--shapeFileInvestigationArea", description = "The shape file of the ruhr area."/*, defaultValue = "scenarios/metropole-ruhr-v2024.0/input/area/area.shp"*/)
 	private static Path shapeFileInvestigationArea;
 
-	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.", defaultValue = "0.1")
+	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.")
 	private static double sampleSize;
 
 	public static void main(String[] args) {
