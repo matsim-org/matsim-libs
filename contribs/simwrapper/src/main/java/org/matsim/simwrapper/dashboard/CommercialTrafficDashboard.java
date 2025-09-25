@@ -1,14 +1,30 @@
 package org.matsim.simwrapper.dashboard;
 
+import jakarta.annotation.Nullable;
+import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.viz.PieChart;
 import org.matsim.simwrapper.viz.TextBlock;
 
 /**
- *  Dashboard to show commercial traffic statistics.
+ * Dashboard to show commercial traffic statistics.
  */
 public class CommercialTrafficDashboard implements Dashboard {
+
+
+	private final String shpFile;
+
+	/**
+	 * Create a new activity dashboard using the given shape file.
+	 *
+	 * @param shpFile Path to the shape file.
+	 */
+	public CommercialTrafficDashboard(@Nullable String shpFile) {
+		this.shpFile = shpFile;
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 		header.title = "Commercial Traffic";
@@ -18,12 +34,31 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.backgroundColor = "transparent";
 			viz.content = """
 				### Notes
-				- The speed performance index is the ratio of average travel speed and the maximum permissible road speed.
-				A performance index of 0.5, means that the average speed is half of the maximum permissible speed. A road with a performance index below 0.5 is considered to be in a congested state.
-				- The congestion index is the ratio of time a road is in an uncongested state. 0.5 means that a road is congested half of the time. A road with 1.0 is always uncongested.
-
-				cf. *A Traffic Congestion Assessment Method for Urban Road Networks Based on Speed Performance Index* by Feifei He, Xuedong Yan*, Yang Liu, Lu Ma.
+				This dashboard analyzes commercial traffic. The commercial traffic contains traffic from vehicles with a commercial purpose, e.g. freight transport, but also vehicles of the small-scale commercial traffic, e.g. service vehicles, care services, etc.
+				<br><br>
 				""";
 		});
+
+		layout.row("first").el(PieChart.class, (viz, data) -> {
+				String[] args = new String[]{
+					"--shapeFileInvestigationArea", shpFile
+				};
+				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perMode.csv", args);
+				viz.title = "Travel Distance Shares by Mode";
+				viz.useLastRow = true;
+			})
+			.el(PieChart.class, (viz, data) -> {
+				;
+				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perSubpopulation.csv");
+				viz.title = "Travel Distance Shares by subpopulation";
+				viz.useLastRow = true;
+			})
+			.el(PieChart.class, (viz, data) -> {
+				;
+				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perType.csv");
+				viz.title = "Travel Distance Shares by model type";
+				viz.useLastRow = true;
+			});
+
 	}
 }
