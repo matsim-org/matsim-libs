@@ -26,8 +26,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
-import static org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy.MAX_WAIT_TIME_VIOLATION_PENALTY;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
