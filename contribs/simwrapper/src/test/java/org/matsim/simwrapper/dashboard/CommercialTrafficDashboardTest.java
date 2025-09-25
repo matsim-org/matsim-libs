@@ -56,8 +56,10 @@ public class CommercialTrafficDashboardTest {
 		final Controler controler = new Controler(scenario);
 
 		SimWrapper sw = SimWrapper.create(config);
+		sw.getConfigGroup().defaultParams().setShp(utils.getInputDirectory() + "/shp/testRegions.shp");
+		sw.getConfigGroup().setSampleSize(1.0);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-		sw.addDashboard(new CommercialTrafficDashboard(utils.getInputDirectory() + "/shp/testRegions.shp"));
+		sw.addDashboard(new CommercialTrafficDashboard());
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 

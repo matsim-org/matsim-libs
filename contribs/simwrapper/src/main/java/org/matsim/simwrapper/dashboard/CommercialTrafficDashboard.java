@@ -1,6 +1,5 @@
 package org.matsim.simwrapper.dashboard;
 
-import jakarta.annotation.Nullable;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.Header;
@@ -12,18 +11,6 @@ import org.matsim.simwrapper.viz.TextBlock;
  * Dashboard to show commercial traffic statistics.
  */
 public class CommercialTrafficDashboard implements Dashboard {
-
-
-	private final String shpFile;
-
-	/**
-	 * Create a new activity dashboard using the given shape file.
-	 *
-	 * @param shpFile Path to the shape file.
-	 */
-	public CommercialTrafficDashboard(@Nullable String shpFile) {
-		this.shpFile = shpFile;
-	}
 
 	@Override
 	public void configure(Header header, Layout layout) {
@@ -40,9 +27,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 
 		layout.row("first").el(PieChart.class, (viz, data) -> {
-				String[] args = new String[]{
-					"--shapeFileInvestigationArea", shpFile
-				};
+				String[] args;
+				double sampleSize = data.config().getSampleSize();
+				if (data.context().getShp() != null) {
+					args = new String[]{
+						"--shapeFileInvestigationArea", data.context().getShp(),
+						"--sampleSize", String.valueOf(sampleSize)
+					};
+				} else {
+					args = new String[]{"--sampleSize", String.valueOf(sampleSize)};
+				}
 				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perMode.csv", args);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.useLastRow = true;
