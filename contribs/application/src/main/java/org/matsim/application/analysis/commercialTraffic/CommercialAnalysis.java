@@ -59,6 +59,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(CommercialAnalysis.class);
 
+	@CommandLine.Mixin
+	private final OutputOptions output = OutputOptions.ofCommand(CommercialAnalysis.class);
+
 	@CommandLine.Option(names = "--analysisOutputDirectory", description = "The directory where the analysis output will be stored.", defaultValue = "analysis/commercialTraffic/")
 	private static String analysisOutputDirectory;
 
