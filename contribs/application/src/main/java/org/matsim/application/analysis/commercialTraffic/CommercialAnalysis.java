@@ -65,7 +65,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--analysisOutputDirectory", description = "The directory where the analysis output will be stored.", defaultValue = "analysis/commercialTraffic/")
 	private static String analysisOutputDirectory;
 
-	@CommandLine.Option(names = "--shapeFileInvestigationArea", description = "The shape file of the ruhr area."/*, defaultValue = "scenarios/metropole-ruhr-v2024.0/input/area/area.shp"*/)
+	@CommandLine.Option(names = "--shapeFileInvestigationArea", description = "The shape file of the investigation area.")
 	private static Path shapeFileInvestigationArea;
 
 	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.")
