@@ -123,6 +123,10 @@ public final class RailResourceManager {
 				}
 
 				RailLink link = new RailLink(e.getValue(), opposite, disallowedNextLinks);
+
+				if (link.length <= 0)
+					throw new IllegalArgumentException("Link length must be greater than zero: " + link);
+
 				resourceMapping.computeIfAbsent(getResourceId(e.getValue()), k -> new ArrayList<>()).add(link);
 				this.links.put(e.getKey(), link);
 			}

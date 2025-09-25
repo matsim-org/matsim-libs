@@ -3280,457 +3280,457 @@
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1182" from="1182_pt" to="1182_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1182" from="1182_pt" to="1182_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1210" from="1210_pt" to="1210_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1210" from="1210_pt" to="1210_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1311" from="1311_pt" to="1311_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1311" from="1311_pt" to="1311_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1313" from="1313_pt" to="1313_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1313" from="1313_pt" to="1313_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1315" from="1315_pt" to="1315_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1315" from="1315_pt" to="1315_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1374" from="1374_pt" to="1374_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1374" from="1374_pt" to="1374_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1402" from="1402_pt" to="1402_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1402" from="1402_pt" to="1402_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1606" from="1606_pt" to="1606_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1606" from="1606_pt" to="1606_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1644" from="1644_pt" to="1644_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1644" from="1644_pt" to="1644_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1686" from="1686_pt" to="1686_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1686" from="1686_pt" to="1686_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1696" from="1696_pt" to="1696_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1696" from="1696_pt" to="1696_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1750" from="1750_pt" to="1750_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1750" from="1750_pt" to="1750_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1754" from="1754_pt" to="1754_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1754" from="1754_pt" to="1754_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1758" from="1758_pt" to="1758_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1758" from="1758_pt" to="1758_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1773" from="1773_pt" to="1773_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1773" from="1773_pt" to="1773_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1805" from="1805_pt" to="1805_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1805" from="1805_pt" to="1805_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1806" from="1806_pt" to="1806_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1806" from="1806_pt" to="1806_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1816" from="1816_pt" to="1816_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1816" from="1816_pt" to="1816_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1852" from="1852_pt" to="1852_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1852" from="1852_pt" to="1852_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1889" from="1889_pt" to="1889_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1889" from="1889_pt" to="1889_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1896" from="1896_pt" to="1896_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1896" from="1896_pt" to="1896_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1897" from="1897_pt" to="1897_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1897" from="1897_pt" to="1897_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1924" from="1924_pt" to="1924_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1924" from="1924_pt" to="1924_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1925" from="1925_pt" to="1925_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1925" from="1925_pt" to="1925_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_1974" from="1974_pt" to="1974_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_1974" from="1974_pt" to="1974_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2013" from="2013_pt" to="2013_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2013" from="2013_pt" to="2013_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2024" from="2024_pt" to="2024_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2024" from="2024_pt" to="2024_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2029" from="2029_pt" to="2029_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2029" from="2029_pt" to="2029_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2035" from="2035_pt" to="2035_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2035" from="2035_pt" to="2035_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2123" from="2123_pt" to="2123_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2123" from="2123_pt" to="2123_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2137" from="2137_pt" to="2137_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2137" from="2137_pt" to="2137_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2152" from="2152_pt" to="2152_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2152" from="2152_pt" to="2152_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2157" from="2157_pt" to="2157_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2157" from="2157_pt" to="2157_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2163" from="2163_pt" to="2163_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2163" from="2163_pt" to="2163_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2173" from="2173_pt" to="2173_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2173" from="2173_pt" to="2173_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2175" from="2175_pt" to="2175_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2175" from="2175_pt" to="2175_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2194" from="2194_pt" to="2194_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2194" from="2194_pt" to="2194_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2200" from="2200_pt" to="2200_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2200" from="2200_pt" to="2200_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2214" from="2214_pt" to="2214_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2214" from="2214_pt" to="2214_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2236" from="2236_pt" to="2236_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2236" from="2236_pt" to="2236_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2250" from="2250_pt" to="2250_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2250" from="2250_pt" to="2250_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2258" from="2258_pt" to="2258_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2258" from="2258_pt" to="2258_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2261" from="2261_pt" to="2261_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2261" from="2261_pt" to="2261_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2278" from="2278_pt" to="2278_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2278" from="2278_pt" to="2278_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2279" from="2279_pt" to="2279_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2279" from="2279_pt" to="2279_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2297" from="2297_pt" to="2297_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2297" from="2297_pt" to="2297_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2380" from="2380_pt" to="2380_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2380" from="2380_pt" to="2380_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2432" from="2432_pt" to="2432_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2432" from="2432_pt" to="2432_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2436" from="2436_pt" to="2436_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2436" from="2436_pt" to="2436_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2527" from="2527_pt" to="2527_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2527" from="2527_pt" to="2527_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2532" from="2532_pt" to="2532_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2532" from="2532_pt" to="2532_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2539" from="2539_pt" to="2539_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2539" from="2539_pt" to="2539_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2620" from="2620_pt" to="2620_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2620" from="2620_pt" to="2620_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2622" from="2622_pt" to="2622_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2622" from="2622_pt" to="2622_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2628" from="2628_pt" to="2628_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2628" from="2628_pt" to="2628_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2634" from="2634_pt" to="2634_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2634" from="2634_pt" to="2634_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2656" from="2656_pt" to="2656_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2656" from="2656_pt" to="2656_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2676" from="2676_pt" to="2676_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2676" from="2676_pt" to="2676_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2692" from="2692_pt" to="2692_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2692" from="2692_pt" to="2692_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2700" from="2700_pt" to="2700_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2700" from="2700_pt" to="2700_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2705" from="2705_pt" to="2705_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2705" from="2705_pt" to="2705_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2717" from="2717_pt" to="2717_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2717" from="2717_pt" to="2717_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2749" from="2749_pt" to="2749_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2749" from="2749_pt" to="2749_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2751" from="2751_pt" to="2751_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2751" from="2751_pt" to="2751_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2754" from="2754_pt" to="2754_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2754" from="2754_pt" to="2754_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2756" from="2756_pt" to="2756_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2756" from="2756_pt" to="2756_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2799" from="2799_pt" to="2799_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2799" from="2799_pt" to="2799_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2832" from="2832_pt" to="2832_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2832" from="2832_pt" to="2832_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2922" from="2922_pt" to="2922_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2922" from="2922_pt" to="2922_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2928" from="2928_pt" to="2928_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2928" from="2928_pt" to="2928_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2968" from="2968_pt" to="2968_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2968" from="2968_pt" to="2968_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_2990" from="2990_pt" to="2990_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_2990" from="2990_pt" to="2990_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3001" from="3001_pt" to="3001_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3001" from="3001_pt" to="3001_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3004" from="3004_pt" to="3004_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3004" from="3004_pt" to="3004_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3005" from="3005_pt" to="3005_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3005" from="3005_pt" to="3005_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3140" from="3140_pt" to="3140_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3140" from="3140_pt" to="3140_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3141" from="3141_pt" to="3141_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3141" from="3141_pt" to="3141_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3148" from="3148_pt" to="3148_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3148" from="3148_pt" to="3148_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3169" from="3169_pt" to="3169_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3169" from="3169_pt" to="3169_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3190" from="3190_pt" to="3190_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3190" from="3190_pt" to="3190_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3196" from="3196_pt" to="3196_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3196" from="3196_pt" to="3196_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3209" from="3209_pt" to="3209_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3209" from="3209_pt" to="3209_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3226" from="3226_pt" to="3226_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3226" from="3226_pt" to="3226_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3231" from="3231_pt" to="3231_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3231" from="3231_pt" to="3231_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3248" from="3248_pt" to="3248_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3248" from="3248_pt" to="3248_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3252" from="3252_pt" to="3252_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3252" from="3252_pt" to="3252_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3258" from="3258_pt" to="3258_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3258" from="3258_pt" to="3258_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3278" from="3278_pt" to="3278_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3278" from="3278_pt" to="3278_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_3466" from="3466_pt" to="3466_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_3466" from="3466_pt" to="3466_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_5048" from="5048_pt" to="5048_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_5048" from="5048_pt" to="5048_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
 		</link>
-		<link id="pt_803" from="803_pt" to="803_pt" length="0.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
+		<link id="pt_803" from="803_pt" to="803_pt" length="1.0" freespeed="10000.0" capacity="10000.0" permlanes="10000.0" oneway="1" modes="rail" >
 			<attributes>
 				<attribute name="railsimTrainCapacity" class="java.lang.Integer">3</attribute>
 			</attributes>
