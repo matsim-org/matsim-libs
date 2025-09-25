@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author nkuehnel / MOIA
  */
-public class OperationFacilityRegistrationEvent extends Event {
+public class OperationFacilityCheckOutEvent extends Event {
 
     private final String mode;
     private final Id<DvrpVehicle> vehicleId;
@@ -21,17 +21,13 @@ public class OperationFacilityRegistrationEvent extends Event {
     public static final String ATTRIBUTE_FACILITY = "facility";
     public static final String ATTRIBUTE_VEHICLE_ID = "vehicle";
 
-    public static final String EVENT_TYPE = "Vehicle registered at operation facility";
+    public static final String EVENT_TYPE = "Operation facility vehicle check-out";
 
-    public OperationFacilityRegistrationEvent(double time, String mode, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
+    public OperationFacilityCheckOutEvent(double time, String mode, Id<DvrpVehicle> vehicleId, Id<OperationFacility> facilityId) {
         super(time);
         this.mode = mode;
         this.facilityId = facilityId;
         this.vehicleId = vehicleId;
-    }
-
-    public String getMode() {
-        return mode;
     }
 
     @Override
@@ -48,4 +44,3 @@ public class OperationFacilityRegistrationEvent extends Event {
         return attr;
     }
 }
-

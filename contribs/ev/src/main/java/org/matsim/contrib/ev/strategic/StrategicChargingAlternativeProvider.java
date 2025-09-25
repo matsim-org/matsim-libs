@@ -125,8 +125,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// send the reservation if requested
 			if (onlineSearchStrategy.equals(AlternativeSearchStrategy.ReservationBased)) {
 				Verify.verify(
-						reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
-								reservationEndTime) != null);
+                        reservationManager.addReservation(selected.getSpecification(), vehicle, reservationStartTime,
+                                reservationEndTime).isPresent());
 			}
 
 			double duration = slot.isLegBased() ? slot.duration() : 0.0;
@@ -168,8 +168,8 @@ public class StrategicChargingAlternativeProvider implements ChargingAlternative
 			// if a reservation can be made now, keep the initial slot
 			if (reservationManager.isAvailable(slot.charger().getSpecification(), vehicle, reservationStartTime,
 					reservationEndTime)) {
-				Verify.verifyNotNull(reservationManager.addReservation(slot.charger().getSpecification(),
-						vehicle, reservationStartTime, reservationEndTime));
+				Verify.verify(reservationManager.addReservation(slot.charger().getSpecification(),
+						vehicle, reservationStartTime, reservationEndTime).isPresent());
 				return null;
 			} else {
 				updateRequired = true;
