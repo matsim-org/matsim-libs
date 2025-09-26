@@ -260,9 +260,9 @@ import java.io.UncheckedIOException;
         this.controllerListenerManagerImpl.addControllerListener(l);
     }
 
-//	public final void removeControllerListener(ControllerListener l) {
-//		this.controllerListenerManagerImpl.removeControllerListener(l);
-//	}
+	public final void removeControllerListener(ControllerListener l) {
+		this.controllerListenerManagerImpl.removeControllerListener(l);
+	}
 
 		@Deprecated(since = "2025-07-19")
     public final void addControlerListener(ControllerListener l) {
