@@ -306,7 +306,7 @@ public class StrategicChargingUtils {
         if (value == null) {
             return new HashSet<>();
         } else {
-            return new HashSet<>(Arrays.stream(attribute.split(",")).collect(Collectors.toSet()));
+            return new HashSet<>(Arrays.stream(value.split(",")).collect(Collectors.toSet()));
         }
     }
 
