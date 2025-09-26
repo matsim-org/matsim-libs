@@ -43,7 +43,7 @@
 				<stop refId="A1_1" arrivalOffset="00:02:00" departureOffset="00:02:30" awaitDeparture="true"/>
 				<stop refId="A1_2" arrivalOffset="00:05:00" departureOffset="00:05:30" awaitDeparture="true"/>
 				<stop refId="A1_3" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
-				<stop refId="middle_1" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
+				<stop refId="middle_1" arrivalOffset="00:10:00"/>
 			</routeProfile>
 			<route>
 				<link refId="A1_start_to_A1_1"/>
@@ -71,7 +71,7 @@
 				<stop refId="C2_1" arrivalOffset="00:02:00" departureOffset="00:02:30" awaitDeparture="true"/>
 				<stop refId="C2_2" arrivalOffset="00:05:00" departureOffset="00:05:30" awaitDeparture="true"/>
 				<stop refId="C2_3" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
-				<stop refId="middle_1" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
+				<stop refId="middle_1" arrivalOffset="00:10:00"/>
 			</routeProfile>
 			<route>
 				<link refId="C2_start_to_C2_1"/>
@@ -95,8 +95,8 @@
 		<transitRoute id="route_formation">
 			<transportMode>rail</transportMode>
 			<routeProfile>
-				<stop refId="middle_1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
-				<stop refId="middle_1" arrivalOffset="00:04:00" departureOffset="00:04:30" awaitDeparture="true"/>
+				<!-- Formation needs 1 minute until it can depart -->
+				<stop refId="middle_1" arrivalOffset="00:00:00" departureOffset="00:01:00" awaitDeparture="true"/>
 				<stop refId="middle_2" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
 				<stop refId="middle_3" arrivalOffset="00:12:00" departureOffset="00:12:30" awaitDeparture="true"/>
 				<stop refId="middle_end" arrivalOffset="00:16:00" departureOffset="00:16:30" awaitDeparture="true"/>
@@ -135,7 +135,7 @@
 				<stop refId="A2_1" arrivalOffset="00:04:00" departureOffset="00:04:30" awaitDeparture="true"/>
 				<stop refId="A2_2" arrivalOffset="00:07:00" departureOffset="00:07:30" awaitDeparture="true"/>
 				<stop refId="A2_3" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
-				<stop refId="A2_end" arrivalOffset="00:13:00" departureOffset="00:13:00" awaitDeparture="true"/>
+				<stop refId="A2_end" arrivalOffset="00:13:00"/>
 			</routeProfile>
 			<route>
 				<link refId="middle_3_to_middle_end"/>
@@ -160,7 +160,7 @@
 				<stop refId="C1_1" arrivalOffset="00:04:00" departureOffset="00:04:30" awaitDeparture="true"/>
 				<stop refId="C1_2" arrivalOffset="00:07:00" departureOffset="00:07:30" awaitDeparture="true"/>
 				<stop refId="C1_3" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
-				<stop refId="C1_end" arrivalOffset="00:13:00" departureOffset="00:13:00" awaitDeparture="true"/>
+				<stop refId="C1_end" arrivalOffset="00:13:00"/>
 			</routeProfile>
 			<route>
 				<link refId="middle_3_to_middle_end"/>

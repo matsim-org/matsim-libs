@@ -5,12 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
 
@@ -48,9 +51,44 @@ public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
 		assertThat(result)
 			.trainHasLastArrival("train_A_1", 29442)
 			.trainHasLastArrival("train_B_1", 29442)
-			.trainHasLastArrival("train_A_1_train_B_1", 30282)
+			.trainHasLastArrival("train_A_1_train_B_1", 30262)
 			.trainHasLastArrival("train_A_1b", 31329)
 			.trainHasLastArrival("train_B_1b", 31339)
+			.allTrainsArrived();
+
+	}
+
+	@Test
+	void runSimpleDelayed() {
+
+		Consumer<Scenario> f = scenario -> {
+
+			TransitSchedule schedule = scenario.getTransitSchedule();
+
+			TransitLine line = schedule.getTransitLines().get(Id.create("lineA_to_junction", TransitLine.class));
+			TransitRoute route = line.getRoutes().get(Id.create("routeA_to_junction", TransitRoute.class));
+
+			Departure departure = route.getDepartures().get(Id.create("dep_A_1", Departure.class));
+
+			route.removeDeparture(departure);
+
+			TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
+			// Delay initial departure
+			Departure newDeparture = factory.createDeparture(departure.getId(), departure.getDepartureTime() + 600);
+			newDeparture.setVehicleId(departure.getVehicleId());
+			newDeparture.setChainedDepartures(departure.getChainedDepartures());
+
+			route.addDeparture(newDeparture);
+		};
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "simpleFormation"), f);
+
+		assertThat(result)
+			.trainHasLastArrival("train_A_1", 30042)
+			.trainHasLastArrival("train_B_1", 29442)
+			.trainHasLastArrival("train_A_1_train_B_1", 30862)
+			.trainHasLastArrival("train_A_1b", 31929)
+			.trainHasLastArrival("train_B_1b", 31939)
 			.allTrainsArrived();
 
 	}
