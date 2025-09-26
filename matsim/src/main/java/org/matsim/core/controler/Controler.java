@@ -454,6 +454,11 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		});
 	}
 
+	@Override
+	public void removeControllerListener(ControllerListener controllerListener) {
+		(injector.getInstance(ControllerListenerManager.class)).removeControllerListener(controllerListener);
+	}
+
 	public final void setScoringFunctionFactory(
 		  final ScoringFunctionFactory scoringFunctionFactory) {
 		this.addOverridingModule(new AbstractModule() {

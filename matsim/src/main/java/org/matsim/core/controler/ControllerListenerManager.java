@@ -26,6 +26,7 @@ import org.matsim.core.controler.listener.ControllerListener;
 public interface ControllerListenerManager extends MatsimManager {
 
 	void addControllerListener(ControllerListener controllerListener);
+	void removeControllerListener(ControllerListener controllerListener);
 
 	@Deprecated(since = "2025-07-19")
 	default void addControlerListener(ControllerListener controllerListener) {
