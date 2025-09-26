@@ -183,7 +183,7 @@ class LSPControllerListener
 		// get all simulation trackers that were added in this iteration ...
 		for (LSPSimulationTracker<?> simulationTracker : simulationTrackersFromThisIt) {
 			// ... and remove them ...
-			log.info("removing eventsHandler: {}", simulationTracker);
+			log.debug("removing eventsHandler: {}", simulationTracker);
 			eventsManager.removeHandler(simulationTracker);
 			registeredHandlers.remove(simulationTracker);
 			matsimServices.removeControllerListener(simulationTracker);
