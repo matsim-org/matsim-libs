@@ -43,6 +43,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * EventHandling
@@ -131,14 +132,20 @@ public final class EventsManagerImpl implements EventsManager {
 		}
 	}
 
+	private int logSuppressCnt = 0;
 	@Override
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
 		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
-			log.info("=== Logging of event-handlers skipped ===");
-			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+			if (logSuppressCnt <= 1) {
+				log.info("=== Logging of event-handlers skipped ===");
+				log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+					+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+				log.info(Gbl.ONLYONCE);
+				log.info(Gbl.FUTURE_SUPPRESSED);
+				logSuppressCnt++;
+			}
 		}
 		log.debug("adding Event-Handler: " + test.getName());
 		do {
