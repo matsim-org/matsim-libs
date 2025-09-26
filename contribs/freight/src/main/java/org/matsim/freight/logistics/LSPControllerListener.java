@@ -50,7 +50,7 @@ class LSPControllerListener
 	private static final Logger log = LogManager.getLogger(LSPControllerListener.class);
 	private final Scenario scenario;
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
-	private final List<LSPSimulationTracker<?>> simulationTrackersFromPrevIt = new ArrayList<>();
+	private final List<LSPSimulationTracker<?>> simulationTrackersFromThisIt = new ArrayList<>();
 
 	private static int addListenerCnt = 0;
 	private static final int maxAddListenerCnt = 1;
@@ -81,7 +81,7 @@ class LSPControllerListener
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		simulationTrackersFromPrevIt.clear(); //resetten.
+		simulationTrackersFromThisIt.clear(); //resetten.
 		LSPs lsps = LSPUtils.getLSPs(scenario);
 
 		// TODO: Why do we add all simTrackers in every iteration beforeMobsim starts?
@@ -104,11 +104,11 @@ class LSPControllerListener
 			}
 
 			// simulation trackers of solutions:
-			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
-				registerSimulationTrackers(solution);
+			for (LogisticChain logisticChain : lsp.getSelectedPlan().getLogisticChains()) {
+				registerSimulationTrackers(logisticChain);
 
 				// simulation trackers of solution elements:
-				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+				for (LogisticChainElement element : logisticChain.getLogisticChainElements()) {
 					registerSimulationTrackers(element);
 
 					// simulation trackers of resources:
@@ -122,8 +122,7 @@ class LSPControllerListener
 
 	private void registerSimulationTrackers(HasSimulationTrackers<?> hasSimulationTrackers) {
 		// get all simulation trackers ...
-		for (LSPSimulationTracker<?> simulationTracker :
-			hasSimulationTrackers.getSimulationTrackers()) {
+		for (LSPSimulationTracker<?> simulationTracker : hasSimulationTrackers.getSimulationTrackers()) {
 			// ... register them ...
 			if (!registeredHandlers.contains(simulationTracker)) {
 				log.info("adding eventsHandler: {}", simulationTracker);
@@ -131,7 +130,7 @@ class LSPControllerListener
 				registeredHandlers.add(simulationTracker);
 				matsimServices.addControllerListener(simulationTracker);
 				simulationTracker.setEventsManager(eventsManager);
-				simulationTrackersFromPrevIt.add(simulationTracker); //remember for afterMobsim
+				simulationTrackersFromThisIt.add(simulationTracker); //remember for afterMobsim
 			} else if ( addListenerCnt < maxAddListenerCnt ){
 				log.warn("not adding eventsHandler since already added: {}", simulationTracker);
 				addListenerCnt++;
@@ -140,7 +139,18 @@ class LSPControllerListener
 				}
 			}
 		}
+	}
 
+	private void removeSimulationTrackers(HasSimulationTrackers<?> hasSimulationTrackers) {
+		// get all simulation trackers that were added in this iteration ...
+		for (LSPSimulationTracker<?> simulationTracker : simulationTrackersFromThisIt) {
+			// ... and remove them ...
+			log.info("removing eventsHandler: {}", simulationTracker);
+			eventsManager.removeHandler(simulationTracker);
+			registeredHandlers.remove(simulationTracker);
+			matsimServices.removeControllerListener(simulationTracker);
+			hasSimulationTrackers.removeSimulationTracker(simulationTracker);
+		}
 	}
 
 	@Override
@@ -179,10 +189,35 @@ class LSPControllerListener
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		//remove all simulation trackers that were added before mobsim.
-		for (LSPSimulationTracker<?> lspSimulationTracker : simulationTrackersFromPrevIt) {
-			eventsManager.removeHandler(lspSimulationTracker);
-			registeredHandlers.remove(lspSimulationTracker);
-			matsimServices.removeControllerListener(lspSimulationTracker);
+
+		LSPs lsps = LSPUtils.getLSPs(scenario);
+		for (LSP lsp : lsps.getLSPs().values()) {
+			((LSPImpl) lsp).setScorer(lspScoringFunctionFactory.createScoringFunction());
+			// simulation trackers of lsp:
+			removeSimulationTrackers(lsp);
+
+			// simulation trackers of resources:
+			for (LSPResource resource : lsp.getResources()) {
+				removeSimulationTrackers(resource);
+			}
+
+			// simulation trackers of shipments:
+			for (LspShipment lspShipment : lsp.getLspShipments()) {
+				removeSimulationTrackers(lspShipment);
+			}
+
+			// simulation trackers of solutions:
+			for (LogisticChain solution : lsp.getSelectedPlan().getLogisticChains()) {
+				removeSimulationTrackers(solution);
+
+				// simulation trackers of solution elements:
+				for (LogisticChainElement element : solution.getLogisticChainElements()) {
+					removeSimulationTrackers(element);
+
+					// simulation trackers of resources:
+					removeSimulationTrackers(element.getResource());
+				}
+			}
 		}
 	}
 

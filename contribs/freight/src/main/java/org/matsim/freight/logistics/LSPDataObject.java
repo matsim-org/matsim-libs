@@ -31,6 +31,12 @@ public class LSPDataObject<T> implements HasSimulationTrackers<T>, Attributable,
 	}
 
 	@Override
+	public final void removeSimulationTracker(LSPSimulationTracker<?> tracker) {
+		this.trackers.remove(tracker);
+		tracker.setEmbeddingContainer(null);
+	}
+
+	@Override
 	public final Collection<LSPSimulationTracker<T>> getSimulationTrackers() {
 		return Collections.unmodifiableCollection(this.trackers);
 	}

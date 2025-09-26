@@ -9,6 +9,6 @@ import java.util.Collection;
 public interface HasSimulationTrackers<T> {
 
   void addSimulationTracker(LSPSimulationTracker<T> tracker);
-
+  void removeSimulationTracker(LSPSimulationTracker<?> tracker);
   Collection<LSPSimulationTracker<T>> getSimulationTrackers();
 }
