@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
@@ -14,7 +15,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.simwrapper.*;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class CommercialTrafficDashboardTest {
@@ -51,6 +54,18 @@ public class CommercialTrafficDashboardTest {
 				new ReplanningConfigGroup.StrategySettings().setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute).setWeight(
 					0.1).setSubpopulation(subpopulation));
 		}
+		Set<String> modes = Set.of("truck8t", "truck18t", "truck26t", "truck40t");
+
+		modes.forEach(mode -> {
+			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
+			config.scoring().addModeParams(thisModeParams);
+		});
+
+		Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
+		config.qsim().setMainModes(Sets.union(qsimModes, modes));
+
+		Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
+		config.routing().setNetworkModes(Sets.union(networkModes, modes));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -65,12 +80,5 @@ public class CommercialTrafficDashboardTest {
 		controler.addOverridingModule(new SimWrapperModule(sw));
 
 		controler.run();
-
-//		new CreateSingleSimWrapperDashboard().execute(
-//			utils.getInputDirectory(), "--type",
-//			"commercialTraffic"
-//		);
-
 	}
-
 }
