@@ -10,6 +10,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.simwrapper.*;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -34,7 +35,7 @@ public class CommercialTrafficDashboardTest {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
-
+		config.global().setCoordinateSystem(TransformationFactory.ATLANTIS);
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(30 * 60));
@@ -56,7 +57,7 @@ public class CommercialTrafficDashboardTest {
 		final Controler controler = new Controler(scenario);
 
 		SimWrapper sw = SimWrapper.create(config);
-		sw.getConfigGroup().defaultParams().setShp(utils.getInputDirectory() + "/shp/testRegions.shp");
+		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
 		sw.getConfigGroup().setSampleSize(1.0);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 		sw.addDashboard(new CommercialTrafficDashboard());
