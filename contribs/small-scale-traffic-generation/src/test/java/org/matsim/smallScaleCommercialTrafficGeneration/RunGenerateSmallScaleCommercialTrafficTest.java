@@ -40,6 +40,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
@@ -78,11 +79,13 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String zoneShapeFileNameColumn = "name";
 		String shapeCRS = "Atlantis";
 		String resultPopulation = "testPopulation.xml.gz";
+		String network = String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml"));
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
 			pathToConfig,
 			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
 			"--pathToCommercialFacilities", pathToCommercialFacilities,
+			"--network", network,
 			"--sample", sample,
 			"--jspritIterations", jspritIterations,
 			"--creationOption", creationOption,
