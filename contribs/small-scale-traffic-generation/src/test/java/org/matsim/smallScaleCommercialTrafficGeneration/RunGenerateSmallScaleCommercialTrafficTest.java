@@ -76,7 +76,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String smallScaleCommercialTrafficType = "completeSmallScaleCommercialTraffic";
 		String zoneShapeFileName = utils.getPackageInputDirectory() + "/shp/testZones.shp";
 		String zoneShapeFileNameColumn = "name";
-		String shapeCRS = "EPSG:4326";
+		String shapeCRS = "Atlantis";
 		String resultPopulation = "testPopulation.xml.gz";
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
