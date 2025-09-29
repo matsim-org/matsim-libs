@@ -28,8 +28,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,12 +59,10 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Mixin
 	private final OutputOptions output = OutputOptions.ofCommand(CommercialAnalysis.class);
-
+	@CommandLine.Mixin
+	private ShpOptions shp;
 	@CommandLine.Option(names = "--analysisOutputDirectory", description = "The directory where the analysis output will be stored.", defaultValue = "analysis/commercialTraffic/")
 	private static String analysisOutputDirectory;
-
-	@CommandLine.Option(names = "--shapeFileInvestigationArea", description = "The shape file of the investigation area.")
-	private static Path shapeFileInvestigationArea;
 
 	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.")
 	private static double sampleSize;
@@ -77,10 +73,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	public Integer call() throws Exception {
 		log.info("++++++++++++++++++ Start Analysis for RVR Freight simulations ++++++++++++++++++++++++++++");
-
-		ShpOptions shpInvestigationArea = null;
-		if (shapeFileInvestigationArea != null)
-			shpInvestigationArea = new ShpOptions(shapeFileInvestigationArea, null, StandardCharsets.UTF_8);
 
 		final String eventsFile = globFile(input.getRunDirectory(), "*output_events*").toString();
 		final String personFile = globFile(input.getRunDirectory(), "*output_persons*").toString();
@@ -126,7 +118,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// link events handler
-		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, personFile, sampleSize, shpInvestigationArea);
+		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, personFile, sampleSize, shp);
 		eventsManager.addHandler(linkDemandEventHandler);
 
 		eventsManager.initProcessing();
