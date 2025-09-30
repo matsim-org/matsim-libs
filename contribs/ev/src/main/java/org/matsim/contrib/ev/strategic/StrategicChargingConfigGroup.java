@@ -5,6 +5,8 @@ import org.matsim.contrib.ev.strategic.costs.AttributeBasedChargingCostsParamete
 import org.matsim.contrib.ev.strategic.costs.ChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.DefaultChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
+import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
+import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.core.config.Config;
 
@@ -57,10 +59,18 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 				c -> {
 					costs = (TariffBasedChargingCostsParameters) c;
 				});
+
+		addDefinition(RandomChargingPlanInnovator.Parameters.SET_NAME, //
+				RandomChargingPlanInnovator.Parameters::new, //
+				() -> (RandomChargingPlanInnovator.Parameters) innovation, //
+				i -> {
+					innovation = (RandomChargingPlanInnovator.Parameters) i;
+				});
 	}
 
 	private ChargingPlanScoringParameters scoring;
 	private ChargingCostsParameters costs;
+	private ChargingInnovationParameters innovation;
 
 	@Parameter
 	@Comment("Minimum duration of the activity-based charging slots")
@@ -162,6 +172,10 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 
 	public ChargingCostsParameters getCostParameters() {
 		return costs;
+	}
+
+	public ChargingInnovationParameters getInnovationParameters() {
+		return innovation;
 	}
 
 	public double getMinimumActivityChargingDuration() {

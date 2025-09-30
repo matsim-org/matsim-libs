@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
+import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder.TestScenario;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
@@ -39,6 +40,7 @@ public class StrategicChargingTest {
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.setScoreTrackingInterval(1);
         config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setActivityInclusionProbability(1.0);
 
         // motivate agent to charge at activity
         config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
@@ -78,7 +80,7 @@ public class StrategicChargingTest {
     @Test
     public void testChargingEnroute() {
         TestScenario scenario = new TestScenarioBuilder(utils) //
-                .enableStrategicCharging(3) //
+                .enableStrategicCharging(1) //
                 .addPublicCharger("charger", 6, 6, 1, 1.0, "default") //
                 .setElectricVehicleRange(10000.0) //
                 .addPerson("person", 0.5) // SoC goes to zero after leaving from work
@@ -89,6 +91,7 @@ public class StrategicChargingTest {
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setLegInclusionProbability(1.0);
 
         // motivate agent to charge enroute
         config.setMaximumActivityChargingDuration(0.0);

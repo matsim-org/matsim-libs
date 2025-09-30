@@ -79,11 +79,21 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
             fail();
         }
 
-        //Compare LSP files
+        //Compare LSP file
         MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-        //Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+        //Compare events file
         MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+
+		//compare some freight statistics
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Carriers_stats.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Carriers_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Load_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perCarrier.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perCarrier.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicleType.tsv");
     }
 
 	/**
@@ -117,11 +127,22 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+
+		//compare some freight statistics
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Carriers_stats.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Carriers_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Load_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perCarrier.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perCarrier.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicleType.tsv");
+
 	}
 
 	/**
@@ -163,11 +184,22 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+
+		//compare some freight statistics
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Carriers_stats.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Carriers_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Load_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perCarrier.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perCarrier.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicleType.tsv");
+
 	}
 
 	/**
@@ -211,11 +243,22 @@ public class ExampleTwoLspsFoodMultipleChainsWTollTest {
 			fail();
 		}
 
-		//Compare LSP files
+		//Compare LSP file
 		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_lsps.xml.gz", utils.getOutputDirectory() + "output_lsps.xml.gz" );
 
-		//Compare events files
+		//Compare Carriers file
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "output_carriers.xml.gz", utils.getOutputDirectory() + "output_carriers.xml.gz" );
+
+		//Compare events file
 		MatsimTestUtils.assertEqualEventsFiles(utils.getInputDirectory() + "output_events.xml.gz", utils.getOutputDirectory() + "output_events.xml.gz" );
+
+		//compare some freight statistics
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Carriers_stats.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Carriers_stats.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "Load_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "Load_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perCarrier.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perCarrier.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicle.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicle.tsv");
+		MatsimTestUtils.assertEqualFilesLineByLine(utils.getInputDirectory() + "TimeDistance_perVehicleType.tsv", utils.getOutputDirectory() + "analysis/freight/" + "TimeDistance_perVehicleType.tsv");
+
 	}
 
 

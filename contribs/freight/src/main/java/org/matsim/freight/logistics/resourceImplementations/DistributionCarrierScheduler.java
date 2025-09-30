@@ -248,21 +248,30 @@ import org.matsim.vehicles.VehicleType;
 		//Todo: maybe add a warning somewhere if time window does not match to the arrival of the LspShipments?
 		//Vehicle do not need to start before the first LspShipment is ready to be picked up.
 		double earliestStartTime = Double.MAX_VALUE;
-		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
-			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
-			if (lpsShipmentPlan != null) {
-				if (!lpsShipmentPlan.getPlanElements().isEmpty()) {
-					// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
-					double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
-					if (endtime < earliestStartTime) {
-						earliestStartTime = endtime;
-					}
-				}
-			} else {
-				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
-				//	throw new AssertionError();
+//		for (Id<CarrierShipment> carrierShipmentId : auxCarrier.getShipments().keySet()) {
+//			var lpsShipmentPlan = LSPUtils.findLspShipmentPlan(lspPlan, Id.create(carrierShipmentId.toString(), LspShipment.class));
+//			if (lpsShipmentPlan != null) {
+//				if (!lpsShipmentPlan.getPlanElements().isEmpty()) {
+//					// If there was a previous element in the shipmentPlan, ensure that the shipment does not start before the end of the last element.
+//					double endtime = lpsShipmentPlan.getMostRecentEntry().getEndTime();
+//					if (endtime < earliestStartTime) {
+//						earliestStartTime = endtime;
+//					}
+//				}
+//			} else {
+//				//  TODO: This currently happens for the directCarrier. Maybe investigate further. Before here was only a unfunctional "assert" statement. So this was never checked in productive code
+//				//	throw new AssertionError();
+//			}
+//		}
+		// We just need the earliest pickup start time of all shipments of this carrier, to make sure that the vehicle will starting not before that.
+		for (CarrierShipment carrierShipment : auxCarrier.getShipments().values()) {
+			var startPickup = carrierShipment.getPickupStartingTimeWindow().getStart();
+			if (startPickup < earliestStartTime) {
+				earliestStartTime = startPickup;
 			}
 		}
+
+
 		if (earliestStartTime == Double.MAX_VALUE) {
 			log.warn("Earliest start time is still set to Double.MAX_VALUE. This means that no LspShipment was found in the carrier {}. " +
 				"Setting earliest start time to 0.", auxCarrier.getId());
@@ -281,8 +290,9 @@ import org.matsim.vehicles.VehicleType;
 		//Take the jsprit iterations from the DistributionCarrier and set it to the auxiliary carrier. If it was not set, set it to 1.
 		int jspritIterations = CarriersUtils.getJspritIterations(this.carrier);
 		if (jspritIterations < 0) {
-			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to 1.", carrier.getId(), jspritIterations);
-			jspritIterations = 1;
+			int jspritIterationsNew = 1;
+			log.error("Jsprit iterations for carrier {} is set to {}, which is not allowed. Setting it to {}.", carrier.getId(), jspritIterations, jspritIterationsNew);
+			jspritIterations = jspritIterationsNew;
 		}
 		CarriersUtils.setJspritIterations(auxCarrier, jspritIterations);
 
@@ -358,12 +368,13 @@ import org.matsim.vehicles.VehicleType;
 				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 				.build();
 		} else {
-			//This is the case, if only a driectCarrier is build for the LSP.
+			//This is the case, if only a directCarrier is build for the LSP.
 			Id<Link> fromLinkId = lspShipment.getFrom();
 			carrierShipment = CarrierShipment.Builder.newInstance(carrierShipmentId, fromLinkId, lspShipment.getTo(), lspShipment.getSize())
 				.setPickupStartingTimeWindow(lspShipment.getPickupTimeWindow())
 				.setDeliveryStartingTimeWindow(lspShipment.getDeliveryTimeWindow())
 				//If added here, we also need to decide what happens, if the vehicles StartTime (plus TT) is > TimeWindowEnd ....
+				.setPickupDuration(lspShipment.getPickupServiceTime())
 				.setDeliveryDuration(lspShipment.getDeliveryServiceTime())
 				.build();
 		}
