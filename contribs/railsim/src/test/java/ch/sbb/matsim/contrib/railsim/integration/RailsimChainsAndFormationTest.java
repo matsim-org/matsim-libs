@@ -1,5 +1,6 @@
 package ch.sbb.matsim.contrib.railsim.integration;
 
+import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -13,6 +14,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
@@ -38,6 +40,13 @@ public class RailsimChainsAndFormationTest extends AbstractIntegrationTest {
 				null, "home", new Coord(679623, 5811182)))
 			.contains(new ActivityStartEvent(71308, Id.createPersonId("person2"), Id.createLinkId("2f8_ip2w3_pt"),
 				null, "home", new Coord(970034, 6017382)));
+
+		Assertions.assertThat(result.getEvents())
+			.contains(new RailsimFormationEvent(17820, Id.createVehicleId("351700_1_351700_2"), List.of("351700_1", "351700_2")))
+			.contains(new RailsimFormationEvent(88981, Id.createVehicleId("351584_1_351543_1"), List.of("351584_1", "351543_1")));
+
+		Assertions.assertThat(result.getEvents().stream().filter(e -> e.getEventType().equals(RailsimFormationEvent.EVENT_TYPE)))
+			.hasSize(39);
 
 		assertThat(result)
 			.allTrainsArrived();
