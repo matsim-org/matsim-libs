@@ -38,6 +38,7 @@ public enum Pollutant{
         FC_MJ,  // fuel consumption in MJ/km
         CO2_rep, // CO2(reported): = carbon dioxide “reported”, i.e. without the biofuel share in the fuel -> input for CO2e calculation
         CO2e,   // CO2 equivalents (WTW basis), CO2 equivalents contain CO2, CH4 and N2O, i.e. the relevant greenhouse gases from the transport sector, multiplied with their respective 100-year Global Warming Potentials and summed up.
+		PM_TOTAL, // all PM emissions created by combustion of the engine AND non-exhaust causes like tire wear TODO Implement this component into the matsim-calculations
         PM2_5,  // particle mass for particles < 2.5 µm. unit = g/km
         PM2_5_non_exhaust, // tire wear!
         PM_non_exhaust, // PM10 from non-exhaust sources(e.g. road, tyre wear)

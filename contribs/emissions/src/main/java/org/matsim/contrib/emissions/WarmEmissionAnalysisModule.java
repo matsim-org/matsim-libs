@@ -445,6 +445,23 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	}
 
 	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
+		// There is no native PM_TOTAL ef-key in the hbefa tables. To allow a native-like usage the normal and non-exhaust key need to be combined
+		if (efkey.getComponent() == Pollutant.PM_TOTAL){
+			//Get both keys
+			efkey.setComponent(Pollutant.PM);
+			HbefaWarmEmissionFactor key_PM = getEf(vehicleInformationTuple, efkey);
+			efkey.setComponent(Pollutant.PM_non_exhaust);
+			HbefaWarmEmissionFactor key_PM_non_exhaust = getEf(vehicleInformationTuple, efkey);
+
+			// If the keys do not have the same speed, throw an Exception
+			if (key_PM.getSpeed() - key_PM_non_exhaust.getSpeed() < 1e6){
+				throw new RuntimeException("PM and PM_non_exhaust hbefa-efkeys have different velocities");
+			}
+
+			// Now combine them
+			double combinedFactor = key_PM.getFactor() + key_PM_non_exhaust.getFactor();
+			return new HbefaWarmEmissionFactor(combinedFactor, key_PM.getSpeed());
+		}
 
 		switch ( ecg.getDetailedVsAverageLookupBehavior() ) {
 			case onlyTryDetailedElseAbort -> {
