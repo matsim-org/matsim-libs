@@ -32,10 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -49,6 +46,7 @@ import org.matsim.core.network.turnRestrictions.TurnRestrictionsNetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 /**
@@ -726,6 +724,13 @@ public final class NetworkUtils {
 		}
 	}
 
+	/**
+	 * Return the partition attribute if set, otherwise null.
+	 */
+	public static Integer getPartition(Attributable obj) {
+		return (Integer) obj.getAttributes().getAttribute(NetworkPartitioning.ATTRIBUTE);
+
+	}
 
 	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
 								  double capacity, double lanes) {

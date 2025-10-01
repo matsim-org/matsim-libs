@@ -21,20 +21,27 @@
 
  package org.matsim.core.events;
 
+import com.google.inject.Provider;
 import org.apache.commons.lang3.BooleanUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.Collection;
 import java.util.Set;
 
 public final class EventsManagerModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {
+
+		if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.dsim.toString())) {
+			// Bind nothing, the distributed sim will bind its own events manager
+		} else if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {
 			bindEventsManager().to(ParallelEventsManager.class).in(Singleton.class);
 		} else if (getConfig().eventsManager().getNumberOfThreads() != null) {
 			if (BooleanUtils.isTrue(getConfig().eventsManager().getSynchronizeOnSimSteps())) {
@@ -45,13 +52,14 @@ public final class EventsManagerModule extends AbstractModule {
 		} else {
 			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 		}
+
 		bind(EventHandlerRegistrator.class).asEagerSingleton();
 	}
 
 	public static class EventHandlerRegistrator {
 		@Inject
-		EventHandlerRegistrator(EventsManager eventsManager, Set<EventHandler> eventHandlersDeclaredByModules) {
-			for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
+		EventHandlerRegistrator(EventsManager eventsManager, Collection<Provider<EventHandler>> eventHandlersDeclaredByModules) {
+			for (Provider<EventHandler> eventHandler : eventHandlersDeclaredByModules) {
 				eventsManager.addHandler(eventHandler);
 			}
 		}

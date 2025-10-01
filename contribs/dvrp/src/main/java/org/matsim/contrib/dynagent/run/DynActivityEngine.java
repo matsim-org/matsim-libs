@@ -19,27 +19,26 @@
 
 package org.matsim.contrib.dynagent.run;
 
+import com.google.common.base.Preconditions;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.mobsim.dsim.DistributedActivityHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-import com.google.common.base.Preconditions;
-
 /**
  * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
-public class DynActivityEngine implements MobsimEngine, ActivityHandler {
+public class DynActivityEngine implements DistributedMobsimEngine, DistributedActivityHandler {
 	public final static String COMPONENT_NAME = "DynActivityEngine";
 
 	private InternalInterface internalInterface;
@@ -125,10 +124,6 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 		if (linkId != null) { // may be bushwacking
 			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
-	}
-
-	@Override
-	public void onPrepareSim() {
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 	public void handleEvent(final CourtesyEvent event) {
 		int index = getBinIndex(event.getTime());
 		final DataFrame data = getData( event.getActType() );
-		switch ( event.getType() ) {
+		switch ( event.getTypeEnum() ) {
 			case sayHelloEvent:
 				data.countsHello[ index ]++;
 				break;

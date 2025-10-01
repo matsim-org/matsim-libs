@@ -37,11 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -95,7 +91,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements Netsim {
 
 	final private static Logger log = LogManager.getLogger(QSim.class);
 
@@ -153,7 +149,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 
 		@Override
-		public QSim getMobsim() {
+		public Netsim getMobsim() {
 			return QSim.this;
 		}
 
@@ -302,6 +298,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 //	}
 
 	private static int wrnCnt2 = 0;
+	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (this.netEngine != null) {
 			this.netEngine.addParkedVehicle(veh, startLinkId);
@@ -329,6 +326,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		// yy one might want to check if the types/vehicles here are the same as in previous iterations. kai/kai, jan'20
 	}
 
+	@Override
 	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
@@ -427,6 +425,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		return doContinue;
 	}
 
+	@Override
 	public void insertAgentIntoMobsim(final MobsimAgent agent) {
 		if (this.agents.containsKey(agent.getId())) {
 			throw new RuntimeException("Agent with same Id (" + agent.getId().toString() + ") already in mobsim; aborting ... ") ;
@@ -702,6 +701,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		};
 	}
 
+	@Override
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}

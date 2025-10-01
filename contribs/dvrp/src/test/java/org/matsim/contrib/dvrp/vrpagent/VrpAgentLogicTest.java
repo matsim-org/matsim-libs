@@ -119,7 +119,7 @@ public class VrpAgentLogicTest {
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
 		assertThatThrownBy(initialActivity::getEndTime).isExactlyInstanceOf(IllegalStateException.class)
-				.hasMessage("Only PLANNED or UNPLANNED schedules allowed.");
+				.hasMessage("Only PLANNED or UNPLANNED schedules allowed. Current status: STARTED");
 		verifyEvents();
 	}
 
