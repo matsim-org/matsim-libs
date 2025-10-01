@@ -193,19 +193,6 @@ final class ColdEmissionAnalysisModule {
 	}
 
 	private HbefaColdEmissionFactor getEmissionsFactor(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant) {
-		// There is no native PM_TOTAL ef-key in the hbefa tables. To allow a native-like usage the normal and non-exhaust key need to be combined
-		if (efkey.getComponent() == Pollutant.PM_TOTAL){
-			//Get both keys
-			efkey.setComponent(Pollutant.PM);
-			HbefaColdEmissionFactor key_PM = getEmissionsFactor(vehicleInformationTuple, distance_km ,efkey, coldPollutant);
-			efkey.setComponent(Pollutant.PM_non_exhaust);
-			HbefaColdEmissionFactor key_PM_non_exhaust = getEmissionsFactor(vehicleInformationTuple, distance_km ,efkey, coldPollutant);
-
-			// Now combine them
-			double combinedFactor = key_PM.getFactor() + key_PM_non_exhaust.getFactor();
-			return new HbefaColdEmissionFactor(combinedFactor);
-		}
-
 		efkey.setDistance(distance_km);
 
 		efkey.setComponent(coldPollutant);

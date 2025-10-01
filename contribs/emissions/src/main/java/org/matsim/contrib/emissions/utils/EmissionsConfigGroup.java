@@ -49,8 +49,13 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	// TODO check for the String Setter / Getter
 	public enum UseHbefaConsistencyChecker {skip, check}
 	private UseHbefaConsistencyChecker useHbefaConsistencyChecker = UseHbefaConsistencyChecker.check;
+
+	// TODO check for the String Setter / Getter
+	public enum SummarizePmMethod {crashOnVelDifference, usePmVel, usePmNonExhaustVel, useAvgVel}
+	private SummarizePmMethod summarizePmMethod = SummarizePmMethod.crashOnVelDifference;
 
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
@@ -322,6 +327,15 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	}
 	public void setHbefaConsistencyChecker(UseHbefaConsistencyChecker use){
 		useHbefaConsistencyChecker = use;
+	}
+	// ============================================
+	// ============================================
+	public SummarizePmMethod getSummarizePmMethod() {
+		return summarizePmMethod;
+	}
+
+	public void setSummarizePmMethod(SummarizePmMethod summarizePmMethod) {
+		this.summarizePmMethod = summarizePmMethod;
 	}
 	// ============================================
 	// ============================================

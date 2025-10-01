@@ -28,10 +28,14 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.collections.Tuple;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author benjamin
@@ -164,6 +168,13 @@ public final class EmissionModule {
 
 		if (shouldCreateAverageTables()) {
 			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+
+			addCombinedPMEntries(avgHbefaColdTable, (k_pm) -> {
+				HbefaColdEmissionFactorKey combinedKey = new HbefaColdEmissionFactorKey(k_pm);
+				combinedKey.setComponent(Pollutant.PM_TOTAL);
+				return combinedKey;
+			}, (v_pm, v_pm_non_exhaust) -> new HbefaColdEmissionFactor(v_pm.getFactor() + v_pm_non_exhaust.getFactor()));
+
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
 			// yy The naming and signature of the above should presumably be changed:
 			// (1) addPollutantsToX implies signature (pollutants,X). But it is actually the other way round (even if it does not read that way.)
@@ -172,6 +183,33 @@ public final class EmissionModule {
 			// field. kai, dec'22
 
 			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+
+			addCombinedPMEntries(avgHbefaWarmTable, (k_pm) -> {
+				HbefaWarmEmissionFactorKey combinedKey = new HbefaWarmEmissionFactorKey(k_pm);
+				combinedKey.setComponent(Pollutant.PM_TOTAL);
+				return combinedKey;
+			}, (v_pm, v_pm_non_exhaust) -> {
+				double combinedValue = v_pm.getFactor() + v_pm_non_exhaust.getFactor();
+				double combinedSpeed = switch (emissionConfigGroup.getSummarizePmMethod()) {
+					case crashOnVelDifference, usePmVel -> v_pm.getSpeed();
+					case usePmNonExhaustVel -> v_pm_non_exhaust.getSpeed();
+					case useAvgVel -> (v_pm.getSpeed() + v_pm_non_exhaust.getSpeed()) / 2;
+				};
+
+				// If the keys do not have the same speed, throw an Exception if the method was not changed
+				if (emissionConfigGroup.getSummarizePmMethod() == EmissionsConfigGroup.SummarizePmMethod.crashOnVelDifference &&
+					v_pm.getSpeed() - v_pm_non_exhaust.getSpeed() < 1e6) {
+					throw new RuntimeException(
+						"PM and PM_non_exhaust hbefa-efkeys have different velocities in the warm table. You can handle this issue by setting summarizePmMethod in the emissionsConfig:" +
+							"usePmVel: Uses the velocity of the PM entry" +
+							"usePmNonExhaustVel: Uses the velocity of the PM_non_exhaust entry" +
+							"useAvgVel: Compute the avg of both and use it"
+					);
+				}
+
+				return new HbefaWarmEmissionFactor(combinedValue, combinedSpeed);
+			});
+
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}
 		if (shouldCreateDetailedTables()) {
@@ -195,6 +233,37 @@ public final class EmissionModule {
 			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
 		} else {
 			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");        //Is table mandatory? -> If yes throw exception
+		}
+	}
+
+	/// Adds entries with PM_TOTAL into the hbefa-table containing the sum of PM and PM_non_exhaust. The exact combining procedure is defined by the caller.
+	/// <i> NOTE: The combineKeyFunction-lambda is mainly there to allow access the copy constructors for cold/warm factor-keys.</i>
+	private <K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> void addCombinedPMEntries(
+		Map<K, V> hbefaTable,
+		Function<K, K> combineKeyFunction,
+		BiFunction<V, V, V> combineFactorFunction) {
+
+		// Search for each PM and PM_non_exhaust entry
+		// Set the component in the filtered PM_non_exhaust to map to PM, will be useful later
+		Map<K, V> entries_PM =
+			hbefaTable.entrySet().stream().filter(e -> e.getKey().getComponent() == Pollutant.PM).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		Map<K, V> entries_PM_non_exhaust =
+			hbefaTable.entrySet().stream().filter(e -> e.getKey().getComponent() == Pollutant.PM_non_exhaust).peek(e -> e.getKey().setComponent(Pollutant.PM)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+		// Now join each entry and merge it by summarizing the ef key factors
+		for (Map.Entry<K, V> e_pm : entries_PM.entrySet()){
+			// Finds the twin-entry in PM_non_exhaust. The Pollutant of both Maps has been changed to be the same.
+			// The HbefaEmissionFactorKey has an implemented hashFunction, thus searching by object is no problem
+			var v_non_exhaust_pm = entries_PM_non_exhaust.get(e_pm.getKey());
+
+			// Generate combined key
+			var combinedKey = combineKeyFunction.apply(e_pm.getKey());
+
+			// Generate combined Factor
+			var combinedFactor = combineFactorFunction.apply(e_pm.getValue(), v_non_exhaust_pm);
+
+			// Add the new key into the hbefa-table
+			hbefaTable.put(combinedKey, combinedFactor);
 		}
 	}
 
