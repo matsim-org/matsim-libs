@@ -26,7 +26,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		addNotesBlock(layout, "General");
 
-		layout.row("first","General").el(PieChart.class, (viz, data) -> {
+		layout.row("General_first","General").el(PieChart.class, (viz, data) -> {
 				String[] args;
 				double sampleSize = data.config().getSampleSize();
 				if (data.context().getShp() != null) {
@@ -55,7 +55,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.description = "at final iteration";
 
 			});
-		layout.row("second", "General").el(Links.class, (viz, data) -> {
+		layout.row("General_second", "General").el(Links.class, (viz, data) -> {
 			viz.title = "Link volumes of the commercial traffic";
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv");
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
@@ -63,8 +63,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.height = 8.;
 		});
 		addNotesBlock(layout, "Trips");
-		layout.row("trips", "Trips").el(Plotly.class, (viz, data) -> {
-			viz.title = "Modal split";
+		layout.row("trips_first", "Trips").el(Plotly.class, (viz, data) -> {
+			viz.title = "Modal split by main mode";
 
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
