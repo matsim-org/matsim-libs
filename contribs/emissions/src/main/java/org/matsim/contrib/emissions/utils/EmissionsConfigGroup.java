@@ -57,6 +57,11 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public enum SummarizePmMethod {crashOnVelDifference, usePmVel, usePmNonExhaustVel, useAvgVel}
 	private SummarizePmMethod summarizePmMethod = SummarizePmMethod.crashOnVelDifference;
 
+	// TODO This is currently here to temporarily fix the duplicate segment problem
+	// TODO check for the String Setter / Getter
+	public enum DuplicateSubsegments {crashIfDuplicateExists, useFirstDuplicate, overwriteOldDuplicates}
+	private DuplicateSubsegments duplicateSubsegments = DuplicateSubsegments.crashIfDuplicateExists;
+
 	public enum NonScenarioVehicles { ignore, abort }
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
@@ -330,10 +335,17 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	}
 	// ============================================
 	// ============================================
+	public DuplicateSubsegments getDuplicateSubsegments() {
+		return duplicateSubsegments;
+	}
+	public void setDuplicateSubsegments(DuplicateSubsegments duplicateSubsegments) {
+		this.duplicateSubsegments = duplicateSubsegments;
+	}
+	// ============================================
+	// ============================================
 	public SummarizePmMethod getSummarizePmMethod() {
 		return summarizePmMethod;
 	}
-
 	public void setSummarizePmMethod(SummarizePmMethod summarizePmMethod) {
 		this.summarizePmMethod = summarizePmMethod;
 	}

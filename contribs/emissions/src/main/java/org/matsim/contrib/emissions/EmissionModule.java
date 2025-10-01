@@ -166,7 +166,7 @@ public final class EmissionModule {
 		logger.info("entering createLookupTables");
 
 		if (shouldCreateAverageTables()) {
-			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
 			// yy The naming and signature of the above should presumably be changed:
 			// (1) addPollutantsToX implies signature (pollutants,X). But it is actually the other way round (even if it does not read that way.)
@@ -174,15 +174,15 @@ public final class EmissionModule {
 			// Since this is a private method, maybe one could also have a method "memorizeColdPollutants" and then not have coldPollutants as
 			// field. kai, dec'22
 
-			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
 			addWarmCombinedPMEntries(avgHbefaWarmTable);
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}
 		if (shouldCreateDetailedTables()) {
-			this.detailedHbefaColdTable = HbefaTables.loadDetailedCold(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.detailedHbefaColdTable = HbefaTables.loadDetailedCold(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
 			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
 
-			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()), emissionConfigGroup.getDuplicateSubsegments());
 			addWarmCombinedPMEntries(detailedHbefaWarmTable);
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}
