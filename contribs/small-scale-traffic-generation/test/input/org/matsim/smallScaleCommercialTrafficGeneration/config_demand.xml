@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="global" >
-		<param name="coordinateSystem" value="Atlantis" />
+		<param name="coordinateSystem" value="EPSG:4326" />
 		<param name="defaultDelimiter" value=";" />
 		<param name="insistingOnDeprecatedConfigVersion" value="false" />
 		<!-- "global" number of threads.  This number is used, e.g., for replanning, but NOT in QSim.  This can typically be set to as many cores as you have available, or possibly even slightly more. -->

@@ -38,7 +38,7 @@ public class CommercialTrafficDashboardTest {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
-		config.global().setCoordinateSystem(TransformationFactory.ATLANTIS);
+		config.global().setCoordinateSystem(TransformationFactory.EPSG4326);
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_start").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("commercial_end").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(30 * 60));
@@ -75,7 +75,7 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
 		sw.getConfigGroup().setSampleSize(1.0);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-		sw.addDashboard(new CommercialTrafficDashboard());
+		sw.addDashboard(new CommercialTrafficDashboard(null, TransformationFactory.EPSG4326));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 
