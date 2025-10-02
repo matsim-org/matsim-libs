@@ -34,6 +34,7 @@ import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Map;
 
@@ -47,7 +48,9 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
-	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
+	private final IdMap<Person, Plan> agentPlanRecords = new IdMap<>(Person.class);
+	private final Map<Id<Person>, Attributes> agentAttributeRecords = new IdMap<>(Person.class);
+
 
 	@Inject
     ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
@@ -55,8 +58,9 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
             @Override
             public void notifyIterationStarts(IterationStartsEvent event) {
                 for (Person person : population.getPersons().values()) {
-                    agentRecords.put(person.getId(), PopulationUtils.createPlan());
-                }
+                    agentPlanRecords.put(person.getId(), PopulationUtils.createPlan());
+					agentAttributeRecords.put(person.getId(), person.getAttributes());
+				}
             }
         });
         eventsToActivities.addActivityHandler(this);
@@ -67,7 +71,8 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
         this.population = scenario.getPopulation();
 
         for (Person person : population.getPersons().values()) {
-            agentRecords.put(person.getId(), PopulationUtils.createPlan());
+            agentPlanRecords.put(person.getId(), PopulationUtils.createPlan());
+			agentAttributeRecords.put(person.getId(), person.getAttributes());
         }
         eventsToActivities.addActivityHandler(this);
         eventsToLegs.addLegHandler(this);
@@ -80,7 +85,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		// on different threads. Will go away when/if we get a more Actor or Reactive Streams like event infrastructure.
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
-		Plan plan = agentRecords.get(agentId);
+		Plan plan = agentPlanRecords.get(agentId);
 		if (plan != null) {
 			plan.addLeg(leg);
 		}
@@ -92,9 +97,9 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		// on different threads. Will go away when/if we get a more Actor or Reactive Streams like event infrastructure.
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();
-		Plan plan = agentRecords.get(agentId);
+		Plan plan = agentPlanRecords.get(agentId);
 		if (plan != null) {
-			agentRecords.get(agentId).addActivity(activity);
+			agentPlanRecords.get(agentId).addActivity(activity);
 		}
 	}
 
@@ -102,10 +107,14 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	public void writeExperiencedPlans(String iterationFilename) {
 //		finishIteration(); // already called somewhere else in pgm flow.
 		Population tmpPop = PopulationUtils.createPopulation(config,network);
-		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+		for (Map.Entry<Id<Person>, Plan> entry : this.agentPlanRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			person.addPlan(plan);
+//			Attributes attributes = agentAttributeRecords.get(entry.getKey());
+//			if (attributes != null){
+//				attributes.getAsMap().forEach((key, value) -> person.getAttributes().putAttribute(key, value));
+//			}
 			tmpPop.addPerson(person);
 		}
 		new PopulationWriter(tmpPop, null).write(iterationFilename);
@@ -117,7 +126,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	public final void finishIteration() {
 		// I separated this from "writeExperiencedPlans" so that it can be called separately even when nothing is written.  Can't say
 		// if the design might be better served by an iteration ends listener.  kai, feb'17
-		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+		for (Map.Entry<Id<Person>, Plan> entry : this.agentPlanRecords.entrySet()) {
 			Plan plan = entry.getValue();
 			if (scoringFunctionsForPopulation != null) {
 				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
@@ -130,7 +139,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 
 	@Override
 	public IdMap<Person, Plan> getExperiencedPlans() {
-		return this.agentRecords;
+		return this.agentPlanRecords;
 	}
 
 }
