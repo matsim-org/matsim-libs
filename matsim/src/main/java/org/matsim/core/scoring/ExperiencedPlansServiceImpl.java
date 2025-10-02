@@ -49,7 +49,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
 	private final IdMap<Person, Plan> agentPlanRecords = new IdMap<>(Person.class);
-	private final Map<Id<Person>, Attributes> agentAttributeRecords = new IdMap<>(Person.class);
+	private final IdMap<Person, Attributes> agentAttributeRecords = new IdMap<>(Person.class);
 
 
 	@Inject
@@ -111,10 +111,10 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			person.addPlan(plan);
-//			Attributes attributes = agentAttributeRecords.get(entry.getKey());
-//			if (attributes != null){
-//				attributes.getAsMap().forEach((key, value) -> person.getAttributes().putAttribute(key, value));
-//			}
+			Attributes attributes = agentAttributeRecords.get(entry.getKey());
+			if (attributes != null){
+				attributes.getAsMap().forEach((key, value) -> person.getAttributes().putAttribute(key, value));
+			}
 			tmpPop.addPerson(person);
 		}
 		new PopulationWriter(tmpPop, null).write(iterationFilename);
