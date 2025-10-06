@@ -130,7 +130,7 @@
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil-core</artifactId>
-			<version>8.5.16</version>
+			<version>8.5.18</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
