@@ -276,7 +276,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		for (int i = 0; i < distGroups.size() - 1; i++) {
 			labels.add(String.format("%d - %d", distGroups.get(i), distGroups.get(i + 1)));
 		}
-		labels.add(distGroups.get(distGroups.size() - 1) + "+");
+		labels.add(distGroups.getLast() + "+");
 		distGroups.add(Long.MAX_VALUE);
 
 		StringColumn dist_group = joined.longColumn("traveled_distance")

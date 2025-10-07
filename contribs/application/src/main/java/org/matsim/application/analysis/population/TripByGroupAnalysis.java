@@ -84,7 +84,7 @@ final class TripByGroupAnalysis {
 			// Norm shares per instance of each group to sum of 1
 			for (Group group : this.groups) {
 
-				String norm = group.columns.get(0);
+				String norm = group.columns.getFirst();
 				if (group.columns.size() > 1)
 					throw new UnsupportedOperationException("Multiple columns not supported yet");
 
@@ -120,7 +120,7 @@ final class TripByGroupAnalysis {
 			aggr = aggr.sortOn(cmp.thenComparingInt(row -> modeOrder.indexOf(row.getString("main_mode"))));
 
 			// Norm each group to 1
-			String norm = group.columns.get(0);
+			String norm = group.columns.getFirst();
 			if (group.columns.size() > 1)
 				throw new UnsupportedOperationException("Multiple columns not supported yet");
 
