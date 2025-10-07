@@ -106,7 +106,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 		updateScore( event.getTime() );
 
 		lastChangeInNCoparticipants = event.getTime();
-		switch ( event.getType() ) {
+		switch ( event.getTypeEnum() ) {
 			case sayGoodbyeEvent:
 				currentNCoparticipants--;
 				break;

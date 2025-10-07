@@ -23,15 +23,16 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -44,23 +45,33 @@ import org.matsim.vehicles.Vehicle;
  * <p></p>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, HasModifiablePlan {
+public class PersonDriverAgentImpl implements DistributedMobsimAgent, MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, HasModifiablePlan {
 	// yy cannot make this final since it is overridden at 65 locations
 	// (but since all methods are final, it seems that all of these could be solved by delegation).
 	// kai, nov'14
 
 	@SuppressWarnings("unused")
 	private static final Logger log = LogManager.getLogger(PersonDriverAgentImpl.class);
-	
-	private BasicPlanAgentImpl basicAgentDelegate ;
-	private PlanBasedDriverAgentImpl driverAgentDelegate ;
+
+	private final BasicPlanAgentImpl basicAgentDelegate;
+	private final PlanBasedDriverAgentImpl driverAgentDelegate;
 
 	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation, final TimeInterpretation timeInterpretation) {
-		basicAgentDelegate = new BasicPlanAgentImpl(plan1, simulation.getScenario(), simulation.getEventsManager(), 
-				simulation.getSimTimer(), timeInterpretation ) ;
-		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate) ;
-		
+		basicAgentDelegate = new BasicPlanAgentImpl(plan1, simulation.getScenario(), simulation.getEventsManager(),
+			simulation.getSimTimer(), timeInterpretation);
+		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
+
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
+	}
+
+	public PersonDriverAgentImpl(final BasicPlanAgentImpl.BasicPlanAgentMessage message, final Netsim simulation, final TimeInterpretation timeInterpretation) {
+		basicAgentDelegate = new BasicPlanAgentImpl(message, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer(), timeInterpretation);
+		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
+	}
+
+	public PersonDriverAgentImpl(final Plan plan1, Scenario scenario, EventsManager eventsManager, MobsimTimer timer, final TimeInterpretation timeInterpretation) {
+		basicAgentDelegate = new BasicPlanAgentImpl(plan1, scenario, eventsManager, timer, timeInterpretation);
+		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate);
 	}
 
 	@Override
@@ -98,12 +109,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
 
-    @Override
-    public final Double getExpectedTravelDistance() {
-        return basicAgentDelegate.getExpectedTravelDistance();
-    }
+	@Override
+	public final Double getExpectedTravelDistance() {
+		return basicAgentDelegate.getExpectedTravelDistance();
+	}
 
-    @Override
+	@Override
 	public String toString() {
 		return basicAgentDelegate.toString();
 	}
@@ -177,27 +188,32 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	public final boolean isWantingToArriveOnCurrentLink() {
 		return driverAgentDelegate.isWantingToArriveOnCurrentLink();
 	}
-	
+
 	final Leg getCurrentLeg() {
-		return basicAgentDelegate.getCurrentLeg() ;
+		return basicAgentDelegate.getCurrentLeg();
 	}
+
 	@Override
 	public final int getCurrentLinkIndex() {
-		return basicAgentDelegate.getCurrentLinkIndex() ;
+		return basicAgentDelegate.getCurrentLinkIndex();
 	}
+
 	final int getCurrentPlanElementIndex() {
-		return basicAgentDelegate.getCurrentPlanElementIndex() ;
+		return basicAgentDelegate.getCurrentPlanElementIndex();
 	}
+
 	@Override
 	public final Plan getModifiablePlan() {
-		return basicAgentDelegate.getModifiablePlan() ;
+		return basicAgentDelegate.getModifiablePlan();
 	}
-//	final void calculateAndSetDepartureTime( Activity act ) {
+
+	//	final void calculateAndSetDepartureTime( Activity act ) {
 //		basicAgentDelegate.calculateAndSetDepartureTime(act);
 //	}
-	@Override public final void resetCaches() {
+	@Override
+	public final void resetCaches() {
 		basicAgentDelegate.resetCaches();
-		driverAgentDelegate.resetCaches(); 
+		driverAgentDelegate.resetCaches();
 	}
 
 	@Override
@@ -215,4 +231,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return this.basicAgentDelegate.getPreviousPlanElement();
 	}
 
+	@Override
+	public Message toMessage() {
+		return this.basicAgentDelegate.toMessage();
+	}
 }

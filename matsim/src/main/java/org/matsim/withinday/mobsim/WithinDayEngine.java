@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -54,7 +55,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
  * @author cdobler
  */
 @Singleton
-public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProvider {
+public class WithinDayEngine implements DistributedMobsimEngine, ActivityEndReschedulerProvider {
 
 	private static final Logger log = LogManager.getLogger(WithinDayEngine.class);
 

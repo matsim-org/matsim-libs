@@ -20,6 +20,7 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
@@ -36,12 +37,28 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
  * </ul>
  *
  */
-public interface EventHandler extends MatsimExtensionPoint {
+public interface EventHandler extends MatsimExtensionPoint, MessageProcessor {
 	/** Gives the event handler the possibility to clean up its internal state.
 	 * Within a Controler-Simulation, this is called before the mobsim starts.
 	 *
 	 * @param iteration the up-coming iteration from which up-coming events will be from.
 	 */
 	default void reset(int iteration) {}
+
+	/**
+	 * The interval in simulation seconds at which events should be processed. This is the minimum guaranteed interval.
+	 * Events may be processed more frequently depending on the event handler.
+	 */
+	default double getProcessInterval() {
+		return 15 * 60;
+	}
+
+	/**
+	 * Display name of the event handler.
+	 */
+	default String getName() {
+		String simpleName = getClass().getSimpleName();
+		return simpleName.isBlank() ? getClass().getName() : simpleName;
+	}
 
 }

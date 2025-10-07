@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.ClassUtils;
 
 import javax.swing.event.EventListenerList;
 
-class MobsimListenerManager implements MatsimManager {
+public final class MobsimListenerManager implements MatsimManager {
 
 	private final static Logger log = LogManager.getLogger(MobsimListenerManager.class);
 
@@ -57,7 +57,7 @@ class MobsimListenerManager implements MatsimManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void removeQueueSimulationListener(final MobsimListener l) {
+	void removeQueueSimulationListener(final MobsimListener l) {
 		for (Class interfaceClass : ClassUtils.getAllTypes(l.getClass())) {
 			if (MobsimListener.class.isAssignableFrom(interfaceClass)) {
 				this.listenerList.remove(interfaceClass, l);

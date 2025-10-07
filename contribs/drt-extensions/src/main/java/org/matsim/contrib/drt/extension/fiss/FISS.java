@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2022 MOIA GmbH - All Rights Reserved
  *
  * You may use, distribute and modify this code under the terms
@@ -44,17 +44,16 @@ import java.util.Random;
 
 /**
  * FISS Flow-inflated selective sampling (working title).
- *
+ * <p>
  * The aim is to only assign a specified fraction of vehicular agents and teleport the rest.
  * This is achieved by making use of a VehicularDepartureHandler (so far not enforced, as the
  * implementation is not exposed, so in theory could be any DepartureHandler) and a TeleportationEngine.
  * Both used as delegates.
- *
+ * <p>
  * Transit driver agents are always assigned. In addition does not handle DynAgents (e.g., DVRP agents)
- *
- *
+ * <p>
+ * <p>
  * Also implements MobsimEngine to delegate required teleportation steps (such as arrivals).
- *
  *
  * @author nkuehnel / MOIA, hrewald
  *
@@ -97,7 +96,8 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		this.scenario = scenario;
 	}
 
-	@Override public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+	@Override
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if ( !this.qsimConfig.getMainModes().contains( agent.getMode() ) ) {
 			return false ;
 		} else if ( agent instanceof DynAgent ) {
@@ -136,7 +136,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 //			if (removedVehicle == null) {
 //				throw new RuntimeException(
 //						"Could not remove parked vehicle with id " + vehicleId + " on the link id "
-// 								+ qNetsimEngine.getVehicles().get(vehicleId).getCurrentLink().getId()
+// 								+ qNetsimEngine.getVehicles().get(vehicleId).getCurrentLinkId()
 //								+ ".  Maybe it is currently used by someone else?"
 //								+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
 //								+ "Maybe was never placed onto a link?");
@@ -171,7 +171,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	private void deflateVehicleTypes(Scenario scenario, FISSConfigGroup fissConfigGroup) {
 		for (String sampledQsimModes : fissConfigGroup.getSampledModes()) {
-			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes,VehicleType.class));
+			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(Id.create(sampledQsimModes, VehicleType.class));
 			vehicleType.setPcuEquivalents(vehicleType.getPcuEquivalents() * fissConfigGroup.getSampleFactor());
 		}
 	}
