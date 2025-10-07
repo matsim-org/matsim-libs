@@ -11,6 +11,4 @@ public interface DrtShiftBreak {
 
     double getDuration();
 
-    void schedule();
-
 }

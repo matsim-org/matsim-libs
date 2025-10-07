@@ -1,5 +1,6 @@
 package org.matsim.contrib.drt.extension.operations.shifts.schedule;
 
+import jakarta.validation.constraints.NotNull;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -25,16 +26,9 @@ public class DrtOperationsActionCreator implements DynActionCreator {
     private final MobsimTimer timer;
 
     /**
-     * Constructor for standard vehicles (no electric capability)
-     */
-    public DrtOperationsActionCreator(PassengerHandler passengerHandler, DynActionCreator delegate) {
-        this(passengerHandler, delegate, null);
-    }
-
-    /**
      * Constructor for both standard and electric vehicles
      */
-    public DrtOperationsActionCreator(PassengerHandler passengerHandler, DynActionCreator delegate, MobsimTimer timer) {
+    public DrtOperationsActionCreator(PassengerHandler passengerHandler, DynActionCreator delegate, @NotNull MobsimTimer timer) {
         this.passengerHandler = passengerHandler;
         this.delegate = delegate;
         this.timer = timer;
@@ -77,7 +71,7 @@ public class DrtOperationsActionCreator implements DynActionCreator {
         // Handle WaitForShiftTask
         if (task instanceof WaitForShiftTask waitTask) {
             // Initialize tracker for electric vehicles if needed
-            if (vehicle instanceof EvDvrpVehicle && timer != null) {
+            if (vehicle instanceof EvDvrpVehicle) {
                 initEvTaskTracker(task, (EvDvrpVehicle) vehicle);
             }
 
@@ -89,7 +83,7 @@ public class DrtOperationsActionCreator implements DynActionCreator {
         DynAction action = delegate.createAction(dynAgent, vehicle, now);
 
         // Initialize tracker for electric vehicles if needed
-        if (vehicle instanceof EvDvrpVehicle && timer != null && task.getTaskTracker() == null) {
+        if (vehicle instanceof EvDvrpVehicle && task.getTaskTracker() == null) {
             initEvTaskTracker(task, (EvDvrpVehicle) vehicle);
         }
 
@@ -100,7 +94,7 @@ public class DrtOperationsActionCreator implements DynActionCreator {
      * Initialize the task tracker for an electric vehicle task
      */
     private void initEvTaskTracker(Task task, EvDvrpVehicle vehicle) {
-        if (timer != null && task.getTaskTracker() == null) {
+        if (task.getTaskTracker() == null) {
             task.initTaskTracker(new OfflineETaskTracker(vehicle, timer));
         }
     }

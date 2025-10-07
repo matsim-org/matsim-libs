@@ -12,8 +12,6 @@ public class DefaultShiftBreakImpl implements DrtShiftBreak {
     private final double latestBreakEndTime;
     private final double duration;
 
-    private boolean scheduled = false;
-
     public DefaultShiftBreakImpl(double earliestBreakStartTime, double latestBreakEndTime, double duration) {
         Gbl.assertIf(latestBreakEndTime - earliestBreakStartTime >= duration);
         if ((earliestBreakStartTime % 1) != 0 || (latestBreakEndTime % 1) != 0 || (duration % 1) != 0) {
@@ -37,10 +35,5 @@ public class DefaultShiftBreakImpl implements DrtShiftBreak {
     @Override
     public double getDuration() {
         return duration;
-    }
-
-    @Override
-    public void schedule() {
-        scheduled = true;
     }
 }

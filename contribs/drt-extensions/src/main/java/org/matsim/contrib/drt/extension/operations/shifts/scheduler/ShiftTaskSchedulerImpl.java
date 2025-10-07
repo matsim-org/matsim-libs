@@ -262,11 +262,15 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                         -energyCharge, // Negative value means charging
                         strategy);
 
-                // Assign vehicle to charger
-                ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev, strategy);
-
                 // Add charging to the break task
-                breakTask.addCharging(chargingTask);
+                boolean added = breakTask.addCharging(chargingTask);
+
+                if(added) {
+                    // Assign vehicle to charger
+                    ((ChargingWithAssignmentLogic) charger.getLogic()).assignVehicle(ev, strategy);
+                } else {
+                    logger.warn("Could not add charging to break task for " + charger + " for " + ev);
+                }
             }
         }
     }
@@ -343,7 +347,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
     /**
      * Record to store break timing information
      */
-    private record BreakTimingInfo(double breakStart, double breakEnd) {
+    private record BreakTimingInfo(double breakStart , double reservationStart, double reservationEnd) {
     }
 
     /**
@@ -370,7 +374,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                     end = vehicleEntry.stops.get(i + 1);
                 }
                 break;
-            } else if (stop != null) {
+            } else {
                 startWaypoint = stop;
             }
         }
@@ -383,16 +387,20 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         ShiftBreakTask shiftBreakTask = (ShiftBreakTask) shiftBreakStop.getTask();
         DrtShiftBreak shiftBreak = shiftBreakTask.getShiftBreak();
 
-        // Find matching facility
-        Set<OperationFacilityType> facilityTypes = Set.of(OperationFacilityType.hub, OperationFacilityType.inField);
-        final Optional<OperationFacilityFinder.FacilityWithPath> facility =
-                operationFacilityFinder.findFacilityForTime(
-                        startWaypoint.getLink(),
-                        activeShift.vehicle(),
-                        startWaypoint.getDepartureTime(),
-                        shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration(),
-                        shiftBreak.getLatestBreakEndTime(),
-                        facilityTypes);
+        final Optional<OperationFacilityFinder.FacilityWithPath> facility;
+        if(shiftBreakTask.getStatus() != Task.TaskStatus.PLANNED) {
+            facility = Optional.of(new OperationFacilityFinder.FacilityWithPath(facilities.getFacilities().get(shiftBreakTask.getFacilityId()), null));
+        } else {
+            // Find potential new facility
+            Set<OperationFacilityType> facilityTypes = Set.of(OperationFacilityType.hub, OperationFacilityType.inField);
+            facility = operationFacilityFinder.findFacilityForTime(
+                    startWaypoint.getLink(),
+                    activeShift.vehicle(),
+                    startWaypoint.getDepartureTime(),
+                    shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration(),
+                    shiftBreak.getLatestBreakEndTime(),
+                    facilityTypes);
+        }
 
         return new ShiftBreakContext(
                 vehicleEntry,
@@ -432,7 +440,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         // Only update if facility has changed or charging is needed
         if (facilityChanged) {
             return tryUpdateShiftBreak(context, newFacility, existingFacilityId, now);
-        } else if (chargingNeeded && context.vehicle() instanceof EvDvrpVehicle) {
+        } else if (chargingNeeded) {
             return tryAddChargingToExistingBreak(context, (EvDvrpVehicle) context.vehicle(), now);
         } else {
             return false;
@@ -509,13 +517,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
             return false;
         }
 
-        // 3. Calculate continuation path
-        VrpPathWithTravelData continuationPath = calculateContinuationPath(context, breakTimingInfo.breakEnd());
-        if (continuationPath == null) {
-            return false;
-        }
-
-        // 4. make new reservation and Clean up existing reservation
+        // 3. make new reservation and Clean up existing reservation
         Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation =
                 makeBreakReservation(newFacility, context.vehicle(), breakTimingInfo);
 
@@ -525,13 +527,13 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
         cleanupExistingReservation(existingFacilityId, context.shiftBreakTask(), context.vehicle, now);
 
-        // 5. All validations passed, NOW we can modify the schedule
+        // 4. All validations passed, NOW we can modify the schedule
         Task arrivalTask = modifyTasksForBreak(context, now);
         if (arrivalTask == null) {
             return false;
         }
 
-        // 6. Add the break and continuation tasks
+        // 5. Add the break and continuation tasks
         Link facilityLink = network.getLinks().get(newFacility.getLinkId());
         ShiftBreakTask newShiftBreakTask = taskFactory.createShiftBreakTask(
                 context.vehicleEntry().vehicle,
@@ -541,13 +543,20 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
                 context.shiftBreak(),
                 newFacility.getId(),
                 reservation.get().reservationId());
-                
+
+        context.schedule().addTask(arrivalTask.getTaskIdx() + 1, newShiftBreakTask);
+
         // Add charging if appropriate (for electric vehicles)
         if (shiftChargingLogic != null && context.vehicle() instanceof EvDvrpVehicle) {
             addChargingToBreakIfNeeded((EvDvrpVehicle) context.vehicle(), newShiftBreakTask, newFacility);
         }
 
-        context.schedule().addTask(arrivalTask.getTaskIdx() + 1, newShiftBreakTask);
+
+        // 6. Calculate continuation path
+        VrpPathWithTravelData continuationPath = calculateContinuationPath(context, newShiftBreakTask.getEndTime());
+        if (continuationPath == null) {
+            return false;
+        }
 
         // 7. Add continuation tasks
         boolean success = addContinuationTasks(context, newShiftBreakTask, continuationPath, facilityLink);
@@ -647,9 +656,8 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
         // Start break at the later of facility arrival or earliest break time
         double breakStart = Math.max(facilityArrivalTime, earliestBreakStartTime);
-        double breakEnd = breakStart + context.shiftBreak().getDuration();
 
-        return new BreakTimingInfo(breakStart, breakEnd);
+        return new BreakTimingInfo(breakStart, breakStart, context.shiftBreak().getLatestBreakEndTime());
     }
 
     /**
@@ -684,8 +692,8 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         return facilityReservationManager.addReservation(
                 facility,
                 vehicle,
-                breakTimingInfo.breakStart(),
-                breakTimingInfo.breakEnd()
+                breakTimingInfo.reservationStart,
+                breakTimingInfo.reservationEnd
         );
     }
 
@@ -701,11 +709,12 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
 
         // Clean up charging if present
         shiftBreakTask.getChargingTask().ifPresent(chargingTask -> {
-            if (vehicle instanceof EvDvrpVehicle) {
-                AtomicReference<EvDvrpVehicle> evVehicle = new AtomicReference<>((EvDvrpVehicle) vehicle);
+            if (vehicle instanceof EvDvrpVehicle evVehicle) {
                 ChargingWithAssignmentLogic chargingLogic = chargingTask.getChargingLogic();
-                ElectricVehicle ev = evVehicle.get().getElectricVehicle();
-                if(Stream.concat(chargingLogic.getPluggedVehicles().stream(), chargingLogic.getQueuedVehicles().stream())
+                ElectricVehicle ev = evVehicle.getElectricVehicle();
+                if(chargingLogic.isAssigned(ev)) {
+                    chargingLogic.unassignVehicle(ev);
+                } else if(Stream.concat(chargingLogic.getPluggedVehicles().stream(), chargingLogic.getQueuedVehicles().stream())
                         .map(ChargingLogic.ChargingVehicle::ev)
                         .anyMatch(chargerEv -> chargerEv.getId().equals(ev.getId()))) {
                     chargingLogic.removeVehicle(ev, now);
@@ -835,7 +844,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
             if (driveDepartureTime > diversion.time) {
                 DrtStayTask waitTask = taskFactory.createStayTask(
                         context.vehicle(),
-                        diversion.time,
+                        currentTask.getEndTime(),
                         driveDepartureTime,
                         context.startWaypoint().getLink()
                 );

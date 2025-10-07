@@ -184,7 +184,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (now % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
             updateShiftEnds(now);
         }
-        if (now % (drtShiftParams.getUpdateShiftEndInterval()) == 0) {
+        if (now % (drtShiftParams.getUpdateShiftBreakInterval()) == 0) {
             updateShiftBreaks(now);
         }
         scheduleShifts(now, this.fleet);
@@ -488,7 +488,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
             if (activeShift.shift().getBreak().isPresent()) {
                 DrtShiftBreak shiftBreak = activeShift.shift().getBreak().get();
                 if (shiftBreak.getEarliestBreakStartTime() > now
-                        && shiftBreak.getEarliestBreakStartTime() < now + drtShiftParams.getShiftEndRescheduleLookAhead()) {
+                        && shiftBreak.getEarliestBreakStartTime() < now + drtShiftParams.getShiftBreakUpdateLookAhead()) {
                     shiftTaskScheduler.updateShiftBreak(activeShift, now);
                 }
             }

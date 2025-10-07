@@ -125,7 +125,7 @@ public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, Op
      * @return true if charging was removed successfully, false otherwise
      */
     public boolean removeCharging() {
-        if (this.getStatus() != TaskStatus.PLANNED && chargingTask != null) {
+        if (this.getStatus() == TaskStatus.PLANNED && chargingTask != null) {
             this.chargingTask = null;
             this.consumedEnergy = 0;
             return true;

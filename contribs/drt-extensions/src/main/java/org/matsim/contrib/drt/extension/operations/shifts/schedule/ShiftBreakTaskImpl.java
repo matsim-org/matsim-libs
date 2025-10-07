@@ -103,7 +103,7 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 	@Override
 	public boolean addCharging(ChargingTask chargingTask) {
 	    // Only allow adding charging if task is planned and no charging exists
-	    if (this.getStatus() == TaskStatus.PLANNED && this.chargingTask == null) {
+	    if (this.getStatus() != TaskStatus.PERFORMED && this.chargingTask == null) {
 	        this.chargingTask = chargingTask;
 	        this.consumedEnergy = chargingTask.getTotalEnergy();
 	        return true;

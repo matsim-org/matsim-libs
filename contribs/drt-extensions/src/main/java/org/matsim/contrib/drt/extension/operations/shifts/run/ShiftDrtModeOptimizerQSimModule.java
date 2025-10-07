@@ -161,7 +161,7 @@ public class ShiftDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule 
 					: getter.getModal(DrtActionCreator.class);
 
 			// adds shift tasks
-			return new DrtOperationsActionCreator(getter.getModal(PassengerHandler.class), delegate);
+			return new DrtOperationsActionCreator(getter.getModal(PassengerHandler.class), delegate, getter.get(MobsimTimer.class));
 		})).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).to(modalKey(DrtOperationsActionCreator.class));

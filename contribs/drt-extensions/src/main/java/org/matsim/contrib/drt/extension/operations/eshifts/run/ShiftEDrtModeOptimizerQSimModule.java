@@ -104,7 +104,7 @@ public class ShiftEDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule
 
 			return new DrtOperationsActionCreator(
 					getter.getModal(PassengerHandler.class), new EDrtActionCreator(delegate,
-					getter.get(MobsimTimer.class)));
+					getter.get(MobsimTimer.class)), getter.get(MobsimTimer.class));
 		})).asEagerSingleton();
 
 	}
