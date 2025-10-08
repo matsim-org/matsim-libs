@@ -244,9 +244,11 @@
 
 # ==== Plot with MATSim/PHEMLight/HBEFA3
 {
+  fuel <- "petrol"
+
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  diff_out <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_petrol_fixedIntervalLength_60_out.csv")
+  diff_out <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/diff_{fuel}_output_fixedIntervalLength_60.csv"))
 
   # Create summarized data fram from MATSim results
   data.MATSIM <- diff_out %>%
@@ -270,7 +272,7 @@
     ))
 
   # Load data from SUMO with PHEMLight and summarize for each interval
-  data.SUMO_PHEMLight <- read_delim("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/sumo_petrol_output.csv",
+  data.SUMO_PHEMLight <- read_delim(glue("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/sumo_{fuel}_output.csv"),
                            delim = ";",
                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                            col_types = cols(
@@ -292,7 +294,7 @@
     mutate(model = "SUMO_PHEMLight", value=value/1000)
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_petrol_pl5_output.csv",
+  data.SUMO_PHEMLight5 <- read_delim(glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_pl5.csv"),
                                     delim = ";",
                                     col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                                     col_types = cols(
@@ -315,26 +317,26 @@
 
   # TODO make sure, that this actually is a petrol car! It is just called "default"
   # Load data from SUMO with HBEFA3 and summarize for each interval
-  data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_average_hbefa3_output.csv",
-                                 delim = ";",
-                                 col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
-                                 col_types = cols(
-                                   time = col_integer(),
-                                   velocity = col_double(),
-                                   acceleration = col_double(),
-                                   slope = col_double(),
-                                   CO = col_double(),
-                                   CO2 = col_double(),
-                                   HC = col_double(),
-                                   PMx = col_double(),
-                                   NOx = col_double(),
-                                   fuel = col_double(),
-                                   electricity = col_double())) %>%
-    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
-    mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
-    group_by(segment, component) %>%
-    summarize(value = sum(value)) %>%
-    mutate(model = "SUMO_HBEFA3", value=value/1000)
+  # data.SUMO_HBEFA3 <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_average_hbefa3_output.csv",
+  #                                delim = ";",
+  #                                col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+  #                                col_types = cols(
+  #                                  time = col_integer(),
+  #                                  velocity = col_double(),
+  #                                  acceleration = col_double(),
+  #                                  slope = col_double(),
+  #                                  CO = col_double(),
+  #                                  CO2 = col_double(),
+  #                                  HC = col_double(),
+  #                                  PMx = col_double(),
+  #                                  NOx = col_double(),
+  #                                  fuel = col_double(),
+  #                                  electricity = col_double())) %>%
+  #   pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+  #   mutate(segment = cut(time, breaks = c(0, intervals$endTime), labels = FALSE, right = FALSE, include.lowest = TRUE)-as.integer(1)) %>%
+  #   group_by(segment, component) %>%
+  #   summarize(value = sum(value)) %>%
+  #   mutate(model = "SUMO_HBEFA3", value=value/1000)
 
   # Append all datasets together
   data_list <- mget(ls(pattern = "^data\\."), envir = .GlobalEnv)
@@ -347,21 +349,24 @@
   # Bar-Plot
   ggplot(data) +
     geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
-    scale_fill_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
+    scale_fill_manual(values=c("#d21717", "#17d2a4", "#7d23cc")) +
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
-    theme(text = element_text(size=18))
-    #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2)
-
+    theme(text = element_text(size=18)) +
+    #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
+    ggtitle(glue("Comparison across WLTP-cycle for {fuel}")) +
+    theme_minimal()
 
   # Line-Plot (for scenarios with more links)
   ggplot(data) +
     geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
     geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
-    scale_color_manual(values=c("#d21717", "#bfbf00", "#17d2a4", "#7d23cc")) +
+    scale_color_manual(values=c("#d21717", "#17d2a4", "#7d23cc")) +
     facet_wrap(~component, scales="free") +
     ylab("emissions in g/km") +
-    theme(text = element_text(size=18))
+    theme(text = element_text(size=18)) +
+    ggtitle(glue("Comparison across WLTP-cycle for {fuel}")) +
+    theme_minimal()
 
 }
 
