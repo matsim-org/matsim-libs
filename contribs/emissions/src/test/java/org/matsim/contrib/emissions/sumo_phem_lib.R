@@ -145,7 +145,7 @@ compute_emission_difference <- function(path_matsim, path_sumo){
 
   cat(sep = "\n")
 
-  relative <- merge(data.MATSIM, data.SUMO_PHEMLight, by = c("segment", "component")) %>%
+  merge(data.MATSIM, data.SUMO_PHEMLight, by = c("segment", "component")) %>%
     mutate(relative = ((value.x/value.y)-1)*100) %>%
     group_by(component) %>%
     summarize(percent_r = mean(relative)) %>%
@@ -156,7 +156,7 @@ compute_emission_difference <- function(path_matsim, path_sumo){
 
   cat(sep = "\n")
 
-  absolute <- merge(data.MATSIM, data.SUMO_PHEMLight, by = c("segment", "component")) %>%
+  merge(data.MATSIM, data.SUMO_PHEMLight, by = c("segment", "component")) %>%
     group_by(component) %>%
     summarize(absolute.x = sum(value.x), absolute.y = sum(value.y)) %>%
     mutate(percent_a = absolute.x/absolute.y) %>%
