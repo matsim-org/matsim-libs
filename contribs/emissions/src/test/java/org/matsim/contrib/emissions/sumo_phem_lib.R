@@ -123,11 +123,6 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
 
 }
 
-# Takes a MATSim and SUMO output and compares the total
-compute_absolute_emission_difference <- function(path){
-  # Load
-}
-
 # Takes a MATSim and SUMO output and compares for each component:
 # 1. the average difference per segment (%r)
 # 2. the difference of the sum over all segments (%a)
@@ -159,10 +154,12 @@ compute_emission_difference <- function(path_matsim, path_sumo){
   merge(data.MATSIM, data.SUMO_PHEMLight, by = c("segment", "component")) %>%
     group_by(component) %>%
     summarize(absolute.x = sum(value.x), absolute.y = sum(value.y)) %>%
-    mutate(percent_a = absolute.x/absolute.y) %>%
+    mutate(percent_a = ((absolute.x/absolute.y)-1)*100) %>%
 
     mutate(line = glue("{component} {percent_a} %a")) %>%
     pull(line) %>%
     cat(sep = "\n")
 
 }
+
+compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output.csv") )
