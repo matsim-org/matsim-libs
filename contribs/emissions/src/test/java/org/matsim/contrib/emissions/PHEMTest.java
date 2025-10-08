@@ -4,12 +4,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
@@ -50,7 +47,7 @@ public class PHEMTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	// TODO Files were changed to local for debugging purposes. CHange them back to the svn entries, when fixed hbefa tables are available
+	// TODO Files were changed to local for debugging purposes. Cange them back to the svn entries, when fixed hbefa tables are available
 	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";
 	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
@@ -191,7 +188,6 @@ public class PHEMTest {
 
 			int time = (segment.getLast().second+1 - drivingSegments.get(finishedSegments).getFirst().second);
 
-			// TODO The freespeed is essential for correct results. Just taking the max value is not the cleanest solution
 			double freespeed = segment.stream().map(s -> s.vel).max(Comparator.naturalOrder()).get()/3.6;
 
 			// Use default hbefa Hbefa Road Type mapping TODO NoOfLanes is important for this to work! Currently statically set to 1
@@ -469,6 +465,7 @@ public class PHEMTest {
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
@@ -558,7 +555,7 @@ public class PHEMTest {
 					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
 					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
 
-				// TODO We are comparing PMx to PM10. SUMO does not specify, what PMx exactly means.
+				// TODO PM or PM_TOTAL?
 				new double[]{sumoSegments.get(i).PMx/1000,
 					link_pollutant2grams.get(i).get(Pollutant.PM),
 					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
@@ -670,6 +667,7 @@ public class PHEMTest {
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
@@ -746,6 +744,7 @@ public class PHEMTest {
 					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
 					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
 
+				// TODO PM or PM_TOTAL?
 				new double[]{sumoSegments.get(i).PMx/1000,
 					link_pollutant2grams.get(i).get(Pollutant.PM),
 					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
@@ -990,7 +989,7 @@ class PHEMTestHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
 			return "RUR/MW/120";
 		} else if (freespeed <= 36.11111111){ // 130kmh
 			return "RUR/MW/130";
-		}else if (freespeed > 36.11111111) { //faster
+		} else if (freespeed > 36.11111111) { //faster
 			return "RUR/MW/>130";
 		} else {
 			throw new RuntimeException("No mapping specified for links with freespeed: " + link.getFreespeed() + " and " + link.getNumberOfLanes() + " lanes");
