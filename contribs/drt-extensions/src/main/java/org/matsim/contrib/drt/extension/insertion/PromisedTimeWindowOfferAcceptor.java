@@ -24,7 +24,7 @@ public class PromisedTimeWindowOfferAcceptor implements DrtOfferAcceptor {
 				request.getLatestStartTime());
 
 		double updatedDropoffTimeWindow = Math.min(arrivalTime + promisedDropoffTimeWindow,
-				request.getConstraints().latestArrivalTime());
+				request.getLatestArrivalTime());
 
 		return Optional
 				.of(AcceptedDrtRequest.newBuilder()

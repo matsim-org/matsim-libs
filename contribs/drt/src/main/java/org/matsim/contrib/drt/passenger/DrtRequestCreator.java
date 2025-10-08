@@ -57,10 +57,12 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
-		double latestStartTime = Double.POSITIVE_INFINITY;
-		double latesArrivalTime = Double.POSITIVE_INFINITY;
+
+		double maxWaitDuration = Double.POSITIVE_INFINITY;
+		double maxTravelDuration = Double.POSITIVE_INFINITY;
 		double maxRideDuration = Double.POSITIVE_INFINITY;
         double maxPickupDelay = Double.POSITIVE_INFINITY;
+
         double lateDiversionThreshold = 0;
 		boolean allowRejection = true;
 		DvrpLoad load = emptyLoad;
@@ -69,9 +71,10 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		for (Route route : routes) {
 			DrtRoute drtRoute = (DrtRoute)route;
             DrtRouteConstraints constraints = drtRoute.getConstraints();
-			latestStartTime =  Math.min(latestStartTime, constraints.latestStartTime());
-			latesArrivalTime =  Math.min(latesArrivalTime, constraints.latestArrivalTime());
-            maxRideDuration = Math.min(maxRideDuration, constraints.maxRideDuration());
+
+			maxWaitDuration = Math.min(maxWaitDuration, constraints.maxWaitDuration());
+			maxTravelDuration = Math.min(maxTravelDuration, constraints.maxTravelDuration());
+			maxRideDuration = Math.min(maxRideDuration, constraints.maxRideDuration());
             maxPickupDelay = Math.min(maxPickupDelay, constraints.maxPickupDelay());
             lateDiversionThreshold = Math.max(lateDiversionThreshold, constraints.lateDiversionThreshold());
             load = load.add(drtRoute.getLoad(dvrpLoadType));
@@ -79,10 +82,9 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		}
 
 		DrtRouteConstraints consolidatedConstrains = new DrtRouteConstraints(
-				departureTime,
-				latestStartTime,
-				latesArrivalTime,
+				maxTravelDuration,
 				maxRideDuration,
+				maxWaitDuration,
 				maxPickupDelay,
 				lateDiversionThreshold,
 				allowRejection
@@ -95,8 +97,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance(),
-						departureTime, consolidatedConstrains.latestStartTime(),
-						consolidatedConstrains.latestArrivalTime(), maxRideDuration,
+						departureTime, departureTime + maxWaitDuration,
+						departureTime + maxTravelDuration, maxRideDuration,
 						load, serializedLoad)
 		);
 
@@ -106,6 +108,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.mode(mode)
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(departureTime)
 				.constraints(consolidatedConstrains)
 				.submissionTime(submissionTime)
 				.load(load)

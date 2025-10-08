@@ -234,12 +234,12 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
+                .earliestDepartureTime(earliestStartTime)
                 .constraints(
                         new DrtRouteConstraints(
-                                earliestStartTime,
-                                latestStartTime,
-                                latestArrivalTime,
+                                latestArrivalTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
                                 0.,
                                 false
