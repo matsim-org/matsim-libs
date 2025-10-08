@@ -234,7 +234,7 @@ public final class MatsimTestUtils implements BeforeEachCallback, AfterEachCallb
 
 	public String getParameterizedTestInputString() {
 		String parameters = this.testDisplayName.replaceFirst("^.*?\\]", "").trim();
-		parameters = parameters.replaceAll(" ", "").replaceAll("[^a-zA-Z0-9]", "_");
+		parameters = parameters.replaceAll(" ", "").replaceAll("\"", "").replaceAll("[^a-zA-Z0-9]", "_");
 		return parameters;
 	}
 
