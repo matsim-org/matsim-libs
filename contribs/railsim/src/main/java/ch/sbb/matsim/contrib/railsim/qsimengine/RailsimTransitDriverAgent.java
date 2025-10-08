@@ -54,6 +54,13 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 	}
 
 	/**
+	 * Get the current stop index of this driver schedule.
+	 */
+	public int getCurrentStopIndex() {
+		return stopIterator.nextIndex() - 1;
+	}
+
+	/**
 	 * Add a detour to this driver schedule.
 	 *
 	 * @return next transit stop, if it needs to be changed.

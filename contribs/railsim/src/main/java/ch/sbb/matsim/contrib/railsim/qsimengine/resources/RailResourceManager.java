@@ -19,6 +19,7 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
@@ -33,6 +34,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
@@ -61,6 +66,7 @@ public final class RailResourceManager {
 	private final Map<Id<RailResource>, RailResource> resources;
 
 	private final DeadlockAvoidance dla;
+	private final TrainManager trains;
 
 	/**
 	 * Retrieve source id of a link.
@@ -74,20 +80,21 @@ public final class RailResourceManager {
 	}
 
 	@Inject
-	public RailResourceManager(QSim qsim, DeadlockAvoidance dla) {
+	public RailResourceManager(QSim qsim, DeadlockAvoidance dla, TrainManager trainManager) {
 		this(qsim.getEventsManager(),
 			ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class),
 			qsim.getScenario().getNetwork(),
-			dla);
+			dla, trainManager);
 	}
 
 	/**
 	 * Construct resources from network.
 	 */
 	public RailResourceManager(EventsManager eventsManager, RailsimConfigGroup config,
-							   Network network, DeadlockAvoidance dla) {
+							   Network network, DeadlockAvoidance dla, TrainManager trainManager) {
 		this.eventsManager = eventsManager;
 		this.dla = dla;
+		this.trains = trainManager;
 		this.links = new IdMap<>(Link.class, network.getLinks().size());
 
 		// Mapping for resources to be created
@@ -97,7 +104,29 @@ public final class RailResourceManager {
 		for (Map.Entry<Id<Link>, ? extends Link> e : network.getLinks().entrySet()) {
 			if (e.getValue().getAllowedModes().stream().anyMatch(modes::contains)) {
 
-				RailLink link = new RailLink(e.getValue());
+				Link opposite = NetworkUtils.findLinkInOppositeDirection(e.getValue());
+				DisallowedNextLinks disallowed = NetworkUtils.getDisallowedNextLinks(e.getValue());
+
+				Set<Id<Link>> disallowedNextLinks = null;
+				if (disallowed != null) {
+					disallowedNextLinks = new LinkedHashSet<>();
+					for (String mode : config.getNetworkModes()) {
+						List<List<Id<Link>>> sequences = disallowed.getDisallowedLinkSequences(mode);
+
+						for (List<Id<Link>> sequence : sequences) {
+							if (sequence.size() > 1)
+								throw new IllegalArgumentException("Only disallowed sequences of length 1 are supported.");
+
+							disallowedNextLinks.add(sequence.getFirst());
+						}
+					}
+				}
+
+				RailLink link = new RailLink(e.getValue(), opposite, disallowedNextLinks);
+
+				if (link.length <= 0)
+					throw new IllegalArgumentException("Link length must be greater than zero: " + link);
+
 				resourceMapping.computeIfAbsent(getResourceId(e.getValue()), k -> new ArrayList<>()).add(link);
 				this.links.put(e.getKey(), link);
 			}
@@ -150,7 +179,55 @@ public final class RailResourceManager {
 			return reservedDist;
 		}
 
-		if (link.resource.hasCapacity(time, link, track, position)) {
+		// For non-blocking areas a whole segment of links needs to be reserved
+		if (link.isNonBlockingArea()) {
+
+			List<RailLink> route = position.getRouteUntilNextStop();
+			int idx = route.indexOf(link);
+
+			List<RailLink> links = new LinkedList<>();
+			boolean allFree = true;
+
+			// After the non-blocking segment, reserve enough area for the train to hold if needed
+			double avoidanceDist = 0;
+
+			for (int i = idx; i < route.size(); i++) {
+				RailLink l = route.get(i);
+
+				// Note that the deadlock avoidance is not checked here on the single links
+				// It will be invoked later on the whole segment of links
+				allFree = l.resource.hasCapacity(time, l, track, position);
+				if (!allFree)
+					break;
+
+				links.addFirst(l);
+
+				// Accumulate the distance after the non-blocking area
+				if (!l.isNonBlockingArea())
+					avoidanceDist += l.length;
+
+				if (avoidanceDist > position.getTrain().length())
+					break;
+			}
+
+			if (!allFree || !dla.checkLinks(time, links, position)) {
+				return RailResourceInternal.NO_RESERVATION;
+			}
+
+			double dist = RailResourceInternal.NO_RESERVATION;
+			for (RailLink l : links) {
+				dist = l.resource.reserve(time, l, track, position);
+				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
+					position.getDriver().getVehicle().getId(), l.resource.getState(l)));
+				dla.onReserve(time, l.resource, position);
+			}
+
+			return dist;
+		}
+
+		// Check and reserve a single link
+		boolean blockedByRelatedTrain = isBlockedByRelatedTrain(link, position);
+		if (link.resource.hasCapacity(time, link, track, position) || blockedByRelatedTrain) {
 
 			if (!dla.checkLink(time, link, position)) {
 				assert reservedDist == RailResourceInternal.NO_RESERVATION : "Link should not be reserved already.";
@@ -158,7 +235,7 @@ public final class RailResourceManager {
 				return RailResourceInternal.NO_RESERVATION;
 			}
 
-			double dist = link.resource.reserve(time, link, track, position);
+			double dist = link.resource.reserve(time, link, track, position, blockedByRelatedTrain);
 			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
 				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
@@ -174,11 +251,41 @@ public final class RailResourceManager {
 	}
 
 	/**
+	 * Vehicle ids with the same units are allowed together on a track, they will effectively become the same vehicle when merging.
+	 */
+	private boolean isBlockedByRelatedTrain(RailLink link, TrainPosition position) {
+		TransitStopFacility stop = position.getNextStop();
+
+		// Only transit stops
+		if (stop == null || !Objects.equals(link.getLinkId(), stop.getLinkId()))
+			return false;
+
+		List<Id<Vehicle>> relatedVehicles = trains.getRelatedVehicles(position.getDriver().getVehicle().getId());
+
+		for (Id<Vehicle> vehicle : relatedVehicles) {
+			TrainPosition state = trains.getActiveTrain(vehicle);
+			if (state != null && isBlockedBy(link, state)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Checks whether a link or underlying resource has remaining capacity.
 	 */
 	public boolean hasCapacity(double time, Id<Link> link, int track, TrainPosition position) {
 		RailLink l = getLink(link);
 		return l.resource.hasCapacity(time, l, track, position);
+	}
+
+	/**
+	 * Set the capacity of a link or underlying resource.
+	 */
+	public void setCapacity(Id<Link> link, int newCapacity) {
+		RailLink l = getLink(link);
+		l.resource.setCapacity(newCapacity);
 	}
 
 	/**
@@ -207,6 +314,7 @@ public final class RailResourceManager {
 
 	/**
 	 * Check if a re-route is allowed.
+	 *
 	 * @see DeadlockAvoidance#checkReroute(double, RailLink, RailLink, List, List, TrainPosition)
 	 */
 	public boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position) {

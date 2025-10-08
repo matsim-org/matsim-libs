@@ -59,8 +59,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	private int nextLinkIndex = 0;
 	private Person dummyPerson;
 	private TransitRouteStop currentStop = null;
+	private Double currentArrivalTime = null;
 	protected TransitRouteStop nextStop;
-	private ListIterator<TransitRouteStop> stopIterator;
+	protected ListIterator<TransitRouteStop> stopIterator;
 	private final InternalInterface internalInterface;
 	protected final PassengerAccessEgress accessEgress;
 
@@ -179,8 +180,13 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
 		// yy can't make this final because of tests.  kai, oct'12
 
-		assertExpectedStop(stop);
-		processEventVehicleArrives(stop, now);
+		// Process the arrival only if not currently waiting at the station
+		if (currentArrivalTime == null) {
+			// Store arrival, needed for stop time calculation
+			currentArrivalTime = now;
+			assertExpectedStop(stop);
+			processEventVehicleArrives(stop, now);
+		}
 
 		TransitRoute route = this.getTransitRoute();
 		List<TransitRouteStop> stopsToCome = route.getStops().subList(stopIterator.nextIndex(), route.getStops().size());
@@ -189,6 +195,11 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
 		double stopTime = ((PassengerAccessEgressImpl) this.accessEgress).calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
+
+		if (currentStop != null && currentStop.getMinimumStopDuration() > 0) {
+			// TODO: event sequence can be incorrect
+			stopTime = Math.max(stopTime, currentStop.getMinimumStopDuration() - (now - currentArrivalTime));
+		}
 
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
@@ -287,6 +298,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getVehicle().getId(),
 				this.currentStop.getStopFacility().getId(),
 				delay));
+		this.currentArrivalTime = null;
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
 		if(this.nextStop == null) {
 			assertVehicleIsEmpty();

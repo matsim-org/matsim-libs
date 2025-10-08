@@ -54,6 +54,7 @@ abstract class Constants {
 	static final String ALLOW_BOARDING = "allowBoarding";
 	static final String ALLOW_ALIGHTING = "allowAlighting";
 	static final String AWAIT_DEPARTURE = "awaitDeparture";
+	static final String MINIMUM_STOP_DURATION = "minimumStopDuration";
 	static final String IS_BLOCKING = "isBlocking";
 	static final String STOP_AREA_ID = "stopAreaId";
 	static final String ATTRIBUTES = "attributes";

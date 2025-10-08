@@ -29,6 +29,14 @@ public interface DeadlockAvoidance {
 	boolean checkLink(double time, RailLink link, TrainPosition position);
 
 	/**
+	 * Check if reserving these links may produce a deadlock. All links will be reserved together.
+	 * @return true if all links can be reserved, false otherwise.
+	 */
+	default boolean checkLinks(double time, List<RailLink> links, TrainPosition position) {
+		return links.stream().allMatch(link -> checkLink(time, link, position));
+	}
+
+	/**
 	 * Check if performing this re-route may produce a deadlock.
 	 * @param subRoute the original route to be changed
 	 * @param detour new detour route
@@ -51,5 +59,4 @@ public interface DeadlockAvoidance {
 	 */
 	default void onReleaseLink(double time, RailLink link, MobsimDriverAgent driver) {
 	}
-
 }

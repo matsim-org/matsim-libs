@@ -20,6 +20,7 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import org.matsim.core.network.NetworkChangeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,17 @@ import java.util.List;
 public final class RailsimCalc {
 
 	private RailsimCalc() {
+	}
+
+	/**
+	 * Calculate the change as specified by a change event.
+	 */
+	static double calculateChange(NetworkChangeEvent.ChangeValue changeValue, double oldValue) {
+		return switch (changeValue.getType()) {
+			case ABSOLUTE_IN_SI_UNITS -> changeValue.getValue();
+			case FACTOR -> changeValue.getValue() * oldValue;
+			case OFFSET_IN_SI_UNITS -> oldValue + changeValue.getValue();
+		};
 	}
 
 	/**
@@ -105,7 +117,9 @@ public final class RailsimCalc {
 
 		// Distance could be zero, speeds must be already equal then
 		if (FuzzyUtils.equals(dist, 0)) {
-			assert FuzzyUtils.equals(currentSpeed, finalSpeed) : "Current speed must be equal to allowed speed";
+			assert FuzzyUtils.equals(currentSpeed, finalSpeed) :
+				String.format("Current speed must be equal to allowed speed, but was %s != %s", currentSpeed, finalSpeed);
+
 			return new SpeedTarget(finalSpeed, 0);
 		}
 
@@ -203,7 +217,7 @@ public final class RailsimCalc {
 	/**
 	 * Calculate the projected driven distance, based on current position and state.
 	 */
-	public static double projectedDistance(double time,  TrainPosition position) {
+	public static double projectedDistance(double time, TrainPosition position) {
 
 		if (!(position instanceof TrainState state))
 			throw new IllegalArgumentException("Position must be a TrainState.");
