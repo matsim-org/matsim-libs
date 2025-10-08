@@ -72,7 +72,6 @@ public class InsertionGeneratorTest {
 	private static final double TIME_REPLACED_DRIVE = 100;
 
 	private static final DrtRouteConstraints DRT_ROUTE_CONSTRAINTS = new DrtRouteConstraints(
-			0,
 			Double.POSITIVE_INFINITY,
 			Double.POSITIVE_INFINITY,
 			Double.POSITIVE_INFINITY,
@@ -90,6 +89,7 @@ public class InsertionGeneratorTest {
 			.passengerIds(
 					List.of(Id.createPersonId("person"))
 			)
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.load(LOAD_TYPE.fromInt(1))
 			.build();
@@ -104,6 +104,7 @@ public class InsertionGeneratorTest {
 				)
 			)
 			.load(LOAD_TYPE.fromInt(2))
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.build();
 
@@ -120,17 +121,18 @@ public class InsertionGeneratorTest {
 				)
 			)
 			.load(LOAD_TYPE.fromInt(5))
+			.earliestDepartureTime(0.)
 			.constraints(DRT_ROUTE_CONSTRAINTS)
 			.build();
 
-	private final DrtRequest prebookedRequest = DrtRequest.newBuilder()
+		private final DrtRequest prebookedRequest = DrtRequest.newBuilder()
 			.fromLink(fromLink)
 			.toLink(toLink)
+			.earliestDepartureTime(100)
 			.constraints(
 					new DrtRouteConstraints(
-							100,
 							0,
-							0,
+							Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY,
 							0.,

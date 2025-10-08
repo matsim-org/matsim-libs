@@ -79,10 +79,9 @@ public class VariableStopDurationTest {
 												  double waitTimeConstraint
 		) {
 			data.put(personId, new DrtRouteConstraints(
-					departureTime,
-					departureTime + waitTimeConstraint,
-					departureTime + travelTimeConstraint,
+					travelTimeConstraint,
 					Double.POSITIVE_INFINITY,
+					waitTimeConstraint,
 					Double.POSITIVE_INFINITY,
 					0.0,
 					true
