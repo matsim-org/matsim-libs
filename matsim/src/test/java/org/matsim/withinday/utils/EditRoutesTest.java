@@ -28,8 +28,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,20 +39,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DijkstraFactory;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -62,14 +61,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class EditRoutesTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	// yyyy This test relies heavily on position counting in plans.  With the introduction of intermediate walk legs the positions changed.
 	// I tried to guess the correct indices, but it would be more honest to change this to TripStructureUtils.  kai, feb'16
@@ -87,11 +85,14 @@ public class EditRoutesTest {
 	/**
 	 * @author cdobler
 	 */
-	@Test
-	void testReplanFutureLegRoute() {
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanFutureLegRoute( AccessEgressType accessEgressType ) {
 		// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 
-		createScenario();
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -109,9 +110,9 @@ public class EditRoutesTest {
 
 		// create new, empty routes and set them in the Legs
 		NetworkRoute networkRouteHW = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(
-				legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
+			legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
 		NetworkRoute networkRouteWH = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(
-				legWH.getRoute().getStartLinkId(), legWH.getRoute().getEndLinkId());
+			legWH.getRoute().getStartLinkId(), legWH.getRoute().getEndLinkId());
 		legHW.setRoute(networkRouteHW);
 		legWH.setRoute(networkRouteWH);
 
@@ -122,10 +123,10 @@ public class EditRoutesTest {
 		// replan the legs to recreate the routes
 
 		//		assertEquals(true, ed.replanFutureLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), scenario.getNetwork(), tripRouter));
-		assertEquals(true, ed.replanFutureLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson() ) ); // 1-->3
+		assertTrue( ed.replanFutureLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), plan.getPerson() ) ); // 1-->3
 
 		//		assertEquals(true, ed.replanFutureLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), scenario.getNetwork(), tripRouter));
-		assertEquals(true, ed.replanFutureLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson() ) ); // 3-->9
+		assertTrue( ed.replanFutureLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson() ) ); // 3-->9
 
 		// the legs have been replaced, the original ones should not have changed
 		assertEquals(0, networkRouteHW.getLinkIds().size());
@@ -145,13 +146,16 @@ public class EditRoutesTest {
 		assertEquals(3, networkRouteWH.getLinkIds().size());	// l4, l5, l2
 	}
 
-	@Test
-	void testRelocateFutureLegRoute() {
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testRelocateFutureLegRoute( AccessEgressType accessEgressType ) {
 		// yyyy this test is misleading.  "relocateFutureLegRoute"  is ok, but it does not look after the overall plan consistency,
 		// as this test implies.  kai, feb'16
 
 
-		createScenario();
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 
 		int firstCarLeg = 1 ; // 1-->3
 		int scndAct = 2 ;
@@ -174,9 +178,9 @@ public class EditRoutesTest {
 
 		// create new, empty routes and set them in the Legs
 		NetworkRoute networkRouteHW = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(
-				legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
+			legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
 		NetworkRoute networkRouteWH = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(
-				legWH.getRoute().getStartLinkId(), legWH.getRoute().getEndLinkId());
+			legWH.getRoute().getStartLinkId(), legWH.getRoute().getEndLinkId());
 		legHW.setRoute(networkRouteHW);
 		legWH.setRoute(networkRouteWH);
 
@@ -187,11 +191,11 @@ public class EditRoutesTest {
 
 		// relocate the legs to recreate the routes
 		//		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter));
-		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson() ));
+		assertTrue( ed.relocateFutureLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson() ) );
 		// 1-->3
 
 		//		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), activityW1.getLinkId(), activityH2.getLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter));
-		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), activityW1.getLinkId(), activityH2.getLinkId(), plan.getPerson() ));
+		assertTrue( ed.relocateFutureLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), activityW1.getLinkId(), activityH2.getLinkId(), plan.getPerson() ) );
 		// 3-->9
 
 		// get replaced legs and routes
@@ -215,10 +219,10 @@ public class EditRoutesTest {
 		legHW.setMode(TransportMode.walk);
 		legWH.setRoute(null);
 		legWH.setMode(TransportMode.walk);
-		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson() ));
+		assertTrue( ed.relocateFutureLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson() ) );
 		// 1-->3
 
-		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), activityW1.getLinkId(), activityH2.getLinkId(), plan.getPerson() ));
+		assertTrue( ed.relocateFutureLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), activityW1.getLinkId(), activityH2.getLinkId(), plan.getPerson() ) );
 		// 3-->9
 
 		assertNotNull(legHW.getRoute());
@@ -228,11 +232,15 @@ public class EditRoutesTest {
 	/**
 	 * @author cdobler
 	 */
-	@Test
-	void testReplanCurrentLegRouteOne()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteOne( AccessEgressType accessEgressType )
 	// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 	{
-		createScenario();
+
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
 		if ( !scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
@@ -250,38 +258,42 @@ public class EditRoutesTest {
 		//		assertEquals(false, ed.replanCurrentLegRoute(plan, 2, 0, tripRouter, 8.0*3600));
 		//		assertEquals(false, ed.replanCurrentLegRoute(plan, 4, 0, tripRouter, 8.0*3600));
 
+		final Leg firstLegToReplan = (Leg) plan.getPlanElements().get( firstCarLeg );
 		// expect ArrayIndexOutOfBoundsException - using illegal indices for the current position in the route
 		try {
 			// yyyy probably testing only the first failure?  kai, nov'17
-			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), -1, 8.0*3600 );
-			ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 100, 8.0*3600 );
-			fail("expected IndexOutOfBoundsException.");
+			ed.replanCurrentLegRoute( firstLegToReplan, plan.getPerson(), -1, 8.0*3600 );
+			ed.replanCurrentLegRoute( firstLegToReplan, plan.getPerson(), 100, 8.0*3600 );
+			fail("We expected an IndexOutOfBoundsException but did not get one.");
 		} catch (IndexOutOfBoundsException e) {
 			log.debug("caught expected exception.", e);
 		}
 
 		// create new routes for HW-trip
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 0, 8.0*3600 )); // HW, start Link
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 1, 8.0*3600 )); // HW, en-route
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 2, 8.0*3600 )); // HW, end Link
+		assertTrue( ed.replanCurrentLegRoute( firstLegToReplan, plan.getPerson(), 0, 8.0 * 3600 ) ); // HW, start Link
+		assertTrue( ed.replanCurrentLegRoute( firstLegToReplan, plan.getPerson(), 1, 8.0 * 3600 ) ); // HW, en-route
+		assertTrue( ed.replanCurrentLegRoute( firstLegToReplan, plan.getPerson(), 2, 8.0 * 3600 ) ); // HW, end Link
 
 		// create new routes for WH-trip
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 )); // WH, start Link
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 1, 8.0*3600 )); // WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 )); // WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 )); // WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 )); // WH, end Link
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 0, 8.0 * 3600 ) ); // WH, start Link
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 1, 8.0 * 3600 ) ); // WH, en-route
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 2, 8.0 * 3600 ) ); // WH, en-route
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 3, 8.0 * 3600 ) ); // WH, en-route
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 4, 8.0 * 3600 ) ); // WH, end Link
 
 	}
 
-	@Test
-	void testReplanCurrentLegRouteTwo()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteTwo( AccessEgressType accessEgressType )
 	{
 		/*
 		 *  replace destinations and create new routes
 		 */
 		// create new routes for HW-trip
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 		int firstCarLeg = 1 ; // 1-->3
 		int scndCarLeg = 3 ; // 3-->9
@@ -295,18 +307,21 @@ public class EditRoutesTest {
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 		final boolean result = ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(),
-				0, 8.0 * 3600);
-		assertEquals(true, result); // HW, start Link
+			0, 8.0 * 3600);
+		assertTrue( result ); // HW, start Link
 
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		log.warn( route );
-		assertEquals(true, checkRouteValidity(route));
+		assertTrue( checkRouteValidity( route ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteThree()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteThree( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -320,15 +335,18 @@ public class EditRoutesTest {
 		Activity activityW1;
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 1, 8.0*3600 ) );	// HW, en-route
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), plan.getPerson(), 1, 8.0 * 3600 ) );	// HW, en-route
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
-		assertEquals(true, checkRouteValidity(route));
+		assertTrue( checkRouteValidity( route ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteFour()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteFour( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -342,16 +360,19 @@ public class EditRoutesTest {
 		Activity activityW1;
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// HW, end Link
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), plan.getPerson(), 2, 8.0 * 3600 ) );	// HW, end Link
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
-		assertEquals(true, checkRouteValidity(route));
+		assertTrue( checkRouteValidity( route ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteFive()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteFive( AccessEgressType accessEgressType )
 	{
 		// create new routes for WH-trip
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -365,14 +386,17 @@ public class EditRoutesTest {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));	// WH, start Link
-		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 0, 8.0 * 3600 ) );	// WH, start Link
+		assertTrue( checkRouteValidity( (NetworkRoute) ((Leg) plan.getPlanElements().get( scndCarLeg )).getRoute() ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteSix()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteSix( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -386,14 +410,17 @@ public class EditRoutesTest {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 1, 8.0*3600 ));	// WH, en-route
-		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 1, 8.0 * 3600 ) );	// WH, en-route
+		assertTrue( checkRouteValidity( (NetworkRoute) ((Leg) plan.getPlanElements().get( scndCarLeg )).getRoute() ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteSeven()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteSeven( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -407,14 +434,17 @@ public class EditRoutesTest {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// WH, en-route
-		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 2, 8.0 * 3600 ) );	// WH, en-route
+		assertTrue( checkRouteValidity( (NetworkRoute) ((Leg) plan.getPlanElements().get( scndCarLeg )).getRoute() ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteEight()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteEight( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -428,14 +458,17 @@ public class EditRoutesTest {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 ) );	// WH, en-route
-		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 3, 8.0 * 3600 ) );	// WH, en-route
+		assertTrue( checkRouteValidity( (NetworkRoute) ((Leg) plan.getPlanElements().get( scndCarLeg )).getRoute() ) );
 	}
 
-	@Test
-	void testReplanCurrentLegRouteNine()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteNine( AccessEgressType accessEgressType )
 	{
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -449,16 +482,19 @@ public class EditRoutesTest {
 
 		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 ));	// WH, end Link
-		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
+		assertTrue( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 4, 8.0 * 3600 ) );	// WH, end Link
+		assertTrue( checkRouteValidity( (NetworkRoute) ((Leg) plan.getPlanElements().get( scndCarLeg )).getRoute() ) );
 
 	}
 
-	@Test
-	void testReplanCurrentLegRouteTen()
+	@ParameterizedTest
+	@EnumSource(value = AccessEgressType.class, names = { "none", "accessEgressModeToLink" })
+	void testReplanCurrentLegRouteTen( AccessEgressType accessEgressType )
 	{
 		// expect EditRoutes to return false if the Route in the leg is not a NetworkRoute
-		createScenario();	// reset scenario
+		Config config = ConfigUtils.createConfig();
+		config.routing().setAccessEgressType( accessEgressType );
+		createScenario( config );
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 
 		int firstCarLeg = 1 ; // 1-->3
@@ -475,164 +511,175 @@ public class EditRoutesTest {
 		legHW.setMode(TransportMode.walk);
 		legWH.setRoute(null);
 		legWH.setMode(TransportMode.walk);
-		assertEquals(false, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 0, 8.0*3600 ));
-		assertEquals(false, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));
+		assertFalse( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( firstCarLeg ), plan.getPerson(), 0, 8.0 * 3600 ) );
+		assertFalse( ed.replanCurrentLegRoute( (Leg) plan.getPlanElements().get( scndCarLeg ), plan.getPerson(), 0, 8.0 * 3600 ) );
 	}
 
 
-/**
- * @author cdobler
- */
-private void createScenario() {
-	scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-	createSampleNetwork();
-	createTripRouter();
-	createSamplePlan();
-}
-
-/**
- * @author cdobler
- */
-private void createSampleNetwork() {
-	Network network = scenario.getNetwork();
-	NetworkFactory networkFactory = network.getFactory();
-
-	Coord coord = null;
-	Node node1 = null;
-	Node node2 = null;
-	Node node3 = null;
-	Node node4 = null;
-	Link link = null;
-
-	/*
-	 * create Nodes
+	/**
+	 * @author cdobler
 	 */
-	coord = new Coord((double) 0, (double) 0);
-	node1 = networkFactory.createNode(Id.create("n1", Node.class), coord);
-	network.addNode(node1);
+	private void createScenario( Config config ){
+		String [] modes = { TransportMode.car };
 
-	coord = new Coord((double) 1, (double) 0);
-	node2 = networkFactory.createNode(Id.create("n2", Node.class), coord);
-	network.addNode(node2);
+		config.routing().setNetworkModes( Arrays.asList( modes ) );
+		config.qsim().setMainModes( Arrays.asList( modes ) );
 
-	coord = new Coord((double) 1, (double) 1);
-	node3 = networkFactory.createNode(Id.create("n3", Node.class), coord);
-	network.addNode(node3);
+		// ---
 
-	coord = new Coord((double) 0, (double) 1);
-	node4 = networkFactory.createNode(Id.create("n4", Node.class), coord);
-	network.addNode(node4);
+		scenario = ScenarioUtils.createScenario( config );
 
-	/*
-	 * create Links
+		createAndAddSampleNetwork();
+		createAndAddSamplePlan();
+
+		createTripRouter();
+		PrepareForSimUtils.createDefaultPrepareForSim( scenario ).run();
+
+	}
+
+	/**
+	 * @author cdobler
 	 */
-	link = networkFactory.createLink(Id.create("l1", Link.class), node2, node1);
-	network.addLink(link);
+	private void createAndAddSampleNetwork() {
+		Network network = scenario.getNetwork();
+		NetworkFactory networkFactory = network.getFactory();
 
-	link = networkFactory.createLink(Id.create("l2", Link.class), node3, node2);
-	network.addLink(link);
+		Coord coord = null;
+		Node node1 = null;
+		Node node2 = null;
+		Node node3 = null;
+		Node node4 = null;
+		Link link = null;
 
-	link = networkFactory.createLink(Id.create("l3", Link.class), node3, node4);
-	network.addLink(link);
+		/*
+		 * create Nodes
+		 */
+		coord = new Coord( 0, 0 );
+		node1 = networkFactory.createNode(Id.create("n1", Node.class), coord);
+		network.addNode(node1);
 
-	link = networkFactory.createLink(Id.create("l4", Link.class), node4, node1);
-	network.addLink(link);
+		coord = new Coord( 1, 0 );
+		node2 = networkFactory.createNode(Id.create("n2", Node.class), coord);
+		network.addNode(node2);
 
-	link = networkFactory.createLink(Id.create("l5", Link.class), node1, node3);
-	network.addLink(link);
-}
+		coord = new Coord( 1, 1 );
+		node3 = networkFactory.createNode(Id.create("n3", Node.class), coord);
+		network.addNode(node3);
 
-/**
- * @author cdobler
- */
-private void createSamplePlan() {
-	plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		coord = new Coord( 0, 1 );
+		node4 = networkFactory.createNode(Id.create("n4", Node.class), coord);
+		network.addNode(node4);
 
-	Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
-	PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
-	Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "w", Id.create("l3", Link.class));
-	PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
-	Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
+		/*
+		 * create Links
+		 */
+		link = networkFactory.createLink(Id.create("l1", Link.class), node2, node1);
+		network.addLink(link);
 
-	/*
-	 * set activity start times and durations
+		link = networkFactory.createLink(Id.create("l2", Link.class), node3, node2);
+		network.addLink(link);
+
+		link = networkFactory.createLink(Id.create("l3", Link.class), node3, node4);
+		network.addLink(link);
+
+		link = networkFactory.createLink(Id.create("l4", Link.class), node4, node1);
+		network.addLink(link);
+
+		link = networkFactory.createLink(Id.create("l5", Link.class), node1, node3);
+		network.addLink(link);
+	}
+
+	/**
+	 * @author cdobler
 	 */
-	activityH1.setStartTime(0.0);
-	activityH1.setEndTime(8.0*3600);
-	activityW1.setStartTime(8.0*3600);
-	activityW1.setEndTime(16.0*3600);
-	activityH2.setStartTime(16.0*3600);
-	activityH2.setEndTime(24.0*3600);
+	private void createAndAddSamplePlan() {
+		final Population population = scenario.getPopulation();
+		PopulationFactory pf = population.getFactory();
+		final Person person = pf.createPerson( Id.createPersonId( 1 ) );
+		population.addPerson( person );
+		plan = pf.createPlan();
+		person.addPlan( plan ); // this also sets the backpointer
 
-	/*
-	 * set coordinates for activities
+		Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId( plan, "h", Id.create("l1", Link.class ) );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId( plan, "w", Id.create("l3", Link.class ) );
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId( plan, "h", Id.create("l1", Link.class ) );
+
+		/*
+		 * set activity start times and durations
+		 */
+		activityH1.setStartTime(0.0);
+		activityH1.setEndTime(8.0*3600);
+		activityW1.setStartTime(8.0*3600);
+		activityW1.setEndTime(16.0*3600);
+		activityH2.setStartTime(16.0*3600);
+		activityH2.setEndTime(24.0*3600);
+
+		/*
+		 * set coordinates for activities
+		 */
+		activityH1.setCoord(scenario.getNetwork().getLinks().get(activityH1.getLinkId() ).getCoord() );
+		activityW1.setCoord(scenario.getNetwork().getLinks().get(activityW1.getLinkId() ).getCoord() );
+		activityH2.setCoord(scenario.getNetwork().getLinks().get(activityH2.getLinkId() ).getCoord() );
+
+	}
+
+	/**
+	 * @author cdobler
 	 */
-	((Activity) activityH1).setCoord(scenario.getNetwork().getLinks().get(activityH1.getLinkId()).getCoord());
-	((Activity) activityW1).setCoord(scenario.getNetwork().getLinks().get(activityW1.getLinkId()).getCoord());
-	((Activity) activityH2).setCoord(scenario.getNetwork().getLinks().get(activityH2.getLinkId()).getCoord());
+	private void createTripRouter() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override( List.of( new TripRouterModule() ), new AbstractModule() {
+					@Override
+					public void install() {
+						install(new ScenarioByInstanceModule(scenario));
+						install(new TimeInterpretationModule());
+						addTravelTimeBinding("car").toInstance(new FreeSpeedTravelTime());
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+			}
+		});
+		tripRouter = injector.getInstance(TripRouter.class);
 
-	/*
-	 * run a PlanRouter to create and set routes
+		TravelTime timeFunction = new FreeSpeedTravelTime() ;
+		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
+		this.pathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), costFunction, timeFunction) ;
+
+	}
+
+	/**
+	 * @author cdobler
 	 */
-	new PlanRouter(tripRouter, TimeInterpretation.create(scenario.getConfig())).run(plan);
-}
+	private boolean checkRouteValidity(NetworkRoute route) {
+		List<Id<Link>> linkIds = new ArrayList<>();
+		linkIds.add(route.getStartLinkId());
+		linkIds.addAll(route.getLinkIds());
+		linkIds.add(route.getEndLinkId());
 
-/**
- * @author cdobler
- */
-private void createTripRouter() {
-	com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
-		@Override
-		public void install() {
-			install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
-				@Override
-				public void install() {
-					install(new ScenarioByInstanceModule(scenario));
-					install(new TimeInterpretationModule());
-					addTravelTimeBinding("car").toInstance(new FreeSpeedTravelTime());
-					addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
-				}
-			}));
+		// if the route ends on the start link and is not a round trip
+		if (route.getStartLinkId() == route.getEndLinkId()) {
+			if(linkIds.size() == 2) return true;
 		}
-	});
-	tripRouter = injector.getInstance(TripRouter.class);
 
-	TravelTime timeFunction = new FreeSpeedTravelTime() ;
-	TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
-	this.pathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), costFunction, timeFunction) ;
+		int index = 0;
+		Link link = null;
+		Link nextLink = null;
 
-}
+		while (index < linkIds.size() - 1) {
+			link = scenario.getNetwork().getLinks().get(linkIds.get(index));
+			if (link == null) return false;
 
-/**
- * @author cdobler
- */
-private boolean checkRouteValidity(NetworkRoute route) {
-	List<Id<Link>> linkIds = new ArrayList<>();
-	linkIds.add(route.getStartLinkId());
-	linkIds.addAll(route.getLinkIds());
-	linkIds.add(route.getEndLinkId());
+			index++;
+			nextLink = scenario.getNetwork().getLinks().get(linkIds.get(index));
 
-	// if the route ends on the start link and is not a round trip
-	if (route.getStartLinkId() == route.getEndLinkId()) {
-		if(linkIds.size() == 2) return true;
+			// if the link does not lead to the nextLink
+			if (!link.getToNode().equals(nextLink.getFromNode())) return false;
+		}
+
+		return true;
 	}
-
-	int index = 0;
-	Link link = null;
-	Link nextLink = null;
-
-	while (index < linkIds.size() - 1) {
-		link = scenario.getNetwork().getLinks().get(linkIds.get(index));
-		if (link == null) return false;
-
-		index++;
-		nextLink = scenario.getNetwork().getLinks().get(linkIds.get(index));
-
-		// if the link does not lead to the nextLink
-		if (!link.getToNode().equals(nextLink.getFromNode())) return false;
-	}
-
-	return true;
-}
 }

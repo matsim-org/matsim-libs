@@ -2,8 +2,10 @@ package org.matsim.contrib.ev.reservation;
 
 import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
 import org.matsim.contrib.ev.charging.ChargingPriority;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-import org.matsim.contrib.ev.reservation.ChargerReservationManager.Reservation;
+import org.matsim.contrib.common.util.reservation.ReservationManager.Reservation;
 
 /**
  * This is an implementation of a charging priority which is backed by the
@@ -28,7 +30,7 @@ public class ReservationBasedChargingPriority implements ChargingPriority {
 
     @Override
     public boolean requestPlugNext(ChargingVehicle cv, double now) {
-        Reservation reservation = manager.findReservation(charger, cv.ev(), now);
+        Reservation<ChargerSpecification, Charger, ElectricVehicle> reservation = manager.findReservation(charger, cv.ev(), now);
 
         if (reservation != null) {
             // vehicle has a reservation, can be plugged right away, consume reservation

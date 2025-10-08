@@ -837,6 +837,10 @@ public final class NetworkUtils {
 	 * @param modes   set of modes to clean network (e.g. modes which are routed)
 	 */
 	public static void cleanNetwork(Network network, Set<String> modes) {
+//		The following cleaning process seems to be really slow.
+//		I do not understand why it is that slow.
+//		E.g. it is used in SumoNetworkConverter and increases run time from several minutes to several hours.
+//		Is there a way to do this in a faster manner? -sm0925
 
 		// clean network for all modes to ensure reachability during routing
 		DisallowedNextLinksUtils.clean(network); // ensure only valid turn restrictions

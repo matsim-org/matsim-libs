@@ -157,10 +157,10 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControllerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assertions.assertEquals(82629, (long) data.counts.get("car"));
-		Assertions.assertEquals(29739, (long) data.counts.get("walk"));
+		Assertions.assertEquals(86254, (long) data.counts.get("car"));
+		Assertions.assertEquals(138432, (long) data.counts.get("walk"));
 		Assertions.assertEquals(31, (long) data.counts.get("bike"));
-		Assertions.assertEquals(19029, (long) data.counts.get("pt"));
+		Assertions.assertEquals(20957, (long) data.counts.get("pt"));
 
 		Assertions.assertEquals(21, (long) data.pickupCounts.get("wheels"));
 		Assertions.assertEquals(2, (long) data.pickupCounts.get("mobility"));

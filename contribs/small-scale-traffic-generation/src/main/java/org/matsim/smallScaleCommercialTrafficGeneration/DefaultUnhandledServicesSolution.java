@@ -52,13 +52,13 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 			if(generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
 				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(carrier.getAttributes().getAttribute("purpose").toString());
 				String carierId = carrier.getId().toString();
-				String smallScaleCommercialTrafficType;
+				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType;
 				String modeORvehType;
 				if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("commercialPersonTraffic")) {
-					smallScaleCommercialTrafficType = "commercialPersonTraffic";
+					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic;
 					modeORvehType = "total";
 				} else if (carrier.getAttributes().getAttribute("subpopulation").toString().contains("goodsTraffic")) {
-					smallScaleCommercialTrafficType = "goodsTraffic";
+					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 					String[] split = carierId.split("_");
 					modeORvehType = split[split.length - 1];
 				}
@@ -195,8 +195,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				int vehicleEndTime = 0;
 				while (tourDuration < maxVehicleAvailability) {
 					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficType()).sample();
-					vehicleStartTime = t.getVehicleStartTime();
-					tourDuration = t.getVehicleTourDuration();
+					vehicleStartTime = t.getVehicleStartTime(rnd);
+					tourDuration = t.getVehicleTourDuration(rnd);
 					vehicleEndTime = vehicleStartTime + tourDuration;
 				}
 				newCarrierVehicle = CarrierVehicle.Builder.newInstance(carrierVehicleToChange.getId(), carrierVehicleToChange.getLinkId(),

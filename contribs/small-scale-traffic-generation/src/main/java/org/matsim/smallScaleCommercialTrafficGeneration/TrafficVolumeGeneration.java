@@ -65,8 +65,8 @@ public class TrafficVolumeGeneration {
 	 * @return trafficVolume_start
 	 */
 	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
-			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_start, resultingDataPerZone, "start", sample, modesORvehTypes);
@@ -89,8 +89,8 @@ public class TrafficVolumeGeneration {
 	 * @return trafficVolume_stop
 	 */
 	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
-			Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
-			List<String> modesORvehTypes, String trafficType) throws MalformedURLException {
+		Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
 		calculateTrafficVolumePerZone(trafficVolume_stop, resultingDataPerZone, "stop", sample, modesORvehTypes);
@@ -206,7 +206,7 @@ public class TrafficVolumeGeneration {
 	 *
 	 * @param smallScaleCommercialTrafficType used smallScaleCommercialTrafficType (freight or business traffic)
 	 */
-	static void setInputParameters(String smallScaleCommercialTrafficType) {
+	static void setInputParameters(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
 
 		// Set generation rates for start potentials
 		generationRatesStart = GetGenerationRates.setGenerationRates(smallScaleCommercialTrafficType, "start");
