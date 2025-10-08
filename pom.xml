@@ -29,7 +29,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <argLine />
 
-        <log4j.version>2.25.1</log4j.version>
+        <log4j.version>2.25.2</log4j.version>
         <geotools.version>33.2</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
@@ -108,12 +108,12 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.8-jre</version>
+                <version>33.5.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.18.0</version>
+                <version>3.19.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -128,7 +128,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-statistics-distribution</artifactId>
-				<version>1.1</version>
+				<version>1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -228,7 +228,7 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-bom</artifactId>
-                <version>4.0.5</version>
+                <version>4.0.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -236,7 +236,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.41.0</version>
+                <version>2.42.0</version>
             </dependency>
 
             <dependency>
@@ -339,26 +339,26 @@
 			<dependency>
 				<groupId>it.unimi.dsi</groupId>
 				<artifactId>fastutil</artifactId>
-				<version>8.5.16</version>
+				<version>8.5.18</version>
 			</dependency>
 
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.27.4</version>
+                <version>3.27.6</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.19.0</version>
+                <version>5.20.0</version>
                 <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>5.19.0</version>
+				<version>5.20.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -401,7 +401,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.14.1</version>
 				<configuration>
 					<source>21</source>
 					<target>21</target>
@@ -410,7 +410,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -451,12 +451,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -481,7 +481,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.3</version>
+                    <version>3.12.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

@@ -20,6 +20,7 @@ import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.ActivityBasedCandidate;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
@@ -51,8 +52,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	private final double minimumEnrouteChargingDuration;
 	private final double maximumEnrouteChargingDuration;
 
+	private final double activityInclusionProbability;
+	private final double legInclusionProbability;
+
 	public RandomChargingPlanInnovator(ChargerProvider chargerProvider, ChargingSlotFinder candidateFinder,
-			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config) {
+			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters) {
 		this.chargerProvider = chargerProvider;
 		this.timeInterpretation = timeInterpretation;
 		this.minimumActivityChargingDuration = config.getMinimumActivityChargingDuration();
@@ -60,6 +64,8 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		this.minimumEnrouteDriveTime = config.getMinimumEnrouteDriveTime();
 		this.minimumEnrouteChargingDuration = config.getMinimumEnrouteChargingDuration();
 		this.maximumEnrouteChargingDuration = config.getMaximumEnrouteChargingDuration();
+		this.activityInclusionProbability = parameters.getActivityInclusionProbability();
+		this.legInclusionProbability = parameters.getLegInclusionProbability();
 		this.candidateFinder = candidateFinder;
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -112,7 +118,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		// construct activities
 		for (ActivityBasedCandidate candidate : activityBased) {
-			if (random.nextBoolean()) {
+			if (random.nextDouble() <= activityInclusionProbability) {
 				// find chargers
 				List<ChargerSpecification> chargers = new LinkedList<>(
 						chargerProvider.findChargers(plan.getPerson(), plan,
@@ -145,7 +151,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		// construct legs
 		for (LegBasedCandidate candidate : legBased) {
-			if (random.nextBoolean()) {
+			if (random.nextDouble() <= legInclusionProbability) {
 				double duration = minimumEnrouteChargingDuration;
 				duration += (maximumEnrouteChargingDuration - minimumEnrouteChargingDuration) * random.nextDouble();
 
@@ -166,5 +172,35 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		}
 
 		return chargingPlan;
+	}
+
+	static public class Parameters extends ReflectiveConfigGroup implements ChargingInnovationParameters {
+		static public final String SET_NAME = "innovation:random";
+
+		public Parameters() {
+			super(SET_NAME);
+		}
+
+		@Parameter
+		private double activityInclusionProbability = 0.5;
+
+		@Parameter
+		private double legInclusionProbability = 0.5;
+
+		public double getActivityInclusionProbability() {
+			return activityInclusionProbability;
+		}
+
+		public void setActivityInclusionProbability(double val) {
+			activityInclusionProbability = val;
+		}
+
+		public double getLegInclusionProbability() {
+			return legInclusionProbability;
+		}
+
+		public void setLegInclusionProbability(double val) {
+			legInclusionProbability = val;
+		}
 	}
 }

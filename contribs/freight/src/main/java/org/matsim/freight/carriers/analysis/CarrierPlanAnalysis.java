@@ -92,7 +92,7 @@ import org.matsim.freight.carriers.*;
 				case carriersPlans, carriersAndEvents -> String.join(delimiter,
 					headerGeneral,
 					"MATSimScoreSelectedPlan",
-					"jSpritScoreSelectedPlan",
+					"jspritScoreSelectedPlan",
 					"nuOfTours",
 					"jobType",
 					"nuOfJobs_planned",

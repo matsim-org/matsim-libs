@@ -195,14 +195,14 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .earliestDepartureTime(submissionTime)
                 .constraints(
                         new DrtRouteConstraints(
-                                submissionTime,
-                                earliestStartTime,
-                                latestStartTime,
-                                latestArrivalTime,
+                                latestArrivalTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                0.,
                                 false
                         )
                 )

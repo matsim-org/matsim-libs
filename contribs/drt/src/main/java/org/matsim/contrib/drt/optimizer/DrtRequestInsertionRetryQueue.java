@@ -64,10 +64,9 @@ public class DrtRequestInsertionRetryQueue {
 			var oldRequest = entry.request;
 
 			DrtRouteConstraints updatedConstraints = new DrtRouteConstraints(
-					oldRequest.getEarliestStartTime(),
-					oldRequest.getConstraints().latestStartTime() + timeDelta,
-					oldRequest.getConstraints().latestArrivalTime() + timeDelta,
-					oldRequest.getConstraints().maxRideDuration(),
+					oldRequest.getConstraints().maxTravelDuration() + timeDelta,
+					oldRequest.getConstraints().maxRideDuration() ,
+					oldRequest.getConstraints().maxWaitDuration() + timeDelta,
 					oldRequest.getConstraints().maxPickupDelay(),
 					oldRequest.getConstraints().lateDiversionThreshold(),
 					oldRequest.getConstraints().allowRejection()
@@ -76,6 +75,7 @@ public class DrtRequestInsertionRetryQueue {
 			//XXX alternatively make both latest start/arrival times modifiable
 			var newRequest = DrtRequest.newBuilder(oldRequest)
 					.constraints(updatedConstraints)
+					.earliestDepartureTime(oldRequest.getEarliestStartTime())
 					.build();
 			requests.add(newRequest);
 		}

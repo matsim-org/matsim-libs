@@ -21,6 +21,7 @@ import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningAlgorithm;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
+import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.EmptyChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
@@ -88,8 +89,14 @@ public class StrategicChargingModule extends AbstractModule {
 				throw new IllegalStateException();
 		}
 
-		// bind(ChargingPlanCreator.class).to(EmptyChargingPlanCreator.class);
-		bind(ChargingPlanInnovator.class).to(RandomChargingPlanInnovator.class);
+		ChargingInnovationParameters innovation = chargingConfig.getInnovationParameters();
+		if (innovation instanceof RandomChargingPlanInnovator.Parameters) {
+			bind(ChargingPlanInnovator.class).to(RandomChargingPlanInnovator.class);
+		} else if (innovation == null) {
+			bind(ChargingPlanInnovator.class).to(EmptyChargingPlanInnovator.class);
+		} else {
+			throw new IllegalStateException("Unknown innovation parameters: " + innovation.getClass());
+		}
 
 		addControllerListenerBinding().to(ChargingPlanScoring.class);
 		addControllerListenerBinding().to(ChargingPlanScoringListener.class);
@@ -117,9 +124,11 @@ public class StrategicChargingModule extends AbstractModule {
 	@Provides
 	@Singleton
 	ChargingPlanScoring provideChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
-			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
+			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
+			ChargingCostCalculator costCalculator,
 			StrategicChargingConfigGroup scConfig, WithinDayEvConfigGroup withinConfig, ScoringTracker tracker) {
-		return new ChargingPlanScoring(eventsManager, population, network, timeInterpretation, fleet, costCalculator, scConfig.getScoringParameters(),
+		return new ChargingPlanScoring(eventsManager, population, network, timeInterpretation, fleet, costCalculator,
+				scConfig.getScoringParameters(),
 				withinConfig.getCarMode(), tracker);
 	}
 
@@ -168,7 +177,8 @@ public class StrategicChargingModule extends AbstractModule {
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
 			TimeInterpretation timeInterpretation) {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
-		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config);
+		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
+				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters());
 	}
 
 	@Provides
