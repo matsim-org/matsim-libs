@@ -234,9 +234,16 @@ public final class EmissionModule {
 		});
 	}
 
-	/// Adds entries with PM_TOTAL into the hbefa-table containing the sum of PM and PM_non_exhaust. The exact combining procedure is defined by the caller.
-	/// <i> NOTE: The combineKeyFunction-lambda is mainly there to allow access the copy constructors for cold/warm factor-keys.</i>
-	/// <i> NOTE2: The function was programmed with generics, in case of changing/adding/removing emission-keys or -factors</i>
+	/**
+	 * Adds entries with PM_TOTAL into the hbefa-table containing the sum of PM and PM_non_exhaust. The exact combining procedure is defined by the caller. <br/>
+	 * <i> NOTE: The combineKeyFunction-lambda is mainly there to allow access to the copy constructors for cold/warm factor-keys.</i><br/>
+	 * <i> NOTE2: The function was programmed with generics, in case of changing/adding/removing emission-keys or -factors for future HBEFA-versions</i>
+	 * @param hbefaTable Table to add the PM_TOTAL-entries to
+	 * @param combineKeyFunction Lambda-Function, that builds the key of the PM_TOTAL-entry, receives the PM-entry-key for reference
+	 * @param combineFactorFunction Lambda-Function, that combines the values of the PM and PM_non_exhaust-entries to a PM_TOTAL entry
+	 * @param <K> child of {@link HbefaEmissionFactorKey}
+	 * @param <V> child of {@link HbefaEmissionFactor}
+	 */
 	private <K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> void addCombinedPMEntries(
 		Map<K, V> hbefaTable,
 		Function<K, K> combineKeyFunction,
