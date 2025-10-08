@@ -128,6 +128,8 @@ public class DrtRequest implements PassengerRequest {
 		return List.copyOf(passengerIds);
 	}
 
+	// to retrofit older code
+
 	@Override
 	public String getMode() {
 		return mode;
