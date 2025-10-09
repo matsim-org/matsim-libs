@@ -14,7 +14,7 @@ import org.matsim.contrib.evrp.ChargingTask;
  * @author nkuehnel / MOIA
  */
 public class WaitForShiftActivity implements DynActivity {
-    public static final String CHARGING_WAIT_FOR_SHIFT = "Wait for shift";
+    public static final String ACTIVITY_TYPE = "Wait for shift";
     
     private final IdleDynActivity idleDynActivity;
     private final WaitForShiftTask waitTask;
@@ -24,7 +24,7 @@ public class WaitForShiftActivity implements DynActivity {
 
     public WaitForShiftActivity(WaitForShiftTask waitTask) {
         this.waitTask = waitTask;
-        this.idleDynActivity = new IdleDynActivity(CHARGING_WAIT_FOR_SHIFT, waitTask::getEndTime);
+        this.idleDynActivity = new IdleDynActivity(ACTIVITY_TYPE, waitTask::getEndTime);
         
         // Initialize with existing charging if any
         waitTask.getChargingTask().ifPresent(this::initializeCharging);
@@ -32,7 +32,7 @@ public class WaitForShiftActivity implements DynActivity {
 
     @Override
     public String getActivityType() {
-        return CHARGING_WAIT_FOR_SHIFT;
+        return ACTIVITY_TYPE;
     }
 
     @Override

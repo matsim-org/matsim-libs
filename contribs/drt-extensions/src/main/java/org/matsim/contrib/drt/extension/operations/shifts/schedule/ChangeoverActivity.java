@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public class ChangeoverActivity implements DynActivity {
 
+    public static final String ACTIVITY_TYPE = "Shift changeover";
     private final DrtStopActivity busStopDelegate;
 	private final double endTime;
     private final ShiftChangeOverTask changeoverTask;
@@ -68,7 +69,7 @@ public class ChangeoverActivity implements DynActivity {
 
     @Override
     public String getActivityType() {
-        return "Shift changeover";
+        return ACTIVITY_TYPE;
     }
 
     private void initializeCharging(ChargingTask task) {

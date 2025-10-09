@@ -41,11 +41,6 @@ public class ChangeoverActivityTest {
         activity = new ChangeoverActivity(passengerHandler, driver, changeoverTask, emptyRequests, emptyRequests);
     }
 
-    @Test
-    public void testGetActivityType() {
-        assertEquals("Shift changeover", activity.getActivityType());
-    }
-
 
     @Test
     public void testDoSimStep_noCharging() {

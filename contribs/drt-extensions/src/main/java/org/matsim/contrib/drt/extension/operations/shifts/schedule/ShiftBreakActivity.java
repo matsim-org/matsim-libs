@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class ShiftBreakActivity implements DynActivity {
 
+    public static final String ACTIVITY_TYPE = "Shift break";
     private final ShiftBreakTask shiftBreakTask;
 
     private final DrtStopActivity busStopDelegate;
@@ -73,7 +74,7 @@ public class ShiftBreakActivity implements DynActivity {
 
     @Override
     public String getActivityType() {
-        return "Shift break";
+        return ACTIVITY_TYPE;
     }
 
     private void initializeCharging(ChargingTask task) {
