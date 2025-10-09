@@ -158,6 +158,7 @@ public class ShiftTaskSchedulerImplTest {
         when(breakTask.getFacilityId()).thenReturn(facility1Id);
         when(breakTask.getShiftBreak()).thenReturn(shiftBreak);
         when(breakTask.getReservationId()).thenReturn(Optional.of(reservation1Id));
+        when(breakTask.getStatus()).thenReturn(Task.TaskStatus.PLANNED);
 
         ShiftBreakStopWaypoint breakWaypoint = mock(ShiftBreakStopWaypoint.class);
         when(breakWaypoint.getTask()).thenReturn(breakTask);

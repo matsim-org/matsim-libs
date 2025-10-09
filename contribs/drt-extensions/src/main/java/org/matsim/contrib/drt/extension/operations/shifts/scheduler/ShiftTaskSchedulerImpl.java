@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
-import org.matsim.contrib.drt.extension.operations.shifts.charging.ShiftChargingLogic;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.*;
+import org.matsim.contrib.drt.extension.operations.shifts.charging.ShiftChargingLogic;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DrtShiftDispatcher;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
@@ -33,11 +33,7 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.ev.charging.BatteryCharging;
-import org.matsim.contrib.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
@@ -53,7 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.matsim.contrib.drt.schedule.DrtDriveTask.TYPE;
@@ -144,8 +139,7 @@ public class ShiftTaskSchedulerImpl implements ShiftTaskScheduler {
         if (currentTask instanceof WaitForShiftTask waitForShiftTask) {
             // Handle charging if present
             waitForShiftTask.getChargingTask().ifPresent(chargingTask -> {
-                if (vehicle instanceof EvDvrpVehicle) {
-                    EvDvrpVehicle evVehicle = (EvDvrpVehicle) vehicle;
+                if (vehicle instanceof EvDvrpVehicle evVehicle) {
                     ChargingWithAssignmentLogic chargingLogic = chargingTask.getChargingLogic();
                     ElectricVehicle ev = evVehicle.getElectricVehicle();
                     if (Stream.concat(chargingLogic.getPluggedVehicles().stream(), chargingLogic.getQueuedVehicles().stream())
