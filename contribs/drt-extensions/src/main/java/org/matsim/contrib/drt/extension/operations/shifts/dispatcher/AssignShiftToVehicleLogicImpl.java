@@ -19,20 +19,22 @@
  */
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
+import org.matsim.contrib.drt.extension.operations.shifts.fleet.EvShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.fleet.ShiftDvrpVehicle;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShift;
+import org.matsim.contrib.ev.fleet.Battery;
 
 import java.util.Iterator;
 
 /**
  * @author nkuehnel / MOIA
  */
-public class DefaultAssignShiftToVehicleLogic implements AssignShiftToVehicleLogic {
+public class AssignShiftToVehicleLogicImpl implements AssignShiftToVehicleLogic {
 
 	private final ShiftsParams drtShiftParams;
 
-	public DefaultAssignShiftToVehicleLogic(ShiftsParams drtShiftParams) {
+	public AssignShiftToVehicleLogicImpl(ShiftsParams drtShiftParams) {
 		this.drtShiftParams = drtShiftParams;
 	}
 
@@ -42,6 +44,13 @@ public class DefaultAssignShiftToVehicleLogic implements AssignShiftToVehicleLog
 		if (shift.getEndTime() > vehicle.getServiceEndTime()
 				|| shift.getStartTime() < vehicle.getServiceBeginTime()) {
 			return false;
+		}
+
+		if (vehicle instanceof EvShiftDvrpVehicle) {
+			final Battery battery = ((EvShiftDvrpVehicle) vehicle).getElectricVehicle().getBattery();
+			if (battery.getCharge() / battery.getCapacity() < drtShiftParams.getShiftAssignmentBatteryThreshold()) {
+				return false;
+			}
 		}
 
 		// assign shift to inactive vehicle
