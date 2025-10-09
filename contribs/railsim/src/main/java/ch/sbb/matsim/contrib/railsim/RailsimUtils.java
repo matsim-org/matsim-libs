@@ -21,11 +21,14 @@ package ch.sbb.matsim.contrib.railsim;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.vehicles.VehicleType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.*;
 
 
 /**
@@ -40,9 +43,12 @@ public final class RailsimUtils {
 	public static final String LINK_ATTRIBUTE_RESOURCE_ID = "railsimResourceId";
 	public static final String LINK_ATTRIBUTE_CAPACITY = "railsimTrainCapacity";
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
+	public static final String LINK_NONBLOCKING_AREA = "railsimNonBlockingArea";
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
+	public static final String VEHICLE_ATTRIBUTE_REVERSIBLE = "railsimReversible";
 	public static final String RESOURCE_TYPE = "railsimResourceType";
+	public static final String FORMATION = "railsimFormation";
 
 	private RailsimUtils() {
 	}
@@ -92,6 +98,20 @@ public final class RailsimUtils {
 	}
 
 	/**
+	 * Sets whether this link is an intersection area.
+	 */
+	public static void setLinkNonBlockingArea(Link link, boolean isIntersectionArea) {
+		link.getAttributes().putAttribute(LINK_NONBLOCKING_AREA, isIntersectionArea);
+	}
+
+	/**
+	 * Whether this link is an intersection area.
+	 */
+	public static boolean isLinkNonBlockingArea(Link link) {
+		return Objects.equals(link.getAttributes().getAttribute(LINK_NONBLOCKING_AREA), true);
+	}
+
+	/**
 	 * Sets the resource id for the link.
 	 */
 	public static void setResourceId(Link link, String resourceId) {
@@ -130,7 +150,7 @@ public final class RailsimUtils {
 	 * Return the default deceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
-		double deceleration = railsimConfigGroup.decelerationDefault;
+		double deceleration = railsimConfigGroup.getDecelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_DECELERATION);
 		return attr != null ? (double) attr : deceleration;
 	}
@@ -146,7 +166,7 @@ public final class RailsimUtils {
 	 * Return the default acceleration time or the vehicle-specific value.
 	 */
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
-		double acceleration = railsimConfigGroup.accelerationDefault;
+		double acceleration = railsimConfigGroup.getAccelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_ACCELERATION);
 		return attr != null ? (double) attr : acceleration;
 	}
@@ -156,6 +176,32 @@ public final class RailsimUtils {
 	 */
 	public static void setTrainAcceleration(VehicleType vehicle, double acceleration) {
 		vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_ACCELERATION, acceleration);
+	}
+
+	/**
+	 * Sets whether the train is reversible.
+	 *
+	 * @param vehicle    The vehicle type to set the attribute for.
+	 * @param reversible time in seconds it takes to reverse the train, or null if not reversible.
+	 */
+	public static void setTrainReversible(VehicleType vehicle, @Nullable Double reversible) {
+		if (reversible == null) {
+			vehicle.getAttributes().removeAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
+		} else
+			vehicle.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE, reversible);
+	}
+
+	/**
+	 * Returns whether the train can be reversed and the time in seconds it takes.
+	 *
+	 * @param vehicle The vehicle type to check.
+	 * @return time to reverse, if the vehicle is reversible, otherwise an empty OptionalDouble.
+	 */
+	public static OptionalDouble getTrainReversible(VehicleType vehicle) {
+		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
+		return attr instanceof Double d
+			? OptionalDouble.of(d)
+			: OptionalDouble.empty();
 	}
 
 	/**
@@ -171,6 +217,24 @@ public final class RailsimUtils {
 	 */
 	public static void setResourceType(Link link, ResourceType type) {
 		link.getAttributes().putAttribute(RESOURCE_TYPE, type.toString());
+	}
+
+
+	/**
+	 * Return the defined formation of vehicle units attached to departure.
+	 */
+	public static List<String> getFormation(Departure departure) {
+		Object attr = departure.getAttributes().getAttribute(FORMATION);
+		return attr instanceof String s
+			? List.of(s.split(","))
+			: List.of();
+	}
+
+	/**
+	 * Sets the formation of vehicle ids for a departure.
+	 */
+	public static void setFormation(Departure departure, List<String> formations) {
+		departure.getAttributes().putAttribute(FORMATION, String.join(",", formations));
 	}
 
 }
