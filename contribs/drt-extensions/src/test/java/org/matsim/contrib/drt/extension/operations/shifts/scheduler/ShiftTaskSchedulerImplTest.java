@@ -397,7 +397,6 @@ public class ShiftTaskSchedulerImplTest {
             @Override public double getEarliestBreakStartTime() { return earliestStartTime; }
             @Override public double getLatestBreakEndTime() { return latestEndTime; }
             @Override public double getDuration() { return duration; }
-            @Override public void schedule() {}
         };
     }
 }
