@@ -90,10 +90,10 @@ public interface CostCalculationStrategy {
 
     //XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
     //XXX however, at the same time prefer max-wait-time to max-travel-time violations
-	double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-    double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
-    double MAX_RIDE_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of exceeded detour
-    double LATE_DIVERSION_VIOLATION_PENALTY = 10;// 10 second of penalty per 1 second of late diversion of onboard requests
+	double MAX_WAIT_TIME_VIOLATION_PENALTY = 1000;// 1 second of penalty per 1 second of late departure
+    double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10000;// 10 seconds of penalty per 1 second of late arrival
+    double MAX_RIDE_TIME_VIOLATION_PENALTY = 10000;// 10 seconds of penalty per 1 second of exceeded detour
+    double LATE_DIVERSION_VIOLATION_PENALTY = 10000;// 10 second of penalty per 1 second of late diversion of onboard requests
 
     private static double discourageSoftConstraintViolations(DrtRequest request, InsertionGenerator.Insertion insertion,
                                                              DetourTimeInfo detourTimeInfo) {
