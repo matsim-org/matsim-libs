@@ -149,7 +149,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
-			.columnTypesPartial(Map.of("person", ColumnType.STRING))
+			.columnTypesPartial(Map.of("person", ColumnType.STRING, "home_x", ColumnType.DOUBLE, "home_y", ColumnType.DOUBLE))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("persons.csv"))).build());
 
