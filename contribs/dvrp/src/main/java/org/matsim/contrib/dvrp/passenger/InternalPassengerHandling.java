@@ -68,7 +68,9 @@ class InternalPassengerHandling {
 		Set<String> violations = requestValidator.validateRequest(request);
 		if (!violations.isEmpty()) {
 			String cause = String.join(", ", violations);
-			LOGGER.warn(format("Request: %s of mode: %s will not be served. Agent will get stuck. Cause: %s",
+			//TODO revert this change afterwards.
+			// Or do we really need this warning in the main run? Or can we only show the first x times of this warning - Oct 2025, Chengqi
+			LOGGER.debug(format("Request: %s of mode: %s will not be served. Agent will get stuck. Cause: %s",
 					request.getId(), mode, cause));
 			eventsManager.processEvent(
 					new PassengerRequestRejectedEvent(now, mode, request.getId(), request.getPassengerIds(), cause));

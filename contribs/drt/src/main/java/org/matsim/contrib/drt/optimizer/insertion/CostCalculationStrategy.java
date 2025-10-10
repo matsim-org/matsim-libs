@@ -88,6 +88,9 @@ public interface CostCalculationStrategy {
         }
     }
 
+	// TODO temporary change in this branch/PR.
+	//  There is another PR addressing this issue with a more elegant solution.
+	//  Switch to that solution after that PR is ready.
     //XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
     //XXX however, at the same time prefer max-wait-time to max-travel-time violations
 	double MAX_WAIT_TIME_VIOLATION_PENALTY = 1000;// 1 second of penalty per 1 second of late departure
