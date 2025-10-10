@@ -24,10 +24,10 @@ public class ServiceAnalysis {
 			}
 			// get information from the last records
 			assert lastRecord != null;
-			maxObservedWaitingTime = Double.parseDouble(lastRecord.get("wait_max"));
+//			maxObservedWaitingTime = Double.parseDouble(lastRecord.get("wait_max"));
 
 			// Alternatively, we can also use 95-pct value
-//			maxObservedWaitingTime = Double.parseDouble(lastRecord.get("wait_p95"));
+			maxObservedWaitingTime = Double.parseDouble(lastRecord.get("wait_p95"));
 
 		}
 
