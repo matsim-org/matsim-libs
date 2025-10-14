@@ -343,9 +343,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		aggr.write().csv(output.getPath("mode_share.csv").toFile());
 
 		// Norm each dist_group to 1
-		for (String label : labels) {
-			DoubleColumn dist_group = aggr.doubleColumn("share");
-			Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
+		normDistanceGroups(labels, aggr);
 
 			double total = dist_group.where(sel).sum();
 			if (total > 0)
@@ -366,6 +364,16 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 	}
 
+	private void normDistanceGroups(List<String> labels, Table aggr) {
+		for (String label : labels) {
+			DoubleColumn dist_group = aggr.doubleColumn("share");
+			Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
+
+			double total = dist_group.where(sel).sum();
+			if (total > 0)
+				dist_group.set(sel, dist_group.divide(total));
+		}
+	}
 	private void writeTripStats(Table trips) throws IOException {
 
 		// Stats per mode
