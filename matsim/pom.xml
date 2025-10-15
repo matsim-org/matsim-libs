@@ -130,7 +130,6 @@
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil-core</artifactId>
-			<version>8.5.18</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -359,6 +358,11 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-params</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-core</artifactId>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 
