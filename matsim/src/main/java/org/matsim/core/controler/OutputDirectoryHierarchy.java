@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  *

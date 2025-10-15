@@ -28,7 +28,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
