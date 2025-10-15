@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -291,6 +292,9 @@ public class PHEMTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"petrol", "diesel"})
 	public void test(String fuel) throws IOException, URISyntaxException {
+		// This test can only run if the password is set
+		Assumptions.assumeTrue(System.getenv("MATSIM_DECRYPTION_PASSWORD") != null);
+
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
