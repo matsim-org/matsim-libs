@@ -313,6 +313,71 @@
 			<groupId>com.fasterxml.woodstox</groupId>
 			<artifactId>woodstox-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-jdbc</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-api</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-sampling</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-client-api</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-core</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.inject</groupId>
+			<artifactId>jakarta.inject-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.logging</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<version>3.6.1.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.errorprone</groupId>
+			<artifactId>error_prone_annotations</artifactId>
+			<version>2.42.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<profiles>
