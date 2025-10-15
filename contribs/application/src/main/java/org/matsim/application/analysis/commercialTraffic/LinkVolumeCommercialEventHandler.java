@@ -284,7 +284,21 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 			travelDistancesPerVehicle_inInvestigationArea.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
 		}
 	}
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		if (event.getLinkId().toString().contains("pt_") || event.getNetworkMode().equals("bike"))
+			return;
 
+		String subpopulation = personMap.get(event.getPersonId().toString()).get("subpopulation");
+		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (k) -> event.getTime());
+		vehicleSubpopulation.computeIfAbsent(event.getVehicleId(), (k) -> subpopulation);
+		vehicleIdToPersonId.put(event.getVehicleId(), event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		tourEndPerPerson.put(event.getVehicleId(), event.getTime());
+	}
 	public Map<Id<Link>, Object2DoubleOpenHashMap<String>> getLinkVolumesPerMode() {
 		return linkVolumesPerMode;
 	}
@@ -352,22 +366,6 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	public HashMap<Id<Vehicle>, Id<Person>> getVehicleIdToPersonId() {
 		return vehicleIdToPersonId;
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (event.getLinkId().toString().contains("pt_") || event.getNetworkMode().equals("bike"))
-			return;
-
-		String subpopulation = personMap.get(event.getPersonId().toString()).get("subpopulation");
-		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (k) -> event.getTime());
-		vehicleSubpopulation.computeIfAbsent(event.getVehicleId(), (k) -> subpopulation);
-		vehicleIdToPersonId.put(event.getVehicleId(), event.getPersonId());
-	}
-
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		tourEndPerPerson.put(event.getVehicleId(), event.getTime());
 	}
 }
 
