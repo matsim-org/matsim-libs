@@ -12,7 +12,6 @@
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-geotiff</artifactId>
-          <version>${geotools.version}</version>
           <exclusions>
               <exclusion>
                   <groupId>org.glassfish.jaxb</groupId>
@@ -29,7 +28,6 @@
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-api</artifactId>
-          <version>34.0</version>
       </dependency>
       <dependency>
           <groupId>it.unimi.dsi</groupId>
@@ -39,27 +37,22 @@
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-coverage</artifactId>
-          <version>34.0</version>
       </dependency>
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-referencing</artifactId>
-          <version>34.0</version>
       </dependency>
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-main</artifactId>
-          <version>34.0</version>
       </dependency>
       <dependency>
           <groupId>com.google.inject</groupId>
           <artifactId>guice</artifactId>
-          <version>7.0.0</version>
       </dependency>
       <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter-api</artifactId>
-          <version>6.0.0</version>
           <scope>test</scope>
       </dependency>
   </dependencies>

@@ -66,7 +66,6 @@
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
-			<version>${jogl.version}</version>
 		</dependency>
 <!--		(This is already in pom.xml of matsim-all.  kai, nov'23)-->
 
@@ -106,7 +105,6 @@
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
 			<artifactId>jogl-all-main</artifactId>
-			<version>${jogl.version}</version>
 		</dependency>
 <!--		(This is already in pom.xml of matsim-all.  kai, nov'23)-->
 
@@ -148,12 +146,10 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-api</artifactId>
-			<version>34.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
-			<version>1.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.inject</groupId>
@@ -173,17 +169,14 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
-			<version>34.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>7.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>6.0.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
