@@ -26,8 +26,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class OTFFileWriterFactory implements Provider<SnapshotWriter> {
 

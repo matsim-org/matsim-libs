@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;

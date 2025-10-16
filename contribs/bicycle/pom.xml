@@ -12,7 +12,6 @@
       <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-geotiff</artifactId>
-          <version>${geotools.version}</version>
           <exclusions>
               <exclusion>
                   <groupId>org.glassfish.jaxb</groupId>
@@ -25,6 +24,35 @@
           <artifactId>osm</artifactId>
           <version>${project.parent.version}</version>
           <scope>compile</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>it.unimi.dsi</groupId>
+          <artifactId>fastutil-core</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-coverage</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-referencing</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-main</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <scope>test</scope>
       </dependency>
   </dependencies>
 </project>
