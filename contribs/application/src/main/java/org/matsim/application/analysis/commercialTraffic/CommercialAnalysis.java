@@ -186,11 +186,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit();
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all = linkDemandEventHandler.getDistancesPerTrip_perPerson_all();
 
-		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inRuhrArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_internal_inInvestigationArea();
-		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inRuhrArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_incoming_inInvestigationArea();
-		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inRuhrArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_outgoing_inInvestigationArea();
-		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inRuhrArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
-		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inRuhrArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
+		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_internal_inInvestigationArea();
+		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_incoming_inInvestigationArea();
+		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_outgoing_inInvestigationArea();
+		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
+		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
 
 		try {
 			// _Intern: internal trips (start and end inside the area)
@@ -214,11 +214,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			bw.write("traveledDistance_Transit;");
 			bw.write("traveledDistance_all;");
 
-			bw.write("traveledDistanceInRVR_area_Intern;");
-			bw.write("traveledDistanceInRVR_area_Incoming;");
-			bw.write("traveledDistanceInRVR_area_Outgoing;");
-			bw.write("traveledDistanceInRVR_area_Transit;");
-			bw.write("traveledDistanceInRVR_area_all;");
+			bw.write("traveledDistanceInInvestigationArea_Intern;");
+			bw.write("traveledDistanceInInvestigationArea_Incoming;");
+			bw.write("traveledDistanceInInvestigationArea_Outgoing;");
+			bw.write("traveledDistanceInInvestigationArea_Transit;");
+			bw.write("traveledDistanceInInvestigationArea_all;");
 
 //			bw.write("averageTripsPerAgent_Intern;"); //TODO why this commented out
 //			bw.write("averageTripsPerAgent_Incoming;");
@@ -244,11 +244,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_transit, subpopulation, scenario);
 				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_all, subpopulation, scenario);
 
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inRuhrArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_internal_inRuhrArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inRuhrArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_incoming_inRuhrArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inRuhrArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_outgoing_inRuhrArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inRuhrArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_transit_inRuhrArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inRuhrArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_all_inRuhrArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_internal_inInvestigationArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_incoming_inInvestigationArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_outgoing_inInvestigationArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_transit_inInvestigationArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_all_inInvestigationArea, subpopulation, scenario);
 
 				int numberOfTrips_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().mapToInt(List::size).sum();
 				int numberOfTrips_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().mapToInt(List::size).sum();
@@ -274,11 +274,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				bw.write(traveledDistance_transit + ";");
 				bw.write(traveledDistance_all + ";");
 
-				bw.write(distancesPerTrip_perPerson_internal_inRuhrArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_incoming_inRuhrArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_outgoing_inRuhrArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_transit_inRuhrArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_all_inRuhrArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				bw.write(distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				bw.write(distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				bw.write(distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				bw.write(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				bw.write(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
 
 				bw.write(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation + ";");
 
