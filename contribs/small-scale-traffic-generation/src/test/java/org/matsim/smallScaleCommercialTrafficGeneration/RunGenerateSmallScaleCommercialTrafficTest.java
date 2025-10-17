@@ -95,7 +95,8 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 			"--nameOutputPopulation", resultPopulation,
 			"--pathOutput", output,
 			"--resistanceFactor_commercialPersonTraffic", "0.005",
-			"--resistanceFactor_goodsTraffic", "0.005");
+			"--resistanceFactor_goodsTraffic", "0.005",
+			"--MATSimIterationsAfterDemandGeneration", "0");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
@@ -105,7 +106,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml";
 		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_carriersVehicleTypes.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_allVehicles.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
