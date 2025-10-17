@@ -52,11 +52,12 @@ import com.google.common.collect.ImmutableList;
 public class InsertionCostCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder()
+
+		private final DrtRequest drtRequest = DrtRequest.newBuilder()
 			.fromLink(fromLink)
 			.toLink(toLink)
+			.earliestDepartureTime(0)
 			.constraints(new DrtRouteConstraints(
-					0,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
@@ -121,12 +122,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								180.,
 								true
@@ -148,12 +149,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								120.,
 								false
@@ -202,12 +203,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								300.,
 								true
@@ -225,12 +226,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								200.,
 								true

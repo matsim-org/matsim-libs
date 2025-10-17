@@ -54,6 +54,7 @@
           refId            CDATA   #REQUIRED
           departureOffset  CDATA   #IMPLIED
           arrivalOffset    CDATA   #IMPLIED
+          minimumStopDuration CDATA   #IMPLIED
           allowBoarding    (true|false)  "true"
           allowAlighting   (true|false)  "true"
           awaitDeparture   (true|false)  "false">
