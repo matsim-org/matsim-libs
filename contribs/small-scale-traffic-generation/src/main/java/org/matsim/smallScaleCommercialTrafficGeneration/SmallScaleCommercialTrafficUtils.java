@@ -43,12 +43,12 @@ import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.ScheduledTour;
+import org.matsim.freight.carriers.Tour;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -186,59 +186,59 @@ public class SmallScaleCommercialTrafficUtils {
 
 		Map<String, AtomicLong> idCounter = new HashMap<>();
 
-		Population populationFromCarrier = (Population) scenario.getScenarioElement("allpersons");
-		Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles(scenario);
 
-		for (Person person : populationFromCarrier.getPersons().values()) {
+		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 
-			Plan plan = popFactory.createPlan();
-			String carrierName = person.getId().toString().split("freight_")[1].split("_veh_")[0];
-			Carrier relatedCarrier = CarriersUtils.addOrGetCarriers(scenario).getCarriers()
-				.get(Id.create(carrierName, Carrier.class));
-			String subpopulation = relatedCarrier.getAttributes().getAttribute("subpopulation").toString();
-			Id<Vehicle> vehicleId = Id.createVehicleId(person.getId().toString());
-			String mode = allVehicles.getVehicles().get(vehicleId).getType().getNetworkMode();
+				Plan plan = popFactory.createPlan();
 
-			List<PlanElement> tourElements = person.getSelectedPlan().getPlanElements();
-			for (PlanElement tourElement : tourElements) {
+				String subpopulation = carrier.getAttributes().getAttribute("subpopulation").toString();
+				Id<Vehicle> vehicleId = tour.getVehicle().getId();
+				String mode = tour.getVehicle().getType().getNetworkMode();
 
-				if (tourElement instanceof Activity activity) {
-					Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getType(),
-						scenario.getNetwork().getLinks().get(activity.getLinkId()).getFromNode().getCoord());
-					if (activity.getMaximumDuration() != OptionalTime.undefined())
-						newActivity.setMaximumDuration(activity.getMaximumDuration().seconds());
-					if (activity.getType().equals("start")) {
-						newActivity.setEndTime(activity.getEndTime().seconds());
-						newActivity.setType("commercial_start");
+				Tour.Start start = tour.getTour().getStart();
+				Activity startActivity = PopulationUtils.createActivityFromCoord("commercial_start",
+					scenario.getNetwork().getLinks().get(start.getLocation()).getFromNode().getCoord());
+				startActivity.setEndTime(tour.getDeparture());
+
+				plan.addActivity(startActivity);
+				List<Tour.TourElement> tourElements = tour.getTour().getTourElements();
+				for (Tour.TourElement tourElement : tourElements) {
+					if (tourElement instanceof Tour.Leg) {
+						PopulationUtils.createAndAddLeg(plan, mode);
+						continue;
 					}
-					if (activity.getType().equals("end"))
-						newActivity.setType("commercial_end");
-					plan.addActivity(newActivity);
+					if (tourElement instanceof Tour.TourActivity activity) {
+						Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getActivityType(),
+							scenario.getNetwork().getLinks().get(activity.getLocation()).getFromNode().getCoord());
+						newActivity.setMaximumDuration(activity.getDuration());
+						plan.addActivity(newActivity);
+					}
 				}
-				if (tourElement instanceof Leg) {
-					PopulationUtils.createAndAddLeg(plan, mode);
-				}
+				Tour.End end = tour.getTour().getEnd();
+				Activity endActivity = PopulationUtils.createActivityFromCoord("commercial_end",
+					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
+				plan.addActivity(endActivity);
+				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
+					carrier.getAttributes().getAttribute("purpose"));
+
+				long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
+
+				Person newPerson = popFactory.createPerson(Id.createPersonId(key + "_" + id));
+
+				newPerson.addPlan(plan);
+				PopulationUtils.putSubpopulation(newPerson, subpopulation);
+				newPerson.getAttributes().putAttribute("purpose",
+					carrier.getAttributes().getAttribute("purpose"));
+				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
+					newPerson.getAttributes().putAttribute("tourStartArea",
+						carrier.getAttributes().getAttribute("tourStartArea"));
+				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
+				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
+				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
+
+				population.addPerson(newPerson);
 			}
-
-			String key = String.format("%s_%s_%s", subpopulation, relatedCarrier.getAttributes().getAttribute("tourStartArea"),
-				relatedCarrier.getAttributes().getAttribute("purpose"));
-
-			long id = idCounter.computeIfAbsent(key, (k) -> new AtomicLong()).getAndIncrement();
-
-			Person newPerson = popFactory.createPerson(Id.createPersonId(key + "_" + id));
-
-			newPerson.addPlan(plan);
-			PopulationUtils.putSubpopulation(newPerson, subpopulation);
-			newPerson.getAttributes().putAttribute("purpose",
-				relatedCarrier.getAttributes().getAttribute("purpose"));
-			if (relatedCarrier.getAttributes().getAsMap().containsKey("tourStartArea"))
-				newPerson.getAttributes().putAttribute("tourStartArea",
-					relatedCarrier.getAttributes().getAttribute("tourStartArea"));
-
-			VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
-			VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, allVehicles.getVehicles().get(vehicleId).getType().getId()));
-
-			population.addPerson(newPerson);
 		}
 
 		String outputPopulationFile;
@@ -258,7 +258,7 @@ public class SmallScaleCommercialTrafficUtils {
 				numberOfPlanVariantsPerAgent);
 
 		PopulationUtils.writePopulation(population, outputPopulationFile);
-		scenario.getPopulation().getPersons().clear();
+		log.info("Population with {} persons created including the plans in {}.", population.getPersons().size(), outputPopulationFile);
 	}
 
 	static String getSampleNameOfOutputFolder(double sample) {
