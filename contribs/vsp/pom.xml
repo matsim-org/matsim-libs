@@ -11,6 +11,10 @@
 	<artifactId>vsp</artifactId>
 	<name>vsp</name>
 
+	<properties>
+		<javafx.version>23.0.2</javafx.version>
+	</properties>
+
 	<repositories>
 		<repository>
 			<id>jogl</id>
@@ -182,7 +186,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>23.0.2</version>
+			<version>${javafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.graphhopper</groupId>
@@ -244,7 +248,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-base</artifactId>
-			<version>23.0.2</version>
+			<version>${javafx.version}</version>
 			<classifier>linux</classifier>
 		</dependency>
 		<dependency>
