@@ -268,7 +268,13 @@ import com.google.common.collect.ImmutableSortedSet;
 	public Coord getCoord() {
 		Coord fromXY = getFromNode().getCoord();
 		Coord toXY = getToNode().getCoord();
-		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
+		double x = (fromXY.getX() + toXY.getX()) / 2.0;
+		double y = (fromXY.getY() + toXY.getY()) / 2.0;
+		if (fromXY.hasZ() && toXY.hasZ()) {
+			double z = (fromXY.getZ() + toXY.getZ()) / 2.0;
+			return new Coord(x, y, z);
+		}
+		return new Coord(x, y);
 	}
 
 	@Override
