@@ -57,9 +57,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private final EmissionsConfigGroup ecg;
 
 	private int detailedReadingInfoCnt = 0;
+	private int techAverageReadingInfoCnt = 0;
 	private int detailedTransformToHbefa4Cnt = 0;
-	private int detailedFallbackTechAverageWarnCnt = 0;
-	private int detailedFallbackAverageTableWarnCnt = 0;
+	private int fallbackTechAverageWarnCnt = 0;
+	private int fallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
 
 	private int freeFlowCounter = 0;
@@ -444,185 +445,181 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return fractionInterpolation;
 	}
 
-	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
-		switch ( ecg.getDetailedVsAverageLookupBehavior() ) {
-			case onlyTryDetailedElseAbort -> {
-				if ( detailedReadingInfoCnt <= 1 ) {
-					logger.info( "try reading detailed values" );
-					logger.info( Gbl.ONLYONCE );
-					logger.info( Gbl.FUTURE_SUPPRESSED );
-					detailedReadingInfoCnt++;
-				}
-				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
-					return ef;
-				} else {
-					if ( detailedTransformToHbefa4Cnt <= 1 ) {
-						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
-						logger.info( Gbl.ONLYONCE );
-						logger.info( Gbl.FUTURE_SUPPRESSED );
-						detailedTransformToHbefa4Cnt++;
-					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
-					// put this into a new key ...
-					efkey2.setVehicleAttributes( attribs2 );
-					// ... and try to look up:
-					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
-						return ef2;
-					}
-				}
-			}
-			case tryDetailedThenTechnologyAverageElseAbort -> {
-				//Look up detailed values
-				if ( detailedReadingInfoCnt <= 1 ) {
-					logger.info( "try reading detailed values" );
-					logger.info( Gbl.ONLYONCE );
-					logger.info( Gbl.FUTURE_SUPPRESSED );
-					detailedReadingInfoCnt++;
-				}
-				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
-					return ef;
-				} else {
-					if ( detailedTransformToHbefa4Cnt <= 1 ) {
-						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
-						logger.info( Gbl.ONLYONCE );
-						logger.info( Gbl.FUTURE_SUPPRESSED );
-						detailedTransformToHbefa4Cnt++;
-					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
-					// put this into a new key ...
-					efkey2.setVehicleAttributes( attribs2 );
-					// ... and try to look up:
-					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
-						return ef2;
-					}
+	/// Create a new key for HBEFA3 from a HBEFA4 key
+	private HbefaWarmEmissionFactorKey getHbefa3fromHbefa4(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
+		// Creates a new key, meant to be used in old HBEFA3 tables
+		HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
+		HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
+		// put this into a new key ...
+		efkey2.setVehicleAttributes( attribs2 );
+		return efkey2;
+	}
 
-					//if not possible, try "<technology>; average; average":
-					if ( ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
-						attribs2.setHbefaSizeClass( "average" );
-						attribs2.setHbefaEmConcept( "average" );
-						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn("did not find emission factor for efkey={}", efkey);
-							logger.warn(" re-written to {}", efkey2);
-							logger.warn( "will try it with '<technology>; average; average'" );
-							logger.warn( Gbl.ONLYONCE );
-							logger.warn( Gbl.FUTURE_SUPPRESSED );
-							detailedFallbackTechAverageWarnCnt++;
-						}
-						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
-							return ef2;
-						}
-						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-						logger.error( "That also did not worked " );
-					}
-				}
-			}
-			case tryDetailedThenTechnologyAverageThenAverageTable -> {
-				//Look up detailed values
-				if ( detailedReadingInfoCnt <= 1 ) {
-					logger.info( "try reading detailed values" );
-					logger.info( Gbl.ONLYONCE );
-					logger.info( Gbl.FUTURE_SUPPRESSED );
-					detailedReadingInfoCnt++;
-				}
-				if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
-					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
-					return ef;
-				} else {
-					if ( detailedTransformToHbefa4Cnt <= 1 ) {
-						logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
-						logger.info( Gbl.ONLYONCE );
-						logger.info( Gbl.FUTURE_SUPPRESSED );
-						detailedTransformToHbefa4Cnt++;
-					}
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
-					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4( vehicleInformationTuple );
-					// put this into a new key ...
-					efkey2.setVehicleAttributes( attribs2 );
-					// ... and try to look up:
-					if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-						logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
-						return ef2;
-					}
-
-					//if not possible, try "<technology>; average; average":
-					if ( ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
-						attribs2.setHbefaSizeClass( "average" );
-						attribs2.setHbefaEmConcept( "average" );
-						if ( detailedFallbackTechAverageWarnCnt <= 1 ) {
-							logger.warn("did not find emission factor for efkey={}", efkey);
-							logger.warn(" re-written to {}", efkey2);
-							logger.warn( "will try it with '<technology>; average; average'" );
-							logger.warn( Gbl.ONLYONCE );
-							logger.warn( Gbl.FUTURE_SUPPRESSED );
-							detailedFallbackTechAverageWarnCnt++;
-						}
-						if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey2 );
-							logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
-							return ef2;
-						}
-						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-					}
-				}
-				if ( detailedFallbackAverageTableWarnCnt <= 1 ) {
-					logger.warn( "That also did not work." );
-					logger.warn( "Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table" );
-					logger.warn( Gbl.ONLYONCE );
-					logger.warn( Gbl.FUTURE_SUPPRESSED );
-					detailedFallbackAverageTableWarnCnt++;
-				}
-				HbefaWarmEmissionFactorKey efkey3 = new HbefaWarmEmissionFactorKey( efkey );
-				efkey3.setVehicleAttributes( new HbefaVehicleAttributes() );
-				if ( this.avgHbefaWarmTable.get( efkey3 ) != null ) {
-					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey3 );
-					logger.debug("Lookup result for {} is {}", efkey3, ef.toString());
-					Gbl.assertNotNull( ef );
-					return ef;
-				}
-			}
-			case directlyTryAverageTable -> {
-				if ( averageReadingInfoCnt <= 1 ) {
-					logger.info( "try reading average values" );
-					logger.info( Gbl.ONLYONCE );
-					logger.info( Gbl.FUTURE_SUPPRESSED );
-					averageReadingInfoCnt++;
-				}
-				efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
-				if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
-					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-					logger.debug("Lookup result for {} is {}", efkey, ef.toString());
-					Gbl.assertNotNull( ef );
-					return ef;
-				} else {
-					logger.warn("did not find average emission factor for efkey={}", efkey);
-					List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
-					list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
-					for ( HbefaWarmEmissionFactorKey key : list ) {
-						logger.warn( key.toString() );
-					}
-				}
-			}
-			default ->
-					throw new IllegalStateException( "Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior() );
+	/// Tries to access the detailed HBEFA table (tries version 4 and 3)
+	private HbefaWarmEmissionFactor tryDetailed(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
+		// Entry Log message
+		if ( detailedReadingInfoCnt <= 1 ) {
+			logger.info( "Try reading detailed values from detailed HBEFA-table" );
+			logger.info( Gbl.ONLYONCE );
+			logger.info( Gbl.FUTURE_SUPPRESSED );
+			detailedReadingInfoCnt++;
 		}
 
-		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
-                                                           "the config OR " +
-				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+		// Try HBEFA4 format
+		if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
+			HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get( efkey );
+			logger.debug("Lookup result for {} is {}", efkey, ef.toString());
+			return ef;
+		}
+
+		// HBEFA4 not found, now try HBEFA3 format
+		if ( detailedTransformToHbefa4Cnt <= 1 ) {
+			logger.info( "try to rewrite from HBEFA3 to HBEFA4 and lookup in detailed table again" );
+			logger.info( Gbl.ONLYONCE );
+			logger.info( Gbl.FUTURE_SUPPRESSED );
+			detailedTransformToHbefa4Cnt++;
+		}
+
+		HbefaWarmEmissionFactorKey efkey_hbefa3 = getHbefa3fromHbefa4(vehicleInformationTuple, efkey);
+
+		if ( this.detailedHbefaWarmTable.get( efkey_hbefa3 ) != null ) {
+			HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey_hbefa3 );
+			logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
+			return ef2;
+		}
+
+		// If none of the approaches worked, return null to get back to calling function
+		return null;
+	}
+
+	/// Tries to access the tech-average entry in the detailed HBEFA-table (tries version 4 and 3)
+	private HbefaWarmEmissionFactor tryTechnologyAverage(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
+		// Entry Log message for technology average
+		if ( techAverageReadingInfoCnt <= 1 ) {
+			logger.info( "Try reading technology-averaged values from detailed HBEFA-table using following vehicle attributes: '{}; average; average'", efkey.getVehicleAttributes().getHbefaTechnology());
+			logger.info( Gbl.ONLYONCE );
+			logger.info( Gbl.FUTURE_SUPPRESSED );
+			techAverageReadingInfoCnt++;
+		}
+
+		HbefaWarmEmissionFactorKey efkey_hbefa3 = getHbefa3fromHbefa4(vehicleInformationTuple, efkey);
+
+		// Tries "<technology>; average; average":
+		if ( ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+			efkey_hbefa3.getVehicleAttributes().setHbefaSizeClass( "average" );
+			efkey_hbefa3.getVehicleAttributes().setHbefaEmConcept( "average" );
+
+			if ( this.detailedHbefaWarmTable.get( efkey_hbefa3 ) != null ) {
+				HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get( efkey_hbefa3 );
+				logger.debug("Lookup result for {} is {}", efkey, ef2.toString());
+				return ef2;
+			}
+		}
+
+		// If none of the approaches worked, return null to get back to calling function
+		return null;
+	}
+
+	/// Tries to access the average HBEFA-table (tries version 4 and 3)
+	private HbefaWarmEmissionFactor tryAverage(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
+		if ( averageReadingInfoCnt <= 1 ) {
+			logger.info( "Try reading average values from average HBEFA-table" );
+			logger.info( Gbl.ONLYONCE );
+			logger.info( Gbl.FUTURE_SUPPRESSED );
+			averageReadingInfoCnt++;
+		}
+
+		//Set VehicleAttributes to '<average>, <average>, <average>'
+		efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
+		if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
+			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
+			logger.debug("Lookup result for {} is {}", efkey, ef.toString());
+			Gbl.assertNotNull( ef );
+			return ef;
+		}
+
+		// Average key was not found
+		logger.warn("Did not find average emission factor for efkey={}", efkey);
+		List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
+		list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
+		for ( HbefaWarmEmissionFactorKey key : list ) {
+			logger.warn( key.toString() );
+		}
+
+		// If none of the approaches worked, return null to get back to calling function
+		return null;
+	}
+
+	private void fallbackTechAverageLogWarning(HbefaWarmEmissionFactorKey efkey) {
+		if ( fallbackTechAverageWarnCnt <= 1 ) {
+			logger.warn("Did not find detailed emission factor for efkey={}", efkey);
+			logger.warn( "Now trying with technology-average: \"<technology>; average; average\"" );
+			logger.warn( Gbl.ONLYONCE );
+			logger.warn( Gbl.FUTURE_SUPPRESSED );
+			fallbackTechAverageWarnCnt++;
+		}
+	}
+
+	private void fallbackAverageLogWarning(HbefaWarmEmissionFactorKey efkey) {
+		if ( fallbackAverageTableWarnCnt <= 1 ) {
+			logger.warn("Did not find technology averaged emission factor for efkey={}", efkey);
+			logger.warn( "Now trying with setting to vehicle attributes to \"average; average; average\" and try it in the average table" );
+			logger.warn( Gbl.ONLYONCE );
+			logger.warn( Gbl.FUTURE_SUPPRESSED );
+			fallbackAverageTableWarnCnt++;
+		}
+	}
+
+	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
+
+		switch ( ecg.getDetailedVsAverageLookupBehavior() ) {
+			case onlyTryDetailedElseAbort -> {
+				HbefaWarmEmissionFactor ef;
+				ef = tryDetailed(vehicleInformationTuple, efkey);
+				if (ef != null) return ef;
+			}
+			case tryDetailedThenTechnologyAverageElseAbort -> {
+				HbefaWarmEmissionFactor ef;
+				ef = tryDetailed(vehicleInformationTuple, efkey);
+				if (ef != null) return ef;
+
+				fallbackTechAverageLogWarning(efkey);
+
+				ef = tryTechnologyAverage(vehicleInformationTuple, efkey);
+				if (ef != null) return ef;
+			}
+			case tryDetailedThenTechnologyAverageThenAverageTable -> {
+				HbefaWarmEmissionFactor ef;
+				ef = tryDetailed(vehicleInformationTuple, efkey);
+				if (ef != null) return null;
+
+				fallbackTechAverageLogWarning(efkey);
+
+				ef = tryTechnologyAverage(vehicleInformationTuple, efkey);
+				if (ef != null) return null;
+
+				fallbackAverageLogWarning(efkey);
+
+				ef = tryAverage(vehicleInformationTuple, efkey);
+				if (ef != null) return null;
+
+			}
+			case directlyTryAverageTable -> {
+				HbefaWarmEmissionFactor ef;
+				ef = tryAverage(vehicleInformationTuple, efkey);
+				if (ef != null) return ef;
+			}
+			default -> throw new IllegalStateException( "Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior() );
+		}
+
+		// If this part of code is reached, the lookup was not successful. Terminate the simulation
+		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in the config \n " +
+			"OR \n " +
+			"you should use another fallback setting when using detailed calculation \n " +
+			"OR \n" +
+			"values are missing in your emissions table(s) either average or detailed \n" +
+			"OR \n" +
+			"... \n\n efkey: " + efkey.toString());
 	}
 
 
