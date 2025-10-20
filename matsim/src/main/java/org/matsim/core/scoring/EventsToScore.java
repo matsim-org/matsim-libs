@@ -33,7 +33,7 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 
 /**

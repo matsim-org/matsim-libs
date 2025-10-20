@@ -19,12 +19,17 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
-import com.google.inject.Inject;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -39,33 +44,48 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.TimeDependentNetwork;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
-import java.util.Set;
+import com.google.inject.Inject;
+
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.events.RailsimFormationEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.TrainDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 
 /**
  * QSim Engine to integrate microscopically simulated train movement.
  */
 public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
+	private static final Logger log = LogManager.getLogger(RailsimQSimEngine.class);
+
 	private final QSim qsim;
 	private final RailsimConfigGroup config;
 	private final RailResourceManager res;
 	private final TrainDisposition disposition;
+	private final TrainManager trainManager;
 	private final Set<String> modes;
+	private final Queue<NetworkChangeEvent> networkChangeEvents;
 	private final TransitStopAgentTracker agentTracker;
 	private InternalInterface internalInterface;
 
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, TrainManager trainManager) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
+		this.trainManager = trainManager;
 		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
+		this.networkChangeEvents = new PriorityQueue<>(Comparator.comparing(NetworkChangeEvent::getStartTime));
 	}
 
 	@Override
@@ -75,7 +95,25 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		engine = new RailsimEngine(qsim.getEventsManager(), config, res, disposition);
+
+		Network network = qsim.getScenario().getNetwork();
+
+		if (network instanceof TimeDependentNetwork tNetwork) {
+
+			// Filter for supported network change events
+			List<NetworkChangeEvent> events = tNetwork.getNetworkChangeEvents().stream()
+				.filter(ev ->
+					ev.getAttributesChanges().stream()
+						.map(NetworkChangeEvent.AttributesChangeValue::getAttribute).anyMatch(RailsimUtils.LINK_ATTRIBUTE_CAPACITY::equals)
+						|| ev.getFreespeedChange() != null)
+				.toList();
+
+			log.info("Found {} network change events to be processed.", events.size());
+
+			networkChangeEvents.addAll(events);
+		}
+
+		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition);
 	}
 
 	@Override
@@ -85,6 +123,16 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
+
+		NetworkChangeEvent event = networkChangeEvents.peek();
+		while (event != null && event.getStartTime() <= time) {
+			networkChangeEvents.poll();
+
+			engine.handleNetworkChangeEvent(time, event);
+
+			event = networkChangeEvents.peek();
+		}
+
 		engine.doSimStep(time);
 	}
 
@@ -116,6 +164,14 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 		if (link instanceof QLinkI qLink) {
 			qLink.unregisterAdditionalAgentOnLink(agent.getId());
 			qLink.removeParkedVehicle(driver.getVehicle().getId());
+		}
+
+		// Check if this vehicle has a formation and throw formation event
+		Id<Vehicle> vehicleId = driver.getVehicle().getId();
+		if (trainManager.hasFormation(vehicleId)) {
+			List<String> units = trainManager.getFormation(vehicleId);
+			RailsimFormationEvent formationEvent = new RailsimFormationEvent(now, vehicleId, units);
+			qsim.getEventsManager().processEvent(formationEvent);
 		}
 
 		return engine.handleDeparture(now, driver, linkId, networkRoute);

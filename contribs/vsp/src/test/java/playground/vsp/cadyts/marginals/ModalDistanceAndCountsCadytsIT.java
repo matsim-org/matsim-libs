@@ -35,7 +35,7 @@ import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.*;
 import java.util.stream.Stream;
 

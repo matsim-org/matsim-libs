@@ -97,26 +97,26 @@ public class RunPrebookingShiftDrtScenarioIT {
 
         run.run();
 
-        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(2)));
         Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(4)));
         Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
-        Assertions.assertEquals(2, submittedPersons.count(Id.createPersonId(6)));
+        Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(6)));
 
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(2)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(4)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
-        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(6)));
 
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
         Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
         Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
-        Assertions.assertEquals(2, rejectedPersons.count(Id.createPersonId(6)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(6)));
     }
 
     @Test
@@ -158,19 +158,19 @@ public class RunPrebookingShiftDrtScenarioIT {
         Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(5)));
         Assertions.assertEquals(1, submittedPersons.count(Id.createPersonId(6)));
 
-        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(2)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(4)));
         Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(5)));
-        Assertions.assertEquals(0, scheduledPersons.count(Id.createPersonId(6)));
+        Assertions.assertEquals(1, scheduledPersons.count(Id.createPersonId(6)));
 
-        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(1)));
+        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(1)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(2)));
         Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(3)));
         Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(4)));
         Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(5)));
-        Assertions.assertEquals(1, rejectedPersons.count(Id.createPersonId(6)));
+        Assertions.assertEquals(0, rejectedPersons.count(Id.createPersonId(6)));
     }
 
     @NotNull

@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.ReplanningContext;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
 

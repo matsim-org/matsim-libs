@@ -38,7 +38,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;

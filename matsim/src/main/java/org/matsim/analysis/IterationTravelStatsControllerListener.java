@@ -29,7 +29,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scoring.ExperiencedPlansService;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 class IterationTravelStatsControllerListener implements IterationEndsListener, ShutdownListener {
 
