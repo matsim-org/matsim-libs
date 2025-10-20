@@ -50,12 +50,12 @@ public interface TransitStopHandler extends ToMessage {
 	 * that want to enter. Only if the method returns 0, it may continue on its route to the next stop.
 	 * </p>
 	 *
-	 * @param stop               the stop the vehicle is currently at
-	 * @param now                the current time
-	 * @param leavingPassengers  the list of passengers that want to exit
-	 * @param enteringPassengers the list of passengers that want to board
+	 * @param stop                 the stop the vehicle is currently at
+	 * @param now                  the current time
+	 * @param leavingPassengers    the list of passengers that want to exit
+	 * @param enteringPassengers   the list of passengers that want to board
 	 * @param relocatingPassengers the list of passengers that want to relocate to another chained vehicle
-	 * @param handler            provides methods for actually removing/adding passengers to the vehicle
+	 * @param handler              provides methods for actually removing/adding passengers to the vehicle
 	 * @return the time (in seconds) how long the vehicle will stay at least at this stop.
 	 */
 	double handleTransitStop(final TransitStopFacility stop, final double now,

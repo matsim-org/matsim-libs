@@ -18,8 +18,14 @@ import org.matsim.dsim.simulation.net.SimLink;
 import org.matsim.dsim.simulation.net.SimNetwork;
 import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.stream.Stream;
 
 public class DistributedPtEngine implements DistributedMobsimEngine, DistributedDepartureHandler, Wait2Link {
@@ -104,7 +110,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			while (!entry.isEmpty()) {
 				var veh = entry.peek().vehicle();
 				var link = entry.peek().link();
-				if (moveVehicle(veh, link, now)) {
+				if (moveWaitingVehicle(veh, link, now)) {
 					entry.remove();
 				} else {
 					break;
@@ -136,7 +142,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 		return 1.;
 	}
 
-	private boolean moveVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+	private boolean moveWaitingVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
 		if (!link.isAccepting(SimLink.LinkPosition.Buffer, now)) {
 			return false;
@@ -148,15 +154,31 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 			now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
 			vehicle.getDriver().getMode(), 1.0)
 		);
-		var result = handleTransitStop(tda, vehicle, link, now);
 
-		switch (result) {
-			case BlockQueue -> link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
-			case MoveToBuffer -> link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
-			case RemoveVehicle -> { // nothing to do. The vehicle should be in vehicles at stop
+		// If a vehicle wants to stop on this link, we let it stop. If the stop has a duration of 0, we immediately check whether the
+		// next stop is on the same link. The for-loop stops once the next stop is not on the same link. In that case we
+		// push the vehicle into the link's buffer.
+		for (var stop = tda.getNextTransitStop(); stopOnLink(stop, link); stop = tda.getNextTransitStop()) {
+			var delay = tda.handleTransitStop(stop, now);
+			if (delay > 0.0) {
+				vehicle.setEarliestLinkExitTime(now + delay);
+				activeStops
+					.computeIfAbsent(link.getId(), _ -> new PriorityQueue<>(new VehAtStopComparator()))
+					.add(new VehicleAtStop(vehicle, link));
+				return true;
 			}
 		}
+		if (tda.isWantingToArriveOnCurrentLink()) {
+			// put the vehicle into the queue so that the network engine can handle the arrival of the vehicle
+			link.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, now);
+		} else {
+			link.pushVehicle(vehicle, SimLink.LinkPosition.Buffer, now);
+		}
 		return true;
+	}
+
+	private static boolean stopOnLink(TransitStopFacility stop, SimLink link) {
+		return stop != null && stop.getLinkId().equals(link.getId());
 	}
 
 
@@ -181,16 +203,19 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 		var delay = driver.handleTransitStop(stop, now);
 		if (delay <= 0.) {
-			// vehicle has delivered passengers without delay. It can keep moving
-			return SimLink.OnLeaveQueueInstruction.MoveToBuffer;
+			// the vehicle has delivered passengers without delay. Put it back into the queue without adjusting the
+			// vehicle's departure time. This causes this handler to be called again immediately. This is necessary
+			// for the case of a vehicle having another stop on the same link. If not, the check for the next stop's
+			// link-id above will result in a signal to MoveToBuffer and the vehicle can progress on its network route
+			return SimLink.OnLeaveQueueInstruction.BlockQueue;
 		}
 
 		vehicle.setEarliestLinkExitTime(now + delay);
 		if (stop.getIsBlockingLane()) {
-			// the vehicle stops on the link and blocks following vehicles
+			// the vehicle stops on the link and blocks the following vehicles
 			return SimLink.OnLeaveQueueInstruction.BlockQueue;
 		} else {
-			// the vehicle stops outside the link (e.g. inside a booth) and following vehicles can pass
+			// the vehicle stops outside the link (e.g. inside a booth) and the following vehicles can pass
 			activeStops
 				.computeIfAbsent(link.getId(), _ -> new PriorityQueue<>(new VehAtStopComparator()))
 				.add(new VehicleAtStop(vehicle, link));
