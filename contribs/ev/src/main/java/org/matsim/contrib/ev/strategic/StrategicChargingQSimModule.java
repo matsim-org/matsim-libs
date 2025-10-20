@@ -10,11 +10,13 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.contrib.ev.reservation.ChargerReservationManager;
 import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoring;
 import org.matsim.contrib.ev.withinday.ChargingAlternativeProvider;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotProvider;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.TravelTime;
@@ -76,8 +78,9 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 	StrategicChargingReservationEngine provideStrategicChargingReservationEngine(Population population,
 			ChargerReservationManager manager,
 			ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
-			ElectricFleet electricFleet, WithinDayEvConfigGroup config) {
+			ElectricFleet electricFleet, WithinDayEvConfigGroup config, EventsManager eventsManager) {
 		return new StrategicChargingReservationEngine(
-				population, manager, infrastructure, timeInterpretation, electricFleet, config.getCarMode());
+				population, manager, infrastructure, timeInterpretation, electricFleet, config.getCarMode(),
+				eventsManager);
 	}
 }

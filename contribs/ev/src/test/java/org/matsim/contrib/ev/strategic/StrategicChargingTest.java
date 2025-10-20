@@ -13,6 +13,7 @@ import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.AlternativeS
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder.TestScenario;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
@@ -196,6 +197,10 @@ public class StrategicChargingTest {
         config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
         ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
                 .setActivityInclusionProbability(1.0);
+
+        // only for persons with a slack set
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setReservationProbability(1.0);
 
         // motivate agent to charge at activity
         config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);

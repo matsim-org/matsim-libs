@@ -53,6 +53,10 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 			+ ChargingPlanScoring.MINIMUM_END_SOC_PERSON_ATTRIBUTE + ")")
 	private double belowMinimumEndSoc = 0.0;
 
+	@Parameter
+	@Comment("applied every time an agent planned to do a reservation but it was unsuccessful")
+	private double failedReservation = -100.0;
+
 	public double getCost() {
 		return cost;
 	}
@@ -123,5 +127,13 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 
 	public void setBelowMinimumEndSoc(double belowMinimumEndSoc) {
 		this.belowMinimumEndSoc = belowMinimumEndSoc;
+	}
+
+	public double getFailedReservation() {
+		return failedReservation;
+	}
+
+	public void setFailedReservation(double failedReservation) {
+		this.failedReservation = failedReservation;
 	}
 }

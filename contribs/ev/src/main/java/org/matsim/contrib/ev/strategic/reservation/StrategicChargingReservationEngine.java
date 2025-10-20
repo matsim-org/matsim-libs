@@ -1,4 +1,4 @@
-package org.matsim.contrib.ev.strategic;
+package org.matsim.contrib.ev.strategic.reservation;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -19,6 +19,7 @@ import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlanActivity;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.TripStructureUtils;
@@ -36,10 +37,12 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
     private final ChargingInfrastructureSpecification infrastructure;
     private final TimeInterpretation timeInterpretation;
     private final ElectricFleet electricFleet;
+    private final EventsManager eventsManager;
 
     private final String chargingMode;
 
-    private record AdvanceReservation(double reservationTime, ChargerSpecification charger, ElectricVehicle vehicle,
+    private record AdvanceReservation(double reservationTime, Person person, ChargerSpecification charger,
+            ElectricVehicle vehicle,
             double startTime, double endTime) {
     }
 
@@ -48,13 +51,14 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
 
     public StrategicChargingReservationEngine(Population population, ChargerReservationManager manager,
             ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
-            ElectricFleet electricFleet, String chargingMode) {
+            ElectricFleet electricFleet, String chargingMode, EventsManager eventsManager) {
         this.population = population;
         this.manager = manager;
         this.electricFleet = electricFleet;
         this.chargingMode = chargingMode;
         this.infrastructure = infrastructure;
         this.timeInterpretation = timeInterpretation;
+        this.eventsManager = eventsManager;
     }
 
     @Override
@@ -62,11 +66,15 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
         while (queue.size() > 0 && queue.peek().reservationTime <= time) {
             AdvanceReservation advance = queue.poll();
 
-            manager.addReservation(advance.charger, advance.vehicle, advance.startTime,
+            var reservation = manager.addReservation(advance.charger, advance.vehicle, advance.startTime,
                     advance.endTime);
 
             // TODO: What if the reservation is unsuccessful? Here we could implement some
             // fallback strategy: Choose another charger
+
+            boolean successful = reservation != null;
+            eventsManager.processEvent(new AdvanceReservationEvent(time, advance.person.getId(),
+                    advance.vehicle.getId(), advance.charger.getId(), advance.startTime, advance.endTime, successful));
         }
     }
 
@@ -111,6 +119,10 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
             }
 
             for (ChargingPlanActivity activity : plan.getChargingActivities()) {
+                if (!activity.isReserved()) {
+                    continue;
+                }
+
                 if (activity.isEnroute()) {
                     // TODO: This is relatively imprecise, but not sure we can do better in the
                     // beginning of the day.
@@ -121,7 +133,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
                     ChargerSpecification charger = infrastructure.getChargerSpecifications()
                             .get(activity.getChargerId());
 
-                    queue.add(new AdvanceReservation(reservationTime, charger, vehicle, startTime, endTime));
+                    queue.add(new AdvanceReservation(reservationTime, person, charger, vehicle, startTime, endTime));
                 } else {
                     double startTime = startTimes.get(activity.getStartActivityIndex());
                     double endTime = endTimes.get(activity.getEndActivityIndex());
@@ -130,7 +142,7 @@ public class StrategicChargingReservationEngine implements MobsimEngine {
                     ChargerSpecification charger = infrastructure.getChargerSpecifications()
                             .get(activity.getChargerId());
 
-                    queue.add(new AdvanceReservation(reservationTime, charger, vehicle, startTime, endTime));
+                    queue.add(new AdvanceReservation(reservationTime, person, charger, vehicle, startTime, endTime));
                 }
             }
         }

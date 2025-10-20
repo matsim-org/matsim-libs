@@ -17,6 +17,7 @@ import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerReq
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlanActivity;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.ActivityBasedCandidate;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
@@ -54,6 +55,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 	private final double activityInclusionProbability;
 	private final double legInclusionProbability;
+	private final double reservationProbability;
 
 	public RandomChargingPlanInnovator(ChargerProvider chargerProvider, ChargingSlotFinder candidateFinder,
 			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters) {
@@ -66,6 +68,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		this.maximumEnrouteChargingDuration = config.getMaximumEnrouteChargingDuration();
 		this.activityInclusionProbability = parameters.getActivityInclusionProbability();
 		this.legInclusionProbability = parameters.getLegInclusionProbability();
+		this.reservationProbability = parameters.getReservationProbability();
 		this.candidateFinder = candidateFinder;
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -130,8 +133,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 					int startActivityIndex = activities.indexOf(candidate.startActivity());
 					int endActivityIndex = activities.indexOf(candidate.endActivity());
 
+					boolean isReserved = StrategicChargingReservationEngine.getReservationSlack(person) != null
+							&& random.nextDouble() < reservationProbability;
+
 					chargingPlan.addChargingActivity(new ChargingPlanActivity(startActivityIndex, endActivityIndex,
-							charger.getId()));
+							charger.getId(), isReserved));
 
 					selectedActivityBased.add(candidate);
 				}
@@ -164,9 +170,11 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 					ChargerSpecification charger = chargers.get(random.nextInt(chargers.size()));
 					int followingActivityIndex = activities.indexOf(candidate.followingActivity());
 
+					boolean isReserved = StrategicChargingReservationEngine.getReservationSlack(person) != null
+							&& random.nextDouble() < reservationProbability;
+
 					chargingPlan.addChargingActivity(new ChargingPlanActivity(followingActivityIndex,
-							duration,
-							charger.getId()));
+							duration, charger.getId(), isReserved));
 				}
 			}
 		}
@@ -187,6 +195,9 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		@Parameter
 		private double legInclusionProbability = 0.5;
 
+		@Parameter
+		private double reservationProbability = 0.0;
+
 		public double getActivityInclusionProbability() {
 			return activityInclusionProbability;
 		}
@@ -201,6 +212,14 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		public void setLegInclusionProbability(double val) {
 			legInclusionProbability = val;
+		}
+
+		public double getReservationProbability() {
+			return reservationProbability;
+		}
+
+		public void setReservationProbability(double val) {
+			reservationProbability = val;
 		}
 	}
 }

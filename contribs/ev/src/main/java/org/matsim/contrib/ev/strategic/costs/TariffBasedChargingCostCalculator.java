@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -49,8 +50,7 @@ public class TariffBasedChargingCostCalculator implements ChargingCostCalculator
 		this.population = population;
 	}
 
-	@Override
-	public double calculateChargingCost(Id<Person> personId, Id<Charger> chargerId, double duration, double energy) {
+	private Stream<TariffParameters> getCompatibleTariffs(Id<Person> personId, Id<Charger> chargerId) {
 		Person person = population.getPersons().get(personId);
 
 		List<TariffParameters> tariffs = cache.get(chargerId);
@@ -59,23 +59,36 @@ public class TariffBasedChargingCostCalculator implements ChargingCostCalculator
 			cache.put(chargerId, tariffs);
 		}
 
-		double best = Double.POSITIVE_INFINITY;
-		for (TariffParameters tariff : tariffs) {
-			if (tariff.getSubscriptions().size() == 0 || Sets
-					.intersection(tariff.getSubscriptions(), subscriptions.getPersonSubscriptions(person)).size() > 0) {
-				double blockingDuration_min = Math.max(duration / 60.0 - tariff.getBlockingDuration_min(), 0.0);
+		return tariffs.stream().filter(tariff -> {
+			return tariff.getSubscriptions().size() == 0 || Sets
+					.intersection(tariff.getSubscriptions(), subscriptions.getPersonSubscriptions(person)).size() > 0;
+		});
+	}
 
-				best = Math.min(best,
-						duration / 60.0 * tariff.getCostPerDuration_min()
-								+ blockingDuration_min * tariff.getCostPerBlockingDuration_min() +
-								+EvUnits.J_to_kWh(energy) * tariff.getCostPerEnergy_kWh() + tariff.getCostPerUse());
-			}
-		}
+	@Override
+	public double calculateChargingCost(Id<Person> personId, Id<Charger> chargerId, double duration, double energy) {
+		var best = getCompatibleTariffs(personId, chargerId).mapToDouble(tariff -> {
+			double blockingDuration_min = Math.max(duration / 60.0 - tariff.getBlockingDuration_min(), 0.0);
 
-		Preconditions.checkState(Double.isFinite(best),
+			return duration / 60.0 * tariff.getCostPerDuration_min()
+					+ blockingDuration_min * tariff.getCostPerBlockingDuration_min() +
+					EvUnits.J_to_kWh(energy) * tariff.getCostPerEnergy_kWh() + tariff.getCostPerUse();
+		}).min();
+
+		Preconditions.checkState(best.isPresent(),
 				String.format("No viable tariff found for person %s at charger %s", personId, chargerId));
 
-		return best;
+		return best.getAsDouble();
+	}
+
+	@Override
+	public double calculateReservationCost(Id<Person> personId, Id<Charger> chargerId, double duration) {
+		var best = getCompatibleTariffs(personId, chargerId).mapToDouble(TariffParameters::getCostPerReservation).min();
+
+		Preconditions.checkState(best.isPresent(),
+				String.format("No viable tariff found for person %s at charger %s", personId, chargerId));
+
+		return best.getAsDouble();
 	}
 
 	private List<TariffParameters> getChargerTariffs(Id<Charger> chargerId) {

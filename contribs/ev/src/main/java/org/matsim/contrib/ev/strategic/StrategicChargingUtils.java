@@ -98,9 +98,10 @@ public class StrategicChargingUtils {
      * additionally for any duration that exceeds the blocking duration.
      */
     static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
-            double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min) {
+            double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min,
+            double costPerReservation) {
         AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
-                costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min);
+                costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min, costPerReservation);
     }
 
     /**
@@ -233,7 +234,8 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Adds the activity scoring parameters to the 'normal' MATSim scoring config group.
+     * Adds the activity scoring parameters to the 'normal' MATSim scoring config
+     * group.
      * You still need to configure the ChargingPlanScoringParameters yourself!
      */
     static public void configureScoring(Config config) {
@@ -292,7 +294,7 @@ public class StrategicChargingUtils {
     /**
      * Sets up the controller
      */
-    static public void configureController (Controler controller) {
+    static public void configureController(Controler controller) {
         controller.addOverridingModule(new WithinDayEvModule());
         controller.addOverridingModule(new StrategicChargingModule());
     }

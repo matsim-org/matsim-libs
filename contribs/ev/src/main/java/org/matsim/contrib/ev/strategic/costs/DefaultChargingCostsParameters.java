@@ -30,6 +30,9 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 	@Parameter
 	private double blockingDuration_min = 0.0;
 
+	@Parameter
+	private double costPerReservation = 0.0;
+
 	public double getCostPerUse() {
 		return costPerUse;
 	}
@@ -68,5 +71,13 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 
 	public void setBlockingDuration_min(double blockingDuration_min) {
 		this.blockingDuration_min = blockingDuration_min;
+	}
+
+	public double getCostPerReservation() {
+		return costPerReservation;
+	}
+
+	public void setCostPerReservation(double costPerReservation) {
+		this.costPerReservation = costPerReservation;
 	}
 }

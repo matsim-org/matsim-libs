@@ -72,6 +72,9 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 		@Parameter
 		private double blockingDuration_min = 0.0;
 
+		@Parameter
+		private double costPerReservation = 0.0;
+
 		public String getTariffName() {
 			return name;
 		}
@@ -126,6 +129,14 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 
 		public void setBlockingDuration_min(double blockingDuration_min) {
 			this.blockingDuration_min = blockingDuration_min;
+		}
+
+		public double getCostPerReservation() {
+			return costPerReservation;
+		}
+
+		public void setCostPerReservation(double costPerReservation) {
+			this.costPerReservation = costPerReservation;
 		}
 	}
 
