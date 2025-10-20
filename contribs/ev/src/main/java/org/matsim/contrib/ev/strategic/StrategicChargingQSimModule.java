@@ -2,8 +2,11 @@ package org.matsim.contrib.ev.strategic;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.contrib.ev.reservation.ChargerReservationManager;
 import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
@@ -37,6 +40,7 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 		bind(ChargingAlternativeProvider.class).to(StrategicChargingAlternativeProvider.class);
 
 		addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingPlanScoring.class);
+		addQSimComponentBinding(EvModule.EV_COMPONENT).to(StrategicChargingReservationEngine.class);
 	}
 
 	@Provides
@@ -65,5 +69,15 @@ public class StrategicChargingQSimModule extends AbstractQSimModule {
 			ChargerProvider chargerProvider, ChargingInfrastructure infrastructure,
 			StrategicChargingConfigGroup config) {
 		return new CriticalAlternativeProvider(qsim, network, travelTime, chargerProvider, infrastructure, config);
+	}
+
+	@Provides
+	@Singleton
+	StrategicChargingReservationEngine provideStrategicChargingReservationEngine(Population population,
+			ChargerReservationManager manager,
+			ChargingInfrastructureSpecification infrastructure, TimeInterpretation timeInterpretation,
+			ElectricFleet electricFleet, WithinDayEvConfigGroup config) {
+		return new StrategicChargingReservationEngine(
+				population, manager, infrastructure, timeInterpretation, electricFleet, config.getCarMode());
 	}
 }
