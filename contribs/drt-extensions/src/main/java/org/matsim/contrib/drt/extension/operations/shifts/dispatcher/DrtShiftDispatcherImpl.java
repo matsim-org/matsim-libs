@@ -165,7 +165,7 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (checkOut) {
             eventsManager.processEvent(new OperationFacilityCheckOutEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
         } else {
-            throw new IllegalStateException(String.format("Could not check out vehicle %s from facility %s", vehicle.getId().toString(), facility.getId()));
+            logger.warn(String.format("Could not check out vehicle %s from facility %s", vehicle.getId().toString(), facility.getId()));
         }
     }
 
