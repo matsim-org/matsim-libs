@@ -20,7 +20,7 @@
 
 package org.matsim.freight.logistics;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 

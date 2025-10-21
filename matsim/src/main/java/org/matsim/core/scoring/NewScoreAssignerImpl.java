@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 

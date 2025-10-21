@@ -38,8 +38,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Manager active trains and can access the state of all trains in the simulation.
