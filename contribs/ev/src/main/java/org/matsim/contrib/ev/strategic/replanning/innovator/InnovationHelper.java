@@ -9,8 +9,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
+import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerRequest;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlanActivity;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.ChargerSelector;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.ActivityBasedCandidate;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
@@ -55,6 +58,14 @@ public class InnovationHelper {
 
     public double endTime(ActivityBasedCandidate candidate) {
         return endTimes.get(candidate.endActivity());
+    }
+
+    public double startTime(LegBasedCandidate candidate) {
+        return endTimes.get(candidate.followingActivity());
+    }
+
+    public double endTime(LegBasedCandidate candidate) {
+        return startTimes.get(candidate.followingActivity());
     }
 
     public double duration(ActivityBasedCandidate candidate) {
@@ -127,24 +138,64 @@ public class InnovationHelper {
         return candidates;
     }
 
-    public void push(ActivityBasedCandidate candidate, ChargerSpecification charger) {
+    public boolean push(ActivityBasedCandidate candidate, ChargerSpecification charger) {
+        if (charger == null) {
+            return false;
+        }
+
         selectedActivityBased.add(candidate);
 
         chargingPlan.addChargingActivity(
                 new ChargingPlanActivity(startActivityIndex(candidate), endActivityIndex(candidate),
                         charger.getId()));
+
+        return true;
     }
 
-    public void push(LegBasedCandidate candidate, double duration, ChargerSpecification charger) {
+    public boolean push(LegBasedCandidate candidate, double duration, ChargerSpecification charger) {
+        if (charger == null) {
+            return false;
+        }
+
         selectedLegBased.add(candidate);
 
         chargingPlan.addChargingActivity(new ChargingPlanActivity(followingActivityIndex(candidate),
                 duration,
                 charger.getId()));
+
+        return true;
     }
 
     public ChargingPlan getChargingPlan() {
         return chargingPlan;
+    }
+
+    // CHARGER SELECTION
+
+    public ChargerSpecification selectCharger(ActivityBasedCandidate slot, ChargerProvider chargerProvider,
+            ChargerSelector selector) {
+        List<ChargerSpecification> chargers = new LinkedList<>(
+                chargerProvider.findChargers(plan.getPerson(), plan,
+                        new ChargerRequest(slot.startActivity(), slot.endActivity())));
+
+        if (chargers.size() > 0) {
+            return selector.select(slot, chargers);
+        } else {
+            return null;
+        }
+    }
+
+    public ChargerSpecification selectCharger(LegBasedCandidate slot, double duration, ChargerProvider chargerProvider,
+            ChargerSelector selector) {
+        List<ChargerSpecification> chargers = new LinkedList<>(
+                chargerProvider.findChargers(plan.getPerson(), plan,
+                        new ChargerRequest(slot.leg(), duration)));
+
+        if (chargers.size() > 0) {
+            return selector.select(slot, duration, chargers);
+        } else {
+            return null;
+        }
     }
 
     static public InnovationHelper build(Plan plan, TimeInterpretation timeInterpretation,

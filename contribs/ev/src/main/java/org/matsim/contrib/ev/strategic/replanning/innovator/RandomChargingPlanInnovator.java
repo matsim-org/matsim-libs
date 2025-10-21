@@ -1,6 +1,5 @@
 package org.matsim.contrib.ev.strategic.replanning.innovator;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -9,9 +8,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
-import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerRequest;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.ChargerSelector;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.ActivityBasedCandidate;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
@@ -34,6 +33,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	private final ChargerProvider chargerProvider;
 	private final ChargingSlotFinder candidateFinder;
 	private final TimeInterpretation timeInterpretation;
+	private final ChargerSelector.Factory selectorFactory;
 
 	private final Random random;
 
@@ -48,7 +48,8 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	private final double legInclusionProbability;
 
 	public RandomChargingPlanInnovator(ChargerProvider chargerProvider, ChargingSlotFinder candidateFinder,
-			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters) {
+			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters,
+			ChargerSelector.Factory selectorFactory) {
 		this.chargerProvider = chargerProvider;
 		this.timeInterpretation = timeInterpretation;
 		this.minimumActivityChargingDuration = config.getMinimumActivityChargingDuration();
@@ -60,12 +61,14 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		this.legInclusionProbability = parameters.getLegInclusionProbability();
 		this.candidateFinder = candidateFinder;
 		this.random = MatsimRandom.getLocalInstance();
+		this.selectorFactory = selectorFactory;
 	}
 
 	@Override
 	public ChargingPlan createChargingPlan(Person person, Plan plan, ChargingPlans chargingPlans) {
 		// set up the helper
 		InnovationHelper helper = InnovationHelper.build(plan, timeInterpretation, candidateFinder);
+		ChargerSelector chargerSelector = selectorFactory.create(person, plan, random, helper);
 
 		// first, obtain activity-based slots
 		List<ActivityBasedCandidate> activityBased = helper.findActivityBased();
@@ -77,14 +80,10 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		for (ActivityBasedCandidate candidate : activityBased) {
 			if (random.nextDouble() <= activityInclusionProbability) {
 				// find chargers
-				List<ChargerSpecification> chargers = new LinkedList<>(
-						chargerProvider.findChargers(plan.getPerson(), plan,
-								new ChargerRequest(candidate.startActivity(), candidate.endActivity())));
+				ChargerSpecification charger = helper.selectCharger(candidate, chargerProvider, chargerSelector);
 
-				if (chargers.size() > 0) {
-					ChargerSpecification charger = chargers.get(random.nextInt(chargers.size()));
-					helper.push(candidate, charger);
-				}
+				// integrate into plan
+				helper.push(candidate, charger);
 			}
 		}
 
@@ -97,18 +96,16 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		// select leg-based slots
 		for (LegBasedCandidate candidate : legBased) {
 			if (random.nextDouble() <= legInclusionProbability) {
+				// define duration
 				double duration = minimumEnrouteChargingDuration;
 				duration += (maximumEnrouteChargingDuration - minimumEnrouteChargingDuration) * random.nextDouble();
 
-				// find chargers
-				List<ChargerSpecification> chargers = new LinkedList<>(
-						chargerProvider.findChargers(plan.getPerson(), plan,
-								new ChargerRequest(candidate.leg(), duration)));
+				// find charger
+				ChargerSpecification charger = helper.selectCharger(candidate, duration, chargerProvider,
+						chargerSelector);
 
-				if (chargers.size() > 0) {
-					ChargerSpecification charger = chargers.get(random.nextInt(chargers.size()));
-					helper.push(candidate, duration, charger);
-				}
+				// integrate into plan
+				helper.push(candidate, duration, charger);
 			}
 		}
 
