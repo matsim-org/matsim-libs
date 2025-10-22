@@ -873,11 +873,15 @@
 
   # WLTP
   plot_main()
-  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output.csv") )
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output_pl5.csv") )
+  compute_emission_difference(glue("{diff_path}/diff_diesel_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_diesel_output_pl5.csv") )
 
-  # CADC-URBAN
-  plot_main(title = "Comparison across CADC-URBAN-cycle for petrol", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv", fuel="petrol")
-  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv")
+  # CADC
+  plot_main(title = "Comparison across CADC-cycle for petrol", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv", fuel="petrol")
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv")
+
+  plot_main(title = "Comparison across CADC-cycle for diesel", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output_pl5.csv", fuel="diesel")
+  compute_emission_difference(glue("{diff_path}/diff_diesel_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output_pl5.csv")
 }
 
 # ==== Plot CADCs ====
@@ -912,7 +916,7 @@
 
   # Compute the acc (method 1)
   CADC <- CADC %>%
-    mutate(acc = (lead(vel) - lag(vel)) / 2) %>%
+    mutate(acc = (lead(vel) - lag(vel)) / (2*3.6)) %>%
     mutate(acc = ifelse(is.na(acc), 0, acc))
 
   # Compute the acc (method 2)
@@ -921,4 +925,59 @@
   #   mutate(acc = ifelse(is.na(acc), 0, acc))
 
   write_delim(CADC, "/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC.csv", delim=";", col_names = FALSE)
+}
+
+# ==== Acceleration, unit&computation test ====
+{
+  # Sumo has a different computation method for the accelerations. I tested it, but has much worse results.
+
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv") )
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_a.csv") )
+
+  manually_computed <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv",
+                                  delim = ";",
+                                  col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                  col_types = cols(
+                                    time = col_integer(),
+                                    velocity = col_double(),
+                                    acceleration = col_double(),
+                                    slope = col_double(),
+                                    CO = col_double(),
+                                    CO2 = col_double(),
+                                    HC = col_double(),
+                                    PMx = col_double(),
+                                    NOx = col_double(),
+                                    fuel = col_double(),
+                                    electricity = col_double()))%>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
+
+  # SUMO computation removes first row, so we need to do this as well
+  # manually_computed <- manually_computed[-1,]
+
+  sumo_computed <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_a.csv",
+                                  delim = ";",
+                                  col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                                  col_types = cols(
+                                    time = col_integer(),
+                                    velocity = col_double(),
+                                    acceleration = col_double(),
+                                    slope = col_double(),
+                                    CO = col_double(),
+                                    CO2 = col_double(),
+                                    HC = col_double(),
+                                    PMx = col_double(),
+                                    NOx = col_double(),
+                                    fuel = col_double(),
+                                    electricity = col_double()))%>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
+
+  all <- inner_join(sumo_computed, manually_computed, by=join_by("time","component")) %>%
+    group_by(component) %>%
+    summarize(absolute.x = sum(value.x), absolute.y = sum(value.y)) %>%
+    mutate(deviation = absolute.x/absolute.y)
+
+
+  # Check how large the difference is
+  manually_computed
+
 }
