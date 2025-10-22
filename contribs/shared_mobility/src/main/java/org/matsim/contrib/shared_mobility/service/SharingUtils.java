@@ -62,7 +62,7 @@ public class SharingUtils {
 	}
 
 	static public String getServiceMode(SharingServiceConfigGroup serviceConfig) {
-		return getServiceMode(Id.create(serviceConfig.id, SharingService.class));
+		return getServiceMode(serviceConfig.getId());
 	}
 
 	public static QSimComponentsConfigurator configureQSim(SharingConfigGroup sharingConfig) {

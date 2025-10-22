@@ -56,8 +56,8 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new FreefloatingService(Id.create(serviceConfig.id, SharingService.class),
-					specification.getVehicles(), network, serviceConfig.maximumAccessEgressDistance);
+			return new FreefloatingService(serviceConfig.getId(), specification.getVehicles(), network,
+							serviceConfig.maximumAccessEgressDistance);
 		})).in(Singleton.class);
 
 
@@ -74,8 +74,8 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new StationBasedService(Id.create(serviceConfig.id, SharingService.class), specification,
-					network, serviceConfig.maximumAccessEgressDistance);
+			return new StationBasedService(serviceConfig.getId(), specification, network,
+							serviceConfig.maximumAccessEgressDistance);
 		})).in(Singleton.class);
 
 		switch (serviceConfig.serviceScheme) {

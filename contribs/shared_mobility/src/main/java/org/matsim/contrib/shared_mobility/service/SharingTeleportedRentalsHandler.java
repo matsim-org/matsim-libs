@@ -34,7 +34,7 @@ public class SharingTeleportedRentalsHandler
 	@Override
 	public void handleEvent(SharingPickupEvent event) {
 
-		if (event.getServiceId().toString().equals(serviceParams.id)) {
+		if (event.getServiceId().equals(serviceParams.getId())) {
 			pickups.put(event.getPersonId(), event);
 		}
 	}
@@ -50,7 +50,7 @@ public class SharingTeleportedRentalsHandler
 	@Override
 	public void handleEvent(SharingDropoffEvent event) {
 
-		if (event.getServiceId().toString().equals(serviceParams.id)) {
+		if (event.getServiceId().equals(serviceParams.getId())) {
 			Verify.verify(this.distance.containsKey(event.getPersonId()));
 			// distance fare
 			double sharedDistanceFare = this.distance.get(event.getPersonId()) * this.serviceParams.distanceFare;

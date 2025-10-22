@@ -11,11 +11,13 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEventHandler;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEventHandler;
@@ -55,7 +57,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.id = "mobility";
+		serviceConfig.setIdFromString("mobility");
 
 		// ... with freefloating characteristics
 		serviceConfig.maximumAccessEgressDistance = 100000;
@@ -79,7 +81,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBike);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBike.id = "velib";
+		serviceConfigBike.setIdFromString("velib");
 
 		// ... with freefloating characteristics
 		serviceConfigBike.maximumAccessEgressDistance = 100000;
@@ -103,7 +105,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBikeFF);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBikeFF.id = "wheels";
+		serviceConfigBikeFF.setIdFromString("wheels");
 
 		// ... with freefloating characteristics
 		serviceConfigBikeFF.maximumAccessEgressDistance = 100000;

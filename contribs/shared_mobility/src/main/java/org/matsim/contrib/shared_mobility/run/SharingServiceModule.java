@@ -61,7 +61,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			TimeInterpretation timeInterpretation = getter.get(TimeInterpretation.class);
 
 			return new SharingRoutingModule(scenario, accessEgressRoutingModule, mainModeRoutingModule,
-					interactionFinder, Id.create(serviceConfig.id, SharingService.class), timeInterpretation);
+					interactionFinder, serviceConfig.getId(), timeInterpretation);
 		}));
 
 		addRoutingModuleBinding(getMode()).to(modalKey(SharingRoutingModule.class));
@@ -83,26 +83,24 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			OutputDirectoryHierarchy outputHierarchy = getter.get(OutputDirectoryHierarchy.class);
 
-			return new OutputWriter(Id.create(serviceConfig.id, SharingService.class), specification,
-					outputHierarchy);
+			return new OutputWriter(serviceConfig.getId(), specification, outputHierarchy);
 		})).in(Singleton.class);
 
 		addControllerListenerBinding().to(modalKey(OutputWriter.class));
 
 		bindModal(FreefloatingServiceValidator.class).toProvider(modalProvider(getter -> {
-			return new FreefloatingServiceValidator(Id.create(serviceConfig.id, SharingService.class));
+			return new FreefloatingServiceValidator(serviceConfig.getId());
 		})).in(Singleton.class);
 
 		bindModal(StationBasedServiceValidator.class).toProvider(modalProvider(getter -> {
-			return new StationBasedServiceValidator(Id.create(serviceConfig.id, SharingService.class));
+			return new StationBasedServiceValidator(serviceConfig.getId());
 		})).in(Singleton.class);
 
 		bindModal(ValidationListener.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			SharingServiceValidator validator = getter.getModal(SharingServiceValidator.class);
 
-			return new ValidationListener(Id.create(serviceConfig.id, SharingService.class), validator,
-					specification);
+			return new ValidationListener(serviceConfig.getId(), validator, specification);
 		}));
 
 		addControllerListenerBinding().to(modalKey(ValidationListener.class));
