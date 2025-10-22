@@ -71,18 +71,22 @@ read_sumo <- function(path, intervals, model_suffix = ""){
 # Creates the default plot with all components
 # Additional datasets, can be attached (however, the function assumes, that it is formatted correctly)
 # Example: plot_main(extra_notes = "Test", data.TEST)
-plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLength_60", extra_notes = ""){
+plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLength_60", extra_notes = "",
+                      title = glue("Comparison across WLTP-cycle for {fuel}"),
+                      matsim_data = glue("{diff_path}/diff_{fuel}_output_{segment_method}.csv"),
+                      pl_data = glue("{sumo_path}/sumo_{fuel}_output.csv"),
+                      pl5_data = glue("{sumo_path}/sumo_{fuel}_output_pl5.csv")){
   # Load data from MATSim
   # diff_out <- read_csv("contribs/emissions/test/input/org/matsim/contrib/emissions/PHEMTest/diff_petrol_ref.csv")
-  r <- read_matsim(glue("{diff_path}/diff_{fuel}_output_{segment_method}.csv"), "")
+  r <- read_matsim(matsim_data, "")
   data.MATSIM <- r[[1]]
   intervals <- r[[2]]
 
   # Load data from SUMO with PHEMLight and summarize for each interval
-  data.SUMO_PHEMLight <- read_sumo(glue("{sumo_path}/sumo_{fuel}_output.csv"), intervals, "PHEMLight")
+  data.SUMO_PHEMLight <- read_sumo(pl_data, intervals, "PHEMLight")
 
   # Load data from SUMO with PHEMLight5 and summarize for each interval
-  data.SUMO_PHEMLight5 <- read_sumo(glue("{sumo_path}/sumo_{fuel}_output_pl5.csv"), intervals, "PHEMLight5")
+  data.SUMO_PHEMLight5 <- read_sumo(pl5_data, intervals, "PHEMLight5")
 
   # Append all datasets together
   data_list <- list(data.MATSIM, data.SUMO_PHEMLight, data.SUMO_PHEMLight5, ...)
@@ -106,7 +110,7 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
   ylab("emissions in g/km") +
   theme(text = element_text(size=18)) +
   #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
-  ggtitle(glue("Comparison across WLTP-cycle for {fuel}")) +
+  ggtitle(title) +
   theme_minimal()
 
   # Line-Plot (for scenarios with more links)
@@ -117,7 +121,7 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
   facet_wrap(~component, scales="free") +
   ylab("emissions in g/km") +
   theme(text = element_text(size=18)) +
-  ggtitle(glue("Comparison across WLTP-cycle for {fuel}"),
+  ggtitle(title,
           subtitle=glue("{segment_method} {extra_notes}")) +
   theme_minimal()
 
@@ -161,5 +165,3 @@ compute_emission_difference <- function(path_matsim, path_sumo){
     cat(sep = "\n")
 
 }
-
-compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output.csv") )
