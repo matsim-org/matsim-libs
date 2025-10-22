@@ -2,10 +2,7 @@ package org.matsim.application.analysis.population;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -38,17 +35,19 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
+import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 
 @CommandLine.Command(name = "trips", description = "Calculates various trip related metrics.")
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
 	produces = {
-		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats.csv",
+		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users_%s.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
-		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
-		"mode_share_distance_distribution.csv", "mode_shift.csv", "mode_chains.csv",
+		"population_trip_stats.csv", "trip_purposes_by_hour_%s.csv",
+		"mode_share_distance_distribution_%s.csv", "mode_shift.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
@@ -67,10 +66,20 @@ public class TripAnalysis implements MATSimAppCommand {
 	 * Person attribute containing its weight for analysis purposes.
 	 */
 	public static final String ATTR_REF_WEIGHT = "ref_weight";
+	public static final String NO_GROUP_ASSIGNED = "undefinedGroup";
+	private Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
+	private Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
+
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
 		"The attribute needs to be contained by output_persons.csv. Persons who do not match all filters are filtered out.", split = ",")
 	private final Map<String, String> personFilters = new HashMap<>();
+	@CommandLine.Option(names = "--groups-of-subpopulations-personAnalysis", description = "Define the subpopulations for the analysis of the person traffic and defines if the have different groups. If a group is defined by several subpopulations," +
+		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
+	private final Map<String, String> groupsOfSubpopulationsForPersonAnalysisRaw = new HashMap<>();
+	@CommandLine.Option(names = "--groups-of-subpopulations-commercialAnalysis", description = "Define the subpopulations for the analysis of the commercial traffic and defines if the have different groups. If a group is defined by several subpopulations," +
+		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
+	private final Map<String, String> groupsOfSubpopulationsForCommercialAnalysisRaw = new HashMap<>();
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(TripAnalysis.class);
 	@CommandLine.Mixin
@@ -145,8 +154,54 @@ public class TripAnalysis implements MATSimAppCommand {
 		return columnTypes;
 	}
 
+	/**
+	 * Converts the raw input map into a map of lists for easier processing.
+	 */
+	private Map<String, List<String>> getGroupsOfSubpopulations(Map<String, String> groupsOfSubpopulationsRaw) {
+		Map<String, List<String>> groupsOfSubpopulations = new HashMap<>();
+		for (Map.Entry<String, String> entry : groupsOfSubpopulationsRaw.entrySet()) {
+			List<String> subpops = Arrays.asList(entry.getValue().split(","));
+			groupsOfSubpopulations.put(entry.getKey(), subpops);
+		}
+		return groupsOfSubpopulations;
+	}
+
+	/**
+	 * Gets the group name of a subpopulation. If the subpopulation is not assigned to any group, NO_GROUP_ASSIGNED is returned.
+	 *
+	 * @return the group name of the subpopulation or NO_GROUP_ASSIGNED if the subpopulation is not assigned to any group.
+	 */
+	private String getGroupOfSubpopulation(String subpopulation) {
+		String group = null;
+		for (Map.Entry<String, List<String>> entry : groupsOfSubpopulationsForPersonAnalysis.entrySet()) {
+			if (entry.getValue().contains(subpopulation)) {
+				if (group != null)
+					log.warn("Subpopulation {} is assigned to multiple groups. Returning the first group {}. Other group is {}", subpopulation, group, entry.getKey());
+				else
+					group = entry.getKey();
+			}
+		}
+		for (Map.Entry<String, List<String>> entry : groupsOfSubpopulationsForCommercialAnalysis.entrySet()) {
+			if (entry.getValue().contains(subpopulation)) {
+				if (group != null)
+					log.warn("Subpopulation {} is assigned to multiple groups. Returning the first group {}. Other group is {}", subpopulation, group, entry.getKey());
+				else
+					group = entry.getKey();
+			}
+		}
+		if (group != null)
+			return group;
+		else
+			return NO_GROUP_ASSIGNED;
+	}
+
 	@Override
 	public Integer call() throws Exception {
+
+		if (!groupsOfSubpopulationsForPersonAnalysisRaw.isEmpty())
+			groupsOfSubpopulationsForPersonAnalysis = getGroupsOfSubpopulations(groupsOfSubpopulationsForPersonAnalysisRaw);
+		if (!groupsOfSubpopulationsForCommercialAnalysisRaw.isEmpty())
+			groupsOfSubpopulationsForCommercialAnalysis = getGroupsOfSubpopulations(groupsOfSubpopulationsForCommercialAnalysisRaw);
 
 		Table persons = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(input.getPath("persons.csv")))
 			.columnTypesPartial(Map.of("person", ColumnType.STRING, "home_x", ColumnType.DOUBLE, "home_y", ColumnType.DOUBLE))
@@ -199,6 +254,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		// Home filter by standard attribute
 		if (shp.isDefined() && filter == LocationFilter.home) {
+			log.info("Using home filter for TripAnalysis. Persons outside of the shape file will be removed from the analysis. Agents without home coordinates will be kept, because they are probably commercial agents.");
 			Geometry geometry = shp.getGeometry();
 			GeometryFactory f = new GeometryFactory();
 
@@ -207,7 +263,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			for (int i = 0; i < persons.rowCount(); i++) {
 				Row row = persons.row(i);
 				Point p = f.createPoint(new Coordinate(row.getDouble("home_x"), row.getDouble("home_y")));
-				if (geometry.contains(p)) {
+				if (geometry.contains(p) || Double.isNaN(p.getX()) && Double.isNaN(p.getY())) {//TODO discuss what we should do with the commercial agents without home coordinates
 					idx.add(i);
 				}
 			}
@@ -292,7 +348,11 @@ public class TripAnalysis implements MATSimAppCommand {
 		writeModeShare(joined, labels);
 
 		if (groups != null) {
-			groups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			// filters for all subpopulations that are used for person analysis
+			Table filteredForPersons = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
+					.flatMap(Collection::stream)
+					.collect(Collectors.toSet())));
+			groups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {
@@ -331,26 +391,30 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private void writeModeShare(Table trips, List<String> labels) {
 
-		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode");
+		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation");
 
-		DoubleColumn share = aggr.numberColumn(2).divide(aggr.numberColumn(2).sum()).setName("share");
-		aggr.replaceColumn(2, share);
+		aggr = setEmptyCombinationsToZero(aggr);
 
 		// Sort by dist_group and mode
 		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("dist_group")));
-		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));
+		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")).thenComparing(row -> row.getString("subpopulation")));
 
-		aggr.write().csv(output.getPath("mode_share.csv").toFile());
+		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
+		}
+		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
+		}
+
+		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share");
+		aggr.addColumns(shareSum);
+
+		aggr.write().csv(output.getPath("mode_share_%s.csv", "SUM").toFile());
 
 		// Norm each dist_group to 1
 		normDistanceGroups(labels, aggr);
 
-			double total = dist_group.where(sel).sum();
-			if (total > 0)
-				dist_group.set(sel, dist_group.divide(total));
-		}
-
-		aggr.write().csv(output.getPath("mode_share_per_dist.csv").toFile());
+		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "SUM").toFile());
 
 		// Derive mode order if not given
 		if (modeOrder == null) {
@@ -364,6 +428,35 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 	}
 
+	private void subSetAnalysisForModeShares(List<String> labels, String group, Table aggr, Comparator<Row> cmp,
+											 Map<String, List<String>> groupsOfSubpopulationsForAnalysis) {
+		Table subset = aggr.where(
+			aggr.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForAnalysis.get(group)));
+		Table sumsByMode = subset.summarize("Count [trip_id]", sum).by("main_mode");
+
+		String sumColName = sumsByMode.columnNames().stream()
+			.filter(n -> n.toLowerCase().contains("sum") && n.contains("Count [trip_id]"))
+			.findFirst().orElseThrow();
+
+		Table usedModesOnly = sumsByMode.where(sumsByMode.numberColumn(sumColName).isGreaterThan(0));
+		Set<String> usedModes = new HashSet<>(usedModesOnly.stringColumn("main_mode").asList());
+
+		// 3) subset auf benutzte Modi filtern
+		subset = subset.where(subset.stringColumn("main_mode").isIn(usedModes));
+
+		DoubleColumn share = subset.numberColumn("Count [trip_id]")
+			.divide(subset.numberColumn("Count [trip_id]").sum())
+			.setName("share");
+
+		subset = subset.replaceColumn("Count [trip_id]", share)
+			.sortOn(cmp);
+		subset.write().csv(output.getPath("mode_share_%s.csv", group).toFile());
+
+		normDistanceGroups(labels, subset);
+
+		subset.write().csv(output.getPath("mode_share_per_dist_%s.csv", group).toFile());
+	}
+
 	private void normDistanceGroups(List<String> labels, Table aggr) {
 		for (String label : labels) {
 			DoubleColumn dist_group = aggr.doubleColumn("share");
@@ -374,138 +467,387 @@ public class TripAnalysis implements MATSimAppCommand {
 				dist_group.set(sel, dist_group.divide(total));
 		}
 	}
+
+	/**
+	 * If a combination of dist_group, main_mode, subpopulation doesn't exist, it will be added with Count [trip_id] = 0
+	 *
+	 * @param aggr table with columns dist_group, main_mode, subpopulation, Count [trip_id]
+	 */
+	private static Table setEmptyCombinationsToZero(Table aggr) {
+		List<String> distVals = aggr.stringColumn("dist_group").unique().asList();
+		List<String> modeVals = aggr.stringColumn("main_mode").unique().asList();
+		List<String> subpVals = aggr.stringColumn("subpopulation").unique().asList();
+
+		Table combos = Table.create("all_combos",
+			StringColumn.create("dist_group"),
+			StringColumn.create("main_mode"),
+			StringColumn.create("subpopulation")
+		);
+
+		for (String d : distVals) {
+			for (String m : modeVals) {
+				for (String s : subpVals) {
+					Row r = combos.appendRow();
+					r.setString("dist_group", d);
+					r.setString("main_mode", m);
+					r.setString("subpopulation", s);
+				}
+			}
+		}
+
+		aggr = combos.joinOn("dist_group", "main_mode", "subpopulation")
+			.leftOuter(aggr);
+
+		DoubleColumn n = aggr.numberColumn("Count [trip_id]").asDoubleColumn();
+		for (int row : n.isMissing().toArray()) {
+			n.set(row, 0.0);
+		}
+		aggr.replaceColumn("Count [trip_id]", n);
+		return aggr;
+	}
+
 	private void writeTripStats(Table trips) throws IOException {
 
-		// Stats per mode
-		Object2IntMap<String> n = new Object2IntLinkedOpenHashMap<>();
-		Object2LongMap<String> travelTime = new Object2LongOpenHashMap<>();
-		Object2LongMap<String> travelDistance = new Object2LongOpenHashMap<>();
-		Object2LongMap<String> beelineDistance = new Object2LongOpenHashMap<>();
-		Map<String, DoubleList> speeds = new HashMap<>();
+		Map<String, Object2IntMap<String>> nBySubpopulationGroup = new HashMap<>();
+		Map<String, Object2LongMap<String>> travelTimeBySubpopulationGroup = new HashMap<>();
+		Map<String, Object2LongMap<String>> travelDistanceBySubpopulationGroup = new HashMap<>();
+		Map<String, Object2LongMap<String>> beelineDistanceBySubpopulationGroup = new HashMap<>();
+		Map<String, Map<String, DoubleList>> speedsBySubpopulationGroup = new HashMap<>();
 
 		for (Row trip : trips) {
+			String group = getGroupOfSubpopulation(trip.getString("subpopulation"));
 			String mainMode = trip.getString("main_mode");
 
-			n.mergeInt(mainMode, 1, Integer::sum);
+			Object2IntMap<String> n =
+				nBySubpopulationGroup.computeIfAbsent(group, k -> new Object2IntLinkedOpenHashMap<>());
+			Object2LongMap<String> travelTime =
+				travelTimeBySubpopulationGroup.computeIfAbsent(group, k -> new Object2LongOpenHashMap<>());
+			Object2LongMap<String> travelDistance =
+				travelDistanceBySubpopulationGroup.computeIfAbsent(group, k -> new Object2LongOpenHashMap<>());
+			Object2LongMap<String> beelineDistance =
+				beelineDistanceBySubpopulationGroup.computeIfAbsent(group, k -> new Object2LongOpenHashMap<>());
+			Map<String, DoubleList> speeds =
+				speedsBySubpopulationGroup.computeIfAbsent(group, k -> new HashMap<>());
+
 			int travTime = durationToSeconds(trip.getString("trav_time"));
 			long traveledDistance = trip.getLong("traveled_distance");
+			long euclid = trip.getLong("euclidean_distance");
 
+			n.mergeInt(mainMode, 1, Integer::sum);
 			travelTime.mergeLong(mainMode, travTime, Long::sum);
 			travelDistance.mergeLong(mainMode, traveledDistance, Long::sum);
-			beelineDistance.mergeLong(mainMode, trip.getLong("euclidean_distance"), Long::sum);
+			beelineDistance.mergeLong(mainMode, euclid, Long::sum);
 
 			double speed = 3.6d * traveledDistance / (double) travTime;
 			if (Double.isFinite(speed) && !Double.isNaN(speed))
 				speeds.computeIfAbsent(mainMode, s -> new DoubleArrayList()).add(speed);
 		}
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats.csv")), CSVFormat.DEFAULT)) {
+		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+			analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+				beelineDistanceBySubpopulationGroup,
+				speedsBySubpopulationGroup);
+		}
+		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+				beelineDistanceBySubpopulationGroup,
+				speedsBySubpopulationGroup);
+		}
+		analyseAndWriteTripStatsPerGroup("SUM", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+			beelineDistanceBySubpopulationGroup,
+			speedsBySubpopulationGroup);
+	}
+
+	private void analyseAndWriteTripStatsPerGroup(String group, Map<String, Object2IntMap<String>> nBySubpopulationGroup,
+												  Map<String, Object2LongMap<String>> travelTimeBySubpopulationGroup,
+												  Map<String, Object2LongMap<String>> travelDistanceBySubpopulationGroup,
+												  Map<String, Object2LongMap<String>> beelineDistanceBySubpopulationGroup,
+												  Map<String, Map<String, DoubleList>> speedsBySubpopulationGroup) throws IOException {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats_%s.csv", group)), CSVFormat.DEFAULT)) {
 
 			printer.print("Info");
 			for (String m : modeOrder) {
-				printer.print(m);
+				if (Objects.equals(group, "SUM") || nBySubpopulationGroup.get(group).getInt(m) > 0)
+					printer.print(m);
 			}
 			printer.println();
 
 			printer.print("Number of trips");
 			for (String m : modeOrder) {
-				printer.print(n.getInt(m));
+				if (group.equals("SUM")) {
+					int sum = 0;
+					for (Object2IntMap<String> n : nBySubpopulationGroup.values()) {
+						sum += n.getInt(m);
+					}
+					printer.print(sum);
+				} else {
+					Object2IntMap<String> n = nBySubpopulationGroup.get(group);
+					if (n.containsKey(m))
+						printer.print(n.getInt(m));
+				}
 			}
 			printer.println();
 
 			printer.print("Total time traveled [h]");
 			for (String m : modeOrder) {
-				long seconds = travelTime.getLong(m);
-				printer.print(new BigDecimal(seconds / (60d * 60d)).setScale(0, RoundingMode.HALF_UP));
+				long seconds;
+				if (group.equals("SUM")) {
+					long sum = 0L;
+					for (Object2LongMap<String> tt : travelTimeBySubpopulationGroup.values()) {
+						sum += tt.getLong(m);
+					}
+					seconds = sum;
+				} else {
+					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
+					if (!tt.containsKey(m))
+						continue;
+					else
+						seconds = tt.getLong(m);
+				}
+				printer.print(new BigDecimal(seconds / 3600d).setScale(0, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Total distance traveled [km]");
 			for (String m : modeOrder) {
-				double meter = travelDistance.getLong(m);
-				printer.print(new BigDecimal(meter / 1000d).setScale(0, RoundingMode.HALF_UP));
+				long meters;
+				if (group.equals("SUM")) {
+					long sum = 0L;
+					for (Object2LongMap<String> td : travelDistanceBySubpopulationGroup.values()) {
+						sum += td.getLong(m);
+					}
+					meters = sum;
+				} else {
+					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
+					if (!td.containsKey(m))
+						continue;
+					else
+						meters = td.getLong(m);
+				}
+				printer.print(new BigDecimal(meters / 1000d).setScale(0, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Avg. speed [km/h]");
 			for (String m : modeOrder) {
-				double speed = (travelDistance.getLong(m) / 1000d) / (travelTime.getLong(m) / (60d * 60d));
+				long seconds;
+				long meters;
+				if (group.equals("SUM")) {
+					long secSum = 0L, mSum = 0L;
+					for (String sub : nBySubpopulationGroup.keySet()) {
+						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
+						Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(sub);
+						if (tt != null) secSum += tt.getLong(m);
+						if (td != null) mSum += td.getLong(m);
+					}
+					seconds = secSum;
+					meters = mSum;
+				} else {
+					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
+					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
+					if (!td.containsKey(m))
+						continue;
+					seconds = (tt == null) ? 0L : tt.getLong(m);
+					meters = td.getLong(m);
+				}
+				double timeH = seconds / 3600d;
+				double distKm = meters / 1000d;
+				double speed = timeH > 0 ? distKm / timeH : 0d;
 				printer.print(new BigDecimal(speed).setScale(2, RoundingMode.HALF_UP));
-
 			}
 			printer.println();
 
 			printer.print("Avg. beeline speed [km/h]");
 			for (String m : modeOrder) {
-				double speed = (beelineDistance.getLong(m) / 1000d) / (travelTime.getLong(m) / (60d * 60d));
+				long seconds;
+				long metersBee;
+				if (group.equals("SUM")) {
+					long secSum = 0L, beeSum = 0L;
+					for (String sub : nBySubpopulationGroup.keySet()) {
+						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
+						Object2LongMap<String> bee = beelineDistanceBySubpopulationGroup.get(sub);
+						if (tt != null) secSum += tt.getLong(m);
+						if (bee != null) beeSum += bee.getLong(m);
+					}
+					seconds = secSum;
+					metersBee = beeSum;
+				} else {
+					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
+					Object2LongMap<String> bee = beelineDistanceBySubpopulationGroup.get(group);
+					if (!tt.containsKey(m))
+						continue;
+					seconds = tt.getLong(m);
+					metersBee = (bee == null) ? 0L : bee.getLong(m);
+				}
+				double timeH = seconds / 3600d;
+				double beeKm = metersBee / 1000d;
+				double speed = timeH > 0 ? beeKm / timeH : 0d;
 				printer.print(new BigDecimal(speed).setScale(2, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Avg. distance per trip [km]");
 			for (String m : modeOrder) {
-				double avg = (travelDistance.getLong(m) / 1000d) / (n.getInt(m));
+				long meters;
+				int nTrips;
+				if (group.equals("SUM")) {
+					long mSum = 0L;
+					int nSum = 0;
+					for (String sub : nBySubpopulationGroup.keySet()) {
+						Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(sub);
+						Object2IntMap<String> n = nBySubpopulationGroup.get(sub);
+						if (td != null) mSum += td.getLong(m);
+						if (n != null) nSum += n.getInt(m);
+					}
+					meters = mSum;
+					nTrips = nSum;
+				} else {
+					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
+					Object2IntMap<String> n = nBySubpopulationGroup.get(group);
+					if (!n.containsKey(m))
+						continue;
+					meters = (td == null) ? 0L : td.getLong(m);
+					nTrips = n.getInt(m);
+				}
+				double avg = nTrips > 0 ? (meters / 1000d) / nTrips : 0d;
 				printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
 			}
 			printer.println();
 
 			printer.print("Avg. speed per trip [km]");
 			for (String m : modeOrder) {
-				double avg = speeds.get(m).doubleStream().average().orElse(0);
+				double avg;
+				if (group.equals("SUM")) {
+					double sum = 0d;
+					long cnt = 0L;
+					for (Map.Entry<String, Map<String, DoubleList>> e : speedsBySubpopulationGroup.entrySet()) {
+						DoubleList dl = e.getValue() == null ? null : e.getValue().get(m);
+						if (dl != null && !dl.isEmpty()) {
+							// Summe und Anzahl der Samples sammeln (gewichtetes Mittel)
+							for (int i = 0; i < dl.size(); i++) sum += dl.getDouble(i);
+							cnt += dl.size();
+						}
+					}
+					avg = cnt > 0 ? (sum / cnt) : 0d;
+				} else {
+					Map<String, DoubleList> map = speedsBySubpopulationGroup.get(group);
+					if (!map.containsKey(m))
+						continue;
+					DoubleList dl = map.get(m);
+					avg = (dl == null || dl.isEmpty())
+						? 0d
+						: dl.doubleStream().average().orElse(0d);
+				}
 				printer.print(new BigDecimal(avg).setScale(2, RoundingMode.HALF_UP));
 			}
-
 			printer.println();
 		}
 	}
 
 	private void writePopulationStats(Table persons, Table trips) throws IOException {
 
-		Object2IntMap<String> tripsPerPerson = new Object2IntLinkedOpenHashMap<>();
-		Map<String, Set<String>> modesPerPerson = new LinkedHashMap<>();
+		HashMap<String, Object2IntMap<String>> tripsPerPerson = new HashMap<>();
+		HashMap<String, Map<String, Set<String>>> modesPerPerson = new HashMap<>();
+		List<String> subpVals = trips.stringColumn("subpopulation").unique().asList();
+		subpVals.forEach(s -> {
+		    String group = getGroupOfSubpopulation(s);
+		    tripsPerPerson.computeIfAbsent(group, k -> new Object2IntLinkedOpenHashMap<>());
+		    modesPerPerson.computeIfAbsent(group, k -> new LinkedHashMap<>());
+		});
 
 		for (Row trip : trips) {
 			String id = trip.getString("person");
-			tripsPerPerson.mergeInt(id, 1, Integer::sum);
+			String subpopulation = trip.getString("subpopulation");
+			String group = getGroupOfSubpopulation(subpopulation);
+			tripsPerPerson.get(group).mergeInt(id, 1, Integer::sum);
 			String mode = trip.getString("main_mode");
-			modesPerPerson.computeIfAbsent(id, s -> new LinkedHashSet<>()).add(mode);
+			modesPerPerson.get(group).computeIfAbsent(id, s -> new LinkedHashSet<>()).add(mode);
 		}
 
-		Object2IntMap<String> usedModes = new Object2IntLinkedOpenHashMap<>();
-		for (Map.Entry<String, Set<String>> e : modesPerPerson.entrySet()) {
-			for (String mode : e.getValue()) {
-				usedModes.mergeInt(mode, 1, Integer::sum);
+		HashMap<String, Object2IntMap<String>> usedModes = new HashMap<>();
+		for (String group : modesPerPerson.keySet()) {
+			for (Set<String> modes : modesPerPerson.get(group).values()) {
+				for (String mode : modes) {
+					usedModes.computeIfAbsent(group, s -> new Object2IntLinkedOpenHashMap<>()).mergeInt(mode, 1, Integer::sum);
+				}
 			}
 		}
+		HashMap<String, Double> totalMobilePerSubpopulation = new HashMap<>();
+		HashMap<String, Double> totalAvgTripsMobilePerSubpopulation = new HashMap<>();
+		HashMap<String, Double> totalAvgTripsPerSubpopulation = new HashMap<>();
 
-		double totalMobile = tripsPerPerson.size();
-		double avgTripsMobile = tripsPerPerson.values().intStream().average().orElse(0);
 
+		for (String group : tripsPerPerson.keySet()) {
+			totalMobilePerSubpopulation.put(group, (double) tripsPerPerson.get(group).size());
+			totalAvgTripsMobilePerSubpopulation.put(group, tripsPerPerson.get(group).values().intStream().average().orElse(0d));
+		}
 		for (Row person : persons) {
 			String id = person.getString("person");
-			if (!tripsPerPerson.containsKey(id))
-				tripsPerPerson.put(id, 0);
+			String groupOfPerson = getGroupOfSubpopulation(person.getString("subpopulation"));
+			if (!tripsPerPerson.get(groupOfPerson).containsKey(id))
+				tripsPerPerson.get(groupOfPerson).put(id, 0);
+		}
+		for (String group : tripsPerPerson.keySet()) {
+			totalAvgTripsPerSubpopulation.put(group, tripsPerPerson.get(group).values().intStream().average().orElse(0d));
+
+			Table table = Table.create("modal_share",	StringColumn.create("main_mode"),DoubleColumn.create("user"), StringColumn.create("group"));
+			for (String m : modeOrder) {
+				int n = usedModes.get(group).getInt(m);
+				if (n == 0) continue;
+
+				double share = new BigDecimal(n / totalMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
+				table.stringColumn("main_mode").append(m);
+				table.doubleColumn("user").append(share);
+				table.stringColumn("group").append(group);
+			}
+			table.write().csv(output.getPath("mode_users_%s.csv", group).toFile());
 		}
 
-		double avgTrips = tripsPerPerson.values().intStream().average().orElse(0);
-
-		Table table = Table.create(StringColumn.create("main_mode", usedModes.size()), DoubleColumn.create("user", usedModes.size()));
-
-		int i = 0;
+		Table table = Table.create("modal_share",	StringColumn.create("main_mode"),DoubleColumn.create("user"), StringColumn.create("group"));
 		for (String m : modeOrder) {
-			int n = usedModes.getInt(m);
-			table.stringColumn(0).set(i, m);
-			table.doubleColumn(1).set(i++, n / totalMobile);
-		}
+			int n = usedModes.values().stream().mapToInt(map -> map.getInt(m)).sum();
+			if (n == 0) continue;
 
-		table.write().csv(output.getPath("mode_users.csv").toFile());
+			double share = new BigDecimal(n / (double)totalMobilePerSubpopulation.values().stream().mapToInt(Double::intValue).sum()).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
+			table.stringColumn("main_mode").append(m);
+			table.doubleColumn("user").append(share);
+			table.stringColumn("group").append("SUM");
+		}
+		table.write().csv(output.getPath("mode_users_%s.csv", "SUM").toFile());
+
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
-			printer.printRecord("Info", "Value");
-			printer.printRecord("Persons", tripsPerPerson.size());
-			printer.printRecord("Mobile persons [%]", new BigDecimal(100 * totalMobile / tripsPerPerson.size()).setScale(2, RoundingMode.HALF_UP));
-			printer.printRecord("Avg. trips", new BigDecimal(avgTrips).setScale(2, RoundingMode.HALF_UP));
-			printer.printRecord("Avg. trip per mobile persons", new BigDecimal(avgTripsMobile).setScale(2, RoundingMode.HALF_UP));
+			printer.printRecord(
+				Stream.concat(
+					Stream.concat(Stream.of("Group"), tripsPerPerson.keySet().stream()),
+					Stream.of("SUM")
+				).toList()
+			);
+
+			List<String> recordPersons = new ArrayList<>();
+			List<String> recordMobilePersons = new ArrayList<>();
+			List<String> recordAvgTrips = new ArrayList<>();
+			List<String> recordAvgTripsMobile = new ArrayList<>();
+			recordPersons.add("Persons");
+			recordMobilePersons.add("Mobile persons [%]");
+			recordAvgTrips.add("Avg. trips");
+			recordAvgTripsMobile.add("Avg. trips per mobile persons");
+			for (String group : tripsPerPerson.keySet()) {
+				recordPersons.add(String.valueOf(tripsPerPerson.get(group).size()));
+				recordMobilePersons.add(new BigDecimal(100 * totalMobilePerSubpopulation.get(group) / tripsPerPerson.get(group).size()).setScale(2, RoundingMode.HALF_UP).toString());
+				recordAvgTrips.add(new BigDecimal(totalAvgTripsPerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
+				recordAvgTripsMobile.add(new BigDecimal(totalAvgTripsMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
+			}
+			recordPersons.add(String.valueOf(tripsPerPerson.values().stream().mapToInt(Object2IntMap::size).sum()));
+			recordMobilePersons.add(new BigDecimal(100 * totalMobilePerSubpopulation.values().stream().mapToInt(Double::intValue).sum() / (double) tripsPerPerson.values().stream().mapToInt(Object2IntMap::size).sum()).setScale(2, RoundingMode.HALF_UP).toString());
+			recordAvgTrips.add(new BigDecimal(totalAvgTripsPerSubpopulation.values().stream().mapToDouble(Double::doubleValue).average().orElse(0d)).setScale(2, RoundingMode.HALF_UP).toString());
+			recordAvgTripsMobile.add(new BigDecimal(totalAvgTripsMobilePerSubpopulation.values().stream().mapToDouble(Double::doubleValue).average().orElse(0d)).setScale(2, RoundingMode.HALF_UP).toString());
+			printer.printRecord(recordPersons);
+			printer.printRecord(recordMobilePersons);
+			printer.printRecord(recordAvgTrips);
+			printer.printRecord(recordAvgTripsMobile);
 		}
 	}
 
@@ -538,7 +880,23 @@ public class TripAnalysis implements MATSimAppCommand {
 			IntColumn.create("arrival_h", arrival.intStream().toArray())
 		);
 
-		Table tArrival = trips.summarize("trip_id", count).by("end_activity_type", "arrival_h");
+		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+			Table filtered = trips.where(
+				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+			);
+			calculateArrivalAndDepartures(group, filtered);
+		}
+		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			Table filtered = trips.where(
+				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+			);
+			calculateArrivalAndDepartures(group, filtered);
+		}
+		calculateArrivalAndDepartures("SUM", trips);
+	}
+
+	private void calculateArrivalAndDepartures(String group, Table filtered) {
+		Table tArrival = filtered.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 
 		tArrival.column(0).setName("purpose");
 		tArrival.column(1).setName("h");
@@ -546,7 +904,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		DoubleColumn share = tArrival.numberColumn(2).divide(tArrival.numberColumn(2).sum()).setName("arrival");
 		tArrival.replaceColumn(2, share);
 
-		Table tDeparture = trips.summarize("trip_id", count).by("end_activity_type", "departure_h");
+		Table tDeparture = filtered.summarize("trip_id", count).by("end_activity_type", "departure_h");
 
 		tDeparture.column(0).setName("purpose");
 		tDeparture.column(1).setName("h");
@@ -560,8 +918,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		table.doubleColumn("departure").setMissingTo(0.0);
 		table.doubleColumn("arrival").setMissingTo(0.0);
 
-		table.write().csv(output.getPath("trip_purposes_by_hour.csv").toFile());
-
+		table.write().csv(output.getPath("trip_purposes_by_hour_%s.csv", group).toFile());
 	}
 
 	private void writeTripDistribution(Table trips) throws IOException {
@@ -576,37 +933,57 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		double[] bins = IntStream.range(0, (int) (max / 100)).mapToDouble(i -> i * 100).toArray();
 		double[] x = Arrays.copyOf(bins, bins.length - 1);
-
-		for (String mode : modeOrder) {
-			double[] distances = trips.where(
-					trips.stringColumn("main_mode").equalsIgnoreCase(mode))
-				.numberColumn("traveled_distance").asDoubleArray();
-
-			double[] hist = calcHistogram(distances, bins);
-
-			double[] y = inp.smooth(x, hist);
-			dists.put(mode, y);
+		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+			Table filtered = trips.where(
+				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+			);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, dists, group);
 		}
+		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			Table filtered = trips.where(
+				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+			);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, dists, group);
+		}
+		writeTripDistributionPerGroup(trips, bins, inp, x, dists, "SUM");
+	}
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("mode_share_distance_distribution.csv")), CSVFormat.DEFAULT)) {
+	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, Map<String, double[]> dists,
+											   String group) throws IOException {
 
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("mode_share_distance_distribution_%s.csv", group)),
+			CSVFormat.DEFAULT)) {
 			printer.print("dist");
-			for (String s : modeOrder) {
-				printer.print(s);
+
+			for (String mode : modeOrder) {
+				double[] distances = trips.where(
+						trips.stringColumn("main_mode").equalsIgnoreCase(mode))
+					.numberColumn("traveled_distance").asDoubleArray();
+				if (distances.length == 0) continue;
+				printer.print(mode);
+
+				double[] hist = calcHistogram(distances, bins);
+
+				double[] y = inp.smooth(x, hist);
+				dists.put(mode, y);
 			}
+
 			printer.println();
 
 			for (int i = 0; i < x.length; i++) {
 
 				double sum = 0;
 				for (String s : modeOrder) {
-					sum += Math.max(0, dists.get(s)[i]);
+					if (dists.containsKey(s))
+						sum += Math.max(0, dists.get(s)[i]);
 				}
 
 				printer.print(x[i]);
 				for (String s : modeOrder) {
-					double value = Math.max(0, dists.get(s)[i]) / sum;
-					printer.print(value);
+					if (dists.containsKey(s)) {
+						double value = Math.max(0, dists.get(s)[i]) / sum;
+						printer.print(value);
+					}
 				}
 				printer.println();
 			}
@@ -636,6 +1013,12 @@ public class TripAnalysis implements MATSimAppCommand {
 		originalTrips.column("main_mode").setName("original_mode");
 
 		Table joined = new DataFrameJoiner(trips, "trip_id").inner(true, originalTrips);
+
+		// filters for all subpopulations that are used for person analysis
+		joined = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
+			.flatMap(Collection::stream)
+			.collect(Collectors.toSet())));
+
 		Table aggr = joined.summarize("trip_id", count).by("original_mode", "main_mode");
 
 		aggr.write().csv(output.getPath("mode_shift.csv").toFile());
@@ -699,8 +1082,11 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	@SuppressWarnings("unchecked")
 	private void writeModeStatsPerPurpose(Table trips) {
-
-		Table aggr = trips.summarize("trip_id", count).by("end_activity_type", "main_mode");
+		// filters for all subpopulations that are used for person analysis
+		Table filteredForPersons = trips.where(trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
+			.flatMap(Collection::stream)
+			.collect(Collectors.toSet())));
+		Table aggr = filteredForPersons.summarize("trip_id", count).by("end_activity_type", "main_mode");
 
 		Comparator<Row> cmp = Comparator.comparing(row -> row.getString("end_activity_type"));
 		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")));

@@ -2,26 +2,31 @@ package org.matsim.application.analysis.commercialTraffic;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.matsim.application.analysis.population.TripAnalysis.NO_GROUP_ASSIGNED;
 
 public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,ActivityEndEventHandler {
+
+	private static final Logger log = LogManager.getLogger(LinkVolumeCommercialEventHandler.class);
 
 	private final Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> travelDistancesPerMode = new Object2DoubleOpenHashMap<>();
@@ -50,54 +55,24 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 	private final Object2DoubleOpenHashMap<Id<Person>> currentTrip_Distance_perPerson = new Object2DoubleOpenHashMap<>();
 	private final Object2DoubleOpenHashMap<Id<Person>> currentTrip_Distance_perPerson_inInvestigationArea = new Object2DoubleOpenHashMap<>();
 
-	private final HashMap<Id<Vehicle>, String> vehicleSubpopulation = new HashMap<>();
+	private final HashMap<Id<Vehicle>, String> groupOfRelevantVehicles = new HashMap<>();
 	private final HashMap<Id<Vehicle>, Id<Person>> vehicleIdToPersonId = new HashMap<>();
 
 	private final Map<Integer, Object2DoubleMap<String>> relations = new HashMap<>();
 	private final Scenario scenario;
 	private final Geometry geometryInvestigationArea;
 	private final double sampleSize;
-	Map<String, Map<String, String>> personMap = new HashMap<>();
-	private final Vehicles vehicles;
+	private final Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis;
 
-	public LinkVolumeCommercialEventHandler(Scenario scenario, String personFile, double sampleSize, ShpOptions shpInvestigationArea) {
-		if (shpInvestigationArea != null)
+	public LinkVolumeCommercialEventHandler(Scenario scenario, double sampleSize, ShpOptions shpInvestigationArea,
+											Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis) {
+		if (shpInvestigationArea.getShapeFile() != null)
 			this.geometryInvestigationArea = shpInvestigationArea.getGeometry();
 		else
 			this.geometryInvestigationArea = null;
 		this.scenario = scenario;
 		this.sampleSize = sampleSize;
-
-		vehicles = VehicleUtils.createVehiclesContainer();
-		new  MatsimVehicleReader(vehicles).readFile(personFile.replace("_persons.csv", "_allVehicles.xml"));
-
-		try (BufferedReader br = IOUtils.getBufferedReader(personFile)) {
-			String line = br.readLine();  // Read the header line
-			if (line != null) {
-				// Split the header line by the delimiter to get column names
-				String[] headers = line.split(";");
-
-				// Read the rest of the lines
-				while ((line = br.readLine()) != null) {
-					// Split each line into values
-					String[] values = line.split(";");
-
-					// Assuming the first column is the "person"
-					String person = values[0];
-
-					// Create a map to store column values for the current person
-					Map<String, String> personDetails = new HashMap<>();
-					for (int i = 1; i < values.length; i++) {
-						personDetails.put(headers[i], values[i]);  // Map column name to value
-					}
-
-					// Add the person and their details to the main map
-					personMap.put(person, personDetails);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.groupsOfSubpopulationsForCommercialAnalysis = groupsOfSubpopulationsForCommercialAnalysis;
 	}
 
 	@Override
@@ -176,58 +151,26 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 			}
 		}
 
-		String personID = event.getPersonId().toString();
-		Map<String, String> personAttributes = personMap.get(personID);
-		String subpopulation = personAttributes.get("subpopulation").replace("_trip", "").replace("_service", "");
-
-		if (subpopulation.equals("goodsTraffic") || subpopulation.contains("commercialPersonTraffic")) {
-			if (event.getActType().contains("end")) {
-				return;
-			}
-			if (event.getActType().equals("service")) {
-				relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(subpopulation + "_service_X",
-					event.getCoord().getX());
-				relations.get(relations.size() - 1).put(subpopulation + "_service_Y", event.getCoord().getY());
-				relations.get(relations.size() - 1).put(subpopulation + "_start_X", Double.parseDouble(personAttributes.get("first_act_x")));
-				relations.get(relations.size() - 1).put(subpopulation + "_start_Y", Double.parseDouble(personAttributes.get("first_act_y")));
-			}
-		}
-		else if (subpopulation.equals("longDistanceFreight") || subpopulation.equals("FTL_kv") || subpopulation.equals("FTL")) {
-			if (event.getActType().equals("freight_end")) {
-				relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(subpopulation + "_end_X",
-					event.getCoord().getX());
-				relations.get(relations.size() - 1).put(subpopulation + "_end_Y", event.getCoord().getY());
-				relations.get(relations.size() - 1).put(subpopulation + "_start_X", Double.parseDouble(personAttributes.get("first_act_x")));
-				relations.get(relations.size() - 1).put(subpopulation + "_start_Y", Double.parseDouble(personAttributes.get("first_act_y")));
-			}
-		}
-		else if (subpopulation.equals("LTL")) {
-			if (personID.contains("WasteCollection")) {
-				subpopulation = subpopulation.replace("LTL", "WasteCollection");
-				if (event.getActType().equals("pickup")) {
-					relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(subpopulation + "_pickup_X",
-						event.getCoord().getX());
-					relations.get(relations.size() - 1).put(subpopulation + "_pickup_Y", event.getCoord().getY());
-					relations.get(relations.size() - 1).put(subpopulation + "_delivery_X", Double.parseDouble(personAttributes.get("first_act_x")));
-					relations.get(relations.size() - 1).put(subpopulation + "_delivery_Y", Double.parseDouble(personAttributes.get("first_act_y")));
-				}
-				return;
-			}
-			if (event.getActType().equals("delivery")) {
-				if (personID.contains("ParcelDelivery"))
-					subpopulation = subpopulation.replace("LTL", "ParcelDelivery");
-				relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(subpopulation + "_delivery_X",
-					event.getCoord().getX());
-				relations.get(relations.size() - 1).put(subpopulation + "_delivery_Y", event.getCoord().getY());
-				relations.get(relations.size() - 1).put(subpopulation + "_pickup_X", Double.parseDouble(personAttributes.get("first_act_x")));
-				relations.get(relations.size() - 1).put(subpopulation + "_pickup_Y", Double.parseDouble(personAttributes.get("first_act_y")));
-			}
-		}
+		Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
+		String group = getGroupOfSubpopulation(PopulationUtils.getSubpopulation(person));
+		List<Activity> activities = PopulationUtils.getActivities(person.getSelectedPlan(),
+			TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+		Coord startCoord = activities.getFirst().getCoord();
+		Set<String> activitiesTyes = activities.subList(1,activities.size()-1).stream()
+			.map(Activity::getType)
+			.collect(Collectors.toSet());
+		if (!activitiesTyes.contains(event.getActType()) || group.equals(NO_GROUP_ASSIGNED))
+			return;
+		relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(group + "_act_X",
+			event.getCoord().getX());
+		relations.get(relations.size() - 1).put(group + "_act_Y", event.getCoord().getY());
+		relations.get(relations.size() - 1).put(group + "_start_X", startCoord.getX());
+		relations.get(relations.size() - 1).put(group + "_start_Y", startCoord.getY());
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().toString().contains("pt_") || !vehicleSubpopulation.containsKey(event.getVehicleId()))
+		if (!groupOfRelevantVehicles.containsKey(event.getVehicleId()))
 			return;
 		String mode = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getNetworkMode();
 		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
@@ -238,60 +181,35 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		boolean isInInvestigationArea = false;
 		if (geometryInvestigationArea != null)
 			isInInvestigationArea = geometryInvestigationArea.contains(MGC.coord2Point(link.getCoord()));
-		String modelType = null;
-		if (event.getVehicleId().toString().contains("goodsTraffic_") || event.getVehicleId().toString().contains("commercialPersonTraffic")) {
-			modelType = "Small-Scale-Commercial-Traffic";
-		}
-		else if (event.getVehicleId().toString().contains("longDistanceFreight")) {
-			modelType = "Long-Distance-Freight-Traffic";
-		}
-		else if (event.getVehicleId().toString().contains("FTL_kv")) {
-			modelType = "FTL_kv-Traffic";
-		}
-		else if (event.getVehicleId().toString().contains("FTL")) {
-			modelType = "FTL-Traffic";
-		}
-		else if (event.getVehicleId().toString().contains("ParcelDelivery_")) {
-			modelType = "KEP";
-
-		}
-		else if (event.getVehicleId().toString().contains("WasteCollection_")) {
-			modelType = "WasteCollection";
-		}
-		else if (event.getVehicleId().toString().contains("GoodsType_")) {
-			modelType = "LTL-Traffic";
-		}
-		else if (event.getVehicleId().toString().contains("freight_") && !event.getVehicleId().toString().contains("FTL")) {
-			modelType = "Transit-Freight-Traffic";
-		}
-		else if (vehicleSubpopulation.get(event.getVehicleId()).equals("person"))
-			modelType = "Person";
+		String group = groupOfRelevantVehicles.get(event.getVehicleId());
 
 		// Add the link volume for the specific modes or modelTypes
-		linkVolumesPerMode.get(event.getLinkId()).mergeDouble(modelType, factorForSampleOfInput, Double::sum);
+		linkVolumesPerMode.get(event.getLinkId()).mergeDouble(group, factorForSampleOfInput, Double::sum);
 		linkVolumesPerMode.get(event.getLinkId()).mergeDouble("allCommercialVehicles", factorForSampleOfInput, Double::sum);
 		linkVolumesPerMode.get(event.getLinkId()).mergeDouble(mode, factorForSampleOfInput, Double::sum);
 
-		String vehicleType = vehicles.getVehicles().get(event.getVehicleId()).getType().getId().toString();
+		String vehicleType = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
 		travelDistancesPerVehicle.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
 
 		currentTrip_Distance_perPerson.merge(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
 		if (isInInvestigationArea) {
 			currentTrip_Distance_perPerson_inInvestigationArea.mergeDouble(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
-			travelDistancesPerType.mergeDouble(modelType, link.getLength(), Double::sum);
-			travelDistancesPerSubpopulation.mergeDouble(vehicleSubpopulation.get(event.getVehicleId()), link.getLength(), Double::sum);
+			travelDistancesPerType.mergeDouble(group, link.getLength(), Double::sum);
+			travelDistancesPerSubpopulation.mergeDouble(groupOfRelevantVehicles.get(event.getVehicleId()), link.getLength(), Double::sum);
 			travelDistancesPerMode.mergeDouble(mode, link.getLength(), Double::sum);
 			travelDistancesPerVehicle_inInvestigationArea.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
 		}
 	}
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (event.getLinkId().toString().contains("pt_") || event.getNetworkMode().equals("bike"))
-			return;
 
-		String subpopulation = personMap.get(event.getPersonId().toString()).get("subpopulation");
+		Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
+		String group = getGroupOfSubpopulation(PopulationUtils.getSubpopulation(person));
+
+		if (group.equals(NO_GROUP_ASSIGNED))
+			return;
 		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (k) -> event.getTime());
-		vehicleSubpopulation.computeIfAbsent(event.getVehicleId(), (k) -> subpopulation);
+		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), (k) -> group);
 		vehicleIdToPersonId.put(event.getVehicleId(), event.getPersonId());
 	}
 
@@ -316,8 +234,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 	public HashMap<String, Object2DoubleOpenHashMap<String>> getTravelDistancesPerVehicle() {
 		return travelDistancesPerVehicle;
 	}
-	public HashMap<Id<Vehicle>, String> getVehicleSubpopulation() {
-		return vehicleSubpopulation;
+	public HashMap<Id<Vehicle>, String> getGroupOfRelevantVehicles() {
+		return groupOfRelevantVehicles;
 	}
 
 	public Map<Integer, Object2DoubleMap<String>> getRelations() {
@@ -366,6 +284,28 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	public HashMap<Id<Vehicle>, Id<Person>> getVehicleIdToPersonId() {
 		return vehicleIdToPersonId;
+	}
+
+	/**
+	 * Gets the group name of a subpopulation. If the subpopulation is not assigned to any group, NO_GROUP_ASSIGNED is returned.
+	 *
+	 * @return the group name of the subpopulation or NO_GROUP_ASSIGNED if the subpopulation is not assigned to any group.
+	 */
+	private String getGroupOfSubpopulation(String subpopulation) {
+		String group = null;
+		for (Map.Entry<String, List<String>> entry : groupsOfSubpopulationsForCommercialAnalysis.entrySet()) {
+			if (entry.getValue().contains(subpopulation)) {
+				if (group != null)
+					log.warn("Subpopulation {} is assigned to multiple groups. Returning the first group {}. Other group is {}", subpopulation, group,
+						entry.getKey());
+				else
+					group = entry.getKey();
+			}
+		}
+		if (group != null)
+			return group;
+		else
+			return NO_GROUP_ASSIGNED;
 	}
 }
 

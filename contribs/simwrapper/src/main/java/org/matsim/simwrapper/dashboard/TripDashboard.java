@@ -19,10 +19,9 @@ import jakarta.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Shows trip information, optionally against reference data.
@@ -48,6 +47,7 @@ public class TripDashboard implements Dashboard {
 	private String[] args;
 
 	private boolean choiceEvaluation;
+	private List<String> groupsOfPersonSubpopulations = new ArrayList<>();
 
 	/**
 	 * Default trip dashboard constructor.
@@ -125,15 +125,41 @@ public class TripDashboard implements Dashboard {
 	 * Set argument that will be passed to the analysis script. See {@link TripAnalysis}.
 	 */
 	public TripDashboard setAnalysisArgs(String... args) {
-		this.args = args;
+		this.args = this.args == null
+			? args
+			: Stream.concat(Stream.of(this.args), Stream.of(args)).toArray(String[]::new);
 		return this;
 	}
 
+	/**
+	 * Set the groups of supopulations for the person analysis. So it is possible to exclude commercial agents from this analysis, and also different subpopulations can be analyzed as one group.
+	 * Different groups are separated by ';' and subpopulations within a group by ','.
+	 * See {@link TripAnalysis}.
+	 *
+	 * @param groupsOfSubpopulations e.g. "personGroup1=berlin_person,brandenburg_person;personGroup2=berlin_person_under18"
+	 */
+	public TripDashboard setGroupsOfSubpopulationsForPersonAnalysis(String... groupsOfSubpopulations) {
+		String joined = String.join(";", groupsOfSubpopulations);
+		groupsOfPersonSubpopulations = Arrays.stream(joined.split(";"))
+			.map(entry -> entry.split("=")[0])
+			.collect(Collectors.toList());
+		return setAnalysisArgs("--groups-of-subpopulations-personAnalysis", joined);
+	}
+
+	/** Set the groups of supopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
+	 * Different groups are separated by ';' and subpopulations within a group by ','.
+	 * See {@link TripAnalysis}.
+	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
+	 */
+	public TripDashboard setGroupsOfSubpopulationsForCommercialAnalysis(String... groupsOfSubpopulations) {
+		String joined = String.join(";", groupsOfSubpopulations);
+		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", joined);
+	}
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Trips";
-		header.description = "General information about modal share and trip distributions.";
+		header.title = "Trips (Persons)";
+		header.description = "General information about modal share and trip distributions of the persons.";
 
 		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
 		System.arraycopy(this.args, 0, args, 0, this.args.length);
@@ -204,6 +230,7 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress)";
 				viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv", args);
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "person", args);// TODO make configurable
 				viz.showAllRows = true;
 			})
 			.el(Plotly.class, (viz, data) -> {
@@ -243,6 +270,10 @@ public class TripDashboard implements Dashboard {
 				viz.description = "over simulated persons (not scaled by sample size)";
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
+				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
+				headerPopStats.addAll(groupsOfPersonSubpopulations);
+				headerPopStats.add("SUM");
+				viz.show = headerPopStats;
 			})
 			.el(Plotly.class, (viz, data) -> {
 
@@ -339,19 +370,21 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_distance_distribution.csv", args))
-				.pivot(List.of("dist"), "main_mode", "share")
-				.constant("source", "Sim");
+			for (String groups: groupsOfPersonSubpopulations) {
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", groups, args))
+					.pivot(List.of("dist"), "main_mode", "share")
+					.constant("source", "Sim");
 
-			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-					.mode(ScatterTrace.Mode.LINE)
-					.build(),
-				ds.mapping()
-					.name("main_mode")
-					.x("dist")
-					.y("share")
-			);
-
+				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.LINE)
+						.build(),
+					ds.mapping()
+						.name("main_mode")
+						.x("dist")
+						.y("share")
+				);
+			}
 			if (distanceRefCsv != null) {
 				viz.description += " Dashed line represents the reference data.";
 

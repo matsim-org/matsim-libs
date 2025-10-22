@@ -54,6 +54,8 @@ import static org.matsim.application.ApplicationUtils.globFile;
 public class CommercialAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CommercialAnalysis.class);
+
+	private Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
 	//TODO make plans configurable
 	@CommandLine.Mixin
 	private final InputOptions input = InputOptions.ofCommand(CommercialAnalysis.class);
@@ -65,6 +67,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.")
 	private static double sampleSize;
+	@CommandLine.Option(names = "--groups-of-subpopulations-commercialAnalysis", description = "Define the subpopulations for the analysis of the commercial traffic and defines if the have different groups. If a group is defined by several subpopulations," +
+		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
+	private final Map<String, String> groupsOfSubpopulationsForCommercialAnalysisRaw = new HashMap<>();
 
 	public static void main(String[] args) {
 		new CommercialAnalysis().execute(args);
@@ -74,15 +79,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		log.info("++++++++++++++++++ Start Analysis for RVR Freight simulations ++++++++++++++++++++++++++++");
 
 		final String eventsFile = globFile(input.getRunDirectory(), "*output_events*").toString();
-		final String personFile = globFile(input.getRunDirectory(), "*output_persons*").toString();
 
-		analysisOutputDirectory = input.getRunDirectory().resolve(analysisOutputDirectory).toString();
-		analysisOutputDirectory = analysisOutputDirectory + "/";
-		File dir = new File(analysisOutputDirectory);
-		if (!dir.exists()) {
-			dir.mkdirs();
-		}
-
+		if (!groupsOfSubpopulationsForCommercialAnalysisRaw.isEmpty())
+			groupsOfSubpopulationsForCommercialAnalysis = getGroupsOfSubpopulations(groupsOfSubpopulationsForCommercialAnalysisRaw);
 		// for SimWrapper
 		final Path linkDemandOutputFile = output.getPath("commercialTraffic_link_volume.csv");
 		log.info("Writing volume per link to: {}", linkDemandOutputFile);
@@ -117,7 +116,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// link events handler
-		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, personFile, sampleSize, shp);
+		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, sampleSize, shp, groupsOfSubpopulationsForCommercialAnalysis);
 		eventsManager.addHandler(linkDemandEventHandler);
 
 		eventsManager.initProcessing();
@@ -288,7 +287,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			}
 
 
-			bw.close();
+
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
@@ -311,7 +310,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	private void createAnalysisPerVehicle(Path travelDistancesPerVehicleOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 	//TODO make this analysis more general or move this as additional analysis to the rvr-freight-analysis module
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
-		HashMap<Id<Vehicle>, String> vehicleSubpopulations = linkDemandEventHandler.getVehicleSubpopulation();
+		HashMap<Id<Vehicle>, String> vehicleSubpopulations = linkDemandEventHandler.getGroupOfRelevantVehicles();
 
 		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType();
 
@@ -450,7 +449,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 //		File file = new File(linkDemandOutputFile);
 		Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = linkDemandEventHandler.getLinkVolumesPerMode();
-		ArrayList<String> headerWithModes = new ArrayList<>(List.of("allCommercialVehicles", "Small-Scale-Commercial-Traffic", "Transit-Freight-Traffic", "FTL-Traffic", "LTL-Traffic", "KEP", "FTL_kv-Traffic", "WasteCollection"));
+		ArrayList<String> headerWithModes = new ArrayList<>(List.of("allCommercialVehicles"));
+		headerWithModes.addAll(groupsOfSubpopulationsForCommercialAnalysis.keySet());
 		scenario.getVehicles().getVehicleTypes().values().forEach(vehicleType -> {
 			if (!headerWithModes.contains(vehicleType.getNetworkMode())) headerWithModes.add(vehicleType.getNetworkMode());
 		});
@@ -471,5 +471,17 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
+	}
+
+	/**
+	 * Converts the raw input map into a map of lists for easier processing.
+	 */
+	private Map<String, List<String>> getGroupsOfSubpopulations(Map<String, String> groupsOfSubpopulationsRaw) {
+		Map<String, List<String>> groupsOfSubpopulations = new HashMap<>();
+		for (Map.Entry<String, String> entry : groupsOfSubpopulationsRaw.entrySet()) {
+			List<String> subpops = Arrays.asList(entry.getValue().split(","));
+			groupsOfSubpopulations.put(entry.getKey(), subpops);
+		}
+		return groupsOfSubpopulations;
 	}
 }

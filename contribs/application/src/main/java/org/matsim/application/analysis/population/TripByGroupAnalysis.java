@@ -100,7 +100,7 @@ final class TripByGroupAnalysis {
 		}
 	}
 
-	void writeModeShare(Table trips, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
+	void writeModeShare(Table filteredForPersons, List<String> dists, List<String> modeOrder, Function<String, Path> output) {
 
 		for (Group group : groups) {
 
@@ -109,7 +109,7 @@ final class TripByGroupAnalysis {
 
 			String[] join = columns.toArray(new String[0]);
 
-			Table aggr = trips.summarize("trip_id", count).by(join);
+			Table aggr = filteredForPersons.summarize("trip_id", count).by(join);
 
 			int idx = aggr.columnCount() - 1;
 			DoubleColumn share = aggr.numberColumn(idx).divide(aggr.numberColumn(idx).sum()).setName("sim_share");
