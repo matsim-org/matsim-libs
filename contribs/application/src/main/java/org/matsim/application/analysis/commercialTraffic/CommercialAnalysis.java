@@ -61,8 +61,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	private final OutputOptions output = OutputOptions.ofCommand(CommercialAnalysis.class);
 	@CommandLine.Mixin
 	private ShpOptions shp;
-	@CommandLine.Option(names = "--analysisOutputDirectory", description = "The directory where the analysis output will be stored.", defaultValue = "analysis/commercialTraffic/")
-	private static String analysisOutputDirectory;
 
 	@CommandLine.Option(names = "--sampleSize", description = "The sample size of the simulation.")
 	private static double sampleSize;
@@ -85,22 +83,22 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 
 		// for SimWrapper
-		final String linkDemandOutputFile = analysisOutputDirectory + "commercialTraffic_link_volume.csv";
+		final Path linkDemandOutputFile = output.getPath("commercialTraffic_link_volume.csv");
 		log.info("Writing volume per link to: {}", linkDemandOutputFile);
 
-		final String travelDistancesPerModeOutputFile = analysisOutputDirectory + "commercialTraffic_travelDistancesShares.csv";
+		final Path travelDistancesPerModeOutputFile = output.getPath("commercialTraffic_travelDistancesShares.csv");
 		log.info("Writing travel distances per mode to: {}", travelDistancesPerModeOutputFile);
 
-		final String travelDistancesPerVehicleOutputFile = analysisOutputDirectory + "commercialTraffic_travelDistances_perVehicle.csv";
+		final Path travelDistancesPerVehicleOutputFile = output.getPath("commercialTraffic_travelDistances_perVehicle.csv");
 		log.info("Writing travel distances per vehicle to: {}", travelDistancesPerVehicleOutputFile);
 
-		final String relationsOutputFile = analysisOutputDirectory + "commercialTraffic_relations.csv";
+		final Path relationsOutputFile = output.getPath("commercialTraffic_relations.csv");
 		log.info("Writing relations to: {}", relationsOutputFile);
 
-		final String tourDurationsOutputFile = analysisOutputDirectory + "commercialTraffic_tour_durations.csv";
+		final Path tourDurationsOutputFile = output.getPath("commercialTraffic_tour_durations.csv");
 		log.info("Writing tour durations to: {}", tourDurationsOutputFile);
 
-		final String generalTravelDataOutputFile = analysisOutputDirectory + "commercialTraffic_generalTravelData.csv";
+		final Path generalTravelDataOutputFile = output.getPath("commercialTraffic_generalTravelData.csv");
 		log.info("Writing general travel data to: {}", generalTravelDataOutputFile);
 
 		Config config = ConfigUtils.createConfig();
@@ -138,44 +136,42 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		createTourDurationPerVehicle(tourDurationsOutputFile, linkDemandEventHandler, scenario);
 
 		log.info("Done");
-		log.info("All output written to {}", analysisOutputDirectory);
+		log.info("All outputs of commercial analysis written to {}", output.getPath());
 		log.info("-------------------------------------------------");
 		return 0;
 	}
 
-	private void createTourDurationPerVehicle(String tourDurationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler,
+	private void createTourDurationPerVehicle(Path tourDurationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler,
 											  Scenario scenario) {
 
 		HashMap<Id<Vehicle>, Double> tourDurations = linkDemandEventHandler.getTourDurationPerPerson();
 		HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId = linkDemandEventHandler.getVehicleIdToPersonId();
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(tourDurationsOutputFile));
-			bw.write("personId;");
-			bw.write("vehicleId;");
-			bw.write("subpopulation;");
-			bw.write("tourDurationInSeconds;");
-			bw.newLine();
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(tourDurationsOutputFile), CSVFormat.DEFAULT)) {
+
+			printer.print("personId");
+			printer.print("vehicleId");
+			printer.print("subpopulation");
+			printer.print("tourDurationInSeconds");
+			printer.println();
 
 			for (Id<Vehicle> vehicleId : tourDurations.keySet()) {
 				Id<Person> personId = vehicleToPersonId.get(vehicleId);
-				bw.write(personId + ";");
-				bw.write(vehicleId + ";");
-				bw.write(scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("subpopulation") + ";");
-				bw.write(tourDurations.get(vehicleId) + ";");
-				bw.newLine();
+				printer.print(personId);
+				printer.print(vehicleId);
+				printer.print(scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("subpopulation"));
+				printer.print(tourDurations.get(vehicleId));
+				printer.println();
 			}
-
-			bw.close();
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
 	}
 
-	private void createGeneralTravelDataAnalysis(String generalTravelDataOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
+	private void createGeneralTravelDataAnalysis(Path generalTravelDataOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
 
-		HashMap<Id<Vehicle>, String> subpopulationPerVehicle = linkDemandEventHandler.getVehicleSubpopulation();
-		Map<String, List<Id<Vehicle>>> vehiclesPerSubpopulation = subpopulationPerVehicle.entrySet().stream()
+		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfRelevantVehicles();
+		Map<String, List<Id<Vehicle>>> vehiclesPerGroup = groupOfVehicles.entrySet().stream()
 			.collect(Collectors.groupingBy(
 				Map.Entry::getValue,
 				Collectors.mapping(Map.Entry::getKey, Collectors.toList())
@@ -192,51 +188,50 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
 
-		try {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(generalTravelDataOutputFile), CSVFormat.DEFAULT)) {
 			// _Intern: internal trips (start and end inside the area)
 			// _Incoming: incoming trips (start outside the area and end inside the area)
 			// _Outgoing: incoming trips (start inside the area and end outside the area)
 			// _Transit: transit trips (start and end inside the area)
 			// _all: all trips
-			BufferedWriter bw = new BufferedWriter(new FileWriter(generalTravelDataOutputFile));
-			bw.write("subpopulation;");
-			bw.write("numberOfAgents;");
+			printer.print("subpopulation");
+			printer.print("numberOfAgents");
 
-			bw.write("numberOfTrips_Intern;");
-			bw.write("numberOfTrips_Incoming;");
-			bw.write("numberOfTrips_Outgoing;");
-			bw.write("numberOfTrips_Transit;");
-			bw.write("numberOfTrips_all;");
+			printer.print("numberOfTrips_Intern");
+			printer.print("numberOfTrips_Incoming");
+			printer.print("numberOfTrips_Outgoing");
+			printer.print("numberOfTrips_Transit");
+			printer.print("numberOfTrips_all");
 
-			bw.write("traveledDistance_Intern;");
-			bw.write("traveledDistance_Incoming;");
-			bw.write("traveledDistance_Outgoing;");
-			bw.write("traveledDistance_Transit;");
-			bw.write("traveledDistance_all;");
+			printer.print("traveledDistance_Intern");
+			printer.print("traveledDistance_Incoming");
+			printer.print("traveledDistance_Outgoing");
+			printer.print("traveledDistance_Transit");
+			printer.print("traveledDistance_all");
 
-			bw.write("traveledDistanceInInvestigationArea_Intern;");
-			bw.write("traveledDistanceInInvestigationArea_Incoming;");
-			bw.write("traveledDistanceInInvestigationArea_Outgoing;");
-			bw.write("traveledDistanceInInvestigationArea_Transit;");
-			bw.write("traveledDistanceInInvestigationArea_all;");
+			printer.print("traveledDistanceInInvestigationArea_Intern");
+			printer.print("traveledDistanceInInvestigationArea_Incoming");
+			printer.print("traveledDistanceInInvestigationArea_Outgoing");
+			printer.print("traveledDistanceInInvestigationArea_Transit");
+			printer.print("traveledDistanceInInvestigationArea_all");
 
-//			bw.write("averageTripsPerAgent_Intern;"); //TODO why this commented out
-//			bw.write("averageTripsPerAgent_Incoming;");
-//			bw.write("averageTripsPerAgent_Outgoing;");
-//			bw.write("averageTripsPerAgent_Transit;");
-			bw.write("averageTripsPerAgent_all;");
+//			printer.print("averageTripsPerAgent_Intern;"); //TODO why this commented out
+//			printer.print("averageTripsPerAgent_Incoming;");
+//			printer.print("averageTripsPerAgent_Outgoing;");
+//			printer.print("averageTripsPerAgent_Transit;");
+			printer.print("averageTripsPerAgent_all");
 
-			bw.write("averageDistancePerTrip_Intern;");
-			bw.write("averageDistancePerTrip_Incoming;");
-			bw.write("averageDistancePerTrip_Outgoing;");
-			bw.write("averageDistancePerTrip_Transit;");
-			bw.write("averageDistancePerTrip_all;");
-			bw.newLine();
+			printer.print("averageDistancePerTrip_Intern");
+			printer.print("averageDistancePerTrip_Incoming");
+			printer.print("averageDistancePerTrip_Outgoing");
+			printer.print("averageDistancePerTrip_Transit");
+			printer.print("averageDistancePerTrip_all");
+			printer.println();
 
-			for (String subpopulation : vehiclesPerSubpopulation.keySet()){
-				bw.write(subpopulation + ";");
-				int numberOfAgentsInSubpopulation = vehiclesPerSubpopulation.get(subpopulation).size();
-				bw.write(numberOfAgentsInSubpopulation + ";");
+			for (String subpopulation : vehiclesPerGroup.keySet()){
+				printer.print(subpopulation);
+				int numberOfAgentsInSubpopulation = vehiclesPerGroup.get(subpopulation).size();
+				printer.print(numberOfAgentsInSubpopulation);
 
 				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_internal, subpopulation, scenario);
 				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_incoming, subpopulation, scenario);
@@ -256,11 +251,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				int numberOfTrips_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().mapToInt(List::size).sum();
 				int numberOfTrips_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().mapToInt(List::size).sum();
 
-				bw.write(numberOfTrips_internal + ";");
-				bw.write(numberOfTrips_incoming + ";");
-				bw.write(numberOfTrips_outgoing + ";");
-				bw.write(numberOfTrips_transit + ";");
-				bw.write(numberOfTrips_all + ";");
+				printer.print(numberOfTrips_internal);
+				printer.print(numberOfTrips_incoming);
+				printer.print(numberOfTrips_outgoing);
+				printer.print(numberOfTrips_transit);
+				printer.print(numberOfTrips_all);
 
 				double traveledDistance_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 				double traveledDistance_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
@@ -268,27 +263,27 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				double traveledDistance_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 				double traveledDistance_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 
-				bw.write(traveledDistance_internal + ";");
-				bw.write(traveledDistance_incoming + ";");
-				bw.write(traveledDistance_outgoing + ";");
-				bw.write(traveledDistance_transit + ";");
-				bw.write(traveledDistance_all + ";");
+				printer.print(traveledDistance_internal);
+				printer.print(traveledDistance_incoming);
+				printer.print(traveledDistance_outgoing);
+				printer.print(traveledDistance_transit);
+				printer.print(traveledDistance_all);
 
-				bw.write(distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
-				bw.write(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum() + ";");
+				printer.print(distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+				printer.print(distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+				printer.print(distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+				printer.print(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+				printer.print(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
 
-				bw.write(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation + ";");
+				printer.print(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation);
 
-				bw.write(numberOfTrips_internal == 0 ? "0;" : traveledDistance_internal / numberOfTrips_internal + ";");
-				bw.write(numberOfTrips_incoming == 0 ? "0;" : traveledDistance_incoming / numberOfTrips_incoming + ";");
-				bw.write(numberOfTrips_outgoing == 0 ? "0;" : traveledDistance_outgoing / numberOfTrips_outgoing + ";");
-				bw.write(numberOfTrips_transit == 0 ? "0;" : traveledDistance_transit / numberOfTrips_transit + ";");
-				bw.write(numberOfTrips_all == 0 ? "0" : String.valueOf(traveledDistance_all / numberOfTrips_all));
+				printer.print(numberOfTrips_internal == 0 ? "0;" : traveledDistance_internal / numberOfTrips_internal);
+				printer.print(numberOfTrips_incoming == 0 ? "0;" : traveledDistance_incoming / numberOfTrips_incoming);
+				printer.print(numberOfTrips_outgoing == 0 ? "0;" : traveledDistance_outgoing / numberOfTrips_outgoing);
+				printer.print(numberOfTrips_transit == 0 ? "0;" : traveledDistance_transit / numberOfTrips_transit);
+				printer.print(numberOfTrips_all == 0 ? "0" : String.valueOf(traveledDistance_all / numberOfTrips_all));
 
-				bw.newLine();
+				printer.println();
 			}
 
 
@@ -312,43 +307,43 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return filteredList;
 	}
 
-	private void createAnalysisPerVehicle(String travelDistancesPerVehicleOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createAnalysisPerVehicle(Path travelDistancesPerVehicleOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 	//TODO make this analysis more general or move this as additional analysis to the rvr-freight-analysis module
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
 		HashMap<Id<Vehicle>, String> vehicleSubpopulations = linkDemandEventHandler.getVehicleSubpopulation();
 
 		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType();
 
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(travelDistancesPerVehicleOutputFile));
-			bw.write("vehicleId;");
-			bw.write("vehicleType;");
-			bw.write("subpopulation;");
-			bw.write("distanceInKm;");
-			bw.write("distanceInKmWithDepotCharging;");
-			bw.write("shareOfTravelDistanceWithDepotCharging");
-			bw.newLine();
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(travelDistancesPerVehicleOutputFile), CSVFormat.DEFAULT)) {
+
+			printer.print("vehicleId;");
+			printer.print("vehicleType;");
+			printer.print("subpopulation;");
+			printer.print("distanceInKm;");
+			printer.print("distanceInKmWithDepotCharging;");
+			printer.print("shareOfTravelDistanceWithDepotCharging");
+			printer.println();
 			for (String vehicleType : travelDistancesPerVehicle.keySet()) {
 				Object2DoubleOpenHashMap<String> travelDistancesForVehiclesWithThisType = travelDistancesPerVehicle.get(vehicleType);
 				for (String vehicleId : travelDistancesForVehiclesWithThisType.keySet()) {
-					bw.write(vehicleId + ";");
-					bw.write(vehicleType + ";");
-					bw.write(vehicleSubpopulations.get(Id.createVehicleId(vehicleId)) + ";");
+					printer.print(vehicleId);
+					printer.print(vehicleType);
+					printer.print(vehicleSubpopulations.get(Id.createVehicleId(vehicleId)));
 					double traveledDistanceInKm = Math.round(travelDistancesForVehiclesWithThisType.getDouble(vehicleId)/10)/100.0;
-					bw.write(traveledDistanceInKm + ";");
+					printer.print(traveledDistanceInKm);
 					String maxDistanceWithoutRecharging;
 					if (maxDistanceWithDepotChargingInKilometers.containsKey(vehicleType)) {
 						maxDistanceWithoutRecharging = String.valueOf(maxDistanceWithDepotChargingInKilometers.get(vehicleType));
-						bw.write(maxDistanceWithoutRecharging + ";");
+						printer.print(maxDistanceWithoutRecharging);
 					} else {
 						throw new IllegalArgumentException("Vehicle type " + vehicleType + " not found in maxDistanceWithDepotChargingInKilometers map.");
 					}
-					bw.write(String.valueOf(
+					printer.print(String.valueOf(
 						Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
-					bw.newLine();
+					printer.println();
 				}
 			}
-			bw.close();
+
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
@@ -374,32 +369,30 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return maxDistanceWithDepotChargingInKilometers;
 	}
 
-	private void createRelationsAnalysis(String relationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
-		File fileRelations = new File(relationsOutputFile);
+	private void createRelationsAnalysis(Path relationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 		Map<Integer, Object2DoubleMap<String>> relations = linkDemandEventHandler.getRelations();
 		ArrayList<String> header = findHeader(relations);
 		ArrayList<Integer> relationNumbers = new ArrayList<>(relations.keySet());
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileRelations));
-			bw.write("relationNumber;");
-			bw.write(String.join(";", header));
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(relationsOutputFile), CSVFormat.DEFAULT)) {
 
-			bw.newLine();
+			printer.print("relationNumber");
+			for (String h : header) {
+				printer.print(h);
+			}
+
+			printer.println();
 			for (Integer relationNumber : relationNumbers) {
-				bw.write(relationNumber + ";");
+				printer.print(relationNumber);
 				Object2DoubleMap<String> relation = relations.get(relationNumber);
 				for (String value : header) {
 					if (relation.containsKey(value))
-						bw.write(String.valueOf(relation.getDouble(value)));
+						printer.print(String.valueOf(relation.getDouble(value)));
 					else
-						bw.write("0");
-					if (header.indexOf(value) < header.size() - 1) {
-						bw.write(";");
-					}
+						printer.print("0");
 				}
-				bw.newLine();
+				printer.println();
 			}
-			bw.close();
+
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
@@ -417,70 +410,63 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return header;
 	}
 
-	private void createTravelDistancesShares(String travelDistancesPerModeOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
-		File filePerMode = new File(travelDistancesPerModeOutputFile.replace(".csv", "_perMode.csv"));
+	private void createTravelDistancesShares(Path travelDistancesPerModeOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+		String newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perMode.csv");
 		Object2DoubleOpenHashMap<String> travelDistancesPerMode = linkDemandEventHandler.getTravelDistancesPerMode();
-		writeDistanceFiles(travelDistancesPerMode, filePerMode);
-		File filePerType = new File(travelDistancesPerModeOutputFile.replace(".csv", "_perType.csv"));
+		writeDistanceFiles(travelDistancesPerMode, newFileName);
+		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perType.csv");
 		Object2DoubleOpenHashMap<String> travelDistancesPerType = linkDemandEventHandler.getTravelDistancesPerType();
-		writeDistanceFiles(travelDistancesPerType, filePerType);
-		File filePerSubpopulation = new File(travelDistancesPerModeOutputFile.replace(".csv", "_perSubpopulation.csv"));
+		writeDistanceFiles(travelDistancesPerType, newFileName);
+		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perSubpopulation.csv");
 		Object2DoubleOpenHashMap<String> travelDistancesPerSubpopulation = linkDemandEventHandler.getTravelDistancesPerSubpopulation();
-		writeDistanceFiles(travelDistancesPerSubpopulation, filePerSubpopulation);
+		writeDistanceFiles(travelDistancesPerSubpopulation, newFileName);
 	}
 
-	private static void writeDistanceFiles(Object2DoubleOpenHashMap<String> travelDistancesPerMode, File file) {
+	private void writeDistanceFiles(Object2DoubleOpenHashMap<String> travelDistancesPerMode, String fileName) {
 		ArrayList<String> headerWithModes = new ArrayList<>(travelDistancesPerMode.keySet());
 		headerWithModes.sort(Comparator.naturalOrder());
 		double sumOfAllDistances = travelDistancesPerMode.values().doubleStream().sum();
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath(fileName)), CSVFormat.DEFAULT)) {
 
-			bw.write(String.join(";", headerWithModes));
+			for (String h : headerWithModes) {
+				printer.print(h);
+			}
 
-			bw.newLine();
+			printer.println();
 
 			// Write the data row
-			for (int i = 0; i < headerWithModes.size(); i++) {
-				String mode = headerWithModes.get(i);
-				bw.write(String.valueOf(travelDistancesPerMode.getDouble(mode) / sumOfAllDistances));
-
-				// Add delimiter if it's not the last element
-				if (i < headerWithModes.size() - 1) {
-					bw.write(";");
-				}
+			for (String mode : headerWithModes) {
+				printer.print(String.valueOf(travelDistancesPerMode.getDouble(mode) / sumOfAllDistances));
 			}
-			bw.newLine();
-			bw.close();
+			printer.println();
+
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
 	}
 
-	public void createLinkVolumeAnalysis(Scenario scenario, String linkDemandOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	public void createLinkVolumeAnalysis(Scenario scenario, Path linkDemandOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 
-		File file = new File(linkDemandOutputFile);
+//		File file = new File(linkDemandOutputFile);
 		Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = linkDemandEventHandler.getLinkVolumesPerMode();
 		ArrayList<String> headerWithModes = new ArrayList<>(List.of("allCommercialVehicles", "Small-Scale-Commercial-Traffic", "Transit-Freight-Traffic", "FTL-Traffic", "LTL-Traffic", "KEP", "FTL_kv-Traffic", "WasteCollection"));
 		scenario.getVehicles().getVehicleTypes().values().forEach(vehicleType -> {
 			if (!headerWithModes.contains(vehicleType.getNetworkMode())) headerWithModes.add(vehicleType.getNetworkMode());
 		});
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("linkId");
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(linkDemandOutputFile), CSVFormat.Builder.create().setDelimiter(";").get())) {
+			printer.print("linkId");
 			for (String mode : headerWithModes) {
-				bw.write(";" + mode);
+				printer.print(mode);
 			}
-			bw.newLine();
+			printer.println();
 
 			for (Id<Link> linkId : linkVolumesPerMode.keySet()) {
-				bw.write(linkId.toString());
+				printer.print(linkId.toString());
 				for (String mode : headerWithModes) {
-					bw.write(";" + (int) (linkVolumesPerMode.get(linkId).getDouble(mode)));
+					printer.print((int) (linkVolumesPerMode.get(linkId).getDouble(mode)));
 				}
-				bw.newLine();
+				printer.println();
 			}
-			bw.close();
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
