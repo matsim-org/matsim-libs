@@ -777,49 +777,148 @@
 
 # ==== Characteristic values of driving cycles ====
 {
-  sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
-  sumo_input_inverted_time <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+  # sumo_input <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "velocity", "acceleration"))
+  WLTP <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input.csv", delim=";", col_names=c("time", "vel", "acc"), col_types=c(col_integer(), col_double(), col_double()))
+  WLTP_inv <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_input_inverted_time.csv", delim=";", col_names=c("time", "vel", "acc"), col_types=c(col_integer(), col_double(), col_double()))
+  CADC <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC.csv", delim=";", col_names=c("time", "vel", "acc"), col_types=c(col_integer(), col_double(), col_double()))
 
-  # Sections:
+  # Make sure, that the accelerations of all datasets were computed in the same way
+
+  WLTP <- WLTP %>%
+    mutate(acc = (lead(vel) - lag(vel)) / (2*3.6)) %>%
+    mutate(acc = ifelse(is.na(acc), 0, acc))
+
+  WLTP_inv <- WLTP_inv %>%
+  mutate(acc = (lead(vel) - lag(vel)) / (2*3.6)) %>%
+  mutate(acc = ifelse(is.na(acc), 0, acc))
+
+  CADC <- CADC %>%
+    mutate(acc = (lead(vel) - lag(vel)) / (2*3.6)) %>%
+    mutate(acc = ifelse(is.na(acc), 0, acc))
+
+
+  # Sections (WLTP):
   # Low: [0:589]
   # Medium: [590:1022]
   # High: [1023:1477]
   # Extra High: [1478:1800]
 
+  # Sections (CADC):
+  # Low [1:993]
+  # Medium [994:2075]
+  # High [2076:3143]
 
+  WLTP.st_dev <- sd(WLTP$acc)
+  WLTP_inv.st_dev <- sd(WLTP_inv$acc)
+  CADC.st_dev <- sd(CADC$acc)
 
-  all.st_dev <- sd(sumo_input$acceleration)
+  WLTP.st_dev_pos_acc <- sd(WLTP$acc[WLTP$acc > 0])
+  WLTP_inv.st_dev_pos_acc <- sd(WLTP_inv$acc[WLTP_inv$acc > 0])
+  CADC.st_dev_pos_acc <- sd(CADC$acc[CADC$acc > 0])
 
-  normal.st_dev_pos_acc <- sd(sumo_input$acceleration[sumo_input$acceleration > 0])
-  inverted.st_dev_pos_acc <- sd(sumo_input_inverted_time$acceleration[sumo_input_inverted_time$acceleration > 0])
+  WLTP.mean_acc <- mean(WLTP$acc[WLTP$acc > 0])
+  WLTP.low.mean_acc <- mean(WLTP$acc[1:589][WLTP$acc[1:589] > 0])
+  WLTP.medium.mean_acc <- mean(WLTP$acc[590:1022][WLTP$acc[590:1022] > 0])
+  WLTP.high.mean_acc <- mean(WLTP$acc[1023:1477][WLTP$acc[1023:1477] > 0])
+  WLTP.extra_high.mean_acc <- mean(WLTP$acc[1478:1800][WLTP$acc[1478:1800] > 0])
 
-  normal.mean_acc <- mean(sumo_input$acceleration[sumo_input$acceleration > 0])
-  normal.low.mean_acc <- mean(sumo_input$acceleration[1:589][sumo_input$acceleration[1:589] > 0])
-  normal.medium.mean_acc <- mean(sumo_input$acceleration[590:1022][sumo_input$acceleration[590:1022] > 0])
-  normal.high.mean_acc <- mean(sumo_input$acceleration[1023:1477][sumo_input$acceleration[1023:1477] > 0])
-  normal.extra_high.mean_acc <- mean(sumo_input$acceleration[1478:1800][sumo_input$acceleration[1478:1800] > 0])
+  WLTP.mean_vel <- mean(WLTP$vel)
+  WLTP.low.mean_vel <- mean(WLTP$vel[1:589])
+  WLTP.medium.mean_vel <- mean(WLTP$vel[590:1022])
+  WLTP.high.mean_vel <- mean(WLTP$vel[1023:1477])
+  WLTP.extra_high.mean_vel <- mean(WLTP$vel[1478:1800])
 
-  normal.mean_vel <- mean(sumo_input$velocity)
-  normal.low.mean_vel <- mean(sumo_input$velocity[1:589])
-  normal.medium.mean_vel <- mean(sumo_input$velocity[590:1022])
-  normal.high.mean_vel <- mean(sumo_input$velocity[1023:1477])
-  normal.extra_high.mean_vel <- mean(sumo_input$velocity[1478:1800])
+  WLTP_inv.mean_acc <- mean(WLTP_inv$acc[WLTP_inv$acc > 0])
+  WLTP_inv.low.mean_acc <- mean(WLTP_inv$acc[1211:1800][WLTP_inv$acc[1211:1800] > 0])
+  WLTP_inv.medium.mean_acc <- mean(WLTP_inv$acc[778:1210][WLTP_inv$acc[778:1210] > 0])
+  WLTP_inv.high.mean_acc <- mean(WLTP_inv$acc[323:777][WLTP_inv$acc[323:777] > 0])
+  WLTP_inv.extra_high.mean_acc <- mean(WLTP_inv$acc[1:322][WLTP_inv$acc[1:322] > 0])
 
-  inverted.mean_acc <- mean(sumo_input_inverted_time$acceleration[sumo_input_inverted_time$acceleration > 0])
-  inverted.low.mean_acc <- mean(sumo_input_inverted_time$acceleration[1211:1800][sumo_input_inverted_time$acceleration[1211:1800] > 0])
-  inverted.medium.mean_acc <- mean(sumo_input_inverted_time$acceleration[778:1210][sumo_input_inverted_time$acceleration[778:1210] > 0])
-  inverted.high.mean_acc <- mean(sumo_input_inverted_time$acceleration[323:777][sumo_input_inverted_time$acceleration[323:777] > 0])
-  inverted.extra_high.mean_acc <- mean(sumo_input_inverted_time$acceleration[1:322][sumo_input_inverted_time$acceleration[1:322] > 0])
+  WLTP_inv.mean_vel <- mean(WLTP_inv$vel)
+  WLTP_inv.low.mean_vel <- mean(WLTP_inv$vel[1211:1800])
+  WLTP_inv.medium.mean_vel <- mean(WLTP_inv$vel[778:1210])
+  WLTP_inv.high.mean_vel <- mean(WLTP_inv$vel[323:777])
+  WLTP_inv.extra_high.mean_vel <- mean(WLTP_inv$vel[1:322])
 
-  inverted.mean_vel <- mean(sumo_input_inverted_time$velocity)
-  inverted.low.mean_vel <- mean(sumo_input_inverted_time$velocity[1211:1800])
-  inverted.medium.mean_vel <- mean(sumo_input_inverted_time$velocity[778:1210])
-  inverted.high.mean_vel <- mean(sumo_input_inverted_time$velocity[323:777])
-  inverted.extra_high.mean_vel <- mean(sumo_input_inverted_time$velocity[1:322])
+  CADC.mean_acc <- mean(CADC$acc[CADC$acc > 0])
+  CADC.low.mean_acc <- mean(CADC$acc[1:993][CADC$acc[1:993] > 0])
+  CADC.medium.mean_acc <- mean(CADC$acc[994:2075][CADC$acc[994:2075] > 0])
+  CADC.high.mean_acc <- mean(CADC$acc[2076:3143][CADC$acc[2076:3143] > 0])
 
-  print(glue("St.dev. normal: {normal.st_dev}; Mean normal: {normal.mean}"))
-  print(glue("St.dev. inverted: {inverted.st_dev}; inverted normal: {inverted.mean}"))
+  CADC.mean_vel <- mean(CADC$vel)
+  CADC.low.mean_vel <- mean(CADC$vel[1:993])
+  CADC.medium.mean_vel <- mean(CADC$vel[994:2075])
+  CADC.high.mean_vel <- mean(CADC$vel[2076:3143])
 
-  print(glue("ORIGINAL: Low mean: {normal.low.mean}; Medium mean: {normal.medium.mean}; High mean: {normal.high.mean}; Extra high mean: {normal.extra_high.mean}"))
+  print(glue("WLTP, St.dev. : {WLTP.st_dev}; Mean vel: {WLTP.mean_vel}; Mean acc: {WLTP.mean_acc}"))
+  print(glue("CADC, St.dev.: {CADC.st_dev}; Mean vel: {CADC.mean_vel}; Mean acc: {WLTP.mean_acc};"))
+  # print(glue("WLTP_inv, St.dev. : {WLTP_inv.st_dev}; Mean vel: {WLTP_inv.mean_vel}; Mean acc: {WLTP.mean_acc}"))
 
+  print(glue("WLTP: Low mean vel: {WLTP.low.mean_vel}; Medium mean vel: {WLTP.medium.mean_vel}; High mean vel: {WLTP.high.mean_vel}; Extra high mean vel: {WLTP.extra_high.mean_vel}"))
+  print(glue("CADC: Low mean vel: {CADC.low.mean_vel}; Medium mean vel: {CADC.medium.mean_vel}; High mean vel: {CADC.high.mean_vel}"))
+  print(glue("WLTP_inv: Low mean vel: {WLTP_inv.low.mean_vel}; Medium mean vel: {WLTP_inv.medium.mean_vel}; High mean vel: {WLTP_inv.high.mean_vel}; Extra high mean vel: {WLTP_inv.extra_high.mean_vel}"))
+
+  print(glue("WLTP: Low mean acc: {WLTP.low.mean_acc}; Medium mean acc: {WLTP.medium.mean_acc}; High mean acc: {WLTP.high.mean_acc}; Extra high mean acc: {WLTP.extra_high.mean_acc}"))
+  print(glue("CADC: Low mean acc: {CADC.low.mean_acc}; Medium mean acc: --.--------------; High mean acc: {CADC.medium.mean_acc}; Extra high mean acc: {CADC.high.mean_acc}"))
+  print(glue("WLTP_inv: Low mean acc: {WLTP_inv.low.mean_acc}; Medium mean acc: {WLTP_inv.medium.mean_acc}; High mean acc: {WLTP_inv.high.mean_acc}; Extra high mean acc: {WLTP_inv.extra_high.mean_acc}"))
+
+  # ggplot() +
+  #   geom_line(data=CADC, aes(x=time, y=vel), color="red") +
+  #   geom_line(data=WLTP, aes(x=time, y=vel), color="blue")
+}
+
+# ==== CADC Test (using phem_lib)
+{
+  #TODO init phem_lib
+
+  # WLTP
+  plot_main()
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output.csv") )
+
+  # CADC-URBAN
+  plot_main(title = "Comparison across CADC-URBAN-cycle for petrol", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv", fuel="petrol")
+  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv")
+}
+
+# ==== Plot CADCs ====
+{
+  CADC_URBAN <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_URBAN.csv", col_names = c("time", "vel"), delim=";")
+  CADC_ROAD <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_ROAD.csv", col_names = c("time", "vel"), delim=";")
+  CADC_MOTORWAY <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_MOTORWAY.csv", col_names = c("time", "vel"), delim=";")
+
+  ggplot(CADC_URBAN) +
+    geom_line(aes(x=time, y=vel))
+  ggplot(CADC_ROAD) +
+    geom_line(aes(x=time, y=vel))
+  ggplot(CADC_MOTORWAY) +
+    geom_line(aes(x=time, y=vel))
+
+}
+
+# ==== Connect CADCs ====
+{
+  CADC_URBAN <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_URBAN.csv", col_names = c("time", "vel"), delim=";")
+  CADC_ROAD <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_ROAD.csv", col_names = c("time", "vel"), delim=";")
+  CADC_MOTORWAY <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC_MOTORWAY.csv", col_names = c("time", "vel"), delim=";")
+
+  # Connect the dataframes
+  CADC_ROAD <- CADC_ROAD %>%
+    mutate(time = time + nrow(CADC_URBAN))
+  CADC_MOTORWAY <- CADC_MOTORWAY %>%
+    mutate(time = time + nrow(CADC_URBAN) + nrow(CADC_ROAD))
+  CADC <- CADC_URBAN
+  CADC <- rbind(CADC, CADC_ROAD)
+  CADC <- rbind(CADC, CADC_MOTORWAY)
+
+  # Compute the acc (method 1)
+  CADC <- CADC %>%
+    mutate(acc = (lead(vel) - lag(vel)) / 2) %>%
+    mutate(acc = ifelse(is.na(acc), 0, acc))
+
+  # Compute the acc (method 2)
+  # CADC <- CADC %>%
+  #   mutate(acc = lead(vel) - vel) %>%
+  #   mutate(acc = ifelse(is.na(acc), 0, acc))
+
+  write_delim(CADC, "/Users/aleksander/Documents/VSP/PHEMTest/CADC/CADC.csv", delim=";", col_names = FALSE)
 }
