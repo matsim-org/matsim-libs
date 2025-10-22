@@ -323,17 +323,19 @@ public class CommercialTrafficDashboard implements Dashboard {
 			}
 		});
 
-	private static void addNotesBlock(Layout layout, String tab) {
-		layout.row(tab+"info", tab).el(TextBlock.class, (viz, data) -> {
-			viz.backgroundColor = "transparent";
-			viz.content = """
-				### Notes
-				This dashboard analyzes commercial traffic. The commercial traffic contains traffic from vehicles with a commercial purpose, e.g. freight transport, but also vehicles of the small-scale commercial traffic, e.g. service vehicles, care services, etc.
-				The simulation results are with **sample size\s"""
-				+data.config().getSampleSize()+"""
-				**. If the sample size is < 1.0 the visualized results are **scale up to the 100% level**.
-				<br><br>
-				""";
+		layout.row("OD_first", "OD").el(Hexagons.class, (viz, data) -> {
+			viz.title = "Origin-Destination of commercial trips";
+			viz.description = "The OD can be filtered according to defined groups of commercial subpopulations.";
+			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
+			for (String group : groupsOfCommercialSubpopulations) {
+				viz.addAggregation(group, "Origin",group+"_start_X",group+"_start_Y","Destination",group+"_act_X",group+"_act_Y");
+
+			}
+			viz.projection = crs;
+			viz.center = data.context().getCenter();
+			viz.zoom = data.context().getMapZoomLevel();
+			viz.height = 15.;
+			viz.radius = 1000.;
 		});
 	}
 }
