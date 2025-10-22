@@ -19,10 +19,10 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import com.google.inject.Inject;
@@ -67,17 +67,6 @@ public final class RailResourceManager {
 
 	private final DeadlockAvoidance dla;
 	private final TrainManager trains;
-
-	/**
-	 * Retrieve source id of a link.
-	 */
-	public static Id<RailResource> getResourceId(Link link) {
-		String id = RailsimUtils.getResourceId(link);
-		if (id == null)
-			return Id.create(link.getId().toString(), RailResource.class);
-		else
-			return Id.create(id, RailResource.class);
-	}
 
 	@Inject
 	public RailResourceManager(QSim qsim, DeadlockAvoidance dla, TrainManager trainManager) {
@@ -150,6 +139,17 @@ public final class RailResourceManager {
 		}
 
 		dla.initResources(resources);
+	}
+
+	/**
+	 * Retrieve source id of a link.
+	 */
+	public static Id<RailResource> getResourceId(Link link) {
+		String id = RailsimUtils.getResourceId(link);
+		if (id == null)
+			return Id.create(link.getId().toString(), RailResource.class);
+		else
+			return Id.create(id, RailResource.class);
 	}
 
 	/**
@@ -306,6 +306,15 @@ public final class RailResourceManager {
 
 		if (release) {
 			dla.onRelease(time, link.resource, driver);
+
+			// Report link states for all other links of the resource when it is released
+			for (RailLink l : link.resource.getLinks()) {
+				if (l == link)
+					continue;
+
+				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(), driver.getVehicle().getId(),
+					link.resource.getState(l)));
+			}
 		}
 
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),

@@ -28,7 +28,9 @@ import org.matsim.vehicles.VehicleType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.OptionalDouble;
 
 
 /**
@@ -152,7 +154,7 @@ public final class RailsimUtils {
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double deceleration = railsimConfigGroup.getDecelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_DECELERATION);
-		return attr != null ? (double) attr : deceleration;
+		return attr instanceof Number n ? n.doubleValue() : deceleration;
 	}
 
 	/**
@@ -168,7 +170,7 @@ public final class RailsimUtils {
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double acceleration = railsimConfigGroup.getAccelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_ACCELERATION);
-		return attr != null ? (double) attr : acceleration;
+		return attr instanceof Number n ? n.doubleValue() : acceleration;
 	}
 
 	/**
@@ -199,8 +201,8 @@ public final class RailsimUtils {
 	 */
 	public static OptionalDouble getTrainReversible(VehicleType vehicle) {
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
-		return attr instanceof Double d
-			? OptionalDouble.of(d)
+		return attr instanceof Number n
+			? OptionalDouble.of(n.doubleValue())
 			: OptionalDouble.empty();
 	}
 
