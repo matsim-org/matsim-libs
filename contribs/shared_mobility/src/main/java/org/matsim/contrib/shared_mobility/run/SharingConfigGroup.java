@@ -47,18 +47,17 @@ public class SharingConfigGroup extends ReflectiveConfigGroup {
 		for (SharingServiceConfigGroup serviceConfig : getServices()) {
 			// Avoid duplicate IDs
 
-			if (serviceIds.contains(serviceConfig.getId())) {
-				throw new IllegalStateException("Duplicate sharing service: " + serviceConfig.getId());
+			if (serviceIds.contains(serviceConfig.id)) {
+				throw new IllegalStateException("Duplicate sharing service: " + serviceConfig.id);
 			}
 
-			serviceIds.add(serviceConfig.getId());
+			serviceIds.add(serviceConfig.id);
 
 			// Some warnings
 
-			if (serviceConfig.getServiceScheme().equals(ServiceScheme.StationBased)
-					&& serviceConfig.getServiceAreaShapeFile() != null) {
-				logger.warn("Service " + serviceConfig.getId()
-						+ " is station-based, so service area file will not be used!");
+			if (serviceConfig.serviceScheme.equals(ServiceScheme.StationBased)
+					&& serviceConfig.serviceAreaShapeFile != null) {
+				logger.warn("Service " + serviceConfig.id + " is station-based, so service area file will not be used!");
 			}
 		}
 	}

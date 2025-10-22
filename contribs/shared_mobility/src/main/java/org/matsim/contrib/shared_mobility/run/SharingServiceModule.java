@@ -48,20 +48,20 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		bindModal(SharingServiceSpecification.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = new DefaultSharingServiceSpecification();
 			new SharingServiceReader(specification).readURL(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), serviceConfig.getServiceInputFile()));
+					ConfigGroup.getInputFileURL(getConfig().getContext(), serviceConfig.serviceInputFile));
 			return specification;
 		})).in(Singleton.class);
 
 		bindModal(SharingRoutingModule.class).toProvider(modalProvider(getter -> {
 			Scenario scenario = getter.get(Scenario.class);
 			RoutingModule accessEgressRoutingModule = getter.getNamed(RoutingModule.class, TransportMode.walk);
-			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.getMode());
+			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.mode);
 
 			InteractionFinder interactionFinder = getter.getModal(InteractionFinder.class);
 			TimeInterpretation timeInterpretation = getter.get(TimeInterpretation.class);
 
 			return new SharingRoutingModule(scenario, accessEgressRoutingModule, mainModeRoutingModule,
-					interactionFinder, Id.create(serviceConfig.getId(), SharingService.class), timeInterpretation);
+					interactionFinder, Id.create(serviceConfig.id, SharingService.class), timeInterpretation);
 		}));
 
 		addRoutingModuleBinding(getMode()).to(modalKey(SharingRoutingModule.class));
@@ -76,32 +76,32 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
 			return new StationBasedInteractionFinder(network, specification,
-					serviceConfig.getMaximumAccessEgressDistance());
+					serviceConfig.maximumAccessEgressDistance);
 		}));
 
 		bindModal(OutputWriter.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			OutputDirectoryHierarchy outputHierarchy = getter.get(OutputDirectoryHierarchy.class);
 
-			return new OutputWriter(Id.create(serviceConfig.getId(), SharingService.class), specification,
+			return new OutputWriter(Id.create(serviceConfig.id, SharingService.class), specification,
 					outputHierarchy);
 		})).in(Singleton.class);
 
 		addControllerListenerBinding().to(modalKey(OutputWriter.class));
 
 		bindModal(FreefloatingServiceValidator.class).toProvider(modalProvider(getter -> {
-			return new FreefloatingServiceValidator(Id.create(serviceConfig.getId(), SharingService.class));
+			return new FreefloatingServiceValidator(Id.create(serviceConfig.id, SharingService.class));
 		})).in(Singleton.class);
 
 		bindModal(StationBasedServiceValidator.class).toProvider(modalProvider(getter -> {
-			return new StationBasedServiceValidator(Id.create(serviceConfig.getId(), SharingService.class));
+			return new StationBasedServiceValidator(Id.create(serviceConfig.id, SharingService.class));
 		})).in(Singleton.class);
 
 		bindModal(ValidationListener.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			SharingServiceValidator validator = getter.getModal(SharingServiceValidator.class);
 
-			return new ValidationListener(Id.create(serviceConfig.getId(), SharingService.class), validator,
+			return new ValidationListener(Id.create(serviceConfig.id, SharingService.class), validator,
 					specification);
 		}));
 
@@ -120,7 +120,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		// teleported/network we need to bind different rental handler
 
 		if (((QSimConfigGroup) getConfig().getModules().get(QSimConfigGroup.GROUP_NAME)).getMainModes()
-				.contains(serviceConfig.getMode())) {
+				.contains(serviceConfig.mode)) {
 			addEventHandlerBinding().toProvider(modalProvider(getter -> {
 				EventsManager eventsManager = getter.get(EventsManager.class);
 				Network network = getter.get(Network.class);
@@ -134,7 +134,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			}));
 		}
 
-		switch (serviceConfig.getServiceScheme()) {
+		switch (serviceConfig.serviceScheme) {
 			case Freefloating:
 				bindModal(InteractionFinder.class).to(modalKey(FreefloatingInteractionFinder.class));
 				bindModal(SharingServiceValidator.class).to(modalKey(FreefloatingServiceValidator.class));

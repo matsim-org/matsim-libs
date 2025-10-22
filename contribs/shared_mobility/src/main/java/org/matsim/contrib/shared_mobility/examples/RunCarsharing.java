@@ -39,18 +39,18 @@ public class RunCarsharing {
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.setId("mobility");
+		serviceConfig.id = "mobility";
 
 		// ... with freefloating characteristics
-		serviceConfig.setMaximumAccessEgressDistance(100000);
-		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
-		serviceConfig.setServiceAreaShapeFile(null);
+		serviceConfig.maximumAccessEgressDistance = 100000;
+		serviceConfig.serviceScheme = ServiceScheme.StationBased;
+		serviceConfig.serviceAreaShapeFile = null;
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
+		serviceConfig.serviceInputFile = "shared_taxi_vehicles_stations.xml";
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfig.setMode("car");
+		serviceConfig.mode = "car";
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
