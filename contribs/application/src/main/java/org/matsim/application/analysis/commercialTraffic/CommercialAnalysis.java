@@ -197,34 +197,39 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("group");
 			printer.print("numberOfAgents");
 
-			printer.print("numberOfTrips_Intern");
-			printer.print("numberOfTrips_Incoming");
-			printer.print("numberOfTrips_Outgoing");
-			printer.print("numberOfTrips_Transit");
+			if (shp.isDefined()) {
+				printer.print("numberOfTrips_Intern");
+				printer.print("numberOfTrips_Incoming");
+				printer.print("numberOfTrips_Outgoing");
+				printer.print("numberOfTrips_Transit");
+			}
 			printer.print("numberOfTrips_all");
 
-			printer.print("traveledDistance_Intern");
-			printer.print("traveledDistance_Incoming");
-			printer.print("traveledDistance_Outgoing");
-			printer.print("traveledDistance_Transit");
+			if (shp.isDefined()) {
+				printer.print("traveledDistance_Intern");
+				printer.print("traveledDistance_Incoming");
+				printer.print("traveledDistance_Outgoing");
+				printer.print("traveledDistance_Transit");
+			}
 			printer.print("traveledDistance_all");
-
-			printer.print("traveledDistanceInInvestigationArea_Intern");
-			printer.print("traveledDistanceInInvestigationArea_Incoming");
-			printer.print("traveledDistanceInInvestigationArea_Outgoing");
-			printer.print("traveledDistanceInInvestigationArea_Transit");
-			printer.print("traveledDistanceInInvestigationArea_all");
-
+			if (shp.isDefined()) {
+				printer.print("traveledDistanceInInvestigationArea_Intern");
+				printer.print("traveledDistanceInInvestigationArea_Incoming");
+				printer.print("traveledDistanceInInvestigationArea_Outgoing");
+				printer.print("traveledDistanceInInvestigationArea_Transit");
+				printer.print("traveledDistanceInInvestigationArea_all");
+			}
 //			printer.print("averageTripsPerAgent_Intern;"); //TODO why this commented out
 //			printer.print("averageTripsPerAgent_Incoming;");
 //			printer.print("averageTripsPerAgent_Outgoing;");
 //			printer.print("averageTripsPerAgent_Transit;");
 			printer.print("averageTripsPerAgent_all");
-
-			printer.print("averageDistancePerTrip_Intern");
-			printer.print("averageDistancePerTrip_Incoming");
-			printer.print("averageDistancePerTrip_Outgoing");
-			printer.print("averageDistancePerTrip_Transit");
+			if (shp.isDefined()) {
+				printer.print("averageDistancePerTrip_Intern");
+				printer.print("averageDistancePerTrip_Incoming");
+				printer.print("averageDistancePerTrip_Outgoing");
+				printer.print("averageDistancePerTrip_Transit");
+			}
 			printer.print("averageDistancePerTrip_all");
 			printer.println();
 
@@ -251,10 +256,12 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				int numberOfTrips_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().mapToInt(List::size).sum();
 				int numberOfTrips_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().mapToInt(List::size).sum();
 
-				printer.print(numberOfTrips_internal);
-				printer.print(numberOfTrips_incoming);
-				printer.print(numberOfTrips_outgoing);
-				printer.print(numberOfTrips_transit);
+				if (shp.isDefined()) {
+					printer.print(numberOfTrips_internal);
+					printer.print(numberOfTrips_incoming);
+					printer.print(numberOfTrips_outgoing);
+					printer.print(numberOfTrips_transit);
+				}
 				printer.print(numberOfTrips_all);
 
 				double traveledDistance_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
@@ -263,24 +270,33 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				double traveledDistance_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 				double traveledDistance_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 
-				printer.print(traveledDistance_internal);
-				printer.print(traveledDistance_incoming);
-				printer.print(traveledDistance_outgoing);
-				printer.print(traveledDistance_transit);
+				if (shp.isDefined()) {
+					printer.print(traveledDistance_internal);
+					printer.print(traveledDistance_incoming);
+					printer.print(traveledDistance_outgoing);
+					printer.print(traveledDistance_transit);
+				}
 				printer.print(traveledDistance_all);
+				if (shp.isDefined()) {
+					printer.print(distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
+						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+					printer.print(distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
+						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+					printer.print(distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
+						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+					printer.print(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
+						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+					printer.print(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
 
-				printer.print(distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-				printer.print(distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-				printer.print(distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-				printer.print(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-				printer.print(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-
+				}
 				printer.print(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation);
 
-				printer.print(numberOfTrips_internal == 0 ? "0;" : traveledDistance_internal / numberOfTrips_internal);
-				printer.print(numberOfTrips_incoming == 0 ? "0;" : traveledDistance_incoming / numberOfTrips_incoming);
-				printer.print(numberOfTrips_outgoing == 0 ? "0;" : traveledDistance_outgoing / numberOfTrips_outgoing);
-				printer.print(numberOfTrips_transit == 0 ? "0;" : traveledDistance_transit / numberOfTrips_transit);
+				if (shp.isDefined()) {
+					printer.print(numberOfTrips_internal == 0 ? "0;" : traveledDistance_internal / numberOfTrips_internal);
+					printer.print(numberOfTrips_incoming == 0 ? "0;" : traveledDistance_incoming / numberOfTrips_incoming);
+					printer.print(numberOfTrips_outgoing == 0 ? "0;" : traveledDistance_outgoing / numberOfTrips_outgoing);
+					printer.print(numberOfTrips_transit == 0 ? "0;" : traveledDistance_transit / numberOfTrips_transit);
+				}
 				printer.print(numberOfTrips_all == 0 ? "0" : String.valueOf(traveledDistance_all / numberOfTrips_all));
 
 				printer.println();
