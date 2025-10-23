@@ -101,6 +101,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		if (TripStructureUtils.isStageActivityType(event.getActType()))
+			return;
 		// checks if an investigation area is defined. If yes
 		if (geometryInvestigationArea != null && geometryInvestigationArea.contains(MGC.coord2Point(event.getCoord())))
 			currentTrips_Started_inInvestigationArea.add(event.getPersonId());
@@ -110,6 +112,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (TripStructureUtils.isStageActivityType(event.getActType()))
+			return;
 		if ((currentTrips_Started_inInvestigationArea.contains(event.getPersonId()) || currentTrips_Started_OutsideOrNoSelectedArea.contains(event.getPersonId())) && currentTrip_Distance_perPerson.getDouble(event.getPersonId()) > 0) {
 			boolean isInInvestigationArea = false;
 			boolean useShpFile = false;
