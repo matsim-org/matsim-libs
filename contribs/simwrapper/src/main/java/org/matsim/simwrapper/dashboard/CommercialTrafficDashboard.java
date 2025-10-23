@@ -96,7 +96,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", args);
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
 			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
-			viz.height = 8.;
+			viz.height = 12.;
 		});
 		layout.row("trips_first", "Trips").el(Plotly.class, (viz, data) -> {
 				viz.title = "Modal split by main mode";
