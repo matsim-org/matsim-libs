@@ -6,11 +6,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
@@ -33,7 +36,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+
+import com.google.common.base.Verify;
 
 public class RunIT {
 
@@ -49,12 +57,15 @@ public class RunIT {
 		SharingConfigGroup sharingConfig = new SharingConfigGroup();
 		config.addModule(sharingConfig);
 
+		// --------------------------------------------------------------------
+
 		// We need to define a service ...
 		SharingServiceConfigGroup serviceConfig = new SharingServiceConfigGroup();
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
 		serviceConfig.setIdFromString("mobility");
+		serviceConfig.setVehicleTypeIdFromString("sharedCar");
 
 		// ... with freefloating characteristics
 		serviceConfig.setMaximumAccessEgressDistance(100000);
@@ -67,18 +78,23 @@ public class RunIT {
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfig.setMode("car");
+		Verify.verify(config.routing().getNetworkModes().contains(serviceConfig.getMode())); // routed
+		Verify.verify(config.qsim().getMainModes().contains(serviceConfig.getMode())); // simulated
 
-		// Finally, we need to make sure that the service mode (sharing:velib) is
+		// Finally, we need to make sure that the service mode (sharing:mobility) is
 		// considered in mode choice.
 		List<String> modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
 		modes.add(SharingUtils.getServiceMode(serviceConfig));
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
+
+		// --------------------------------------------------------------------
 
 		SharingServiceConfigGroup serviceConfigBike = new SharingServiceConfigGroup();
 		sharingConfig.addService(serviceConfigBike);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
 		serviceConfigBike.setIdFromString("velib");
+		serviceConfigBike.setVehicleTypeIdFromString("sharedVelib");
 
 		// ... with freefloating characteristics
 		serviceConfigBike.setMaximumAccessEgressDistance(100000);
@@ -90,7 +106,8 @@ public class RunIT {
 		serviceConfigBike.setServiceInputFile(vehiclesUrl_velib.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfigBike.setMode("bike");
+		Verify.verify(!config.routing().getNetworkModes().contains(serviceConfigBike.getMode())); // not routed
+		Verify.verify(!config.qsim().getMainModes().contains(serviceConfigBike.getMode())); // teleported
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -98,11 +115,14 @@ public class RunIT {
 		modes.add(SharingUtils.getServiceMode(serviceConfigBike));
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
 
+		// --------------------------------------------------------------------
+
 		SharingServiceConfigGroup serviceConfigBikeFF = new SharingServiceConfigGroup();
 		sharingConfig.addService(serviceConfigBikeFF);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
 		serviceConfigBikeFF.setIdFromString("wheels");
+		serviceConfigBikeFF.setVehicleTypeIdFromString("sharedWheels");
 
 		// ... with freefloating characteristics
 		serviceConfigBikeFF.setMaximumAccessEgressDistance(100000);
@@ -115,12 +135,49 @@ public class RunIT {
 
 		// ... and, we need to define the underlying mode, here "car".
 		serviceConfigBikeFF.setMode("bike");
+		Verify.verify(!config.routing().getNetworkModes().contains(serviceConfigBikeFF.getMode())); // not routed
+		Verify.verify(!config.qsim().getMainModes().contains(serviceConfigBikeFF.getMode())); // teleported
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
 		modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
 		modes.add(SharingUtils.getServiceMode(serviceConfigBikeFF));
 		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
+
+		// --------------------------------------------------------------------
+
+		SharingServiceConfigGroup serviceConfigScooter = new SharingServiceConfigGroup();
+		sharingConfig.addService(serviceConfigScooter);
+
+		// ... with a service id. The respective mode will be "sharing:velib".
+		serviceConfigScooter.setIdFromString("scooter");
+		serviceConfigScooter.setVehicleTypeIdFromString("sharedScooter");
+		// Todo: add vtype and set max speed
+
+		// ... with freefloating characteristics
+		serviceConfigScooter.setMaximumAccessEgressDistance(100000);
+		serviceConfigScooter.setServiceScheme(ServiceScheme.Freefloating);
+		serviceConfigScooter.setServiceAreaShapeFile(null);
+
+		// ... with a number of available vehicles and their initial locations
+		URL vehiclesUrl_scooter = RunIT.class.getResource("shared_vehicles_scooter.xml");
+		serviceConfigScooter.setServiceInputFile(vehiclesUrl_scooter.toURI().getPath());
+
+		// ... and, we need to define the underlying mode, here "car".
+		serviceConfigScooter.setMode("eScooter");
+		Set<String> routingModes = new HashSet<>(config.routing().getNetworkModes());
+		routingModes.add(serviceConfigScooter.getMode());
+		config.routing().setNetworkModes(routingModes);
+		Verify.verify(config.routing().getNetworkModes().contains(serviceConfigScooter.getMode())); // routed
+		Verify.verify(!config.qsim().getMainModes().contains(serviceConfigScooter.getMode())); // teleported
+
+		// Finally, we need to make sure that the service mode (sharing:velib) is
+		// considered in mode choice.
+		modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
+		modes.add(SharingUtils.getServiceMode(serviceConfigScooter));
+		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
+
+		// --------------------------------------------------------------------
 
 		// We need to add interaction activity types to scoring
 		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
@@ -135,16 +192,54 @@ public class RunIT {
 		bookingParams.setScoringThisActivityAtAll(false);
 		config.scoring().addActivityParams(bookingParams);
 
-		// We need to score car
+		// We need to score car (mobility)
 		ModeParams carScoringParams = new ModeParams("car");
 		config.scoring().addModeParams(carScoringParams);
 
-		// We need to score bike
+		// We need to score bike (velib & wheels)
 		ModeParams bikeScoringParams = new ModeParams("bike");
 		config.scoring().addModeParams(bikeScoringParams);
 
-		// Set up controller (no specific settings needed for scenario)
-		Controler controller = new Controler(config);
+		// We need to score bike (velib & wheels)
+		ModeParams eScooterScoringParams = new ModeParams(serviceConfigScooter.getMode());
+		config.scoring().addModeParams(eScooterScoringParams);
+
+		// --------------------------------------------------------------------
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// --------------------------------------------------------------------
+
+		// 1) add sharedCar vehicleType for routing and simulating "mobility" on network
+		VehicleType sharedCarType = VehicleUtils.createVehicleType(serviceConfig.getVehicleTypeId());
+		sharedCarType.setNetworkMode(serviceConfig.getMode());
+		sharedCarType.setMaximumVelocity(100 / 3.6);
+		scenario.getVehicles().addVehicleType(sharedCarType);
+		// 2) check that serviceConfig.mode is an allowedMode (somewhere) on the network
+		Verify.verify(scenario.getNetwork().getLinks().values().stream()
+				.anyMatch(link -> link.getAllowedModes().contains(serviceConfig.getMode())));
+
+		// bike (velib & wheels) is not routed nor simulated but teleported
+
+		// 1) add sharedScooter vehicleType for routing and simulating "scooter" on
+		// network
+		VehicleType sharedScooterType = VehicleUtils.createVehicleType(serviceConfigScooter.getVehicleTypeId());
+		sharedScooterType.setNetworkMode(serviceConfigScooter.getMode());
+		sharedScooterType.setMaximumVelocity(22 / 3.6);
+		scenario.getVehicles().addVehicleType(sharedScooterType);
+		// 2) add serviceConfig.mode as an allowedMode on the network
+		scenario.getNetwork().getLinks().values().stream()
+				.filter(link -> link.getAllowedModes().contains("car")) // same as car
+				.forEach(link -> {
+					Set<String> allowedModes = new HashSet<>(link.getAllowedModes());
+					allowedModes.add(sharedScooterType.getNetworkMode());
+					link.setAllowedModes(allowedModes);
+				});
+
+		// --------------------------------------------------------------------
+
+		// Set up controller
+		Controler controller = new Controler(scenario);
 
 		// Does not really "override" anything
 		controller.addOverridingModule(new SharingModule());
@@ -156,30 +251,36 @@ public class RunIT {
 
 		OutputData data = countLegs(controller.getControllerIO().getOutputPath() + "/output_events.xml.gz");
 
-		Assertions.assertEquals(86254, (long) data.counts.get("car"));
-		Assertions.assertEquals(138432, (long) data.counts.get("walk"));
-		Assertions.assertEquals(31, (long) data.counts.get("bike"));
-		Assertions.assertEquals(20957, (long) data.counts.get("pt"));
+		Assertions.assertEquals(86074, (long) data.counts.get("car"));
+		Assertions.assertEquals(137816, (long) data.counts.get("walk"));
+		Assertions.assertEquals(33, (long) data.counts.get("bike"));
+		Assertions.assertEquals(20882, (long) data.counts.get("pt"));
+		Assertions.assertEquals(23, (long) data.counts.get("eScooter"));
 
-		Assertions.assertEquals(21, (long) data.pickupCounts.get("wheels"));
+		Assertions.assertEquals(20, (long) data.pickupCounts.get("wheels"));
 		Assertions.assertEquals(2, (long) data.pickupCounts.get("mobility"));
-		Assertions.assertEquals(10, (long) data.pickupCounts.get("velib"));
+		Assertions.assertEquals(13, (long) data.pickupCounts.get("velib"));
+		Assertions.assertEquals(23, (long) data.pickupCounts.get("scooter"));
 
-		Assertions.assertEquals(21, (long) data.dropoffCounts.get("wheels"));
+		Assertions.assertEquals(20, (long) data.dropoffCounts.get("wheels"));
 		Assertions.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
-		Assertions.assertEquals(10, (long) data.dropoffCounts.get("velib"));
+		Assertions.assertEquals(13, (long) data.dropoffCounts.get("velib"));
+		Assertions.assertEquals(23, (long) data.dropoffCounts.get("scooter"));
 
 		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels", 0L));
 		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility", 0L));
 		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib", 0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("scooter", 0L));
 
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("velib", 0L));
+		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("scooter", 0L));
 
 		Assertions.assertEquals(2, (long) data.vehicleCounts.get("wheels"));
 		Assertions.assertEquals(2, (long) data.vehicleCounts.get("mobility"));
 		Assertions.assertEquals(2, (long) data.vehicleCounts.get("velib"));
+		Assertions.assertEquals(2, (long) data.vehicleCounts.get("scooter"));
 	}
 
 	static class OutputData {

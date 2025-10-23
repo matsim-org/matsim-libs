@@ -10,6 +10,7 @@ import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
+import org.matsim.vehicles.VehicleType;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,8 +20,10 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "mode";
 
 	public static final String ID = "id";
+	public static final String VEHICLE_TYPE_ID = "vehicleTypeId";
 	public static final String SERVICE_SCHEME = "serviceScheme";
 	public static final String ID_COMMENT = "The id of the sharing service";
+	public static final String VEHICLE_TYPE_ID_COMMENT = "The vehicle type for the sharing service. Used to create vehicles if not already present in the vehicles file and for routing during replanning";
 	public static final String SERVICE_SCHEME_COMMENT = "One of: " + String.join(", ",
 			Arrays.asList(ServiceScheme.values()).stream().map(String::valueOf).toList());
 
@@ -52,6 +55,9 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	@Comment("Defines the underlying mode of the service")
 	@NotNull
 	private String mode;
+
+	@NotNull
+	private Id<VehicleType> vehicleTypeId;
 
 	@Parameter
 	@Comment("Maximum distance to a bike or station")
@@ -174,10 +180,31 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 		this.id = (idString != null && !idString.isBlank()) ? Id.create(idString, SharingService.class) : null;
 	}
 
+	public Id<VehicleType> getVehicleTypeId() {
+		return vehicleTypeId;
+	}
+
+	public void setVehicleTypeId(Id<VehicleType> vtId) {
+		this.vehicleTypeId = vtId;
+	}
+
+	@StringGetter(VEHICLE_TYPE_ID)
+	public String getVehicleTypeIdAsString() {
+		return vehicleTypeId != null ? vehicleTypeId.toString() : "";
+	}
+
+	@StringSetter(VEHICLE_TYPE_ID)
+	public void setVehicleTypeIdFromString(String vehicleTypeIdString) {
+		this.vehicleTypeId = (vehicleTypeIdString != null && !vehicleTypeIdString.isBlank())
+				? Id.createVehicleTypeId(vehicleTypeIdString)
+				: null;
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(ID, ID_COMMENT);
+		map.put(VEHICLE_TYPE_ID, VEHICLE_TYPE_ID_COMMENT);
 		map.put(SERVICE_SCHEME, SERVICE_SCHEME_COMMENT);
 		return map;
 	}
