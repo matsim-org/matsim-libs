@@ -219,10 +219,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				printer.print("traveledDistanceInInvestigationArea_Transit");
 				printer.print("traveledDistanceInInvestigationArea_all");
 			}
-//			printer.print("averageTripsPerAgent_Intern;"); //TODO why this commented out
-//			printer.print("averageTripsPerAgent_Incoming;");
-//			printer.print("averageTripsPerAgent_Outgoing;");
-//			printer.print("averageTripsPerAgent_Transit;");
 			printer.print("averageTripsPerAgent_all");
 			if (shp.isDefined()) {
 				printer.print("averageDistancePerTrip_Intern");
