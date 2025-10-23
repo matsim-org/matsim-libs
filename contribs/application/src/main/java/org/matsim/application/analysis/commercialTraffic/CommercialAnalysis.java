@@ -194,7 +194,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			// _Outgoing: incoming trips (start inside the area and end outside the area)
 			// _Transit: transit trips (start and end inside the area)
 			// _all: all trips
-			printer.print("subpopulation");
+			printer.print("group");
 			printer.print("numberOfAgents");
 
 			printer.print("numberOfTrips_Intern");
@@ -228,22 +228,22 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("averageDistancePerTrip_all");
 			printer.println();
 
-			for (String subpopulation : vehiclesPerGroup.keySet()){
-				printer.print(subpopulation);
-				int numberOfAgentsInSubpopulation = vehiclesPerGroup.get(subpopulation).size();
+			for (String group : vehiclesPerGroup.keySet()){
+				printer.print(group);
+				int numberOfAgentsInSubpopulation = vehiclesPerGroup.get(group).size();
 				printer.print(numberOfAgentsInSubpopulation);
 
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_internal, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_incoming, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_outgoing, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_transit, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_all, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_internal, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_incoming, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_outgoing, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_transit, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_all, group, scenario);
 
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_internal_inInvestigationArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_incoming_inInvestigationArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_outgoing_inInvestigationArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_transit_inInvestigationArea, subpopulation, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation = filterBySubpopulation(distancesPerTrip_perPerson_all_inInvestigationArea, subpopulation, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_internal_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_incoming_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_outgoing_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_transit_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_all_inInvestigationArea, group, scenario);
 
 				int numberOfTrips_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().mapToInt(List::size).sum();
 				int numberOfTrips_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().mapToInt(List::size).sum();
@@ -294,13 +294,13 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	}
 
-	private HashMap<Id<Person>, List<Double>> filterBySubpopulation(HashMap<Id<Person>, List<Double>> distancesPerTripPerPerson, String subpopulation, Scenario scenario) {
+	private HashMap<Id<Person>, List<Double>> filterByPopulationGroup(HashMap<Id<Person>, List<Double>> distancesPerTripPerPerson, String populationGroup, Scenario scenario) {
 		HashMap<Id<Person>, List<Double>> filteredList = new HashMap<>();
 		distancesPerTripPerPerson.keySet().stream().filter(personId -> {
 			Person person = scenario.getPopulation().getPersons().get(personId);
 			if (PopulationUtils.getSubpopulation(person) == null)
-				log.error("This agent has no subpopulation {}, This should not happen", personId);
-			return PopulationUtils.getSubpopulation(person).equals(subpopulation);
+				log.error("This agent has no populationGroup {}, This should not happen", personId);
+			return groupsOfSubpopulationsForCommercialAnalysis.get(populationGroup).contains(PopulationUtils.getSubpopulation(person));
 		}).forEach(personId -> {
 			filteredList.put(personId, distancesPerTripPerPerson.get(personId));
 		});
