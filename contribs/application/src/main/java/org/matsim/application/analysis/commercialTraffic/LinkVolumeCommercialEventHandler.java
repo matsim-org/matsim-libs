@@ -148,13 +148,15 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 						currentTrip_Distance_perPerson.removeDouble(event.getPersonId()));
 					distancesPerTrip_perPerson_incoming_inInvestigationArea.computeIfAbsent(event.getPersonId(), k -> new ArrayList<>()).add(
 						currentTrip_Distance_perPerson_inInvestigationArea.removeDouble(event.getPersonId()));
-				} else if (useShpFile){
+				} else if (useShpFile) {
 					// transit trips or if no investigation area is defined all trips
 					distancesPerTrip_perPerson_transit.computeIfAbsent(event.getPersonId(), k -> new ArrayList<>()).add(
 						currentTrip_Distance_perPerson.removeDouble(event.getPersonId()));
 					distancesPerTrip_perPerson_transit_inInvestigationArea.computeIfAbsent(event.getPersonId(), k -> new ArrayList<>()).add(
 						currentTrip_Distance_perPerson_inInvestigationArea.removeDouble(event.getPersonId()));
 				}
+				else
+					currentTrip_Distance_perPerson.removeDouble(event.getPersonId()); // because it was not removed before, because no shapefile was used
 				currentTrips_Started_OutsideOrNoSelectedArea.remove(event.getPersonId());
 			}
 		}
