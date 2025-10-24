@@ -154,7 +154,7 @@ import org.matsim.freight.carriers.*;
 						bw1.write(delimiter + numberOfPlannedJobs);
 						bw1.write(delimiter + numberOfPlannedDemandSize);
 					}
-					case carriersAndEvents -> {
+					case carriersPlans, carriersAndEvents -> {
 						int numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
 							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
 						int nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
