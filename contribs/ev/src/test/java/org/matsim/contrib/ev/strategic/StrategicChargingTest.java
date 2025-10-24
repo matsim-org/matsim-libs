@@ -219,4 +219,35 @@ public class StrategicChargingTest {
         assertEquals(1, scenario.tracker().chargingStartEvents.size());
         assertEquals("charger:publicchargerB", scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
     }
+
+    @Test
+    public void testConstrainedReplanning() {
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(1) //
+                .addWorkCharger(8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                .addPerson("person", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+
+        // very infrequent
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setActivityInclusionProbability(0.1);
+
+        // but constrained
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setConstraintIterations(1000);
+
+        // motivate agent to charge at activity
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
+
+        Controler controller = scenario.controller();
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
+    }
 }

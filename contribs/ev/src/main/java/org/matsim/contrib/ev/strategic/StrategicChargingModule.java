@@ -25,6 +25,7 @@ import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningAlg
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.replanning.innovator.ConstrainedChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.EmptyChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.ChargerSelector;
@@ -65,6 +66,8 @@ import com.google.inject.name.Names;
 public class StrategicChargingModule extends AbstractModule {
 	static public final String MODE_BINDING = "ev:strategic";
 
+	static public final String ACTIVE_INNOVATOR = "active_innovator";
+
 	@Override
 	public void install() {
 		WithinDayEvConfigGroup withinDayConfig = WithinDayEvConfigGroup.get(getConfig());
@@ -98,12 +101,21 @@ public class StrategicChargingModule extends AbstractModule {
 		}
 
 		ChargingInnovationParameters innovation = chargingConfig.getInnovationParameters();
+
 		if (innovation instanceof RandomChargingPlanInnovator.Parameters) {
 			bind(ChargingPlanInnovator.class).to(RandomChargingPlanInnovator.class);
 		} else if (innovation == null) {
 			bind(ChargingPlanInnovator.class).to(EmptyChargingPlanInnovator.class);
 		} else {
 			throw new IllegalStateException("Unknown innovation parameters: " + innovation.getClass());
+		}
+
+		if (innovation.getConstraintIterations() > 0) {
+			bind(Key.get(ChargingPlanInnovator.class, Names.named(ACTIVE_INNOVATOR)))
+					.to(ConstrainedChargingPlanInnovator.class);
+		} else {
+			bind(Key.get(ChargingPlanInnovator.class, Names.named(ACTIVE_INNOVATOR)))
+					.to(ChargingPlanInnovator.class);
 		}
 
 		addControllerListenerBinding().to(ChargingPlanScoring.class);
@@ -161,7 +173,7 @@ public class StrategicChargingModule extends AbstractModule {
 
 	@Provides
 	StrategicChargingReplanningAlgorithm provideStrategicReplanningAlgorithm(ChargingPlanSelector selector,
-			ChargingPlanInnovator creator, StrategicChargingConfigGroup config) {
+			@Named(ACTIVE_INNOVATOR) ChargingPlanInnovator creator, StrategicChargingConfigGroup config) {
 		return new StrategicChargingReplanningAlgorithm(selector, creator, config.getSelectionProbability(),
 				config.getMaximumChargingPlans());
 	}
@@ -193,6 +205,22 @@ public class StrategicChargingModule extends AbstractModule {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
 				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory);
+	}
+
+	@Provides
+	ConstrainedChargingPlanInnovator provideConstrainedChargingPlanInnovator(
+			ChargingPlanInnovator delegate,
+			TimeInterpretation timeInterpretation,
+			@Named(MODE_BINDING) TravelTime travelTime, Network network, Vehicles vehicles,
+			ElectricFleetSpecification electricFleet,
+			ChargingInfrastructureSpecification infrastructure, StrategicChargingConfigGroup config,
+			WithinDayEvConfigGroup wevcConfig, ChargingPower.Factory chargingPowerFactory,
+			DriveEnergyConsumption.Factory driveEnergyConsumptionFactory) {
+		ChargingInnovationParameters parameters = config
+				.getInnovationParameters();
+		return new ConstrainedChargingPlanInnovator(delegate, timeInterpretation, travelTime, network, vehicles,
+				electricFleet, infrastructure, wevcConfig.getCarMode(), parameters.getConstraintIterations(),
+				parameters.getConstraintErrorMode(), chargingPowerFactory, driveEnergyConsumptionFactory);
 	}
 
 	@Provides

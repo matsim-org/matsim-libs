@@ -14,7 +14,6 @@ import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.ChargerSele
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.ActivityBasedCandidate;
 import org.matsim.contrib.ev.withinday.ChargingSlotFinder.LegBasedCandidate;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
@@ -112,7 +111,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		return helper.getChargingPlan();
 	}
 
-	static public class Parameters extends ReflectiveConfigGroup implements ChargingInnovationParameters {
+	static public class Parameters extends ChargingInnovationParameters {
 		static public final String SET_NAME = "innovation:random";
 
 		public Parameters() {
