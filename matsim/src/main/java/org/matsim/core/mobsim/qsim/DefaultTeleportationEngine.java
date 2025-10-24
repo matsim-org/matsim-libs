@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,6 +74,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private EventsManager eventsManager;
 
 	private final boolean withTravelTimeCheck;
+	private final boolean delayInstantTeleportationArrivals;
 
 	@Inject
 	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager) {
@@ -81,9 +82,14 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, boolean withTravelTimeCheck) {
+		this(scenario, eventsManager, withTravelTimeCheck, scenario.getConfig().qsim().getDelayInstantTeleportationArrivals());
+	}
+
+	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, boolean withTravelTimeCheck, boolean delayInstantTeleportationArrivals) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withTravelTimeCheck = withTravelTimeCheck;
+		this.delayInstantTeleportationArrivals = delayInstantTeleportationArrivals;
 	}
 
 	@Override
@@ -103,17 +109,20 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		}
 
 		double arrivalTime = now + travelTime ;
-		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
 
-		// === below here is only visualization, no dynamics ===
-		Id<Person> agentId = agent.getId();
-		Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
-		Link destLink = this.scenario .getNetwork().getLinks().get(agent.getDestinationLinkId());
-		Coord fromCoord = currLink.getToNode().getCoord();
-		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
-		this.teleportationData.put(agentId, agentInfo);
-
+		if(travelTime == 0 && !delayInstantTeleportationArrivals) {
+			handlePersonTeleportationArrival(now, new Tuple<>(now, agent));
+		} else {
+			this.teleportationList.add(new Tuple<>(arrivalTime, agent));
+			// === below here is only visualization, no dynamics ===
+			Id<Person> agentId = agent.getId();
+			Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
+			Link destLink = this.scenario .getNetwork().getLinks().get(agent.getDestinationLinkId());
+			Coord fromCoord = currLink.getToNode().getCoord();
+			Coord toCoord = destLink.getToNode().getCoord();
+			TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
+			this.teleportationData.put(agentId, agentInfo);
+		}
 		return true;
 	}
 
@@ -137,18 +146,22 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			Tuple<Double, MobsimAgent> entry = teleportationList.peek();
 			if (entry.getFirst() <= now) {
 				teleportationList.poll();
-				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
-				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(
-						new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
-				personAgent.endLegAndComputeNextState(now);
-				this.teleportationData.remove(personAgent.getId());
-				internalInterface.arrangeNextAgentState(personAgent);
+				handlePersonTeleportationArrival(now, entry);
 			} else {
 				break;
 			}
 		}
+	}
+
+	private void handlePersonTeleportationArrival(double now, Tuple<Double, MobsimAgent> entry) {
+		MobsimAgent personAgent = entry.getSecond();
+		personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
+		double distance = personAgent.getExpectedTravelDistance();
+		this.eventsManager.processEvent(
+			new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
+		personAgent.endLegAndComputeNextState(now);
+		this.teleportationData.remove(personAgent.getId());
+		internalInterface.arrangeNextAgentState(personAgent);
 	}
 
 	@Override
