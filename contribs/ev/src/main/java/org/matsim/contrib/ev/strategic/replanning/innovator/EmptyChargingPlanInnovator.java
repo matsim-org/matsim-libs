@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * This implementation creates empty charging plans (= no charging at all).
@@ -17,7 +16,7 @@ public class EmptyChargingPlanInnovator implements ChargingPlanInnovator {
 		return new ChargingPlan();
 	}
 
-	static public class Parameters extends ReflectiveConfigGroup implements ChargingInnovationParameters {
+	static public class Parameters extends ChargingInnovationParameters {
 		static public final String SET_NAME = "innovation:empty";
 
 		public Parameters() {
