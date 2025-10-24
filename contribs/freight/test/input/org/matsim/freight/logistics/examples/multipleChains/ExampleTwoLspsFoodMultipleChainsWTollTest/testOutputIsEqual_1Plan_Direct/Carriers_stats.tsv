@@ -1,3 +1,3 @@
 carrierId	nuOfJspritIterations	fleetSize	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations_planned	nuOfPickupLocations_planned	nuOfDeliveryLocations_planned	MATSimScoreSelectedPlan	jspritScoreSelectedPlan	nuOfTours	jobType	nuOfJobs_planned	nuOfJobs_handled	noOfJobs_notHandled	demandSize_planned	demandSize_handled	jspritComputationTime
-Edeka_DIRECT_directCarrier	1	INFINITE	1	1	0	1	68	-42485.37882068233	-42447.044261126684	15	shipments	72	72	0	895	895	null
+Edeka_DIRECT_directCarrier	1	INFINITE	1	1	0	1	24	-6254.3808072972715	-6240.1618407988935	6	shipments	24	24	0	258	258	null
 Kaufland_DIRECT_directCarrier	1	INFINITE	1	1	0	1	16	-12588.150510889887	-12559.195136969007	8	shipments	17	17	0	347	347	null

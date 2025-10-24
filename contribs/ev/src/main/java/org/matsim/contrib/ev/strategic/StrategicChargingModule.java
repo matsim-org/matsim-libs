@@ -28,6 +28,10 @@ import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingPlanInnovato
 import org.matsim.contrib.ev.strategic.replanning.innovator.ConstrainedChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.EmptyChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.ChargerSelector;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.EnergyHelper;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.MinimalCostChargerSelector;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.RandomChargerSelector;
 import org.matsim.contrib.ev.strategic.replanning.selector.BestChargingPlanSelector;
 import org.matsim.contrib.ev.strategic.replanning.selector.ChargingPlanSelector;
 import org.matsim.contrib.ev.strategic.replanning.selector.ExponentialChargingPlanSelector;
@@ -117,6 +121,12 @@ public class StrategicChargingModule extends AbstractModule {
 		addControllerListenerBinding().to(ChargingPlanScoring.class);
 		addControllerListenerBinding().to(ChargingPlanScoringListener.class);
 
+		if (chargingConfig.getChargerSelector().equals(RandomChargerSelector.NAME)) {
+			bind(ChargerSelector.Factory.class).to(RandomChargerSelector.Factory.class);
+		} else if (chargingConfig.getChargerSelector().equals(MinimalCostChargerSelector.NAME)) {
+			bind(ChargerSelector.Factory.class).to(MinimalCostChargerSelector.Factory.class);
+		}
+
 		if (chargingConfig.getChargingScoreWeight() != 0.0) {
 			bind(ScoringFunctionFactory.class).to(StrategicChargingScoringFunction.Factory.class).in(Singleton.class);
 		}
@@ -191,10 +201,10 @@ public class StrategicChargingModule extends AbstractModule {
 	@Provides
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
-			TimeInterpretation timeInterpretation) {
+			TimeInterpretation timeInterpretation, ChargerSelector.Factory selectorFactory) {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
-				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters());
+				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory);
 	}
 
 	@Provides
@@ -254,5 +264,24 @@ public class StrategicChargingModule extends AbstractModule {
 	@Singleton
 	SubscriptionRegistry provideSubscriptionRegistry() {
 		return new SubscriptionRegistry();
+	}
+
+	@Provides
+	@Singleton
+	RandomChargerSelector.Factory provideRandomChargerSelectorFactory() {
+		return new RandomChargerSelector.Factory();
+	}
+
+	@Provides
+	@Singleton
+	MinimalCostChargerSelector.Factory provideMinimalCostChargerSelectorFactory(ChargingCostCalculator costCalculator,
+			WithinDayEvConfigGroup config, TimeInterpretation timeInterpretation,
+			@Named(MODE_BINDING) TravelTime travelTime, Network network,
+			DriveEnergyConsumption.Factory driveFactory,
+			ChargingPower.Factory chargingFactory,
+			Vehicles vehicles, ElectricFleetSpecification fleet) {
+		EnergyHelper.Factory energyFactory = new EnergyHelper.Factory(timeInterpretation, travelTime, network,
+				driveFactory, chargingFactory, vehicles, fleet, config.getCarMode());
+		return new MinimalCostChargerSelector.Factory(costCalculator, energyFactory);
 	}
 }
