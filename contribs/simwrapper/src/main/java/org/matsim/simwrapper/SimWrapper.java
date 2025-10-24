@@ -120,6 +120,15 @@ public final class SimWrapper {
 		return dashboards.stream().anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
 	}
 
+	public void replaceDashboard(Class<? extends Dashboard> oldDashboard, Class<? extends Dashboard> newDashboard, String context) {
+		if (hasDashboard(oldDashboard, context)) {
+			log.info("Replacing dashboard {} with context {} by dashboard {}", oldDashboard, context, newDashboard);
+			dashboards.remove(oldDashboard);
+		} else {
+			log.info("Dashboard {} with context {} not found in list of dashboards. Not replacing anything.", oldDashboard, context);
+		}
+	}
+
 	/**
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
 	 */
