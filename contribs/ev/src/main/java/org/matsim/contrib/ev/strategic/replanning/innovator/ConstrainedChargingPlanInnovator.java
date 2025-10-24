@@ -1,6 +1,8 @@
 package org.matsim.contrib.ev.strategic.replanning.innovator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -164,6 +166,16 @@ public class ConstrainedChargingPlanInnovator implements ChargingPlanInnovator {
             // copy
             List<Double> energy = new ArrayList<>(baselineEnergy);
             double endEnergy = baselineEndEnergy;
+
+            // sorting
+            List<ChargingPlanActivity> chargingActivities = new LinkedList<>();
+            chargingActivities.addAll(proposal.getChargingActivities());
+
+            Collections.sort(chargingActivities, Comparator.comparing(a -> {
+                return a.isEnroute() ? //
+                        startTimes.get(a.getFollowingActivityIndex() - 1) : //
+                        startTimes.get(a.getStartActivityIndex());
+            }));
 
             for (ChargingPlanActivity chargingActivity : proposal.getChargingActivities()) {
                 ChargerSpecification charger = infrastructure.getChargerSpecifications()
