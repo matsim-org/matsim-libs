@@ -26,6 +26,8 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +40,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
 
@@ -67,6 +70,11 @@ public final class RailResourceManager {
 
 	private final DeadlockAvoidance dla;
 	private final TrainManager trains;
+
+	/**
+	 * Cache for vMax maps to avoid creating duplicate instances when multiple links share the same vMax configuration.
+	 */
+	private final Map<Map<Id<VehicleType>, Double>, Object2DoubleMap<Id<VehicleType>>> vMaxCache = new HashMap<>();
 
 	@Inject
 	public RailResourceManager(QSim qsim, DeadlockAvoidance dla, TrainManager trainManager) {
@@ -111,7 +119,8 @@ public final class RailResourceManager {
 					}
 				}
 
-				RailLink link = new RailLink(e.getValue(), opposite, disallowedNextLinks);
+				Object2DoubleMap<Id<VehicleType>> vMax = getCachedVMax(e.getValue());
+				RailLink link = new RailLink(e.getValue(), opposite, vMax, disallowedNextLinks);
 
 				if (link.length <= 0)
 					throw new IllegalArgumentException("Link length must be greater than zero: " + link);
@@ -150,6 +159,29 @@ public final class RailResourceManager {
 			return Id.create(link.getId().toString(), RailResource.class);
 		else
 			return Id.create(id, RailResource.class);
+	}
+
+	/**
+	 * Get or create a cached vMax map for the given link.
+	 * This ensures that links with identical vMax configurations share the same map instance.
+	 */
+	private Object2DoubleMap<Id<VehicleType>> getCachedVMax(Link link) {
+		Map<Id<VehicleType>, Double> vMaxMap = RailsimUtils.getLinkVMax(link);
+		
+		// Return cached instance if available
+		Object2DoubleMap<Id<VehicleType>> cached = vMaxCache.get(vMaxMap);
+		if (cached != null) {
+			return cached;
+		}
+		
+		// Create new instance and cache it
+		Object2DoubleMap<Id<VehicleType>> newVMax = new Object2DoubleOpenHashMap<>();
+		for (Map.Entry<Id<VehicleType>, Double> entry : vMaxMap.entrySet()) {
+			newVMax.put(entry.getKey(), entry.getValue().doubleValue());
+		}
+		
+		vMaxCache.put(vMaxMap, newVMax);
+		return newVMax;
 	}
 
 	/**

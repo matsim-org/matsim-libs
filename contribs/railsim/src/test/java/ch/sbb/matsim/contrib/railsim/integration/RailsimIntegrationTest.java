@@ -703,6 +703,19 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 	}
 
+	@Test
+	void testVaryingVMax() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "varyingVMax"));
+
+		// Train 2 is slower on the infrastructure
+		assertThat(result)
+			.trainHasLastArrival("train1", 30000)
+			.trainHasLastArrival("train2", 30960)
+			.allTrainsArrived();
+
+	}
+
 	private void assertSingleTrainOnLink(List<Event> events, String linkId) {
 		assertSingleTrainOnLinks(events, List.of(linkId));
 	}
