@@ -692,7 +692,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
 
-	public static final String DELAY_INSTANT_TELEPORTATION_ARRIVALS = "delayInstantTeleportations";
+	public static final String DELAY_INSTANT_TELEPORTATION_ARRIVALS = "delayInstantTeleportationArrivals";
 	public boolean delayInstantTeleportationArrivals = true;
 
 	@StringGetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
