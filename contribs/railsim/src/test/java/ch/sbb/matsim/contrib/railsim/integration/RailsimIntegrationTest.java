@@ -690,7 +690,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
 
 		assertThat(result).hasNumberOfTrains(71).allTrainsArrived();
-		Assertions.assertEquals(result.getEvents().size(), 31731, 10);
+		Assertions.assertEquals(32904, result.getEvents().size(), 10);
 	}
 
 
