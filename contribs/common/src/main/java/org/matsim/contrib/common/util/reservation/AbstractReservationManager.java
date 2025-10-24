@@ -27,7 +27,7 @@ public abstract class AbstractReservationManager<
     public abstract int getCapacity(R resource);
 
     @Override
-    public final boolean isAvailable(R resource, C consumer, double startTime, double endTime) {
+    public boolean isAvailable(R resource, C consumer, double startTime, double endTime) {
         int capacity = getCapacity(resource);
         if (capacity == 0) {
             return false;

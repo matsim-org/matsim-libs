@@ -8,6 +8,9 @@ import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
 import org.matsim.contrib.ev.reservation.ChargerReservationModule;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder.TestScenario;
@@ -886,6 +889,12 @@ public class WithinDayEvTest {
 				/**/.addActivity("work", 8, 8, 18.0 * 3600.0) //
 				/**/.addActivity("home", 0, 0) //
 				.build();
+
+		ChargingInfrastructureSpecification infrastructure = (ChargingInfrastructureSpecification) scenario.scenario()
+				.getScenarioElement("infrastructure");
+		for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
+			ChargerReservability.setReservable(charger, true);
+		}
 
 		Controler controller = scenario.controller();
 		controller.addOverridingModule(new ChargerReservationModule());

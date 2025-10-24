@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.Nullable;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -29,6 +27,8 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
 import com.google.common.base.Verify;
+
+import jakarta.annotation.Nullable;
 
 /**
  * This is the ChargingAlternativeProvider of the strategic charging package.
