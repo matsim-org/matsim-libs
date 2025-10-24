@@ -1,7 +1,9 @@
 package org.matsim.contrib.ev.reservation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.matsim.api.core.v01.IdMap;
@@ -21,11 +23,33 @@ public class ChargerReservability {
         List<ReservableSlot> entry = slots.get(charger.getId());
 
         if (entry == null) {
-            entry = getReservableSlots(charger);
+            entry = new ArrayList<>(getReservableSlots(charger));
+            mergeSlots(entry);
             slots.put(charger.getId(), entry);
         }
 
         return entry;
+    }
+
+    static void mergeSlots(List<ReservableSlot> slots) {
+        Collections.sort(slots, Comparator.comparing(ReservableSlot::startTime).thenComparing(ReservableSlot::endTime));
+
+        int k = 1;
+        while (k < slots.size()) {
+            int previousIndex = k - 1;
+            int currentIndex = k;
+
+            ReservableSlot previousSlot = slots.get(previousIndex);
+            ReservableSlot currentSlot = slots.get(currentIndex);
+
+            if (currentSlot.startTime <= previousSlot.endTime) {
+                slots.set(previousIndex, new ReservableSlot(previousSlot.startTime, currentSlot.endTime));
+                slots.remove(currentIndex);
+                continue;
+            }
+
+            k++;
+        }
     }
 
     public boolean isReservable(ChargerSpecification charger, double startTime, double endTime) {
