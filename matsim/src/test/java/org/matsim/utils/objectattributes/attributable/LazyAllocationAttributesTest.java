@@ -26,13 +26,23 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-/**
- * @author thibautd
- */
 public class LazyAllocationAttributesTest {
+
+	private class LazyAllocationAttributesContainerClass implements Attributable {
+
+		Attributes attributes = null;
+
+		public Attributes getAttributes() {
+			if (attributes != null) {
+				return attributes;
+			}
+			return new LazyAllocationAttributes(attributes -> this.attributes = attributes, () -> this.attributes);
+		}
+	}
+
 	@Test
 	void testInsertion() {
-		final Attributes attributes = new AttributesImpl();
+		final Attributes attributes = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		attributes.putAttribute("sun", "nice");
 		attributes.putAttribute("rain is nice", false);
@@ -60,7 +70,7 @@ public class LazyAllocationAttributesTest {
 
 	@Test
 	void testReplacement() {
-		final Attributes attributes = new AttributesImpl();
+		final Attributes attributes = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		attributes.putAttribute("sun", "nice");
 		attributes.putAttribute("rain is nice", false);
@@ -81,7 +91,7 @@ public class LazyAllocationAttributesTest {
 
 	@Test
 	void testRemoval() {
-		final Attributes attributes = new AttributesImpl();
+		final Attributes attributes = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		attributes.putAttribute("sun", "nice");
 		attributes.putAttribute("rain is nice", false);
@@ -101,7 +111,7 @@ public class LazyAllocationAttributesTest {
 
 	@Test
 	void testGetAsMap() {
-		final Attributes attributes = new AttributesImpl();
+		final Attributes attributes = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		attributes.putAttribute("sun", "nice");
 		attributes.putAttribute("rain is nice", false);
@@ -150,8 +160,8 @@ public class LazyAllocationAttributesTest {
 	@Test
 	void testComparison() {
 
-		AttributesImpl a1 = new AttributesImpl();
-		AttributesImpl a2 = new AttributesImpl();
+		Attributes a1 = new LazyAllocationAttributesContainerClass().getAttributes();
+		Attributes a2 = new LazyAllocationAttributesContainerClass().getAttributes();
 		Assertions.assertTrue(AttributesComparison.equals(a1, a2));
 
 		a1.putAttribute("att1", "1");
@@ -168,8 +178,8 @@ public class LazyAllocationAttributesTest {
 	@Test
 	void testComplexComparisonMap() {
 
-		AttributesImpl a1 = new AttributesImpl();
-		AttributesImpl a2 = new AttributesImpl();
+		Attributes a1 = new LazyAllocationAttributesContainerClass().getAttributes();
+		Attributes a2 = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		Map<Object, Object> map = new HashMap<>();
 		a1.putAttribute("map", map);
@@ -208,8 +218,8 @@ public class LazyAllocationAttributesTest {
 	@Test
 	void testComplexComparisonList() {
 
-		AttributesImpl a1 = new AttributesImpl();
-		AttributesImpl a2 = new AttributesImpl();
+		Attributes a1 = new LazyAllocationAttributesContainerClass().getAttributes();
+		Attributes a2 = new LazyAllocationAttributesContainerClass().getAttributes();
 
 		List<Object> list = new ArrayList<>();
 		a1.putAttribute("list", list);
