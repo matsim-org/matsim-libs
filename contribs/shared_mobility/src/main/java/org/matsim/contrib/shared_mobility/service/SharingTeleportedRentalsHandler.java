@@ -34,7 +34,7 @@ public class SharingTeleportedRentalsHandler
 	@Override
 	public void handleEvent(SharingPickupEvent event) {
 
-		if (event.getServiceId().toString().equals(serviceParams.getId())) {
+		if (event.getServiceId().equals(serviceParams.getId())) {
 			pickups.put(event.getPersonId(), event);
 		}
 	}
@@ -50,21 +50,21 @@ public class SharingTeleportedRentalsHandler
 	@Override
 	public void handleEvent(SharingDropoffEvent event) {
 
-		if (event.getServiceId().toString().equals(serviceParams.getId())) {
+		if (event.getServiceId().equals(serviceParams.getId())) {
 			Verify.verify(this.distance.containsKey(event.getPersonId()));
 			// distance fare
-			double sharedDistanceFare = this.distance.get(event.getPersonId()) * this.serviceParams.getDistanceFare();
+			double sharedDistanceFare = this.distance.get(event.getPersonId()) * this.serviceParams.distanceFare;
 
 			// base fare
-			double sharedBaseFare = this.serviceParams.getBaseFare();
+			double sharedBaseFare = this.serviceParams.baseFare;
 
 			// time fare
 			double pickuptime = this.pickups.get(event.getPersonId()).getTime();
 			double rentalTime = event.getTime() - pickuptime;
-			double sharedTimeFare = rentalTime * serviceParams.getTimeFare();
+			double sharedTimeFare = rentalTime * serviceParams.timeFare;
 
 			// minimum fare
-			double minimumFare = serviceParams.getMinimumFare();
+			double minimumFare = serviceParams.minimumFare;
 
 			double sharedFare = Math.max(minimumFare, sharedBaseFare + sharedDistanceFare + sharedTimeFare);
 			eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -sharedFare, PERSON_MONEY_EVENT_PURPOSE_SHARING_FARE, event.getServiceId().toString(), null));

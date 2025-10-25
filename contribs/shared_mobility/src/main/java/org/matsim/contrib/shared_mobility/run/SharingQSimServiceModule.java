@@ -46,7 +46,7 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			SharingService service = getter.getModal(SharingService.class);
 
 			RoutingModule accessEgressRoutingModule = getter.getNamed(RoutingModule.class, TransportMode.walk);
-			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.getMode());
+			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.mode);
 
 			return new SharingLogic(service, accessEgressRoutingModule, mainModeRoutingModule, scenario, eventsManager,
 					timeInterpretation);
@@ -56,8 +56,8 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new FreefloatingService(Id.create(serviceConfig.getId(), SharingService.class),
-					specification.getVehicles(), network, serviceConfig.getMaximumAccessEgressDistance());
+			return new FreefloatingService(serviceConfig.getId(), specification.getVehicles(), network,
+							serviceConfig.maximumAccessEgressDistance);
 		})).in(Singleton.class);
 
 
@@ -74,11 +74,11 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new StationBasedService(Id.create(serviceConfig.getId(), SharingService.class), specification,
-					network, serviceConfig.getMaximumAccessEgressDistance());
+			return new StationBasedService(serviceConfig.getId(), specification, network,
+							serviceConfig.maximumAccessEgressDistance);
 		})).in(Singleton.class);
 
-		switch (serviceConfig.getServiceScheme()) {
+		switch (serviceConfig.serviceScheme) {
 		case Freefloating:
 			bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
 			break;
