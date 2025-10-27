@@ -885,6 +885,127 @@
   compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
 }
 
+# ==== CADC Segent wise comparison
+{
+  # Compare WLTP <-> CADC
+  # Low [0:589] <-> Urban [0:993]
+  # High [1023:1477] <-> Rural Roads [994:2075]
+  # Extra High  [1478:1800] <-> Motorway [2076:
+
+  WLTP_matsim <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_petrol_output_fixedIntervalLength_1.csv", delim=",") %>%
+    rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
+    pivot_longer(cols = c("CO-MATSIM",
+    "CO2-MATSIM",
+    "HC-MATSIM",
+    "PMx-MATSIM",
+    "NOx-MATSIM"), names_to="model", values_to="value") %>%
+    separate(model, c("component", "model"), "-")
+
+  WLTP_matsim.low <- WLTP_matsim %>%
+    filter(startTime < 589) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_matsim.high <- WLTP_matsim %>%
+    filter(startTime > 1023 & startTime < 1477) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_matsim.extra_high <- WLTP_matsim %>%
+    filter(startTime > 1478 & startTime < 1800) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_sumo <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_petrol_output_pl5.csv",
+                          delim = ";",
+                          col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                          col_types = cols(
+                            time = col_integer(),
+                            velocity = col_double(),
+                            acceleration = col_double(),
+                            slope = col_double(),
+                            CO = col_double(),
+                            CO2 = col_double(),
+                            HC = col_double(),
+                            PMx = col_double(),
+                            NOx = col_double(),
+                            fuel = col_double(),
+                            electricity = col_double())) %>%
+                          pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
+
+  WLTP_sumo.urban <- WLTP_sumo %>%
+    filter(time < 589) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_sumo.road <- WLTP_sumo %>%
+    filter(time > 1023 & time < 1477) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_sumo.motorway <- WLTP_sumo %>%
+    filter(time > 1478 & time < 1800) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  # CADC
+  CADC_matsim <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/diff/CADC/diff_petrol_output_fixedIntervalLength_1.csv", delim=",") %>%
+    rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
+    pivot_longer(cols = c("CO-MATSIM",
+                          "CO2-MATSIM",
+                          "HC-MATSIM",
+                          "PMx-MATSIM",
+                          "NOx-MATSIM"), names_to="model", values_to="value") %>%
+    separate(model, c("component", "model"), "-")
+
+  CADC_matsim.low <- WLTP_matsim %>%
+    filter(startTime < 589) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  CADC_matsim.high <- WLTP_matsim %>%
+    filter(startTime > 1023 & startTime < 1477) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  CADC_matsim.extra_high <- WLTP_matsim %>%
+    filter(startTime > 1478 & startTime < 1800) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  CADC_sumo <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv",
+                          delim = ";",
+                          col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                          col_types = cols(
+                            time = col_integer(),
+                            velocity = col_double(),
+                            acceleration = col_double(),
+                            slope = col_double(),
+                            CO = col_double(),
+                            CO2 = col_double(),
+                            HC = col_double(),
+                            PMx = col_double(),
+                            NOx = col_double(),
+                            fuel = col_double(),
+                            electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
+
+  CADC_sumo.urban <- WLTP_sumo %>%
+    filter(time < 589) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  CADC_sumo.road <- WLTP_sumo %>%
+    filter(time > 1023 & time < 1477) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  CADC_sumo.motorway <- WLTP_sumo %>%
+    filter(time > 1478 & time < 1800) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+}
+
 # ==== Scale WLTP-cycle ====
 {
   wltp <- read_delim(glue("{sumo_path}/sumo_input.csv"), col_names=c("time", "vel", "acc"), col_types=cols(time=col_integer(), vel=col_double(), acc=col_double()))
