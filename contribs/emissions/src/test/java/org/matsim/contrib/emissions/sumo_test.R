@@ -855,7 +855,7 @@
   # print(glue("WLTP_inv, St.dev. : {WLTP_inv.st_dev}; Mean vel: {WLTP_inv.mean_vel}; Mean acc: {WLTP.mean_acc}"))
 
   print(glue("WLTP: Low mean vel: {WLTP.low.mean_vel}; Medium mean vel: {WLTP.medium.mean_vel}; High mean vel: {WLTP.high.mean_vel}; Extra high mean vel: {WLTP.extra_high.mean_vel}"))
-  print(glue("CADC: Low mean vel: {CADC.low.mean_vel}; Medium mean vel: {CADC.medium.mean_vel}; High mean vel: {CADC.high.mean_vel}"))
+  print(glue("CADC: Low mean vel: {CADC.low.mean_vel}; Medium mean acc: --.--------------; High mean vel: {CADC.medium.mean_vel}; Extra high mean vel: {CADC.high.mean_vel}"))
   print(glue("WLTP_inv: Low mean vel: {WLTP_inv.low.mean_vel}; Medium mean vel: {WLTP_inv.medium.mean_vel}; High mean vel: {WLTP_inv.high.mean_vel}; Extra high mean vel: {WLTP_inv.extra_high.mean_vel}"))
 
   print(glue("WLTP: Low mean acc: {WLTP.low.mean_acc}; Medium mean acc: {WLTP.medium.mean_acc}; High mean acc: {WLTP.high.mean_acc}; Extra high mean acc: {WLTP.extra_high.mean_acc}"))
@@ -870,18 +870,102 @@
 # ==== CADC Test (using phem_lib)
 {
   #TODO init phem_lib
+  fuel <- "petrol"
 
   # WLTP
   plot_main()
-  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_petrol_output_pl5.csv") )
-  compute_emission_difference(glue("{diff_path}/diff_diesel_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_diesel_output_pl5.csv") )
+  compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_{fuel}_output_pl5.csv") )
+  compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_{fuel}_output_pl5.csv") )
 
   # CADC
-  plot_main(title = "Comparison across CADC-cycle for petrol", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv", fuel="petrol")
-  compute_emission_difference(glue("{diff_path}/diff_petrol_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_petrol_output_pl5.csv")
+  plot_main(title = glue("Comparison across CADC-cycle for {fuel}"), pl_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output.csv"), pl5_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"), fuel=fuel)
+  compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
 
-  plot_main(title = "Comparison across CADC-cycle for diesel", pl_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output.csv", pl5_data="/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output_pl5.csv", fuel="diesel")
-  compute_emission_difference(glue("{diff_path}/diff_diesel_output_fixedIntervalLength_60.csv"), "/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_diesel_output_pl5.csv")
+  plot_main(title = glue("Comparison across CADC-cycle for {fuel}"), pl_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output.csv"), pl5_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"), fuel=fuel)
+  compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
+}
+
+# ==== Scale WLTP-cycle ====
+{
+  wltp <- read_delim(glue("{sumo_path}/sumo_input.csv"), col_names=c("time", "vel", "acc"), col_types=cols(time=col_integer(), vel=col_double(), acc=col_double()))
+
+  scales <- c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
+
+  for (s in scales) {
+    wltp_scaled <- wltp %>%
+      mutate(time = s * time)
+
+    t_target <- seq(1, floor(max(wltp_scaled$time)))
+
+    vel_interp <- approx(wltp_scaled$time, wltp_scaled$vel, xout = t_target)$y
+
+    assign(
+      glue("wltp{s}"),
+      tibble(
+        time = t_target,
+        vel = vel_interp,
+        acc = 0
+      )
+    )
+
+    write_delim(get(glue("wltp{s}")), glue("/Users/aleksander/Documents/VSP/PHEMTest/scaled/wltp{s}.csv"), delim=";", col_names = FALSE)
+  }
+}
+
+# ==== Compare the scaled WLTP segments ====
+{
+  fuel <- "petrol"
+
+  # Define scales
+  scales <- c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
+  input_dir <- "/Users/aleksander/Documents/VSP/PHEMTest/scaled"
+
+  # Create empty lists to store results
+  avg_vel_list <- list()
+  avg_acc_list <- list()
+  emissions_list <- list()
+
+  for (s in scales) {
+    # Build file path
+    file_path <- file.path(input_dir, paste0("sumo_petrol_", s, "_output.csv"))
+
+    # Read the file
+    sumo_output <- read_delim(
+      file_path,
+      delim = ";",
+      col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+      col_types = cols(
+        time = col_integer(),
+        velocity = col_double(),
+        acceleration = col_double(),
+        slope = col_double(),
+        CO = col_double(),
+        CO2 = col_double(),
+        HC = col_double(),
+        PMx = col_double(),
+        NOx = col_double(),
+        fuel = col_double(),
+        electricity = col_double()
+      )
+    )
+
+    avg_vel_list[[as.character(s)]] <- mean(sumo_output$velocity)
+    avg_acc_list[[as.character(s)]] <- mean(sumo_output$acceleration[sumo_output$acceleration > 0])
+
+    emissions_list[[as.character(s)]] <- sumo_output %>%
+      pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+      group_by(component) %>%
+      summarize(value = sum(value)/1000) %>%
+      mutate(avg_acc = avg_acc_list[[as.character(s)]], avg_vel = avg_vel_list[[as.character(s)]], scale = s, )
+  }
+
+  emissions_all <- bind_rows(emissions_list)
+
+  # Compute the sum for MATSim values
+  r <- read_matsim(glue("{diff_path}/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), "")
+  emissions_matsim <- r[[1]] %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
 }
 
 # ==== Plot CADCs ====
