@@ -141,9 +141,6 @@ public final class PopulationAgentSource implements AgentSource {
 
 			// if we are here, we haven't seen the mode before in this plan
 
-			// now memorizing mode and its vehicle ID:
-			seenModes.put(leg.getMode(),vehicleId);
-
 			// find the vehicle from the vehicles container.  It should be there, see automatic vehicle creation in PrepareForSim.
 			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 			if ( vehicle==null ) {
@@ -163,6 +160,18 @@ public final class PopulationAgentSource implements AgentSource {
 				}
 				throw new RuntimeException( msg ) ;
 			}
+
+			if (!(VehicleUtils.hasVehicleId(person, leg.getMode()) && VehicleUtils.getVehicleId(person, leg.getMode()).equals(vehicleId))) {
+				// This is a routing-only vehicle, which is not actually picked up by any agent
+				// and is required for WithinDay-functionality and (possibly shared) vehicles,
+				// that are not assigned exclusively to persons. It is replaced by a real
+				// vehicle when the agent actually starts its trip e.g,
+				// SharingEngine>SharingLogic in shared_mobility. hrewald, oct'25
+				continue; // do not place it in the simulation
+			}
+
+			// now memorizing mode and its vehicle ID:
+			seenModes.put(leg.getMode(), vehicleId);
 
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person, vehicle);
