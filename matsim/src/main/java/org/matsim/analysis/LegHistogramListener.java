@@ -67,6 +67,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 					LegHistogramChart.writeGraphic(this.histogram, controllerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
 				}
 			}
+			event.getServices().getEvents().removeHandler(this.histogram);
 		}
 	}
 
