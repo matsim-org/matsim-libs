@@ -12,7 +12,7 @@
 	<name>vsp</name>
 
 	<properties>
-		<javafx.version>23.0.2</javafx.version>
+		<javafx.version>26-ea+13</javafx.version>
 	</properties>
 
 	<repositories>
