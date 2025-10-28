@@ -57,8 +57,8 @@ public class SharingConfigGroup extends ReflectiveConfigGroup {
 
 			// Some warnings
 
-			if (serviceConfig.serviceScheme.equals(ServiceScheme.StationBased)
-					&& serviceConfig.serviceAreaShapeFile != null) {
+			if (serviceConfig.getServiceScheme().equals(ServiceScheme.StationBased)
+					&& serviceConfig.getServiceAreaShapeFile() != null) {
 				logger.warn("Service " + serviceConfig.getId()
 						+ " is station-based, so service area file will not be used!");
 			}

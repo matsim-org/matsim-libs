@@ -11,13 +11,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
-import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEventHandler;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEventHandler;
@@ -43,7 +41,6 @@ public class RunIT {
 	final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
-
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
 		config.controller().setLastIteration(2);
 
@@ -60,16 +57,16 @@ public class RunIT {
 		serviceConfig.setIdFromString("mobility");
 
 		// ... with freefloating characteristics
-		serviceConfig.maximumAccessEgressDistance = 100000;
-		serviceConfig.serviceScheme = ServiceScheme.StationBased;
-		serviceConfig.serviceAreaShapeFile = null;
+		serviceConfig.setMaximumAccessEgressDistance(100000);
+		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
+		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_mobility = RunIT.class.getResource("shared_vehicles_mobility.xml");
-		serviceConfig.serviceInputFile = vehiclesUrl_mobility.toURI().getPath();
+		serviceConfig.setServiceInputFile(vehiclesUrl_mobility.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfig.mode = "car";
+		serviceConfig.setMode("car");
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -84,16 +81,16 @@ public class RunIT {
 		serviceConfigBike.setIdFromString("velib");
 
 		// ... with freefloating characteristics
-		serviceConfigBike.maximumAccessEgressDistance = 100000;
-		serviceConfigBike.serviceScheme = ServiceScheme.StationBased;
-		serviceConfigBike.serviceAreaShapeFile = null;
+		serviceConfigBike.setMaximumAccessEgressDistance(100000);
+		serviceConfigBike.setServiceScheme(ServiceScheme.StationBased);
+		serviceConfigBike.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_velib = RunIT.class.getResource("shared_vehicles_velib.xml");
-		serviceConfigBike.serviceInputFile = vehiclesUrl_velib.toURI().getPath();
+		serviceConfigBike.setServiceInputFile(vehiclesUrl_velib.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfigBike.mode = "bike";
+		serviceConfigBike.setMode("bike");
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -108,16 +105,16 @@ public class RunIT {
 		serviceConfigBikeFF.setIdFromString("wheels");
 
 		// ... with freefloating characteristics
-		serviceConfigBikeFF.maximumAccessEgressDistance = 100000;
-		serviceConfigBikeFF.serviceScheme = ServiceScheme.Freefloating;
-		serviceConfigBikeFF.serviceAreaShapeFile = null;
+		serviceConfigBikeFF.setMaximumAccessEgressDistance(100000);
+		serviceConfigBikeFF.setServiceScheme(ServiceScheme.Freefloating);
+		serviceConfigBikeFF.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_wheels = RunIT.class.getResource("shared_vehicles_wheels.xml");
-		serviceConfigBikeFF.serviceInputFile = vehiclesUrl_wheels.toURI().getPath();
+		serviceConfigBikeFF.setServiceInputFile(vehiclesUrl_wheels.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfigBikeFF.mode = "bike";
+		serviceConfigBikeFF.setMode("bike");
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -172,9 +169,9 @@ public class RunIT {
 		Assertions.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
 		Assertions.assertEquals(10, (long) data.dropoffCounts.get("velib"));
 
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib",0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels", 0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility", 0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib", 0L));
 
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));
