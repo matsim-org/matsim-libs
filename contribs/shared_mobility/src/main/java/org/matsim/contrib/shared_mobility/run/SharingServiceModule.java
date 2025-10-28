@@ -48,20 +48,20 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		bindModal(SharingServiceSpecification.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = new DefaultSharingServiceSpecification();
 			new SharingServiceReader(specification).readURL(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), serviceConfig.serviceInputFile));
+					ConfigGroup.getInputFileURL(getConfig().getContext(), serviceConfig.getServiceInputFile()));
 			return specification;
 		})).in(Singleton.class);
 
 		bindModal(SharingRoutingModule.class).toProvider(modalProvider(getter -> {
 			Scenario scenario = getter.get(Scenario.class);
 			RoutingModule accessEgressRoutingModule = getter.getNamed(RoutingModule.class, TransportMode.walk);
-			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.mode);
+			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.getMode());
 
 			InteractionFinder interactionFinder = getter.getModal(InteractionFinder.class);
 			TimeInterpretation timeInterpretation = getter.get(TimeInterpretation.class);
 
 			return new SharingRoutingModule(scenario, accessEgressRoutingModule, mainModeRoutingModule,
-					interactionFinder, serviceConfig.getId(), timeInterpretation);
+					interactionFinder, Id.create(serviceConfig.getId(), SharingService.class), timeInterpretation);
 		}));
 
 		addRoutingModuleBinding(getMode()).to(modalKey(SharingRoutingModule.class));
@@ -76,14 +76,15 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
 			return new StationBasedInteractionFinder(network, specification,
-					serviceConfig.maximumAccessEgressDistance);
+					serviceConfig.getMaximumAccessEgressDistance());
 		}));
 
 		bindModal(OutputWriter.class).toProvider(modalProvider(getter -> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			OutputDirectoryHierarchy outputHierarchy = getter.get(OutputDirectoryHierarchy.class);
 
-			return new OutputWriter(serviceConfig.getId(), specification, outputHierarchy);
+			return new OutputWriter(serviceConfig.getId(), specification,
+					outputHierarchy);
 		})).in(Singleton.class);
 
 		addControllerListenerBinding().to(modalKey(OutputWriter.class));
@@ -100,7 +101,8 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 			SharingServiceValidator validator = getter.getModal(SharingServiceValidator.class);
 
-			return new ValidationListener(serviceConfig.getId(), validator, specification);
+			return new ValidationListener(serviceConfig.getId(), validator,
+					specification);
 		}));
 
 		addControllerListenerBinding().to(modalKey(ValidationListener.class));
@@ -113,12 +115,11 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 		addEventHandlerBinding().to(modalKey(VehicleStateCollector.class));
 		addControllerListenerBinding().to(modalKey(VehicleStateCollector.class));
 
-
 		// based on the underlying mode and how it is simulated
 		// teleported/network we need to bind different rental handler
 
 		if (((QSimConfigGroup) getConfig().getModules().get(QSimConfigGroup.GROUP_NAME)).getMainModes()
-				.contains(serviceConfig.mode)) {
+				.contains(serviceConfig.getMode())) {
 			addEventHandlerBinding().toProvider(modalProvider(getter -> {
 				EventsManager eventsManager = getter.get(EventsManager.class);
 				Network network = getter.get(Network.class);
@@ -132,7 +133,7 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			}));
 		}
 
-		switch (serviceConfig.serviceScheme) {
+		switch (serviceConfig.getServiceScheme()) {
 			case Freefloating:
 				bindModal(InteractionFinder.class).to(modalKey(FreefloatingInteractionFinder.class));
 				bindModal(SharingServiceValidator.class).to(modalKey(FreefloatingServiceValidator.class));

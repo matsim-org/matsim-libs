@@ -35,53 +35,61 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("Input file defining vehicles and stations")
 	@NotNull
-	public String serviceInputFile;
+	private String serviceInputFile;
 
 	@NotNull
 	private Id<SharingService> id;
 
 	@Parameter
 	@NotNull
-	public ServiceScheme serviceScheme;
+	private ServiceScheme serviceScheme;
 
 	@Parameter
 	@Comment("Shape file defining the service area")
-	public String serviceAreaShapeFile;
+	private String serviceAreaShapeFile;
 
 	@Parameter
 	@Comment("Defines the underlying mode of the service")
 	@NotNull
-	public String mode;
+	private String mode;
 
 	@Parameter
 	@Comment("Maximum distance to a bike or station")
 	@Positive
-	public double maximumAccessEgressDistance = 1000;
+	private double maximumAccessEgressDistance = 1000;
 
 	@Parameter
 	@Comment("Time [second] fare")
 	@Nonnegative
-	public double timeFare = 0.0;
+	private double timeFare = 0.0;
 
 	@Parameter
 	@Comment("Distance [meter] fare")
 	@Nonnegative
-	public double distanceFare = 0.0;
+	private double distanceFare = 0.0;
 
 	@Parameter
 	@Comment("Base fare")
 	@Nonnegative
-	public double baseFare = 0.0;
+	private double baseFare = 0.0;
 
 	@Parameter
 	@Comment("Minimum fare per rental")
 	@Nonnegative
-	public double minimumFare = 0.0;
+	private double minimumFare = 0.0;
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
+	}
+
+	public String getServiceInputFile() {
+		return serviceInputFile;
+	}
+
+	public void setServiceInputFile(String serviceInputFile) {
+		this.serviceInputFile = serviceInputFile;
 	}
 
 	public Id<SharingService> getId() {
@@ -90,6 +98,70 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 
 	public void setId(Id<SharingService> serviceId) {
 		id = serviceId;
+	}
+
+	public ServiceScheme getServiceScheme() {
+		return serviceScheme;
+	}
+
+	public void setServiceScheme(ServiceScheme serviceScheme) {
+		this.serviceScheme = serviceScheme;
+	}
+
+	public String getServiceAreaShapeFile() {
+		return serviceAreaShapeFile;
+	}
+
+	public void setServiceAreaShapeFile(String serviceAreaShapeFile) {
+		this.serviceAreaShapeFile = serviceAreaShapeFile;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public double getMaximumAccessEgressDistance() {
+		return maximumAccessEgressDistance;
+	}
+
+	public void setMaximumAccessEgressDistance(double maximumAccessEgressDistance) {
+		this.maximumAccessEgressDistance = maximumAccessEgressDistance;
+	}
+
+	public double getTimeFare() {
+		return timeFare;
+	}
+
+	public void setTimeFare(double timeFare) {
+		this.timeFare = timeFare;
+	}
+
+	public double getDistanceFare() {
+		return distanceFare;
+	}
+
+	public void setDistanceFare(double distanceFare) {
+		this.distanceFare = distanceFare;
+	}
+
+	public double getBaseFare() {
+		return baseFare;
+	}
+
+	public void setBaseFare(double baseFare) {
+		this.baseFare = baseFare;
+	}
+
+	public double getMinimumFare() {
+		return minimumFare;
+	}
+
+	public void setMinimumFare(double minimumFare) {
+		this.minimumFare = minimumFare;
 	}
 
 	@StringGetter(ID)

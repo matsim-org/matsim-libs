@@ -61,16 +61,17 @@ public class RunTeleportationBikesharing {
 		serviceConfig.setIdFromString("velib");
 
 		// ... with freefloating characteristics
-		serviceConfig.maximumAccessEgressDistance = 100000;
-		serviceConfig.serviceScheme = ServiceScheme.StationBased;
-		serviceConfig.serviceAreaShapeFile = null;
+		serviceConfig.setMaximumAccessEgressDistance(100000);
+		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
+		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		// the following file is an example and it works with the siouxfalls-2014 scenario
-		serviceConfig.serviceInputFile = "shared_taxi_vehicles_stations.xml";
+		// the following file is an example and it works with the siouxfalls-2014
+		// scenario
+		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
 
 		// ... and, we need to define the underlying mode, here "bike".
-		serviceConfig.mode = "bike";
+		serviceConfig.setMode("bike");
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.

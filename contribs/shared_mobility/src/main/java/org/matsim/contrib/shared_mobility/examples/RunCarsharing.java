@@ -18,6 +18,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
+
 /**
  *
  * This is an example of a station-based oneway car-sharing service
@@ -44,15 +45,15 @@ public class RunCarsharing {
 		serviceConfig.setIdFromString("mobility");
 
 		// ... with freefloating characteristics
-		serviceConfig.maximumAccessEgressDistance = 100000;
-		serviceConfig.serviceScheme = ServiceScheme.StationBased;
-		serviceConfig.serviceAreaShapeFile = null;
+		serviceConfig.setMaximumAccessEgressDistance(100000);
+		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
+		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		serviceConfig.serviceInputFile = "shared_taxi_vehicles_stations.xml";
+		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfig.mode = "car";
+		serviceConfig.setMode("car");
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.

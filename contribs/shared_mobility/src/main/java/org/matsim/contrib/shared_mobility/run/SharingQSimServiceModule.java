@@ -46,7 +46,7 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			SharingService service = getter.getModal(SharingService.class);
 
 			RoutingModule accessEgressRoutingModule = getter.getNamed(RoutingModule.class, TransportMode.walk);
-			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.mode);
+			RoutingModule mainModeRoutingModule = getter.getNamed(RoutingModule.class, serviceConfig.getMode());
 
 			return new SharingLogic(service, accessEgressRoutingModule, mainModeRoutingModule, scenario, eventsManager,
 					timeInterpretation);
@@ -57,9 +57,8 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
 			return new FreefloatingService(serviceConfig.getId(), specification.getVehicles(), network,
-							serviceConfig.maximumAccessEgressDistance);
+					serviceConfig.getMaximumAccessEgressDistance());
 		})).in(Singleton.class);
-
 
 		addModalComponent(AgentSource.class, modalProvider(getter -> {
 
@@ -75,18 +74,18 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
 			return new StationBasedService(serviceConfig.getId(), specification, network,
-							serviceConfig.maximumAccessEgressDistance);
+					serviceConfig.getMaximumAccessEgressDistance());
 		})).in(Singleton.class);
 
-		switch (serviceConfig.serviceScheme) {
-		case Freefloating:
-			bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
-			break;
-		case StationBased:
-			bindModal(SharingService.class).to(modalKey(StationBasedService.class));
-			break;
-		default:
-			throw new IllegalStateException();
+		switch (serviceConfig.getServiceScheme()) {
+			case Freefloating:
+				bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
+				break;
+			case StationBased:
+				bindModal(SharingService.class).to(modalKey(StationBasedService.class));
+				break;
+			default:
+				throw new IllegalStateException();
 		}
 	}
 }
