@@ -22,14 +22,16 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
     private final double latestDepartureTime;
 
     private final DvrpLoad emptyLoad;
+    private final DvrpLoad outgoingOccupancy;
 
 
-    public ShiftBreakStopWaypoint(ShiftBreakTask shiftBreakTask, DvrpLoadType loadType) {
+    public ShiftBreakStopWaypoint(ShiftBreakTask shiftBreakTask, DvrpLoadType loadType, DvrpLoad outgoingOccupancy) {
         this.shiftBreakTask = shiftBreakTask;
         this.earliestArrivalTime = calcEarliestArrivalTime();
         this.latestArrivalTime = calcLatestArrivalTime();
         this.latestDepartureTime = calcLatestDepartureTime();
         this.emptyLoad = loadType.getEmptyLoad();
+        this.outgoingOccupancy = outgoingOccupancy;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
 
     @Override
     public DvrpLoad getOutgoingOccupancy() {
-        return emptyLoad;
+        return outgoingOccupancy;
     }
 
     private double calcEarliestArrivalTime() {

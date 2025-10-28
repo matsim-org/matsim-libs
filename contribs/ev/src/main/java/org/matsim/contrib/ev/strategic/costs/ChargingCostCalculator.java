@@ -10,7 +10,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public interface ChargingCostCalculator {
-	double calculateChargingCost(Id<Person> personId, Id<Charger> charger, double duration,
+	double calculateChargingCost(Id<Person> personId, Id<Charger> charger, double startTime, double duration,
 			double energy);
 
 	double calculateReservationCost(Id<Person> personId, Id<Charger> charger, double duration);

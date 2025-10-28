@@ -435,7 +435,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		Id<Person> personId = getPerson(event.getVehicleId());
 
 		if (personId != null) {
-			double cost = costCalculator.calculateChargingCost(personId, event.getChargerId(), duration, energy);
+			double cost = costCalculator.calculateChargingCost(personId, event.getChargerId(), start.time, duration,
+					energy);
 			addScoreForVehicle(event.getVehicleId(), cost * parameters.getCost());
 			trackScoreForVehicle(event.getTime(), event.getVehicleId(), "cost", cost * parameters.getCost(), cost);
 

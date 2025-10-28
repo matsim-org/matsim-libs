@@ -10,7 +10,7 @@
     <name>protobuf</name>
 
     <properties>
-        <protobuf.version>4.32.1</protobuf.version>
+        <protobuf.version>4.33.0</protobuf.version>
     </properties>
 
     <dependencies>
@@ -24,6 +24,12 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

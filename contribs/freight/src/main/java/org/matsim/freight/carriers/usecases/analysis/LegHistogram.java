@@ -21,7 +21,7 @@
 
 package org.matsim.freight.carriers.usecases.analysis;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;

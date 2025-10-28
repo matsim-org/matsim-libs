@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+
+	<networkChangeEvent startTime="08:05:00">
+		<link refId="A1"/>
+		<link refId="A2"/>
+		<link refId="A3"/>
+		<link refId="A4"/>
+		<link refId="B1"/>
+		<link refId="B2"/>
+		<link refId="B3"/>
+		<link refId="B4"/>
+
+		<freespeed type="absolute" value="3"/>
+	</networkChangeEvent>
+
+
+	<networkChangeEvent startTime="08:35:00">
+		<link refId="A1"/>
+		<link refId="A2"/>
+		<link refId="A3"/>
+		<link refId="A4"/>
+		<link refId="B1"/>
+		<link refId="B2"/>
+		<link refId="B3"/>
+		<link refId="B4"/>
+
+		<freespeed type="absolute" value="20"/>
+	</networkChangeEvent>
+
+
+</networkChangeEvents>

@@ -11,11 +11,13 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEventHandler;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEventHandler;
@@ -55,19 +57,19 @@ public class RunIT {
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.setId("mobility");
+		serviceConfig.setIdFromString("mobility");
 
 		// ... with freefloating characteristics
-		serviceConfig.setMaximumAccessEgressDistance(100000);
-		serviceConfig.setServiceScheme(ServiceScheme.StationBased);
-		serviceConfig.setServiceAreaShapeFile(null);
+		serviceConfig.maximumAccessEgressDistance = 100000;
+		serviceConfig.serviceScheme = ServiceScheme.StationBased;
+		serviceConfig.serviceAreaShapeFile = null;
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_mobility = RunIT.class.getResource("shared_vehicles_mobility.xml");
-		serviceConfig.setServiceInputFile(vehiclesUrl_mobility.toURI().getPath());
+		serviceConfig.serviceInputFile = vehiclesUrl_mobility.toURI().getPath();
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfig.setMode("car");
+		serviceConfig.mode = "car";
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -79,19 +81,19 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBike);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBike.setId("velib");
+		serviceConfigBike.setIdFromString("velib");
 
 		// ... with freefloating characteristics
-		serviceConfigBike.setMaximumAccessEgressDistance(100000);
-		serviceConfigBike.setServiceScheme(ServiceScheme.StationBased);
-		serviceConfigBike.setServiceAreaShapeFile(null);
+		serviceConfigBike.maximumAccessEgressDistance = 100000;
+		serviceConfigBike.serviceScheme = ServiceScheme.StationBased;
+		serviceConfigBike.serviceAreaShapeFile = null;
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_velib = RunIT.class.getResource("shared_vehicles_velib.xml");
-		serviceConfigBike.setServiceInputFile(vehiclesUrl_velib.toURI().getPath());
+		serviceConfigBike.serviceInputFile = vehiclesUrl_velib.toURI().getPath();
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfigBike.setMode("bike");
+		serviceConfigBike.mode = "bike";
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.
@@ -103,19 +105,19 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBikeFF);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBikeFF.setId("wheels");
+		serviceConfigBikeFF.setIdFromString("wheels");
 
 		// ... with freefloating characteristics
-		serviceConfigBikeFF.setMaximumAccessEgressDistance(100000);
-		serviceConfigBikeFF.setServiceScheme(ServiceScheme.Freefloating);
-		serviceConfigBikeFF.setServiceAreaShapeFile(null);
+		serviceConfigBikeFF.maximumAccessEgressDistance = 100000;
+		serviceConfigBikeFF.serviceScheme = ServiceScheme.Freefloating;
+		serviceConfigBikeFF.serviceAreaShapeFile = null;
 
 		// ... with a number of available vehicles and their initial locations
 		URL vehiclesUrl_wheels = RunIT.class.getResource("shared_vehicles_wheels.xml");
-		serviceConfigBikeFF.setServiceInputFile(vehiclesUrl_wheels.toURI().getPath());
+		serviceConfigBikeFF.serviceInputFile = vehiclesUrl_wheels.toURI().getPath();
 
 		// ... and, we need to define the underlying mode, here "car".
-		serviceConfigBikeFF.setMode("bike");
+		serviceConfigBikeFF.mode = "bike";
 
 		// Finally, we need to make sure that the service mode (sharing:velib) is
 		// considered in mode choice.

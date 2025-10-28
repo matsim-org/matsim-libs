@@ -217,7 +217,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 	static PreplannedRequest createFromRequest(DrtRequest request) {
 		return new PreplannedRequest(new PreplannedRequestKey(Set.copyOf(request.getPassengerIds()), request.getFromLink().getId(),
 				request.getToLink().getId()), request.getEarliestStartTime(), request.getLatestStartTime(),
-				request.getConstraints().latestArrivalTime());
+				request.getLatestArrivalTime());
 	}
 
 	// sequence of preplanned tasks is the output from the external optimiser and the input to the drt simulation

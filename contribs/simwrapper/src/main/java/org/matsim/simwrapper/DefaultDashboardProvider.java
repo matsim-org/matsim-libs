@@ -55,4 +55,9 @@ public class DefaultDashboardProvider implements DashboardProvider {
 	public double priority() {
 		return -1;
 	}
+
+	@Override
+	public boolean isDefault() {
+		return true;
+	}
 }

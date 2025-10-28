@@ -29,7 +29,7 @@ import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Set;
 
 class NewControler extends AbstractController implements ControlerI {

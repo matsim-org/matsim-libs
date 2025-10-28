@@ -12,6 +12,7 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.strategic.access.SubscriptionRegistry;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
 import org.matsim.contrib.ev.strategic.costs.AttributeBasedChargingCostCalculator;
+import org.matsim.contrib.ev.strategic.costs.DynamicEnergyCosts;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
@@ -89,20 +90,37 @@ public class StrategicChargingUtils {
      * Sets the cost structure for the charger.
      */
     static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
-            double costPerDuration_kWh) {
-        AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
-                costPerDuration_kWh);
+            double costPerDuration_min) {
+        AttributeBasedChargingCostCalculator.setCostPerUse(charger, costPerUse);
+        AttributeBasedChargingCostCalculator.setCostPerEnergy_kWh(charger, costPerEnergy_kWh);
+        AttributeBasedChargingCostCalculator.setCostPerDuration_min(charger, costPerDuration_min);
     }
 
     /**
-     * Sets the cost structure for the charger. The blocking costs are charged
-     * additionally for any duration that exceeds the blocking duration.
+     * Sets the cost structure for the charger.
      */
     static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
             double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min,
             double costPerReservation) {
         AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
                 costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min, costPerReservation);
+    }
+
+    /**
+     * The blocking costs are charged
+     * additionally for any duration that exceeds the blocking duration.
+     */
+    static public void setBlockingCosts(ChargerSpecification charger, double costPerBlockingDuration_min,
+            double blockingDuration_min) {
+        AttributeBasedChargingCostCalculator.setCostPerBlockingDuration_min(charger, costPerBlockingDuration_min);
+        AttributeBasedChargingCostCalculator.setBlockingDuration_min(charger, blockingDuration_min);
+    }
+
+    /**
+     * The dynamic costs are added to the base costs of the charger.
+     */
+    static public void setDynamicCosts(ChargerSpecification charger, DynamicEnergyCosts dynamicCosts) {
+        AttributeBasedChargingCostCalculator.setDynamicEnergyCost_kWh(charger, dynamicCosts);
     }
 
     /**
