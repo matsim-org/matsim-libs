@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
@@ -26,10 +27,10 @@ import org.matsim.contrib.shared_mobility.service.events.SharingFailedPickupEven
 import org.matsim.contrib.shared_mobility.service.events.SharingPickupEventHandler;
 import org.matsim.contrib.shared_mobility.service.events.SharingVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.CommandLine.ConfigurationException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
@@ -38,18 +39,154 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.common.base.Verify;
 
 public class RunIT {
 
 	@Test
-	final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
+	final void testFromVehiclesData() throws UncheckedIOException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
+		config.controller().setOutputDirectory(config.controller().getOutputDirectory() + "/testFromVehiclesData");
+		config.controller().setLastIteration(2);
+
+		// Do not create vehicles automatically
+		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		// We need to add the sharing config group
+		SharingConfigGroup sharingConfig = new SharingConfigGroup();
+		config.addModule(sharingConfig);
+
+		// --------------------------------------------------------------------
+
+		SharingServiceConfigGroup serviceConfigScooter = new SharingServiceConfigGroup();
+		sharingConfig.addService(serviceConfigScooter);
+
+		// ... with a service id. The respective mode will be "sharing:velib".
+		serviceConfigScooter.setIdFromString("scooter");
+		serviceConfigScooter.setVehicleTypeIdFromString("sharedScooter");
+
+		// ... with freefloating characteristics
+		serviceConfigScooter.setMaximumAccessEgressDistance(100000);
+		serviceConfigScooter.setServiceScheme(ServiceScheme.Freefloating);
+		serviceConfigScooter.setServiceAreaShapeFile(null);
+
+		// ... with a number of available vehicles and their initial locations
+		URL vehiclesUrl_scooter = RunIT.class.getResource("shared_vehicles_scooter.xml");
+		serviceConfigScooter.setServiceInputFile(vehiclesUrl_scooter.toURI().getPath());
+
+		// ... and, we need to define the underlying mode, here "car".
+		serviceConfigScooter.setMode("eScooter");
+		Set<String> routingModes = new HashSet<>(config.routing().getNetworkModes());
+		routingModes.add(serviceConfigScooter.getMode());
+		config.routing().setNetworkModes(routingModes);
+		Verify.verify(config.routing().getNetworkModes().contains(serviceConfigScooter.getMode())); // routed
+		Set<String> qsimModes = new HashSet<>(config.qsim().getMainModes());
+		qsimModes.add(serviceConfigScooter.getMode());
+		config.qsim().setMainModes(qsimModes);
+		Verify.verify(config.qsim().getMainModes().contains(serviceConfigScooter.getMode())); // simulated
+
+		// Finally, we need to make sure that the service mode (sharing:velib) is
+		// considered in mode choice.
+		List<String> modes = new ArrayList<>(Arrays.asList(config.subtourModeChoice().getModes()));
+		modes.add(SharingUtils.getServiceMode(serviceConfigScooter));
+		config.subtourModeChoice().setModes(modes.toArray(new String[modes.size()]));
+
+		// --------------------------------------------------------------------
+
+		// We need to add interaction activity types to scoring
+		ActivityParams pickupParams = new ActivityParams(SharingUtils.PICKUP_ACTIVITY);
+		pickupParams.setScoringThisActivityAtAll(false);
+		config.scoring().addActivityParams(pickupParams);
+
+		ActivityParams dropoffParams = new ActivityParams(SharingUtils.DROPOFF_ACTIVITY);
+		dropoffParams.setScoringThisActivityAtAll(false);
+		config.scoring().addActivityParams(dropoffParams);
+
+		ActivityParams bookingParams = new ActivityParams(SharingUtils.BOOKING_ACTIVITY);
+		bookingParams.setScoringThisActivityAtAll(false);
+		config.scoring().addActivityParams(bookingParams);
+
+		// We need to score eScooter (scooter)
+		ModeParams eScooterScoringParams = new ModeParams(serviceConfigScooter.getMode());
+		config.scoring().addModeParams(eScooterScoringParams);
+
+		// --------------------------------------------------------------------
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// Do not create vehicles automatically
+		Vehicles vehicles = scenario.getVehicles();
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
+		vehicles.addVehicleType(vehicleType);
+		scenario.getPopulation().getPersons().values().stream()
+				.forEach(person -> {
+					Vehicle vehicle = vehicles.getFactory()
+							.createVehicle(Id.createVehicleId(person.getId()), vehicleType);
+					vehicles.addVehicle(vehicle);
+					VehicleUtils.insertVehicleIdsIntoPersonAttributes(person, Map.of("car", vehicle.getId()));
+				});
+
+		// --------------------------------------------------------------------
+
+		// 1) add sharedScooter vehicleType for routing and simulating "scooter" on
+		// network
+		VehicleType sharedScooterType = VehicleUtils.createVehicleType(serviceConfigScooter.getVehicleTypeId());
+		sharedScooterType.setNetworkMode(serviceConfigScooter.getMode());
+		sharedScooterType.setMaximumVelocity(22 / 3.6);
+		scenario.getVehicles().addVehicleType(sharedScooterType);
+		// 2) add serviceConfig.mode as an allowedMode on the network
+		scenario.getNetwork().getLinks().values().stream()
+				.filter(link -> link.getAllowedModes().contains("car")) // same as car
+				.forEach(link -> {
+					Set<String> allowedModes = new HashSet<>(link.getAllowedModes());
+					allowedModes.add(sharedScooterType.getNetworkMode());
+					link.setAllowedModes(allowedModes);
+				});
+
+		// --------------------------------------------------------------------
+
+		// Set up controller
+		Controler controller = new Controler(scenario);
+
+		// Does not really "override" anything
+		controller.addOverridingModule(new SharingModule());
+		// Enable QSim components
+		controller.configureQSimComponents(SharingUtils.configureQSim(sharingConfig));
+
+		controller.run();
+
+		OutputData data = countLegs(controller.getControllerIO().getOutputPath() + "/output_events.xml.gz");
+
+		Assertions.assertEquals(115802, (long) data.counts.get("car"));
+		Assertions.assertEquals(243273, (long) data.counts.get("walk"));
+		Assertions.assertEquals(34897, (long) data.counts.get("pt"));
+		Assertions.assertEquals(7, (long) data.counts.get("eScooter"));
+
+		Assertions.assertEquals(7, (long) data.pickupCounts.get("scooter"));
+
+		Assertions.assertEquals(5, (long) data.dropoffCounts.get("scooter"));
+
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("scooter", 0L));
+
+		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("scooter", 0L));
+
+		Assertions.assertEquals(2, (long) data.vehicleCounts.get("scooter"));
+	}
+
+	@Test
+	final void test() throws UncheckedIOException, URISyntaxException {
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
+
+		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
+		config.controller().setOutputDirectory(config.controller().getOutputDirectory() + "/test");
 		config.controller().setLastIteration(2);
 
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -106,6 +243,7 @@ public class RunIT {
 		serviceConfigBike.setServiceInputFile(vehiclesUrl_velib.toURI().getPath());
 
 		// ... and, we need to define the underlying mode, here "car".
+		serviceConfigBike.setMode("bike");
 		Verify.verify(!config.routing().getNetworkModes().contains(serviceConfigBike.getMode())); // not routed
 		Verify.verify(!config.qsim().getMainModes().contains(serviceConfigBike.getMode())); // teleported
 
@@ -152,7 +290,6 @@ public class RunIT {
 		// ... with a service id. The respective mode will be "sharing:velib".
 		serviceConfigScooter.setIdFromString("scooter");
 		serviceConfigScooter.setVehicleTypeIdFromString("sharedScooter");
-		// Todo: add vtype and set max speed
 
 		// ... with freefloating characteristics
 		serviceConfigScooter.setMaximumAccessEgressDistance(100000);
@@ -221,8 +358,7 @@ public class RunIT {
 
 		// bike (velib & wheels) is not routed nor simulated but teleported
 
-		// 1) add sharedScooter vehicleType for routing and simulating "scooter" on
-		// network
+		// 1) add sharedScooter vehicleType for routing and add mode to links
 		VehicleType sharedScooterType = VehicleUtils.createVehicleType(serviceConfigScooter.getVehicleTypeId());
 		sharedScooterType.setNetworkMode(serviceConfigScooter.getMode());
 		sharedScooterType.setMaximumVelocity(22 / 3.6);
@@ -243,7 +379,6 @@ public class RunIT {
 
 		// Does not really "override" anything
 		controller.addOverridingModule(new SharingModule());
-
 		// Enable QSim components
 		controller.configureQSimComponents(SharingUtils.configureQSim(sharingConfig));
 
