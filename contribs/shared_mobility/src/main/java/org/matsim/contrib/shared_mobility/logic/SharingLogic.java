@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.LinkWrapperFacility;
@@ -50,6 +51,7 @@ public class SharingLogic {
 	private final RoutingModule accessEgressRoutingModule;
 	private final RoutingModule mainModeRoutingModule;
 
+	private final Scenario scenario;
 	private final Network network;
 	private final PopulationFactory populationFactory;
 	private final EventsManager eventsManager;
@@ -65,9 +67,10 @@ public class SharingLogic {
 
 		this.accessEgressRoutingModule = accessEgressRoutingModule;
 		this.mainModeRoutingModule = mainModeRoutingModule;
-
-		this.network = scenario.getNetwork();
-		this.populationFactory = scenario.getPopulation().getFactory();
+		
+		this.scenario = scenario;
+		this.network = this.scenario.getNetwork();
+		this.populationFactory = this.scenario.getPopulation().getFactory();
 		this.timeInterpretation = timeInterpretation;
 	}
 
@@ -339,8 +342,9 @@ public class SharingLogic {
 			now = timeInterpretation.decideOnElementEndTime(updatedPickupActivity, now).seconds();
 
 			// 3) Leg to destination
+			Id<Link> destinationLinkId = PopulationUtils.decideOnLinkIdForActivity(destinationActivity, this.scenario);
 			List<? extends PlanElement> accessElements = routeAccessEgressStage(closestDropoffInteraction.getLinkId(),
-					destinationActivity.getLinkId(), now, agent);
+					destinationLinkId, now, agent);
 			updatedElements.addAll(accessElements);
 
 			// Insert new plan elements
