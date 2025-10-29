@@ -41,7 +41,6 @@ public class RunIT {
 	final void test() throws UncheckedIOException, ConfigurationException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 
-
 		Config config = ConfigUtils.loadConfig(ConfigGroup.getInputFileURL(scenarioUrl, "config_default.xml"));
 		config.controller().setLastIteration(2);
 
@@ -55,7 +54,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.setId("mobility");
+		serviceConfig.setIdFromString("mobility");
 
 		// ... with freefloating characteristics
 		serviceConfig.setMaximumAccessEgressDistance(100000);
@@ -79,7 +78,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBike);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBike.setId("velib");
+		serviceConfigBike.setIdFromString("velib");
 
 		// ... with freefloating characteristics
 		serviceConfigBike.setMaximumAccessEgressDistance(100000);
@@ -103,7 +102,7 @@ public class RunIT {
 		sharingConfig.addService(serviceConfigBikeFF);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfigBikeFF.setId("wheels");
+		serviceConfigBikeFF.setIdFromString("wheels");
 
 		// ... with freefloating characteristics
 		serviceConfigBikeFF.setMaximumAccessEgressDistance(100000);
@@ -170,9 +169,9 @@ public class RunIT {
 		Assertions.assertEquals(0, (long) data.dropoffCounts.getOrDefault("mobility", 0L));
 		Assertions.assertEquals(10, (long) data.dropoffCounts.get("velib"));
 
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels",0L));
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility",0L));
-		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib",0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("wheels", 0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("mobility", 0L));
+		Assertions.assertEquals(0, (long) data.failedPickupCounts.getOrDefault("velib", 0L));
 
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("wheels", 0L));
 		Assertions.assertEquals(0, (long) data.failedDropoffCounts.getOrDefault("mobility", 0L));

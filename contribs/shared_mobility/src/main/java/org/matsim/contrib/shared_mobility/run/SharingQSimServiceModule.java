@@ -56,10 +56,9 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new FreefloatingService(Id.create(serviceConfig.getId(), SharingService.class),
-					specification.getVehicles(), network, serviceConfig.getMaximumAccessEgressDistance());
+			return new FreefloatingService(serviceConfig.getId(), specification.getVehicles(), network,
+					serviceConfig.getMaximumAccessEgressDistance());
 		})).in(Singleton.class);
-
 
 		addModalComponent(AgentSource.class, modalProvider(getter -> {
 
@@ -74,19 +73,19 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			Network network = getter.get(Network.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new StationBasedService(Id.create(serviceConfig.getId(), SharingService.class), specification,
-					network, serviceConfig.getMaximumAccessEgressDistance());
+			return new StationBasedService(serviceConfig.getId(), specification, network,
+					serviceConfig.getMaximumAccessEgressDistance());
 		})).in(Singleton.class);
 
 		switch (serviceConfig.getServiceScheme()) {
-		case Freefloating:
-			bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
-			break;
-		case StationBased:
-			bindModal(SharingService.class).to(modalKey(StationBasedService.class));
-			break;
-		default:
-			throw new IllegalStateException();
+			case Freefloating:
+				bindModal(SharingService.class).to(modalKey(FreefloatingService.class));
+				break;
+			case StationBased:
+				bindModal(SharingService.class).to(modalKey(StationBasedService.class));
+				break;
+			default:
+				throw new IllegalStateException();
 		}
 	}
 }

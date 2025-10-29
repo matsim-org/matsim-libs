@@ -48,7 +48,7 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
 		// If there are taste variations, the individual scoring parameters are used
 		if (tasteVariations) {
 			bind(ScoringParametersForPerson.class).to(IndividualPersonScoringParameters.class).in(Singleton.class);
-			addControllerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(jakarta.inject.Singleton.class);
+			addControllerListenerBinding().to(IndividualPersonScoringOutputWriter.class).in(Singleton.class);
 
 		} else {
 			bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);

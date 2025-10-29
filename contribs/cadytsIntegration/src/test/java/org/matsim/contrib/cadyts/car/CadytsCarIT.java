@@ -64,7 +64,8 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -123,7 +124,7 @@ public class CadytsCarIT {
 				install(new AbstractModule() {
 					@Override
 					public void install() {
-						addPlanStrategyBinding(CADYTS_STRATEGY_NAME).toProvider(new jakarta.inject.Provider<PlanStrategy>() {
+						addPlanStrategyBinding(CADYTS_STRATEGY_NAME).toProvider(new Provider<PlanStrategy>() {
 							@Inject Scenario scenario;
 							@Inject CadytsContext cadytsContext;
 							@Override

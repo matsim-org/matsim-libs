@@ -24,7 +24,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;

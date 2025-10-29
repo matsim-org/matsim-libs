@@ -2,179 +2,81 @@ package org.matsim.contrib.shared_mobility.run;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import javax.annotation.Nonnegative;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 
-import javax.annotation.Nonnegative;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
+
 	public static final String GROUP_NAME = "mode";
 
-	public static final String SERVICE_INPUT_FILE = "serviceInputFile";
 	public static final String ID = "id";
 	public static final String SERVICE_SCHEME = "serviceScheme";
-	public static final String SERVICE_AREA_SHAPE_FILE = "serviceAreaShapeFile";
-	public static final String MODE = "mode";
-	public static final String MAXIMUM_ACCESS_EGRESS_DISTANCE = "maximumAccesEgressDistance";
-	public static final String TIME_FARE = "timeFare";
-	public static final String DISTANCE_FARE = "distanceFare";
-	public static final String BASE_FARE = "baseFare";
-	public static final String MINIMUM_FARE = "minimumFare";
-
-	public static final String SERVICE_INPUT_FILE_EXP = "Input file defining vehicles and stations";
-	public static final String ID_EXP = "The id of the sharing service";
-	public static final String SERVICE_SCHEME_EXP = "One of: " + String.join(", ",
-			Arrays.asList(ServiceScheme.values()).stream().map(String::valueOf).collect(Collectors.toList()));
-	public static final String SERVICE_AREA_SHAPE_FILE_EXP = "Shape file defining the service area";
-	public static final String MODE_EXP = "Defines the underlying mode of the service";
-	public static final String MAXIMUM_ACCESS_EGRESS_DISTANCE_EXP = "Maximum distance to a bike or station";
-	public static final String TIME_FARE_EXP = "Time [second] fare";
-	public static final String DISTANCE_FARE_EXP = "Distance [meter] fare";
-	public static final String BASE_FARE_EXP = "Base fare";
-	public static final String MINIMUM_FARE_EXP = "Minimum fare per rental";
-
-	public enum ServiceScheme {
-		StationBased, Freefloating
-	}
-
-	@NotNull
-	private String serviceInputFile;
-
-	@NotNull
-	private String id;
-
-	@NotNull
-	private ServiceScheme serviceScheme;
-
-	private String serviceAreaShapeFile;
-
-	@NotNull
-	private String mode;
-
-	@Positive
-	private double maximumAccessEgressDistance = 1000;
-
-	@Nonnegative
-	private double timeFare = 0.0;
-
-	@Nonnegative
-	private double distanceFare = 0.0;
-
-	@Nonnegative
-	private double baseFare = 0.0;
-
-	@Nonnegative
-	private double minimumFare = 0.0;
+	public static final String ID_COMMENT = "The id of the sharing service";
+	public static final String SERVICE_SCHEME_COMMENT = "One of: " + String.join(", ",
+			Arrays.asList(ServiceScheme.values()).stream().map(String::valueOf).toList());
 
 	public SharingServiceConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-	@StringGetter(ID)
-	public String getId() {
-		return id;
+	public enum ServiceScheme {
+		StationBased, Freefloating
 	}
 
-	@StringSetter(ID)
-	public void setId(String id) {
-		this.id = id;
-	}
+	@Parameter
+	@Comment("Input file defining vehicles and stations")
+	@NotNull
+	private String serviceInputFile;
 
-	@StringSetter(SERVICE_INPUT_FILE)
-	public void setServiceInputFile(String serviceInputFile) {
-		this.serviceInputFile = serviceInputFile;
-	}
+	@NotNull
+	private Id<SharingService> id;
 
-	@StringGetter(SERVICE_INPUT_FILE)
-	public String getServiceInputFile() {
-		return serviceInputFile;
-	}
+	@Parameter
+	@NotNull
+	private ServiceScheme serviceScheme;
 
-	@StringSetter(SERVICE_SCHEME)
-	public void setServiceScheme(ServiceScheme serviceScheme) {
-		this.serviceScheme = serviceScheme;
-	}
+	@Parameter
+	@Comment("Shape file defining the service area")
+	private String serviceAreaShapeFile;
 
-	@StringGetter(SERVICE_SCHEME)
-	public ServiceScheme getServiceScheme() {
-		return serviceScheme;
-	}
+	@Parameter
+	@Comment("Defines the underlying mode of the service")
+	@NotNull
+	private String mode;
 
-	@StringSetter(SERVICE_AREA_SHAPE_FILE)
-	public void setServiceAreaShapeFile(String serviceAreaShapeFile) {
-		this.serviceAreaShapeFile = serviceAreaShapeFile;
-	}
+	@Parameter
+	@Comment("Maximum distance to a bike or station")
+	@Positive
+	private double maximumAccessEgressDistance = 1000;
 
-	@StringGetter(SERVICE_AREA_SHAPE_FILE)
-	public String getServiceAreaShapeFile() {
-		return serviceAreaShapeFile;
-	}
+	@Parameter
+	@Comment("Time [second] fare")
+	@Nonnegative
+	private double timeFare = 0.0;
 
-	@StringSetter(MODE)
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+	@Parameter
+	@Comment("Distance [meter] fare")
+	@Nonnegative
+	private double distanceFare = 0.0;
 
-	@StringGetter(MODE)
-	public String getMode() {
-		return mode;
-	}
+	@Parameter
+	@Comment("Base fare")
+	@Nonnegative
+	private double baseFare = 0.0;
 
-	@StringSetter(MAXIMUM_ACCESS_EGRESS_DISTANCE)
-	public void setMaximumAccessEgressDistance(double maximumAccessEgressDistance) {
-		this.maximumAccessEgressDistance = maximumAccessEgressDistance;
-	}
-
-	@StringGetter(MAXIMUM_ACCESS_EGRESS_DISTANCE)
-	public double getMaximumAccessEgressDistance() {
-		return maximumAccessEgressDistance;
-	}
-
-	@StringSetter(TIME_FARE)
-	public void setTimeFare(double timeFare) {
-		this.timeFare = timeFare;
-	}
-
-	@StringGetter(TIME_FARE)
-	public double getTimeFare() {
-		return timeFare;
-	}
-
-	@StringSetter(DISTANCE_FARE)
-	public void setDistanceFare(double distanceFare) {
-		this.distanceFare = distanceFare;
-	}
-
-	@StringGetter(DISTANCE_FARE)
-	public double getDistanceFare() {
-		return distanceFare;
-	}
-
-	@StringSetter(BASE_FARE)
-	public void setBaseFare(double baseFare) {
-		this.baseFare = baseFare;
-	}
-
-	@StringGetter(BASE_FARE)
-	public double getBaseFare() {
-		return baseFare;
-	}
-
-	@StringSetter(MINIMUM_FARE)
-	public void setMinimumFare(double minimumFare) {
-		this.minimumFare = minimumFare;
-	}
-
-	@StringGetter(MINIMUM_FARE)
-	public double getMinimumFare() {
-		return minimumFare;
-	}
+	@Parameter
+	@Comment("Minimum fare per rental")
+	@Nonnegative
+	private double minimumFare = 0.0;
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -182,19 +84,101 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
 	}
 
+	public String getServiceInputFile() {
+		return serviceInputFile;
+	}
+
+	public void setServiceInputFile(String serviceInputFile) {
+		this.serviceInputFile = serviceInputFile;
+	}
+
+	public Id<SharingService> getId() {
+		return id;
+	}
+
+	public void setId(Id<SharingService> serviceId) {
+		id = serviceId;
+	}
+
+	public ServiceScheme getServiceScheme() {
+		return serviceScheme;
+	}
+
+	public void setServiceScheme(ServiceScheme serviceScheme) {
+		this.serviceScheme = serviceScheme;
+	}
+
+	public String getServiceAreaShapeFile() {
+		return serviceAreaShapeFile;
+	}
+
+	public void setServiceAreaShapeFile(String serviceAreaShapeFile) {
+		this.serviceAreaShapeFile = serviceAreaShapeFile;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public double getMaximumAccessEgressDistance() {
+		return maximumAccessEgressDistance;
+	}
+
+	public void setMaximumAccessEgressDistance(double maximumAccessEgressDistance) {
+		this.maximumAccessEgressDistance = maximumAccessEgressDistance;
+	}
+
+	public double getTimeFare() {
+		return timeFare;
+	}
+
+	public void setTimeFare(double timeFare) {
+		this.timeFare = timeFare;
+	}
+
+	public double getDistanceFare() {
+		return distanceFare;
+	}
+
+	public void setDistanceFare(double distanceFare) {
+		this.distanceFare = distanceFare;
+	}
+
+	public double getBaseFare() {
+		return baseFare;
+	}
+
+	public void setBaseFare(double baseFare) {
+		this.baseFare = baseFare;
+	}
+
+	public double getMinimumFare() {
+		return minimumFare;
+	}
+
+	public void setMinimumFare(double minimumFare) {
+		this.minimumFare = minimumFare;
+	}
+
+	@StringGetter(ID)
+	public String getIdAsString() {
+		return id != null ? id.toString() : "";
+	}
+
+	@StringSetter(ID)
+	public void setIdFromString(String idString) {
+		this.id = (idString != null && !idString.isBlank()) ? Id.create(idString, SharingService.class) : null;
+	}
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(SERVICE_INPUT_FILE, SERVICE_INPUT_FILE_EXP);
-		map.put(ID, ID_EXP);
-		map.put(SERVICE_SCHEME, SERVICE_SCHEME_EXP);
-		map.put(SERVICE_AREA_SHAPE_FILE, SERVICE_AREA_SHAPE_FILE_EXP);
-		map.put(MODE, MODE_EXP);
-		map.put(MAXIMUM_ACCESS_EGRESS_DISTANCE, MAXIMUM_ACCESS_EGRESS_DISTANCE_EXP);
-		map.put(TIME_FARE, TIME_FARE_EXP);
-		map.put(DISTANCE_FARE, DISTANCE_FARE_EXP);
-		map.put(BASE_FARE, BASE_FARE_EXP);
-		map.put(MINIMUM_FARE, MINIMUM_FARE_EXP);
+		map.put(ID, ID_COMMENT);
+		map.put(SERVICE_SCHEME, SERVICE_SCHEME_COMMENT);
 		return map;
 	}
 

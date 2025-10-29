@@ -21,7 +21,7 @@
 
 package org.matsim.freight.logistics.examples.initialPlans;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
