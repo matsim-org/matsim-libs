@@ -103,8 +103,8 @@ final class ScheduleImpl implements Schedule {
 		if (taskIdx > 0) {
 			Task previousTask = tasks.get(taskIdx - 1);
 			Preconditions.checkArgument(previousTask.getEndTime() == beginTime,
-					"Previous task end time %s != next task begin time %s; Vehicle %s; time %s",
-					previousTask.getEndTime(), beginTime, vehicleSpecification.getId(), beginTime);
+					"Previous task end time %s != next task begin time %s; Vehicle %s",
+					previousTask.getEndTime(), beginTime, vehicleSpecification.getId());
 			Preconditions.checkArgument(Tasks.getEndLink(previousTask) == beginLink,
 					"Last task end link: %s; Next task start link: %s; vehicle %s", Tasks.getEndLink(previousTask).getId(),
 					beginLink.getId(), vehicleSpecification.getId());
