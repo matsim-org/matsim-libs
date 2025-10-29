@@ -1,10 +1,13 @@
 package org.matsim.contrib.shared_mobility.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModes;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
+import org.matsim.contrib.shared_mobility.run.SharingVehicleSource;
 import org.matsim.contrib.shared_mobility.service.events.SharingReservingEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingDropoffEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingFailedDropoffEvent;
@@ -13,10 +16,17 @@ import org.matsim.contrib.shared_mobility.service.events.SharingPickupEvent;
 import org.matsim.contrib.shared_mobility.service.events.SharingVehicleEvent;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.common.base.Verify;
 
 public class SharingUtils {
+
+	public static final Logger LOG = LogManager.getLogger(SharingUtils.class);
+
 	static public final String BOOKING_ACTIVITY = "sharing booking interaction";
 	static public final String PICKUP_ACTIVITY = "sharing pickup interaction";
 	static public final String DROPOFF_ACTIVITY = "sharing dropoff interaction";
@@ -81,4 +91,51 @@ public class SharingUtils {
 		reader.addCustomEventMapper(SharingFailedDropoffEvent.TYPE, SharingFailedDropoffEvent::convert);
 		reader.addCustomEventMapper(SharingReservingEvent.TYPE, SharingReservingEvent::convert);
 	}
+
+	public static VehicleType getOrCreateAndAddVehicleType(SharingServiceConfigGroup serviceConfig,
+			Vehicles vehicles) {
+		Id<VehicleType> vehicleTypeId = serviceConfig.getVehicleTypeId();
+		VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
+		if (vehicleType == null) {
+			SharingVehicleSource.LOG.warn("VehicleType with id " + vehicleTypeId
+					+ " not found in vehicles file, but required for sharing service "
+					+ serviceConfig.getId() + ", creating a default one for mode ", serviceConfig.getMode());
+			vehicleType = VehicleUtils.createVehicleType(vehicleTypeId, serviceConfig.getMode());
+			vehicles.addVehicleType(vehicleType);
+		}
+		return vehicleType;
+	}
+
+	public static Vehicle getOrCreateAndAddVehicle(Id<Vehicle> vehicleId, VehicleType vehicleType, Vehicles vehicles) {
+		Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
+		if (vehicle != null) {
+			if (vehicle.getType() != vehicleType) {
+				throw new IllegalStateException("Vehicle with id " + vehicleId
+						+ " already exists but has a different vehicle type ("
+						+ vehicle.getType().getId() + ") than expected ("
+						+ vehicleType.getId() + ").");
+			}
+			LOG.debug("Vehicle with id {} already exists. Skipping creation of sharing vehicle.", vehicleId);
+		} else {
+			// create vehicle with type and add to vehicles
+			vehicle = vehicles.getFactory().createVehicle(vehicleId, vehicleType);
+			vehicles.addVehicle(vehicle);
+		}
+		return vehicle;
+	}
+
+	public static Vehicle getOrCreateAndAddDummyVehicle(SharingServiceConfigGroup serviceConfig, Vehicles vehicles) {
+		Id<Vehicle> routingVehicleId = Id.createVehicleId(
+				serviceConfig.getId().toString() + "_" + serviceConfig.getMode() + "_replanningRoutingDummyVehicle");
+		Vehicle routingVehicle = vehicles.getVehicles().get(routingVehicleId);
+		if (routingVehicle != null) {
+			return routingVehicle;
+		} else {
+			VehicleType vehicleType = getOrCreateAndAddVehicleType(serviceConfig, vehicles);
+			routingVehicle = vehicles.getFactory().createVehicle(routingVehicleId, vehicleType);
+			vehicles.addVehicle(routingVehicle);
+		}
+		return routingVehicle;
+	}
+
 }
