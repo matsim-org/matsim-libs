@@ -93,6 +93,8 @@ public class EquilTwoAgentsTest {
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
+		config.scoring().setWriteExperiencedPlans( true );
+
 		ScoringConfigGroup pcsConfig = config.scoring() ;
 		ActivityParams params = new ActivityParams("h") ;
         params.setTypicalDuration(123456789.0) ; // probably dummy
