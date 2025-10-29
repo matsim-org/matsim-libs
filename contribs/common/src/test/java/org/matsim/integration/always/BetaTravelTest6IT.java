@@ -25,10 +25,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

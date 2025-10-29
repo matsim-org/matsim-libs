@@ -14,7 +14,14 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, ElectricVehicle> implements IterationStartsListener {
+public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, ElectricVehicle>
+		implements IterationStartsListener {
+
+	private final ChargerReservability reservability;
+
+	public ChargerReservationManager(ChargerReservability reservability) {
+		this.reservability = reservability;
+	}
 
 	@Override
 	protected int getCapacity(ChargerSpecification charger) {
@@ -24,5 +31,15 @@ public class ChargerReservationManager extends AbstractReservationManager<Charge
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		super.cleanReservations();
+	}
+
+	@Override
+	public boolean isAvailable(ChargerSpecification resource, ElectricVehicle consumer, double startTime,
+			double endTime) {
+		if (!reservability.isReservable(resource, startTime, endTime)) {
+			return false;
+		}
+
+		return super.isAvailable(resource, consumer, startTime, endTime);
 	}
 }

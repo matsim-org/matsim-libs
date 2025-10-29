@@ -21,7 +21,7 @@
 
 package org.matsim.core.controler;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.core.config.groups.ControllerConfigGroup;
 

@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 public class RandomDynAgentSource implements AgentSource {
 	private static final int AGENT_COUNT = 100;

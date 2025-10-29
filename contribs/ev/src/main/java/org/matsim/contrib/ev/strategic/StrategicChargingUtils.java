@@ -12,11 +12,13 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.strategic.access.SubscriptionRegistry;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
 import org.matsim.contrib.ev.strategic.costs.AttributeBasedChargingCostCalculator;
+import org.matsim.contrib.ev.strategic.costs.DynamicEnergyCosts;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PublicChargerProvider;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoring;
 import org.matsim.contrib.ev.withinday.WithinDayChargingStrategy;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
@@ -88,19 +90,37 @@ public class StrategicChargingUtils {
      * Sets the cost structure for the charger.
      */
     static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
-            double costPerDuration_kWh) {
-        AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
-                costPerDuration_kWh);
+            double costPerDuration_min) {
+        AttributeBasedChargingCostCalculator.setCostPerUse(charger, costPerUse);
+        AttributeBasedChargingCostCalculator.setCostPerEnergy_kWh(charger, costPerEnergy_kWh);
+        AttributeBasedChargingCostCalculator.setCostPerDuration_min(charger, costPerDuration_min);
     }
 
     /**
-     * Sets the cost structure for the charger. The blocking costs are charged
-     * additionally for any duration that exceeds the blocking duration.
+     * Sets the cost structure for the charger.
      */
     static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
-            double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min) {
+            double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min,
+            double costPerReservation) {
         AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
-                costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min);
+                costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min, costPerReservation);
+    }
+
+    /**
+     * The blocking costs are charged
+     * additionally for any duration that exceeds the blocking duration.
+     */
+    static public void setBlockingCosts(ChargerSpecification charger, double costPerBlockingDuration_min,
+            double blockingDuration_min) {
+        AttributeBasedChargingCostCalculator.setCostPerBlockingDuration_min(charger, costPerBlockingDuration_min);
+        AttributeBasedChargingCostCalculator.setBlockingDuration_min(charger, blockingDuration_min);
+    }
+
+    /**
+     * The dynamic costs are added to the base costs of the charger.
+     */
+    static public void setDynamicCosts(ChargerSpecification charger, DynamicEnergyCosts dynamicCosts) {
+        AttributeBasedChargingCostCalculator.setDynamicEnergyCost_kWh(charger, dynamicCosts);
     }
 
     /**
@@ -233,7 +253,8 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Adds the activity scoring parameters to the 'normal' MATSim scoring config group.
+     * Adds the activity scoring parameters to the 'normal' MATSim scoring config
+     * group.
      * You still need to configure the ChargingPlanScoringParameters yourself!
      */
     static public void configureScoring(Config config) {
@@ -292,7 +313,7 @@ public class StrategicChargingUtils {
     /**
      * Sets up the controller
      */
-    static public void configureController (Controler controller) {
+    static public void configureController(Controler controller) {
         controller.addOverridingModule(new WithinDayEvModule());
         controller.addOverridingModule(new StrategicChargingModule());
     }
@@ -315,5 +336,21 @@ public class StrategicChargingUtils {
      */
     public static void writeList(Attributable target, String attribute, Set<String> items) {
         target.getAttributes().putAttribute(attribute, String.join(",", items));
+    }
+
+    /**
+     * Sets the duration at which reservations for chargers are made in advance by
+     * that person.
+     */
+    static public void setReservationSlack(Person person, double slack) {
+        StrategicChargingReservationEngine.setReservationSlack(person, slack);
+    }
+
+    /**
+     * Gets the duration at which reservations for chargers are made in advance by
+     * that person.
+     */
+    static public Double getReservationSlack(Person person) {
+        return StrategicChargingReservationEngine.getReservationSlack(person);
     }
 }

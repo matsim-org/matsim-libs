@@ -9,7 +9,9 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -42,7 +44,7 @@ public class SharingConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency(config);
 		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
 
-		Set<String> serviceIds = new HashSet<>();
+		Set<Id<SharingService>> serviceIds = new HashSet<>();
 
 		for (SharingServiceConfigGroup serviceConfig : getServices()) {
 			// Avoid duplicate IDs

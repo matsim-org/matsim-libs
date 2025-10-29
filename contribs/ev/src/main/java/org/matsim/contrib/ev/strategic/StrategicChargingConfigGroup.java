@@ -7,6 +7,7 @@ import org.matsim.contrib.ev.strategic.costs.DefaultChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.RandomChargerSelector;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.core.config.Config;
 
@@ -152,6 +153,10 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 	@Parameter
 	@Comment("Defines whether to precompute viable charger alternatives for each charging activity planned in an agent's plan. A value of -1 means no caching.")
 	private int alternativeCacheSize = -1;
+
+	@Parameter
+	@Comment("Defines the charger selector that is used in the innovation strategy")
+	private String chargerSelector = RandomChargerSelector.NAME;
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -304,5 +309,13 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 
 	public void setAlternativeCacheSize(int alternativeCacheSize) {
 		this.alternativeCacheSize = alternativeCacheSize;
+	}
+
+	public String getChargerSelector() {
+		return chargerSelector;
+	}
+
+	public void setChargerSelector(String val) {
+		this.chargerSelector = val;
 	}
 }

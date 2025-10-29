@@ -25,7 +25,7 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;

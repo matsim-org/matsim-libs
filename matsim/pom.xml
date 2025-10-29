@@ -130,38 +130,31 @@
 		<dependency>
 			<groupId>it.unimi.dsi</groupId>
 			<artifactId>fastutil-core</artifactId>
-			<version>8.5.18</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
-			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
-			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
-			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geopkg</artifactId>
-			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
-			<version>${geotools.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
-			<version>${jts.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jfree</groupId>
@@ -183,13 +176,12 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>2026.0-SNAPSHOT</version>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>${guice.version}</version>
 			<!-- Use newer guava version -->
 			<exclusions>
 				<exclusion>
@@ -215,7 +207,6 @@
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.lz4</groupId>
@@ -225,7 +216,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.7-5</version>
+			<version>1.5.7-6</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -266,7 +257,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.14.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -312,6 +302,61 @@
 		<dependency>
 			<groupId>com.fasterxml.woodstox</groupId>
 			<artifactId>woodstox-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-sampling</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-client-api</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.logging</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<version>3.6.1.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.errorprone</groupId>
+			<artifactId>error_prone_annotations</artifactId>
+			<version>2.43.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-rng-core</artifactId>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 
