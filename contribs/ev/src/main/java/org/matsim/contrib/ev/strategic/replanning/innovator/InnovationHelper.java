@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider.ChargerRequest;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlan;
@@ -27,15 +28,18 @@ import com.google.common.base.Preconditions;
 public class InnovationHelper {
     private final TimeInterpretation timeInterpretation;
     private final ChargingSlotFinder candidateFinder;
+    private final ChargerReservability reservability;
 
     protected InnovationHelper(Plan plan, List<Activity> activities, Map<Activity, Double> startTimes,
-            Map<Activity, Double> endTimes, TimeInterpretation timeInterpretation, ChargingSlotFinder candidateFinder) {
+            Map<Activity, Double> endTimes, TimeInterpretation timeInterpretation, ChargingSlotFinder candidateFinder,
+            ChargerReservability reservability) {
         this.plan = plan;
         this.activities = activities;
         this.startTimes = startTimes;
         this.endTimes = endTimes;
         this.timeInterpretation = timeInterpretation;
         this.candidateFinder = candidateFinder;
+        this.reservability = reservability;
     }
 
     // INDEXING AND TIMING FUNCTIONALITY
@@ -138,7 +142,7 @@ public class InnovationHelper {
         return candidates;
     }
 
-    public boolean push(ActivityBasedCandidate candidate, ChargerSpecification charger) {
+    public boolean push(ActivityBasedCandidate candidate, ChargerSpecification charger, boolean withReservation) {
         if (charger == null) {
             return false;
         }
@@ -147,12 +151,13 @@ public class InnovationHelper {
 
         chargingPlan.addChargingActivity(
                 new ChargingPlanActivity(startActivityIndex(candidate), endActivityIndex(candidate),
-                        charger.getId()));
+                        charger.getId(), withReservation));
 
         return true;
     }
 
-    public boolean push(LegBasedCandidate candidate, double duration, ChargerSpecification charger) {
+    public boolean push(LegBasedCandidate candidate, double duration, ChargerSpecification charger,
+            boolean withReservation) {
         if (charger == null) {
             return false;
         }
@@ -161,7 +166,7 @@ public class InnovationHelper {
 
         chargingPlan.addChargingActivity(new ChargingPlanActivity(followingActivityIndex(candidate),
                 duration,
-                charger.getId()));
+                charger.getId(), withReservation));
 
         return true;
     }
@@ -173,10 +178,19 @@ public class InnovationHelper {
     // CHARGER SELECTION
 
     public ChargerSpecification selectCharger(ActivityBasedCandidate slot, ChargerProvider chargerProvider,
-            ChargerSelector selector) {
+            ChargerSelector selector, boolean withReservation) {
         List<ChargerSpecification> chargers = new LinkedList<>(
                 chargerProvider.findChargers(plan.getPerson(), plan,
                         new ChargerRequest(slot.startActivity(), slot.endActivity())));
+
+        double startTime = startTime(slot);
+        double endTime = endTime(slot);
+
+        if (withReservation) {
+            chargers.removeIf(charger -> {
+                return !reservability.isReservable(charger, startTime, endTime);
+            });
+        }
 
         if (chargers.size() > 0) {
             return selector.select(slot, chargers);
@@ -186,10 +200,19 @@ public class InnovationHelper {
     }
 
     public ChargerSpecification selectCharger(LegBasedCandidate slot, double duration, ChargerProvider chargerProvider,
-            ChargerSelector selector) {
+            ChargerSelector selector, boolean withReservation) {
         List<ChargerSpecification> chargers = new LinkedList<>(
                 chargerProvider.findChargers(plan.getPerson(), plan,
                         new ChargerRequest(slot.leg(), duration)));
+
+        double startTime = startTime(slot);
+        double endTime = endTime(slot);
+
+        if (withReservation) {
+            chargers.removeIf(charger -> {
+                return !reservability.isReservable(charger, startTime, endTime);
+            });
+        }
 
         if (chargers.size() > 0) {
             return selector.select(slot, duration, chargers);
@@ -199,7 +222,7 @@ public class InnovationHelper {
     }
 
     static public InnovationHelper build(Plan plan, TimeInterpretation timeInterpretation,
-            ChargingSlotFinder candidateFinder) {
+            ChargingSlotFinder candidateFinder, ChargerReservability reservability) {
         List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
                 StageActivityHandling.ExcludeStageActivities);
         Map<Activity, Double> startTimes = new HashMap<>();
@@ -229,6 +252,7 @@ public class InnovationHelper {
             }
         }
 
-        return new InnovationHelper(plan, activities, startTimes, endTimes, timeInterpretation, candidateFinder);
+        return new InnovationHelper(plan, activities, startTimes, endTimes, timeInterpretation, candidateFinder,
+                reservability);
     }
 }

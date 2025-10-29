@@ -7,6 +7,7 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
 import org.matsim.contrib.ev.reservation.ChargerReservationModule;
 import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.AlternativeSearchStrategy;
 import org.matsim.contrib.ev.strategic.access.AnyChargerAccess;
@@ -201,10 +202,12 @@ public class StrategicChargingModule extends AbstractModule {
 	@Provides
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
-			TimeInterpretation timeInterpretation, ChargerSelector.Factory selectorFactory) {
+			TimeInterpretation timeInterpretation, ChargerSelector.Factory selectorFactory,
+			ChargerReservability chargerReservability) {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
-				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory);
+				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory,
+				chargerReservability);
 	}
 
 	@Provides

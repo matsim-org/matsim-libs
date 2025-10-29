@@ -18,6 +18,7 @@ import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PublicChargerProvider;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoring;
 import org.matsim.contrib.ev.withinday.WithinDayChargingStrategy;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
@@ -93,6 +94,16 @@ public class StrategicChargingUtils {
         AttributeBasedChargingCostCalculator.setCostPerUse(charger, costPerUse);
         AttributeBasedChargingCostCalculator.setCostPerEnergy_kWh(charger, costPerEnergy_kWh);
         AttributeBasedChargingCostCalculator.setCostPerDuration_min(charger, costPerDuration_min);
+    }
+
+    /**
+     * Sets the cost structure for the charger.
+     */
+    static public void setChargingCosts(ChargerSpecification charger, double costPerUse, double costPerEnergy_kWh,
+            double costPerDuration_min, double costPerBlockingDuration_min, double blockingDuration_min,
+            double costPerReservation) {
+        AttributeBasedChargingCostCalculator.setChargingCosts(charger, costPerUse, costPerEnergy_kWh,
+                costPerDuration_min, costPerBlockingDuration_min, blockingDuration_min, costPerReservation);
     }
 
     /**
@@ -325,5 +336,21 @@ public class StrategicChargingUtils {
      */
     public static void writeList(Attributable target, String attribute, Set<String> items) {
         target.getAttributes().putAttribute(attribute, String.join(",", items));
+    }
+
+    /**
+     * Sets the duration at which reservations for chargers are made in advance by
+     * that person.
+     */
+    static public void setReservationSlack(Person person, double slack) {
+        StrategicChargingReservationEngine.setReservationSlack(person, slack);
+    }
+
+    /**
+     * Gets the duration at which reservations for chargers are made in advance by
+     * that person.
+     */
+    static public Double getReservationSlack(Person person) {
+        return StrategicChargingReservationEngine.getReservationSlack(person);
     }
 }
