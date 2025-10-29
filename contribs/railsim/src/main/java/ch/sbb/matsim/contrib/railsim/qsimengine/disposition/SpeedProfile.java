@@ -2,15 +2,11 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.disposition;
 
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimTransitDriverAgent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.List;
 
 /**
  * Interface for calculating the target speed of a train, incorporating planned arrivals and current delay.

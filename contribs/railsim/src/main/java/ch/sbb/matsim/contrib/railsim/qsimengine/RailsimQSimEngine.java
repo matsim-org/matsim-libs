@@ -69,6 +69,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private final RailResourceManager res;
 	private final TrainDisposition disposition;
 	private final TrainManager trainManager;
+	private final TrainTimeDistanceHandler ttdHandler;
 	private final Set<String> modes;
 	private final Queue<NetworkChangeEvent> networkChangeEvents;
 	private final TransitStopAgentTracker agentTracker;
@@ -77,12 +78,14 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, TrainManager trainManager) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker,
+							 TrainManager trainManager, TrainTimeDistanceHandler ttdHandler) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
 		this.trainManager = trainManager;
+		this.ttdHandler = ttdHandler;
 		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
 		this.networkChangeEvents = new PriorityQueue<>(Comparator.comparing(NetworkChangeEvent::getStartTime));
@@ -119,6 +122,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	@Override
 	public void afterSim() {
 		engine.clearTrains(qsim.getSimTimer().getTimeOfDay());
+		ttdHandler.close();
 	}
 
 	@Override

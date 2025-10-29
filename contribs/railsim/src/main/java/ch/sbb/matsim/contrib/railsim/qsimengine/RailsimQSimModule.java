@@ -50,6 +50,7 @@ public class RailsimQSimModule extends AbstractQSimModule implements QSimCompone
 
 		bind(TrainRouter.class).asEagerSingleton();
 		bind(TrainManager.class).asEagerSingleton();
+		bind(TrainTimeDistanceHandler.class).asEagerSingleton();
 		bind(RailResourceManager.class).asEagerSingleton();
 
 		// These interfaces might be replaced with other implementations

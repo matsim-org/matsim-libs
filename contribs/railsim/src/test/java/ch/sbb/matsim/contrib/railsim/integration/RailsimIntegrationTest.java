@@ -60,7 +60,6 @@ import ch.sbb.matsim.contrib.railsim.RailsimModule;
 import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
 import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import org.opentest4j.AssertionFailedError;
 
 public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
