@@ -40,6 +40,29 @@ public class SharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch (type) {
+			case SharingServiceConfigGroup.GROUP_NAME:
+				return new SharingServiceConfigGroup();
+			default:
+				throw new IllegalArgumentException(type);
+		}
+	}
+
+	@Override
+	protected void checkParameterSet(final ConfigGroup module) {
+		switch (module.getName()) {
+			case SharingServiceConfigGroup.GROUP_NAME:
+				if (!(module instanceof SharingServiceConfigGroup)) {
+					throw new RuntimeException("unexpected class for module " + module);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException(module.getName());
+		}
+	}
+
+	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
