@@ -1,6 +1,7 @@
 package org.matsim.contrib.ev.analysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
@@ -25,15 +26,19 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.common.io.Files;
 
 public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
         IdlingEnergyConsumptionEventHandler, DrivingEnergyConsumptionEventHandler, IterationStartsListener,
-        IterationEndsListener {
+        IterationEndsListener, ShutdownListener {
     static public final String OUTPUT_FILE = "ev_trajectories.csv.gz";
 
     private final EventsManager eventsManager;
@@ -102,6 +107,17 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
 
             writer = null;
             eventsManager.removeHandler(this);
+        }
+    }
+
+    @Override
+    public void notifyShutdown(ShutdownEvent event) {
+        File iterationPath = new File(outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE));
+
+        try {
+            Files.copy(iterationPath, outputPath);
+        } catch (IOException e) {
         }
     }
 

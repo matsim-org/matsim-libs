@@ -123,6 +123,10 @@ import jakarta.validation.constraints.NotNull;
 	 @Comment("Interval at which detailed vehicle trajectories are written")
 	 private int writeVehicleTrajectoriesInterval = 0;
  
+	 @Parameter
+	 @Comment("Interval at which zonal energy demand information is written")
+	 private int writeZonalEnergyDemandInterval = 0;
+
 	 public enum InitialSocBehavior {
 		 Keep, UpdateAfterIteration
 	 }
@@ -202,6 +206,14 @@ import jakarta.validation.constraints.NotNull;
 
 	 public void setWriteVehicleTrajectoriesInterval(int value) {
 		this.writeVehicleTrajectoriesInterval = value;
+	 }
+
+	 public int getWriteZonalEnergyDemandInterval() {
+		return writeZonalEnergyDemandInterval;
+	 }
+
+	 public void setWriteZonalEnergyDemandInterval(int value) {
+		this.writeZonalEnergyDemandInterval = value;
 	 }
  }
  
