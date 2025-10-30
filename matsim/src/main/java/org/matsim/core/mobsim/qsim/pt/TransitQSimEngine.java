@@ -47,7 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * @author mrieser

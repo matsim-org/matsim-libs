@@ -32,8 +32,8 @@ import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 

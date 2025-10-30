@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * Design decisions:<ul>

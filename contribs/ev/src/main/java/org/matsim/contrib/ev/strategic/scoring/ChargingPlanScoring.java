@@ -37,6 +37,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEvent;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEventHandler;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEventHandler;
@@ -50,7 +52,6 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -68,6 +69,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		AbortChargingAttemptEventHandler, DrivingEnergyConsumptionEventHandler, IdlingEnergyConsumptionEventHandler,
 		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler,
 		LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
+		AdvanceReservationEventHandler,
 		MobsimEngine {
 	static public final String MINIMUM_SOC_PERSON_ATTRIBUTE = "sevc:minimumSoc";
 	static public final String MINIMUM_END_SOC_PERSON_ATTRIBUTE = "sevc:minimumEndSoc";
@@ -89,7 +91,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	private final TimeInterpretation timeInterpretation;
 
 	public ChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
-							   TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet, ChargingCostCalculator costCalculator,
+			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
+			ChargingCostCalculator costCalculator,
 			ChargingPlanScoringParameters parameters, String chargingMode, ScoringTracker tracker) {
 		this.eventsManager = eventsManager;
 		this.population = population;
@@ -261,7 +264,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		EnergyEntry entry = this.energy.get(vehicleId);
 		double initialSoc = entry.current / entry.total;
 
-		//entry can not be null because we initialize the energy map with all vehicles, see initializeEnergy()
+		// entry can not be null because we initialize the energy map with all vehicles,
+		// see initializeEnergy()
 		entry.current = endCharge;
 
 		double finalSoc = entry.current / entry.total;
@@ -325,7 +329,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 						if (entry.current / entry.total < minimumEndOfDaySoc) {
 							addScoreForPerson(person.getId(), parameters.getBelowMinimumEndSoc());
-							trackScoreForPerson(now, person.getId(), "minimum_end_soc", parameters.getBelowMinimumEndSoc(),
+							trackScoreForPerson(now, person.getId(), "minimum_end_soc",
+									parameters.getBelowMinimumEndSoc(),
 									null);
 						}
 					}
@@ -340,7 +345,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	public void handleEvent(AbortChargingAttemptEvent event) {
 		// handles an unsuccessful charging attempt, but the agent tries another one
 		addScoreForPerson(event.getPersonId(), parameters.getFailedChargingAttempt());
-		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_attempt", parameters.getFailedChargingAttempt(),
+		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_attempt",
+				parameters.getFailedChargingAttempt(),
 				null);
 	}
 
@@ -348,8 +354,20 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	public void handleEvent(AbortChargingProcessEvent event) {
 		// handles an unsuccessful charging process after trying several chargers
 		addScoreForPerson(event.getPersonId(), parameters.getFailedChargingProcess());
-		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_process", parameters.getFailedChargingProcess(),
+		trackScoreForPerson(event.getTime(), event.getPersonId(), "failed_process",
+				parameters.getFailedChargingProcess(),
 				null);
+	}
+
+	// RESERVATION scoring
+
+	@Override
+	public void handleEvent(AdvanceReservationEvent event) {
+		if (!event.getSuccessful()) {
+			addScoreForPerson(event.getPersonId(), parameters.getFailedReservation());
+		} else {
+			handleReservationCost(event);
+		}
 	}
 
 	// WAITING scoring
@@ -417,7 +435,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		Id<Person> personId = getPerson(event.getVehicleId());
 
 		if (personId != null) {
-			double cost = costCalculator.calculateChargingCost(personId, event.getChargerId(), duration, energy);
+			double cost = costCalculator.calculateChargingCost(personId, event.getChargerId(), start.time, duration,
+					energy);
 			addScoreForVehicle(event.getVehicleId(), cost * parameters.getCost());
 			trackScoreForVehicle(event.getTime(), event.getVehicleId(), "cost", cost * parameters.getCost(), cost);
 
@@ -425,6 +444,12 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				moneyEvents.add(new MoneyRecord(personId, event.getChargerId(), cost));
 			}
 		}
+	}
+
+	private void handleReservationCost(AdvanceReservationEvent event) {
+		double cost = costCalculator.calculateReservationCost(event.getPersonId(), event.getChargerId(),
+				event.getEndTime() - event.getStartTime());
+		moneyEvents.add(new MoneyRecord(event.getPersonId(), event.getChargerId(), cost));
 	}
 
 	// DETOUR scoring : works by calculating the travel time according to schedule
@@ -450,10 +475,12 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				// Here, we determine the planned travel time.
 				// Later, we track the actual travel time by listening to events on links.
 				// This means, we can not compare access and egress legs.
-				// (otherwise we would include all legs with _routing_Mode.equals(chargingMode) in the following filter)
+				// (otherwise we would include all legs with _routing_Mode.equals(chargingMode)
+				// in the following filter)
 				// tschlenther, march '24
 				// TODO: include detour of access and egress in ChargingPlanScoring !?
-				if (! leg.getMode().equals(chargingMode)) continue;
+				if (!leg.getMode().equals(chargingMode))
+					continue;
 
 				plannedTotalTravelTime.addAndGet(this.timeInterpretation.decideOnLegTravelTime(leg).seconds());
 				plannedTotalTravelDistance.addAndGet(-leg.getRoute().getDistance());

@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;

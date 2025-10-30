@@ -25,7 +25,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;

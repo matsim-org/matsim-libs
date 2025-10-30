@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import java.util.Set;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;

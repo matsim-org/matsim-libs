@@ -56,6 +56,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import com.google.inject.Provider;
 import com.google.inject.util.Modules;
 
 /**
@@ -254,7 +255,7 @@ public abstract class AbstractModule implements Module {
 		return binder;
 	}
 
-	protected final <T> jakarta.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
+	protected final <T> Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
 		return binder.getProvider(Key.get(typeLiteral));
 	}
 
