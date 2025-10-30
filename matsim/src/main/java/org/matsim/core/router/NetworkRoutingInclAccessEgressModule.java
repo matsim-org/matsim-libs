@@ -140,6 +140,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
+		final Attributes attributes = request.getAttributes();
 
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
@@ -154,7 +155,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === access:
 		{
 			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
-					scenario.getConfig(), request.getAttributes());
+					scenario.getConfig(), attributes);
 			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			now = timeInterpretation.decideOnElementsEndTime(accessTrip, now).seconds();
 			result.addAll(accessTrip);
@@ -164,7 +165,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		{
 			Leg newLeg = this.populationFactory.createLeg(this.mode);
 			newLeg.setDepartureTime(now);
-			now += routeLeg(person, newLeg, accessActLink, egressActLink, now);
+			now += routeLeg(person, newLeg, accessActLink, egressActLink, now, attributes);
 
 			result.add(newLeg);
 			//			log.warn( newLeg );
@@ -173,7 +174,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === egress:
 		{
 			List<PlanElement> egressTrip = computeEgressTripFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result.get(result.size() - 1), populationFactory, mode,
-					scenario.getConfig(), request.getAttributes());
+					scenario.getConfig(), attributes);
 			if(egressTrip == null ) return null; //egress trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
 			result.addAll(egressTrip);
 		}
@@ -396,15 +397,19 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return "[NetworkRoutingModule: mode=" + this.mode + "]";
 	}
 
-	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
+	/* package (Tests) */ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime,
+			Attributes attributes) {
 		double travTime;
 
 		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 		if (toLink != fromLink) { // (a "true" route)
-
-			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+			// use vehicle from routing request attribute, if defined
+			Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+			if (vehicleId == null) {
+				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+			}
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 			Path path;

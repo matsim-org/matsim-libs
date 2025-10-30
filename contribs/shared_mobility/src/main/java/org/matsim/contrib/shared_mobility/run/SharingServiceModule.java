@@ -1,6 +1,8 @@
 
 package org.matsim.contrib.shared_mobility.run;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -18,7 +20,6 @@ import org.matsim.contrib.shared_mobility.routing.InteractionFinder;
 import org.matsim.contrib.shared_mobility.routing.SharingRoutingModule;
 import org.matsim.contrib.shared_mobility.routing.StationBasedInteractionFinder;
 import org.matsim.contrib.shared_mobility.service.SharingNetworkRentalsHandler;
-import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingTeleportedRentalsHandler;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -28,10 +29,14 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.modal.AbstractModalModule;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Singleton;
 
 public class SharingServiceModule extends AbstractModalModule<SharingMode> {
+
+	private static final Logger LOG = LogManager.getLogger(SharingServiceModule.class);
+
 	private final SharingServiceConfigGroup serviceConfig;
 
 	public SharingServiceModule(SharingServiceConfigGroup serviceConfig) {
@@ -43,14 +48,11 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 	public void install() {
 		SharingModes.registerSharingMode(binder(), getMode());
 
+		SharingServiceSpecification sss = readSpecification(serviceConfig);
+
 		installQSimModule(new SharingQSimServiceModule(serviceConfig));
 
-		bindModal(SharingServiceSpecification.class).toProvider(modalProvider(getter -> {
-			SharingServiceSpecification specification = new DefaultSharingServiceSpecification();
-			new SharingServiceReader(specification).readURL(
-					ConfigGroup.getInputFileURL(getConfig().getContext(), serviceConfig.getServiceInputFile()));
-			return specification;
-		})).in(Singleton.class);
+		bindModal(SharingServiceSpecification.class).toProvider(modalProvider(getter -> sss)).in(Singleton.class);
 
 		bindModal(SharingRoutingModule.class).toProvider(modalProvider(getter -> {
 			Scenario scenario = getter.get(Scenario.class);
@@ -60,8 +62,16 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 			InteractionFinder interactionFinder = getter.getModal(InteractionFinder.class);
 			TimeInterpretation timeInterpretation = getter.get(TimeInterpretation.class);
 
+			// create and add dummy vehicle for routing requests in replanning, if routed
+			Id<Vehicle> routingVehicleId = null;
+			if (getConfig().routing().getNetworkModes().contains(serviceConfig.getMode())) {
+				Vehicle routingVehicle = SharingUtils.getOrCreateAndAddDummyVehicle(serviceConfig,
+						scenario.getVehicles());
+				routingVehicleId = routingVehicle.getId();
+			}
+
 			return new SharingRoutingModule(scenario, accessEgressRoutingModule, mainModeRoutingModule,
-					interactionFinder, Id.create(serviceConfig.getId(), SharingService.class), timeInterpretation);
+					interactionFinder, serviceConfig.getId(), routingVehicleId, timeInterpretation);
 		}));
 
 		addRoutingModuleBinding(getMode()).to(modalKey(SharingRoutingModule.class));
@@ -146,4 +156,12 @@ public class SharingServiceModule extends AbstractModalModule<SharingMode> {
 				throw new IllegalStateException();
 		}
 	}
+
+	private SharingServiceSpecification readSpecification(SharingServiceConfigGroup sharingServiceConfigGroup) {
+		SharingServiceSpecification specification = new DefaultSharingServiceSpecification();
+		new SharingServiceReader(specification).readURL(
+				ConfigGroup.getInputFileURL(getConfig().getContext(), sharingServiceConfigGroup.getServiceInputFile()));
+		return specification;
+	}
+
 }

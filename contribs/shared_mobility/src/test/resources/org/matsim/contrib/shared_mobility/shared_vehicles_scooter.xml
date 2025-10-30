@@ -6,7 +6,7 @@
 <station id="2" link="7_2" capacity="4"/>
 </stations>
 <vehicles>
-<vehicle id="1_velib" startLink="55_2"  startStation="1"/>
-<vehicle id="2_velib" startLink="7_2" startStation="2"/>
+<vehicle id="1_scooter" startLink="55_2"  startStation="1"/>
+<vehicle id="2_scooter" startLink="7_2" startStation="2"/>
 </vehicles>
 </service>
