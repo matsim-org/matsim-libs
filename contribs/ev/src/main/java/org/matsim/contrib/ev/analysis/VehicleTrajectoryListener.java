@@ -23,6 +23,7 @@ import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -39,8 +40,9 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
         IdlingEnergyConsumptionEventHandler, DrivingEnergyConsumptionEventHandler, IterationStartsListener,
         IterationEndsListener, ShutdownListener {
-    static public final String OUTPUT_FILE = "ev_trajectories.csv.gz";
+	static public final String OUTPUT_FILE = "ev_trajectories.csv";
 
+    private final String fileEnding;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -54,8 +56,9 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     private final int interval;
 
     public VehicleTrajectoryListener(EventsManager eventsManager, Network network,
-            ElectricFleetSpecification electricFleet,
-            OutputDirectoryHierarchy outputHierarchy, int interval) {
+            ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy, int interval,
+            CompressionType compressionType) {
+        this.fileEnding = compressionType.fileEnding;
         this.eventsManager = eventsManager;
         this.network = network;
         this.electricFleet = electricFleet;
@@ -74,7 +77,8 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
                 capacity.put(vehicle.getId(), vehicle.getBatteryCapacity());
             }
 
-            String outputPath = outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE);
+            String outputPath = outputHierarchy.getIterationFilename(event.getIteration(),
+                    OUTPUT_FILE + this.fileEnding);
 
             writer = IOUtils.getBufferedWriter(outputPath);
 
@@ -112,8 +116,9 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        File iterationPath = new File(outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE));
-        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE));
+        File iterationPath = new File(
+                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + this.fileEnding));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE + this.fileEnding));
 
         try {
             Files.copy(iterationPath, outputPath);
