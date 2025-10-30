@@ -21,23 +21,64 @@
 
  import java.util.Collections;
  import java.util.Set;
- 
- import org.matsim.core.config.Config;
+import java.util.function.Supplier;
+
+import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.core.config.Config;
  import org.matsim.core.config.ReflectiveConfigGroup;
- 
- import jakarta.validation.constraints.NotNull;
+import org.matsim.core.config.ReflectiveConfigGroup.Comment;
+import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
+
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
  import jakarta.validation.constraints.Positive;
  
- public final class EvConfigGroup extends ReflectiveConfigGroup {
+ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	 public static final String GROUP_NAME = "ev";
  
 	 public EvConfigGroup() {
 		 super(GROUP_NAME);
+		 initSingletonParameterSets();
 	 }
  
 	 public static EvConfigGroup get(Config config) {
 		 return (EvConfigGroup) config.getModules().get(GROUP_NAME);
 	 }
+
+	 private void initSingletonParameterSets() {
+		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (SquareGridZoneSystemParams)params);
+
+		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GISFileZoneSystemParams)params);
+
+		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (H3GridZoneSystemParams)params);
+
+		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> analysisZoneSystemParams,
+				params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams)params);
+	}
+
+	 @Nullable
+	 private ZoneSystemParams analysisZoneSystemParams;
+
+	public ZoneSystemParams addOrGetAnalysisZoneSystemParams() {
+		if (analysisZoneSystemParams == null) {
+			ZoneSystemParams params = new SquareGridZoneSystemParams();
+			this.addParameterSet(params);
+		}
+
+		return analysisZoneSystemParams;
+	}
  
 	 @Parameter
 	 @Comment("charging will be simulated every 'chargeTimeStep'-th time step")
@@ -82,6 +123,10 @@
 	 @Comment("Interval at which detailed vehicle trajectories are written")
 	 private int writeVehicleTrajectoriesInterval = 0;
  
+	 @Parameter
+	 @Comment("Interval at which zonal energy demand information is written")
+	 private int writeZonalEnergyDemandInterval = 0;
+
 	 public enum InitialSocBehavior {
 		 Keep, UpdateAfterIteration
 	 }
@@ -161,6 +206,14 @@
 
 	 public void setWriteVehicleTrajectoriesInterval(int value) {
 		this.writeVehicleTrajectoriesInterval = value;
+	 }
+
+	 public int getWriteZonalEnergyDemandInterval() {
+		return writeZonalEnergyDemandInterval;
+	 }
+
+	 public void setWriteZonalEnergyDemandInterval(int value) {
+		this.writeZonalEnergyDemandInterval = value;
 	 }
  }
  
