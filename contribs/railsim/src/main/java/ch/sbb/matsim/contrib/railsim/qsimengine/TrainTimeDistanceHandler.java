@@ -1,34 +1,26 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-
-import com.google.inject.Inject;
-
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.PlannedArrival;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds data for time-distance chart and writes CSV file.
@@ -89,19 +81,26 @@ public class TrainTimeDistanceHandler {
 
 		TimeDistanceData data = new TimeDistanceData(line.getId(), route.getId());
 
-		double departureTime = departure.getDepartureTime();
+		List<TransitRouteStop> stops = new ArrayList<>(route.getStops());
+
+		TransitRouteStop first = stops.removeFirst();
+
+		// Train is starting at the first stop
+		data.add(departure.getDepartureTime(), 0, links.getFirst().getLinkId(), first.getStopFacility().getId());
+		position.nextLink();
+		position.nextStop();
+
+		double departureTime = departure.getDepartureTime() + first.getDepartureOffset().orElse(0);
 		double currentTime = departureTime;
 		double cumulativeDistance = 0.0;
 
-		// TODO: vehicle starts at the end of the transit stop link
+		for (TransitRouteStop stop : stops) {
 
-		for (TransitRouteStop stop : route.getStops()) {
+			List<RailLink> segment = position.getRouteUntilNextStop();
 
 			double currentSpeed = 0.0;
 			double scheduledArrival = departureTime + stop.getArrivalOffset().or(stop.getDepartureOffset()).orElse(0);
 			double targetArrivalAtStop = Math.max(currentTime, scheduledArrival);
-
-			List<RailLink> segment = position.getRouteUntilNextStop();
 
 			// compute remaining distance to the stop (over all links in this segment)
 			double remainingToStop = 0.0;
@@ -150,8 +149,15 @@ public class TrainTimeDistanceHandler {
 
 				currentTime += linkTime;
 				cumulativeDistance += L;
-				data.add(currentTime, cumulativeDistance, link.getLinkId(),
-						isLastLink ? stop.getStopFacility().getId() : null);
+
+				Id<TransitStopFacility> nextStopId = position.getNextStop() != null ? position.getNextStop().getId() : null;
+				data.add(currentTime, cumulativeDistance, link.getLinkId(), isLastLink ? nextStopId : null);
+
+				if (isLastLink) {
+					// Time at which the train is still present at the stop
+					double scheduledDeparture = departureTime + stop.getDepartureOffset().or(stop.getArrivalOffset()).orElse(0);
+					data.add(scheduledDeparture, cumulativeDistance, link.getLinkId(), nextStopId);
+				}
 
 				position.nextLink();
 				remainingToStop -= L;

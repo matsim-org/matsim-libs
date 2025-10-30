@@ -123,7 +123,7 @@ final class SimpleTrainState implements TrainPosition {
 		int from = routeIdx;
 
 		for (int i = 0; i < links.size(); i++) {
-			if (isStop(links.get(i).getLinkId())) {
+			if (isStop(links.get(i).getLinkId()) && from <= i + 1) {
 				return links.subList(from, i + 1);
 			}
 		}
