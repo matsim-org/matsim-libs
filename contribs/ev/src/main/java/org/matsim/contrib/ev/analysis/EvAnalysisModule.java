@@ -28,7 +28,7 @@ public class EvAnalysisModule extends AbstractModule {
     VehicleTrajectoryListener provideVehicleTrajectoryListener(EventsManager eventsManager, Network network,
             ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy,
             EvConfigGroup evConfig) {
-        return new VehicleTrajectoryListener(eventsManager, network, electricFleet, outputHierarchy,
+        return new VehicleTrajectoryListener(getConfig(), eventsManager, network, electricFleet, outputHierarchy,
                 evConfig.getWriteVehicleTrajectoriesInterval());
     }
 }

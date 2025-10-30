@@ -22,6 +22,7 @@ import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -34,8 +35,9 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
         IdlingEnergyConsumptionEventHandler, DrivingEnergyConsumptionEventHandler, IterationStartsListener,
         IterationEndsListener {
-    static public final String OUTPUT_FILE = "ev_trajectories.csv.gz";
+    static public final String OUTPUT_FILE = "ev_trajectories.csv";
 
+	private final String fileEnding;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -48,9 +50,10 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     private BufferedWriter writer;
     private final int interval;
 
-    public VehicleTrajectoryListener(EventsManager eventsManager, Network network,
+    public VehicleTrajectoryListener(Config config, EventsManager eventsManager, Network network,
             ElectricFleetSpecification electricFleet,
             OutputDirectoryHierarchy outputHierarchy, int interval) {
+        this.fileEnding = config.controller().getCompressionType().fileEnding;
         this.eventsManager = eventsManager;
         this.network = network;
         this.electricFleet = electricFleet;
@@ -69,7 +72,7 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
                 capacity.put(vehicle.getId(), vehicle.getBatteryCapacity());
             }
 
-            String outputPath = outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE);
+            String outputPath = outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + fileEnding);
 
             writer = IOUtils.getBufferedWriter(outputPath);
 
