@@ -1,5 +1,9 @@
 package org.matsim.contrib.ev.example;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +17,8 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
+import com.google.common.io.Files;
+
 public class RunEvExampleTest {
 
 	private static final Logger log = LogManager.getLogger(RunEvExample.class);
@@ -25,6 +31,7 @@ public class RunEvExampleTest {
 		try {
 			String[] args = {RunEvExample.DEFAULT_CONFIG_FILE,
 				"--config:controler.outputDirectory", utils.getOutputDirectory(),
+				"--config:ev.writeVehicleTrajectoriesInterval", "1"
 			};
 
 			new RunEvExample().run(args);
@@ -43,6 +50,9 @@ public class RunEvExampleTest {
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 				ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
 				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+			}
+			{
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_trajectories.csv.gz").exists());
 			}
 
 		} catch (Exception ee) {
