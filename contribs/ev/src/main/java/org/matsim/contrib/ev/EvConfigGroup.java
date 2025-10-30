@@ -77,6 +77,10 @@
 	 @Comment("Number of individual time profiles to be created")
 	 @Positive
 	 private int numberOfIndividualTimeProfiles = 50;
+
+	 @Parameter
+	 @Comment("Interval at which detailed vehicle trajectories are written")
+	 private int writeVehicleTrajectoriesInterval = 0;
  
 	 public enum InitialSocBehavior {
 		 Keep, UpdateAfterIteration
@@ -150,5 +154,13 @@
 	 public void setInitialSocBehavior(InitialSocBehavior initialSocBehavior) {
 		 this.initialSocBehavior = initialSocBehavior;
 	 }	
+
+	 public int getWriteVehicleTrajectoriesInterval() {
+		return writeVehicleTrajectoriesInterval;
+	 }
+
+	 public void setWriteVehicleTrajectoriesInterval(int value) {
+		this.writeVehicleTrajectoriesInterval = value;
+	 }
  }
  
