@@ -23,6 +23,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -37,7 +38,7 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         IterationEndsListener {
     static public final String OUTPUT_FILE = "ev_trajectories.csv";
 
-	private final String fileEnding;
+    private final String fileEnding;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -50,10 +51,10 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     private BufferedWriter writer;
     private final int interval;
 
-    public VehicleTrajectoryListener(Config config, EventsManager eventsManager, Network network,
-            ElectricFleetSpecification electricFleet,
-            OutputDirectoryHierarchy outputHierarchy, int interval) {
-        this.fileEnding = config.controller().getCompressionType().fileEnding;
+    public VehicleTrajectoryListener(EventsManager eventsManager, Network network,
+            ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy, int interval,
+            CompressionType compressionType) {
+        this.fileEnding = compressionType.fileEnding;
         this.eventsManager = eventsManager;
         this.network = network;
         this.electricFleet = electricFleet;
