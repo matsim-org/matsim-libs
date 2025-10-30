@@ -20,6 +20,7 @@ import org.matsim.contrib.ev.charging.EnergyChargedEventHandler;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -34,8 +35,9 @@ import com.google.common.io.Files;
 
 public class ZonalEnergyDemandListener
         implements IterationStartsListener, IterationEndsListener, EnergyChargedEventHandler, ShutdownListener {
-    static public final String OUTPUT_FILE = "ev_zonal_energy_demand.csv.gz";
+    static public final String OUTPUT_FILE = "ev_zonal_energy_demand.csv";
 
+    private final String fileEnding;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -53,7 +55,9 @@ public class ZonalEnergyDemandListener
     }
 
     public ZonalEnergyDemandListener(EventsManager eventsManager, OutputDirectoryHierarchy outputHierarchy,
-            ZoneSystem zoneSystem, ChargingInfrastructureSpecification infrastructure, int interval) {
+            ZoneSystem zoneSystem, ChargingInfrastructureSpecification infrastructure, int interval,
+            CompressionType compressionType) {
+        this.fileEnding = compressionType.fileEnding;
         this.eventsManager = eventsManager;
         this.zoneSystem = zoneSystem;
         this.infrastructure = infrastructure;
@@ -82,8 +86,8 @@ public class ZonalEnergyDemandListener
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-        File iterationPath = new File(outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE));
-        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE));
+        File iterationPath = new File(outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + this.fileEnding));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE + this.fileEnding));
 
         try {
             Files.copy(iterationPath, outputPath);
@@ -93,7 +97,7 @@ public class ZonalEnergyDemandListener
 
     private void writeData(int iteration) {
         try {
-            String outputPath = outputHierarchy.getIterationFilename(iteration, OUTPUT_FILE);
+            String outputPath = outputHierarchy.getIterationFilename(iteration, OUTPUT_FILE + this.fileEnding);
             BufferedWriter writer = IOUtils.getBufferedWriter(outputPath);
 
             writer.write(String.join(";", new String[] {

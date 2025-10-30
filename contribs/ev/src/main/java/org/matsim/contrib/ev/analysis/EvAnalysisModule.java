@@ -89,6 +89,6 @@ public class EvAnalysisModule extends AbstractModule {
             ChargingInfrastructureSpecification infrastructure, OutputDirectoryHierarchy outputHierarchy,
             EvConfigGroup evConfig) {
         return new ZonalEnergyDemandListener(eventsManager, outputHierarchy, zoneSystem, infrastructure,
-                evConfig.getWriteZonalEnergyDemandInterval());
+                evConfig.getWriteZonalEnergyDemandInterval(), getConfig().controller().getCompressionType());
     }
 }
