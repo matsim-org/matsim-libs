@@ -1,11 +1,12 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import jakarta.annotation.Nullable;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -14,7 +15,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import jakarta.annotation.Nullable;
 
 /**
  * Simple train state that can be used without simulation and exact positions on track.
@@ -237,18 +239,75 @@ final class SimpleTrainState implements TrainPosition {
 			return "rail";
 		}
 
+
 		@Override
 		public void setVehicle(MobsimVehicle veh) {
-			throw new UnsupportedOperationException("Not supported.");
+			// no-op for simple offline calculations
 		}
 
 		@Override
 		public MobsimVehicle getVehicle() {
-			throw new UnsupportedOperationException("Not supported.");
+			return new SimpleMobsimVehicle(vehicle, this);
 		}
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
+			return vehicle.getId();
+		}
+	}
+
+	private static final class SimpleMobsimVehicle implements MobsimVehicle {
+
+		private final Vehicle vehicle;
+		private final MobsimDriverAgent driver;
+
+		SimpleMobsimVehicle(Vehicle vehicle, MobsimDriverAgent driver) {
+			this.vehicle = vehicle;
+			this.driver = driver;
+		}
+
+		@Override
+		public Link getCurrentLink() {
+			return null;
+		}
+
+		@Override
+		public double getSizeInEquivalents() {
+			return 1.0;
+		}
+
+		@Override
+		public boolean addPassenger(PassengerAgent passenger) {
+			return false;
+		}
+
+		@Override
+		public boolean removePassenger(PassengerAgent passenger) {
+			return false;
+		}
+
+		@Override
+		public java.util.Collection<? extends PassengerAgent> getPassengers() {
+			return java.util.List.of();
+		}
+
+		@Override
+		public int getPassengerCapacity() {
+			return 0;
+		}
+
+		@Override
+		public org.matsim.vehicles.Vehicle getVehicle() {
+			return vehicle;
+		}
+
+		@Override
+		public MobsimDriverAgent getDriver() {
+			return driver;
+		}
+
+		@Override
+		public org.matsim.api.core.v01.Id<org.matsim.vehicles.Vehicle> getId() {
 			return vehicle.getId();
 		}
 	}
