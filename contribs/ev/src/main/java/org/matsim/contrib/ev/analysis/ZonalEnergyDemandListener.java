@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.zones.Zone;
@@ -26,6 +28,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 import com.google.common.io.Files;
 
@@ -45,8 +48,8 @@ public class ZonalEnergyDemandListener
     private final List<Map<Id<Zone>, Item>> data = new ArrayList<>(30);
 
     private class Item {
-        public double energy;
-        public int users;
+        public double energy = 0.0;
+        public Set<Id<Vehicle>> vehicles = new HashSet<>();
     }
 
     public ZonalEnergyDemandListener(EventsManager eventsManager, OutputDirectoryHierarchy outputHierarchy,
@@ -109,7 +112,7 @@ public class ZonalEnergyDemandListener
                     writer.write(String.join(";", new String[] {
                             entry.getKey().toString(), //
                             String.valueOf(hour), //
-                            String.valueOf(item.users), //
+                            String.valueOf(item.vehicles.size()), //
                             String.valueOf(EvUnits.J_to_kWh(item.energy)) //
                     }) + "\n");
                 }
@@ -143,7 +146,7 @@ public class ZonalEnergyDemandListener
         if (zone.isPresent()) {
             Item item = getItem(event.getTime(), zone.get());
             item.energy += event.getEnergy();
-            item.users++;
+            item.vehicles.add(event.getVehicleId());
         }
     }
 }
