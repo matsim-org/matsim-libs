@@ -111,6 +111,8 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 				person.getAttributes().putAttribute( entry2.getKey(),entry2.getValue() );
 				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the end we never know.  kai, oct'25
 			}
+			entry.getValue().setScore( originalPerson.getSelectedPlan().getScore() );
+			// yyyy this is somewhat dangerous ... since there is no guarantee that this is indeed the correct plan.
 			// ... up to here.
 			// There is EquilTwoAgentsTest, where I switched on the experienced plans writing in the scoring config.
 			// W/o the code lines above, the person attributes are not written.  W/ the code lines, they are written.
