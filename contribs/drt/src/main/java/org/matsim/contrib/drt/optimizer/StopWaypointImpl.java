@@ -35,13 +35,13 @@ public class StopWaypointImpl implements StopWaypoint {
         this.changedCapacity = null;
 
         // essentially the min of the latest possible arrival times at this stop
-        latestArrivalTime = calcLatestArrivalTime();
+        latestArrivalTime = task.calcLatestArrivalTime();
 
         // essentially the min of the earliest arrival times at this stop
-        earliestArrivalTime = calcEarliestArrivalTime();
+        earliestArrivalTime = task.calcEarliestArrivalTime();
 
         // essentially the min of the latest possible pickup times at this stop
-        latestDepartureTime = calcLatestDepartureTime();
+        latestDepartureTime = task.calcLatestDepartureTime();
 
     }
 
@@ -123,38 +123,6 @@ public class StopWaypointImpl implements StopWaypoint {
     @Override
     public boolean scheduleWaitBeforeDrive() {
         return scheduleWaitBeforeDrive;
-    }
-
-    private double calcLatestArrivalTime() {
-        return getMaxTimeConstraint(
-                task.getDropoffRequests().values().stream().mapToDouble(request -> request.getLatestArrivalTime() - request.getDropoffDuration()),
-                task.getBeginTime());
-    }
-
-    private double calcEarliestArrivalTime() {
-
-        if(getChangedCapacity().isPresent()) {
-            return task.getBeginTime();
-        }
-
-        return task.getPickupRequests().values()
-                .stream()
-                .mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
-                .min()
-                .orElse(0);
-    }
-
-    private double calcLatestDepartureTime() {
-        return getMaxTimeConstraint(
-                task.getPickupRequests().values().stream().mapToDouble(AcceptedDrtRequest::getLatestStartTime),
-                task.getEndTime());
-    }
-
-    private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
-        //XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
-        //thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
-        //but we cannot add a new stop before the delayed task
-        return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
     }
 
     @Override

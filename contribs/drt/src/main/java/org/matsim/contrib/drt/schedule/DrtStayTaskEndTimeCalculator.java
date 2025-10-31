@@ -18,15 +18,14 @@
 
 package org.matsim.contrib.drt.schedule;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
-import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
-
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
+import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
 
 public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
@@ -55,7 +54,8 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 				}
 			}
 			case STOP: {
-				return stopTimeCalculator.shiftEndTime(vehicle, (DrtStopTask) task, newBeginTime);
+				DrtStopTask stopTask = (DrtStopTask) task;
+				return Math.max(stopTask.calcEarliestDepartureTime(), stopTimeCalculator.shiftEndTime(vehicle, stopTask, newBeginTime));
 			}
 
 			default:
