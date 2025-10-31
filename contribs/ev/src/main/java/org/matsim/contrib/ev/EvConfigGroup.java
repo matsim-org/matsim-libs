@@ -40,8 +40,16 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
         initSingletonParameterSets();
     }
 
-    public static EvConfigGroup get(Config config) {
+    public static EvConfigGroup get(Config config, boolean create) {
+        if (!config.getModules().containsKey(GROUP_NAME)) {
+            config.addModule(new EvConfigGroup());
+        }
+
         return (EvConfigGroup) config.getModules().get(GROUP_NAME);
+    }
+
+    public static EvConfigGroup get(Config config) {
+        return get(config, false);
     }
 
     private void initSingletonParameterSets() {
