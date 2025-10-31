@@ -44,7 +44,7 @@ final class SimulationResult {
 				SequencedMap<String, StopTimeData> stops = stopTimesByTrainAndFacility
 					.computeIfAbsent(trainId, k -> new LinkedHashMap<>());
 
-				StopTimeData stop = stops.computeIfAbsent(facilityId, k -> new StopTimeData(stops.lastEntry()));
+				StopTimeData stop = stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()));
 
 				stop.arrivalTime = arrivalEvent.getTime();
 				stop.stopCount++;
@@ -56,7 +56,7 @@ final class SimulationResult {
 				SequencedMap<String, StopTimeData> stops = stopTimesByTrainAndFacility
 					.computeIfAbsent(trainId, k -> new LinkedHashMap<>());
 
-				stops.computeIfAbsent(facilityId, k -> new StopTimeData(stops.lastEntry()))
+				stops.computeIfAbsent(facilityId, k -> new StopTimeData(facilityId, stops.lastEntry()))
 					.departureTime = departureEvent.getTime();
 			}
 		}
