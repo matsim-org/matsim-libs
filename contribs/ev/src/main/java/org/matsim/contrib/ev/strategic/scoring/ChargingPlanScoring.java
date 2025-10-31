@@ -169,7 +169,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
+	public void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
 		if (score != 0.0) {
 			tracker.trackScore(time, personId, dimension, score, value);
 		}
@@ -183,7 +183,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
+	public void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
 			Double value) {
 		Id<Person> personId = getPerson(vehicleId);
 
