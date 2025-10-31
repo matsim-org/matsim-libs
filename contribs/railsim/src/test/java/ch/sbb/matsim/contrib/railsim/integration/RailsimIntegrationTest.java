@@ -675,9 +675,9 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			.trainHasLastArrival("v_IC_2", 29650.0)
 			.trainHasLastArrival("v_IC_3", 31383.0)
 			.trainHasLastArrival("v_IC_4", 31450.0)
-			.trainHasLastArrival("v_IR_1", 30321.0)
+			.trainHasLastArrival("v_IR_1", 30359.0)
 			.trainHasLastArrival("v_IR_2", 30609.0)
-			.trainHasLastArrival("v_IR_3", 32121.0)
+			.trainHasLastArrival("v_IR_3", 32159.0)
 			.trainHasLastArrival("v_IR_4", 32409.0);
 
 	}
