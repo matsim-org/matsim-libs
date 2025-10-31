@@ -56,6 +56,7 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -202,6 +203,8 @@ public class StrategicChargingScenarioConfigurator {
 
         public PublicChargerSettings publicChargers = new PublicChargerSettings();
 
+        public boolean considerExistingChargingInfrastructure = false;
+
         public class SubscriptionSettings {
             // number of ev users holding a special tariff subscription for public chargers
             public double subscriptionRate = 0.2;
@@ -284,8 +287,12 @@ public class StrategicChargingScenarioConfigurator {
                 Id<Vehicle> vehicleId = VehicleUtils.getVehicleIds(person).get(carMode);
                 if (vehicleId != null) {
                     Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
-                    usesElectricVehicle = VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())
-                            .equals(ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY);
+                    EngineInformation engineInformation = vehicle.getType().getEngineInformation();
+
+                    if (engineInformation != null) {
+                        usesElectricVehicle = ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY
+                                .equals(VehicleUtils.getHbefaTechnology(engineInformation));
+                    }
                 }
 
                 if (!usesElectricVehicle || settings.vehicles.considerExistingElectricVehicles) {
@@ -320,9 +327,9 @@ public class StrategicChargingScenarioConfigurator {
             }
         }
 
-        logger.info(String.format("Vehicles: generated {} vehicles", numberOfGeneratedVehicles));
-        logger.info(String.format("Vehicles: retained {} existing vehicles", numberOfRetainedVehicles));
-        logger.info(String.format("Vehicles: created new vehicle type: {}", sevcVehicleType == null ? "no" : "yes"));
+        logger.info(String.format("Vehicles: generated %d vehicles", numberOfGeneratedVehicles));
+        logger.info(String.format("Vehicles: retained %d existing vehicles", numberOfRetainedVehicles));
+        logger.info(String.format("Vehicles: created new vehicle type: %s", sevcVehicleType == null ? "no" : "yes"));
     }
 
     private VehicleType createVehicleType(Vehicles vehicles, String carMode) {
@@ -352,13 +359,13 @@ public class StrategicChargingScenarioConfigurator {
     public void loadExistingChargingInfrastructure(Scenario scenario) {
         EvConfigGroup evConfig = EvConfigGroup.get(scenario.getConfig());
 
-        if (evConfig.getChargersFile() != null) {
+        if (evConfig.getChargersFile() != null && settings.considerExistingChargingInfrastructure) {
             new ChargerReader(infrastructure).readURL(
                     ConfigGroup.getInputFileURL(scenario.getConfig().getContext(), evConfig.getChargersFile()));
         }
 
         logger.info(
-                String.format("Chargers: kept existing chargers: ", evConfig.getChargersFile() == null ? "no" : "yes"));
+                String.format("Chargers: kept existing chargers: %s", evConfig.getChargersFile() == null ? "no" : "yes"));
     }
 
     /**
@@ -397,7 +404,7 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} home chargers: ", numberOfChargers));
+                String.format("Chargers: created %d home chargers", numberOfChargers));
     }
 
     /**
@@ -456,9 +463,9 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} work chargers: ", numberOfChargers));
+                String.format("Chargers: created %d work chargers", numberOfChargers));
         logger.info(
-                String.format("  number of plugs at largest work place: ", maximumNumberOfPlugs));
+                String.format("  %d plugs at largest work place", maximumNumberOfPlugs));
     }
 
     /**
@@ -504,7 +511,7 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} public chargers: ", numberOfChargers));
+                String.format("Chargers: created %d public chargers: ", numberOfChargers));
     }
 
     /**
@@ -526,6 +533,8 @@ public class StrategicChargingScenarioConfigurator {
 
         loadExistingChargingInfrastructure(scenario);
         configureChargers(scenario);
+
+        configureCosts(scenario.getConfig());
 
         if (settings.subscriptions.subscriptionRate > 0.0 && settings.subscriptions.availabilityRate > 0.0) {
             configureSubscriptions(scenario);
