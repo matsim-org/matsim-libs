@@ -94,7 +94,6 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     @Parameter
     @Comment("Location of the chargers file")
-    @NotNull
     private String chargersFile = null;
 
     public enum EvAnalysisOutput {
