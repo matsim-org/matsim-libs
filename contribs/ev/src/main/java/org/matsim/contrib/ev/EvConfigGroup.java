@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
@@ -51,21 +52,9 @@ import jakarta.validation.constraints.NotNull;
 	 }
 
 	 private void initSingletonParameterSets() {
-		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (SquareGridZoneSystemParams)params);
-
-		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (GISFileZoneSystemParams)params);
-
-		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (H3GridZoneSystemParams)params);
-
-		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams)params);
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> analysisZoneSystemParams = params, // 
+			() -> analysisZoneSystemParams);
 	}
 
 	 @Nullable
