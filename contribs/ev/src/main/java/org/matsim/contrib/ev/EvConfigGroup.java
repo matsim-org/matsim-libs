@@ -24,9 +24,7 @@ import java.util.Set;
 
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.core.config.Config;
 
@@ -42,26 +40,22 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
         initSingletonParameterSets();
     }
 
-    public static EvConfigGroup get(Config config) {
+    public static EvConfigGroup get(Config config, boolean create) {
+        if (!config.getModules().containsKey(GROUP_NAME)) {
+            config.addModule(new EvConfigGroup());
+        }
+
         return (EvConfigGroup) config.getModules().get(GROUP_NAME);
     }
 
+    public static EvConfigGroup get(Config config) {
+        return get(config, false);
+    }
+
     private void initSingletonParameterSets() {
-        addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (SquareGridZoneSystemParams) params);
-
-        addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (GISFileZoneSystemParams) params);
-
-        addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (H3GridZoneSystemParams) params);
-
-        addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams) params);
+        ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition, //
+                (ZoneSystemParams params) -> analysisZoneSystemParams = params, //
+                () -> analysisZoneSystemParams);
     }
 
     @Nullable
