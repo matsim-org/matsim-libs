@@ -52,7 +52,7 @@ public class StrategicChargingUtils {
      * Adds a subscription to the person attributes. To be used with
      * AttributeBasedChargerAccess.
      */
-    public void addSubscription(Person person, String subscription) {
+    static public void addSubscription(Person person, String subscription) {
         SubscriptionRegistry.addSubscription(person, subscription);
     }
 
@@ -67,7 +67,7 @@ public class StrategicChargingUtils {
      * Adds a subscription to the charger attributes. To be used with
      * AttributeBasedChargerAccess.
      */
-    public void addSubscription(ChargerSpecification charger, String subscription) {
+    static public void addSubscription(ChargerSpecification charger, String subscription) {
         SubscriptionRegistry.addSubscription(charger, subscription);
     }
 
