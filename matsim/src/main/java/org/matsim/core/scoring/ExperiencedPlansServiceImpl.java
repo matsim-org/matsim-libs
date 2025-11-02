@@ -96,7 +96,6 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		if (plan != null) {
 			agentRecords.get(agentId).addActivity(activity);
 		}
-		log.warn("personId={}; just added activity={}",agentId,activity);
 	}
 
 	@Override
