@@ -3,11 +3,15 @@ package org.matsim.contrib.ev.strategic;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.strategic.access.SubscriptionRegistry;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
@@ -18,8 +22,10 @@ import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PublicChargerProvider;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
+import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoring;
+import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.contrib.ev.withinday.WithinDayChargingStrategy;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
@@ -46,7 +52,7 @@ public class StrategicChargingUtils {
      * Adds a subscription to the person attributes. To be used with
      * AttributeBasedChargerAccess.
      */
-    public void addSubscription(Person person, String subscription) {
+    static public void addSubscription(Person person, String subscription) {
         SubscriptionRegistry.addSubscription(person, subscription);
     }
 
@@ -61,7 +67,7 @@ public class StrategicChargingUtils {
      * Adds a subscription to the charger attributes. To be used with
      * AttributeBasedChargerAccess.
      */
-    public void addSubscription(ChargerSpecification charger, String subscription) {
+    static public void addSubscription(ChargerSpecification charger, String subscription) {
         SubscriptionRegistry.addSubscription(charger, subscription);
     }
 
@@ -255,7 +261,6 @@ public class StrategicChargingUtils {
     /**
      * Adds the activity scoring parameters to the 'normal' MATSim scoring config
      * group.
-     * You still need to configure the ChargingPlanScoringParameters yourself!
      */
     static public void configureScoring(Config config) {
         for (String activityType : Arrays.asList(WithinDayEvEngine.PLUG_ACTIVITY_TYPE,
@@ -269,19 +274,24 @@ public class StrategicChargingUtils {
 
     /**
      * Sets up configuration for a SEVC simulation.
-     *
-     * Things that still need to be done by the user:
-     * <ul>
-     * <li>Agents still need to be activated using the `activate` method</li>
-     * <li>The ChargingPlanScoringParameters still need to be added</li>
-     * </ul>
+     * 
+     * - Agents still need to be activated using the `WithinDayEvUtils.activate`
+     * method.
+     * - Replanning still needs to be configured (see the helper methods)
      */
     static public void configure(Config config) {
-        WithinDayEvConfigGroup wdevConfig = new WithinDayEvConfigGroup();
-        config.addModule(wdevConfig);
+        // make sure that config groups are present
+        EvConfigGroup.get(config, true);
+        WithinDayEvConfigGroup.get(config, true);
+        StrategicChargingConfigGroup sevcConfig = StrategicChargingConfigGroup.get(config, true);
 
-        StrategicChargingConfigGroup sevcConfig = new StrategicChargingConfigGroup();
-        config.addModule(sevcConfig);
+        // sensible defaults for scoring parameters
+        ChargingPlanScoringParameters scoringParameters = new ChargingPlanScoringParameters();
+        sevcConfig.addParameterSet(scoringParameters);
+
+        // sensible defaults for innovator parameters
+        RandomChargingPlanInnovator.Parameters innovationParameters = new RandomChargingPlanInnovator.Parameters();
+        sevcConfig.addParameterSet(innovationParameters);
 
         StrategySettings sevcStrategy = new StrategySettings();
         sevcStrategy.setStrategyName(StrategicChargingReplanningStrategy.STRATEGY);
@@ -292,30 +302,71 @@ public class StrategicChargingUtils {
     }
 
     /**
-     * Sets up configuration for a standalone SEVC simulation
-     * 
-     * <ul>
-     * <li>Agents still need to be activated using the `activate` method</li>
-     * </ul>
+     * Adds a replanning startegy to the given subpopulation
      */
-    static public void configureStandalone(Config config) {
-        configure(config);
+    static public void configureDefaultReplanning(Config config, String subpopulation, double weight) {
+        StrategySettings sevcStrategy = new StrategySettings();
+        sevcStrategy.setStrategyName(StrategicChargingReplanningStrategy.STRATEGY);
+        sevcStrategy.setWeight(weight);
+        sevcStrategy.setSubpopulation(subpopulation);
+        config.replanning().addStrategySettings(sevcStrategy);
+    }
 
-        config.replanning().setMaxAgentPlanMemorySize(1);
-        config.replanning().clearStrategySettings();
+    /**
+     * Adds a replanning strategy
+     */
+    static public void configureDefaultReplanning(Config config, double weight) {
+        configureDefaultReplanning(config, null, weight);
+    }
 
+    /**
+     * Sets up the subpopulation for standalone strategic charging without any other
+     * innovation strategy
+     */
+    static public void configureStandaloneReplanning(Config config, String subpopulation) {
+        // clean up
+        List<StrategySettings> remove = new LinkedList<>();
+
+        for (StrategySettings settings : config.replanning().getStrategySettings()) {
+            if (settings.getSubpopulation() == subpopulation) {
+                remove.add(settings);
+            }
+        }
+
+        remove.forEach(config.replanning()::removeParameterSet);
+
+        // add new
         StrategySettings sevcStrategy = new StrategySettings();
         sevcStrategy.setStrategyName(StrategicChargingReplanningStrategy.STRATEGY);
         sevcStrategy.setWeight(1.0);
+        sevcStrategy.setSubpopulation(subpopulation);
         config.replanning().addStrategySettings(sevcStrategy);
+    }
+
+    /**
+     * Sets up standalone strategic charging without any other innovation strategy
+     */
+    static public void configureStandaloneReplanning(Config config) {
+        configureStandaloneReplanning(config, null);
+    }
+
+    /**
+     * Sets up the controller
+     */
+    static public void configureController(Controler controller, boolean addEvModule) {
+        if (addEvModule) {
+            controller.addOverridingModule(new EvModule());
+        }
+
+        controller.addOverridingModule(new WithinDayEvModule());
+        controller.addOverridingModule(new StrategicChargingModule());
     }
 
     /**
      * Sets up the controller
      */
     static public void configureController(Controler controller) {
-        controller.addOverridingModule(new WithinDayEvModule());
-        controller.addOverridingModule(new StrategicChargingModule());
+        configureController(controller, true);
     }
 
     /**

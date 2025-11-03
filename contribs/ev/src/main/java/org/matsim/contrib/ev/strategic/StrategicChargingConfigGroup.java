@@ -26,8 +26,16 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String GROUP_NAME = "strategic_charging";
 
-	public static StrategicChargingConfigGroup get(Config config) {
+	public static StrategicChargingConfigGroup get(Config config, boolean create) {
+		if (!config.getModules().containsKey(GROUP_NAME)) {
+			config.addModule(new StrategicChargingConfigGroup());
+		}
+
 		return (StrategicChargingConfigGroup) config.getModules().get(GROUP_NAME);
+	}
+
+	public static StrategicChargingConfigGroup get(Config config) {
+		return get(config, false);
 	}
 
 	public StrategicChargingConfigGroup() {
@@ -107,6 +115,10 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 	@Comment("Defines the probability with which a charging plan is selected among the existing ones versus creating a new charging plan")
 	@DecimalMin("0.0")
 	@DecimalMax("1.0")
+	/**
+	 * I think we should phase out selection for strategic charging and just rely on
+	 * the standard selection mechanisms. / sebhoerl oct 2025
+	 */
 	private double selectionProbability = 0.8;
 
 	@Parameter
