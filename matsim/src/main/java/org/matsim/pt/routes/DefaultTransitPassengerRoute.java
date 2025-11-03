@@ -33,10 +33,8 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 	public DefaultTransitPassengerRoute chainedRoute = null;
 
-	public double totalRouteCost = Double.NaN;
-
 	DefaultTransitPassengerRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		this(startLinkId, endLinkId, null, null, null, null, Double.NaN);
+		this(startLinkId, endLinkId, null, null, null, null);
 	}
 
 	public DefaultTransitPassengerRoute(TransitStopFacility accessFacility, TransitLine line, TransitRoute route,
@@ -44,8 +42,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		this( //
 			accessFacility.getLinkId(), egressFacility.getLinkId(), //
 			accessFacility.getId(), egressFacility.getId(), //
-			line != null ? line.getId() : null, route != null ? route.getId() : null,
-			Double.NaN);
+			line != null ? line.getId() : null, route != null ? route.getId() : null);
 	}
 
 	public DefaultTransitPassengerRoute(TransitStopFacility accessFacility, TransitLine line, TransitRoute route,
@@ -53,8 +50,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		this( //
 			accessFacility.getLinkId(), egressFacility.getLinkId(), //
 			accessFacility.getId(), egressFacility.getId(), //
-			line != null ? line.getId() : null, route != null ? route.getId() : null,
-			Double.NaN);
+			line != null ? line.getId() : null, route != null ? route.getId() : null);
 		this.chainedRoute = chainedRoute;
 	}
 
@@ -62,29 +58,19 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 										 final Id<Link> accessLinkId, final Id<Link> egressLinkId, //
 										 Id<TransitStopFacility> accessFacilityId, Id<TransitStopFacility> egressFacilityId, //
 										 Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
-		this(accessLinkId, egressLinkId, accessFacilityId, egressFacilityId, transitLineId, transitRouteId, Double.NaN);
-	}
-
-	public DefaultTransitPassengerRoute( //
-										 final Id<Link> accessLinkId, final Id<Link> egressLinkId, //
-										 Id<TransitStopFacility> accessFacilityId, Id<TransitStopFacility> egressFacilityId, //
-										 Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId,
-										 double totalRouteCost) {
 		super(accessLinkId, egressLinkId);
 
 		this.transitLineIndex = Objects.isNull(transitLineId) ? NULL_ID : transitLineId.index();
 		this.transitRouteIndex = Objects.isNull(transitRouteId) ? NULL_ID : transitRouteId.index();
 		this.accessFacilityIndex = Objects.isNull(accessFacilityId) ? NULL_ID : accessFacilityId.index();
 		this.egressFacilityIndex = Objects.isNull(egressFacilityId) ? NULL_ID : egressFacilityId.index();
-		this.totalRouteCost = totalRouteCost;
 	}
 
 	/**
 	 * Construct for data read from JSON.
 	 */
 	private DefaultTransitPassengerRoute(double boardingTime, int accessFacilityIndex, int egressFacilityIndex,
-										 int transitLineIndex, int transitRouteIndex, DefaultTransitPassengerRoute chainedRoute,
-										 double  totalRouteCost) {
+										 int transitLineIndex, int transitRouteIndex, DefaultTransitPassengerRoute chainedRoute) {
 		super(null, null);
 		this.boardingTime = boardingTime;
 		this.accessFacilityIndex = accessFacilityIndex;
@@ -92,7 +78,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		this.transitLineIndex = transitLineIndex;
 		this.transitRouteIndex = transitRouteIndex;
 		this.chainedRoute = chainedRoute;
-		this.totalRouteCost = totalRouteCost;
 	}
 
 	@Override
@@ -121,7 +106,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			this.transitLineIndex = parsed.transitLineId == null ? NULL_ID : parsed.transitLineId.index();
 			this.transitRouteIndex = parsed.transitRouteId == null ? NULL_ID : parsed.transitRouteId.index();
 			this.chainedRoute = createChainedRoutes(parsed.chainedRoute);
-			this.totalRouteCost = parsed.totalRouteCost;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -144,7 +128,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		return new DefaultTransitPassengerRoute(
 			boardingTime, accessFacilityIndex, egressFacilityIndex, transitLineIndex, transitRouteIndex,
-			createChainedRoutes(r.chainedRoute), r.totalRouteCost
+			createChainedRoutes(r.chainedRoute)
 		);
 	}
 
@@ -193,8 +177,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		DefaultTransitPassengerRoute copy = new DefaultTransitPassengerRoute( //
 			getStartLinkId(), getEndLinkId(), //
 			getAccessStopId(), getEgressStopId(), //
-			getLineId(), getRouteId(),
-			totalRouteCost);
+			getLineId(), getRouteId());
 
 		// Perform deep copy of the chained route
 		if (this.chainedRoute != null) {
@@ -219,8 +202,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		public RouteDescription chainedRoute;
 
-		public double totalRouteCost = Double.NaN;
-
 		public RouteDescription() {
 		}
 
@@ -230,7 +211,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 			egressFacilityId = r.egressFacilityIndex == NULL_ID ? null : Id.get(r.egressFacilityIndex, TransitStopFacility.class);
 			transitLineId = r.transitLineIndex == NULL_ID ? null : Id.get(r.transitLineIndex, TransitLine.class);
 			transitRouteId = r.transitRouteIndex == NULL_ID ? null : Id.get(r.transitRouteIndex, TransitRoute.class);
-			totalRouteCost = r.totalRouteCost;
 
 			if (r.chainedRoute != null) {
 				this.chainedRoute = new RouteDescription(r.chainedRoute);
@@ -260,11 +240,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		@JsonProperty("transitRouteId")
 		public String getRouteLineId() {
 			return this.transitRouteId == null ? null : this.transitRouteId.toString();
-		}
-
-		@JsonProperty("totalRouteCost")
-		public String getTotalRouteCost() {
-			return String.valueOf(this.totalRouteCost);
 		}
 
 		@JsonProperty("boardingTime")
@@ -301,11 +276,6 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		@JsonProperty("chainedRoute")
 		public void setChainedRoute(RouteDescription chainedRoute) {
 			this.chainedRoute = chainedRoute;
-		}
-
-		@JsonProperty("totalRouteCost")
-		public void setTotalRouteCost(String totalRouteCost) {
-			this.totalRouteCost = Double.parseDouble(totalRouteCost);
 		}
 	}
 }
