@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -119,6 +119,13 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
         }
         checkSettings();
     }
+
+	/**
+	 * Tha agent id for an umlauf.
+	 */
+	static String createId(TransitLine line, TransitRoute route, Departure departure) {
+		return line.getId().toString() + "_" + route.getId().toString() + "_" + departure.getId().toString();
+	}
 
     private void checkSettings() {
         if (this.config.getDeterministicServiceModes().isEmpty()) {
@@ -261,7 +268,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     }
 
     private Umlauf createUmlauf(TransitLine line, TransitRoute route, Departure departure) {
-        Id<Umlauf> id = Id.create(line.getId().toString() + "_" + route.getId().toString() + "_" + departure.getId().toString(), Umlauf.class);
+        Id<Umlauf> id = Id.create(createId(line, route, departure), Umlauf.class);
         UmlaufImpl umlauf = new UmlaufImpl(id);
         UmlaufStueck part = new UmlaufStueck(line, route, departure);
         umlauf.getUmlaufStuecke().add(part);

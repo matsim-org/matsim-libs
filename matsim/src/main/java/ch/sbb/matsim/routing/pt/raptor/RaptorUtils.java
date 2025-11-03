@@ -162,7 +162,10 @@ public final class RaptorUtils {
                 ptLeg.setDepartureTime(part.depTime);
                 ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
 
-                ptLeg.setRoute(convertRoutePart(part));
+				DefaultTransitPassengerRoute defaultTransitPassengerRoute = convertRoutePart(part);
+				defaultTransitPassengerRoute.totalRouteCost = route.getTotalCosts();
+
+                ptLeg.setRoute(defaultTransitPassengerRoute);
 
 				legs.add(ptLeg);
                 lastArrivalTime = part.getChainedArrivalTime();
@@ -208,8 +211,10 @@ public final class RaptorUtils {
 
 		DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop, convertRoutePart(part.chainedPart));
 		ptRoute.setBoardingTime(part.boardingTime);
-		ptRoute.setTravelTime(part.arrivalTime - part.depTime);
-		ptRoute.setDistance(part.distance);
+		ptRoute.setTravelTime(part.getChainedArrivalTime() - part.depTime);
+		ptRoute.setDistance(part.getChainedDistance());
+		// End link is always set to the last destination
+		ptRoute.setEndLinkId(part.getChainedEgressStop().getLinkId());
 
 		return ptRoute;
 	}

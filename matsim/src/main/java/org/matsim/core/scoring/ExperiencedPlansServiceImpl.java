@@ -104,6 +104,18 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		Population tmpPop = PopulationUtils.createPopulation(config,network);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
+
+			// the following is new as of oct-25 ...
+			Person originalPerson = population.getPersons().get( entry.getKey() );
+			for( Map.Entry<String, Object> entry2 : originalPerson.getAttributes().getAsMap().entrySet() ){
+				person.getAttributes().putAttribute( entry2.getKey(),entry2.getValue() );
+				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the end we never know.  kai, oct'25
+			}
+			// ... up to here.
+			// There is EquilTwoAgentsTest, where I switched on the experienced plans writing in the scoring config.
+			// W/o the code lines above, the person attributes are not written.  W/ the code lines, they are written.
+			// This is, evidently, not a true regression test, but at least I had a look if the functionality works at all. kai, oct'25
+
 			Plan plan = entry.getValue();
 			person.addPlan(plan);
 			tmpPop.addPerson(person);

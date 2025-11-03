@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacility;
@@ -141,6 +142,10 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		Iterator<Activity> act_it = subChain.getSlActs().iterator();
 		while (act_it.hasNext()) {
 			Activity act = act_it.next();
+
+			if(TripStructureUtils.isStageActivityType(act.getType()))
+				continue;
+
 			double radius = (ttBudget * speed) / 2.0;
 			if (!this.modifyLocation((Activity) act, startCoord, endCoord, radius, 0)) {
 				return 1;
@@ -193,19 +198,18 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 				fromAct.getEndTime().seconds(),
 				person, new AttributesImpl() );
 
-		if ( trip.size() != 1 ) {
-			throw new IllegalStateException( "This method can only be used with "+
-					"routing modules returning single legs. Got the following trip "+
-					"for mode "+ leg.getMode()+": "+trip );
+		double travelTime = 0;
+		for (PlanElement pe : trip){
+			if(pe instanceof Leg tripLeg) {
+				leg.setRoute(tripLeg.getRoute());
+				leg.setTravelTime(tripLeg.getTravelTime().seconds());
+				leg.setDepartureTime(tripLeg.getDepartureTime().seconds());
+				timeInterpretation.decideOnLegTravelTime(tripLeg);
+				travelTime += leg.getTravelTime().seconds();
+			}
 		}
 
-		Leg tripLeg = (Leg) trip.get( 0 );
-		leg.setRoute( tripLeg.getRoute() );
-		leg.setTravelTime(tripLeg.getTravelTime().seconds() );
-		leg.setDepartureTime(tripLeg.getDepartureTime().seconds() );
-
-		timeInterpretation.decideOnLegTravelTime( tripLeg );
-		return leg.getTravelTime().seconds();
+		return travelTime;
 	}
 
 	private List<SubChain> calcActChainsDefinedFixedTypes(final Plan plan) {
@@ -214,6 +218,9 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
+
+			if(TripStructureUtils.isStageActivityType(act.getType()))
+				continue;
 
 			if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains( act.getType() )) { // found secondary activity
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));

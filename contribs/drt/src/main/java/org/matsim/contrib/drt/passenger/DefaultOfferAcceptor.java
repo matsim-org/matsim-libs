@@ -26,12 +26,12 @@ public class DefaultOfferAcceptor implements DrtOfferAcceptor{
 	@Override
 	public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
 		double updatedLatestStartTime = Math.min(departureTime
-			+ request.getMaxPickupDelay(), request.getLatestStartTime());
+			+ request.getConstraints().maxPickupDelay(), request.getLatestStartTime());
 		return Optional.of(AcceptedDrtRequest
 			.newBuilder()
 			.request(request)
 			.earliestStartTime(request.getEarliestStartTime())
-			.maxRideDuration(request.getMaxRideDuration())
+			.maxRideDuration(request.getConstraints().maxRideDuration())
 			.latestArrivalTime(request.getLatestArrivalTime())
 			.latestStartTime(updatedLatestStartTime)
 			.dropoffDuration(dropoffDuration)

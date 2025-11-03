@@ -23,7 +23,7 @@
 
 import org.matsim.core.mobsim.framework.Steppable;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 public class SteppableScheduler extends Scheduler implements Steppable {
 

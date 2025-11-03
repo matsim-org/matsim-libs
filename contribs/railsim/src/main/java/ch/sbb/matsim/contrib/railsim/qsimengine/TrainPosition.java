@@ -6,6 +6,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import jakarta.annotation.Nullable;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import java.util.List;
 
 /**
@@ -83,4 +85,10 @@ public interface TrainPosition {
 	 * Check whether to stop at certain link.
 	 */
 	boolean isStop(Id<Link> link);
+
+	/**
+	 * Get the next stop facility, if any.
+	 */
+	@Nullable
+	TransitStopFacility getNextStop();
 }

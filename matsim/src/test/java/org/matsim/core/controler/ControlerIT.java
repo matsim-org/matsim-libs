@@ -20,15 +20,7 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
-import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -43,20 +35,15 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -70,28 +57,36 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Provider;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.matsim.core.config.groups.ControllerConfigGroup.CompressionType;
+import static org.matsim.core.config.groups.ControllerConfigGroup.SnapshotFormat;
 
 public class ControlerIT {
 
 	private final static Logger log = LogManager.getLogger(ControlerIT.class);
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testScenarioLoading() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		Controler controler = new Controler( config );
+		Controler controler = new Controler(config);
 
 		// need to run the controler to get Scenario initilized
-		controler.getConfig().controller().setLastIteration( 0 );
+		controler.getConfig().controller().setLastIteration(0);
 		controler.getConfig().controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
 		controler.run();
 
-        assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
-        assertNotNull(controler.getScenario().getPopulation());
-        assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
-        assertEquals(15, controler.getScenario().getNetwork().getNodes().size());
-        assertEquals(100, controler.getScenario().getPopulation().getPersons().size());
+		assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
+		assertNotNull(controler.getScenario().getPopulation());
+		assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
+		assertEquals(15, controler.getScenario().getNetwork().getNodes().size());
+		assertEquals(100, controler.getScenario().getPopulation().getPersons().size());
 		assertNotNull(controler.getEvents());
 	}
 
@@ -158,7 +153,7 @@ public class ControlerIT {
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
 		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
+		a1.setEndTime(7.0 * 3600);
 		plan1.addActivity(a1);
 		Leg leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
@@ -174,7 +169,7 @@ public class ControlerIT {
 		Plan plan2 = factory.createPlan();
 		person2.addPlan(plan2);
 		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a2.setEndTime(7.0*3600);
+		a2.setEndTime(7.0 * 3600);
 		plan2.addActivity(a2);
 		Leg leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
@@ -191,11 +186,11 @@ public class ControlerIT {
 		// Complete the configuration for our test case
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setCreateGraphs(false);
-		config.controller().setWriteEventsInterval(0);
+		config.controller().setWriteEventsInterval(1);
 		config.controller().setDumpDataAtEnd(false);
 		// - set scoring parameters
 		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
+		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
 		config.scoring().addActivityParams(actParams);
 		// - define iterations
@@ -212,7 +207,7 @@ public class ControlerIT {
 		// test if the travel time calculator got the right result
 		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
 		assertEquals(avgTravelTimeLink2,
-				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON, "TravelTimeCalculator has wrong result");
+			controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON, "TravelTimeCalculator has wrong result");
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controller().setLastIteration(1);
@@ -228,8 +223,10 @@ public class ControlerIT {
 
 		// test that the plans have the correct travel times
 		// (travel time of the plan does not contain first and last link)
-		assertEquals(avgTravelTimeLink2,
-				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
+		// NOTE: I changed the test to match exactly 150, since the AccessEgressRouter casts the TT to an integer, aleks Mar'25
+		double seconds = ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds();
+		assertEquals(150,
+			seconds, MatsimTestUtils.EPSILON, "ReRoute seems to have wrong travel times.");
 	}
 
 	/**
@@ -244,10 +241,10 @@ public class ControlerIT {
 		final Config config = this.utils.loadConfig((String) null);
 		config.controller().setLastIteration(0);
 
-		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		// create a very simple network with one link only and an empty population
+		// create a very simple network with two links only and an empty population
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(100, 0));
@@ -258,10 +255,17 @@ public class ControlerIT {
 		link.setFreespeed(1);
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1);
+		Link linkOpposite = network.getFactory().createLink(Id.create(2, Link.class), node2, node1);
+		link.setLength(100);
+		link.setFreespeed(1);
+		link.setCapacity(3600.0);
+		link.setNumberOfLanes(1);
+		network.addLink(link);
+		network.addLink(linkOpposite);
 
 		final Controler controler = new Controler(scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
-        controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -279,7 +283,7 @@ public class ControlerIT {
 		controler.run();
 
 		assertTrue(controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory,
-				"Custom ScoringFunctionFactory was not set.");
+			"Custom ScoringFunctionFactory was not set.");
 	}
 
 	/**
@@ -305,7 +309,7 @@ public class ControlerIT {
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
 		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
+		a1.setEndTime(7.0 * 3600);
 		plan1.addActivity(a1);
 		leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
@@ -315,7 +319,7 @@ public class ControlerIT {
 		Plan plan2 = factory.createPlan();
 		person1.addPlan(plan2);
 		Activity a2 = factory.createActivityFromLinkId("h", f.link1.getId());
-		a2.setEndTime(7.0*3600);
+		a2.setEndTime(7.0 * 3600);
 		plan2.addActivity(a2);
 
 		leg2 = factory.createLeg(TransportMode.car);
@@ -327,7 +331,7 @@ public class ControlerIT {
 		// Complete the configuration for our test case
 		// - set scoring parameters
 		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
+		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
 		config.scoring().addActivityParams(actParams);
 		// - define iterations
@@ -335,12 +339,12 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
-        controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -363,12 +367,12 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					3,
-					plan.getPlanElements().size(),
-					"unexpected plan length in "+plan.getPlanElements());
+				3,
+				plan.getPlanElements().size(),
+				"unexpected plan length in " + plan.getPlanElements());
 			assertNotNull(
-					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
-					"null route in plan "+plan.getPlanElements());
+				((Leg) plan.getPlanElements().get(1)).getRoute(),
+				"null route in plan " + plan.getPlanElements());
 		}
 	}
 
@@ -400,7 +404,7 @@ public class ControlerIT {
 		person1.addPlan(plan1);
 		double x1 = -50.0;
 		act1a = factory.createActivityFromCoord("h", new Coord(x1, 10.0));
-		act1a.setEndTime(7.0*3600);
+		act1a.setEndTime(7.0 * 3600);
 		plan1.addActivity(act1a);
 		leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
@@ -414,7 +418,7 @@ public class ControlerIT {
 		double x = -50.0;
 		double y = -10.0;
 		act2a = factory.createActivityFromCoord("h", new Coord(x, y));
-		act2a.setEndTime(7.9*3600);
+		act2a.setEndTime(7.9 * 3600);
 		plan2.addActivity(act2a);
 		leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
@@ -426,7 +430,7 @@ public class ControlerIT {
 		// Complete the configuration for our test case
 		// - set scoring parameters
 		ActivityParams actParams = new ActivityParams("h");
-		actParams.setTypicalDuration(8*3600);
+		actParams.setTypicalDuration(8 * 3600);
 		actParams.setPriority(1.0);
 		config.scoring().addActivityParams(actParams);
 		// - define iterations
@@ -434,12 +438,12 @@ public class ControlerIT {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
-		config.qsim().setUsingFastCapacityUpdate( isUsingFastCapacityUpdate );
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
-        controler.getConfig().controller().setWriteEventsInterval(0);
+		controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -462,11 +466,7 @@ public class ControlerIT {
 		assertEquals(f.link1.getId(), act2a.getLinkId());
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 
-		int expectedPlanLength = 3 ;
-		if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
-			expectedPlanLength = 7 ;
-		}
+		int expectedPlanLength = 7;
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		//assertNotNull(leg1.getRoute());
@@ -474,17 +474,15 @@ public class ControlerIT {
 		// but do not assume that the leg will be the same instance...
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
-					expectedPlanLength,
-					plan.getPlanElements().size(),
-					"unexpected plan length in "+plan.getPlanElements());
+				expectedPlanLength,
+				plan.getPlanElements().size(),
+				"unexpected plan length in " + plan.getPlanElements());
 			assertNotNull(
-					((Leg) plan.getPlanElements().get( 1 )).getRoute(),
-					"null route in plan "+plan.getPlanElements());
-			if ( !f.scenario.getConfig().routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
-				assertNotNull(
-					((Leg) plan.getPlanElements().get( 3 )).getRoute(),
-					"null route in plan "+plan.getPlanElements());
-			}
+				((Leg) plan.getPlanElements().get(1)).getRoute(),
+				"null route in plan " + plan.getPlanElements());
+			assertNotNull(
+				((Leg) plan.getPlanElements().get(3)).getRoute(),
+				"null route in plan " + plan.getPlanElements());
 		}
 	}
 
@@ -495,7 +493,7 @@ public class ControlerIT {
 	void testCompressionType() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controller().setLastIteration(0);
-		config.controller().setCompressionType( CompressionType.zst );
+		config.controller().setCompressionType(CompressionType.zst);
 		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
 
 		final Controler controler = new Controler(config);
@@ -538,7 +536,7 @@ public class ControlerIT {
 
 		final Controler controler = new Controler(config);
 		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
-				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
+			"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 
 		controler.getConfig().controller().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controller().getWriteEventsInterval());
@@ -582,8 +580,8 @@ public class ControlerIT {
 
 		final Controler controler = new Controler(config);
 		assertFalse(3 == controler.getConfig().controller().getWriteEventsInterval(),
-				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
-        controler.getConfig().controller().setCreateGraphs(false);
+			"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -623,10 +621,10 @@ public class ControlerIT {
 
 		final Controler controler = new Controler(config);
 		assertFalse(0 == controler.getConfig().controller().getWriteEventsInterval(),
-				"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
+			"Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.");
 		controler.getConfig().controller().setWriteEventsInterval(0);
 		assertEquals(0, controler.getConfig().controller().getWriteEventsInterval());
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -657,7 +655,7 @@ public class ControlerIT {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controller().getWriteEventsInterval());
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -689,7 +687,7 @@ public class ControlerIT {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controller().getWriteEventsInterval());
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -718,7 +716,7 @@ public class ControlerIT {
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setWriteEventsInterval(0);
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -748,7 +746,7 @@ public class ControlerIT {
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setWriteEventsInterval(0);
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -825,13 +823,13 @@ public class ControlerIT {
 	@Test
 	void test_ExceptionOnMissingNetworkFile() {
 		try {
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		config.controller().setLastIteration(0);
-		config.controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
-		config.network().setInputFile("dummy/non-existing/network.xml");
+			final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+			config.controller().setLastIteration(0);
+			config.controller().setWriteEventsInterval(0);
+			config.controller().setWritePlansInterval(0);
+			config.network().setInputFile("dummy/non-existing/network.xml");
 
-		final Controler controler = new Controler(config);
+			final Controler controler = new Controler(config);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -860,13 +858,13 @@ public class ControlerIT {
 	@Test
 	void test_ExceptionOnMissingFacilitiesFile() {
 		try {
-		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
-		config.controller().setLastIteration(0);
-		config.controller().setWriteEventsInterval(0);
-		config.controller().setWritePlansInterval(0);
-		config.facilities().setInputFile("dummy/non-existing/network.xml");
+			final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+			config.controller().setLastIteration(0);
+			config.controller().setWriteEventsInterval(0);
+			config.controller().setWritePlansInterval(0);
+			config.facilities().setInputFile("dummy/non-existing/network.xml");
 
-		final Controler controler = new Controler(config);
+			final Controler controler = new Controler(config);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -899,10 +897,10 @@ public class ControlerIT {
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);
 		config.qsim().setSnapshotPeriod(10);
-		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;
+		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist);
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.run();
 
@@ -916,10 +914,10 @@ public class ControlerIT {
 		config.controller().setWriteEventsInterval(0);
 		config.controller().setWritePlansInterval(0);
 		config.controller().setMobsim("qsim");
-		config.controller().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
+		config.controller().setSnapshotFormat(Collections.singletonList(SnapshotFormat.transims));
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
+		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist);
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controller().setCreateGraphs(false);
@@ -944,32 +942,32 @@ public class ControlerIT {
 		assertThrows(RuntimeException.class, () -> {
 			final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 			config.controller().setLastIteration(0);
-			final Controler controler = new Controler( config );
+			final Controler controler = new Controler(config);
 
 			final Scenario replacementScenario = ScenarioUtils.createScenario(config);
 
 			controler.addOverridingModule(
-					new AbstractModule() {
-						@Override
-						public void install() {
-							controler.addOverridingModule(
-									new AbstractModule() {
-										@Override
-										public void install() {
-											bind(Scenario.class).toInstance(replacementScenario);
-										}
-									}
-							);
-						}
+				new AbstractModule() {
+					@Override
+					public void install() {
+						controler.addOverridingModule(
+							new AbstractModule() {
+								@Override
+								public void install() {
+									bind(Scenario.class).toInstance(replacementScenario);
+								}
+							}
+						);
 					}
+				}
 			);
 
 			controler.run();
 
 			Assertions.assertSame(
-					replacementScenario,
-					controler.getScenario(),
-					"adding a Guice module to the controler from a Guice module is allowed but has no effect");
+				replacementScenario,
+				controler.getScenario(),
+				"adding a Guice module to the controler from a Guice module is allowed but has no effect");
 		});
 	}
 
@@ -1001,7 +999,9 @@ public class ControlerIT {
 		}
 	}
 
-	/** A helper class for testSetScoringFunctionFactory() */
+	/**
+	 * A helper class for testSetScoringFunctionFactory()
+	 */
 	static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(final Person person) {

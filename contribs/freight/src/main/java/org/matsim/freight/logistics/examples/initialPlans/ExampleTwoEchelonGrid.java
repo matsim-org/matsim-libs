@@ -117,18 +117,15 @@ final class ExampleTwoEchelonGrid {
             bind(CarrierStrategyManager.class)
                 .toProvider(
                     () -> {
-                      CarrierStrategyManager strategyManager =
-                          CarrierControllerUtils.createDefaultCarrierStrategyManager();
-                      strategyManager.addStrategy(
-                          new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+                      CarrierStrategyManager strategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
+                      strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                       return strategyManager;
                     });
             bind(LSPStrategyManager.class)
                 .toProvider(
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-                      strategyManager.addStrategy(
-                          new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
+                      strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new BestPlanSelector<>()), null, 1);
                       return strategyManager;
                     });
             bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
@@ -140,10 +137,7 @@ final class ExampleTwoEchelonGrid {
 
     // The VSP default settings are designed for person transport simulation. After talking to Kai,
     // they will be set to WARN here. Kai MT may'23
-    controller
-        .getConfig()
-        .vspExperimental()
-        .setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
+    controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
     controller.run();
 
     log.info("Some results ....");
@@ -167,32 +161,15 @@ final class ExampleTwoEchelonGrid {
 
       CommandLine cmd = ConfigUtils.getCommandLine(args);
     } else {
-      config
-          .controller().setOutputDirectory("output/2echelon_"
-                  + demandSetting
-                  + "_"
-                  + costSetting
-                  + "_"
-                  + HUBCOSTS_FIX
-                  + "_"
-                  + TOLL_VALUE);
+      config.controller().setOutputDirectory("output/2echelon_" + demandSetting + "_" + costSetting + "_" + HUBCOSTS_FIX + "_" + TOLL_VALUE);
       config.controller().setLastIteration(2);
     }
 
-    config
-        .network()
-        .setInputFile(
-            String.valueOf(
-                IOUtils.extendUrl(
-                    ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
-    config
-        .controller()
-        .setOverwriteFileSetting(
-            OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+    config.network().setInputFile(String.valueOf(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "grid9x9.xml")));
+    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     config.controller().setWriteEventsInterval(1);
 
-    FreightCarriersConfigGroup freightConfig =
-        ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+    FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
     freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
     return config;
@@ -222,37 +199,25 @@ final class ExampleTwoEchelonGrid {
     {
       log.info("Create lspPlan for direct delivery");
 
-      Carrier directCarrier =
-          CarriersUtils.createCarrier(Id.create("directCarrier", Carrier.class));
+      Carrier directCarrier = CarriersUtils.createCarrier(Id.create("directCarrier", Carrier.class));
       directCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-      CarriersUtils.addCarrierVehicle(
-          directCarrier,
-          CarrierVehicle.newInstance(
-              Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-      LSPResource directCarrierRessource =
-          ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  directCarrier)
-              .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+      CarriersUtils.addCarrierVehicle(directCarrier,
+          CarrierVehicle.newInstance(Id.createVehicleId("directTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+      LSPResource directCarrierRessource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(directCarrier)
+              .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
 
-      LogisticChainElement directCarrierElement =
-          LSPUtils.LogisticChainElementBuilder.newInstance(
-                  Id.create("directCarrierLSE", LogisticChainElement.class))
+      LogisticChainElement directCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("directCarrierLSE", LogisticChainElement.class))
               .setResource(directCarrierRessource)
               .build();
 
-      LogisticChain solution_direct =
-          LSPUtils.LogisticChainBuilder.newInstance(
-                  Id.create("directSolution", LogisticChain.class))
+      LogisticChain solution_direct = LSPUtils.LogisticChainBuilder.newInstance(Id.create("directSolution", LogisticChain.class))
               .addLogisticChainElement(directCarrierElement)
               .build();
 
-      final InitialShipmentAssigner singleSolutionShipmentAssigner =
-          ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
-      lspPlan_direct =
-          LSPUtils.createLSPPlan()
+      final InitialShipmentAssigner singleSolutionShipmentAssigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+      lspPlan_direct = LSPUtils.createLSPPlan()
               .addLogisticChain(solution_direct)
               .setInitialShipmentAssigner(singleSolutionShipmentAssigner);
     }
@@ -264,51 +229,38 @@ final class ExampleTwoEchelonGrid {
       Carrier mainCarrier = CarriersUtils.createCarrier(Id.create("mainCarrier", Carrier.class));
       mainCarrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
 
-      CarriersUtils.addCarrierVehicle(
-          mainCarrier,
-          CarrierVehicle.newInstance(
-              Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
-      LSPResource mainCarrierRessource =
-          ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
+      CarriersUtils.addCarrierVehicle(mainCarrier,
+          CarrierVehicle.newInstance(Id.createVehicleId("mainTruck"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
+      LSPResource mainCarrierRessource = ResourceImplementationUtils.MainRunCarrierResourceBuilder.newInstance(mainCarrier)
               .setFromLinkId(DEPOT_LINK_ID)
-              .setMainRunCarrierScheduler(
-                  ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
+              .setMainRunCarrierScheduler(ResourceImplementationUtils.createDefaultMainRunCarrierScheduler(scenario))
               .setToLinkId(HUB_LINK_ID)
               .setVehicleReturn(ResourceImplementationUtils.VehicleReturn.returnToFromLink)
               .build();
 
-      LogisticChainElement mainCarrierLSE =
-          LSPUtils.LogisticChainElementBuilder.newInstance(
-                  Id.create("mainCarrierLSE", LogisticChainElement.class))
+      LogisticChainElement mainCarrierLCE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("mainCarrierLSE", LogisticChainElement.class))
               .setResource(mainCarrierRessource)
               .build();
 
       // The scheduler for the first reloading point is created --> this will be the depot in this
       // use case
-      LSPResourceScheduler hubScheduler =
-          ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
+      LSPResourceScheduler hubScheduler = ResourceImplementationUtils.TranshipmentHubSchedulerBuilder.newInstance()
               .setCapacityNeedFixed(10) // Time needed, fixed (for Scheduler)
               .setCapacityNeedLinear(1) // additional time needed per shipmentSize (for Scheduler)
               .build();
 
       // The scheduler is added to the Resource and the Resource is created
-      LSPResource hubResource =
-          ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(
-                  Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
+      LSPResource hubResource = ResourceImplementationUtils.TransshipmentHubBuilder.newInstance(Id.create("Hub", LSPResource.class), HUB_LINK_ID, scenario)
               .setTransshipmentHubScheduler(hubScheduler)
               .build();
-      LSPUtils.setFixedCost(
-          hubResource, HUBCOSTS_FIX); // Set fixed costs (per day) for the availability of the hub.
+      LSPUtils.setFixedCost(hubResource, HUBCOSTS_FIX); // Set fixed costs (per day) for the availability of the hub.
 
-      LogisticChainElement hubLSE =
-          LSPUtils.LogisticChainElementBuilder.newInstance(
-                  Id.create("HubLSE", LogisticChainElement.class))
+      LogisticChainElement hubLCE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("HubLSE", LogisticChainElement.class))
               .setResource(hubResource)
               .build(); // Nicht unbedingt nötig, aber nehme den alten Hub nun als Depot. Waren
                         // werden dann dort "Zusammengestellt".
 
-      Carrier distributionCarrier =
-          CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
+      Carrier distributionCarrier = CarriersUtils.createCarrier(Id.create("distributionCarrier", Carrier.class));
       distributionCarrier
           .getCarrierCapabilities()
           .setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
@@ -319,20 +271,13 @@ final class ExampleTwoEchelonGrid {
         case lowerCost4LastMile -> vehType = VEH_TYPE_SMALL_05;
         default -> throw new IllegalStateException("Unexpected value: " + costSetting);
       }
-      CarriersUtils.addCarrierVehicle(
-          distributionCarrier,
-          CarrierVehicle.newInstance(
-              Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
-      LSPResource distributionCarrierRessource =
-          ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(
-                  distributionCarrier)
-              .setDistributionScheduler(
-                  ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+      CarriersUtils.addCarrierVehicle(distributionCarrier,
+          CarrierVehicle.newInstance(Id.createVehicleId("distributionTruck"), HUB_LINK_ID, vehType));
+      LSPResource distributionCarrierRessource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(distributionCarrier)
+              .setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
               .build();
 
-      LogisticChainElement distributionCarrierElement =
-          LSPUtils.LogisticChainElementBuilder.newInstance(
-                  Id.create("distributionCarrierLSE", LogisticChainElement.class))
+      LogisticChainElement distributionCarrierLCE = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("distributionCarrierLSE", LogisticChainElement.class))
               .setResource(distributionCarrierRessource)
               .build();
 
@@ -340,18 +285,16 @@ final class ExampleTwoEchelonGrid {
       // Vielleicht bekommt man das noch eleganter hin.
       // z.B. in der Reihenfolge in der die solutionsElements der LogisticsSolution zugeordnet
       // werden: ".addSolutionElement(..)"
-      mainCarrierLSE.connectWithNextElement(hubLSE);
-      hubLSE.connectWithNextElement(distributionCarrierElement);
+      mainCarrierLCE.connectWithNextElement(hubLCE);
+      hubLCE.connectWithNextElement(distributionCarrierLCE);
 
-      LogisticChain solution_withHub =
-          LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubSolution", LogisticChain.class))
-              .addLogisticChainElement(mainCarrierLSE)
-              .addLogisticChainElement(hubLSE)
-              .addLogisticChainElement(distributionCarrierElement)
+      LogisticChain solution_withHub = LSPUtils.LogisticChainBuilder.newInstance(Id.create("hubSolution", LogisticChain.class))
+              .addLogisticChainElement(mainCarrierLCE)
+              .addLogisticChainElement(hubLCE)
+              .addLogisticChainElement(distributionCarrierLCE)
               .build();
 
-      lspPlan_withHub =
-          LSPUtils.createLSPPlan()
+      lspPlan_withHub = LSPUtils.createLSPPlan()
               .addLogisticChain(solution_withHub)
               .setInitialShipmentAssigner(ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner());
     }
@@ -363,19 +306,16 @@ final class ExampleTwoEchelonGrid {
     lspPlans.add(lspPlan_withHub);
     lspPlans.add(lspPlan_direct);
 
-    LSP lsp =
-        LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
+    LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
             .setInitialPlan(lspPlan_direct)
-            .setLogisticChainScheduler(
-                ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(
-                    createResourcesListFromLSPPlans(lspPlans)))
+            .setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
             .build();
     lsp.addPlan(lspPlan_withHub); // add the second plan to the lsp
 
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : createInitialLSPShipments(network)) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
@@ -426,13 +366,11 @@ final class ExampleTwoEchelonGrid {
           LspShipmentUtils.LspShipmentBuilder builder =
               LspShipmentUtils.LspShipmentBuilder.newInstance(id);
 
-          int capacityDemand =
-              rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to bound (excl) -> adding 1.
+          int capacityDemand = rand1.nextInt(5) + 1; // Random is drawn from 0 (incl) to bound (excl) -> adding 1.
           builder.setCapacityDemand(capacityDemand);
 
           builder.setFromLinkId(DEPOT_LINK_ID);
-          final Id<Link> toLinkId =
-              Id.createLinkId(zoneLinkList.get(rand2.nextInt(zoneLinkList.size() - 1)));
+          final Id<Link> toLinkId = Id.createLinkId(zoneLinkList.get(rand2.nextInt(zoneLinkList.size() - 1)));
           builder.setToLinkId(toLinkId);
 
           builder.setEndTimeWindow(TimeWindow.newInstance(0, (24 * 3600)));

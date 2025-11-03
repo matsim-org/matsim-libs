@@ -22,7 +22,7 @@ package playground.vsp.planselectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;

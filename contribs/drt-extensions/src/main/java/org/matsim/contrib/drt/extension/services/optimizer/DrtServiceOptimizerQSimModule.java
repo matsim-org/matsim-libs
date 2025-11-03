@@ -30,12 +30,12 @@ import org.matsim.contrib.drt.prebooking.PrebookingActionCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -68,14 +68,15 @@ public class DrtServiceOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		})).asEagerSingleton();
 
 		bindModal(VehicleEntry.EntryFactory.class).toProvider(modalProvider(getter ->
-			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl(getter.getModal(DvrpLoadType.class))))).asEagerSingleton();
+			new DrtServiceEntryFactory(new VehicleDataEntryFactoryImpl(getter.getModal(DvrpLoadType.class),
+					getter.getModal(StopWaypointFactory.class))))).asEagerSingleton();
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 			getter -> {
 				var delegate = new DefaultDrtOptimizer(
 					getter.getModal(QsimScopeForkJoinPool.class) ,drtConfigGroup, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 					getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-					getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
+					getter.getModal(ScheduleInquiry.class), getter.getModal(ScheduleTimingUpdater.class),
 					getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class),
 					getter.getModal(DrtRequestInsertionRetryQueue.class));
 				return new DrtServiceTaskOptimizer(getter.getModal(ServiceTaskDispatcher.class),
