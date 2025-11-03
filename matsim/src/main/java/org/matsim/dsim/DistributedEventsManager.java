@@ -2,7 +2,12 @@ package org.matsim.dsim;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.Getter;
@@ -21,7 +26,11 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -220,13 +229,16 @@ public final class DistributedEventsManager implements EventsManager {
 		byPartitionAndType.values().forEach(list -> list.remove(task));
 		globalListener.values().forEach(list -> list.remove(task));
 
-		if (task.isDirect())
+		if (task.isDirect()) {
 			for (int type : task.getSupportedMessages()) {
 				Consumer<Message> c = task.getConsumer(type);
 				directListener.values().forEach(list -> list.remove(c));
 			}
+		}
 
 		tasks.remove(task);
+		broker.deregister(task);
+		executor.deregister(task);
 	}
 
 	/**
@@ -315,14 +327,10 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void removeHandler(EventHandler handler) {
 
-		var it = tasks.iterator();
-		while (it.hasNext()) {
-			var task = it.next();
-			if (task.getHandler() == handler) {
-				it.remove();
-				executor.deregister(task);
-			}
-		}
+		tasks.stream()
+			.filter(t -> t.getHandler() == handler)
+			.findAny()
+			.ifPresent(this::removeTask);
 	}
 
 	@Override
