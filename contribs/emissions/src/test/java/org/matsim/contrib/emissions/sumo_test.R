@@ -573,12 +573,12 @@
   # Clear old data
   rm(list = ls(pattern = "^data\\."))
 
-  r <- read_matsim(glue("{diff_path}/diff_{fuel}_output.csv"), "original")
+  r <- read_matsim(glue("{diff_path}/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), "original")
   data.MATSIM_original <- r[[1]]
   intervals <- r[[2]]
 
-  r <- read_matsim(glue("{diff_path}/diff_{fuel}_output_inverted_time.csv"), "inverted")
-  data.MATSIM_inverted_time <- r[[1]]
+  s <- read_matsim(glue("{diff_path}/WLTP_inv/diff_{fuel}_output_inverted_time.csv"), "inverted")
+  data.MATSIM_inverted_time <- s[[1]]
 
   # Load data from SUMO with original times and summarize for each interval
   data.SUMO_original <- read_delim(glue("{sumo_path}/sumo_{fuel}_output.csv"),
@@ -604,7 +604,7 @@
 
 
   # Load data from SUMO with inverted times and summarize for each interval
-  data.SUMO_inverted_time <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_inverted_time.csv"),
+  data.SUMO_inverted_time <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_inverted_time_pl5.csv"),
                                     delim = ";",
                                     col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
                                     col_types = cols(
