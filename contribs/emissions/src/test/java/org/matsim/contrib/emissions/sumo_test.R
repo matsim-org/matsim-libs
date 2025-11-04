@@ -858,9 +858,10 @@
   fuel <- "diesel"
   # Compare WLTP <-> CADC
   # Low [0:589] <-> Urban [0:993]
-  # High [1023:1477] <-> Rural Roads [994:2075]
+  # Med+High [590:1477] <-> Rural Roads [994:2075]
   # Extra High [1478:1800] <-> Motorway [2076:
 
+  # WLTP
   WLTP_matsim <- read_delim(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), delim=",") %>%
     rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
     pivot_longer(cols = c("CO-MATSIM",
@@ -871,17 +872,17 @@
     separate(model, c("component", "model"), "-")
 
   WLTP_matsim.low <- WLTP_matsim %>%
-    filter(startTime < 589) %>%
+    filter(startTime <= 540) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
   WLTP_matsim.high <- WLTP_matsim %>%
-    filter(startTime > 589 & startTime <= 1477) %>%
+    filter(startTime > 540 & startTime <= 1460) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
   WLTP_matsim.extra_high <- WLTP_matsim %>%
-    filter(startTime > 1477 & startTime < 1800) %>%
+    filter(startTime > 1460 & startTime < 1800) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
@@ -903,17 +904,74 @@
                           pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
 
   WLTP_sumo.low <- WLTP_sumo %>%
-    filter(time < 589) %>%
+    filter(time <= 600) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
   WLTP_sumo.high <- WLTP_sumo %>%
-    filter(time > 589 & time <= 1477) %>%
+    filter(time > 600 & time <= 1520) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
   WLTP_sumo.extra_high <- WLTP_sumo %>%
-    filter(time > 1477 & time < 1800) %>%
+    filter(time > 1520 & time < 1800) %>%
+    group_by(component) %>%
+    summarize(value = sum(value)/1000)
+
+  # WLTP_inv
+  WLTP_inv_matsim <- read_delim(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP_inv/diff_{fuel}_output_inverted_time.csv"), delim=",") %>%
+    rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
+    pivot_longer(cols = c("CO-MATSIM",
+                          "CO2-MATSIM",
+                          "HC-MATSIM",
+                          "PMx-MATSIM",
+                          "NOx-MATSIM"), names_to="model", values_to="value") %>%
+    separate(model, c("component", "model"), "-")
+
+  WLTP_inv_matsim.low <- WLTP_matsim %>%
+    filter(startTime >= 1260) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_inv_matsim.high <- WLTP_matsim %>%
+    filter(startTime >= 340 & startTime < 260) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_inv_matsim.extra_high <- WLTP_matsim %>%
+    filter(startTime < 340) %>%
+    group_by(component) %>%
+    summarize(value = sum(value))
+
+  WLTP_inv_sumo <- read_delim(glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_inverted_time_pl5.csv"),
+                          delim = ";",
+                          col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                          col_types = cols(
+                            time = col_integer(),
+                            velocity = col_double(),
+                            acceleration = col_double(),
+                            slope = col_double(),
+                            CO = col_double(),
+                            CO2 = col_double(),
+                            HC = col_double(),
+                            PMx = col_double(),
+                            NOx = col_double(),
+                            fuel = col_double(),
+                            electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
+
+  WLTP_inv_sumo.low <- WLTP_sumo %>%
+    filter(time <= 600) %>%
+    group_by(component) %>%
+    summarize(value = sum(value)/1000)
+
+  WLTP_inv_sumo.high <- WLTP_sumo %>%
+    filter(time > 600 & time <= 1520) %>%
+    group_by(component) %>%
+    summarize(value = sum(value)/1000)
+
+  WLTP_inv_sumo.extra_high <- WLTP_sumo %>%
+    filter(time > 1520 & time < 1800) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
@@ -928,17 +986,17 @@
     separate(model, c("component", "model"), "-")
 
   CADC_matsim.urban <- CADC_matsim %>%
-    filter(startTime <= 993) %>%
+    filter(startTime <= 960) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
   CADC_matsim.road <- CADC_matsim %>%
-    filter(startTime > 993 & startTime <= 2075) %>%
+    filter(startTime > 960 & startTime <= 2040) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
   CADC_matsim.motorway <- CADC_matsim %>%
-    filter(startTime > 2075) %>%
+    filter(startTime > 2040) %>%
     group_by(component) %>%
     summarize(value = sum(value))
 
@@ -960,17 +1018,17 @@
     pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value")
 
   CADC_sumo.urban <- CADC_sumo %>%
-    filter(time <= 993) %>%
+    filter(time <= 1020) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
   CADC_sumo.road <- CADC_sumo %>%
-    filter(time > 993 & time <= 2075) %>%
+    filter(time > 1020 & time <= 2100) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
   CADC_sumo.motorway <- CADC_sumo %>%
-    filter(time > 2075) %>%
+    filter(time > 2100) %>%
     group_by(component) %>%
     summarize(value = sum(value)/1000)
 
@@ -994,6 +1052,7 @@
     mutate(deviation = 100*(value.x/value.y) - 100)
 
   compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_pl5.csv"))
+  compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP_inv/diff_{fuel}_output_inverted_time.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_inverted_time_pl5.csv"))
   compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/CADC/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
 
 }
