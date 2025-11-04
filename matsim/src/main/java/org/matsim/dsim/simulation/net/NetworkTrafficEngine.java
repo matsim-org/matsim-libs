@@ -75,32 +75,6 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		}
 	}
 
-//	@Override
-//	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-//
-//		if (!modes.contains(agent.getMode())) {
-//			return false;
-//		}
-//
-//		if (!(agent instanceof MobsimDriverAgent driver)) {
-//			throw new RuntimeException("Only driver agents are supported");
-//		}
-//
-//		var vehicle = parkedVehicles.unpark(driver.getPlannedVehicleId(), linkId);
-//		driver.setVehicle(vehicle);
-//		vehicle.setDriver(driver);
-//		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
-//
-//		Id<Link> currentRouteElement = agent.getCurrentLinkId();
-//		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(vehicle.getId());
-//
-//		SimLink link = simNetwork.getLinks().get(currentRouteElement);
-//		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
-//
-//		wait2Link.accept(vehicle, link, now);
-//		return true;
-//	}
-
 	@Override
 	public void process(SimStepMessage stepMessage, double now) {
 		for (VehicleContainer vehicleMessage : stepMessage.vehicles()) {
