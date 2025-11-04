@@ -35,4 +35,9 @@ public class DefaultChargingCostCalculator implements ChargingCostCalculator {
 				+ energy_kWh * parameters.getCostPerEnergy_kWh() // energy-based cost
 				+ parameters.getCostPerUse(); // cost per use
 	}
+
+	@Override
+	public double calculateReservationCost(Id<Person> personId, Id<Charger> charger, double duration) {
+		return parameters.getCostPerReservation();
+	}
 }

@@ -15,4 +15,9 @@ public class NoChargingCostCalculator implements ChargingCostCalculator {
 			double energy) {
 		return 0;
 	}
+
+	@Override
+	public double calculateReservationCost(Id<Person> personId, Id<Charger> charger, double duration) {
+		return 0;
+	}
 }

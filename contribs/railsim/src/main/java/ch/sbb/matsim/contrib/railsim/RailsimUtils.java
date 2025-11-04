@@ -19,16 +19,25 @@
 
 package ch.sbb.matsim.contrib.railsim;
 
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
-import jakarta.annotation.Nullable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.OptionalDouble;
+import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.vehicles.VehicleType;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
+import jakarta.annotation.Nullable;
 
 
 /**
@@ -43,12 +52,17 @@ public final class RailsimUtils {
 	public static final String LINK_ATTRIBUTE_RESOURCE_ID = "railsimResourceId";
 	public static final String LINK_ATTRIBUTE_CAPACITY = "railsimTrainCapacity";
 	public static final String LINK_ATTRIBUTE_MINIMUM_TIME = "railsimMinimumTime";
+	public static final String LINK_ATTRIBUTE_VMAX = "railsimVMax";
 	public static final String LINK_NONBLOCKING_AREA = "railsimNonBlockingArea";
+
 	public static final String VEHICLE_ATTRIBUTE_ACCELERATION = "railsimAcceleration";
 	public static final String VEHICLE_ATTRIBUTE_DECELERATION = "railsimDeceleration";
 	public static final String VEHICLE_ATTRIBUTE_REVERSIBLE = "railsimReversible";
 	public static final String RESOURCE_TYPE = "railsimResourceType";
 	public static final String FORMATION = "railsimFormation";
+
+	private static final Joiner.MapJoiner JOINER = Joiner.on(",").withKeyValueSeparator("=");
+	private static final Splitter.MapSplitter SPLITTER = Splitter.on(",").withKeyValueSeparator("=");
 
 	private RailsimUtils() {
 	}
@@ -65,7 +79,7 @@ public final class RailsimUtils {
 	 */
 	public static int getTrainCapacity(Link link) {
 		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_CAPACITY);
-		return attr != null ? (int) attr : 1;
+		return attr instanceof Number n ? n.intValue(): 1;
 	}
 
 	/**
@@ -152,7 +166,7 @@ public final class RailsimUtils {
 	public static double getTrainDeceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double deceleration = railsimConfigGroup.getDecelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_DECELERATION);
-		return attr != null ? (double) attr : deceleration;
+		return attr instanceof Number n ? n.doubleValue() : deceleration;
 	}
 
 	/**
@@ -168,7 +182,7 @@ public final class RailsimUtils {
 	public static double getTrainAcceleration(VehicleType vehicle, RailsimConfigGroup railsimConfigGroup) {
 		double acceleration = railsimConfigGroup.getAccelerationDefault();
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_ACCELERATION);
-		return attr != null ? (double) attr : acceleration;
+		return attr instanceof Number n ? n.doubleValue() : acceleration;
 	}
 
 	/**
@@ -199,9 +213,39 @@ public final class RailsimUtils {
 	 */
 	public static OptionalDouble getTrainReversible(VehicleType vehicle) {
 		Object attr = vehicle.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_REVERSIBLE);
-		return attr instanceof Double d
-			? OptionalDouble.of(d)
+		return attr instanceof Number n
+			? OptionalDouble.of(n.doubleValue())
 			: OptionalDouble.empty();
+	}
+
+	/**
+	 * Sets the maximum velocity (vMax) for the given link, varying by vehicle type.
+	 *
+	 * @param link                The link for which the maximum velocity is being set.
+	 * @param vMaxPerVehicleType  A map specifying the maximum velocity for different vehicle types,
+	 *                            where the key is the vehicle type ID and the value is the associated maximum velocity.
+	 */
+	public static void setLinkVMax(Link link, Map<Id<VehicleType>, Double> vMaxPerVehicleType) {
+		if (vMaxPerVehicleType.isEmpty()) {
+			link.getAttributes().removeAttribute(LINK_ATTRIBUTE_VMAX);
+		} else {
+			link.getAttributes().putAttribute(LINK_ATTRIBUTE_VMAX, JOINER.join(vMaxPerVehicleType));
+		}
+	}
+
+	/**
+	 * Return the maximum velocity map for the given link, if not set returns null.
+	 */
+	public static Map<Id<VehicleType>, Double> getLinkVMax(Link link) {
+		Object attr = link.getAttributes().getAttribute(LINK_ATTRIBUTE_VMAX);
+		if (attr == null) return Map.of();
+
+		Map<String, String> split = SPLITTER.split(attr.toString());
+
+		return split.entrySet().stream().collect(Collectors.toMap(
+			e -> Id.create(e.getKey(), VehicleType.class),
+			e -> Double.valueOf(e.getValue()))
+		);
 	}
 
 	/**
@@ -234,7 +278,11 @@ public final class RailsimUtils {
 	 * Sets the formation of vehicle ids for a departure.
 	 */
 	public static void setFormation(Departure departure, List<String> formations) {
-		departure.getAttributes().putAttribute(FORMATION, String.join(",", formations));
+		if (formations.isEmpty()) {
+			departure.getAttributes().removeAttribute(FORMATION);
+		} else {
+			departure.getAttributes().putAttribute(FORMATION, String.join(",", formations));
+		}
 	}
 
 }

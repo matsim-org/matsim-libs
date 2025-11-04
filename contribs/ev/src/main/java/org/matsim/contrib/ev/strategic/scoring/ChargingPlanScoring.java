@@ -37,6 +37,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEvent;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEventHandler;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEventHandler;
@@ -67,6 +69,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		AbortChargingAttemptEventHandler, DrivingEnergyConsumptionEventHandler, IdlingEnergyConsumptionEventHandler,
 		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler,
 		LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
+		AdvanceReservationEventHandler,
 		MobsimEngine {
 	static public final String MINIMUM_SOC_PERSON_ATTRIBUTE = "sevc:minimumSoc";
 	static public final String MINIMUM_END_SOC_PERSON_ATTRIBUTE = "sevc:minimumEndSoc";
@@ -166,7 +169,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
+	public void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
 		if (score != 0.0) {
 			tracker.trackScore(time, personId, dimension, score, value);
 		}
@@ -180,7 +183,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
+	public void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
 			Double value) {
 		Id<Person> personId = getPerson(vehicleId);
 
@@ -356,6 +359,17 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				null);
 	}
 
+	// RESERVATION scoring
+
+	@Override
+	public void handleEvent(AdvanceReservationEvent event) {
+		if (!event.getSuccessful()) {
+			addScoreForPerson(event.getPersonId(), parameters.getFailedReservation());
+		} else {
+			handleReservationCost(event);
+		}
+	}
+
 	// WAITING scoring
 
 	private final IdMap<Vehicle, Double> enterQueueTimes = new IdMap<>(Vehicle.class);
@@ -430,6 +444,12 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				moneyEvents.add(new MoneyRecord(personId, event.getChargerId(), cost));
 			}
 		}
+	}
+
+	private void handleReservationCost(AdvanceReservationEvent event) {
+		double cost = costCalculator.calculateReservationCost(event.getPersonId(), event.getChargerId(),
+				event.getEndTime() - event.getStartTime());
+		moneyEvents.add(new MoneyRecord(event.getPersonId(), event.getChargerId(), cost));
 	}
 
 	// DETOUR scoring : works by calculating the travel time according to schedule
