@@ -4,7 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Person;
@@ -30,6 +39,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class NetworkTrafficEngineTest {
@@ -94,11 +104,14 @@ class NetworkTrafficEngineTest {
 			}
 		});
 
-		engine.handleDeparture(0, agent, agent.getCurrentLinkId());
+		// TODO: fix the simulation below with the departure handling being done outside the network engine.
+		fail();
 
-		do {
-			engine.doSimStep(i.get());
-		} while (i.getAndIncrement() <= 120);
+//		engine.handleDeparture(0, agent, agent.getCurrentLinkId());
+//
+//		do {
+//			engine.doSimStep(i.get());
+//		} while (i.getAndIncrement() <= 120);
 	}
 
 	private static List<Event> createExpectedEvents() {
