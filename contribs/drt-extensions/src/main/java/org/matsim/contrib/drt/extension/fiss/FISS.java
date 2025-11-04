@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
@@ -28,7 +27,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -83,21 +81,18 @@ public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHa
 
 
 	@Inject
-	FISS(MatsimServices matsimServices, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup, Network network,
+	FISS(MatsimServices matsimServices, Scenario scenario, FISSConfigGroup fissConfigGroup, Network network, TeleportationEngine teleport,
 		 @Named(TransportMode.car) TravelTime travelTime,
 		 @Named("base-network-mode-departure-handler") NetworkModeDepartureHandler networkModeDepartureHandler) {
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
 		this.network = network;
-
-		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
-		// yyyy should be replaced by using the binding.  kai, feb'25
-
+		this.teleport = teleport;
 		this.travelTime = travelTime;
-		this.random = MatsimRandom.getLocalInstance();
 		this.matsimServices = matsimServices;
-		this.qsimConfig = scenario.getConfig().qsim();
 		this.scenario = scenario;
+		this.qsimConfig = scenario.getConfig().qsim();
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override

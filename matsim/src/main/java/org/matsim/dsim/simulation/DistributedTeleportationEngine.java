@@ -13,13 +13,16 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 @Log4j2
-public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
+public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine, TeleportationEngine {
 
 	private final EventsManager em;
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
@@ -107,6 +110,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	private boolean firstPersonReady(double now) {
 		return !personsTeleporting.isEmpty() && personsTeleporting.peek().exitTime() <= now;
+	}
+
+	@Override
+	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+		throw new RuntimeException("Snapshot Positions are not implemented for Distributed Teleportation Engine. This method is only here because the 'TeleportationInterface' requires it.");
 	}
 
 	private record TeleportationEntry(DistributedMobsimAgent person, double exitTime) {
