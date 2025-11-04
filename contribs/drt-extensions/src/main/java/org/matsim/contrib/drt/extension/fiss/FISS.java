@@ -25,6 +25,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
@@ -33,7 +34,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetworkModeDepartureHandler;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
@@ -65,14 +66,14 @@ import java.util.Random;
  * </ul>
  * </p>
  */
-public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
+public class FISS implements NetworkModeDepartureHandler, DistributedDepartureHandler, MobsimEngine {
 
 	private static final Logger LOG = LogManager.getLogger(FISS.class);
 
 	private final DepartureHandler delegate;
 	private final FISSConfigGroup fissConfigGroup;
 	private final TeleportationEngine teleport;
-	@Inject private Network network;
+	private final Network network;
 	private final TravelTime travelTime;
 	private final Random random;
 
@@ -81,10 +82,13 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 	private final Scenario scenario;
 
 
-	@Inject FISS( MatsimServices matsimServices, QNetsimEngineI qNetsimEngine, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup,
-		      @Named(TransportMode.car) TravelTime travelTime, NetworkModeDepartureHandlerDefaultImpl networkModeDepartureHandler ) {
+	@Inject
+	FISS(MatsimServices matsimServices, Scenario scenario, EventsManager eventsManager, FISSConfigGroup fissConfigGroup, Network network,
+		 @Named(TransportMode.car) TravelTime travelTime,
+		 @Named("base-network-mode-departure-handler") NetworkModeDepartureHandler networkModeDepartureHandler) {
 		this.delegate = networkModeDepartureHandler;
 		this.fissConfigGroup = fissConfigGroup;
+		this.network = network;
 
 		this.teleport = new DefaultTeleportationEngine(scenario, eventsManager);
 		// yyyy should be replaced by using the binding.  kai, feb'25
@@ -98,12 +102,12 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if ( !this.qsimConfig.getMainModes().contains( agent.getMode() ) ) {
-			return false ;
-		} else if ( agent instanceof DynAgent ) {
-			return delegate.handleDeparture( now,agent, linkId );
-		} else if ( !this.fissConfigGroup.getSampledModes().contains( agent.getMode() ) ) {
-			return delegate.handleDeparture( now,agent, linkId ); // not covered by test
+		if (!this.qsimConfig.getMainModes().contains(agent.getMode())) {
+			return false;
+		} else if (agent instanceof DynAgent) {
+			return delegate.handleDeparture(now, agent, linkId);
+		} else if (!this.fissConfigGroup.getSampledModes().contains(agent.getMode())) {
+			return delegate.handleDeparture(now, agent, linkId); // not covered by test
 			// (the earlier design would have such agents fall through, in which case they would be treated by the standard network mode
 			// dp handler)
 		} else if (random.nextDouble() < fissConfigGroup.getSampleFactor() || agent instanceof TransitDriverAgent || this.switchOffFISS()) {
@@ -117,7 +121,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 			Person person = planAgent.getCurrentPlan().getPerson();
 			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(networkRoute.getVehicleId());
 
-			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime );
+			double newTravelTime = RouteUtils.calcTravelTimeExcludingStartEndLink(networkRoute, now, person, vehicle, network, travelTime);
 			// yyyy This travel time _should_ include start and end link.  Also in regular teleportation!  kai, jan'25
 			LOG.debug("New travelTime: {}, was {}", newTravelTime, networkRoute.getTravelTime().orElseGet(() -> Double.NaN));
 
@@ -144,7 +148,7 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 //			// yyyy need to check how this is handled elsewhere.  I think that with some config settings we wait until the vehicle becomes available--???
 //		}
 		boolean result = teleport.handleDeparture(now, agent, linkId);
-		Gbl.assertIf( result ); // otherwise we are now confused
+		Gbl.assertIf(result); // otherwise we are now confused
 
 		// teleport vehicle right after agent
 //		if (removedVehicle != null) {
@@ -157,11 +161,13 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 
 	}
 
-	@Override public void doSimStep(double time) {
+	@Override
+	public void doSimStep(double time) {
 		teleport.doSimStep(time);
 	}
 
-	@Override public void onPrepareSim() {
+	@Override
+	public void onPrepareSim() {
 		if (switchOffFISS()) {
 			deflateVehicleTypes(matsimServices.getScenario(), this.fissConfigGroup);
 			// (This is before the QVehicles are generated, so it wil be taken into account when generating them.)
@@ -176,7 +182,8 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		}
 	}
 
-	@Override public void afterSim() {
+	@Override
+	public void afterSim() {
 		teleport.afterSim();
 	}
 
@@ -187,7 +194,8 @@ public class FISS implements NetworkModeDepartureHandler, MobsimEngine {
 		// afterwards again.
 	}
 
-	@Override public void setInternalInterface(InternalInterface internalInterface) {
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
 		teleport.setInternalInterface(internalInterface);
 	}
 }
