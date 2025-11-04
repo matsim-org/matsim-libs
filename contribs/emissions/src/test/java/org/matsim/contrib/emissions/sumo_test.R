@@ -6,38 +6,6 @@
   sumo_path <- "/Users/aleksander/Documents/VSP/PHEMTest/sumo"
   diff_path <- "/Users/aleksander/Documents/VSP/PHEMTest/diff"
   hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
-
-  # ==== Helper functions ====
-
-  # Reads in the sv from matsim at the given path and returns the datasteeht and intervals from this sheet
-  # model_suffix: optional,  adds a suffix to the 'model'-column which is just "MATSIM" by default
-  read_matsim <- function(path, model_suffix = ""){
-    # Load data from MATSim csv
-    diff_out <- read_csv(path)
-
-    # Create summarized data frame from MATSim results
-    dataframe <- diff_out %>%
-      select(segment, "CO-MATSIM", "CO2(total)-MATSIM", "HC-MATSIM", "PM-MATSIM", "NOx-MATSIM") %>%
-      rename("CO2-MATSIM" = "CO2(total)-MATSIM", "PMx-MATSIM" = "PM-MATSIM") %>%
-      pivot_longer(cols = c("CO-MATSIM",
-                            "CO2-MATSIM",
-                            "HC-MATSIM",
-                            "PMx-MATSIM",
-                            "NOx-MATSIM"), names_to="model", values_to="value") %>%
-      separate(model, c("component", "model"), "-") %>%
-      mutate(segment = as.integer(segment), model = paste(model, model_suffix, sep="_"))
-
-    # Extract the interval times from the matsim-test-file
-    intervals <- diff_out %>%
-      mutate(endTime = startTime+travelTime) %>%
-      select(segment, startTime, endTime, travelTime, lengths) %>%
-      mutate(across(
-        .cols = everything(),
-        .fns = ~ as.integer(.x)
-      ))
-
-    return (list(dataframe, intervals))
-  }
 }
 
 # ==== Plotting of raw SUMO NOx-emissions ====
