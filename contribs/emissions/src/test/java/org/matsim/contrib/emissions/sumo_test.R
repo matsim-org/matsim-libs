@@ -800,13 +800,13 @@
   WLTP_inv.low.mean_acc <- mean(WLTP_inv$acc[1211:1800][WLTP_inv$acc[1211:1800] > 0])
   WLTP_inv.medium.mean_acc <- mean(WLTP_inv$acc[778:1210][WLTP_inv$acc[778:1210] > 0])
   WLTP_inv.high.mean_acc <- mean(WLTP_inv$acc[323:777][WLTP_inv$acc[323:777] > 0])
-  WLTP_inv.extra_high.mean_acc <- mean(WLTP_inv$acc[1:322][WLTP_inv$acc[1:322] > 0])
+  WLTP_inv.extra_high.mean_acc <- mean(WLTP_inv$acc[1:323][WLTP_inv$acc[1:323] > 0])
 
   WLTP_inv.mean_vel <- mean(WLTP_inv$vel)
   WLTP_inv.low.mean_vel <- mean(WLTP_inv$vel[1211:1800])
   WLTP_inv.medium.mean_vel <- mean(WLTP_inv$vel[778:1210])
   WLTP_inv.high.mean_vel <- mean(WLTP_inv$vel[323:777])
-  WLTP_inv.extra_high.mean_vel <- mean(WLTP_inv$vel[1:322])
+  WLTP_inv.extra_high.mean_vel <- mean(WLTP_inv$vel[1:323])
 
   CADC.mean_acc <- mean(CADC$acc[CADC$acc > 0])
   CADC.low.mean_acc <- mean(CADC$acc[1:993][CADC$acc[1:993] > 0])
