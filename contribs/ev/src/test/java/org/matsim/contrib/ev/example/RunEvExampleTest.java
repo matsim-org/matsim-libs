@@ -1,17 +1,25 @@
 package org.matsim.contrib.ev.example;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+
+import com.google.common.io.Files;
 
 public class RunEvExampleTest {
 
@@ -24,10 +32,19 @@ public class RunEvExampleTest {
 	public void runTest() {
 		try {
 			String[] args = {RunEvExample.DEFAULT_CONFIG_FILE,
-				"--config:controler.outputDirectory", utils.getOutputDirectory(),
+				"--config:controler.outputDirectory", utils.getOutputDirectory()
 			};
 
-			new RunEvExample().run(args);
+			new RunEvExample().run(args, config -> {
+				EvConfigGroup.get(config).setWriteVehicleTrajectoriesInterval(1);
+				EvConfigGroup.get(config).setWriteZonalEnergyDemandInterval(1);
+				config.global().setCoordinateSystem("EPSG:2154");
+
+				SquareGridZoneSystemParams params = new SquareGridZoneSystemParams();
+				params.setCellSize(10000);
+				EvConfigGroup.get(config).addParameterSet(params);
+			});
+
 			{
 				Population expected = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 				PopulationUtils.readPopulation(expected, utils.getInputDirectory() + "/output_plans.xml.gz");
@@ -43,6 +60,15 @@ public class RunEvExampleTest {
 				String actual = utils.getOutputDirectory() + "/output_events.xml.gz";
 				ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
 				Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
+			}
+			{
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_analysis_zones.shp").exists());
+				
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_trajectories.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_trajectories.csv.gz").exists());
+
+				assertTrue(new File(utils.getOutputDirectory() + "/ITERS/it.0/0.ev_zonal_energy_demand.csv.gz").exists());
+				assertTrue(new File(utils.getOutputDirectory() + "/ev_zonal_energy_demand.csv.gz").exists());
 			}
 
 		} catch (Exception ee) {
