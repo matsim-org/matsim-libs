@@ -167,19 +167,19 @@ public final class RailResourceManager {
 	 */
 	private Object2DoubleMap<Id<VehicleType>> getCachedVMax(Link link) {
 		Map<Id<VehicleType>, Double> vMaxMap = RailsimUtils.getLinkVMax(link);
-		
+
 		// Return cached instance if available
 		Object2DoubleMap<Id<VehicleType>> cached = vMaxCache.get(vMaxMap);
 		if (cached != null) {
 			return cached;
 		}
-		
+
 		// Create new instance and cache it
 		Object2DoubleMap<Id<VehicleType>> newVMax = new Object2DoubleOpenHashMap<>();
 		for (Map.Entry<Id<VehicleType>, Double> entry : vMaxMap.entrySet()) {
 			newVMax.put(entry.getKey(), entry.getValue().doubleValue());
 		}
-		
+
 		vMaxCache.put(vMaxMap, newVMax);
 		return newVMax;
 	}
@@ -217,44 +217,47 @@ public final class RailResourceManager {
 			List<RailLink> route = position.getRouteUntilNextStop();
 			int idx = route.indexOf(link);
 
-			List<RailLink> links = new LinkedList<>();
-			boolean allFree = true;
+			// Vehicle currently at stop is skipped
+			if (idx >= 0) {
+				List<RailLink> links = new LinkedList<>();
+				boolean allFree = true;
 
-			// After the non-blocking segment, reserve enough area for the train to hold if needed
-			double avoidanceDist = 0;
+				// After the non-blocking segment, reserve enough area for the train to hold if needed
+				double avoidanceDist = 0;
 
-			for (int i = idx; i < route.size(); i++) {
-				RailLink l = route.get(i);
+				for (int i = idx; i < route.size(); i++) {
+					RailLink l = route.get(i);
 
-				// Note that the deadlock avoidance is not checked here on the single links
-				// It will be invoked later on the whole segment of links
-				allFree = l.resource.hasCapacity(time, l, track, position);
-				if (!allFree)
-					break;
+					// Note that the deadlock avoidance is not checked here on the single links
+					// It will be invoked later on the whole segment of links
+					allFree = l.resource.hasCapacity(time, l, track, position);
+					if (!allFree)
+						break;
 
-				links.addFirst(l);
+					links.addFirst(l);
 
-				// Accumulate the distance after the non-blocking area
-				if (!l.isNonBlockingArea())
-					avoidanceDist += l.length;
+					// Accumulate the distance after the non-blocking area
+					if (!l.isNonBlockingArea())
+						avoidanceDist += l.length;
 
-				if (avoidanceDist > position.getTrain().length())
-					break;
+					if (avoidanceDist > position.getTrain().length())
+						break;
+				}
+
+				if (!allFree || !dla.checkLinks(time, links, position)) {
+					return RailResourceInternal.NO_RESERVATION;
+				}
+
+				double dist = RailResourceInternal.NO_RESERVATION;
+				for (RailLink l : links) {
+					dist = l.resource.reserve(time, l, track, position);
+					eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
+						position.getDriver().getVehicle().getId(), l.resource.getState(l)));
+					dla.onReserve(time, l.resource, position);
+				}
+
+				return dist;
 			}
-
-			if (!allFree || !dla.checkLinks(time, links, position)) {
-				return RailResourceInternal.NO_RESERVATION;
-			}
-
-			double dist = RailResourceInternal.NO_RESERVATION;
-			for (RailLink l : links) {
-				dist = l.resource.reserve(time, l, track, position);
-				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
-					position.getDriver().getVehicle().getId(), l.resource.getState(l)));
-				dla.onReserve(time, l.resource, position);
-			}
-
-			return dist;
 		}
 
 		// Check and reserve a single link
