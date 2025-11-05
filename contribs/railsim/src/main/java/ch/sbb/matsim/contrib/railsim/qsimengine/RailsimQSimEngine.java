@@ -116,7 +116,7 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 			networkChangeEvents.addAll(events);
 		}
 
-		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition);
+		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition, ttdHandler);
 	}
 
 	@Override

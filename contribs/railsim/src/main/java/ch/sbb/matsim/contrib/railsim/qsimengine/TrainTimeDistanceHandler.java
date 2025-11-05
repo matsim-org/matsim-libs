@@ -1,31 +1,41 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+
+import com.google.inject.Inject;
+
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.PlannedArrival;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Holds data for time-distance chart and writes CSV file.
  */
-public class TrainTimeDistanceHandler {
+public final class TrainTimeDistanceHandler {
 
 	private final BufferedWriter writer;
 
@@ -34,12 +44,21 @@ public class TrainTimeDistanceHandler {
 	private final RailsimConfigGroup config;
 
 	@Inject
-	public TrainTimeDistanceHandler(MatsimServices services, RailResourceManager resources, SpeedProfile speedProfile) throws IOException {
+	public TrainTimeDistanceHandler(MatsimServices services, RailResourceManager resources, SpeedProfile speedProfile) {
 		this.resources = resources;
 		this.config = ConfigUtils.addOrGetModule(services.getConfig(), RailsimConfigGroup.class);
-		String timeDistanceCSV = services.getControllerIO().getIterationFilename(services.getIterationNumber(), "railsimTimeDistance.csv", services.getConfig().controller().getCompressionType());
-		writer = Files.newBufferedWriter(Path.of(timeDistanceCSV));
+		try {
+			this.writer = prepareWriter(services, speedProfile);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
+	private BufferedWriter prepareWriter(MatsimServices services, SpeedProfile speedProfile) throws IOException {
+
+		String timeDistanceCSV = services.getControllerIO().getIterationFilename(services.getIterationNumber(), "railsimTimeDistance.csv", services.getConfig().controller().getCompressionType());
+
+		BufferedWriter writer = Files.newBufferedWriter(Path.of(timeDistanceCSV));
 		writer.append("vehicle_id,line_id,route_id,departure_id,time,distance,type,link_id,stop_id\n");
 
 		for (TransitLine line : services.getScenario().getTransitSchedule().getTransitLines().values()) {
@@ -66,6 +85,8 @@ public class TrainTimeDistanceHandler {
 				}
 			}
 		}
+
+		return writer;
 	}
 
 	private TimeDistanceData initialTimeDistanceData(TransitLine line, TransitRoute route, Departure departure, Vehicle vehicle, SpeedProfile speedProfile) {
@@ -86,11 +107,12 @@ public class TrainTimeDistanceHandler {
 		TransitRouteStop first = stops.removeFirst();
 
 		// Train is starting at the first stop
-		data.add(departure.getDepartureTime(), 0, links.getFirst().getLinkId(), first.getStopFacility().getId());
+		data.add(0, 0, links.getFirst().getLinkId(), first.getStopFacility().getId());
+
 		position.nextLink();
 		position.nextStop();
 
-		double departureTime = departure.getDepartureTime() + first.getDepartureOffset().orElse(0);
+		double departureTime = first.getDepartureOffset().orElse(0);
 		double currentTime = departureTime;
 		double cumulativeDistance = 0.0;
 
@@ -167,7 +189,51 @@ public class TrainTimeDistanceHandler {
 			position.nextStop();
 		}
 
+		data.createIndex();
+
 		return data;
+	}
+
+	void writePosition(TrainState state, TransitStopFacility atStop) {
+
+		if (state.getPt() == null)
+			return;
+
+		try {
+			writer.append(state.getPt().getVehicle().getId().toString()).append(',')
+				.append(state.getPt().getTransitLine().getId().toString()).append(',')
+				.append(state.getPt().getTransitRoute().getId().toString()).append(',')
+				.append(state.getPt().getDeparture().getId().toString()).append(',')
+				.append(String.valueOf(RailsimUtils.round(state.timestamp))).append(',')
+				.append(String.valueOf(RailsimUtils.round(state.cumulativeDistance))).append(',')
+				.append("simulated").append(',')
+				.append(Objects.toString(state.getHeadLink(), "")).append(',')
+				.append(atStop != null ? atStop.getId().toString() : "").append('\n');
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Calculate the approximate delay and update the state.
+	 */
+	void calculateDelay(TrainState state) {
+
+		if (state.pt == null)
+			return;
+
+		Id<TransitRoute> transitRoute = state.pt.getTransitRoute().getId();
+		Id<VehicleType> vehicleType = state.pt.getVehicle().getVehicle().getType().getId();
+
+		TimeDistanceData data = targetData.get(new Key(transitRoute, vehicleType));
+
+		if (data == null)
+			return;
+
+		double departureTime = state.pt.getDeparture().getDepartureTime();
+
+		state.delay = data.calcDelay(departureTime, state.cumulativeDistance, state.timestamp);
+
 	}
 
 	public void close() {

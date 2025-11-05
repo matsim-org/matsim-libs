@@ -99,6 +99,11 @@ final class SimpleTrainState implements TrainPosition {
 	}
 
 	@Override
+	public double getDelay() {
+		return 0;
+	}
+
+	@Override
 	public int getRouteIndex() {
 		return routeIdx;
 	}

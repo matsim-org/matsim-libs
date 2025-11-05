@@ -65,7 +65,7 @@ public final class RailsimCsvWriter {
 	 * Write {@link RailsimTrainStateEvent} to a csv file.
 	 */
 	public static void writeTrainStatesCsv(List<RailsimTrainStateEvent> events, Network network, String filename) throws UncheckedIOException {
-		String[] header = {"vehicle", "time", "acceleration", "speed", "targetSpeed", "headLink", "headPosition", "headX", "headY", "tailLink", "tailPosition", "tailX", "tailY"};
+		String[] header = {"vehicle", "time", "acceleration", "speed", "targetSpeed", "headLink", "headPosition", "headX", "headY", "tailLink", "tailPosition", "tailX", "tailY", "delay"};
 
 		try (CSVPrinter csv = new CSVPrinter(IOUtils.getBufferedWriter(filename), CSVFormat.DEFAULT.builder().setHeader(header).build())) {
 			for (RailsimTrainStateEvent event : events) {
@@ -106,6 +106,8 @@ public final class RailsimCsvWriter {
 					csv.print("");
 					csv.print("");
 				}
+
+				csv.print(RailsimUtils.round(event.getDelay()));
 
 				csv.println();
 			}
