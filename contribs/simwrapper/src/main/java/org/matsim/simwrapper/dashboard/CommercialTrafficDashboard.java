@@ -119,31 +119,34 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
+				for (String group : groupsOfCommercialSubpopulations) {
+					Plotly.DataSet ds = viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
+						.constant("source", "Simulated")
+						.aggregate(List.of("subpopulation"), "share", Plotly.AggrFunc.SUM);
 
-				Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "commercialPersonTraffic"))
-					.constant("source", "Simulated")
-					.aggregate(List.of("subpopulation"), "share", Plotly.AggrFunc.SUM);
-
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
-					ds.mapping()
-						.name("subpopulation")
-						.y("source")
-						.x("share")
-				);
+					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
+						ds.mapping()
+							.name("subpopulation")
+							.y("source")
+							.x("share")
+					);
+				}
 			});
 
 		layout.row("trips_second", "Trips").el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Trip distance distribution";
 				viz.colorRamp = ColorScheme.Viridis;
-
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
-					viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","commercialPersonTraffic"))
-						.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
-						.mapping()
-						.x("dist_group")
-						.y("share")
-				);
+				for (String group : groupsOfCommercialSubpopulations) {
+					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name(group).build(),
+						viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
+							.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+							.mapping()
+							.x("dist_group")
+							.y("share")
+					);
+				}
 			})
 			.el(Plotly.class, (viz, data) -> {
 
@@ -156,21 +159,22 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
+				for (String group : groupsOfCommercialSubpopulations) {
+					var ds = viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
+						.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
+						.constant("source", "Sim")
+						.mapping()
+						.x("dist_group")
+						.y("share");
 
-				var ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","commercialPersonTraffic"))
-					.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
-					.constant("source", "Sim")
-					.mapping()
-					.x("dist_group")
-					.y("share");
-
-				viz.addTrace(
-					BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-						.orientation(BarTrace.Orientation.VERTICAL)
-						.name("$dataset.main_mode")
-						.build(), ds
-				);
+					viz.addTrace(
+						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+							.orientation(BarTrace.Orientation.VERTICAL)
+							.name("$dataset.main_mode")
+							.build(), ds
+					);
+				}
 			})
 			.el(Plotly.class, (viz, data) -> {
 
@@ -183,22 +187,23 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
+				for (String group : groupsOfCommercialSubpopulations) {
+					var ds = viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
+						.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
+						.constant("source", "Sim")
+						.mapping()
+						.x("dist_group")
+						.y("share");
 
-				var ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","commercialPersonTraffic"))
-					.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
-					.constant("source", "Sim")
-					.mapping()
-					.x("dist_group")
-					.y("share");
-
-				viz.addTrace(
-					BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-						.orientation(BarTrace.Orientation.VERTICAL)
-						.name("$dataset.subpopulation")
-						.build(),
-					ds
-				);
+					viz.addTrace(
+						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+							.orientation(BarTrace.Orientation.VERTICAL)
+							.name("$dataset.subpopulation")
+							.build(),
+						ds
+					);
+				}
 			});
 //		layout.row("trips_third", "Trips").el(Plotly.class, (viz, data) -> {
 //
