@@ -49,20 +49,20 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
-	// TODO check for the String Setter / Getter
-	public enum UseHbefaConsistencyChecker {skip, check}
+	public enum UseHbefaConsistencyChecker {skip, check;}
+	private static final String USE_HBEFA_CONSISTENCY_CHECKER = "useHbefaConsistencyChecker";
 	private UseHbefaConsistencyChecker useHbefaConsistencyChecker = UseHbefaConsistencyChecker.check;
 
-	// TODO check for the String Setter / Getter
-	public enum SummarizePmMethod {crashOnVelDifference, usePmVel, usePmNonExhaustVel, useAvgVel}
+	public enum SummarizePmMethod {crashOnVelDifference, usePmVel, usePmNonExhaustVel, useAvgVel;}
+	private static final String SUMMARIZE_PM_METHOD = "summarizePmMethod";
 	private SummarizePmMethod summarizePmMethod = SummarizePmMethod.crashOnVelDifference;
 
-	// TODO This is currently here to temporarily fix the duplicate segment problem
-	// TODO check for the String Setter / Getter
-	public enum DuplicateSubsegments {crashIfDuplicateExists, useFirstDuplicate, overwriteOldDuplicates}
+	// TODO Add aggregateByFleetComposition
+	public enum DuplicateSubsegments {crashIfDuplicateExists, useFirstDuplicate, overwriteOldDuplicates, aggregateByFleetComposition}
+	private static final String DUPLICATE_SUBSEGMENTS = "duplicateSubsegments";
 	private DuplicateSubsegments duplicateSubsegments = DuplicateSubsegments.crashIfDuplicateExists;
 
-	public enum NonScenarioVehicles { ignore, abort }
+	public enum NonScenarioVehicles { ignore, abort;}
 	private static final String NON_SCENARIO_VEHICLES = "nonScenarioVehicles";
 	private NonScenarioVehicles nonScenarioVehicles = NonScenarioVehicles.abort;
 
@@ -113,6 +113,20 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 		  ;
 
 	private static final String EMISSIONS_COMPUTATION_METHOD_CMT = "if true, the original fractional method from Hülsmann et al (2011) will be used to calculate emission factors";
+
+	private static final String USE_HBEFA_CONSISTENCY_CHECKER_CMT = "if set to check, it will test if the given Hbefa tables are corrupted and throw an excpetion if they do.";
+
+	private static final String SUMMARIZE_PM_METHOD_CMT = "method for the calculation of PM_TOTAL in case there are two entries with different V-entries (velocities): " + "\n\t\t\t" +
+		"crashOnVelDifference: Crashed in case there is a vel difference" + "\n\t\t\t" +
+		"usePmVel: Uses the velocitiy of the PM entry" + "\n\t\t\t" +
+		"usePmNonExhaustVel: Uses the velocitiy of the PM_NON_EXHAUST entry" + "\n\t\t\t" +
+		"useAvgVel: Takes average of both velocites";
+
+	private static final String DUPLICATE_SUBSEGMENTS_CMT = "method for handling duplicate subsegments. This problem can arise when using a custom exported hbefa-table: " + "\n\t\t\t" +
+		"crashIfDuplicateExists: Crashed if there are duplicate subsegments" + "\n\t\t\t" +
+		"aggregateByFleetComposition: Aggregates the duplicates using the fleet-composition information from the hbefa table. " + "\n\t\t\t" +
+		"useFirstDuplicate: use the first entry and ignore all duplicates afterwards (recommended for debug-purposes only)" + "\n\t\t\t" +
+		"overwriteOldDuplicates: Always overwrite the entries, effectively using the last entry (recommended for debug-purposes only)" + "\n\t\t\t";
 
 
 	@Override
@@ -327,30 +341,37 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	}
 	// ============================================
 	// ============================================
+	@StringGetter(USE_HBEFA_CONSISTENCY_CHECKER)
 	public UseHbefaConsistencyChecker getHbefaConsistencyChecker(){
 		return useHbefaConsistencyChecker;
 	}
+	@StringSetter(USE_HBEFA_CONSISTENCY_CHECKER)
 	public void setHbefaConsistencyChecker(UseHbefaConsistencyChecker use){
 		useHbefaConsistencyChecker = use;
 	}
 	// ============================================
 	// ============================================
+	@StringSetter(SUMMARIZE_PM_METHOD)
+	public void setSummarizePmMethod(SummarizePmMethod summarizePmMethod) {
+		this.summarizePmMethod = summarizePmMethod;
+	}
+	@StringGetter(SUMMARIZE_PM_METHOD)
+	public SummarizePmMethod getSummarizePmMethod() {
+		return summarizePmMethod;
+	}
+	// ============================================
+	// ============================================
+	@StringGetter(DUPLICATE_SUBSEGMENTS)
 	public DuplicateSubsegments getDuplicateSubsegments() {
 		return duplicateSubsegments;
 	}
+	@StringSetter(DUPLICATE_SUBSEGMENTS)
 	public void setDuplicateSubsegments(DuplicateSubsegments duplicateSubsegments) {
 		this.duplicateSubsegments = duplicateSubsegments;
 	}
 	// ============================================
 	// ============================================
-	public SummarizePmMethod getSummarizePmMethod() {
-		return summarizePmMethod;
-	}
-	public void setSummarizePmMethod(SummarizePmMethod summarizePmMethod) {
-		this.summarizePmMethod = summarizePmMethod;
-	}
-	// ============================================
-	// ============================================
+
 	@Override
 	protected final void checkConsistency(Config config){
 		switch( this.emissionsComputationMethod ){
