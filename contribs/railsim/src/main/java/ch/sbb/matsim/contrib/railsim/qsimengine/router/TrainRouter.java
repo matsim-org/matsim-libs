@@ -19,16 +19,12 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine.router;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-
+import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,13 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.Inject;
-
-import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
-import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import java.util.*;
 
 /**
  * Calculates unblocked route between two {@link RailLink}.
@@ -55,7 +45,7 @@ public final class TrainRouter {
 	private final RailResourceManager resources;
 
 	/**
-	 * Maps stops to list of links that belong to the same stop area.
+	 * Maps stops to list of loop links that belong to the same stop area.
 	 */
 	private final Map<Id<TransitStopFacility>, Set<Link>> stopLinks = new HashMap<>();
 
@@ -87,9 +77,15 @@ public final class TrainRouter {
 
 				Set<Link> linkIds = stopLinks.computeIfAbsent(stop.getId(), k -> new HashSet<>());
 				if (stopAreaId != null) {
-					linkIds.addAll(stopAreas.get(stopAreaId).stream().map(network.getLinks()::get).toList());
+					linkIds.addAll(stopAreas.get(stopAreaId).stream()
+						.map(network.getLinks()::get)
+						.filter(l -> Objects.equals(l.getFromNode(), l.getToNode()))
+						.toList());
 				} else {
-					linkIds.add(network.getLinks().get(stop.getLinkId()));
+					Link l = network.getLinks().get(stop.getLinkId());
+					if (l != null && Objects.equals(l.getFromNode(), l.getToNode())) {
+						linkIds.add(l);
+					}
 				}
 			}
 		}
@@ -121,7 +117,8 @@ public final class TrainRouter {
 
 		// Maps node -> best cost found so far
 		Object2DoubleMap<Id<Node>> nodeCosts = new Object2DoubleOpenHashMap<>();
-		// Tracks stop links that have been visited (stop links should be traversed once)
+
+		// Tracks stop loop links that have been visited (these can be visited once)
 		Set<Link> visitedStopLinks = new HashSet<>();
 
 		// Priority queue: (node, cost, pathNode)
@@ -194,17 +191,22 @@ public final class TrainRouter {
 	}
 
 	/**
-	 * Check if the given link is opposite to any link already in the path.
+	 * Check if any of the last two traversed links are opposite of the next one,
 	 */
-	private boolean isOppositeLinkInPath(Link link, PathNode pathNode) {
-		PathNode current = pathNode;
-		while (current != null && current.link != null) {
-			RailLink pathRailLink = resources.getLink(current.link.getId());
-			if (pathRailLink != null && pathRailLink.isOppositeLink(link.getId())) {
+	private boolean isOppositeLinkInPath(Link link, PathNode current) {
+
+		if (current.link != null) {
+			RailLink l = resources.getLink(current.link.getId());
+			if (l.isOppositeLink(link.getId()))
 				return true;
-			}
-			current = current.previous;
 		}
+
+		if (current.previous != null && current.previous.link != null) {
+			RailLink l = resources.getLink(current.previous.link.getId());
+			if (l.isOppositeLink(link.getId()))
+				return true;
+		}
+
 		return false;
 	}
 
@@ -212,7 +214,7 @@ public final class TrainRouter {
 	 * Calculate the cost of traversing a link.
 	 */
 	private double calculateLinkCost(Link link, TrainPosition position, boolean isStopLink) {
-		// Stop links should always be traversed, so give them negative cost
+		// Stop loop links should always be traversed once, so give them negative cost
 		if (isStopLink) {
 			return -0.5;
 		}
