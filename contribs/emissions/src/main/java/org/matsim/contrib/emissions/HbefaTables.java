@@ -24,15 +24,18 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 
@@ -41,69 +44,137 @@ public abstract class HbefaTables {
     private static final Logger logger = LogManager.getLogger(HbefaTables.class);
 
     static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> loadAverageWarm(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-
-        return load(file, duplicateSubsegments, HbefaTables::createWarmKey, record -> {
-            var factor = Double.parseDouble(record.get("EFA_weighted"));
-            var speed = Double.parseDouble(record.get("V_weighted"));
-            return new HbefaWarmEmissionFactor(factor, speed);
-        });
+        return load(
+			file,
+			duplicateSubsegments,
+			HbefaTables::createWarmKey,
+			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA_weighted")), Double.parseDouble(record.get("V_weighted"))),
+			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			HbefaTables::aggregateWarmKeys
+		);
     }
 
     static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> loadDetailedWarm(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-        return load(file, duplicateSubsegments, record -> {
-            var key = createWarmKey(record);
-            setCommonDetailedParametersOnKey(key, record);
-            return key;
-        }, record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V"))));
+        return load(
+			file,
+			duplicateSubsegments,
+			record -> {
+				var key = createWarmKey(record);
+				setCommonDetailedParametersOnKey(key, record);
+				return key;
+        	},
+			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V"))),
+			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			HbefaTables::aggregateWarmKeys
+		);
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadAverageCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-        return load(file, duplicateSubsegments, HbefaTables::createColdKey, record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted"))));
+        return load(
+			file,
+			duplicateSubsegments,
+			HbefaTables::createColdKey,
+			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted"))),
+			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			HbefaTables::aggregateColdKeys
+		);
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadDetailedCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
-        return load(file, duplicateSubsegments, record -> {
-            var key = createColdKey(record);
-            setCommonDetailedParametersOnKey(key, record);
-            return key;
-        }, record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA"))));
+        return load(file,
+			duplicateSubsegments,
+			record -> {
+				var key = createColdKey(record);
+				setCommonDetailedParametersOnKey(key, record);
+				return key;
+        	},
+			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA"))),
+			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			HbefaTables::aggregateColdKeys
+		);
     }
 
-    private static <K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> Map<K, V> load(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments, Function<CSVRecord, K> createKey, Function<CSVRecord, V> createValue) {
+    private static <K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> Map<K, V> load(
+			URL file,
+			EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments,
+			Function<CSVRecord, K> createKey,
+			Function<CSVRecord, V> createValue,
+			Function<CSVRecord, Double> createFleetComposition,
+			TriFunction<V, V, Double, V> aggregateHbefaEmissionFactors) {
+
         Map<K, V> result = new HashMap<>();
+		Map<K, Double> totalEntryWeight = new HashMap<>();
 
         try (var reader = IOUtils.getBufferedReader(file);
              var parser = CSVParser.parse(reader, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
 
             for (var record : parser) {
-
                 var key = createKey.apply(record);
                 var value = createValue.apply(record);
+				var fleetCompositionWeight = createFleetComposition.apply(record);
 
-				// Check if this entry has duplicates
+				// Check if this key was already set -> Check for duplicate
 				if (result.containsKey(key)){
-					// TODO Update troubleshooting information after discussing how to deal with this problem
-					// This message intends to be annoying since ignoring it will result in wrong values
-					logger.warn("Tried to overwrite an already existing emission-key! This will make emission-results useless, as the original entry will be lost! \n" +
-						"This error usually occurs when the Subsegment columns contains additional information, that is not integrated into the EmConcept column. MATSim will then treat both entries as identical. \n" +
-						"The duplicate key:  " + key + "\n" +
-						"The current record: " + record + "\n" +
-						"To temporarily bypass this problem you can set the duplicateSubsegments in the EmissionsConfigGroup. \n" +
-						"WARNING: using the first or last entry of the subsegment will cause wrong emission results!\n");
-					if (duplicateSubsegments == EmissionsConfigGroup.DuplicateSubsegments.crashIfDuplicateExists){
-						throw new RuntimeException("Terminating due to crashIfDuplicateExists rule being active");
-					} else if (duplicateSubsegments == EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate){
-						continue;
+					// We have a duplicate, Check for the current duplicateSubsegment setting in the emissions config group
+
+					switch(duplicateSubsegments){
+						case crashIfDuplicateExists -> {
+							logger.error("""
+								Tried to overwrite an already existing emission-key! This will make emission-results useless, as the original entry will be lost!\s
+								This error usually occurs when the Subsegment columns contains additional information, that is not integrated into the EmConcept column. MATSim will then treat both entries as identical.\s
+								The duplicate key:  {}
+								The current record: {}
+								To temporarily bypass this problem you can set the duplicateSubsegments in the EmissionsConfigGroup to useFirstDuplicate or overwriteOldDuplicates.\s
+								WARNING: using the first or last entry of the subsegment will cause wrong emission results!
+								To run an actual simulation you should use the aggregateByFleetComposition setting.""", key, record);
+							throw new RuntimeException("Terminating due to crashIfDuplicateExists rule being active");
+						}
+						case useFirstDuplicate -> {
+							logger.warn("""
+								Tried to overwrite an already existing emission-key! The procedure for duplicates is currently set to useFirstDuplicate. This is meant for debugging or testing only!\s
+								If you want to carry out a simulation, fix the hbefa-table or change the duplicateSubsegments setting to aggregateByFleetComposition using EmissionsConfigGroup.setDuplicateSubsegments()\s
+								The duplicate key:  {}
+								The current record: {}
+								""", key, record);
+							continue;
+						}
+						case overwriteOldDuplicates -> logger.warn("""
+							Tried to overwrite an already existing emission-key! The procedure for duplicates is currently set to overwriteOldDuplicates. This is meant for debugging or testing only!\s
+							If you want to carry out a simulation, fix the hbefa-table or change the duplicateSubsegments setting to aggregateByFleetComposition using EmissionsConfigGroup.setDuplicateSubsegments()
+							The duplicate key:  {}
+							The current record: {}
+							""", key, record);
+						case aggregateByFleetComposition -> {
+							// We need to aggregate multiple HbefaEmissionFactors. However, we do not have direct access to the constructor since we
+							// are working with generics. Thus, we will reuse the createValue lambda function by creating a temporary CSVRecord with
+							// the new value. This temporary CSVRecord is made using an inner class.
+
+							result.put(key, aggregateHbefaEmissionFactors.apply(result.get(key), value, (fleetCompositionWeight/(totalEntryWeight.get(key) + fleetCompositionWeight)) ));
+						}
 					}
 				}
 
                 result.put(key, value);
+				totalEntryWeight.putIfAbsent(key, fleetCompositionWeight);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return result;
     }
+
+	static HbefaWarmEmissionFactor aggregateWarmKeys(HbefaWarmEmissionFactor v1, HbefaWarmEmissionFactor v2, double newValueWeight){
+		double newFactor = (1 - newValueWeight) * v1.getFactor() + newValueWeight * v2.getFactor();
+		double newSpeed = (1 - newValueWeight) * v1.getSpeed() + newValueWeight * v2.getSpeed();
+
+		return new HbefaWarmEmissionFactor(newFactor, newSpeed);
+	}
+
+	static HbefaColdEmissionFactor aggregateColdKeys(HbefaColdEmissionFactor v1, HbefaColdEmissionFactor v2, double newValueWeight){
+		double newFactor = (1 - newValueWeight) * v1.getFactor() + newValueWeight * v2.getFactor();
+
+		return new HbefaColdEmissionFactor(newFactor);
+	}
 
     static HbefaWarmEmissionFactorKey createWarmKey(CSVRecord record) {
         var key = new HbefaWarmEmissionFactorKey();
