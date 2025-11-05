@@ -181,7 +181,7 @@ public class TripDashboard implements Dashboard {
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
 
-			Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args))
+			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","person", args))// TODO make configurable
 				.constant("source", "Simulated")
 				.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
 
@@ -207,7 +207,7 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args))
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","person", args))// TODO make configurable
 					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
 					.mapping()
 					.x("dist_group")
@@ -228,8 +228,7 @@ public class TripDashboard implements Dashboard {
 		layout.row("second", tab)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
-				viz.description = "by main mode, over whole trip (including access & egress)";
-				viz.dataset = data.compute(TripAnalysis.class, "trip_stats.csv", args);
+				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "person", args);// TODO make configurable
 				viz.showAllRows = true;
 			})
@@ -243,7 +242,7 @@ public class TripDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
-				Plotly.DataSet sim = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv"))
+				Plotly.DataSet sim = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", "person"))// TODO make configurable
 					.constant("source", "Sim");
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
@@ -281,7 +280,8 @@ public class TripDashboard implements Dashboard {
 				viz.description = "Share of persons using a main mode at least once per day";
 				viz.width = 2d;
 
-				Plotly.DataSet ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_users.csv"));
+				Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", "person"));// TODO make configurable
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("main_mode")
 					.y("user")
@@ -318,7 +318,7 @@ public class TripDashboard implements Dashboard {
 				.build();
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", "person")).mapping()// TODO make configurable
 					.name("purpose", ColorScheme.Spectral)
 					.x("h")
 					.y("departure")
@@ -337,7 +337,7 @@ public class TripDashboard implements Dashboard {
 				.build();
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).mapping()
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", "person")).mapping()// TODO make configurable
 					.name("purpose", ColorScheme.Spectral)
 					.x("h")
 					.y("arrival")
