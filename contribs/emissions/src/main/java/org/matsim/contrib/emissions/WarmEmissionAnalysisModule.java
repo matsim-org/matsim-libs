@@ -58,10 +58,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	private int detailedReadingInfoCnt = 0;
 	private int techAverageReadingInfoCnt = 0;
+	private int averageReadingInfoCnt = 0;
 	private int detailedTransformToHbefa4Cnt = 0;
 	private int fallbackTechAverageWarnCnt = 0;
 	private int fallbackAverageTableWarnCnt = 0;
-	private int averageReadingInfoCnt = 0;
 
 	private int freeFlowCounter = 0;
 	private int saturatedCounter = 0;
@@ -459,7 +459,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private HbefaWarmEmissionFactor tryDetailed(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
 		// Entry Log message
 		if ( detailedReadingInfoCnt <= 1 ) {
-			logger.info( "Try reading detailed values from detailed HBEFA-table" );
+			logger.info( "Try reading detailed values from detailed warm HBEFA-table" );
 			logger.info( Gbl.ONLYONCE );
 			logger.info( Gbl.FUTURE_SUPPRESSED );
 			detailedReadingInfoCnt++;
@@ -496,7 +496,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private HbefaWarmEmissionFactor tryTechnologyAverage(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
 		// Entry Log message for technology average
 		if ( techAverageReadingInfoCnt <= 1 ) {
-			logger.info( "Try reading technology-averaged values from detailed HBEFA-table using following vehicle attributes: '{}; average; average'", efkey.getVehicleAttributes().getHbefaTechnology());
+			logger.info( "Try reading technology-averaged values from detailed warm HBEFA-table using following vehicle attributes: '{}; average; average'", efkey.getVehicleAttributes().getHbefaTechnology());
 			logger.info( Gbl.ONLYONCE );
 			logger.info( Gbl.FUTURE_SUPPRESSED );
 			techAverageReadingInfoCnt++;
@@ -523,23 +523,24 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	/// Tries to access the average HBEFA-table (tries version 4 and 3)
 	private HbefaWarmEmissionFactor tryAverage(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey){
 		if ( averageReadingInfoCnt <= 1 ) {
-			logger.info( "Try reading average values from average HBEFA-table" );
+			logger.info( "Try reading average values from average warm HBEFA-table" );
 			logger.info( Gbl.ONLYONCE );
 			logger.info( Gbl.FUTURE_SUPPRESSED );
 			averageReadingInfoCnt++;
 		}
 
 		//Set VehicleAttributes to '<average>, <average>, <average>'
-		efkey.setVehicleAttributes( new HbefaVehicleAttributes() );
-		if ( this.avgHbefaWarmTable.get( efkey ) != null ) {
-			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-			logger.debug("Lookup result for {} is {}", efkey, ef.toString());
+		HbefaWarmEmissionFactorKey efkey_average = new HbefaWarmEmissionFactorKey(efkey);
+		efkey_average.setVehicleAttributes( new HbefaVehicleAttributes() );
+		if ( this.avgHbefaWarmTable.get( efkey_average ) != null ) {
+			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey_average );
+			logger.debug("Lookup result for {} is {}", efkey_average, ef.toString());
 			Gbl.assertNotNull( ef );
 			return ef;
 		}
 
 		// Average key was not found
-		logger.warn("Did not find average emission factor for efkey={}", efkey);
+		logger.warn("Did not find average emission factor for efkey={}", efkey_average);
 		List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
 		list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
 		for ( HbefaWarmEmissionFactorKey key : list ) {
@@ -552,7 +553,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	private void fallbackTechAverageLogWarning(HbefaWarmEmissionFactorKey efkey) {
 		if ( fallbackTechAverageWarnCnt <= 1 ) {
-			logger.warn("Did not find detailed emission factor for efkey={}", efkey);
+			logger.warn("Did not find detailed emission factor for warm efkey={}", efkey);
 			logger.warn( "Now trying with technology-average: \"<technology>; average; average\"" );
 			logger.warn( Gbl.ONLYONCE );
 			logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -562,7 +563,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	private void fallbackAverageLogWarning(HbefaWarmEmissionFactorKey efkey) {
 		if ( fallbackAverageTableWarnCnt <= 1 ) {
-			logger.warn("Did not find technology averaged emission factor for efkey={}", efkey);
+			logger.warn("Did not find technology averaged emission factor for warm efkey={}", efkey);
 			logger.warn( "Now trying with setting to vehicle attributes to \"average; average; average\" and try it in the average table" );
 			logger.warn( Gbl.ONLYONCE );
 			logger.warn( Gbl.FUTURE_SUPPRESSED );
@@ -613,7 +614,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// If this part of code is reached, the lookup was not successful. Terminate the simulation
-		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in the config \n " +
+		throw new RuntimeException("Was not able to lookup emissions factor in warm table. \n" +
+			"Maybe you wanted to look up detailed values and did not specify this in the config \n " +
 			"OR \n " +
 			"you should use another fallback setting when using detailed calculation \n " +
 			"OR \n" +
