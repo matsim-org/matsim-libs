@@ -11,10 +11,7 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -104,27 +101,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
-
-				Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "commercialPersonTraffic"))
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "SUM"))
 					.constant("source", "Simulated")
-					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
+					.aggregate(List.of("main_mode"), "mode_share_commercialTraffic", Plotly.AggrFunc.SUM);
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
 					ds.mapping()
 						.name("main_mode")
 						.y("source")
-						.x("share")
-				);
-
-				Plotly.DataSet ds2 = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "smallScaleGoodsTraffic"))
-					.constant("source", "Simulated")
-					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
-
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
-					ds2.mapping()
-						.name("main_mode")
-						.y("source")
-						.x("share")
+						.x("mode_share_commercialTraffic")
 				);
 			})
 			.el(Plotly.class, (viz, data) -> {

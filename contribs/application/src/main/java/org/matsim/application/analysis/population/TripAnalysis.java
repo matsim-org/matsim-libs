@@ -67,8 +67,8 @@ public class TripAnalysis implements MATSimAppCommand {
 	 */
 	public static final String ATTR_REF_WEIGHT = "ref_weight";
 	public static final String NO_GROUP_ASSIGNED = "undefinedGroup";
-	private Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
-	private Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
+	private static Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
+	private static Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
@@ -207,6 +207,15 @@ public class TripAnalysis implements MATSimAppCommand {
 			.columnTypesPartial(Map.of("person", ColumnType.STRING, "home_x", ColumnType.DOUBLE, "home_y", ColumnType.DOUBLE))
 			.sample(false)
 			.separator(CsvOptions.detectDelimiter(input.getPath("persons.csv"))).build());
+		StringColumn subpop = persons.stringColumn("subpopulation");
+
+		StringColumn modelType = StringColumn.create("modelType");
+
+		for (String subpopulation : subpop) {
+			String foundModelType = getModelType(subpopulation);
+			modelType.append(foundModelType);
+		}
+		persons.addColumns(modelType);
 
 		int total = persons.rowCount();
 
@@ -381,6 +390,21 @@ public class TripAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
+	private static String getModelType(String subpopulation) {
+		String foundModelType = "unknown";
+		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+			if (groupsOfSubpopulationsForPersonAnalysis.get(group).contains(subpopulation)) {
+				foundModelType = "personTraffic";
+			}
+		}
+		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			if (groupsOfSubpopulationsForCommercialAnalysis.get(group).contains(subpopulation)) {
+				foundModelType = "commercialTraffic";
+			}
+		}
+		return foundModelType;
+	}
+
 	private void tryRun(ThrowingConsumer<Table> f, Table df) {
 		try {
 			f.accept(df);
@@ -391,7 +415,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private void writeModeShare(Table trips, List<String> labels) {
 
-		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation");
+		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation", "modelType");
 
 		aggr = setEmptyCombinationsToZero(aggr);
 
@@ -409,6 +433,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share");
 		aggr.addColumns(shareSum);
 
+		aggr = addModeSharesPerModelType(aggr);
 		aggr.write().csv(output.getPath("mode_share_%s.csv", "SUM").toFile());
 
 		// Norm each dist_group to 1
@@ -426,6 +451,48 @@ public class TripAnalysis implements MATSimAppCommand {
 				}
 			}
 		}
+	}
+
+	private static Table addModeSharesPerModelType(Table aggr) {
+		List<String> modelVals = aggr.stringColumn("modelType").unique().asList();
+
+		// Schlüsselspalten, über die wir je modelType die Counts „quer“ reinjoinen
+		String[] keys = new String[] {"dist_group", "main_mode", "subpopulation"};
+
+		for (String mt : modelVals) {
+			// 1) Counts für diesen modelType extrahieren
+			Table countsMt = aggr.where(aggr.stringColumn("modelType").isEqualTo(mt))
+				.selectColumns("dist_group", "main_mode", "subpopulation", "Count [trip_id]")
+				.copy();
+			String countCol = "count_" + mt;
+			countsMt.column("Count [trip_id]").setName(countCol);
+
+			// 2) In die Haupttabelle reinjoinen (ohne modelType im Join),
+			//    sodass jede Zeile die Zählung für diesen modelType „quer“ stehen hat
+			aggr = aggr.joinOn(keys).leftOuter(countsMt);
+
+			// 3) fehlende Counts -> 0
+			DoubleColumn c = aggr.numberColumn(countCol).asDoubleColumn();
+			for (int row : c.isMissing().toArray()) c.set(row, 0.0);
+			aggr.replaceColumn(countCol, c);
+
+			// 4) Denominator: Summe über alle Zeilen dieses modelType
+			double denom = c.sum();
+			String shareCol = "mode_share_" + mt;
+
+			DoubleColumn share;
+			if (denom == 0.0) {
+				share = DoubleColumn.create(shareCol, aggr.rowCount());
+				share.fillWith(0.0);
+			} else {
+				share = c.divide(denom).setName(shareCol);
+			}
+			aggr.addColumns(share);
+
+			// 5) Hilfsspalte wieder entfernen
+			aggr.removeColumns(countCol);
+		}
+		return aggr;
 	}
 
 	private void subSetAnalysisForModeShares(List<String> labels, String group, Table aggr, Comparator<Row> cmp,
@@ -471,12 +538,12 @@ public class TripAnalysis implements MATSimAppCommand {
 	/**
 	 * If a combination of dist_group, main_mode, subpopulation doesn't exist, it will be added with Count [trip_id] = 0
 	 *
-	 * @param aggr table with columns dist_group, main_mode, subpopulation, Count [trip_id]
+	 * @param aggr table with columns dist_group, main_mode, subpopulation, Count [trip_id], modelType
 	 */
 	private static Table setEmptyCombinationsToZero(Table aggr) {
-		List<String> distVals = aggr.stringColumn("dist_group").unique().asList();
-		List<String> modeVals = aggr.stringColumn("main_mode").unique().asList();
-		List<String> subpVals = aggr.stringColumn("subpopulation").unique().asList();
+		List<String> distVals  = aggr.stringColumn("dist_group").unique().asList();
+		List<String> modeVals  = aggr.stringColumn("main_mode").unique().asList();
+		List<String> subpVals  = aggr.stringColumn("subpopulation").unique().asList();
 
 		Table combos = Table.create("all_combos",
 			StringColumn.create("dist_group"),
@@ -503,6 +570,16 @@ public class TripAnalysis implements MATSimAppCommand {
 			n.set(row, 0.0);
 		}
 		aggr.replaceColumn("Count [trip_id]", n);
+
+		StringColumn subpop = aggr.stringColumn("subpopulation");
+		StringColumn modelType = StringColumn.create("modelType");
+
+		for (String subpopulation : subpop) {
+			String foundModelType = getModelType(subpopulation);
+			modelType.append(foundModelType);
+		}
+		aggr.replaceColumn("modelType", modelType);
+
 		return aggr;
 	}
 
