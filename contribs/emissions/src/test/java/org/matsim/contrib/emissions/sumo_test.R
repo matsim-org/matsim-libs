@@ -1237,3 +1237,28 @@
   manually_computed
 
 }
+
+# ==== PL vs. PL5 ====
+{
+  compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output.csv"))
+  compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_pl5.csv"))
+
+}
+
+# ==== Pretoria Analysis ====
+{
+  fuel <- "petrol"
+
+  pretoria_output <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/output_{fuel}")) %>%
+    mutate(n = row_number())
+
+  ggplot(pretoria_output) +
+    geom_line(aes(x=n, y=CO_original), color = "orange") +
+    geom_line(aes(x=n, y=CO_HBEFA), color = "red") +
+    geom_line(aes(x=n, y=CO_pems), color = "green")
+
+  sum(pretoria_output$CO_original)/sum(pretoria_output$CO_pems)-1
+  sum(pretoria_output$CO2_original)/sum(pretoria_output$CO2_pems)-1
+  sum(pretoria_output$NOx_original)/sum(pretoria_output$NOx_pems)-1
+
+}
