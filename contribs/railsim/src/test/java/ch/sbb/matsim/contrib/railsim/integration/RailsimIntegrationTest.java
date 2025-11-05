@@ -704,6 +704,15 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	void testpScenarioParallelTracksNonStopingAreaRerouting() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "parallelTracksNonStopingAreaRerouting"));
+		assertThat(result)
+			.allTrainsArrived();
+
+	}
+
+	@Test
 	void testVaryingVMax() {
 
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "varyingVMax"));

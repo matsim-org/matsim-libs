@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev;
+package playground.vsp.analysis.modules.vtts;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.StartupListener;
 
-import org.matsim.contrib.ev.analysis.EvAnalysisModule;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+/**
+* @author ikaddoura
+*/
 
-public class EvModule extends AbstractModule {
-	public static final String EV_COMPONENT = "EV_COMPONENT";
+public class VTTScomputation implements StartupListener, AfterMobsimListener {
 
-	@Inject
-	private EvConfigGroup evCfg;
+	private final VTTSHandler vttsHandler;
 
-	public EvModule(){}
+	public VTTScomputation(VTTSHandler vttsHandler) {
+		this.vttsHandler = vttsHandler;
+	}
 
 	@Override
-	public void install() {
-		install( new EvBaseModule() );
-		install(new EvAnalysisModule());
-
-		// this is not for DynVehicles.  Does that mean that we cannot combine charging for normal vehicles with charging for eTaxis?  Can't say ...  kai, dec'22
-		installQSimModule(new AbstractQSimModule() {
-			@Override protected void configureQSim() {
-				bind(VehicleChargingHandler.class).in(Singleton.class);
-				addMobsimScopeEventHandlerBinding().to( VehicleChargingHandler.class);
-				if(evCfg.isEnforceChargingInteractionDuration()){
-					this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(VehicleChargingHandler.class);
-					addMobsimListenerBinding().to(VehicleChargingHandler.class);
-				}
-			}
-		});
-
+	public void notifyStartup(StartupEvent event) {
+		event.getServices().getEvents().addHandler(vttsHandler);
 	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		this.vttsHandler.computeFinalVTTS();
+	}
+
 }
+
