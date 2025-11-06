@@ -996,8 +996,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Filtering and assign links to zones. This take some time...");
 
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		Set<String> modes = new HashSet<>();
-		modes.add("car");
+		Set<String> modes = (Set<String>) scenario.getConfig().routing().getNetworkModes();
 		Network filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 		filter.filter(filteredNetwork, modes);
 
