@@ -7,6 +7,8 @@ import java.util.Map;
  */
 final class StopTimeData {
 
+	private final String facilityId;
+
 	double arrivalTime = -1.0;
 	double departureTime = -1.0;
 	int stopCount = 0;
@@ -16,8 +18,16 @@ final class StopTimeData {
 	 */
 	private final StopTimeData prev;
 
-	public StopTimeData(Map.Entry<String, StopTimeData> prev) {
+	public StopTimeData(String facilityId, Map.Entry<String, StopTimeData> prev) {
+		this.facilityId = facilityId;
 		this.prev = prev != null ? prev.getValue() : null;
+	}
+
+	/**
+	 * @return the facility id
+	 */
+	public String getFacilityId() {
+		return facilityId;
 	}
 
 	/**

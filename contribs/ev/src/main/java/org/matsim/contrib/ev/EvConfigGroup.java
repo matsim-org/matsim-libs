@@ -29,7 +29,6 @@ import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemP
 import org.matsim.core.config.Config;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
@@ -94,7 +93,6 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     @Parameter
     @Comment("Location of the chargers file")
-    @NotNull
     private String chargersFile = null;
 
     public enum EvAnalysisOutput {
@@ -117,6 +115,10 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
     @Parameter
     @Comment("Interval at which zonal energy demand information is written")
     private int writeZonalEnergyDemandInterval = 0;
+
+    @Parameter
+    @Comment("Interval at which chargers should be written out")
+    private int writeChargersInterval = 100;
 
     public enum InitialSocBehavior {
         Keep, UpdateAfterIteration
@@ -205,5 +207,13 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     public void setWriteZonalEnergyDemandInterval(int value) {
         this.writeZonalEnergyDemandInterval = value;
+    }
+
+    public int getWriteChargersInterval() {
+        return writeChargersInterval;
+    }
+
+    public void setWriteChargersInterval(int value) {
+        this.writeChargersInterval = value;
     }
 }

@@ -14,6 +14,8 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.locationtech.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
@@ -35,9 +37,11 @@ import org.matsim.contrib.ev.infrastructure.ChargerWriter;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecificationDefaultImpl;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
+import org.matsim.contrib.ev.strategic.StrategicChargingScenarioConfigurator.Settings.PublicChargerSettings;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters.TariffParameters;
+import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters.ChargerTypeParams;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.WithinDayEvUtils;
 import org.matsim.core.config.CommandLine;
@@ -54,8 +58,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -66,6 +73,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 
 /**
  * This class shows how to set up a MATSim scenario for simulation with the
@@ -148,8 +156,11 @@ public class StrategicChargingScenarioConfigurator {
             // battery capacity of the electric vehicles (uniform across all evs)
             public double batteryCapacity_kWh = 75.0;
 
-            // initial soc at the beginning of the day (uniform across all evs)
-            public double initialSoc = 0.7;
+            // initial soc at the beginning of the day (lower bound, uniformly sampled)
+            public double minimumInitialSoc = 0.3;
+
+            // initial soc at the beginning of the day (upper bound, uniformly sampled)
+            public double maximumInitialSoc = 0.9;
 
             // maximum soc until which a vehicle is charged (uniform across all evs)
             public double maximumSoc = 0.9;
@@ -169,6 +180,9 @@ public class StrategicChargingScenarioConfigurator {
 
             // cost per energy consumption of a home charger
             public double costPerEnergy_kWh = 0.3;
+
+            // bonus that is given for home chargers in scoring
+            public double scoringBonus = 10.0;
         }
 
         public HomeChargerSettings homeChargers = new HomeChargerSettings();
@@ -188,7 +202,7 @@ public class StrategicChargingScenarioConfigurator {
 
         public class PublicChargerSettings {
             // number of public chargers to be created randomly in the network
-            public int count = 1000;
+            public int count = 500;
 
             // number of plugs per created charger
             public int plugs = 3;
@@ -198,9 +212,24 @@ public class StrategicChargingScenarioConfigurator {
 
             // cost per hour charged when using a public charger
             public double costPerDuration_h = 5.0;
+
+            public PublicChargerSettings() {
+            }
+
+            PublicChargerSettings(double power_kWh, double costPerDuration_h) {
+                this.power_kW = power_kWh;
+                this.costPerDuration_h = costPerDuration_h;
+            }
         }
 
-        public PublicChargerSettings publicChargers = new PublicChargerSettings();
+        public PublicChargerSettings slowPublicChargers = new PublicChargerSettings(18.0, 5.0);
+        public PublicChargerSettings fastPublicChargers = new PublicChargerSettings(55.0, 10.0);
+
+        // a file defining additional public chargeres (point geometries, with
+        // "charger_type" column [slow/fast] and optional "power_kW" and "plugs")
+        public String externalChargersFile = null;
+
+        public boolean considerExistingChargingInfrastructure = false;
 
         public class SubscriptionSettings {
             // number of ev users holding a special tariff subscription for public chargers
@@ -266,6 +295,8 @@ public class StrategicChargingScenarioConfigurator {
      * electric vehicles will be kept.
      */
     public void configureVehicles(Scenario scenario) {
+        Random random = new Random(settings.seed + 95857126);
+
         String carMode = getChargingMode(scenario);
 
         Vehicles vehicles = scenario.getVehicles();
@@ -284,8 +315,12 @@ public class StrategicChargingScenarioConfigurator {
                 Id<Vehicle> vehicleId = VehicleUtils.getVehicleIds(person).get(carMode);
                 if (vehicleId != null) {
                     Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
-                    usesElectricVehicle = VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation())
-                            .equals(ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY);
+                    EngineInformation engineInformation = vehicle.getType().getEngineInformation();
+
+                    if (engineInformation != null) {
+                        usesElectricVehicle = ElectricFleetUtils.EV_ENGINE_HBEFA_TECHNOLOGY
+                                .equals(VehicleUtils.getHbefaTechnology(engineInformation));
+                    }
                 }
 
                 if (!usesElectricVehicle || settings.vehicles.considerExistingElectricVehicles) {
@@ -301,7 +336,11 @@ public class StrategicChargingScenarioConfigurator {
                     vehicles.addVehicle(vehicle);
 
                     // set the initial SoC of the electric vehicle
-                    ElectricFleetUtils.setInitialSoc(vehicle, settings.vehicles.initialSoc);
+                    double initialSoc = settings.vehicles.minimumInitialSoc;
+                    initialSoc += random.nextDouble()
+                            * (settings.vehicles.maximumInitialSoc - settings.vehicles.minimumInitialSoc);
+
+                    ElectricFleetUtils.setInitialSoc(vehicle, initialSoc);
 
                     // set the maximum SoC up to which the person will charge (this is optional, 1.0
                     // is assumed)
@@ -320,9 +359,9 @@ public class StrategicChargingScenarioConfigurator {
             }
         }
 
-        logger.info(String.format("Vehicles: generated {} vehicles", numberOfGeneratedVehicles));
-        logger.info(String.format("Vehicles: retained {} existing vehicles", numberOfRetainedVehicles));
-        logger.info(String.format("Vehicles: created new vehicle type: {}", sevcVehicleType == null ? "no" : "yes"));
+        logger.info(String.format("Vehicles: generated %d vehicles", numberOfGeneratedVehicles));
+        logger.info(String.format("Vehicles: retained %d existing vehicles", numberOfRetainedVehicles));
+        logger.info(String.format("Vehicles: created new vehicle type: %s", sevcVehicleType == null ? "no" : "yes"));
     }
 
     private VehicleType createVehicleType(Vehicles vehicles, String carMode) {
@@ -352,13 +391,14 @@ public class StrategicChargingScenarioConfigurator {
     public void loadExistingChargingInfrastructure(Scenario scenario) {
         EvConfigGroup evConfig = EvConfigGroup.get(scenario.getConfig());
 
-        if (evConfig.getChargersFile() != null) {
+        if (evConfig.getChargersFile() != null && settings.considerExistingChargingInfrastructure) {
             new ChargerReader(infrastructure).readURL(
                     ConfigGroup.getInputFileURL(scenario.getConfig().getContext(), evConfig.getChargersFile()));
         }
 
         logger.info(
-                String.format("Chargers: kept existing chargers: ", evConfig.getChargersFile() == null ? "no" : "yes"));
+                String.format("Chargers: kept existing chargers: %s",
+                        evConfig.getChargersFile() == null ? "no" : "yes"));
     }
 
     /**
@@ -397,7 +437,7 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} home chargers: ", numberOfChargers));
+                String.format("Chargers: created %d home chargers", numberOfChargers));
     }
 
     /**
@@ -456,18 +496,28 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} work chargers: ", numberOfChargers));
+                String.format("Chargers: created %d work chargers", numberOfChargers));
         logger.info(
-                String.format("  number of plugs at largest work place: ", maximumNumberOfPlugs));
+                String.format("  %d plugs at largest work place", maximumNumberOfPlugs));
     }
 
     /**
      * Generate public chargers.
      * 
-     * - we distribute `publicChargerCount` chargers randomly in the network
+     * - we distribute `slowPublicChargers` and `fastPublicChargers` randomly in the
+     * network
      */
     public void configurePublicChargers(Scenario scenario) {
-        Random random = new Random(settings.seed + 5536122);
+        configurePublicChargers(scenario, settings.seed + 5536122, settings.slowPublicChargers, "slow");
+        configurePublicChargers(scenario, settings.seed + 6362377, settings.fastPublicChargers, "fast");
+    }
+
+    /**
+     * Create a set of public chargers accordign to the PublicChargerSettings
+     */
+    public void configurePublicChargers(Scenario scenario, int seed, PublicChargerSettings chargerSettings,
+            String publicName) {
+        Random random = new Random(seed);
         String carMode = getChargingMode(scenario);
 
         int numberOfChargers = 0;
@@ -479,16 +529,16 @@ public class StrategicChargingScenarioConfigurator {
         List<Link> links = new LinkedList<>(roadNetwork.getLinks().values());
         Collections.shuffle(links, random);
 
-        for (int k = 0; k < settings.publicChargers.count; k++) { // create N chargers for the first N links
+        for (int k = 0; k < chargerSettings.count; k++) { // create N chargers for the first N links
             Link link = links.get(k);
 
             // describe the charger
             ChargerSpecification charger = ImmutableChargerSpecification.newBuilder() //
-                    .id(Id.create("sevc:public:" + k, Charger.class)) // ,
+                    .id(Id.create("sevc:public:" + publicName + ":" + k, Charger.class)) // ,
                     .linkId(link.getId()) //
-                    .chargerType("public") // only for analysis, no logical meaning
-                    .plugPower(settings.publicChargers.power_kW * 1e3) //
-                    .plugCount(settings.publicChargers.plugs) //
+                    .chargerType("public:" + publicName) // only for analysis, no logical meaning
+                    .plugPower(chargerSettings.power_kW * 1e3) //
+                    .plugCount(chargerSettings.plugs) //
                     .build();
 
             // make this a selectable public charger
@@ -496,6 +546,7 @@ public class StrategicChargingScenarioConfigurator {
 
             // for aggregated analysis
             ChargerTypeAnalysisListener.addAnalysisType(charger, "public");
+            ChargerTypeAnalysisListener.addAnalysisType(charger, "public:" + publicName);
 
             // add it to the infrastructure
             infrastructure.addChargerSpecification(charger);
@@ -504,7 +555,64 @@ public class StrategicChargingScenarioConfigurator {
         }
 
         logger.info(
-                String.format("Chargers: created {} public chargers: ", numberOfChargers));
+                String.format("Chargers: created %d public chargers of type %s: ", numberOfChargers, publicName));
+    }
+
+    /**
+     * Loads additional public chargers
+     */
+    public void loadExternalChargers(Scenario scenario) {
+        String carMode = getChargingMode(scenario);
+
+        Network roadNetwork = NetworkUtils.createNetwork(scenario.getConfig());
+        new TransportModeNetworkFilter(scenario.getNetwork()).filter(roadNetwork, Collections.singleton(carMode));
+
+        int numberOfChargers = 0;
+        for (var feature : GeoFileReader.getAllFeatures(settings.externalChargersFile)) {
+            Coord location = MGC.point2Coord(((Point) feature.getDefaultGeometry()));
+            Link link = NetworkUtils.getNearestLink(roadNetwork, location);
+
+            String chargerType = (String) feature.getAttribute("charger_type");
+            Preconditions.checkNotNull(chargerType, "The charger_type should be defined for input chargers.");
+            Preconditions.checkState(chargerType.equals("slow") || chargerType.equals("fast"),
+                    "The charger_type should be either 'slow' or 'fast'");
+
+            Double power_kW = (Double) feature.getAttribute("power_kW");
+            if (power_kW == null || power_kW <= 0) {
+                power_kW = chargerType.equals("slow") ? settings.slowPublicChargers.power_kW
+                        : settings.fastPublicChargers.power_kW;
+            }
+
+            Integer plugs = (Integer) feature.getAttribute("plugs");
+            if (plugs == null || plugs == 0) {
+                plugs = chargerType.equals("slow") ? settings.slowPublicChargers.plugs
+                        : settings.fastPublicChargers.plugs;
+            }
+
+            // describe the charger
+            ChargerSpecification charger = ImmutableChargerSpecification.newBuilder() //
+                    .id(Id.create("sevc:public:" + chargerType + ":external:" + numberOfChargers, Charger.class)) // ,
+                    .linkId(link.getId()) //
+                    .chargerType("public:" + chargerType) // only for analysis, no logical meaning
+                    .plugPower(power_kW * 1e3) //
+                    .plugCount(plugs) //
+                    .build();
+
+            // make this a selectable public charger
+            StrategicChargingUtils.assignPublic(charger, true);
+
+            // for aggregated analysis
+            ChargerTypeAnalysisListener.addAnalysisType(charger, "public");
+            ChargerTypeAnalysisListener.addAnalysisType(charger, "public:" + chargerType);
+
+            // add it to the infrastructure
+            infrastructure.addChargerSpecification(charger);
+
+            numberOfChargers++;
+        }
+
+        logger.info(
+                String.format("Chargers: created %d public chargers from external file", numberOfChargers));
     }
 
     /**
@@ -514,6 +622,10 @@ public class StrategicChargingScenarioConfigurator {
         configureHomeChargers(scenario);
         configureWorkChargers(scenario);
         configurePublicChargers(scenario);
+
+        if (settings.externalChargersFile != null) {
+            loadExternalChargers(scenario);
+        }
     }
 
     /**
@@ -526,6 +638,8 @@ public class StrategicChargingScenarioConfigurator {
 
         loadExistingChargingInfrastructure(scenario);
         configureChargers(scenario);
+
+        configureCosts(scenario.getConfig());
 
         if (settings.subscriptions.subscriptionRate > 0.0 && settings.subscriptions.availabilityRate > 0.0) {
             configureSubscriptions(scenario);
@@ -588,20 +702,45 @@ public class StrategicChargingScenarioConfigurator {
             }
         }
 
-        // we create the public tariff
-        TariffParameters publicTariff = new TariffParameters();
-        publicTariff.setTariffName("public");
-        publicTariff.setCostPerDuration_min(settings.publicChargers.costPerDuration_h / 60.0);
-        tariffs.addParameterSet(publicTariff);
+        // we create the public tariffs
+        TariffParameters slowPublicTariff = new TariffParameters();
+        slowPublicTariff.setTariffName("public:slow");
+        slowPublicTariff.setCostPerDuration_min(settings.slowPublicChargers.costPerDuration_h / 60.0);
+        tariffs.addParameterSet(slowPublicTariff);
 
         // add tariff to all chargers with the right type
         for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
-            if (charger.getChargerType().equals("public")) {
-                StrategicChargingUtils.addTariff(charger, "public");
+            if (charger.getChargerType().equals("public:slow")) {
+                StrategicChargingUtils.addTariff(charger, "public:slow");
+            }
+        }
+
+        TariffParameters fastPublicTariff = new TariffParameters();
+        fastPublicTariff.setTariffName("public:fast");
+        fastPublicTariff.setCostPerDuration_min(settings.fastPublicChargers.costPerDuration_h / 60.0);
+        tariffs.addParameterSet(fastPublicTariff);
+
+        // add tariff to all chargers with the right type
+        for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
+            if (charger.getChargerType().equals("public:fast")) {
+                StrategicChargingUtils.addTariff(charger, "public:fast");
             }
         }
 
         logger.warn("Costs: added tariffs for home, work, public chargers");
+    }
+
+    /**
+     * Updates the configuration to favor home-based charging
+     */
+    public void configureScoring(Config config) {
+        StrategicChargingConfigGroup sevcConfig = StrategicChargingConfigGroup.get(config);
+
+        ChargerTypeParams homeParams = new ChargerTypeParams();
+        homeParams.setChargerType("home");
+        homeParams.setConstant(settings.homeChargers.scoringBonus);
+
+        sevcConfig.getScoringParameters().addParameterSet(sevcConfig);
     }
 
     /**
@@ -623,9 +762,9 @@ public class StrategicChargingScenarioConfigurator {
         specialTariff.setSubscriptions(Set.of("special_subscription")); // only accessible with this subscription
         tariffs.addParameterSet(specialTariff);
 
-        // add tariff to all chargers with the right type
+        // add tariff to all chargers with the right type (for public fast chargers)
         for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
-            if (charger.getChargerType().equals("public")) {
+            if (charger.getChargerType().equals("public:fast")) {
                 if (random.nextDouble() < settings.subscriptions.availabilityRate) {
                     StrategicChargingUtils.addTariff(charger, "special");
                 }
