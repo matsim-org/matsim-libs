@@ -33,12 +33,12 @@ import org.geotools.api.feature.simple.SimpleFeature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions.Index;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
@@ -384,6 +384,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 // 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 			Controller controller = prepareController(scenario);
 
+			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
+				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
+			}
 			// Creating inject always adds check for unmaterialized config groups.
 			controller.getInjector();
 
@@ -415,6 +418,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param originalScenario complete Scenario
 	 */
 	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
+
+		CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(originalScenario);
+
 		boolean splitCarrier = true;
 		boolean splitVRPs = false;
 		int maxServicesPerCarrier = 100;
