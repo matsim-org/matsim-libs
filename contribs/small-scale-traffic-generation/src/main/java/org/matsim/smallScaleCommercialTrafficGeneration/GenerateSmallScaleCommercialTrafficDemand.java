@@ -329,7 +329,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 			carriers.getCarriers().clear();
 
-			//this is necessary because integrated existing models can have addional vehicleTypes
+			//this is necessary because integrated existing models can have additional vehicleTypes
 			CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values().forEach(vehicleType -> {
 				log.info("Adding vehicle type {} to scenario vehicles.", vehicleType.getId());
 				if (!scenario.getVehicles().getVehicleTypes().containsKey(vehicleType.getId()))
@@ -538,7 +538,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
 			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
-			if (!nonCompleteSolvedCarriers.isEmpty()) {
+			if (!nonCompleteSolvedCarriers.isEmpty() && maxReplanningIterations > 0) {
 				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
 				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
 			}
