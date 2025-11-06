@@ -250,7 +250,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car)); // e.g. for vulkaneifel network
 
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
@@ -376,7 +375,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 			config.routing().setNetworkModes(Sets.union(networkModes, modes));
 
-
+			sw.getConfigGroup().defaultParams().setShp(null);
+			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+			sw.addDashboard(new OverviewDashboard());
+			sw.addDashboard(new CarrierDashboard());
+//			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
+//			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
+//			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
+// 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 			Controller controller = prepareController(scenario);
 
 			// Creating inject always adds check for unmaterialized config groups.
@@ -581,9 +587,35 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
+
+		prepareConfigForResultingModes(scenario);
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), (Set<String>) scenario.getConfig().qsim().getMainModes());
+
 		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output);
 		createCarriers(scenario, smallScaleCommercialTrafficType);
+	}
+
+	/**
+	 * This method prepares the config to include all resulting modes from the vehicle types.
+	 * This done so late, because only after adding existing carriers the used vehicle types and modes are known.
+	 *
+	 * @param scenario scenario
+	 */
+	private static void prepareConfigForResultingModes(Scenario scenario) {
+		Set<String> modes = scenario.getVehicles().getVehicleTypes().values().stream()
+			.map(VehicleType::getNetworkMode).collect(Collectors.toSet());
+
+		modes.forEach(mode -> {
+			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
+			scenario.getConfig().scoring().addModeParams(thisModeParams);
+		});
+
+		Set<String> qsimModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
+		scenario.getConfig().qsim().setMainModes(Sets.union(qsimModes, modes));
+
+		Set<String> networkModes = new HashSet<>(scenario.getConfig().routing().getNetworkModes());
+		scenario.getConfig().routing().setNetworkModes(Sets.union(networkModes, modes));
 	}
 
 	/**
