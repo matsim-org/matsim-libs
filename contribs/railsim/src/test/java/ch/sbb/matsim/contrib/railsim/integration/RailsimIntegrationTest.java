@@ -65,6 +65,8 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		// trains depart in 10min intervals
 		assertThat(result).allTrainsArrived()
+			.allLinksArrivedOnTime()
+			.allStopsArrivedOnTime()
 			.trainHasLastArrival("train1", 29180.0)
 			.trainHasLastArrival("train2", 29180.0 + 1 * 600)
 			.trainHasLastArrival("train3", 29180.0 + 2 * 600)
@@ -333,6 +335,8 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingVaryingSpeed"));
 
 		assertThat(result)
+			.allLinksArrivedOnTime()
+			.allStopsArrivedOnTime()
 			.allTrainsArrived()
 			.trainHasLastArrival("train1", 29525.0)
 			.trainHasLastArrival("train2", 29782.0);

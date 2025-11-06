@@ -138,6 +138,10 @@ public final class RailsimTrainStateEvent extends Event implements HasVehicleId 
 		attr.put(ATTRIBUTE_SPEED, Double.toString(speed));
 		attr.put(ATTRIBUTE_ACCELERATION, Double.toString(acceleration));
 		attr.put(ATTRIBUTE_TARGET_SPEED, Double.toString(targetSpeed));
+
+		if (!Double.isNaN(delay))
+			attr.put(ATTRIBUTE_DELAY, Double.toString(delay));
+
 		return attr;
 	}
 }
