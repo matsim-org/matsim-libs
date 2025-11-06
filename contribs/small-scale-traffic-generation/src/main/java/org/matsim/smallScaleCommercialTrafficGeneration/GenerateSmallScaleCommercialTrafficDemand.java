@@ -303,12 +303,12 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic -> createCarriersAndDemand(output, scenario,
 						usedSmallScaleCommercialTrafficType,
-						includeExistingModels);
+						includeExistingModels, indexZones);
 					case completeSmallScaleCommercialTraffic -> {
 						createCarriersAndDemand(output, scenario, SmallScaleCommercialTrafficType.commercialPersonTraffic,
-							includeExistingModels);
+							includeExistingModels, indexZones);
 						createCarriersAndDemand(output, scenario, SmallScaleCommercialTrafficType.goodsTraffic,
-							false);
+							false, indexZones);
 					}
 					default -> throw new RuntimeException("No traffic type selected.");
 				}
@@ -565,7 +565,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private void createCarriersAndDemand(Path output, Scenario scenario,
 										 SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
-										 boolean includeExistingModels) throws Exception {
+										 boolean includeExistingModels, Index indexZones) throws Exception {
 		ArrayList<String> modesORvehTypes;
 		if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.goodsTraffic))
 			modesORvehTypes = new ArrayList<>(
@@ -583,8 +583,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.createTrafficVolume_stop(resultingDataPerZone, output, sample, modesORvehTypes, smallScaleCommercialTrafficType);
 
 		if (includeExistingModels) {
-			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
-			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, smallScaleCommercialTrafficType,
+			integrateExistingTrafficToSmallScaleCommercial.readExistingCarriersFromFolder(scenario, sample, indexZones);
+			integrateExistingTrafficToSmallScaleCommercial.reduceDemandBasedOnExistingCarriers(scenario, indexZones, smallScaleCommercialTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 		}
 
