@@ -79,6 +79,13 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 
 			Id<TransitStopArea> areaId = nextStop.getStopAreaId();
 
+			if (areaId == null) {
+				log.warn("Could not re-route vehicle {} to a replacement transit stop for {} because it has no stop area",
+					getVehicle().getId(), nextStop);
+
+				return null;
+			}
+
 			boolean adjust = false;
 			for (RailLink link : original) {
 				if (nextStop.getLinkId().equals(link.getLinkId())) {

@@ -7,6 +7,7 @@ import org.matsim.contrib.ev.strategic.costs.DefaultChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostsParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.RandomChargerSelector;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.core.config.Config;
 
@@ -25,8 +26,16 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String GROUP_NAME = "strategic_charging";
 
-	public static StrategicChargingConfigGroup get(Config config) {
+	public static StrategicChargingConfigGroup get(Config config, boolean create) {
+		if (!config.getModules().containsKey(GROUP_NAME)) {
+			config.addModule(new StrategicChargingConfigGroup());
+		}
+
 		return (StrategicChargingConfigGroup) config.getModules().get(GROUP_NAME);
+	}
+
+	public static StrategicChargingConfigGroup get(Config config) {
+		return get(config, false);
 	}
 
 	public StrategicChargingConfigGroup() {
@@ -106,6 +115,10 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 	@Comment("Defines the probability with which a charging plan is selected among the existing ones versus creating a new charging plan")
 	@DecimalMin("0.0")
 	@DecimalMax("1.0")
+	/**
+	 * I think we should phase out selection for strategic charging and just rely on
+	 * the standard selection mechanisms. / sebhoerl oct 2025
+	 */
 	private double selectionProbability = 0.8;
 
 	@Parameter
@@ -152,6 +165,10 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 	@Parameter
 	@Comment("Defines whether to precompute viable charger alternatives for each charging activity planned in an agent's plan. A value of -1 means no caching.")
 	private int alternativeCacheSize = -1;
+
+	@Parameter
+	@Comment("Defines the charger selector that is used in the innovation strategy")
+	private String chargerSelector = RandomChargerSelector.NAME;
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -304,5 +321,13 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 
 	public void setAlternativeCacheSize(int alternativeCacheSize) {
 		this.alternativeCacheSize = alternativeCacheSize;
+	}
+
+	public String getChargerSelector() {
+		return chargerSelector;
+	}
+
+	public void setChargerSelector(String val) {
+		this.chargerSelector = val;
 	}
 }

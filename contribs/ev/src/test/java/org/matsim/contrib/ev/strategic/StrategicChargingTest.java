@@ -4,18 +4,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
+import org.matsim.contrib.ev.strategic.StrategicChargingConfigGroup.AlternativeSearchStrategy;
+import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
+import org.matsim.contrib.ev.strategic.replanning.innovator.chargers.MinimalCostChargerSelector;
+import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder.TestScenario;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,7 +53,8 @@ public class StrategicChargingTest {
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.setScoreTrackingInterval(1);
         config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
-        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setActivityInclusionProbability(1.0);
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setActivityInclusionProbability(1.0);
 
         // motivate agent to charge at activity
         config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
@@ -91,7 +105,8 @@ public class StrategicChargingTest {
 
         StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
         config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge
-        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters()).setLegInclusionProbability(1.0);
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setLegInclusionProbability(1.0);
 
         // motivate agent to charge enroute
         config.setMaximumActivityChargingDuration(0.0);
@@ -161,5 +176,149 @@ public class StrategicChargingTest {
 
         assertEquals(1, scenario.tracker().chargingStartEvents.size());
         assertEquals(1, scenario.tracker().chargingEndEvents.size());
+    }
+
+    @Test
+    public void testMinimalCostChargerSelector() {
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(1) //
+                .addPublicCharger("chargerA", 8, 8, 1, 1.0, "default") //
+                .addPublicCharger("chargerB", 8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                .addPerson("person", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setActivityInclusionProbability(1.0);
+
+        // motivate agent to charge at activity
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
+
+        // minimize cost
+        config.setChargerSelector(MinimalCostChargerSelector.NAME);
+
+        Controler controller = scenario.controller();
+
+        Map<String, Double> offset = new HashMap<>();
+        offset.put("charger:publicchargerA", 100.0); // more expensive
+        offset.put("charger:publicchargerB", 0.0);
+
+        controller.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(ChargingCostCalculator.class).toInstance(new ChargingCostCalculator() {
+                    @Override
+                    public double calculateChargingCost(Id<Person> personId, Id<Charger> charger,
+                            double startTime, double duration, double energy) {
+                        return energy + offset.get(charger.toString());
+                    }
+
+                    @Override
+                    public double calculateReservationCost(Id<Person> personId, Id<Charger> charger, double duration) {
+                        return 0.0;
+                    }
+                });
+            }
+        });
+
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
+        assertEquals("charger:publicchargerB",
+                scenario.tracker().chargingStartEvents.getFirst().getChargerId().toString());
+    }
+
+    @Test
+    public void testConstrainedReplanning() {
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(1) //
+                .addWorkCharger(8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                .addPerson("person", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+
+        // very infrequent
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setActivityInclusionProbability(0.1);
+
+        // but constrained
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setConstraintIterations(1000);
+
+        // motivate agent to charge at activity
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
+
+        Controler controller = scenario.controller();
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
+    }
+
+    @Test
+    public void testPriorityForAdvanceReservation() {
+        /*
+         * Here we have two persons with the same charging demand. Usually, personA
+         * would arrive earlier than personB and thus occupy the charger. However,
+         * personB has advance reservation enabled, so the priority is inversed!
+         */
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(1) //
+                .addWorkCharger(8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                //
+                .addPerson("personA", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                //
+                .addPerson("personB", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0 + 60.0) // a bit later
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setOnlineSearchStrategy(AlternativeSearchStrategy.ReservationBased);
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setActivityInclusionProbability(1.0);
+
+        // only for persons with a slack set
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setReservationProbability(1.0);
+
+        // motivate agent to charge at activity
+        config.setMinimumEnrouteDriveTime(Double.POSITIVE_INFINITY);
+
+        Controler controller = scenario.controller();
+
+        ChargingInfrastructureSpecification infrastructure = (ChargingInfrastructureSpecification) scenario
+                .scenario().getScenarioElement("infrastructure");
+        for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
+            ChargerReservability.setReservable(charger, true);
+        }
+
+        Person personB = controller.getScenario().getPopulation().getPersons()
+                .get(Id.createPersonId("personB"));
+        StrategicChargingReservationEngine.setReservationSlack(personB, 7200.0);
+
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
+        assertEquals("personB", scenario.tracker().chargingStartEvents.getLast().getVehicleId().toString());
     }
 }
