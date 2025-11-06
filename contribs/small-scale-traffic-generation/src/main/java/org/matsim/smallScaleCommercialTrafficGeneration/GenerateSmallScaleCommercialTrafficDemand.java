@@ -597,7 +597,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		prepareConfigForResultingModes(scenario);
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), (Set<String>) scenario.getConfig().qsim().getMainModes());
-		if (linksPerZone.isEmpty())
+		if (linksPerZone == null)
 			linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
