@@ -374,10 +374,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 			config.routing().setNetworkModes(Sets.union(networkModes, modes));
 
-			sw.getConfigGroup().defaultParams().setShp(null);
-			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-			sw.addDashboard(new OverviewDashboard());
-			sw.addDashboard(new CarrierDashboard());
+//			sw.getConfigGroup().defaultParams().setShp(null);
+//			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+//			sw.addDashboard(new OverviewDashboard());
+//			sw.addDashboard(new CarrierDashboard());
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
 //			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
@@ -387,7 +387,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
 			}
-			controller.addOverridingModule(new SimWrapperModule(sw));
+//			controller.addOverridingModule(new SimWrapperModule(sw));
 
 			// Creating inject always adds check for unmaterialized config groups.
 			controller.getInjector();
