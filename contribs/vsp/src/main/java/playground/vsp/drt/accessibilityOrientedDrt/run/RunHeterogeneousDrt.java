@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
-import org.matsim.contrib.drt.analysis.afterSimAnalysis.DrtVehicleStoppingTaskWriter;
-import org.matsim.contrib.drt.extension.preplanned.optimizer.WaitForStopTask;
 import org.matsim.contrib.drt.optimizer.constraints.ConstraintSetChooser;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -140,9 +138,6 @@ public class RunHeterogeneousDrt implements MATSimAppCommand {
 			});
 
 			controler.run();
-
-			// Plot DRT stopping tasks
-			new DrtVehicleStoppingTaskWriter(Path.of(fleetSizeFolder)).addingCustomizedTaskToAnalyze(WaitForStopTask.TYPE).run(WaitForStopTask.TYPE);
 
 			// perform analysis
 			// analyze system travel behavior
