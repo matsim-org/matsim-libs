@@ -865,7 +865,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode(), "mobsim ends while in link queue"));
 
 			context.getAgentCounter().incLost();
 			context.getAgentCounter().decLiving();
@@ -875,7 +875,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		for (Pair<QVehicle,Double> bufferEntry : buffer) {
 			QVehicle veh = bufferEntry.getKey();
 			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode(), "mobsim ends while in link buffer"));
 
 			context.getAgentCounter().incLost();
 			context.getAgentCounter().decLiving();
