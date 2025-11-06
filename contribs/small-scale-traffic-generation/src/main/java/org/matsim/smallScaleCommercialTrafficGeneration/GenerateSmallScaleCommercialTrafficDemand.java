@@ -298,7 +298,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
 				filterFacilitiesForZones(scenario, facilitiesPerZone);
-				linksPerZone = filterLinksForZones(scenario, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic -> createCarriersAndDemand(output, scenario,
@@ -590,6 +589,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		prepareConfigForResultingModes(scenario);
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), (Set<String>) scenario.getConfig().qsim().getMainModes());
+		if (linksPerZone.isEmpty())
+			linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
 
 		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output);
