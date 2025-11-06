@@ -255,6 +255,9 @@ public final class RailsimCalc {
 	 */
 	public static List<RailLink> calcLinksToBlock(TrainPosition position, RailLink currentLink, double reserveDist) {
 
+		if (position.isStop(currentLink.getLinkId()))
+			return List.of(currentLink);
+
 		List<RailLink> result = new ArrayList<>();
 
 		// Assume current distance left on link is already reserved (only for fixed block)
