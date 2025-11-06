@@ -387,6 +387,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
 			}
+			controller.addOverridingModule(new SimWrapperModule(sw));
+
 			// Creating inject always adds check for unmaterialized config groups.
 			controller.getInjector();
 
@@ -1003,7 +1005,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		log.info("Filtering and assign links to zones. This take some time...");
 
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		Set<String> modes = (Set<String>) scenario.getConfig().routing().getNetworkModes();
+		Set<String> modes = new HashSet<>(scenario.getConfig().routing().getNetworkModes());
 		Network filteredNetwork = NetworkUtils.createNetwork(scenario.getConfig().network());
 		filter.filter(filteredNetwork, modes);
 
