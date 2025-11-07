@@ -434,12 +434,12 @@ public class TripAnalysis implements MATSimAppCommand {
 		aggr.addColumns(shareSum);
 
 		aggr = addModeSharesPerModelType(aggr);
-		aggr.write().csv(output.getPath("mode_share_%s.csv", "SUM").toFile());
+		aggr.write().csv(output.getPath("mode_share_%s.csv", "total").toFile());
 
 		// Norm each dist_group to 1
 		normDistanceGroups(labels, aggr);
 
-		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "SUM").toFile());
+		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "total").toFile());
 
 		// Derive mode order if not given
 		if (modeOrder == null) {
@@ -630,7 +630,7 @@ public class TripAnalysis implements MATSimAppCommand {
 				beelineDistanceBySubpopulationGroup,
 				speedsBySubpopulationGroup);
 		}
-		analyseAndWriteTripStatsPerGroup("SUM", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+		analyseAndWriteTripStatsPerGroup("total", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
 			beelineDistanceBySubpopulationGroup,
 			speedsBySubpopulationGroup);
 	}
@@ -644,14 +644,14 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Info");
 			for (String m : modeOrder) {
-				if (Objects.equals(group, "SUM") || nBySubpopulationGroup.get(group).getInt(m) > 0)
+				if (Objects.equals(group, "total") || nBySubpopulationGroup.get(group).getInt(m) > 0)
 					printer.print(m);
 			}
 			printer.println();
 
 			printer.print("Number of trips");
 			for (String m : modeOrder) {
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					int sum = 0;
 					for (Object2IntMap<String> n : nBySubpopulationGroup.values()) {
 						sum += n.getInt(m);
@@ -668,7 +668,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			printer.print("Total time traveled [h]");
 			for (String m : modeOrder) {
 				long seconds;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					long sum = 0L;
 					for (Object2LongMap<String> tt : travelTimeBySubpopulationGroup.values()) {
 						sum += tt.getLong(m);
@@ -688,7 +688,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			printer.print("Total distance traveled [km]");
 			for (String m : modeOrder) {
 				long meters;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					long sum = 0L;
 					for (Object2LongMap<String> td : travelDistanceBySubpopulationGroup.values()) {
 						sum += td.getLong(m);
@@ -709,7 +709,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			for (String m : modeOrder) {
 				long seconds;
 				long meters;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					long secSum = 0L, mSum = 0L;
 					for (String sub : nBySubpopulationGroup.keySet()) {
 						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
@@ -738,7 +738,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			for (String m : modeOrder) {
 				long seconds;
 				long metersBee;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					long secSum = 0L, beeSum = 0L;
 					for (String sub : nBySubpopulationGroup.keySet()) {
 						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
@@ -767,7 +767,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			for (String m : modeOrder) {
 				long meters;
 				int nTrips;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					long mSum = 0L;
 					int nSum = 0;
 					for (String sub : nBySubpopulationGroup.keySet()) {
@@ -794,7 +794,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			printer.print("Avg. speed per trip [km]");
 			for (String m : modeOrder) {
 				double avg;
-				if (group.equals("SUM")) {
+				if (group.equals("total")) {
 					double sum = 0d;
 					long cnt = 0L;
 					for (Map.Entry<String, Map<String, DoubleList>> e : speedsBySubpopulationGroup.entrySet()) {
@@ -890,16 +890,16 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			table.stringColumn("main_mode").append(m);
 			table.doubleColumn("user").append(share);
-			table.stringColumn("group").append("SUM");
+			table.stringColumn("group").append("total");
 		}
-		table.write().csv(output.getPath("mode_users_%s.csv", "SUM").toFile());
+		table.write().csv(output.getPath("mode_users_%s.csv", "total").toFile());
 
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
 			printer.printRecord(
 				Stream.concat(
 					Stream.concat(Stream.of("Group"), tripsPerPerson.keySet().stream()),
-					Stream.of("SUM")
+					Stream.of("total")
 				).toList()
 			);
 
@@ -969,7 +969,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			);
 			calculateArrivalAndDepartures(group, filtered);
 		}
-		calculateArrivalAndDepartures("SUM", trips);
+		calculateArrivalAndDepartures("total", trips);
 	}
 
 	private void calculateArrivalAndDepartures(String group, Table filtered) {
@@ -1022,7 +1022,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			);
 			writeTripDistributionPerGroup(filtered, bins, inp, x, dists, group);
 		}
-		writeTripDistributionPerGroup(trips, bins, inp, x, dists, "SUM");
+		writeTripDistributionPerGroup(trips, bins, inp, x, dists, "total");
 	}
 
 	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, Map<String, double[]> dists,

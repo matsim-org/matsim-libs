@@ -102,7 +102,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "SUM"))
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
 					.constant("source", "Simulated")
 					.aggregate(List.of("main_mode"), "mode_share_commercialTraffic", Plotly.AggrFunc.SUM);
 

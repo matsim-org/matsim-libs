@@ -271,7 +271,7 @@ public class TripDashboard implements Dashboard {
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
 				headerPopStats.addAll(groupsOfPersonSubpopulations);
-				headerPopStats.add("SUM");
+				headerPopStats.add("total");
 				viz.show = headerPopStats;
 			})
 			.el(Plotly.class, (viz, data) -> {
