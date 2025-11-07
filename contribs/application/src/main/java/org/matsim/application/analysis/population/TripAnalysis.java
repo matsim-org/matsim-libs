@@ -1000,7 +1000,6 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private void writeTripDistribution(Table trips) throws IOException {
 
-		Map<String, double[]> dists = new LinkedHashMap<>();
 
 		// Note that the results of this interpolator are consistent with the one performed in matsim-python-tools
 		// This makes the results comparable with reference data, changes here will also require changes in the python package
@@ -1014,19 +1013,19 @@ public class TripAnalysis implements MATSimAppCommand {
 			Table filtered = trips.where(
 				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
 			);
-			writeTripDistributionPerGroup(filtered, bins, inp, x, dists, group);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, group);
 		}
 		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 			Table filtered = trips.where(
 				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
 			);
-			writeTripDistributionPerGroup(filtered, bins, inp, x, dists, group);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, group);
 		}
-		writeTripDistributionPerGroup(trips, bins, inp, x, dists, "total");
+		writeTripDistributionPerGroup(trips, bins, inp, x, "total");
 	}
 
-	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, Map<String, double[]> dists,
-											   String group) throws IOException {
+	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, String group) throws IOException {
+		Map<String, double[]> dists = new LinkedHashMap<>();
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("mode_share_distance_distribution_%s.csv", group)),
 			CSVFormat.DEFAULT)) {
