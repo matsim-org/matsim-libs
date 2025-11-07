@@ -15,11 +15,11 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * One can configure which modes should be cached. This way, for instance when a
  * trip would be estimates many times, e.g. in a tour-based model, one makes
  * sure that this only happens once.
- * 
+ *
  * @author sebhoerl
  */
 public class CachedTripEstimator implements TripEstimator {
-	final private Map<String, Map<DiscreteModeChoiceTrip, TripCandidate>> cache = new HashMap<>();
+	final private Map<String, Map<DiscreteModeChoiceTrip, Map<Double, TripCandidate>>> cache = new HashMap<>();
 	final private TripEstimator delegate;
 
 	public CachedTripEstimator(TripEstimator delegate, Collection<String> cachedModes) {
@@ -33,14 +33,14 @@ public class CachedTripEstimator implements TripEstimator {
 	@Override
 	public TripCandidate estimateTrip(Person person, String mode, DiscreteModeChoiceTrip trip,
 			List<TripCandidate> preceedingTrips) {
-		Map<DiscreteModeChoiceTrip, TripCandidate> modeCache = cache.get(mode);
+		Map<DiscreteModeChoiceTrip, Map<Double, TripCandidate>> modeCache = cache.get(mode);
 
 		if (modeCache != null) {
-			TripCandidate candidate = modeCache.get(trip);
+			TripCandidate candidate = modeCache.computeIfAbsent(trip, t -> new HashMap<>()).get(trip.getDepartureTime());
 
 			if (candidate == null) {
 				candidate = delegate.estimateTrip(person, mode, trip, preceedingTrips);
-				modeCache.put(trip, candidate);
+				modeCache.get(trip).put(trip.getDepartureTime(), candidate);
 			}
 
 			return candidate;
