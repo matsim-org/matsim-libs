@@ -36,6 +36,8 @@ import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 
+import com.google.common.base.Preconditions;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -83,12 +85,17 @@ public class GeoFileReader implements MatsimSomeReader {
                 FileDataStore dataStore = FileDataStoreFinder.getDataStore(dataFile);
 				return getSimpleFeatures(dataStore);
 			} else if(filename.endsWith(".gpkg")){
-				Gbl.assertNotNull(layerName);
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
 				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
 				DataStore dataStore = DataStoreFinder.getDataStore(params);
+
+				if (layerName == null) {
+					Preconditions.checkState(dataStore.getNames().size() == 1, "Expecting exactly one layer if no layer name is specified.");
+					layerName = dataStore.getNames().get(0);
+				}
+
 				return getSimpleFeatures(dataStore, layerName);
 			} else {
 				throw new RuntimeException("Unsupported file type.");

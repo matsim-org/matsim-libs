@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -392,7 +391,6 @@ public class TrafficVolumeGenerationTest {
 	void testAddingExistingScenarios() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 		double sample = 1.;
 		Config config = ConfigUtils.createConfig();
@@ -401,15 +399,9 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
-		String shapeFileZoneNameColumn = "name";
-
-		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand.filterLinksForZones(scenario,
-			SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(), shapeFileZoneNameColumn),
-			facilitiesPerZone, shapeFileZoneNameColumn);
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
-		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
 		Assertions.assertEquals(3, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -460,10 +452,8 @@ public class TrafficVolumeGenerationTest {
 	void testAddingExistingScenariosWithSample() throws Exception {
 
 		Path inputDataDirectory = Path.of(utils.getPackageInputDirectory());
-		Path shapeFileZonePath = inputDataDirectory.resolve("shp/testZones.shp");
 		String networkPath = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 		double sample = 0.2;
-		String shapeFileZoneNameColumn = "name";
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setCoordinateSystem("EPSG:4326");
@@ -471,14 +461,9 @@ public class TrafficVolumeGenerationTest {
 		config.network().setInputCRS("EPSG:4326");
 		config.setContext(inputDataDirectory.resolve("config.xml").toUri().toURL());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
-		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, config.global().getCoordinateSystem(),
-						shapeFileZoneNameColumn),
-					facilitiesPerZone, shapeFileZoneNameColumn);
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
-		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
 		Assertions.assertEquals(2, CarriersUtils.getCarriers(scenario).getCarriers().size(), MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(1, CarriersUtils.getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().size(), MatsimTestUtils.EPSILON);
@@ -552,12 +537,9 @@ public class TrafficVolumeGenerationTest {
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, Map<Id<Link>, Link>> linksPerZone = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
-		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, linksPerZone);
-
-		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, linksPerZone, usedTrafficType,
+		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, SCTUtils.getZoneIndex(inputDataDirectory), usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 
 		// test for "area1"
@@ -678,7 +660,6 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
 		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
-		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -706,7 +687,6 @@ public class TrafficVolumeGenerationTest {
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
-
 		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
@@ -718,12 +698,9 @@ public class TrafficVolumeGenerationTest {
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop = TrafficVolumeGeneration
 				.createTrafficVolume_stop(resultingDataPerZone, outputDataDistributionFile.getParent(), sample, modesORvehTypes, usedTrafficType);
 
-		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand
-				.filterLinksForZones(scenario, SCTUtils.getZoneIndex(inputDataDirectory), facilitiesPerZone, shapeFileZoneNameColumn);
+		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, SCTUtils.getZoneIndex(inputDataDirectory));
 
-		integratedExistingModels.readExistingCarriersFromFolder(scenario, sample, regionLinksMap);
-
-		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, regionLinksMap, usedTrafficType,
+		integratedExistingModels.reduceDemandBasedOnExistingCarriers(scenario, SCTUtils.getZoneIndex(inputDataDirectory), usedTrafficType,
 				trafficVolumePerTypeAndZone_start, trafficVolumePerTypeAndZone_stop);
 
 		//because the reduction of the start volume in zone3 (purpose 2) is higher than the value, a start reduction will be distributed over other zones

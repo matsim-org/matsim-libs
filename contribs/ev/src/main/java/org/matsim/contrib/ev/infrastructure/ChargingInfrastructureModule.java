@@ -20,21 +20,18 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.utils.objectattributes.AttributeConverter;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
@@ -44,9 +41,6 @@ import com.google.inject.name.Names;
 public final class ChargingInfrastructureModule extends AbstractModule {
 	public static final String CHARGERS = "chargers";
 	private final Key<Network> networkKey;
-
-	@Inject
-	private EvConfigGroup evCfg;
 
 	public ChargingInfrastructureModule() {
 		this(Key.get(Network.class));
@@ -60,24 +54,8 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 	public void install() {
 		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
-		bind(ChargingInfrastructureSpecification.class).toProvider(new Provider<>() {
-			@Inject
-			private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();
-
-			public ChargingInfrastructureSpecification get() {
-				// do not replace this by @NotNull inside the config group as people tend to dynamically bind their custom infrastructure
-				Preconditions.checkNotNull(evCfg.getChargersFile(), "Need to specify a chargers file in the ev config group.");
-
-				ChargingInfrastructureSpecification chargingInfrastructureSpecification = new ChargingInfrastructureSpecificationDefaultImpl();
-				
-				ChargerReader reader = new ChargerReader(chargingInfrastructureSpecification);
-				reader.putAttributeConverters(attributeConverters);
-				reader.parse(
-						ConfigGroup.getInputFileURL(getConfig().getContext(), evCfg.getChargersFile()));
-						
-				return chargingInfrastructureSpecification;
-			}
-		}).asEagerSingleton();
+		bind(ChargingInfrastructureSpecification.class)
+				.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class);
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
@@ -93,11 +71,21 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 
 					@Override
 					public ChargingInfrastructure get() {
-						return ChargingInfrastructureUtils.createChargingInfrastructure(chargingInfrastructureSpecification,
-								network.getLinks()::get, chargingLogicFactory );
+						return ChargingInfrastructureUtils.createChargingInfrastructure(
+								chargingInfrastructureSpecification,
+								network.getLinks()::get, chargingLogicFactory);
 					}
 				}).asEagerSingleton();
 			}
 		});
+	}
+
+	@Provides
+	@Singleton
+	ChargerWriterListener provideChargerWriterListener(ChargingInfrastructureSpecification infrastructure,
+			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		EvConfigGroup evConfig = EvConfigGroup.get(getConfig());
+		return new ChargerWriterListener(infrastructure, outputDirectoryHierarchy, evConfig.getWriteChargersInterval(),
+				getConfig().controller().getCompressionType());
 	}
 }
