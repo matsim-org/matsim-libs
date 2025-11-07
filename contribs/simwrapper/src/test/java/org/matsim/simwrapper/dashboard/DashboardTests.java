@@ -57,8 +57,8 @@ public class DashboardTests {
 			// Stuck agents
 			.isDirectoryRecursivelyContaining("glob:**stuck_agents.csv")
 			// Trip stats
-			.isDirectoryRecursivelyContaining("glob:**trip_stats.csv")
-			.isDirectoryRecursivelyContaining("glob:**mode_share.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_total.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_total.csv")
 			.isDirectoryRecursivelyContaining("glob:**mode_share_per_purpose.csv")
 			.isDirectoryRecursivelyContaining("glob:**mode_shift.csv")
 			// Traffic stats
@@ -76,12 +76,12 @@ public class DashboardTests {
 
 		run(new TripDashboard().setAnalysisArgs("--person-filter", "subpopulation=person"));
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv");
+			.isDirectoryContaining("glob:**trip_stats_total.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv");
 
-		Table tripStats = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats.csv").toString()))
+		Table tripStats = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats_total.csv").toString()))
 			.sample(false)
-			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString())).build());
+			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_total.csv").toString())).build());
 
 		Assertions.assertThat(tripStats.containsColumn("freight")).isFalse();
 	}
@@ -99,7 +99,7 @@ public class DashboardTests {
 		run(dashboard);
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv")
 			.isDirectoryContaining("glob:**mode_choices.csv")
 			.isDirectoryContaining("glob:**mode_choice_evaluation.csv")
 			.isDirectoryContaining("glob:**mode_confusion_matrix.csv");
