@@ -264,4 +264,11 @@ public class TrainManager {
 	public List<Id<Vehicle>> getRelatedVehicles(Id<Vehicle> vehicleId) {
 		return relatedVehicles.getOrDefault(vehicleId, Collections.emptyList());
 	}
+
+	/**
+	 * Remove active trains.
+	 */
+	public void clear() {
+		activeTrains.clear();
+	}
 }

@@ -25,6 +25,7 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +72,7 @@ public class RailsimEngineTest {
 			}
 		}
 		TrainManager trains = new TrainManager();
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance(), trains);
+		RailResourceManager res = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(), trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 		TrainTimeDistanceHandler ttd = createTrainTimeDistanceHandler();

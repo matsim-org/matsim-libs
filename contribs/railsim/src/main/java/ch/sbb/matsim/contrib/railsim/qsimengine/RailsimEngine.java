@@ -555,6 +555,8 @@ final class RailsimEngine implements Steppable {
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
+		ttdHandler.writePosition(state, null);
+
 		decideTargetSpeed(event, state);
 
 		createEvent(state.asEvent(time));
@@ -735,9 +737,6 @@ final class RailsimEngine implements Steppable {
 		// Only emit events on certain occasions
 		if (event.type == UpdateEvent.Type.ENTER_LINK || event.type == UpdateEvent.Type.LEAVE_LINK || event.type == UpdateEvent.Type.POSITION || event.type == UpdateEvent.Type.SPEED_CHANGE)
 			createEvent(state.asEvent(time));
-
-		if (event.type == UpdateEvent.Type.ENTER_LINK)
-			ttdHandler.writePosition(state, null);
 	}
 
 	/**

@@ -71,13 +71,9 @@ class TrainTimeDistanceHandlerTest {
 		Path output = Path.of(io.getIterationFilename(0, "railsimTimeDistance.csv", config.controller().getCompressionType()));
 		Files.createDirectories(output.getParent());
 
-		RailResourceManager resources = new RailResourceManager(
-			EventsUtils.createEventsManager(), railsim, scenario.getNetwork(), new SimpleDeadlockAvoidance(), new TrainManager(scenario)
-		);
-
 		MatsimServices services = new StubServices(io, config, scenario);
+		TrainTimeDistanceHandler handler = new TrainTimeDistanceHandler(services);
 
-		TrainTimeDistanceHandler handler = new TrainTimeDistanceHandler(services, resources, profile);
 		handler.close();
 
 		return output;
