@@ -16,7 +16,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -250,5 +252,28 @@ public final class ZoneSystemUtils {
 
 			return false;
 		};
+	}
+
+	public static void registerDefaultZoneSystems(AddZoneSystemDefinition delegate, Consumer<ZoneSystemParams> setter, Supplier<ZoneSystemParams> getter) {
+		delegate.addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((SquareGridZoneSystemParams)params));
+
+		delegate.addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((GISFileZoneSystemParams)params));
+
+		delegate.addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((H3GridZoneSystemParams)params));
+
+		delegate.addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((GeometryFreeZoneSystemParams)params));
+	}
+
+	static public interface AddZoneSystemDefinition {
+		<T extends ConfigGroup> void addDefinition(String type, Supplier<T> creator, Supplier<ConfigGroup> getter,
+				Consumer<ConfigGroup> setter);
 	}
 }

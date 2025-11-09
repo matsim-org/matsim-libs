@@ -24,14 +24,11 @@ import java.util.Set;
 
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
-import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.core.config.Config;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
@@ -42,26 +39,22 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
         initSingletonParameterSets();
     }
 
-    public static EvConfigGroup get(Config config) {
+    public static EvConfigGroup get(Config config, boolean create) {
+        if (!config.getModules().containsKey(GROUP_NAME)) {
+            config.addModule(new EvConfigGroup());
+        }
+
         return (EvConfigGroup) config.getModules().get(GROUP_NAME);
     }
 
+    public static EvConfigGroup get(Config config) {
+        return get(config, false);
+    }
+
     private void initSingletonParameterSets() {
-        addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (SquareGridZoneSystemParams) params);
-
-        addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (GISFileZoneSystemParams) params);
-
-        addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (H3GridZoneSystemParams) params);
-
-        addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-                () -> analysisZoneSystemParams,
-                params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams) params);
+        ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition, //
+                (ZoneSystemParams params) -> analysisZoneSystemParams = params, //
+                () -> analysisZoneSystemParams);
     }
 
     @Nullable
@@ -100,7 +93,6 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     @Parameter
     @Comment("Location of the chargers file")
-    @NotNull
     private String chargersFile = null;
 
     public enum EvAnalysisOutput {
@@ -123,6 +115,10 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
     @Parameter
     @Comment("Interval at which zonal energy demand information is written")
     private int writeZonalEnergyDemandInterval = 0;
+
+    @Parameter
+    @Comment("Interval at which chargers should be written out")
+    private int writeChargersInterval = 100;
 
     public enum InitialSocBehavior {
         Keep, UpdateAfterIteration
@@ -211,5 +207,13 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     public void setWriteZonalEnergyDemandInterval(int value) {
         this.writeZonalEnergyDemandInterval = value;
+    }
+
+    public int getWriteChargersInterval() {
+        return writeChargersInterval;
+    }
+
+    public void setWriteChargersInterval(int value) {
+        this.writeChargersInterval = value;
     }
 }
