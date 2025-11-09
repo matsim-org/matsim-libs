@@ -79,10 +79,9 @@ public class MarginalSumScoringFunction {
 		double scoreB0 = sumScoringB.getScore();
 
 		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
-		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() + delay);
-		// yy "-" is a bit dangerous here: Depending on how complete the later used "handleActivity" is set up, the facility may be closed, and then the resulting VTTS will be zero. kai, nov'25
-		// --> I just changed the sign on this.  kai, nov'25
-		// --> Has no visible consequence on dresden v0.9 analysis (20k acts with VTTS=0 remain).
+		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
+		// yy Depending on how complete the later used "handleActivity" is set up, the facility may become closed at exactly this time step, and then the resulting VTTS will be zero. kai, nov'25
+		// --> However, may also work the other way around, and the facility may just become open at exactly this time step.
 
 		if ( cnt < 10 ){
 			cnt++;
@@ -105,7 +104,7 @@ public class MarginalSumScoringFunction {
 		double scoreWithoutDelay = scoreB1 - scoreB0;
 
 		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
-		return -activityDelayDisutility;
+		return activityDelayDisutility;
 	}
 
 	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {

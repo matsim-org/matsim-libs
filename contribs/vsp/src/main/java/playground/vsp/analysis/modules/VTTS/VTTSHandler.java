@@ -305,6 +305,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 		// Translate the disutility into monetary units.
 		double marginalUtilityOfMoney = scoringParametersForPerson.getScoringParameters(scenario.getPopulation().getPersons().get(personId)).marginalUtilityOfMoney;
+		log.warn("personId={}, mUM={}", personId, marginalUtilityOfMoney );
 		double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / marginalUtilityOfMoney;
 
 		// store the VTTS for analysis purposes
@@ -332,6 +333,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 	public void printVTTS(String fileName) {
 		// yyyyyy The column header says "VTTS (money/hour)", but I think that it writes utils/hour.  ???  kai, nov'25
+		// --> actually no, it does the correct division by the person-specific utl-of-money.  This now does NOT explain why, in the bln scenario, we have so many persons with identical VTTS.
+		// --> (possibly, I had an experienced_plans_file without income?)
 
 		File file = new File(fileName);
 
