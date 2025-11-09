@@ -331,6 +331,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	}
 
 	public void printVTTS(String fileName) {
+		// yyyyyy The column header says "VTTS (money/hour)", but I think that it writes utils/hour.  ???  kai, nov'25
 
 		File file = new File(fileName);
 
