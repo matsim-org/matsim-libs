@@ -41,9 +41,10 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 	@CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds.")
 	private int maxTypicalDuration = 86400;
 
-	public enum HandlingOfOverlyLongPlans { accept, fail }
-	@CommandLine.Option(names={"--handling-of-overly-long-plans"})
-	private HandlingOfOverlyLongPlans handlingOfOverlyLongPlans = HandlingOfOverlyLongPlans.fail;
+	@CommandLine.Option(names={"--overlong-plans-factor"}, description = "Plans where adding up their durations becomes larger than overlongPlansFactor * 24hrs lead to an abort.  " +
+																			 "Set to very large value if you want to accept all plans.")
+		// yyyy unclear how all of this work work with simulations > 24 hrs.  kai, nov'25
+	double overlongPlansFactor = 1.2;
 
 	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter than this value.")
 	private int endTimeToDuration = 1800;
@@ -159,18 +160,11 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 				}
 			}
 
-			if ( sumDurations > maxTypicalDuration * 1.2 ) {
+			if ( sumDurations > maxTypicalDuration * this.overlongPlansFactor ) {
 				log.error( "sumDurations={} is considerably longer than maxTypicalDuration={}, despite the fact travel is not even included.  " +
-								   "Implies some issue with the incoming data.  The default is to fail here; ignoring the issue can be forced with --handling-of-overly-long-plans=accept."
+								   "Implies some issue with the incoming data.  The default is to fail here; ignoring the issue can be forced with --overlong-plans-factor = <some very large value>."
 						 , sumDurations, maxTypicalDuration );
-				switch ( this.handlingOfOverlyLongPlans ) {
-					case accept -> {
-					}
-					case fail -> {
-						throw new RuntimeException( "See error message above." );
-					}
-					default -> throw new IllegalStateException("Unexpected value: " + this.handlingOfOverlyLongPlans);
-				}
+				throw new RuntimeException( "See error message above." );
 			}
 
 			mergeOvernightActivities(activities);
