@@ -67,9 +67,14 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			double chargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
 			
 			double chargedEnergy = chargingPower * chargePeriod;
+
+			// limited by requested energy
 			chargedEnergy = Math.min(chargedEnergy, requestedEnergy);
 
-			double updatedCharge = Math.min(currentCharge + chargedEnergy, cv.ev().getBattery().getCapacity());
+			// limited by battery capacity
+			chargedEnergy = Math.min(chargedEnergy, cv.ev().getBattery().getCapacity() - currentCharge);
+
+			double updatedCharge = currentCharge + chargedEnergy; // cannot exceed battery capacity
 			cv.ev().getBattery().setCharge(updatedCharge);
 
 			eventsManager.processEvent(new EnergyChargedEvent(now, charger.getId(), cv.ev().getId(), chargedEnergy, updatedCharge));
