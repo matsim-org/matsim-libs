@@ -166,10 +166,11 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		List<Activity> activities = PopulationUtils.getActivities(person.getSelectedPlan(),
 			TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 		Coord startCoord = activities.getFirst().getCoord();
-		Set<String> activitiesTyes = activities.subList(1,activities.size()-1).stream()
+		Set<String> activitiesTypes = activities.subList(1,activities.size()-1).stream()
 			.map(Activity::getType)
 			.collect(Collectors.toSet());
-		if (!activitiesTyes.contains(event.getActType()) || group.equals(NO_GROUP_ASSIGNED))
+		// only consider relations of the jobs and not the first and last activity of a commercial tour
+		if (!activitiesTypes.contains(event.getActType()) || group.equals(NO_GROUP_ASSIGNED))
 			return;
 		relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(group + "_act_X",
 			event.getCoord().getX());
