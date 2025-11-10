@@ -28,6 +28,7 @@ import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 class NetworkTrafficEngineTest {
@@ -56,6 +56,8 @@ class NetworkTrafficEngineTest {
 		var activeLinks = new ActiveLinks(mock(SimStepMessaging.class));
 		var parkedVehicles = new MassConservingParking();
 		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
+		var config = new DSimConfigGroup();
+		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);
 
 		var engine = new NetworkTrafficEngine(scenario, mock(AgentSourcesContainer.class), simNetwork,
 			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager);
@@ -100,18 +102,14 @@ class NetworkTrafficEngineTest {
 
 			@Override
 			public List<DepartureHandler> getDepartureHandlers() {
-				return List.of();
+				return List.of(networkDepartureHandler);
 			}
 		});
 
-		// TODO: fix the simulation below with the departure handling being done outside the network engine.
-		fail();
-
-//		engine.handleDeparture(0, agent, agent.getCurrentLinkId());
-//
-//		do {
-//			engine.doSimStep(i.get());
-//		} while (i.getAndIncrement() <= 120);
+		networkDepartureHandler.handleDeparture(0, agent, agent.getCurrentLinkId());
+		do {
+			engine.doSimStep(i.get());
+		} while (i.getAndIncrement() <= 120);
 	}
 
 	private static List<Event> createExpectedEvents() {
@@ -139,7 +137,7 @@ class NetworkTrafficEngineTest {
 
 		var scenario = ScenarioUtils.createMutableScenario(ConfigUtils.createConfig());
 		scenario.setNetwork(TestUtils.createLocalThreeLinkNetwork());
-		addPerson("person", scenario);
+		addPerson(scenario);
 		addVehicle(scenario);
 		return scenario;
 	}
@@ -161,9 +159,9 @@ class NetworkTrafficEngineTest {
 		}
 	}
 
-	private static void addPerson(String id, Scenario scenario) {
+	private static void addPerson(Scenario scenario) {
 		var factory = scenario.getPopulation().getFactory();
-		var person = factory.createPerson(Id.createPersonId(id));
+		var person = factory.createPerson(Id.createPersonId("person"));
 		var plan = factory.createPlan();
 
 		var startAct = factory.createActivityFromCoord(
