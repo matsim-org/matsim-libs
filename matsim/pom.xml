@@ -227,7 +227,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.0.1.Final</version>
+			<version>9.1.0.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.validation</groupId>
