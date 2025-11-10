@@ -260,7 +260,7 @@ public class LanduseBuildingAnalysis {
 	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
 		double buildingLevels;
 		double buildingLevelsPerType;
-		if (building.getAttribute("levels") == null)
+		if (building.getAttribute("levels") == null || String.valueOf(building.getAttribute("levels")).isEmpty())
 			buildingLevels = 1;
 		else {
 			Object levelsAttribute = building.getAttribute("levels");

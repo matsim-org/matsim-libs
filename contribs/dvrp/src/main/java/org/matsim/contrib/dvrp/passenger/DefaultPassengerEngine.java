@@ -44,8 +44,8 @@ import org.matsim.core.modal.ModalProviders;
 
 import com.google.common.base.Preconditions;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)

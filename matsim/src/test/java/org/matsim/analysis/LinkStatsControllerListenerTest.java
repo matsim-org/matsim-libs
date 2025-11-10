@@ -49,10 +49,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
@@ -420,8 +419,8 @@ public class LinkStatsControllerListenerTest {
 		String[] parts = line.split("\t");// [0] = linkId, [1] = matsim volume, [2] = real volume
 		return new double[]{
 			Double.parseDouble(parts[7]), // min
-			Double.parseDouble(parts[8]),    // avg
-			Double.parseDouble(parts[9])    // max
+			Double.parseDouble(parts[8]), // avg
+			Double.parseDouble(parts[9])  // max
 		};
 	}
 

@@ -19,7 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -49,6 +48,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import com.google.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -191,6 +191,15 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 						throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
 				}
 				throw new RuntimeException(msg);
+			}
+
+			if (!(VehicleUtils.hasVehicleId(person, leg.getMode()) && VehicleUtils.getVehicleId(person, leg.getMode()).equals(vehicleId))) {
+				// This is a routing-only vehicle, which is not actually picked up by any agent
+				// and is required for WithinDay-functionality and (possibly shared) vehicles,
+				// that are not assigned exclusively to persons. It is replaced by a real
+				// vehicle when the agent actually starts its trip e.g,
+				// SharingEngine>SharingLogic in shared_mobility. hrewald, oct'25
+				continue; // do not place it in the simulation
 			}
 
 			// find the link ID of where to place the vehicle:

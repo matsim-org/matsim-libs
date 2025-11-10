@@ -24,6 +24,7 @@ package org.matsim.contrib.ev.example;/*
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,8 +63,13 @@ public class RunEvExample {
 	}
 
 	public void run( String[] args ) {
+		run(args, config -> {});	
+	}
+
+	public void run( String[] args, Consumer<Config> configurator) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		configurator.accept(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule( new AbstractModule(){

@@ -20,7 +20,7 @@
 package ch.sbb.matsim.mobsim.qsim.pt;
 
 import ch.sbb.matsim.config.SBBTransitConfigGroup;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;

@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;

@@ -28,10 +28,8 @@ import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
-import java.util.Collection;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.util.Set;
 
 public final class EventsManagerModule extends AbstractModule {
@@ -52,7 +50,6 @@ public final class EventsManagerModule extends AbstractModule {
 		} else {
 			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 		}
-
 		bind(EventHandlerRegistrator.class).asEagerSingleton();
 	}
 

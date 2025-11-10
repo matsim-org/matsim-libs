@@ -19,7 +19,7 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +56,6 @@ class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-
 		private final MobsimAgent agent;
 		private final double activityEndTime;
 	}

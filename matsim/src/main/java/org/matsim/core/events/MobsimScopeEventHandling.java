@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;

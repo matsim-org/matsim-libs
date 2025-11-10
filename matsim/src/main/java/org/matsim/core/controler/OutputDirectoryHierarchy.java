@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
-import jakarta.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.messages.ComputeNode;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -34,6 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
 
 /**
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -313,7 +313,6 @@ public final class OutputDirectoryHierarchy {
 			throw new UncheckedIOException("The tmp directory %s could not be created.".formatted(getTempPath()), e);
 		}
 
-
 		File itersDir = new File(outputPath + "/" + Controler.DIRECTORY_ITERS);
 		try {
 			Files.createDirectories(itersDir.toPath());
@@ -321,5 +320,4 @@ public final class OutputDirectoryHierarchy {
 			throw new UncheckedIOException("The iterations directory %s could not be created.".formatted(itersDir), e);
 		}
 	}
-
 }

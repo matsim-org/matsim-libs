@@ -20,8 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.*;
@@ -53,12 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.Serial;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.inject.Inject;
 
 /**
  * @author mrieser

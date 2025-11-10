@@ -2,7 +2,6 @@ package org.matsim.contrib.ev.reservation;
 
 import org.matsim.contrib.common.util.reservation.AbstractReservationManager;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -15,19 +14,32 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  * 
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, Charger, ElectricVehicle> implements IterationStartsListener {
+public class ChargerReservationManager extends AbstractReservationManager<ChargerSpecification, ElectricVehicle>
+		implements IterationStartsListener {
 
-	public ChargerReservationManager() {
-		super(Charger.class);
+	private final ChargerReservability reservability;
+
+	public ChargerReservationManager(ChargerReservability reservability) {
+		this.reservability = reservability;
 	}
 
 	@Override
-	public int getCapacity(ChargerSpecification charger) {
+	protected int getCapacity(ChargerSpecification charger) {
 		return charger.getPlugCount();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		super.cleanReservations();
+	}
+
+	@Override
+	public boolean isAvailable(ChargerSpecification resource, ElectricVehicle consumer, double startTime,
+			double endTime) {
+		if (!reservability.isReservable(resource, startTime, endTime)) {
+			return false;
+		}
+
+		return super.isAvailable(resource, consumer, startTime, endTime);
 	}
 }

@@ -49,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.matsim.testcases.MatsimTestUtils.EPSILON;
@@ -92,6 +92,8 @@ public class EquilTwoAgentsTest {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
+
+		config.scoring().setWriteExperiencedPlans( true );
 
 		ScoringConfigGroup pcsConfig = config.scoring() ;
 		ActivityParams params = new ActivityParams("h") ;
