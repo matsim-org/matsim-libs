@@ -40,36 +40,47 @@ import se.vti.atap.minimalframework.defaults.replannerselection.MSAStepSize;
 public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extends Agent<P>, T extends NetworkConditions, Q extends ApproximateNetworkConditions<P, A, Q>>
 		implements PlanSelection<A, T> {
 
-	private final int maxNumberOfFailures = 0;
-
 	private final MSAStepSize stepSize;
 
 	private final Random rnd;
 
 	private final ApproximateNetworkLoading<P, A, T, Q> approximateNetworkLoading;
 
-	private final double epsPsi;
-	private final double epsT;
+	private double epsPsi = 1e-6;
 
-	private boolean approximateDistance = false;
+	private double epsT = 1e-6;
 
-	private boolean transformDistance = true;
+	private boolean approximateDistance = true;
 
 	private boolean normalizeDistance = false;
 
 	private double minimalImprovement = 1e-6;
 
-//	private double individualMinimalGap = 0.0;
-
 	private double initialStepSize = 1.0;
-	
+
+	private int maxNumberOfFailures = 0;
+
+	private Double maxPsi = null;
+
+	private Double maxD = null;
+
+	private Double maxT = null;
+
 	public ProposedMethodWithLocalSearchPlanSelection(double stepSizeIterationExponent, Random rnd,
-			ApproximateNetworkLoading<P, A, T, Q> approximateNetworkLoading, double epsPsi, double epsT) {
+			ApproximateNetworkLoading<P, A, T, Q> approximateNetworkLoading) {
 		this.stepSize = new MSAStepSize(stepSizeIterationExponent);
 		this.rnd = rnd;
 		this.approximateNetworkLoading = approximateNetworkLoading;
+	}
+
+	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setGapEpsilon(double epsPsi) {
 		this.epsPsi = epsPsi;
+		return this;
+	}
+
+	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setDistanceEpsilon(double epsT) {
 		this.epsT = epsT;
+		return this;
 	}
 
 	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setApproximateDistance(boolean approximateDistance) {
@@ -77,18 +88,8 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 		return this;
 	}
 
-	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setTransformDistance(boolean transformDistance) {
-		this.transformDistance = transformDistance;
-		return this;
-	}
-
 	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setNormalizeDistance(boolean normalizeDistance) {
 		this.normalizeDistance = normalizeDistance;
-		return this;
-	}
-	
-	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setInitialStepSize(double initialStepSize) {
-		this.initialStepSize = initialStepSize;
 		return this;
 	}
 
@@ -97,31 +98,19 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 		return this;
 	}
 
+	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setInitialStepSize(double initialStepSize) {
+		this.initialStepSize = initialStepSize;
+		return this;
+	}
 
-//	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setMinimalRelativeImprovement(
-//			double minimalImprovement) {
-//		this.minimalRelativeImprovement = minimalImprovement;
-//		return this;
-//	}
-
-//	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setIndividualMinimalGap(double individualMinimalGap) {
-//		this.individualMinimalGap = individualMinimalGap;
-//		return this;
-//	}
-
-//	private Double objectiveFunctionNumeratorScale = null;
-//	private Double objectiveFunctionDenominatorScale = null;
-//	private Double objectiveFunctionScale = null;
-
-	private Double maxPsi = null;
-	private Double maxD = null;
-	private Double maxT = null;
-
-//	private Double objFctScale = null;
+	public ProposedMethodWithLocalSearchPlanSelection<P, A, T, Q> setMaxNumberOfFailures(int maxNumberOfFailures) {
+		this.maxNumberOfFailures = maxNumberOfFailures;
+		return this;
+	}
 
 	private double computeObjectiveFunctionValue(double expectedImprovement, Q currentApproximateNetworkConditions,
 			Q candidateApproximatNetworkConditions, double absoluteAmbitionLevel) {
-		
+
 		double distance;
 		if (this.approximateDistance) {
 			distance = currentApproximateNetworkConditions.computeDistance(candidateApproximatNetworkConditions);
@@ -132,9 +121,9 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 		if (this.normalizeDistance) {
 			distance /= this.maxD;
 		}
-		double _T = (this.transformDistance ? (distance + distance * distance) : (distance));
+		double _T = distance + distance * distance;
 
-		double numerator = (expectedImprovement - absoluteAmbitionLevel) / this.maxPsi;	
+		double numerator = (expectedImprovement - absoluteAmbitionLevel) / this.maxPsi;
 		double denominator = _T / (this.maxT + this.epsT) + this.epsT;
 
 		return (numerator / denominator);
@@ -149,7 +138,6 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 			return;
 		}
 		double absoluteAmbitionLevel = this.initialStepSize * this.stepSize.compute(iteration) * this.maxPsi;
-		// * agents.stream().mapToDouble(a -> a.computeGap()).sum();
 
 		Q approximateNetworkConditionsWithoutAnySwitch = this.approximateNetworkLoading.compute(agents,
 				Collections.emptySet(), networkConditions);
@@ -157,13 +145,12 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 				agents, networkConditions);
 		this.maxD = approximateNetworkConditionsWithoutAnySwitch
 				.computeDistance(approximateNetworkConditionsWithAllSwitch);
-		
-		if (this.normalizeDistance) {
-			this.maxT = (this.transformDistance ? (1.0 + 1.0 * 1.0) : 1.0);
-		} else {
-			this.maxT = (this.transformDistance ? (this.maxD + this.maxD * this.maxD) : this.maxD);
-		}
 
+		if (this.normalizeDistance) {
+			this.maxT = 2.0; // D + D^2 with D=1
+		} else {
+			this.maxT = this.maxD + this.maxD * this.maxD;
+		}
 
 		Set<A> agentsUsingCurrentPlan = new LinkedHashSet<>(agents);
 		Set<A> agentsUsingCandidatePlan = new LinkedHashSet<>();
@@ -175,26 +162,18 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 				approximateNetworkConditionsWithoutAnySwitch, approximateNetworkConditions, absoluteAmbitionLevel);
 
 		long innerIteration = 0;
-		
+
 		List<A> agentsList = new ArrayList<>(agents);
 		int failures = 0;
 		boolean switched;
 		do {
 			innerIteration++;
-			
-//			System.out.println(objectiveFunctionValue);
-
 			switched = false;
 			Collections.shuffle(agentsList, this.rnd);
-//			Collections.sort(allAgents, new Comparator<>() {
-//				@Override
-//				public int compare(A agent1, A agent2) { // sort in descending order
-//					return Double.compare(agent2.computeGap(), agent1.computeGap());
-//				}
-//			});
+
 			for (A agent : agentsList) {
 				boolean agentWasUsingCandidatePlan = agentsUsingCandidatePlan.contains(agent);
-				PlanSwitch<P, A> candidateSwitch;
+				BasicPlanSwitch<P, A> candidateSwitch;
 				double expectedImprovementAfterSwitch;
 				if (agentWasUsingCandidatePlan) {
 					candidateSwitch = approximateNetworkConditions.switchToPlan(agent.getCurrentPlan(), agent);
@@ -207,9 +186,8 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 						expectedImprovementAfterSwitch, approximateNetworkConditionsWithoutAnySwitch,
 						approximateNetworkConditions, absoluteAmbitionLevel);
 
-//				if (objectiveFunctionValueAfterSwitch > objectiveFunctionValue
-//						* (1.0 + 1e-0 * this.epsPsi / this.epsT)) {
-				if (objectiveFunctionValueAfterSwitch - objectiveFunctionValue >= this.minimalImprovement * Math.max(1.0, objectiveFunctionValue)) {
+				if (objectiveFunctionValueAfterSwitch - objectiveFunctionValue >= this.minimalImprovement
+						* Math.max(1.0, objectiveFunctionValue)) {
 					expectedImprovement = expectedImprovementAfterSwitch;
 					objectiveFunctionValue = objectiveFunctionValueAfterSwitch;
 					if (agentWasUsingCandidatePlan) {
@@ -221,14 +199,15 @@ public class ProposedMethodWithLocalSearchPlanSelection<P extends Plan, A extend
 					}
 					switched = true;
 				} else {
-					approximateNetworkConditions.undoSwitch(candidateSwitch);
+					approximateNetworkConditions.undoPlanSwitch(candidateSwitch);
 				}
 			}
-			
+
 			if (innerIteration % 100 == 0) {
+				// TODO use logger
 				System.out.println(innerIteration + "\t" + objectiveFunctionValue);
 			}
-			
+
 			if (!switched) {
 				failures++;
 			}

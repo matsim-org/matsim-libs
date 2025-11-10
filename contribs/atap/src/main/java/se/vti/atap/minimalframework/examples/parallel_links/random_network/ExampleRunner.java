@@ -293,27 +293,12 @@ public class ExampleRunner {
 			this.createRunner(network, demand, randomize ? this.rnd : null)
 					.setPlanSelection(new SortingPlanSelection<>(iterationExp)).setLogger(sortingLogger).run();
 
-//			boolean useCosts = false;
-			double costWeight = 1.0;
-			double distanceFactor = 1.0;
-			boolean approximateDistances = true;
-			boolean transformDistance = true;
-						
-			boolean normalizeDistance = false;
-//			double individualMinimalGap = 1e-6;
+			var distanceType = ApproximateNetworkLoadingImpl.DistanceType.FLOW_SQUARED;
 
-			boolean capacityScale = false;
-			boolean squareFlow = false;
-
-			double epsPsi = 1e-6;
-			double epsT = 1e-6;
-			double minimalImprovement = 1e-6;
-			
 			System.out.println("  running Proposed");
 			var proposedPlanSelection = new ProposedMethodWithLocalSearchPlanSelection<>(iterationExp, this.rnd,
-					new ApproximateNetworkLoadingImpl(network, costWeight, distanceFactor, capacityScale, squareFlow),
-					epsPsi, epsT).setApproximateDistance(approximateDistances).setTransformDistance(transformDistance)
-					.setNormalizeDistance(normalizeDistance).setInitialStepSize(1.0).setMinimalImprovement(minimalImprovement);
+					new ApproximateNetworkLoadingImpl(network, distanceType))
+					.setApproximateDistance(true);
 			this.createRunner(network, demand, randomize ? this.rnd : null).setPlanSelection(proposedPlanSelection)
 					.setLogger(proposedLogger).setVerbose(false).run();
 
@@ -347,8 +332,8 @@ public class ExampleRunner {
 
 	public static void main(String[] args) {
 //		runSmallTripMakerExample();
-//		runSmallODExample();
-		runArticleExample();
+		runSmallODExample();
+//		runArticleExample();
 	}
 
 }

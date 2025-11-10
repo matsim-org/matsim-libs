@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.minimalframework
+ * se.vti.atap.minimalframework.examples.parallel_links
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -27,14 +27,27 @@ import se.vti.atap.minimalframework.Plan;
  * @author GunnarF
  *
  */
-public interface ApproximateNetworkConditions<P extends Plan, A extends Agent<P>, Q extends ApproximateNetworkConditions<P, A, Q>> {
+public class BasicPlanSwitch<P extends Plan, A extends Agent<P>> {
 
-	BasicPlanSwitch<P, A> switchToPlan(P plan, A agent);
+	private final P oldPlan;
+	private final P newPlan;
+	private final A agent;
 
-	void undoPlanSwitch(BasicPlanSwitch<P, A> undoSwitch);
-	
-	double computeLeaveOneOutDistance(Q other);
+	public BasicPlanSwitch(P oldPlan, P newPlan, A agent) {
+		this.oldPlan = oldPlan;
+		this.newPlan = newPlan;
+		this.agent = agent;
+	}
 
-	double computeDistance(Q other);
+	public P getOldPlan() {
+		return this.oldPlan;
+	}
 
+	public P getNewPlan() {
+		return this.newPlan;
+	}
+
+	public A getAgent() {
+		return this.agent;
+	}
 }

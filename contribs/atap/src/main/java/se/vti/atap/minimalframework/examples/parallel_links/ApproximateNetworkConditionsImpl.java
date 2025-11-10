@@ -22,7 +22,7 @@ package se.vti.atap.minimalframework.examples.parallel_links;
 import java.util.Set;
 
 import se.vti.atap.minimalframework.defaults.replannerselection.proposed.AbstractApproximateNetworkConditions;
-import se.vti.atap.minimalframework.defaults.replannerselection.proposed.PlanSwitch;
+import se.vti.atap.minimalframework.defaults.replannerselection.proposed.BasicPlanSwitch;
 
 /**
  * 
@@ -32,83 +32,48 @@ import se.vti.atap.minimalframework.defaults.replannerselection.proposed.PlanSwi
 public class ApproximateNetworkConditionsImpl
 		extends AbstractApproximateNetworkConditions<PathFlows, AgentImpl, ApproximateNetworkConditionsImpl> {
 
-	private double[] linkFlows_veh;
-	private double[] linkConditions;
+	private final ApproximateNetworkLoadingImpl.DistanceType distanceType;
 
-//	private final boolean useCostsForDistance;
-	private final double costWeight;
-	private final double distanceFactor;
-	private final boolean capacityScale;
-	private final boolean squareFlow;
+	private double distanceFactor = 1.0;
+
+	private double[] linkFlows_veh = null;
+
+	private double[] linkConditions = null;
 
 	public ApproximateNetworkConditionsImpl(Set<AgentImpl> agentsUsingCurrentPlan,
-			Set<AgentImpl> agentsUsingCandidatePlan, Network network, double costWeight, double distanceFactor,
-			boolean capacityScale, boolean squareFlow) {
+			Set<AgentImpl> agentsUsingCandidatePlan, Network network,
+			ApproximateNetworkLoadingImpl.DistanceType distanceType) {
 		super(agentsUsingCurrentPlan, agentsUsingCandidatePlan, network);
-//		this.useCostsForDistance = useCostsForDistances;
-		this.costWeight = costWeight;
-		this.distanceFactor = distanceFactor;
-		this.capacityScale = capacityScale;
-		this.squareFlow = squareFlow;
+		this.distanceType = distanceType;
 
 		this.linkFlows_veh = new double[super.network.getNumberOfLinks()];
 		this.linkConditions = new double[super.network.getNumberOfLinks()];
 
 		for (int linkIndex = 0; linkIndex < super.network.getNumberOfLinks(); linkIndex++) {
-			this.linkConditions[linkIndex] = (1.0 - this.costWeight) * this.flow(linkIndex)
-					+ this.costWeight * this.cost(linkIndex);
-//					* this.costScale
-//					* (super.network.computeLinkTravelTime_s(linkIndex, this.linkFlows_veh[linkIndex])
-//							+ this.linkFlows_veh[linkIndex] * super.network
-//									.compute_dLinkTravelTime_dLinkFlow_s_veh(linkIndex, this.linkFlows_veh[linkIndex]));
+			this.linkConditions[linkIndex] = this.computeLinkCondition(linkIndex);
 		}
+
 		super.switchAgentsIntoEmptyState(agentsUsingCurrentPlan, agentsUsingCandidatePlan);
 	}
 
-	private double flow(int linkIndex) {
-		double flow = this.linkFlows_veh[linkIndex];
-		if (this.squareFlow) {
-			flow = flow * flow;
+	private double computeLinkCondition(int linkIndex) {
+		double flow_veh = this.linkFlows_veh[linkIndex];
+		if (ApproximateNetworkLoadingImpl.DistanceType.FLOWS == this.distanceType) {
+			return flow_veh;
+		} else if (ApproximateNetworkLoadingImpl.DistanceType.CAPACITY_SCALED_FLOWS == this.distanceType) {
+			return flow_veh
+					* this.network.compute_dLinkTravelTime_dLinkFlow_s_veh(linkIndex, this.network.cap_veh[linkIndex]);
+		} else if (ApproximateNetworkLoadingImpl.DistanceType.FLOW_SQUARED == this.distanceType) {
+			return flow_veh * flow_veh;
+		} else if (ApproximateNetworkLoadingImpl.DistanceType.TRAVELTIMES == this.distanceType) {
+			return this.network.computeLinkTravelTime_s(linkIndex, flow_veh);
+		} else {
+			throw new UnsupportedOperationException("Unknown distance type: " + this.distanceType);
 		}
-		if (this.capacityScale) {
-			flow *= this.network.t0_s[linkIndex] * this.network.alpha[linkIndex] * this.network.beta[linkIndex]
-					/ this.network.cap_veh[linkIndex];
-		}
-		return flow;
 	}
-
-	private double cost(int linkIndex) {
-//		double factor = this.network.t0_s[linkIndex] * this.network.alpha[linkIndex] * this.network.beta[linkIndex]
-//				/ Math.pow(this.network.cap_veh[linkIndex], this.network.beta[linkIndex]);
-//		return factor * this.linkFlows_veh[linkIndex];
-
-		return this.linkFlows_veh[linkIndex]
-				* this.network.computeLinkTravelTime_s(linkIndex, this.linkFlows_veh[linkIndex]);
-//		return this.network.computeLinkTravelTime_s(linkIndex, this.linkFlows_veh[linkIndex]);
-
-	}
-
-//	@Override
-//	private void ensureInitializedInternalState() {
-//		if (this.linkFlows_veh == null) {
-//			this.linkFlows_veh = new double[super.network.getNumberOfLinks()];
-//			this.linkConditions = new double[super.network.getNumberOfLinks()];
-//
-//			if (this.useCostsForDistance) {
-//				for (int linkIndex = 0; linkIndex < super.network.getNumberOfLinks(); linkIndex++) {
-//					this.linkConditions[linkIndex] = this.conditionScale
-//							* super.network.computeLinkTravelTime_s(linkIndex, 0.0);
-//				}
-//			}
-//		}
-//	}
 
 	@Override
 	public double computeDistance(ApproximateNetworkConditionsImpl other) {
-
-//		this.ensureInitializedInternalState();
-//		other.ensureInitializedInternalState();
-
 		double sumOfSquares = 0.0;
 		for (int link = 0; link < this.linkConditions.length; link++) {
 			double diff = this.linkConditions[link] - other.linkConditions[link];
@@ -116,14 +81,13 @@ public class ApproximateNetworkConditionsImpl
 			sumOfSquares += diff * diff;
 		}
 		double result = Math.sqrt(sumOfSquares);
-//		System.out.println("  " + result);
 		return result;
 	}
 
 	@Override
-	public PlanSwitch<PathFlows, AgentImpl> switchToPlan(PathFlows newPlan, AgentImpl agent) {
+	public BasicPlanSwitch<PathFlows, AgentImpl> switchToPlan(PathFlows newPlan, AgentImpl agent) {
 
-		var planSwitch = new PlanSwitch<>(this.agent2plan.get(agent), newPlan, agent);
+		var planSwitch = new PlanSwitch(this.agent2plan.get(agent), newPlan, agent);
 
 		planSwitch.oldLinkFlowsOnPaths_veh = new double[agent.getNumberOfPaths()];
 		planSwitch.oldLinkConditionsOnPaths = new double[agent.getNumberOfPaths()];
@@ -150,52 +114,26 @@ public class ApproximateNetworkConditionsImpl
 			}
 		}
 
-//		for (int linkIndex = 0; linkIndex < super.network.getNumberOfLinks(); linkIndex++) {
-//			this.linkConditions[linkIndex] = (1.0 - this.costWeight) * this.flow(linkIndex)
-//					+ this.costWeight * this.cost(linkIndex);
-//		}
 		for (int path = 0; path < agent.getNumberOfPaths(); path++) {
 			int link = agent.availableLinks[path];
-			this.linkConditions[link] = (1.0 - this.costWeight) * this.flow(link)
-					+ this.costWeight * this.cost(link);
+			this.linkConditions[link] = this.computeLinkCondition(link);
 		}
 
 		return planSwitch;
 	}
 
 	@Override
-	public void undoSwitch(PlanSwitch<PathFlows, AgentImpl> undoSwitch) {
+	public void undoPlanSwitch(BasicPlanSwitch<PathFlows, AgentImpl> undoSwitch) {
 
 		AgentImpl agent = undoSwitch.getAgent();
 
 		PathFlows oldPlan = undoSwitch.getOldPlan();
-//		if (oldPlan != null) {
-//			for (int path = 0; path < agent.getNumberOfPaths(); path++) {
-//				this.linkFlows_veh[agent.availableLinks[path]] += oldPlan.pathFlows_veh[path];
-//			}
-//		}
-//		PathFlows newPlan = undoSwitch.getNewPlan();
-//		if (newPlan != null) {
-//			for (int path = 0; path < agent.getNumberOfPaths(); path++) {
-//				this.linkFlows_veh[agent.availableLinks[path]] -= newPlan.pathFlows_veh[path];
-//			}
-//		}
-//		this.linkFlows_veh = Arrays.copyOf(undoSwitch.oldLinkFlows_veh, undoSwitch.oldLinkFlows_veh.length);
 
+		var parallelLinksUndoSwitch = (PlanSwitch) undoSwitch;
 		for (int path = 0; path < agent.getNumberOfPaths(); path++) {
-			this.linkFlows_veh[agent.availableLinks[path]] = undoSwitch.oldLinkFlowsOnPaths_veh[path];
-			this.linkConditions[agent.availableLinks[path]] = undoSwitch.oldLinkConditionsOnPaths[path];
+			this.linkFlows_veh[agent.availableLinks[path]] = parallelLinksUndoSwitch.oldLinkFlowsOnPaths_veh[path];
+			this.linkConditions[agent.availableLinks[path]] = parallelLinksUndoSwitch.oldLinkConditionsOnPaths[path];
 		}
-
-//		for (int linkIndex = 0; linkIndex < super.network.getNumberOfLinks(); linkIndex++) {
-//			this.linkConditions[linkIndex] = (1.0 - this.costWeight) * this.flow(linkIndex)
-//					+ this.costWeight * this.cost(linkIndex);
-//		}
-//		for (int path = 0; path < agent.getNumberOfPaths(); path++) {
-//			int link = agent.availableLinks[path];
-//			this.linkConditions[link] = (1.0 - this.costWeight) * this.flow(link)
-//					+ this.costWeight * this.cost(link);
-//		}
 
 		this.agent2plan.put(agent, oldPlan);
 	}

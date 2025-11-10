@@ -44,12 +44,6 @@ public abstract class AbstractApproximateNetworkConditions<P extends Plan, A ext
 			Network network) {
 		this.agent2plan = new LinkedHashMap<>(agentsUsingCurrentPlan.size() + agentsUsingCandidatePlan.size());
 		this.network = network;
-//		for (A agent : agentsUsingCurrentPlan) {
-//			this.switchToPlan(agent.getCurrentPlan(), agent);
-//		}
-//		for (A agent : agentsUsingCandidatePlan) {
-//			this.switchToPlan(agent.getCandidatePlan(), agent);
-//		}
 	}
 	
 	protected void switchAgentsIntoEmptyState(Set<A> agentsUsingCurrentPlan, Set<A> agentsUsingCandidatePlan) {
@@ -66,23 +60,21 @@ public abstract class AbstractApproximateNetworkConditions<P extends Plan, A ext
 		double result = 0.0;
 		Set<A> agents = new LinkedHashSet<>(this.agent2plan.keySet()); // map changes during iterations
 		for (A agent : agents) {
-			PlanSwitch<P, A> thisSwitch = this.switchToPlan(null, agent);
-			PlanSwitch<P, A> otherSwitch = other.switchToPlan(null, agent);
+			BasicPlanSwitch<P, A> thisSwitch = this.switchToPlan(null, agent);
+			BasicPlanSwitch<P, A> otherSwitch = other.switchToPlan(null, agent);
 			result += this.computeDistance(other);
-			this.undoSwitch(thisSwitch);
-			other.undoSwitch(otherSwitch);
+			this.undoPlanSwitch(thisSwitch);
+			other.undoPlanSwitch(otherSwitch);
 		}
 		return result /= (this.agent2plan.size() - 1);
 	}
 
 	@Override
-	abstract public double computeDistance(Q other);
-
-//	abstract protected void initializeInternalState();
+	public abstract double computeDistance(Q other);
 
 	@Override
-	public abstract PlanSwitch<P, A> switchToPlan(P plan, A agent);
+	public abstract BasicPlanSwitch<P, A> switchToPlan(P plan, A agent);
 
 	@Override
-	abstract public void undoSwitch(PlanSwitch<P, A> undoSwitch);
+	public abstract void undoPlanSwitch(BasicPlanSwitch<P, A> undoSwitch);
 }

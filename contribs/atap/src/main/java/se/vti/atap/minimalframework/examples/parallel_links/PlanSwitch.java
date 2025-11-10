@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.minimalframework.examples.parallel_links
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -17,41 +17,20 @@
  * You should have received a copy of the GNU General Public License along with this program.
  * If not, see <https://www.gnu.org/licenses/>. See also COPYING and WARRANTY file.
  */
-package se.vti.atap.minimalframework.defaults.replannerselection.proposed;
+package se.vti.atap.minimalframework.examples.parallel_links;
 
-import se.vti.atap.minimalframework.Agent;
-import se.vti.atap.minimalframework.Plan;
-import se.vti.atap.minimalframework.examples.parallel_links.PathFlows;
+import se.vti.atap.minimalframework.defaults.replannerselection.proposed.BasicPlanSwitch;
 
 /**
- * 
- * @author GunnarF
- *
+ * @author Gunnar Flötteröd
  */
-public class PlanSwitch<P extends Plan, A extends Agent<P>> {
+public class PlanSwitch extends BasicPlanSwitch<PathFlows, AgentImpl> {
 
 	public double[] oldLinkFlowsOnPaths_veh = null;
 	public double[] oldLinkConditionsOnPaths = null;
-	
-	private final P oldPlan;
-	private final P newPlan;
-	private final A agent;
 
-	public PlanSwitch(P oldPlan, P newPlan, A agent) {
-		this.oldPlan = oldPlan;
-		this.newPlan = newPlan;
-		this.agent = agent;
-	}
-
-	public P getOldPlan() {
-		return this.oldPlan;
-	}
-
-	public P getNewPlan() {
-		return this.newPlan;
-	}
-
-	public A getAgent() {
-		return this.agent;
+	public PlanSwitch(PathFlows oldPlan, PathFlows newPlan, AgentImpl agent) {
+		super(oldPlan, newPlan, agent);
+		// TODO Auto-generated constructor stub
 	}
 }

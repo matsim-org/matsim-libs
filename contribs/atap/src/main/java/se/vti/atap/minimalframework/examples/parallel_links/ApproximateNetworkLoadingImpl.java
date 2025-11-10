@@ -31,29 +31,24 @@ import se.vti.atap.minimalframework.defaults.replannerselection.proposed.Approxi
 public class ApproximateNetworkLoadingImpl implements
 		ApproximateNetworkLoading<PathFlows, AgentImpl, NetworkConditionsImpl, ApproximateNetworkConditionsImpl> {
 
+	public static enum DistanceType {
+		FLOWS, CAPACITY_SCALED_FLOWS, FLOW_SQUARED, TRAVELTIMES
+	}
+
 	private final Network network;
 
-//	private final boolean useCosts;
-	private final double costWeight;
-	private final double distanceFactor;
-	private final boolean capacityScale;
-	private final boolean squareFlow;
+	private final DistanceType distanceType;
 
-	public ApproximateNetworkLoadingImpl(Network network, double costWeight, double distanceFactor,
-			boolean capacityScale, boolean squareFlow) {
+	public ApproximateNetworkLoadingImpl(Network network, DistanceType distanceType) {
 		this.network = network;
-//		this.useCosts = useCosts;
-		this.costWeight = costWeight;
-		this.distanceFactor = distanceFactor;
-		this.capacityScale = capacityScale;
-		this.squareFlow = squareFlow;
+		this.distanceType = distanceType;
 	}
 
 	@Override
 	public ApproximateNetworkConditionsImpl compute(Set<AgentImpl> agentsUsingCurrentPlan,
 			Set<AgentImpl> agentsUsingCandidatePlan, NetworkConditionsImpl networkConditions) {
 		return new ApproximateNetworkConditionsImpl(agentsUsingCurrentPlan, agentsUsingCandidatePlan, this.network,
-				this.costWeight, this.distanceFactor, this.capacityScale, this.squareFlow);
+				this.distanceType);
 	}
 
 }
