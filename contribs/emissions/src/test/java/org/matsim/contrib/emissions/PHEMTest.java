@@ -692,7 +692,7 @@ public class PHEMTest {
 		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
 		List<SumoEntry> sumoSegments = null;
 		if (!ignoreSumo){
-			Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + cycle + "_" + fuel + "_output.csv");
+			Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + cycle + "_" + fuel + "_output_pl5.csv");
 			sumoSegments = readSumoEmissionsForLinks(sumo_out_path, cycleLinkAttributes);
 		}
 
