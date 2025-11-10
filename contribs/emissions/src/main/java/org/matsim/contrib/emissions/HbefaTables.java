@@ -43,13 +43,27 @@ public abstract class HbefaTables {
 
     private static final Logger logger = LogManager.getLogger(HbefaTables.class);
 
+	private static int getterErrorCnt = 0;
+
+	private static final TriFunction<String, CSVRecord, String, String> safeGetLambda = (key, record, defaultValue) -> {
+		try {
+			return record.get(key);
+		} catch (IllegalArgumentException e){
+			if (getterErrorCnt < 1){
+				logger.warn(e);
+				getterErrorCnt++;
+			}
+		}
+		return defaultValue;
+	};
+
     static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> loadAverageWarm(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
         return load(
 			file,
 			duplicateSubsegments,
 			HbefaTables::createWarmKey,
 			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA_weighted")), Double.parseDouble(record.get("V_weighted"))),
-			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
 			HbefaTables::aggregateWarmKeys
 		);
     }
@@ -64,23 +78,27 @@ public abstract class HbefaTables {
 				return key;
         	},
 			record -> new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V"))),
-			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
 			HbefaTables::aggregateWarmKeys
 		);
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadAverageCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
+		// TODO Check if %OfSubsegment exists for cold-hbefa tables
+
         return load(
 			file,
 			duplicateSubsegments,
 			HbefaTables::createColdKey,
 			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted"))),
-			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
 			HbefaTables::aggregateColdKeys
 		);
     }
 
     static Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> loadDetailedCold(URL file, EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments) {
+		// TODO Check if %OfSubsegment exists for cold-hbefa tables
+
         return load(file,
 			duplicateSubsegments,
 			record -> {
@@ -89,7 +107,7 @@ public abstract class HbefaTables {
 				return key;
         	},
 			record -> new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA"))),
-			record -> Double.parseDouble(record.get("%OfSubsegment")),
+			record -> Double.parseDouble(safeGetLambda.apply("%OfSubsegment", record, "0.0")),
 			HbefaTables::aggregateColdKeys
 		);
     }
