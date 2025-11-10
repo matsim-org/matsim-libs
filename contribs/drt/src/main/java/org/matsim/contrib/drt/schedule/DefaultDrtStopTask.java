@@ -128,7 +128,7 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	@Override
 	public double calcEarliestDepartureTime() {
 		// no restriction on earliest departure time in default implementation
-		return 0;
+		return Double.NEGATIVE_INFINITY;
 	}
 
 	private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
