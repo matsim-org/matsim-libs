@@ -31,11 +31,9 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 
@@ -162,13 +160,11 @@ public abstract class HbefaTables {
 							The duplicate key:  {}
 							The current record: {}
 							""", key, record);
-						case aggregateByFleetComposition -> {
+						case aggregateByFleetComposition ->
 							// We need to aggregate multiple HbefaEmissionFactors. However, we do not have direct access to the constructor since we
 							// are working with generics. Thus, we will reuse the createValue lambda function by creating a temporary CSVRecord with
 							// the new value. This temporary CSVRecord is made using an inner class.
-
 							result.put(key, aggregateHbefaEmissionFactors.apply(result.get(key), value, (fleetCompositionWeight/(totalEntryWeight.get(key) + fleetCompositionWeight)) ));
-						}
 					}
 				}
 

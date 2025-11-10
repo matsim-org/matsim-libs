@@ -973,7 +973,8 @@ public class PHEMTest {
 
 		public int getAttr(){
 			return 0;
-		};
+		}
+
 		public LinkCutSetting setAttr(int attr){return this;}
 	}
 
