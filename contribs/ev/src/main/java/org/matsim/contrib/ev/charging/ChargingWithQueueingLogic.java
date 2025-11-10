@@ -60,12 +60,25 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ChargingVehicle cv = cvIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			double oldCharge = cv.ev().getBattery().getCharge();
-			double energy = cv.ev().getChargingPower().calcChargingPower(charger) * chargePeriod;
-			double newCharge = Math.min(oldCharge + energy, cv.ev().getBattery().getCapacity());
-			cv.ev().getBattery().setCharge(newCharge);
-			eventsManager.processEvent(new EnergyChargedEvent(now, charger.getId(), cv.ev().getId(), newCharge - oldCharge, newCharge));
 
+			double requestedEnergy = cv.strategy().calcRemainingEnergyToCharge();
+			double currentCharge = cv.ev().getBattery().getCharge();
+
+			double chargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
+			
+			double chargedEnergy = chargingPower * chargePeriod;
+
+			// limited by requested energy
+			chargedEnergy = Math.min(chargedEnergy, requestedEnergy);
+
+			// limited by battery capacity
+			chargedEnergy = Math.min(chargedEnergy, cv.ev().getBattery().getCapacity() - currentCharge);
+
+			double updatedCharge = currentCharge + chargedEnergy; // cannot exceed battery capacity
+			cv.ev().getBattery().setCharge(updatedCharge);
+
+			eventsManager.processEvent(new EnergyChargedEvent(now, charger.getId(), cv.ev().getId(), chargedEnergy, updatedCharge));
+			
 			if (cv.strategy().isChargingCompleted()) {
 				cvIter.remove();
 				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), cv.ev().getId(), cv.ev().getBattery().getCharge()));
