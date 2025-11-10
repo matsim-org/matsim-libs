@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.TeleportationModule;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -25,7 +26,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 		bind(SimStepMessaging.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 
-		bind(DistributedTeleportationEngine.class).in(Singleton.class);
+		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
 		addQSimComponentBinding(TeleportationModule.COMPONENT_NAME).to(DistributedTeleportationEngine.class);
 
 		bind(PopulationAgentSource.class).asEagerSingleton();

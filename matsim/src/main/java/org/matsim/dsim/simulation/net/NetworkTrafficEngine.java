@@ -4,24 +4,22 @@ import com.google.inject.Inject;
 import lombok.Setter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.dsim.*;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.dsim.CapacityUpdate;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
+import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public class NetworkTrafficEngine implements DistributedDepartureHandler, DistributedMobsimEngine {
+public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private final SimNetwork simNetwork;
 	private final EventsManager em;
@@ -32,7 +30,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
-	private final Set<String> modes;
+	//private final Set<String> modes;
 
 	@Setter
 	private InternalInterface internalInterface;
@@ -49,7 +47,7 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
 		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
-		this.modes = new HashSet<>(dsimConfig.getNetworkModes());
+		//this.modes = new HashSet<>(dsimConfig.getNetworkModes());
 	}
 
 	@Override
@@ -75,32 +73,6 @@ public class NetworkTrafficEngine implements DistributedDepartureHandler, Distri
 				}
 			});
 		}
-	}
-
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-
-		if (!modes.contains(agent.getMode())) {
-			return false;
-		}
-
-		if (!(agent instanceof MobsimDriverAgent driver)) {
-			throw new RuntimeException("Only driver agents are supported");
-		}
-
-		var vehicle = parkedVehicles.unpark(driver.getPlannedVehicleId(), linkId);
-		driver.setVehicle(vehicle);
-		vehicle.setDriver(driver);
-		em.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
-
-		Id<Link> currentRouteElement = agent.getCurrentLinkId();
-		assert currentRouteElement != null : "Vehicle %s has no current route element".formatted(vehicle.getId());
-
-		SimLink link = simNetwork.getLinks().get(currentRouteElement);
-		assert link != null : "Link %s not found in partition on partition #%d".formatted(currentRouteElement, simNetwork.getPart());
-
-		wait2Link.accept(vehicle, link, now);
-		return true;
 	}
 
 	@Override
