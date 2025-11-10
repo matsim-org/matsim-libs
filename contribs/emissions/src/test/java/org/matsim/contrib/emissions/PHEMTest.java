@@ -4,13 +4,15 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -22,13 +24,14 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
 import static org.apache.commons.lang3.math.IEEE754rUtils.min;
@@ -39,8 +42,8 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  *  	It will however fail, if a new HBEFA-version is set up. <br>
  *  (2)	Values lie between SUMO and HBEFAv4.1. This test may fail when setting up a new HBEFA-version. Affected values should be checked <br>
  *  (3) Average-deviance is better than for HBEFAv4.1. This test should never fail, even when setting up a new HBEFA-version. <br>
- *  If you need to adjust this test for future HBEFA versions, you can use the diff_{fuel}_out.csv output and change and sue it as new reference file.
- *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update.
+ *  If you need to adjust this test for future HBEFA versions, you can use the diff_{fuel}_out.csv output and change and use it as new reference file.
+ *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update. TODO Update to PLv5
  */
 public class PHEMTest {
 
@@ -53,8 +56,6 @@ public class PHEMTest {
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
-
-	static CSVPrinter csvPrinter = null;
 
 	// ----- Helper methods -----
 
@@ -84,12 +85,12 @@ public class PHEMTest {
 	}
 
 	/**
-	 * Reads a csv (header: time,speed,acceleration) containing a wltp cycle and converts it into a List og {@link WLTPLinkAttributes},
+	 * Reads a csv (header: time,speed,acceleration) containing a cycle and converts it into a List of {@link CycleLinkAttributes},
 	 * with each element representing a section of the cycle.
-	 * @param path path of the wltp.csv
+	 * @param path path of the cycle csv-file
 	 * @param cutSetting defining where the cuts in the cycle are set
 	 */
-	private static List<WLTPLinkAttributes> createTestLinks(Path path, LinkCutSetting cutSetting){
+	private static List<CycleLinkAttributes> createTestLinks(Path path, LinkCutSetting cutSetting){
 		List<DrivingCycleSecond> drivingCycleSeconds = readCycle(path);
 		for (var i : drivingCycleSeconds) {
 			System.out.println(i);
@@ -170,11 +171,11 @@ public class PHEMTest {
 		// Add last segment
 		drivingSegments.add(currentList);
 
-		// Now build the list of WLTP Link attributes
+		// Now build the list of Cycle Link attributes
 		PHEMTestHbefaRoadTypeMapping mapping = new PHEMTestHbefaRoadTypeMapping();
 
 		// Variables needed for the mapping
-		List<WLTPLinkAttributes> attributeList = new ArrayList<>();
+		List<CycleLinkAttributes> attributeList = new ArrayList<>();
 
 		int i = 0;
 		int finishedSegments = 0;
@@ -194,7 +195,7 @@ public class PHEMTest {
 			Link link = NetworkUtils.createLink(Id.createLinkId("l" + i), null, null, null, len, freespeed, 1, 1);
 			String roadType = mapping.determineHbefaType(link);
 
-			attributeList.add(new WLTPLinkAttributes(time, len, freespeed, roadType));
+			attributeList.add(new CycleLinkAttributes(time, len, freespeed, roadType));
 			finishedSegments = i;
 		}
 
@@ -236,21 +237,21 @@ public class PHEMTest {
 	}
 
 	/**
-	 * Read a SUMO emissionsDrivingCycle csv-output and maps the emissions to the test links, given in {@code wltpLinkAttributes}.
+	 * Read a SUMO emissionsDrivingCycle csv-output and maps the emissions to the test links, given in {@code cycleLinkAttributes}.
 	 * @param path Path to SUMO output-file
-	 * @param wltpLinkAttributes Array of records, containing the information of each WLTP-test-segment
-	 * @return a {@link SumoEntry} for each WLTP-test-segment
+	 * @param cycleLinkAttributes Array of records, containing the information of each cycle-test-segment
+	 * @return a {@link SumoEntry} for each cycle-test-segment
 	 */
-	private static List<SumoEntry> readSumoEmissionsForLinks(Path path, List<WLTPLinkAttributes> wltpLinkAttributes){
+	private static List<SumoEntry> readSumoEmissionsForLinks(Path path, List<CycleLinkAttributes> cycleLinkAttributes){
 		List<SumoEntry> sumoSeconds = readSumoFile(path);
 		List<SumoEntry> sumoSegments = new ArrayList<>();
 
 		/*
-		Partition the SumoSeconds into the segments, given in wltpLinkAttributes.
+		Partition the SumoSeconds into the segments, given in cycleLinkAttributes.
 		 */
 		int currentSecond = 0;
-		for(WLTPLinkAttributes wltpLink : wltpLinkAttributes){
-			int travelTime = wltpLink.time;
+		for(CycleLinkAttributes cycleLink : cycleLinkAttributes){
+			int travelTime = cycleLink.time;
 			double sumVelocity = 0;
 			double sumAcceleration = 0;
 			double sumSlope = 0;
@@ -263,7 +264,7 @@ public class PHEMTest {
 			double sumElectricity = 0;
 
 			int i = currentSecond;
-			for(; i < currentSecond + wltpLink.time; i++){
+			for(; i < currentSecond + cycleLink.time; i++){
 				sumVelocity += sumoSeconds.get(i).velocity;
 				sumAcceleration += sumoSeconds.get(i).acceleration;
 				sumSlope += sumoSeconds.get(i).slope;
@@ -295,13 +296,13 @@ public class PHEMTest {
 		}
 
 		//Make sure, that everything went right
-		assert sumoSegments.size() == wltpLinkAttributes.size();
+		assert sumoSegments.size() == cycleLinkAttributes.size();
 
 		return sumoSegments;
 	}
 
-	private static List<WLTPLinkComparison> readReferenceComparison(Path path){
-		List<WLTPLinkComparison> refComparison = new ArrayList<>();
+	private static List<CycleLinkComparison> readReferenceComparison(Path path){
+		List<CycleLinkComparison> refComparison = new ArrayList<>();
 
 		var format = CSVFormat.DEFAULT.builder()
 			.setDelimiter(",")
@@ -311,7 +312,7 @@ public class PHEMTest {
 
 		try (var reader = Files.newBufferedReader(path); var parser = CSVParser.parse(reader, format)) {
 			for(var record : parser){
-				refComparison.add(new WLTPLinkComparison(
+				refComparison.add(new CycleLinkComparison(
 					Integer.parseInt(record.get(0)),
 					Integer.parseInt(record.get(1)),
 					Integer.parseInt(record.get(2)),
@@ -360,14 +361,244 @@ public class PHEMTest {
 		return refComparison;
 	}
 
+	/// Sets up the {@link EmissionsConfigGroup}
+	private static Config configureTest(EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments){
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
+		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+		ecg.setDuplicateSubsegments( duplicateSubsegments );
+		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
+		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
+		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
+		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
+
+		return ConfigUtils.createConfig(ecg);
+	}
+
+	///  Defines the links used for calculation
+	private static List<CycleLinkAttributes> configureLinks(Path cyclePath, LinkCutSetting cutSetting){
+		List<CycleLinkAttributes> cycleLinkAttributes = null;
+		if(cutSetting == LinkCutSetting.fromLinkAttributes){
+			cycleLinkAttributes = new ArrayList<>();
+			cycleLinkAttributes.add(new CycleLinkAttributes(589, 3095, 15.69, "URB/Local/50"));
+			cycleLinkAttributes.add(new CycleLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"));
+			cycleLinkAttributes.add(new CycleLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
+			cycleLinkAttributes.add(new CycleLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
+		} else if(cutSetting == LinkCutSetting.fixedIntervalLength){
+			cycleLinkAttributes = createTestLinks(cyclePath, cutSetting);
+		} else if(cutSetting == LinkCutSetting.eachMinimum){
+			cycleLinkAttributes = createTestLinks(cyclePath, cutSetting);
+		} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
+			cycleLinkAttributes = createTestLinks(cyclePath, cutSetting);
+		}
+		assert cycleLinkAttributes != null;
+
+		return cycleLinkAttributes;
+	}
+
+	/// Configures the HBEFAVehicleCategory settings
+	private static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> configureVehicle(Fuel fuel) {
+		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
+		switch(fuel){
+			case Fuel.petrol:
+				vehicleAttributes.setHbefaTechnology("petrol (4S)");
+				vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
+				break;
+			case Fuel.diesel:
+				vehicleAttributes.setHbefaTechnology("diesel");
+				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
+				break;
+		}
+		vehicleAttributes.setHbefaSizeClass("average");
+		return new Tuple<>(
+			HbefaVehicleCategory.PASSENGER_CAR,
+			vehicleAttributes);
+	}
+
+	/**
+	 * Initializes the Emission module and calculates the MATSim emissions for each link.
+	 * @param config Config configured by {@link PHEMTest#configureTest}
+	 * @param vehHbefaInfo Vehicle information configured by {@link PHEMTest#configureVehicle}
+	 * @param cycleLinkAttributes Links built in {@link PHEMTest#configureLinks}
+	 * @return A list of the results for each link.
+	 */
+	private static List<Map<Pollutant, Double>> calculateMATSIMEmissions(Config config,
+																		 Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo,
+																		 List<CycleLinkAttributes> cycleLinkAttributes){
+		// Create Scenario and EventManager
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		EventsManager manager = EventsUtils.createEventsManager(config);
+
+		EmissionModule module = new EmissionModule(scenario, manager);
+		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
+		for (CycleLinkAttributes cycleLinkAttribute : cycleLinkAttributes) {
+			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+				cycleLinkAttribute.time,
+				cycleLinkAttribute.hbefaStreetType,
+				cycleLinkAttribute.freespeed,
+				cycleLinkAttribute.length,
+				vehHbefaInfo));
+		}
+
+		return link_pollutant2grams;
+	}
+
+	/**
+	 * Compares MATSim to SUMO emission data and saves the comparison values for each link.
+	 * @param linkAttributes Defines the links, generated by {@link PHEMTest#configureLinks}
+	 * @param link_pollutant2grams Provides the MATSim-emission data, calculated by {@link PHEMTest#calculateMATSIMEmissions}
+	 * @param sumoSegments Provides the SUMO-PHEMLight-emission data, retrieved by {@link PHEMTest#readSumoEmissionsForLinks}.
+	 *                     NOTE: This argument is nullable, in this case, the diff file will contain zero-entries for sumo and diff values.
+	 * @return A {@link CycleLinkComparison} instance for each link containing the combined data of MATSIM and SUMO, which can be used in the subtests
+	 * and {@link PHEMTest#writeDiffFile} to get a csv output-file for the test
+	 */
+	private static List<CycleLinkComparison> compare(List<CycleLinkAttributes> linkAttributes,
+													 List<Map<Pollutant, Double>> link_pollutant2grams,
+													 @Nullable List<PHEMTest.SumoEntry> sumoSegments){
+
+		// Lambda Function which handles if a sumoSegment is a null-pointer
+		BiFunction<Integer, List<SumoEntry>, PHEMTest.SumoEntry> safeGetLambda = (i, l) -> l == null ? SumoEntry.getZeroEntry() : l.get(i);
+
+		List<CycleLinkComparison> comparison = new ArrayList<>();
+		int currentSecond = 0;
+
+
+		for(int i = 0; i < linkAttributes.size(); i++){
+			double sumoCO = safeGetLambda.apply(i, sumoSegments).CO/1000;
+			double sumoCO2 = safeGetLambda.apply(i, sumoSegments).CO2/1000;
+			double sumoHC = safeGetLambda.apply(i, sumoSegments).HC/1000;
+			double sumoPM = safeGetLambda.apply(i, sumoSegments).PMx/1000;
+			double sumoNOx = safeGetLambda.apply(i, sumoSegments).NOx/1000;
+
+			double matsimCO = link_pollutant2grams.get(i).get(Pollutant.CO);
+			double matsimCO2 = link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL);
+			double matsimHC = link_pollutant2grams.get(i).get(Pollutant.HC);
+			double matsimPM = link_pollutant2grams.get(i).get(Pollutant.PM); // TODO PM or PM_TOTAL?
+			double matsimNOx = link_pollutant2grams.get(i).get(Pollutant.NOx);
+
+			comparison.add( new CycleLinkComparison(
+				i,
+				currentSecond,
+				linkAttributes.get(i).time,
+				linkAttributes.get(i).length,
+
+				new double[]{sumoCO,
+					matsimCO,
+					matsimCO - sumoCO,
+					sumoCO < 1e6 ? 0 : matsimCO / sumoCO},
+
+				new double[]{sumoCO2,
+					matsimCO2,
+					matsimCO2 - sumoCO2,
+					sumoCO2 < 1e6 ? 0 : matsimCO2 / sumoCO2},
+
+				new double[]{sumoHC,
+					matsimHC,
+					matsimHC - sumoHC,
+					sumoHC < 1e6 ? 0 : matsimHC / sumoHC},
+
+				new double[]{sumoPM,
+					matsimPM,
+					matsimPM - sumoPM,
+					sumoPM < 1e6 ? 0 : matsimPM / sumoPM},
+
+				new double[]{sumoNOx,
+					matsimNOx,
+					matsimNOx - sumoNOx,
+					sumoNOx < 1e6 ? 0 : matsimNOx / sumoNOx}
+			));
+			currentSecond += linkAttributes.get(i).time;
+		}
+
+
+		return comparison;
+	}
+
+	/**
+	 * Print out the results as csv, useful for later analysis (via R). <br/>
+	 * NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.
+	 * If you need the files, you have to change the path to a custom file path.
+	 * @param output Path and name of file: "/path/to/file.csv"
+	 * @param comparison List of comparison values created by {@link PHEMTest#compare)}
+	 * @throws IOException If the given output path is invalid
+	 */
+	private static void writeDiffFile(String output, List<CycleLinkComparison> comparison) throws IOException {
+		CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter(output), CSVFormat.DEFAULT);
+		writer.printRecord(
+			"segment",
+			"startTime",
+			"travelTime",
+			"lengths",
+			"CO-SUMO",
+			"CO-MATSIM",
+			"CO-Diff",
+			"CO-Factor",
+			"CO2(total)-SUMO",
+			"CO2(total)-MATSIM",
+			"CO2(total)-Diff",
+			"CO2(total)-Factor",
+			"HC-SUMO",
+			"HC-MATSIM",
+			"HC-Diff",
+			"HC-Factor",
+			"PM-SUMO",
+			"PM-MATSIM",
+			"PM-Diff",
+			"PM-Factor",
+			"NOx-SUMO",
+			"NOx-MATSIM",
+			"NOx-Diff",
+			"NOx-Factor"
+		);
+
+		for(int i = 0; i < comparison.size(); i++){
+			writer.printRecord(
+				i,
+				comparison.get(i).startTime,
+				comparison.get(i).travelTime,
+				comparison.get(i).length,
+
+				comparison.get(i).CO[0],
+				comparison.get(i).CO[1],
+				comparison.get(i).CO[2],
+				comparison.get(i).CO[3],
+
+				comparison.get(i).CO2[0],
+				comparison.get(i).CO2[1],
+				comparison.get(i).CO2[2],
+				comparison.get(i).CO2[3],
+
+				comparison.get(i).HC[0],
+				comparison.get(i).HC[1],
+				comparison.get(i).HC[2],
+				comparison.get(i).HC[3],
+
+				comparison.get(i).PMx[0],
+				comparison.get(i).PMx[1],
+				comparison.get(i).PMx[2],
+				comparison.get(i).PMx[3],
+
+				comparison.get(i).NOx[0],
+				comparison.get(i).NOx[1],
+				comparison.get(i).NOx[2],
+				comparison.get(i).NOx[3]
+			);
+		}
+		writer.flush();
+		writer.close();
+
+	}
+
 	// ----- Sub-Test methods -----
+	// TODO Update these tests for the paper, Add a highway deviation test
 
 	/**
 	 * Tests if the values match the HBEFA v4.1 reference values exactly.
 	 * <i>NOTE: This test will most likely fail if a new HBEFA version is used. The purpose if this test is to remind you of any result-changes
 	 * when switching to a new version. If the new results seem reasonable, you can override the reference file.</i>
 	 */
-	private void testHbefaV4_1(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison) {
+	private void testHbefaV4_1(List<CycleLinkComparison> refComparison, List<CycleLinkComparison> testComparison) {
 		 Assertions.assertEquals(refComparison.size(), testComparison.size(), "It seems like you are comparing two different setups. Maybe the reference-file was changed improperly?");
 
 		for (int i = 0; i < refComparison.size(); i++){
@@ -386,7 +617,7 @@ public class PHEMTest {
 	 * @param refComparison original reference values
 	 * @param testComparison test values
 	 */
-	private void testValueDeviation(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison){
+	private void testValueDeviation(List<CycleLinkComparison> refComparison, List<CycleLinkComparison> testComparison){
 		for (int i = 0; i < refComparison.size(); i++){
 			// Check CO interval
 			Assertions.assertTrue(testComparison.get(i).CO[1] >= min(refComparison.get(i).CO[0], refComparison.get(i).CO[1]));
@@ -412,7 +643,7 @@ public class PHEMTest {
 	 * @param refComparison original reference values
 	 * @param testComparison test values
 	 */
-	private void averageDeviation(List<WLTPLinkComparison> refComparison, List<WLTPLinkComparison> testComparison){
+	private void averageDeviation(List<CycleLinkComparison> refComparison, List<CycleLinkComparison> testComparison){
 		// Compute the average (relative) deviation
 
 		double[] refAverages = new double[5];
@@ -441,7 +672,60 @@ public class PHEMTest {
 
 	// ----- Main-test method -----
 
-	static Stream<Arguments> testArgs() {
+	/// Start the main-test with the given settings
+	public void startTest(Cycle cycle,
+						  Fuel fuel,
+						  LinkCutSetting cutSetting,
+						  EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments,
+						  boolean ignoreSumo,
+						  boolean ignoreSubTests) throws IOException {
+		System.out.println(fuel.toString() + cutSetting + cutSetting.getAttr());
+
+		// Create config
+		Config config = configureTest(duplicateSubsegments);
+
+		// Define the cycleLinkAttributes
+		Path cyclePath = Paths.get(utils.getClassInputDirectory()).resolve(cycle + ".csv");
+		List<CycleLinkAttributes> cycleLinkAttributes = configureLinks(cyclePath, cutSetting);
+
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
+		List<SumoEntry> sumoSegments = null;
+		if (!ignoreSumo){
+			Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + cycle + "_" + fuel + "_output.csv");
+			sumoSegments = readSumoEmissionsForLinks(sumo_out_path, cycleLinkAttributes);
+		}
+
+		// Define vehicle
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+
+		// Calculate MATSim-emissions
+		List<Map<Pollutant, Double>> link_pollutant2grams = calculateMATSIMEmissions(config, vehHbefaInfo, cycleLinkAttributes);
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
+
+		// Print out the results as csv TODO Change path back to test-output folder
+		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff/" + cycle + "/";
+		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
+		writeDiffFile(path + diff_name, comparison);
+
+		// Start the tests
+		if (!ignoreSubTests){
+			// We need to read in the reference-files with the SUMO and MATSIM results for HBEFA v4.1
+			var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_" + cycle + "_" + fuel + "_ref.csv"));
+
+			// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
+			testHbefaV4_1(refComparison, comparison);
+			testValueDeviation(refComparison, comparison);
+			averageDeviation(refComparison, comparison);
+		}
+	}
+
+	// ----- Caller functions -----
+
+	@TestFactory
+	Collection<DynamicTest> basicWLTPTest() {
 		LinkCutSetting[] cutSettings = new LinkCutSetting[]{
 			LinkCutSetting.fromLinkAttributes,
 			LinkCutSetting.fixedIntervalLength.setAttr(60),
@@ -449,17 +733,53 @@ public class PHEMTest {
 			LinkCutSetting.minSpacingMinimum.setAttr(30),
 		};
 
-		// All combinations
-		return Stream.of("petrol", "diesel")
+		return Arrays.stream(Fuel.values())
 			.flatMap(fuel -> Arrays.stream(cutSettings)
-				.map(setting -> Arguments.of(fuel, setting)));
+				.map(cutSetting -> DynamicTest.dynamicTest(
+					"Inv.-WLTP-Test: Fuel=" + fuel + "; CutSetting=" + cutSetting,
+					() -> startTest(
+						Cycle.WLTP,
+						fuel,
+						cutSetting,
+						EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate,
+						false,
+						false
+					)
+				))
+			)
+			.toList();
 	}
 
-	@ParameterizedTest
-	@MethodSource("testArgs")
-	public void test(String fuel, LinkCutSetting cutSetting) throws IOException, URISyntaxException {
-		System.out.println(fuel + cutSetting + cutSetting.getAttr());
+	@TestFactory
+	Collection<DynamicTest> invertedWLTPTest() {
+		Cycle[] cycles = new Cycle[]{
+			Cycle.WLTP,
+			Cycle.WLTP_derivated_acc,
+			Cycle.WLTP_inverted_time
+		};
 
+		return Arrays.stream(Fuel.values())
+			.flatMap(fuel -> Arrays.stream(cycles)
+				.map(cycle -> DynamicTest.dynamicTest(
+					"Inv.-WLTP-Test: Fuel=" + fuel + "; Cycle=" + cycle,
+					() -> startTest(
+						cycle,
+						fuel,
+						LinkCutSetting.fixedIntervalLength.setAttr(60),
+						EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate,
+						true,
+						true
+					)
+				))
+			)
+			.toList();
+	}
+
+	// ----- Additional/Experimental tests -----
+
+	@ParameterizedTest
+	@EnumSource(Fuel.class)
+	public void pretoriaInputsExpTest(Fuel fuel) throws IOException{
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -474,361 +794,82 @@ public class PHEMTest {
 		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
 
-		// Define the wltpLinkAttributes
-		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp.csv");
-		List<WLTPLinkAttributes> wltpLinkAttributes = null;
-		if(cutSetting == LinkCutSetting.fromLinkAttributes){
-			wltpLinkAttributes = new ArrayList<>();
-			wltpLinkAttributes.add(new WLTPLinkAttributes(589, 3095, 15.69, "URB/Local/50"));
-			wltpLinkAttributes.add(new WLTPLinkAttributes(433, 4756, 21.28, "URB/MW-City/80"));
-			wltpLinkAttributes.add(new WLTPLinkAttributes(455, 7158, 27.06, "RUR/MW/100"));
-			wltpLinkAttributes.add(new WLTPLinkAttributes(323, 8254, 36.47, "RUR/MW/130"));
-		} else if(cutSetting == LinkCutSetting.fixedIntervalLength){
-			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
-		} else if(cutSetting == LinkCutSetting.eachMinimum){
-			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
-		} else if(cutSetting == LinkCutSetting.minSpacingMinimum){
-			wltpLinkAttributes = createTestLinks(wltp_path, cutSetting);
-		}
-		assert wltpLinkAttributes != null;
-
-		// Read in the SUMO-outputs
-		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
-		Path sumo_out_path = Paths.get(utils.getClassInputDirectory()).resolve("sumo_" + fuel + "_output.csv");
-		List<SumoEntry> sumoSegments = readSumoEmissionsForLinks(sumo_out_path, wltpLinkAttributes);
-
 		// Define vehicle
-		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
-		switch(fuel){
-			case "petrol":
-				vehicleAttributes.setHbefaTechnology("petrol (4S)");
-				vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
-				break;
-			case "diesel":
-				vehicleAttributes.setHbefaTechnology("diesel");
-				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
-				break;
-		}
-		vehicleAttributes.setHbefaSizeClass("average");
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
-			HbefaVehicleCategory.PASSENGER_CAR,
-			vehicleAttributes);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager manager = EventsUtils.createEventsManager(config);
 
-		// Calculate MATSim-emissions
+		// Read in the Pretoria network file with real emissions
+		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
+
+		// Sort the links by the timeOut attribute
+		List<Link> sortedLinks = pretoriaNetwork.getLinks().values().stream().sorted(Comparator.comparingDouble((Link l) -> (double) l.getAttributes().getAttribute("timeOut"))).collect(Collectors.toList());
+
+		// Compute the MATSim emissions for the Pretoria network
 		EmissionModule module = new EmissionModule(scenario, manager);
-		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
-		for (WLTPLinkAttributes wltpLinkAttribute : wltpLinkAttributes) {
-			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-				wltpLinkAttribute.time,
-				wltpLinkAttribute.hbefaStreetType,
-				wltpLinkAttribute.freespeed,
-				wltpLinkAttribute.length,
-				vehHbefaInfo));
+		List<Tuple<Link, Map<Pollutant, Double>>> link_pollutant2grams = new ArrayList<>();
+
+		Link previous = null;
+		for (Link link : sortedLinks) {
+			if (previous != null){
+				double time = (double) link.getAttributes().getAttribute("timeOut") - (double) previous.getAttributes().getAttribute("timeOut");
+
+				link_pollutant2grams.add(
+					new Tuple<>(
+						link,
+						module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+							time,
+							(String) link.getAttributes().getAttribute("hbefa_road_type"),
+							link.getFreespeed(),
+							link.getLength(),
+							vehHbefaInfo)
+					)
+				);
+			}
+
+			previous = link;
 		}
 
-		// Prepare data for comparison (and print out a csv for debugging)
-		List<WLTPLinkComparison> comparison = new ArrayList<>();
-		int currentSecond = 0;
-		for(int i = 0; i < wltpLinkAttributes.size(); i++){
-			comparison.add( new WLTPLinkComparison(
-				i,
-				currentSecond,
-				wltpLinkAttributes.get(i).time,
-				wltpLinkAttributes.get(i).length,
-
-				new double[]{sumoSegments.get(i).CO/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO),
-					link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO) / (sumoSegments.get(i).CO/1000)},
-
-				new double[]{sumoSegments.get(i).CO2/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) / (sumoSegments.get(i).CO2/1000)},
-
-				new double[]{sumoSegments.get(i).HC/1000,
-					link_pollutant2grams.get(i).get(Pollutant.HC),
-					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
-					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
-
-				// TODO PM or PM_TOTAL?
-				new double[]{sumoSegments.get(i).PMx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.PM),
-					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.PM) / (sumoSegments.get(i).PMx/1000)},
-
-				new double[]{sumoSegments.get(i).NOx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.NOx),
-					link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.NOx) / (sumoSegments.get(i).NOx/1000)}
-			));
-			currentSecond += wltpLinkAttributes.get(i).time;
-		}
-
-		// Print out the results as csv TODO Change path to output
-		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
-		// If you need the files, you have to change the path to a custom file path.
-		String diff_name = "diff_" + fuel + "_output_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
+		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + fuel),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
-			"segment",
-			"startTime",
-			"travelTime",
-			"lengths",
-			"CO-SUMO",
-			"CO-MATSIM",
-			"CO-Diff",
-			"CO-Factor",
-			"CO2(total)-SUMO",
-			"CO2(total)-MATSIM",
-			"CO2(total)-Diff",
-			"CO2(total)-Factor",
-			"HC-SUMO",
-			"HC-MATSIM",
-			"HC-Diff",
-			"HC-Factor",
-			"PM-SUMO",
-			"PM-MATSIM",
-			"PM-Diff",
-			"PM-Factor",
-			"NOx-SUMO",
-			"NOx-MATSIM",
-			"NOx-Diff",
-			"NOx-Factor"
+			"CO_original",
+			"CO_HBEFA",
+			"CO_pems",
+			"CO2_original",
+			"CO2_HBEFA",
+			"CO2_pems",
+			"NOx_original",
+			"NOx_HBEFA",
+			"NOx_pems"
 		);
 
-		for(int i = 0; i < comparison.size(); i++){
-			writer.printRecord(
-				i,
-				comparison.get(i).startTime,
-				comparison.get(i).travelTime,
-				comparison.get(i).length,
+		link_pollutant2grams.forEach(t -> {
+			try {
+				writer.printRecord(
+					t.getFirst().getAttributes().getAttribute("CO"),
+					t.getSecond().get(Pollutant.CO),
+					t.getFirst().getAttributes().getAttribute("CO_pems"),
 
-				comparison.get(i).CO[0],
-				comparison.get(i).CO[1],
-				comparison.get(i).CO[2],
-				comparison.get(i).CO[3],
+					t.getFirst().getAttributes().getAttribute("CO2_TOTAL"),
+					t.getSecond().get(Pollutant.CO2_TOTAL),
+					t.getFirst().getAttributes().getAttribute("CO2_pems"),
 
-				comparison.get(i).CO2[0],
-				comparison.get(i).CO2[1],
-				comparison.get(i).CO2[2],
-				comparison.get(i).CO2[3],
+					t.getFirst().getAttributes().getAttribute("NOx"),
+					t.getSecond().get(Pollutant.NOx),
+					t.getFirst().getAttributes().getAttribute("NOx_pems")
+				);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
-				comparison.get(i).HC[0],
-				comparison.get(i).HC[1],
-				comparison.get(i).HC[2],
-				comparison.get(i).HC[3],
-
-				comparison.get(i).PMx[0],
-				comparison.get(i).PMx[1],
-				comparison.get(i).PMx[2],
-				comparison.get(i).PMx[3],
-
-				comparison.get(i).NOx[0],
-				comparison.get(i).NOx[1],
-				comparison.get(i).NOx[2],
-				comparison.get(i).NOx[3]
-			);
-		}
 		writer.flush();
 		writer.close();
-
-		// Start the tests
-
-		// We need to read in the reference-files with the SUMO and MATSIM results for HBEFA v4.1
-		var refComparison = readReferenceComparison(Paths.get(utils.getClassInputDirectory()).resolve("diff_" + fuel + "_ref.csv"));
-
-
-		// Now we have everything we need for comparing -> Compute the difference between MATSim- and SUMO-emissions
-
-		testHbefaV4_1(refComparison, comparison);
-		testValueDeviation(refComparison, comparison);
-		averageDeviation(refComparison, comparison);
-	}
-
-	static Stream<Arguments> testSumoInputArgs() {
-		// All combinations
-		return Stream.of("petrol", "diesel")
-			.flatMap(fuel -> Stream.of("", "_inverted_time", "_derivated_acc")
-				.map(setting -> Arguments.of(fuel, setting)));
-	}
-
-	@ParameterizedTest
-	@MethodSource("testSumoInputArgs")
-	public void testSumoInputs(String fuel, String sumoInput) throws IOException {
-		// Prepare emission-config
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
-		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
-		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
-		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
-		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
-		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
-
-		// Create config
-		Config config = ConfigUtils.createConfig(ecg);
-
-		// Define the wltpLinkAttributes
-		Path wltp_path = Paths.get(utils.getClassInputDirectory()).resolve("wltp" + sumoInput + ".csv");
-		List<WLTPLinkAttributes> wltpLinkAttributes;
-		wltpLinkAttributes = createTestLinks(wltp_path, LinkCutSetting.fixedIntervalLength.setAttr(60));
-
-		// Read in the SUMO-outputs TODO currently local paths, change to UnitTestPath if this stays in the final test
-		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
-		Path sumo_out_path = Paths.get("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_" + fuel + "_output" + sumoInput + ".csv");
-		List<SumoEntry> sumoSegments = readSumoEmissionsForLinks(sumo_out_path, wltpLinkAttributes);
-
-		// Define vehicle
-		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
-		switch(fuel){
-			case "petrol":
-				vehicleAttributes.setHbefaTechnology("petrol (4S)");
-				vehicleAttributes.setHbefaEmConcept("PC P Euro-4");
-				break;
-			case "diesel":
-				vehicleAttributes.setHbefaTechnology("diesel");
-				vehicleAttributes.setHbefaEmConcept("PC D Euro-4");
-				break;
-		}
-		vehicleAttributes.setHbefaSizeClass("average");
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
-			HbefaVehicleCategory.PASSENGER_CAR,
-			vehicleAttributes);
-
-		// Create Scenario and EventManager
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		EventsManager manager = EventsUtils.createEventsManager(config);
-
-		// Calculate MATSim-emissions
-		EmissionModule module = new EmissionModule(scenario, manager);
-		List<Map<Pollutant, Double>> link_pollutant2grams = new ArrayList<>();
-		for (WLTPLinkAttributes wltpLinkAttribute : wltpLinkAttributes) {
-			link_pollutant2grams.add(module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-				wltpLinkAttribute.time,
-				wltpLinkAttribute.hbefaStreetType,
-				wltpLinkAttribute.freespeed,
-				wltpLinkAttribute.length,
-				vehHbefaInfo));
-		}
-
-		// Prepare data for comparison (and print out a csv for debugging)
-		List<WLTPLinkComparison> comparison = new ArrayList<>();
-		int currentSecond = 0;
-		for(int i = 0; i < wltpLinkAttributes.size(); i++){
-			comparison.add( new WLTPLinkComparison(
-				i,
-				currentSecond,
-				wltpLinkAttributes.get(i).time,
-				wltpLinkAttributes.get(i).length,
-
-				new double[]{sumoSegments.get(i).CO/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO),
-					link_pollutant2grams.get(i).get(Pollutant.CO) - sumoSegments.get(i).CO/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO) / (sumoSegments.get(i).CO/1000)},
-
-				new double[]{sumoSegments.get(i).CO2/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL),
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) - sumoSegments.get(i).CO2/1000,
-					link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL) / (sumoSegments.get(i).CO2/1000)},
-
-				new double[]{sumoSegments.get(i).HC/1000,
-					link_pollutant2grams.get(i).get(Pollutant.HC),
-					link_pollutant2grams.get(i).get(Pollutant.HC) - sumoSegments.get(i).HC/1000,
-					link_pollutant2grams.get(i).get(Pollutant.HC) / (sumoSegments.get(i).HC/1000)},
-
-				// TODO PM or PM_TOTAL?
-				new double[]{sumoSegments.get(i).PMx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.PM),
-					link_pollutant2grams.get(i).get(Pollutant.PM) - sumoSegments.get(i).PMx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.PM) / (sumoSegments.get(i).PMx/1000)},
-
-				new double[]{sumoSegments.get(i).NOx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.NOx),
-					link_pollutant2grams.get(i).get(Pollutant.NOx) - sumoSegments.get(i).NOx/1000,
-					link_pollutant2grams.get(i).get(Pollutant.NOx) / (sumoSegments.get(i).NOx/1000)}
-			));
-			currentSecond += wltpLinkAttributes.get(i).time;
-		}
-
-		// Print out the results as csv TODO Change path to output
-		// NOTE: When using the outputDirectory of the MATSimTestUtils, the files will be deleted after each run.diff
-		// If you need the files, you have to change the path to a custom file path.
-		String diff_name = "diff_" + fuel + "_output" + sumoInput + ".csv";
-		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/diff/" + diff_name),
-			CSVFormat.DEFAULT);
-		writer.printRecord(
-			"segment",
-			"startTime",
-			"travelTime",
-			"lengths",
-			"CO-SUMO",
-			"CO-MATSIM",
-			"CO-Diff",
-			"CO-Factor",
-			"CO2(total)-SUMO",
-			"CO2(total)-MATSIM",
-			"CO2(total)-Diff",
-			"CO2(total)-Factor",
-			"HC-SUMO",
-			"HC-MATSIM",
-			"HC-Diff",
-			"HC-Factor",
-			"PM-SUMO",
-			"PM-MATSIM",
-			"PM-Diff",
-			"PM-Factor",
-			"NOx-SUMO",
-			"NOx-MATSIM",
-			"NOx-Diff",
-			"NOx-Factor"
-		);
-
-		for(int i = 0; i < comparison.size(); i++){
-			writer.printRecord(
-				i,
-				comparison.get(i).startTime,
-				comparison.get(i).travelTime,
-				comparison.get(i).length,
-
-				comparison.get(i).CO[0],
-				comparison.get(i).CO[1],
-				comparison.get(i).CO[2],
-				comparison.get(i).CO[3],
-
-				comparison.get(i).CO2[0],
-				comparison.get(i).CO2[1],
-				comparison.get(i).CO2[2],
-				comparison.get(i).CO2[3],
-
-				comparison.get(i).HC[0],
-				comparison.get(i).HC[1],
-				comparison.get(i).HC[2],
-				comparison.get(i).HC[3],
-
-				comparison.get(i).PMx[0],
-				comparison.get(i).PMx[1],
-				comparison.get(i).PMx[2],
-				comparison.get(i).PMx[3],
-
-				comparison.get(i).NOx[0],
-				comparison.get(i).NOx[1],
-				comparison.get(i).NOx[2],
-				comparison.get(i).NOx[3]
-			);
-		}
-		writer.flush();
-		writer.close();
-
-		// TODO Add tests or remove this function
 	}
 
 
@@ -837,7 +878,7 @@ public class PHEMTest {
 	private record DrivingCycleSecond(int second, double vel, double acc){}
 
 	/**
-	 * Represents a row of the SUMO output-file / a segment of the WLTP-cycle.
+	 * Represents a row of the SUMO output-file / a segment of the cycle.
 	 * The enum defines which of them it represents.
 	 * @param type wheter this rentry represents a second / segment
 	 * @param second start time in [s] / travel time in [s]
@@ -857,16 +898,20 @@ public class PHEMTest {
 			SECOND,
 			SEGMENT
 		}
+
+		static SumoEntry getZeroEntry(){
+			return new SumoEntry(Type.SECOND, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		}
 	}
 
 	/**
-	 * Represents a segment of the WLTP-cycle. Each segment would be one link in MATSim.
+	 * Represents a segment of the cycle. Each segment would be one link in MATSim.
 	 * @param time travelTime [s]
 	 * @param length [m]
 	 * @param freespeed [m/s]
 	 * @param hbefaStreetType More information at: {@link VspHbefaRoadTypeMapping}
 	 */
-	private record WLTPLinkAttributes(int time, double length, double freespeed, String hbefaStreetType){}
+	private record CycleLinkAttributes(int time, double length, double freespeed, String hbefaStreetType){}
 
 	/**
 	 * Helper struct containing values important for comparing SUMO and MATSim emissions.
@@ -875,12 +920,12 @@ public class PHEMTest {
 	 * @param startTime in seconds
 	 * @param travelTime in seconds <br>
 	 */
-	private record WLTPLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
+	private record CycleLinkComparison(int segment, int startTime, int travelTime, double length, double[] CO, double[] CO2, double[] HC, double[] PMx, double[] NOx){}
 
 	// TODO Due to enums being a singleton, the variables can cause unexpected behavior if not used properly! The current implementation propagates that the value is object bound. Change this for the final test!
 	public enum LinkCutSetting {
 		/**
-		 * The easiest setting: Each link corresponds to predefined {@link WLTPLinkAttributes}.
+		 * The easiest setting: Each link corresponds to predefined {@link CycleLinkAttributes}.
 		 * There are 4 links in total: slow (~50km/h), medium(~80km/h), high(~100km/h), very high(~130km/h)
 		 */
 		fromLinkAttributes,
@@ -930,6 +975,18 @@ public class PHEMTest {
 			return 0;
 		};
 		public LinkCutSetting setAttr(int attr){return this;}
+	}
+
+	public enum Fuel {
+		petrol,
+		diesel
+	}
+
+	public enum Cycle {
+		WLTP,
+		WLTP_derivated_acc,
+		WLTP_inverted_time,
+		CADC
 	}
 }
 
