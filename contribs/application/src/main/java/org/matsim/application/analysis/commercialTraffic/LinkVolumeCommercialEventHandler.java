@@ -2,6 +2,7 @@ package org.matsim.application.analysis.commercialTraffic;
 
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.matsim.application.analysis.population.TripAnalysis.NO_GROUP_ASSIGNED;
 
-public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,ActivityEndEventHandler {
+public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ActivityEndEventHandler {
 
 	private static final Logger log = LogManager.getLogger(LinkVolumeCommercialEventHandler.class);
 
@@ -54,6 +55,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	private final Object2DoubleOpenHashMap<Id<Person>> currentTrip_Distance_perPerson = new Object2DoubleOpenHashMap<>();
 	private final Object2DoubleOpenHashMap<Id<Person>> currentTrip_Distance_perPerson_inInvestigationArea = new Object2DoubleOpenHashMap<>();
+	private final Object2IntOpenHashMap<Id<Person>> numberOfJobsPerPerson = new Object2IntOpenHashMap<>();
+
 
 	private final HashMap<Id<Vehicle>, String> groupOfRelevantVehicles = new HashMap<>();
 	private final HashMap<Id<Vehicle>, Id<Person>> vehicleIdToPersonId = new HashMap<>();
@@ -172,6 +175,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		// only consider relations of the jobs and not the first and last activity of a commercial tour
 		if (!activitiesTypes.contains(event.getActType()) || group.equals(NO_GROUP_ASSIGNED))
 			return;
+		numberOfJobsPerPerson.mergeInt(event.getPersonId(), 1, Integer::sum);
 		relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(group + "_act_X",
 			event.getCoord().getX());
 		relations.get(relations.size() - 1).put(group + "_act_Y", event.getCoord().getY());
@@ -283,7 +287,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		return distancesPerTrip_perPerson_all_inInvestigationArea;
 	}
 
-	public HashMap<Id<Vehicle>, Double> getTourDurationPerPerson() {
+	public HashMap<Id<Vehicle>, Double> getTourDurationPerVehicle() {
 		HashMap<Id<Vehicle>, Double> tourDurationPerPerson = new HashMap<>();
 		for (Id<Vehicle> vehicleId : tourStartPerPerson.keySet()) {
 			if (tourEndPerPerson.containsKey(vehicleId)) {
@@ -295,6 +299,10 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	public HashMap<Id<Vehicle>, Id<Person>> getVehicleIdToPersonId() {
 		return vehicleIdToPersonId;
+	}
+
+	public Object2IntOpenHashMap<Id<Person>> getNumberOfJobsPerPerson() {
+		return numberOfJobsPerPerson;
 	}
 
 	/**
