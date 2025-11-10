@@ -287,7 +287,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 		layout.row("dist-dist", "Trips").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Detailed distance distribution";
+			viz.title = "Detailed mode share distance distribution";
 			viz.description = "by mode.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("Distance [m]").build())
