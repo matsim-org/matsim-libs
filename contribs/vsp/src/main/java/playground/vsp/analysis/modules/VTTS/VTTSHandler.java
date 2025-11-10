@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.vtts;
+package playground.vsp.analysis.modules.VTTS;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -231,10 +231,6 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 	private void computeVTTS(Id<Person> personId, double activityEndTime){
 
-		Person person = scenario.getPopulation().getPersons().get( personId );
-
-	//	this.scoringParametersForPerson.getScoringParameters( person ).marginalUtilityOfMoney;
-
 		if( this.personId2currentTripMode.get( personId ) == null ){
 			// No mode stored for this person and trip. This indicates that the current trip mode was skipped.
 			// Thus, do not compute any VTTS for this trip.
@@ -243,7 +239,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		double activityDelayDisutilityOneSec = 0.;
 
 		// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity
-		person = this.scenario.getPopulation().getPersons().get( personId );
+		Person person = this.scenario.getPopulation().getPersons().get( personId );
 		if( this.personId2currentActivityType.containsKey( personId ) && this.personId2currentActivityStartTime.containsKey( personId ) ){
 			// the second condition was already tested earlier.
 
@@ -309,6 +305,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 		// Translate the disutility into monetary units.
 		double marginalUtilityOfMoney = scoringParametersForPerson.getScoringParameters(scenario.getPopulation().getPersons().get(personId)).marginalUtilityOfMoney;
+		log.warn("personId={}, mUM={}", personId, marginalUtilityOfMoney );
 		double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / marginalUtilityOfMoney;
 
 		// store the VTTS for analysis purposes
@@ -335,6 +332,9 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	}
 
 	public void printVTTS(String fileName) {
+		// yyyyyy The column header says "VTTS (money/hour)", but I think that it writes utils/hour.  ???  kai, nov'25
+		// --> actually no, it does the correct division by the person-specific utl-of-money.  This now does NOT explain why, in the bln scenario, we have so many persons with identical VTTS.
+		// --> (possibly, I had an experienced_plans_file without income?)
 
 		File file = new File(fileName);
 
