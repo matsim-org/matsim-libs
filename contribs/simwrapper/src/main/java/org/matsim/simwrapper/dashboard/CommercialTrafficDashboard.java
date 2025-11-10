@@ -8,7 +8,9 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
+import tech.tablesaw.plotly.components.Marker;
 import tech.tablesaw.plotly.traces.BarTrace;
+import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.util.*;
@@ -313,8 +315,196 @@ public class CommercialTrafficDashboard implements Dashboard {
 				);
 			}
 		});
+		layout.row("distances", "Tours").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### **Distance Analysis of the tours**
+				""";
+		});
+		layout.row("veh-dist-hist", "Tours").el(Plotly.class, (viz, data) -> {
 
-		layout.row("OD_first", "OD").el(Hexagons.class, (viz, data) -> {
+			viz.title = "Distance per vehicle (km)";
+			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Distance [km]").build())
+				.yAxis(Axis.builder().title("Count").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+
+				.constant("source", "Veh");
+			for (String group : groupsOfCommercialSubpopulations) {
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.x("distanceInKm_" + group)
+				);
+			}
+		});
+
+		layout.row("veh-dist-box", "Tours").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Distance per vehicle type (km) II";
+			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Vehicle type").build())
+				.yAxis(Axis.builder().title("Distance [km]").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+				.constant("source", "Veh");
+
+			viz.addTrace(
+				tech.tablesaw.plotly.traces.BoxTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.build(),
+				ds.mapping()
+					.name("groupOfSubpopulation")
+					.x("vehicleType")
+					.y("distanceInKm")
+			);
+		});
+
+		for (String group : groupsOfCommercialSubpopulations) {
+			layout.row("veh-dist-violin", "Tours").	el(Plotly.class, (viz, data) -> {
+			viz.title = "Distance per vehicle type (km) Violin *" + group + "*";
+			viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Vehicle type").build())
+				.yAxis(Axis.builder().title("Distance [km]").build())
+				.showLegend(false)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+				.constant("source", "Veh");
+
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.build(),
+					ds.mapping()
+						.x("vehicleType")
+						.y("distanceInKm_"+group)
+				);
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.MARKERS)
+						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+						.build(),
+					ds.mapping()
+						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+						.x("vehicleType")
+						.y("distanceInKm_"+group)
+				);
+			});
+		}
+		layout.row("durations", "Tours").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### **Duration Analysis of the tours**
+				""";
+		});
+		layout.row("veh-duration-hist", "Tours").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Duration per vehicle (h)";
+			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Duration [h]").build())
+				.yAxis(Axis.builder().title("Count").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+
+				.constant("source", "Veh");
+			for (String group : groupsOfCommercialSubpopulations) {
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.x("tourDurationsInHours_" + group)
+				);
+			}
+		});
+
+		layout.row("veh-duration-box", "Tours").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Duration per vehicle type (h)";
+			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Vehicle type").build())
+				.yAxis(Axis.builder().title("Duration [h]").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+				.constant("source", "Veh");
+
+			viz.addTrace(
+				tech.tablesaw.plotly.traces.BoxTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.build(),
+				ds.mapping()
+					.name("groupOfSubpopulation")
+					.x("vehicleType")
+					.y("tourDurationsInHours")
+			);
+		});
+
+		for (String group : groupsOfCommercialSubpopulations) {
+			layout.row("veh-duration-violin", "Tours").	el(Plotly.class, (viz, data) -> {
+				viz.title = "Duration per vehicle type (h) Violin *" + group + "*";
+				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Vehicle type").build())
+					.yAxis(Axis.builder().title("Duration [h]").build())
+					.showLegend(false)
+					.build();
+
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+					.constant("source", "Veh");
+
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.build(),
+					ds.mapping()
+						.x("vehicleType")
+						.y("tourDurationsInHours_"+group)
+				);
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.MARKERS)
+						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+						.build(),
+					ds.mapping()
+						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+						.x("vehicleType")
+						.y("tourDurationsInHours_"+group)
+				);
+			});
+		}
+
+		layout.row("OD_first", "Activities").el(Hexagons.class, (viz, data) -> {
 			viz.title = "Origin-Destination of commercial trips";
 			viz.description = "The OD can be filtered according to defined groups of commercial subpopulations.";
 			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
@@ -328,5 +518,194 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.height = 15.;
 			viz.radius = 1000.;
 		});
+		layout.row("Activities", "Activities").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### **Number of Jobs Analysis**
+				""";
+		});
+		layout.row("veh-Activities-hist", "Activities").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Number of Jobs per vehicle (h)";
+			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Duration [h]").build())
+				.yAxis(Axis.builder().title("Count").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+
+				.constant("source", "Veh");
+			for (String group : groupsOfCommercialSubpopulations) {
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.x("jobsPerTour_" + group)
+				);
+			}
+		});
+
+		layout.row("veh-Activities-box", "Activities").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Number of Jobs  per vehicle type (h)";
+			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Vehicle type").build())
+				.yAxis(Axis.builder().title("Duration [h]").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+				.constant("source", "Veh");
+
+			viz.addTrace(
+				tech.tablesaw.plotly.traces.BoxTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.build(),
+				ds.mapping()
+					.name("groupOfSubpopulation")
+					.x("vehicleType")
+					.y("jobsPerTour")
+			);
+		});
+
+		for (String group : groupsOfCommercialSubpopulations) {
+			layout.row("veh-Activities-violin", "Activities").	el(Plotly.class, (viz, data) -> {
+				viz.title = "Number of Jobs per vehicle type (h) Violin *" + group + "*";
+				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Vehicle type").build())
+					.yAxis(Axis.builder().title("Duration [h]").build())
+					.showLegend(false)
+					.build();
+
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+					.constant("source", "Veh");
+
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.build(),
+					ds.mapping()
+						.x("vehicleType")
+						.y("jobsPerTour_"+group)
+				);
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.MARKERS)
+						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+						.build(),
+					ds.mapping()
+						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+						.x("vehicleType")
+						.y("jobsPerTour_"+group)
+				);
+			});
+		}
+
+		layout.row("ActivityDurations", "Activities").el(TextBlock.class, (viz, data) -> {
+			viz.backgroundColor = "transparent";
+			viz.content = """
+				### **Activity Duration Analysis of the tours**
+				""";
+		});
+		layout.row("veh-ActivityDurations-hist", "Activities").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "ActivityDurations per vehicle (km)";
+			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Distance [km]").build())
+				.yAxis(Axis.builder().title("Count").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+
+				.constant("source", "Act");
+			for (String group : groupsOfCommercialSubpopulations) {
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.x("activityDurationInMinutes_" + group)
+				);
+			}
+		});
+
+		layout.row("veh-ActivityDurations-box", "Activities").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "ActivityDurations per activityType (km)";
+			viz.description = "Boxplots per activityType, split by groups of subpopulation.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("activityType").build())
+				.yAxis(Axis.builder().title("Distance [km]").build())
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+				.constant("source", "Act");
+
+			viz.addTrace(
+				tech.tablesaw.plotly.traces.BoxTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.build(),
+				ds.mapping()
+					.name("groupOfSubpopulation")
+					.x("activityType")
+					.y("activityDurationInMinutes")
+			);
+		});
+
+		for (String group : groupsOfCommercialSubpopulations) {
+			layout.row("veh-ActivityDurations-violin", "Activities").	el(Plotly.class, (viz, data) -> {
+				viz.title = "ActivityDurations per vehicle type (km) Violin *" + group + "*";
+				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("activityType").build())
+					.yAxis(Axis.builder().title("Distance [km]").build())
+					.showLegend(false)
+					.build();
+
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+					.constant("source", "Act");
+
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.build(),
+					ds.mapping()
+						.x("activityType")
+						.y("activityDurationInMinutes_"+group)
+				);
+				viz.addTrace(
+					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+						.mode(ScatterTrace.Mode.MARKERS)
+						.marker(Marker.builder().size(6).opacity(0.2).color("red").sizeMode(Marker.SizeMode.DIAMETER).build())
+						.build(),
+					ds.mapping()
+						.name("activityId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+						.x("activityType")
+						.y("activityDurationInMinutes_"+group)
+				);
+			});
+		}
 	}
 }
