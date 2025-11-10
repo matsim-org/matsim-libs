@@ -34,7 +34,8 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	private final Id<ReservationManager.Reservation> reservationId;
 
 	private final DrtStopTask delegate;
-	
+	private final double duration;
+
 	// Optional charging fields - null for non-electric vehicles
 	private ChargingTask chargingTask;
 	private double consumedEnergy = 0;
@@ -60,6 +61,7 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 		this.reservationId = reservationId;
 		this.chargingTask = chargingTask;
 		this.consumedEnergy = consumedEnergy;
+		this.duration = endTime - beginTime;
 	}
 
 	@Override
@@ -95,6 +97,26 @@ public class ShiftChangeoverTaskImpl extends DefaultStayTask implements ShiftCha
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		delegate.removeDropoffRequest(requestId);
+	}
+
+	@Override
+	public double calcLatestArrivalTime() {
+		return shift.getEndTime();
+	}
+
+	@Override
+	public double calcEarliestArrivalTime() {
+		return shift.getEndTime();
+	}
+
+	@Override
+	public double calcEarliestDepartureTime() {
+		return shift.getEndTime() + duration;
+	}
+
+	@Override
+	public double calcLatestDepartureTime() {
+		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
