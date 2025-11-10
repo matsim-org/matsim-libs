@@ -288,10 +288,10 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				printer.print(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation);
 
 				if (shp.isDefined()) {
-					printer.print(numberOfTrips_internal == 0 ? "0;" : traveledDistance_internal / numberOfTrips_internal);
-					printer.print(numberOfTrips_incoming == 0 ? "0;" : traveledDistance_incoming / numberOfTrips_incoming);
-					printer.print(numberOfTrips_outgoing == 0 ? "0;" : traveledDistance_outgoing / numberOfTrips_outgoing);
-					printer.print(numberOfTrips_transit == 0 ? "0;" : traveledDistance_transit / numberOfTrips_transit);
+					printer.print(numberOfTrips_internal == 0 ? "0" : traveledDistance_internal / numberOfTrips_internal);
+					printer.print(numberOfTrips_incoming == 0 ? "0" : traveledDistance_incoming / numberOfTrips_incoming);
+					printer.print(numberOfTrips_outgoing == 0 ? "0" : traveledDistance_outgoing / numberOfTrips_outgoing);
+					printer.print(numberOfTrips_transit == 0 ? "0" : traveledDistance_transit / numberOfTrips_transit);
 				}
 				printer.print(numberOfTrips_all == 0 ? "0" : String.valueOf(traveledDistance_all / numberOfTrips_all));
 
@@ -328,11 +328,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(travelDistancesPerVehicleOutputFile), CSVFormat.DEFAULT)) {
 
-			printer.print("vehicleId;");
-			printer.print("vehicleType;");
-			printer.print("subpopulation;");
-			printer.print("distanceInKm;");
-			printer.print("distanceInKmWithDepotCharging;");
+			printer.print("vehicleId");
+			printer.print("vehicleType");
+			printer.print("subpopulation");
+			printer.print("distanceInKm");
+			printer.print("distanceInKmWithDepotCharging");
 			printer.print("shareOfTravelDistanceWithDepotCharging");
 			printer.println();
 			for (String vehicleType : travelDistancesPerVehicle.keySet()) {
