@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
@@ -23,6 +24,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import picocli.CommandLine;
@@ -50,7 +52,8 @@ import static org.matsim.application.ApplicationUtils.globFile;
 		"commercialTraffic_travelDistancesShares_perSubpopulation.csv",
 		"commercialTraffic_travelDistancesShares_perType.csv",
 		"commercialTraffic_tourAnalysis.csv",
-		"commercialTraffic_relations.csv"
+		"commercialTraffic_relations.csv",
+		"commercialTraffic_activities.csv"
 	}
 )
 public class CommercialAnalysis implements MATSimAppCommand {
@@ -100,6 +103,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		final Path generalTravelDataOutputFile = output.getPath("commercialTraffic_generalTravelData.csv");
 		log.info("Writing general travel data to: {}", generalTravelDataOutputFile);
 
+		final Path commercialActivitiesOutputFile = output.getPath("commercialTraffic_activities.csv");
+		log.info("Writing general activity analysis to: {}", generalTravelDataOutputFile);
+
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(globFile(input.getRunDirectory(), "*output_vehicles*").toString());
 		config.network().setInputFile(globFile(input.getRunDirectory(), "*output_network*").toString());
@@ -132,11 +138,67 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		createLinkVolumeAnalysis(scenario, linkDemandOutputFile, linkDemandEventHandler);
 		createRelationsAnalysis(relationsOutputFile, linkDemandEventHandler);
 		createAnalysisPerVehicle(travelDistancesPerVehicleOutputFile, linkDemandEventHandler);
+		createActivityAnalysis(scenario, commercialActivitiesOutputFile, linkDemandEventHandler);
 
 		log.info("Done");
 		log.info("All outputs of commercial analysis written to {}", output.getPath());
 		log.info("-------------------------------------------------");
 		return 0;
+	}
+
+	private void createActivityAnalysis(Scenario scenario, Path commercialActivitiesOutputFile,
+										LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(commercialActivitiesOutputFile), CSVFormat.DEFAULT)) {
+			HashMap<String, List<Double>> activityDurationsPerGroup = new HashMap<>();
+			printer.print("personId");
+			printer.print("activityId");
+			printer.print("groupOfSubpopulation");
+			printer.print("activityType");
+			printer.print("activityCount");
+			printer.print("activityDurationInSeconds");
+			printer.print("activityDurationInMinutes");
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				printer.print("activityDurationInMinutes_" + group);
+			}
+			printer.println();
+
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+				String subpop = PopulationUtils.getSubpopulation(person);
+				Optional<String> groupOpt = groupsOfSubpopulationsForCommercialAnalysis.entrySet().stream()
+					.filter(e -> e.getValue().contains(subpop))
+					.map(Map.Entry::getKey)
+					.findFirst();
+				if (groupOpt.isPresent()) {
+					List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(),
+						TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+
+					// skip first and last activity
+					for (int i = 1; i <= activities.size() - 2; i++) {
+						printer.print(person.getId());
+						printer.print(person.getId() + "_" + i);
+						printer.print(groupOpt.get());
+						Activity activity = activities.get(i);
+						printer.print(activity.getType());
+						printer.print(i);
+						double duration = activity.getMaximumDuration().seconds();
+						printer.print(duration);
+						BigDecimal durationInMinutes = new BigDecimal(duration / 60).setScale(0, RoundingMode.HALF_UP);
+						printer.print(durationInMinutes);
+						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+							if (groupOpt.get().equals(group)) {
+								printer.print(durationInMinutes);
+							} else {
+								printer.print("NaN");
+							}
+						}
+						printer.println();
+						activityDurationsPerGroup.computeIfAbsent(groupOpt.get(), k -> new ArrayList<>()).add(duration);
+					}
+				}
+			}
+		} catch (IOException e) {
+			log.error("Could not create output file", e);
+		}
 	}
 
 	private void createGeneralTravelDataAnalysis(Path generalTravelDataOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
