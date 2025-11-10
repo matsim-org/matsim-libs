@@ -24,11 +24,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.commons.math.stat.StatUtils;
+import org.mapdb.Atomic;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,6 +53,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 
 
 /**
@@ -63,6 +66,22 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 
+	private static class TripData {
+		double VTTSh;
+		String mode;
+	}
+
+	private static class SimData {
+		double currentActivityStartTime = Double.NaN;
+		String currentActivityType;
+		int currentTripNr = 0;
+		String currentTripMode;
+		List<TripData> tripdata = new ArrayList<>();
+		double firstActivityEndTime = Double.NaN;
+		String firstActivityType ;
+	}
+	private final Map<Id<Person>,SimData> simDataMap = new HashMap<>();
+	// I think that the above might be much faster during events reading.  If possible, also replace the number objects by primitive types.
 
 	private static final Logger log = LogManager.getLogger( VTTSHandler.class );
 	private static int incompletedPlanWarning = 0;
@@ -159,13 +178,17 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} else {
 			this.departedPersonIds.add(event.getPersonId());
 			this.personId2currentTripMode.put(event.getPersonId(), event.getRoutingMode());
-
+			//
+//			SimData simData = simDataMap.computeIfAbsent( event.getPersonId(), k -> new SimData() );
+//			simData.currentTripMode = event.getRoutingMode();
 
 			if (this.personId2currentTripNr.containsKey(event.getPersonId())){
 				this.personId2currentTripNr.put(event.getPersonId(), this.personId2currentTripNr.get(event.getPersonId()) + 1);
 			} else {
 				this.personId2currentTripNr.put(event.getPersonId(), 1);
 			}
+			//
+//			simData.currentTripNr++;
 
 			if (this.personId2TripNr2DepartureTime.containsKey(event.getPersonId())) {
 				this.personId2TripNr2DepartureTime.get(event.getPersonId()).put(this.personId2currentTripNr.get(event.getPersonId()), event.getTime());
@@ -174,6 +197,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 				tripNr2departureTime.put(this.personId2currentTripNr.get(event.getPersonId()), event.getTime());
 				this.personId2TripNr2DepartureTime.put(event.getPersonId(), tripNr2departureTime);
 			}
+			//
+
 		}
 	}
 
@@ -192,12 +217,30 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	public void handleEvent(ActivityEndEvent event) {
 
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
-			this.personIdsToBeIgnored.add(event.getPersonId());
+			this.personIdsToBeIgnored.add(event.getPersonId()); // ok
 		}
 
-		if ( StageActivityTypeIdentifier.isStageActivity( event.getActType() ) || this.personIdsToBeIgnored.contains(event.getPersonId() )) {
+		if ( StageActivityTypeIdentifier.isStageActivity( event.getActType() ) || this.personIdsToBeIgnored.contains(event.getPersonId() )) { // ok
 			// skip
 		} else {
+//			SimData simData = simDataMap.get( event.getPersonId() );
+//			if ( simData==null ) {
+//				// not seen before; is also first activity!
+//				simData = new SimData();
+//				simData.firstActivityEndTime = event.getTime();
+//				simData.firstActivityType = event.getActType();
+//			} else {
+//				// this is NOT the first activity ...
+//
+//				// ... now process the events thrown during the trip to the activity which has just ended, ...
+//				computeVTTS( event.getPersonId(), event.getTime() );
+//
+//				simData.currentActivityType = null;
+//				simData.currentActivityStartTime = Double.NaN;
+//
+//				this.departedPersonIds.remove( event.getPersonId() );
+//			}
+
 			if (this.personId2currentActivityStartTime.containsKey(event.getPersonId())) {
 				// This is not the first activity...
 
@@ -229,6 +272,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		}
 	}
 
+	private static int cnt=0;
+
 	private void computeVTTS(Id<Person> personId, double activityEndTime){
 
 		if( this.personId2currentTripMode.get( personId ) == null ){
@@ -236,10 +281,22 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			// Thus, do not compute any VTTS for this trip.
 			return;
 		}
+//		if ( this.simDataMap.get( personId).currentTripMode == null ) {
+//			// No mode stored for this person and trip. This indicates that the current trip mode was skipped.
+//			// Thus, do not compute any VTTS for this trip.
+//			return;
+//		}
+
 		double activityDelayDisutilityOneSec = 0.;
 
 		// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity
 		Person person = this.scenario.getPopulation().getPersons().get( personId );
+
+//		SimData simData = simDataMap.get( person.getId() ); // yy should already know this from earlier
+		// hier verstehe ich die Logik gerade nicht.  Merken wir uns sowohl trip mode als auch act type?  Beides kann nicht "current" sein.
+
+
+
 		if( this.personId2currentActivityType.containsKey( personId ) && this.personId2currentActivityStartTime.containsKey( personId ) ){
 			// the second condition was already tested earlier.
 
@@ -275,20 +332,8 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			}
 
 		} else{
-			// No, there is no information about the current activity which indicates that the trip (with the delay) was not completed.
-
-			if( incompletedPlanWarning <= 10 ){
-				log.warn( "Agent " + personId + " has not yet completed the plan/trip (the agent is probably stucking). Cannot compute the disutility of being late at this activity. "
-								  + "Something like the disutility of not arriving at the activity is required. Try to avoid this by setting a smaller stuck time period." );
-				log.warn(
-						"Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.scenario.getConfig().scoring().getPerforming_utils_hr() );
-
-				if( incompletedPlanWarning == 10 ){
-					log.warn( Gbl.FUTURE_SUPPRESSED );
-				}
-				incompletedPlanWarning++;
-			}
-			activityDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().scoring().getPerforming_utils_hr();
+			// there is no information about the current activity which indicates that the trip (with the delay) was not completed.
+			activityDelayDisutilityOneSec = handleIncompletePlan( personId, scenario.getConfig().scoring().getPerforming_utils_hr() );
 		}
 
 		// Calculate the agent's trip delay disutility.
@@ -305,15 +350,53 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 		// Translate the disutility into monetary units.
 		double marginalUtilityOfMoney = scoringParametersForPerson.getScoringParameters(scenario.getPopulation().getPersons().get(personId)).marginalUtilityOfMoney;
-		log.warn("personId={}, mUM={}", personId, marginalUtilityOfMoney );
+		if ( cnt < 10 ){
+			cnt++;
+			log.warn( "personId={}, mUM={}", personId, marginalUtilityOfMoney );
+			if ( cnt == 10 ) {
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
+		}
 		double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / marginalUtilityOfMoney;
 
 		// store the VTTS for analysis purposes
+		storeVTTSForAnalysisPurposes( personId, delayCostPerSec_usingActivityDelayOneSec );
+	}
+	private static double handleIncompletePlan( Id<Person> personId, double performing_utils_hr ){
+		double activityDelayDisutilityOneSec;
+		if( incompletedPlanWarning <= 10 ){
+			log.warn( "Agent " + personId + " has not yet completed the plan/trip (the agent is probably stucking). Cannot compute the disutility of being late at this activity. "
+							  + "Something like the disutility of not arriving at the activity is required. Try to avoid this by setting a smaller stuck time period." );
+			log.warn(
+					"Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + performing_utils_hr );
+
+			if( incompletedPlanWarning == 10 ){
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
+			incompletedPlanWarning++;
+		}
+		activityDelayDisutilityOneSec = (1.0 / 3600.) * performing_utils_hr;
+		return activityDelayDisutilityOneSec;
+	}
+
+	private void storeVTTSForAnalysisPurposes( Id<Person> personId, double delayCostPerSec_usingActivityDelayOneSec ){
+//		SimData simData = simDataMap.get( personId );
+//		Gbl.assertNotNull( simData ); // should not happen
+//
+//		TripData tripData = new TripData();
+//		tripData.VTTSh = delayCostPerSec_usingActivityDelayOneSec * 3600.;
+//		tripData.mode = simData.currentTripMode;
+//		simData.tripdata.add( tripData );
+		// Is that it?
+
+
 		if( this.personId2VTTSh.containsKey( personId ) ){
 
 			this.personId2VTTSh.get( personId ).add( delayCostPerSec_usingActivityDelayOneSec * 3600 );
-			this.personId2TripNr2VTTSh.get( personId ).put( this.personId2currentTripNr.get( personId ), delayCostPerSec_usingActivityDelayOneSec * 3600 );
-			this.personId2TripNr2Mode.get( personId ).put( this.personId2currentTripNr.get( personId ), this.personId2currentTripMode.get( personId ) );
+			this.personId2TripNr2VTTSh.get( personId ).put( this.personId2currentTripNr.get(
+				personId ), delayCostPerSec_usingActivityDelayOneSec * 3600 );
+			this.personId2TripNr2Mode.get( personId ).put( this.personId2currentTripNr.get( personId ), this.personId2currentTripMode.get(
+				personId ) );
 
 		} else{
 
@@ -335,6 +418,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		// yyyyyy The column header says "VTTS (money/hour)", but I think that it writes utils/hour.  ???  kai, nov'25
 		// --> actually no, it does the correct division by the person-specific utl-of-money.  This now does NOT explain why, in the bln scenario, we have so many persons with identical VTTS.
 		// --> (possibly, I had an experienced_plans_file without income?)
+		// --> no, the injection needs to be set up correctly, otherwise it does not use the income-dep scoring params.
 
 		File file = new File(fileName);
 
@@ -554,6 +638,45 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 				throw new RuntimeException("This is not the initial iteration and there is no information available from the previous iteration. Aborting...");
 			}
 		}
+	}
+
+	public void printVTTSHistogram( String fileName ) {
+
+		long maxBin = 0;
+		Map<Integer, Long> histogram = new HashMap<>();
+		for( Map.Entry<Id<Person>, Map<Integer, Double>> entry : this.personId2TripNr2VTTSh.entrySet() ){
+			Id<Person> personId = entry.getKey();
+			Map<Integer, Double> map = entry.getValue();
+			for( Map.Entry<Integer, Double> entry2 : map.entrySet() ){
+				Integer tripNr = entry2.getKey();
+				int bin = entry2.getValue().intValue();
+				if ( bin > maxBin ) {
+					maxBin = bin ;
+				}
+				Long value = histogram.get( bin );
+				if ( value == null ) {
+					histogram.put( bin, 1L );
+				} else {
+					value++;
+					histogram.put( bin, value );
+				}
+			}
+		}
+
+		try( BufferedWriter writer = IOUtils.getBufferedWriter( fileName ) ){
+			writer.write( "bin\tvtts" + System.lineSeparator() );
+			for( int ii = 0 ; ii <= maxBin ; ii++ ){
+				Long value = histogram.get( ii );
+				if( value == null ){
+					writer.write( ii + "\t" + 0 + System.lineSeparator() );
+				} else{
+					writer.write( ii + "\t" + value + System.lineSeparator() );
+				}
+			}
+		} catch( IOException e ){
+			throw new RuntimeException( e );
+		}
+
 	}
 
 	public void printVTTSstatistics(String fileName, String mode, Tuple<Double, Double> fromToTime_sec) {
