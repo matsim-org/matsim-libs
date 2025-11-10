@@ -4,8 +4,6 @@ import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
@@ -17,11 +15,9 @@ import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
 
-@Log4j2
 public class DistributedSimulationModule extends AbstractModule {
 
 
-	@SneakyThrows
 	@Override
 	public void install() {
 

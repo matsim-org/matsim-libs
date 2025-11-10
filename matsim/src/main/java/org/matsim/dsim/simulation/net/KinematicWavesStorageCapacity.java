@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.dsim.utils.CountedWarning;
 
@@ -35,8 +34,13 @@ class KinematicWavesStorageCapacity implements StorageCapacity {
 		return link.getLength() * link.getFlowCapacityPerSec() * (link.getFreespeed() + HOLE_SPEED) / link.getFreespeed() / HOLE_SPEED;
 	}
 
-	@Getter
 	private final double max;
+
+	@Override
+	public double getMax() {
+		return max;
+	}
+
 	private final double holeTravelTime;
 	private final Queue<Hole> holes = new ArrayDeque<>();
 

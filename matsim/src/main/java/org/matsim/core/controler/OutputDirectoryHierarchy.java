@@ -19,6 +19,14 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
+import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.messages.ComputeNode;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -26,14 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.utils.io.IOUtils;
-
-import com.google.inject.Inject;
 
 /**
  * Represents the directory hierarchy where the MATSim output goes in.

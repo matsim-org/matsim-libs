@@ -5,9 +5,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
@@ -15,10 +12,11 @@ import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.serialization.SerializationProvider;
 
+import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-@Log4j2
 public final class LPTask implements SimTask {
 
 	/**
@@ -70,13 +68,12 @@ public final class LPTask implements SimTask {
 	/**
 	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
 	 */
-	@Setter
 	private volatile double time;
 
 	/**
 	 * Switching phase for the queues.
 	 */
-	private volatile boolean phase;
+	private final AtomicBoolean phase = new AtomicBoolean(true);
 
 	public LPTask(LP lp, int partition, DistributedEventsManager manager, SerializationProvider serializer) {
 		this.lp = lp;
@@ -97,7 +94,11 @@ public final class LPTask implements SimTask {
 		return partition;
 	}
 
-	@SneakyThrows
+	@Override
+	public boolean needsExecution() {
+		return SimTask.super.needsExecution();
+	}
+
 	@SuppressWarnings("unchecked")
 	private void buildConsumers(SerializationProvider serializer) {
 
@@ -108,21 +109,25 @@ public final class LPTask implements SimTask {
 				Class<?> msgType = methods[0].getParameterTypes()[0];
 				int type = serializer.getType(msgType);
 
-				consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
+				try {
+					consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(lp, msgType, "process"));
+				} catch (LambdaConversionException | ReflectiveOperationException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}
 
 	@Override
 	public void beforeExecution() {
-		phase = !phase;
+		phase.set(!phase.get());
 	}
 
 	/**
 	 * Adds a message to the buffer.
 	 */
 	public void add(Message msg) {
-		ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueOdd : queueEven;
+		ManyToOneConcurrentLinkedQueue<Message> queue = phase.get() ? queueOdd : queueEven;
 		queue.add(msg);
 	}
 
@@ -135,6 +140,11 @@ public final class LPTask implements SimTask {
 
 	public IntSet waitForOtherRanks(double time) {
 		return lp.waitForOtherRanks(time);
+	}
+
+	@Override
+	public void setTime(double time) {
+		this.time = time;
 	}
 
 	@Override
@@ -153,7 +163,7 @@ public final class LPTask implements SimTask {
 		long t = System.nanoTime();
 
 		manager.setContext(partition);
-		ManyToOneConcurrentLinkedQueue<Message> queue = phase ? queueEven : queueOdd;
+		ManyToOneConcurrentLinkedQueue<Message> queue = phase.get() ? queueEven : queueOdd;
 
 		Message msg;
 		while ((msg = queue.poll()) != null) {
@@ -179,7 +189,7 @@ public final class LPTask implements SimTask {
 			runtimes.add(sumRuntime);
 			sumRuntime = 0;
 		}
-    }
+	}
 
 	@Override
 	public void cleanup() {

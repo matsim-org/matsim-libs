@@ -1,6 +1,7 @@
 package org.matsim.dsim;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -15,49 +16,50 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "ssim", mixinStandardHelpOptions = true, version = "1.0",
-        description = "Run a standard simulation")
-@Log4j2
-public class RunStandardSim  implements Callable<Integer> {
+	description = "Run a standard simulation")
+public class RunStandardSim implements Callable<Integer> {
 
-    @CommandLine.Option(names = {"-s", "--scenario"}, description = "Scenario to run (from matsim-examples)", defaultValue = "kelheim")
-    private String scenario;
+	private static final Logger log = LogManager.getLogger(RunStandardSim.class);
 
-    @CommandLine.Option(names = {"-o", "--output"}, description = "Overwrite output path in the config")
-    private String output;
+	@CommandLine.Option(names = {"-s", "--scenario"}, description = "Scenario to run (from matsim-examples)", defaultValue = "kelheim")
+	private String scenario;
 
-    public static void main(String[] args) {
-        new CommandLine(new RunStandardSim()).execute(args);
-    }
+	@CommandLine.Option(names = {"-o", "--output"}, description = "Overwrite output path in the config")
+	private String output;
 
-    @Override
-    public Integer call() throws Exception {
+	public static void main(String[] args) {
+		new CommandLine(new RunStandardSim()).execute(args);
+	}
 
-        URL url = RunDistributedSim.getScenarioURL(scenario);
+	@Override
+	public Integer call() throws Exception {
 
-        Config config = ConfigUtils.loadConfig(url);
+		URL url = RunDistributedSim.getScenarioURL(scenario);
 
-        if (output != null)
-            config.controller().setOutputDirectory(output);
+		Config config = ConfigUtils.loadConfig(url);
 
-        config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controller().setWriteEventsInterval(1);
-        config.controller().setLastIteration(0);
+		if (output != null)
+			config.controller().setOutputDirectory(output);
 
-        // Compatibility with many scenarios
-        Activities.addScoringParams(config);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setLastIteration(0);
 
-        Scenario s = ScenarioUtils.loadScenario(config);
+		// Compatibility with many scenarios
+		Activities.addScoringParams(config);
 
-        log.warn("Adding freight and ride as modes to all car links. As we need this in some scenarios. Ideally, this would be encoded in the network already.");
-        var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		Scenario s = ScenarioUtils.loadScenario(config);
 
-        s.getNetwork().getLinks().values().parallelStream()
-                .filter(l -> l.getAllowedModes().contains(TransportMode.car))
-                .forEach(l -> l.setAllowedModes(carandfreight));
+		log.warn("Adding freight and ride as modes to all car links. As we need this in some scenarios. Ideally, this would be encoded in the network already.");
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
 
-        Controler controler = new Controler(s);
-        controler.run();
+		s.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
 
-        return 0;
-    }
+		Controler controler = new Controler(s);
+		controler.run();
+
+		return 0;
+	}
 }

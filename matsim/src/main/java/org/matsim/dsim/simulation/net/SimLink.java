@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -109,8 +108,13 @@ public interface SimLink {
 	/// then be implemented somewhere else, as they should (ideally) only interact with the interface methods.
 	class LocalLink implements SimLink {
 
-		@Getter
 		private final Id<Link> id;
+
+		@Override
+		public Id<Link> getId() {
+			return id;
+		}
+
 		private final Consumer<SimLink> activateLink;
 		private final List<OnLeaveQueue> onLeaveHandlers = new ArrayList<>();
 
@@ -254,10 +258,18 @@ public interface SimLink {
 	}
 
 	class SplitOutLink implements SimLink {
-		@Getter
 		private final Id<Link> id;
-		@Getter
+
+		@Override
+		public Id<Link> getId() {
+			return id;
+		}
+
 		private final int toPart;
+
+		public int getToPart() {
+			return toPart;
+		}
 
 		private final Queue<DistributedMobsimVehicle> q = new ArrayDeque<>();
 		// deliberately use implementation and NOT the interface, since the out link mirrors the downstream storage
@@ -354,8 +366,12 @@ public interface SimLink {
 
 	class SplitInLink implements SimLink {
 
-		@Getter
 		private final int fromPart;
+
+		public int getFromPart() {
+			return fromPart;
+		}
+
 		private final LocalLink localLink;
 
 		private double consumedStorageCap = 0;

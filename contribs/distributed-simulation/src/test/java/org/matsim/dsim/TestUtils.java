@@ -31,7 +31,9 @@ public class TestUtils {
 
 	public static SimLink createLink(Link link, DSimConfigGroup config, int part) {
 		var simNode = new SimNode(link.getToNode().getId());
-		return SimLink.create(link, simNode, config, 7.5, part, x -> {}, x -> {});
+		return SimLink.create(link, simNode, config, 7.5, part, x -> {
+		}, x -> {
+		});
 	}
 
 	public static Link createSingleLink() {
@@ -107,9 +109,9 @@ public class TestUtils {
 	}
 
 	public static SimpleAgent createAgent(String id) {
-		return SimpleAgent.builder()
-			.setId(Id.createPersonId(id))
-			.build();
+		var result = new SimpleAgent();
+		result.setId(Id.createPersonId(id));
+		return result;
 	}
 
 	public static SimpleVehicle createVehicle() {
@@ -121,12 +123,13 @@ public class TestUtils {
 	}
 
 	public static SimpleVehicle createVehicle(String id, SimpleAgent driver, double pce, double maxV) {
-		return SimpleVehicle.builder()
-			.setId(Id.createVehicleId(id))
-			.setDriver(driver)
-			.setMaximumVelocity(maxV)
-			.setSizeInEquivalents(pce)
-			.build();
+
+		var result = new SimpleVehicle();
+		result.setId(Id.createVehicleId(id));
+		result.setDriver(driver);
+		result.setMaximumVelocity(maxV);
+		result.setSizeInEquivalents(pce);
+		return result;
 	}
 
 	public static EventsManager mockExpectingEventsManager(List<Event> expectedEvents) {

@@ -2,10 +2,11 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import lombok.extern.log4j.Log4j2;
-import org.matsim.api.core.v01.LP;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -35,8 +36,9 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 import java.util.*;
 
-@Log4j2
 public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsim, InternalInterface {
+
+	private static final Logger log = LogManager.getLogger(SimProcess.class);
 
 	private final List<DistributedMobsimEngine> engines = new ArrayList<>();
 	private final List<DistributedDepartureHandler> departureHandlers = new ArrayList<>();

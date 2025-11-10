@@ -8,14 +8,13 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.HdrHistogram.Histogram;
 import org.agrona.BitUtil;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.fury.ThreadSafeFury;
 import org.apache.fury.memory.MemoryBuffer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.Topology;
@@ -45,8 +44,9 @@ import java.util.function.Consumer;
 /**
  * Class responsible for routing messages to the correct recipient.
  */
-@Log4j2
 public final class MessageBroker implements MessageConsumer, MessageReceiver {
+
+	private static final Logger log = LogManager.getLogger(MessageBroker.class);
 
 	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
 
@@ -133,7 +133,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	private final Histogram histogram = new Histogram(TimeUnit.SECONDS.toNanos(1), 3);
 
-	@Getter
 	private final Histogram sizes = new Histogram(Integer.MAX_VALUE, 0);
 
 	/**
@@ -197,20 +196,13 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		return events;
 	}
 
-	/**
-	 * Returns the message queue for unprompted messages.
-	 */
-	Queue<ByteBuffer> getMessageQueue() {
-		return aheadMsgs;
-	}
-
 	void register(SimTask task, int part) {
 
 		tasks.add(task);
 		for (int type : task.getSupportedMessages()) {
 			long address = address(part, type);
-			byAddress.computeIfAbsent(address, k -> new ArrayList<>()).add(task);
-			byType.computeIfAbsent(type, k -> new ArrayList<>()).add(task);
+			byAddress.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
+			byType.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
 		}
 	}
 
@@ -269,14 +261,14 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			for (int i = 0; i < comm.getSize(); i++) {
 				if (i == comm.getRank())
-					nodesMessages.computeIfAbsent(msg.getType(), k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+					nodesMessages.computeIfAbsent(msg.getType(), _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
 				else {
 					queueSend(msg, i, NODE_MESSAGE);
 				}
 			}
 
 		} else if (receiverNode == comm.getRank()) {
-			nodesMessages.computeIfAbsent(msg.getType(), k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+			nodesMessages.computeIfAbsent(msg.getType(), _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
 		} else {
 			queueSend(msg, receiverNode, NODE_MESSAGE);
 		}
@@ -402,7 +394,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 *
 	 * @param partition receiving partition, if {@link Integer#MIN_VALUE} the message is send to the node inbox.
 	 */
-	@SneakyThrows
 	private void queueSend(Message msg, int rank, int partition) {
 
 		AtomicInteger oldPos = dataSize[rank + 1];
@@ -522,7 +513,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			while (in.readerIndex() < length) {
 				int partition = in.readInt32();
 				int type = in.readInt32();
-				int size = in.readInt32();
+				int _ = in.readInt32();
 
 				FuryBufferParser parser = serialization.getFuryParser(type);
 				Message msg = parser.parse(in);
@@ -541,13 +532,13 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		while (in.readerIndex() < length) {
 			int partition = in.readInt32();
 			int type = in.readInt32();
-			int size = in.readInt32();
+			int _ = in.readInt32();
 
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
 
 			if (partition == NODE_MESSAGE) {
-				nodesMessages.computeIfAbsent(type, k -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
+				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
 				continue;
 			}
 
@@ -573,4 +564,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		return histogram;
 	}
 
+	public Histogram getSizes() {
+		return sizes;
+	}
 }

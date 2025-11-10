@@ -3,8 +3,8 @@ package org.matsim.dsim;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,7 +19,6 @@ import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,9 +31,9 @@ import java.util.stream.Stream;
 /**
  * Simple implementation of a controller. Main entry point for testing, but only a single iteration and not the full matsim loop.
  */
-@Log4j2
 public class DistributedController implements ControlerI {
 
+	private static final Logger log = LogManager.getLogger(DistributedController.class);
 
 	private final Communicator comm;
 	private final Config config;
@@ -47,7 +46,6 @@ public class DistributedController implements ControlerI {
 	}
 
 	@Override
-	@SneakyThrows
 	public void run() {
 
 		// TODO: always loads whole scenario

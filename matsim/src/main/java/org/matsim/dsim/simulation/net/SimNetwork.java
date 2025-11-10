@@ -2,7 +2,6 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.common.collect.Streams;
 import com.google.inject.Inject;
-import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -15,12 +14,25 @@ import org.matsim.dsim.DSimConfigGroup;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Getter
 public class SimNetwork {
 
 	private final Map<Id<Link>, SimLink> links;
+
+	public Map<Id<Link>, SimLink> getLinks() {
+		return links;
+	}
+
 	private final Map<Id<Node>, SimNode> nodes;
+
+	public Map<Id<Node>, SimNode> getNodes() {
+		return nodes;
+	}
+
 	private final int part;
+
+	public int getPart() {
+		return part;
+	}
 
 	@Inject
 	SimNetwork(Network network, Config config, NetworkPartition networkPartition,

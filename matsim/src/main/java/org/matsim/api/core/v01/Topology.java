@@ -1,6 +1,5 @@
 package org.matsim.api.core.v01;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.messages.ComputeNode;
 
 import javax.annotation.Nonnull;
@@ -14,7 +13,6 @@ import java.util.List;
  */
 public class Topology implements Message, Iterable<ComputeNode> {
 
-	@Getter
 	private final int totalPartitions;
 
 	@Nonnull
@@ -48,6 +46,10 @@ public class Topology implements Message, Iterable<ComputeNode> {
 	@Nonnull
 	public Iterator<ComputeNode> iterator() {
 		return computeNodes.iterator();
+	}
+
+	public int getTotalPartitions() {
+		return totalPartitions;
 	}
 
 	public static class TopologyBuilder {

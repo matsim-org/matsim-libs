@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation;
 
 import it.unimi.dsi.fastutil.ints.IntList;
-import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
@@ -23,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@Log4j2
 class SimStepMessagingTest {
 
 	@Test

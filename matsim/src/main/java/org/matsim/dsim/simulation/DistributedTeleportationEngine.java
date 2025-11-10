@@ -1,8 +1,6 @@
 package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
-import lombok.Setter;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -21,7 +19,6 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-@Log4j2
 public class DistributedTeleportationEngine implements DistributedDepartureHandler, DistributedMobsimEngine, TeleportationEngine {
 
 	private final EventsManager em;
@@ -29,8 +26,12 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final SimStepMessaging simStepMessaging;
 	private final AgentSourcesContainer asc;
 
-	@Setter
 	private InternalInterface internalInterface;
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
 
 	@Inject
 	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc) {

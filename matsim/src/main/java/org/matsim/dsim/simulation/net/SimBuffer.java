@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayFIFOQueue;
-import lombok.Getter;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.ArrayDeque;
@@ -19,8 +18,11 @@ class SimBuffer {
 	private final Consumer<SimNode> activateToNode;
 	private final SimNode toNode;
 
-	@Getter
 	private double pceInBuffer = 0;
+
+	public double getPceInBuffer() {
+		return pceInBuffer;
+	}
 
 	double getMaxFlowCapacity() {
 		return flowCap.getMax();

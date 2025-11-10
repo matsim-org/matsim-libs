@@ -1,6 +1,5 @@
 package org.matsim.dsim;
 
-import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Log4j2
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ThreeLinkIntegrationTest {
 

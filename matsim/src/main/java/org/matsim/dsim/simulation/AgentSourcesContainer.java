@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.Message;
 import org.matsim.core.mobsim.dsim.DistributedAgentSource;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
@@ -19,8 +18,11 @@ public class AgentSourcesContainer {
 	private final Map<Class<? extends DistributedMobsimAgent>, List<DistributedAgentSource>> agentTypes = new HashMap<>();
 	private final Map<Class<? extends DistributedMobsimVehicle>, List<DistributedAgentSource>> vehicleTypes = new HashMap<>();
 
-	@Getter
 	private final List<DistributedAgentSource> agentSources = new ArrayList<>();
+
+	public List<DistributedAgentSource> getAgentSources() {
+		return agentSources;
+	}
 
 	/**
 	 * Add source to this container.

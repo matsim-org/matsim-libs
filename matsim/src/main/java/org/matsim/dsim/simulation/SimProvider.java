@@ -1,11 +1,11 @@
 package org.matsim.dsim.simulation;
 
-import com.google.inject.Module;
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.name.Named;
 import com.google.inject.util.Modules;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.messages.ComputeNode;
@@ -27,8 +27,9 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Log4j2
 public class SimProvider implements LPProvider {
+
+	private static final Logger log = LogManager.getLogger(SimProvider.class);
 
 	private final Network network;
 	private final Config config;
@@ -39,11 +40,17 @@ public class SimProvider implements LPProvider {
 	private final Set<AbstractQSimModule> overridingModulesFromAbstractModule;
 	private final QSimComponentsConfig components;
 
-	@Getter
 	private final Injector injector;
 
-	@Getter
+	public Injector getInjector() {
+		return injector;
+	}
+
 	private final Set<MobsimListener> listeners = new HashSet<>();
+
+	public Collection<? extends MobsimListener> getListeners() {
+		return this.listeners;
+	}
 
 	/**
 	 * Injector containing the node singletons
@@ -187,4 +194,5 @@ public class SimProvider implements LPProvider {
 
 		return simProcess;
 	}
+
 }

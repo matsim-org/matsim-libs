@@ -1,10 +1,8 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.dsim.utils.CountedWarning;
 
-@Getter
 class SimpleStorageCapacity implements StorageCapacity {
 
 	static double calculateDefaultCapacity(Link link, double effectiveCellSize) {
@@ -35,7 +33,18 @@ class SimpleStorageCapacity implements StorageCapacity {
 	}
 
 	private final double max;
+
+	@Override
+	public double getMax() {
+		return max;
+	}
+	
 	private double occupied;
+
+	@Override
+	public double getOccupied() {
+		return occupied;
+	}
 
 	SimpleStorageCapacity(double maxCapacity) {
 		this.max = maxCapacity;
@@ -61,6 +70,7 @@ class SimpleStorageCapacity implements StorageCapacity {
 	public boolean isAvailable() {
 		return occupied < max;
 	}
+
 
 	@Override
 	public String toString() {

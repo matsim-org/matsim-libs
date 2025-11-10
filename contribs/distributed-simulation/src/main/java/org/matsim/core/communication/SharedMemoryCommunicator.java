@@ -1,19 +1,15 @@
 package org.matsim.core.communication;
 
 import io.aeron.CommonContext;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.agrona.concurrent.YieldingIdleStrategy;
 import org.agrona.concurrent.ringbuffer.ManyToOneRingBuffer;
 import org.agrona.concurrent.ringbuffer.RingBufferDescriptor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UncheckedIOException;
-import java.lang.foreign.Arena;
+import java.io.*;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -24,8 +20,9 @@ import java.nio.file.Path;
 /**
  * Communicates using shared memory.
  */
-@Log4j2
 public class SharedMemoryCommunicator implements Communicator {
+
+	private static final Logger log = LogManager.getLogger(SharedMemoryCommunicator.class);
 
 	private final int rank;
 	private final int size;
@@ -35,7 +32,6 @@ public class SharedMemoryCommunicator implements Communicator {
 	private final IPC subscription;
 	private final IPC[] others;
 
-	@SneakyThrows
 	public SharedMemoryCommunicator(int rank, int size) {
 		this.rank = rank;
 		this.size = size;
@@ -43,23 +39,28 @@ public class SharedMemoryCommunicator implements Communicator {
 		File name = getName(rank);
 		log.info("Serving on {}", name);
 
-		Files.createDirectories(Path.of(CommonContext.getAeronDirectoryName()));
+		try {
+			Files.createDirectories(Path.of(CommonContext.getAeronDirectoryName()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		this.subscription = new IPC(name, size, true);
 		this.others = new IPC[size];
 	}
 
-	public static void main(String[] args) {
-		SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1);
-
-		comm.connect();
+	static void main() {
+		try (SharedMemoryCommunicator comm = new SharedMemoryCommunicator(0, 1)) {
+			comm.connect();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private File getName(int rank) {
 		return new File(CommonContext.getAeronDirectoryName() + "/q-" + rank);
 	}
 
-	@SneakyThrows
 	public void connect() {
 
 		for (int i = 0; i < size; i++) {
@@ -168,6 +169,7 @@ public class SharedMemoryCommunicator implements Communicator {
 
 		/**
 		 * Compute next power of two for the given value.
+		 *
 		 * @param value
 		 * @return
 		 */
@@ -175,11 +177,10 @@ public class SharedMemoryCommunicator implements Communicator {
 			return 1L << (64 - Long.numberOfLeadingZeros(value - 1));
 		}
 
-		@SneakyThrows
 		public IPC(File path, long total, boolean clear) {
 
 			this.path = path;
-			file = new RandomAccessFile(path, "rw");
+			file = getRandomAccessFile(path);
 			channel = file.getChannel();
 
 			String bufferSize = System.getenv("MSG_BUFFER_SIZE");
@@ -192,7 +193,7 @@ public class SharedMemoryCommunicator implements Communicator {
 			}
 
 			// Create a memory-mapped file
-			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, size);
+			buffer = mapBuffer(size);
 
 			// Zero the buffer before using it
 			if (clear) {
@@ -206,11 +207,30 @@ public class SharedMemoryCommunicator implements Communicator {
 			rb = new ManyToOneRingBuffer(ub);
 		}
 
-		@SneakyThrows
-		public void close(boolean delete) {
-			channel.close();
-			file.close();
+		private MappedByteBuffer mapBuffer(long size) {
+			try {
+				return channel.map(FileChannel.MapMode.READ_WRITE, 0, size);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
+		private RandomAccessFile getRandomAccessFile(File path) {
+			try {
+				return new RandomAccessFile(path, "rw");
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		public void close(boolean delete) {
+
+			try {
+				channel.close();
+				file.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 			if (delete) {
 				delete();
 			}

@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -13,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
-@Log4j2
 public class DefaultWait2Link implements Wait2Link {
 
 	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();

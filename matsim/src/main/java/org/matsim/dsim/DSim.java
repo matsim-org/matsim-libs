@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 import it.unimi.dsi.fastutil.longs.LongList;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.HdrHistogram.Histogram;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.Topology;
@@ -41,8 +41,9 @@ import java.util.concurrent.TimeUnit;
 import static com.google.inject.Key.get;
 
 
-@Log4j2
 public final class DSim implements Mobsim {
+
+	private static final Logger log = LogManager.getLogger(DSim.class);
 
 	private final Injector injector;
 	private final Communicator comm;
@@ -67,7 +68,6 @@ public final class DSim implements Mobsim {
 		return new BigDecimal(v).setScale(3, RoundingMode.HALF_UP).doubleValue();
 	}
 
-	@SneakyThrows
 	@Override
 	public void run() {
 
@@ -213,18 +213,20 @@ public final class DSim implements Mobsim {
 		broker.afterSim();
 	}
 
-	@SneakyThrows
 	private void writeRuntimeStats(int size, int rank, long runtimeMillis, double rtr) {
 		OutputDirectoryHierarchy io = injector.getInstance(OutputDirectoryHierarchy.class);
 		Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(rank));
-		Files.createDirectories(out);
-		try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("runtime-%d.csv".formatted(rank)))) {
-			writer.write("size,rank,runtime,rtr\n");
-			writer.write(size + "," + rank + "," + runtimeMillis + "," + rtr + "\n");
+		try {
+			Files.createDirectories(out);
+			try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("runtime-%d.csv".formatted(rank)))) {
+				writer.write("size,rank,runtime,rtr\n");
+				writer.write(size + "," + rank + "," + runtimeMillis + "," + rtr + "\n");
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	@SneakyThrows
 	private void writeRuntimes(ComputeNode node, Histogram simulation, Histogram broker, Histogram sizes, LPExecutor executor,
 							   long overallRuntime, long beforeListener, long afterListener, long syncStep) {
 
@@ -232,43 +234,47 @@ public final class DSim implements Mobsim {
 
 		Path out = Path.of(io.getOutputPath(), "runtimes-%d".formatted(node.getRank()));
 
-		Files.createDirectories(out);
+		try {
+			Files.createDirectories(out);
 
-		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("simulation.hgrm")))) {
-			simulation.outputPercentileDistribution(writer, 1000.0);
-		}
+			try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("simulation.hgrm")))) {
+				simulation.outputPercentileDistribution(writer, 1000.0);
+			}
 
-		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("broker.hgrm")))) {
-			broker.outputPercentileDistribution(writer, 1000.0);
-		}
+			try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("broker.hgrm")))) {
+				broker.outputPercentileDistribution(writer, 1000.0);
+			}
 
-		try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("msgSizes.hgrm")))) {
-			sizes.outputPercentileDistribution(writer, 1.0);
-		}
+			try (PrintStream writer = new PrintStream(Files.newOutputStream(out.resolve("msgSizes.hgrm")))) {
+				sizes.outputPercentileDistribution(writer, 1.0);
+			}
 
-		try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("tasks.csv"))) {
+			try (BufferedWriter writer = Files.newBufferedWriter(out.resolve("tasks.csv"))) {
 
-			writer.write("name,partition,step,runtime\n");
-			writer.write("OverallRuntime,-1,-1," + overallRuntime + "\n");
-			writer.write("BeforeSimStepListener,-1,-1," + beforeListener + "\n");
-			writer.write("AfterSimStepListener,-1,-1," + afterListener + "\n");
-			writer.write("SyncStep,-1,-1," + syncStep + "\n");
+				writer.write("name,partition,step,runtime\n");
+				writer.write("OverallRuntime,-1,-1," + overallRuntime + "\n");
+				writer.write("BeforeSimStepListener,-1,-1," + beforeListener + "\n");
+				writer.write("AfterSimStepListener,-1,-1," + afterListener + "\n");
+				writer.write("SyncStep,-1,-1," + syncStep + "\n");
 
-			executor.processRuntimes(info -> {
-				LongList steps = info.runtime();
-				for (int i = 0; i < steps.size(); i++) {
-					try {
-						long runtime = steps.getLong(i);
-						if (runtime == 0)
-							continue;
+				executor.processRuntimes(info -> {
+					LongList steps = info.runtime();
+					for (int i = 0; i < steps.size(); i++) {
+						try {
+							long runtime = steps.getLong(i);
+							if (runtime == 0)
+								continue;
 
-						// Runtimes are collected as 10% samples currently
-						writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
+							// Runtimes are collected as 10% samples currently
+							writer.write("\"%s\",%d,%d,%d\n".formatted(info.name(), info.partition(), i * 10, runtime));
+						} catch (IOException e) {
+							throw new UncheckedIOException(e);
+						}
 					}
-				}
-			});
+				});
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

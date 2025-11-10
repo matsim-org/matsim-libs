@@ -2,17 +2,12 @@ package org.matsim.dsim;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
@@ -26,20 +21,16 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-@Log4j2
 public final class DistributedEventsManager implements EventsManager {
+
+	private static final Logger log = LogManager.getLogger(DistributedEventsManager.class);
 
 	private final MessageBroker broker;
 
-	@Getter
 	private final ComputeNode computeNode;
 	private final LPExecutor executor;
 	private final SerializationProvider serializer;
@@ -450,5 +441,9 @@ public final class DistributedEventsManager implements EventsManager {
 
 		executor.runEventHandler();
 
+	}
+
+	public ComputeNode getComputeNode() {
+		return computeNode;
 	}
 }

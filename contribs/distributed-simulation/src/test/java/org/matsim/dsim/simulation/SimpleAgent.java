@@ -1,9 +1,5 @@
 package org.matsim.dsim.simulation;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
@@ -15,10 +11,6 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-@Data
-@Builder(setterPrefix = "set")
-@Getter
-@Setter
 public class SimpleAgent implements Message, DistributedMobsimAgent, MobsimDriverAgent {
 
 	private Id<Person> id;
@@ -34,6 +26,124 @@ public class SimpleAgent implements Message, DistributedMobsimAgent, MobsimDrive
 	private MobsimVehicle vehicle;
 	private Id<Vehicle> plannedVehicleId;
 	private boolean isWantingToArriveOnCurrentLink;
+
+	@Override
+	public Id<Person> getId() {
+		return id;
+	}
+
+	@Override
+	public Id<Link> getCurrentLinkId() {
+		return currentLinkId;
+	}
+
+	@Override
+	public Id<Link> getDestinationLinkId() {
+		return destinationLinkId;
+	}
+
+	@Override
+	public String getMode() {
+		return mode;
+	}
+
+	@Override
+	public State getState() {
+		return state;
+	}
+
+	@Override
+	public double getActivityEndTime() {
+		return activityEndTime;
+	}
+
+	@Override
+	public OptionalTime getExpectedTravelTime() {
+		return expectedTravelTime;
+	}
+
+	@Override
+	public Double getExpectedTravelDistance() {
+		return expectedTravelDistance;
+	}
+
+	@Override
+	public Facility getCurrentFacility() {
+		return currentFacility;
+	}
+
+	@Override
+	public Facility getDestinationFacility() {
+		return destinationFacility;
+	}
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		return vehicle;
+	}
+
+	@Override
+	public Id<Vehicle> getPlannedVehicleId() {
+		return plannedVehicleId;
+	}
+
+	@Override
+	public boolean isWantingToArriveOnCurrentLink() {
+		return isWantingToArriveOnCurrentLink;
+	}
+
+	public void setId(Id<Person> id) {
+		this.id = id;
+	}
+
+	public void setCurrentLinkId(Id<Link> currentLinkId) {
+		this.currentLinkId = currentLinkId;
+	}
+
+	public void setDestinationLinkId(Id<Link> destinationLinkId) {
+		this.destinationLinkId = destinationLinkId;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public void setActivityEndTime(double activityEndTime) {
+		this.activityEndTime = activityEndTime;
+	}
+
+	public void setExpectedTravelTime(OptionalTime expectedTravelTime) {
+		this.expectedTravelTime = expectedTravelTime;
+	}
+
+	public void setExpectedTravelDistance(Double expectedTravelDistance) {
+		this.expectedTravelDistance = expectedTravelDistance;
+	}
+
+	public void setCurrentFacility(Facility currentFacility) {
+		this.currentFacility = currentFacility;
+	}
+
+	public void setDestinationFacility(Facility destinationFacility) {
+		this.destinationFacility = destinationFacility;
+	}
+
+	@Override
+	public void setVehicle(MobsimVehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+
+	public void setPlannedVehicleId(Id<Vehicle> plannedVehicleId) {
+		this.plannedVehicleId = plannedVehicleId;
+	}
+
+	public void setWantingToArriveOnCurrentLink(boolean wantingToArriveOnCurrentLink) {
+		isWantingToArriveOnCurrentLink = wantingToArriveOnCurrentLink;
+	}
 
 	@Override
 	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
@@ -65,4 +175,6 @@ public class SimpleAgent implements Message, DistributedMobsimAgent, MobsimDrive
 	public Message toMessage() {
 		return this;
 	}
+
+
 }

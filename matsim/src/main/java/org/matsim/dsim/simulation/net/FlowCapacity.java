@@ -1,13 +1,15 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.dsim.DSimConfigGroup;
 
 class FlowCapacity {
 
-	@Getter
 	private final double max;
+
+	public double getMax() {
+		return max;
+	}
 
 	private double lastUpdateTime;
 	private double accumulatedCapacity;

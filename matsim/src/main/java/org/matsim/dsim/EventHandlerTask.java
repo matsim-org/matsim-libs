@@ -5,10 +5,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.events.Event;
@@ -22,6 +18,7 @@ import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.AggregateFromAll;
 import org.matsim.dsim.events.EventMessagingPattern;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,14 +28,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-@Log4j2
 public sealed abstract class EventHandlerTask implements SimTask permits DefaultEventHandlerTask, GlobalAsyncEventHandlerTask, SingleNodeAsyncEventHandlerTask {
 
 	/**
 	 * Handler to execute.
 	 */
-	@Getter
 	protected final EventHandler handler;
+
+	public EventHandler getHandler() {
+		return handler;
+	}
 
 	protected final DistributedEventsManager manager;
 
@@ -62,8 +61,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final LongList runtimes = new LongArrayList();
 
-	@Setter
 	protected MessageBroker broker;
+
+	public void setBroker(MessageBroker broker) {
+		this.broker = broker;
+	}
 
 	/**
 	 * Avg. runtime of last iterations.
@@ -76,8 +78,12 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * Current simulation time. Needs to be volatile to ensure visibility across threads.
 	 */
-	@Setter
 	protected volatile double time;
+
+	public void setTime(double time) {
+		this.time = time;
+	}
+
 	/**
 	 * Indicates if the messages need to be sorted.
 	 */
@@ -86,14 +92,20 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * Whether this task can be executed asynchronously between sim steps.
 	 */
-	@Getter
 	protected final boolean async;
+
+	public boolean isAsync() {
+		return async;
+	}
 
 	/**
 	 * If the task is executed asynchronously, the future is stored here.
 	 */
-	@Setter
 	protected Future<?> future;
+
+	public void setFuture(Future<?> future) {
+		this.future = future;
+	}
 
 	public EventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition, boolean async) {
 		this.handler = handler;
@@ -132,7 +144,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		return consumers.get(type);
 	}
 
-	@SneakyThrows
 	@SuppressWarnings("unchecked")
 	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
 
@@ -158,9 +169,10 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				int type = serializer.getType(msgType);
 
 				String target = isEvent ? "handleEvent" : "process";
-				Method consumerMethod = handler.getClass().getMethod(target, msgType);
 
-				consumers.put(type, (Consumer<Message>) LambdaUtils.createConsumer(handler, msgType, target));
+				Method consumerMethod = getConsumerMethod(target, msgType);
+
+				consumers.put(type, (Consumer<Message>) createConsumer(handler, msgType, target));
 				if (isEvent) {
 					EventSource source = node ? EventSource.NODE : partition ? EventSource.PARTITION : EventSource.GLOBAL;
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
@@ -188,8 +200,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		// Register consumers for message patterns
 		if (handler instanceof AggregatingEventHandler<?>) {
 			AggregateFromAll<Message> h = new AggregateFromAll<>();
-
-			Method m = handler.getClass().getDeclaredMethod("send");
+			Method m = getHandlerSendMethod(handler);
 			int type = serializer.getType(m.getReturnType());
 			consumers.put(type, h);
 			return h;
@@ -197,6 +208,31 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 		return null;
 	}
+
+	private Method getConsumerMethod(String target, Class<?> msgType) {
+		try {
+			return handler.getClass().getMethod(target, msgType);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Method getHandlerSendMethod(EventHandler target) {
+		try {
+			return target.getClass().getDeclaredMethod("send");
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Consumer<? extends Message> createConsumer(Object handler, Class<?> msgType, String target) {
+		try {
+			return LambdaUtils.createConsumer(handler, msgType, target);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 
 	/**
 	 * Wait for async task to finish (if set).
@@ -232,7 +268,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * Debug function to dump events to a file.
 	 */
-	@SneakyThrows
 	static void dumpEvents(Path out, Collection<Message> messages) {
 		StringBuilder b = new StringBuilder();
 		for (Message m2 : messages) {
@@ -241,7 +276,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 			}
 		}
 
-		Files.write(out, b.toString().getBytes());
+		try {
+			Files.write(out, b.toString().getBytes());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

@@ -2,7 +2,8 @@ package org.matsim.dsim;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.Topology;
@@ -32,8 +33,9 @@ import java.util.List;
 /**
  * Controller listener running during distributed simulation.
  */
-@Log4j2
 public class DSimControllerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, IterationEndsListener {
+
+	private static final Logger log = LogManager.getLogger(DSimControllerListener.class);
 
 	public static double PRIORITY = -100;
 

@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
-import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -20,7 +19,6 @@ import java.util.Set;
  * the graph information, but the engine, which holds nodes and links performs the mutations on the
  * links.
  */
-@Log4j2
 public class ActiveNodes implements Steppable {
 
 	private final Set<SimNode> activeNodes = new HashSet<>();

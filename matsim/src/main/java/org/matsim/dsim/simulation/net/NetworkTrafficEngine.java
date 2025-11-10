@@ -1,7 +1,6 @@
 package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
-import lombok.Setter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -9,11 +8,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.dsim.CapacityUpdate;
-import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
-import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
-import org.matsim.core.mobsim.dsim.SimStepMessage;
-import org.matsim.core.mobsim.dsim.VehicleContainer;
+import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
@@ -32,8 +27,12 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	private final Wait2Link wait2Link;
 	//private final Set<String> modes;
 
-	@Setter
 	private InternalInterface internalInterface;
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+	}
 
 	@Inject
 	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,

@@ -19,24 +19,25 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.events;
+package org.matsim.core.events;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.apache.commons.lang3.BooleanUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import java.util.Set;
+import java.util.Collection;
 
 public final class EventsManagerModule extends AbstractModule {
 
 	@Override
 	public void install() {
 
+		//noinspection StatementWithEmptyBody
 		if (getConfig().controller().getMobsim().equals(ControllerConfigGroup.MobsimType.dsim.toString())) {
 			// Bind nothing, the distributed sim will bind its own events manager
 		} else if (BooleanUtils.isTrue(getConfig().eventsManager().getOneThreadPerHandler())) {

@@ -1,8 +1,8 @@
 package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Topology;
 import org.matsim.api.core.v01.messages.ComputeNode;
 import org.matsim.core.communication.Communicator;
@@ -15,17 +15,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@Getter
-@Log4j2
 public final class DistributedContext implements ExecutionContext {
 
+	private static final Logger log = LogManager.getLogger(DistributedContext.class);
+
 	private final Communicator comm;
+
+	public Communicator getComm() {
+		return comm;
+	}
 
 	private final Topology topology;
 
 	private final ComputeNode computeNode;
 
 	private final SerializationProvider serializer;
+
+	public SerializationProvider getSerializer() {
+		return serializer;
+	}
 
 	private DistributedContext(Communicator comm, Topology topology, SerializationProvider serializer) {
 		this.comm = comm;
@@ -124,5 +132,15 @@ public final class DistributedContext implements ExecutionContext {
 			.computeNodes(topoNodes)
 			.totalPartitions(total)
 			.build();
+	}
+
+	@Override
+	public Topology getTopology() {
+		return topology;
+	}
+
+	@Override
+	public ComputeNode getComputeNode() {
+		return computeNode;
 	}
 }

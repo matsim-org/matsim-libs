@@ -1,16 +1,20 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
 
-@RequiredArgsConstructor
 class SimQueue {
 
 	private final SimDequeue internalQ;
 	private final FlowCapacity inflowCapacity;
 	private final StorageCapacity storageCapacity;
+
+	SimQueue(SimDequeue internalQ, FlowCapacity inflowCapacity, StorageCapacity storageCapacity) {
+		this.internalQ = internalQ;
+		this.inflowCapacity = inflowCapacity;
+		this.storageCapacity = storageCapacity;
+	}
 
 	boolean isEmpty() {
 		return internalQ.isEmpty();

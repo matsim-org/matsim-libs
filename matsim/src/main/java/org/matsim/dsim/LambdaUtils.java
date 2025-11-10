@@ -1,6 +1,7 @@
 package org.matsim.dsim;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
 
 import java.lang.invoke.*;
@@ -13,10 +14,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Used from https://gist.github.com/alexengrig/df1797d4d07c9f5d521d8c33c2a56563
+ * Used from <a href="https://gist.github.com/alexengrig/df1797d4d07c9f5d521d8c33c2a56563">This Gist</a>
  */
-@Log4j2
 public class LambdaUtils {
+
+	private static final Logger log = LogManager.getLogger(LambdaUtils.class);
 
 	public static Consumer<? extends Message> createConsumer(Object lp, Class<?> msgType, String target) throws LambdaConversionException, ReflectiveOperationException {
 

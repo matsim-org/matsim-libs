@@ -1,6 +1,5 @@
 package org.matsim.dsim.simulation.net;
 
-import lombok.Getter;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -10,13 +9,25 @@ import java.util.*;
 
 public class SimNode {
 
-	@Getter
 	private final Id<Node> id;
+
+	public Id<Node> getId() {
+		return id;
+	}
+
 	private final Random rng;
-	@Getter
+
 	private final List<SimLink> inLinks = new ArrayList<>();
-	@Getter
+
+	public List<SimLink> getInLinks() {
+		return inLinks;
+	}
+
 	private final Map<Id<Link>, SimLink> outLinks = new HashMap<>();
+
+	public Map<Id<Link>, SimLink> getOutLinks() {
+		return outLinks;
+	}
 
 	public SimNode(Id<Node> id) {
 		this.id = id;

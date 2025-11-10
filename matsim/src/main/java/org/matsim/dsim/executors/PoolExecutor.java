@@ -1,7 +1,8 @@
 package org.matsim.dsim.executors;
 
 import com.google.inject.Inject;
-import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
@@ -17,8 +18,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-@Log4j2
 public final class PoolExecutor implements LPExecutor {
+
+	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
 	private final ExecutorService executor;
 	private final SerializationProvider serializer;
@@ -40,8 +42,8 @@ public final class PoolExecutor implements LPExecutor {
 	/**
 	 * Simple modulo operation that works for powers of 2.
 	 */
-	private static int mod(int x, int y) {
-		return (x & (y - 1));
+	private static int mod128(int x) {
+		return (x & (128 - 1));
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public final class PoolExecutor implements LPExecutor {
 	public void doSimStep(double time) {
 
 		// Sort by descending runtime for better load distribution
-		if (mod(step++, 128) == 0)
+		if (mod128(step++) == 0)
 			tasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
 
 		// Prepare all tasks before executing them
