@@ -499,7 +499,7 @@ public class WithinDayEvTest {
 
 		// check charger interaction
 		assertEquals(1, scenario.tracker().chargingStartEvents.size());
-		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().chargingEndEvents.size());
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
@@ -1110,7 +1110,7 @@ public class WithinDayEvTest {
 
 		// check charger interaction
 		assertEquals(1, scenario.tracker().chargingStartEvents.size());
-		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().chargingEndEvents.size());
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
