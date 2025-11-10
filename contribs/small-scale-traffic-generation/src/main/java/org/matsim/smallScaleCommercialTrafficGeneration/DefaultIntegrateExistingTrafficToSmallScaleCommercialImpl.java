@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
@@ -21,7 +22,6 @@ import org.matsim.vehicles.VehicleType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.getObjectiveFunction;
 import static org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.makeTrafficVolumeKey;
@@ -62,20 +62,10 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			stopVolume.mergeDouble(purpose, -1, Double::sum);
 	}
 
-	protected static String findZoneOfLink(Map<String, Map<Id<Link>, Link>> linksPerZone, Id<Link> linkId) {
-		AtomicReference<String> resultingZone = new AtomicReference<>();
-
-		linksPerZone.forEach( (zone, links) -> {
-			if (links.containsKey(linkId)) {
-				resultingZone.set(zone);
-			}
-		});
-		if (resultingZone.get() == null) {
-			return null;
-		}
-		return resultingZone. get();
+	private String findZoneOfLink(Scenario scenario, ShpOptions.Index indexZones, Id<Link> linkId) {
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		return indexZones.query(link.getCoord());
 	}
-
 	/**
 	 * Finds zone with demand and reduces this demand by 1.
 	 *
@@ -112,11 +102,11 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	 *
 	 * @param scenario       the scenario
 	 * @param sampleScenario the sample size of the scenario
-	 * @param linksPerZone   the links per zone
+	 * @param indexZones   the links per zone
 	 */
 	@Override
 	public void readExistingCarriersFromFolder(Scenario scenario, double sampleScenario,
-											   Map<String, Map<Id<Link>, Link>> linksPerZone) throws Exception {
+											   ShpOptions.Index indexZones) throws Exception {
 		Path existingModelsFolder = Path.of(scenario.getConfig().getContext().toURI()).getParent().resolve("existingModels");
 		String locationOfExistingModels = existingModelsFolder.resolve("existingModels.csv").toString();
 		CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
@@ -316,7 +306,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 
 					List<String> startAreas = new ArrayList<>();
 					for (ScheduledTour tour : newCarrier.getSelectedPlan().getScheduledTours()) {
-						String tourStartZone = findZoneOfLink(linksPerZone, tour.getTour().getStartLinkId());
+						String tourStartZone = findZoneOfLink(scenario, indexZones, tour.getTour().getStartLinkId());
 						if (!startAreas.contains(tourStartZone))
 							startAreas.add(tourStartZone);
 					}
@@ -342,7 +332,7 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 	}
 
 	@Override
-	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, Map<String, Map<Id<Link>, Link>> linksPerZone,
+	public void reduceDemandBasedOnExistingCarriers(Scenario scenario, ShpOptions.Index indexZones,
 													GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
 													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_start,
 													Map<TrafficVolumeGeneration.TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolumePerTypeAndZone_stop) {
@@ -358,10 +348,10 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			Integer purpose = (Integer) carrier.getAttributes().getAttribute("purpose");
 			if (carrier.getSelectedPlan() != null) {
 				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-					String startZone = findZoneOfLink(linksPerZone, tour.getTour().getStartLinkId());
+					String startZone = findZoneOfLink(scenario, indexZones, tour.getTour().getStartLinkId());
 					for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
 						if (tourElement instanceof Tour.ServiceActivity service) {
-							String stopZone = findZoneOfLink(linksPerZone, service.getLocation());
+							String stopZone = findZoneOfLink(scenario, indexZones, service.getLocation());
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -372,8 +362,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 							}
 						}
 						if (tourElement instanceof Tour.Pickup pickup) {
-							startZone = findZoneOfLink(linksPerZone, pickup.getShipment().getPickupLinkId());
-							String stopZone = findZoneOfLink(linksPerZone, pickup.getShipment().getDeliveryLinkId());
+							startZone = findZoneOfLink(scenario, indexZones, pickup.getShipment().getPickupLinkId());
+							String stopZone = findZoneOfLink(scenario, indexZones, pickup.getShipment().getDeliveryLinkId());
 							try {
 								reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 									trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -390,12 +380,12 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					List<String> possibleStartAreas = new ArrayList<>();
 					for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 						possibleStartAreas
-							.add(findZoneOfLink(linksPerZone, vehicle.getLinkId()));
+							.add(findZoneOfLink(scenario, indexZones, vehicle.getLinkId()));
 					}
 					for (CarrierService service : carrier.getServices().values()) {
 						String startZone = (String) possibleStartAreas.toArray()[MatsimRandom.getRandom()
 							.nextInt(possibleStartAreas.size())];
-						String stopZone = findZoneOfLink(linksPerZone, service.getServiceLinkId());
+						String stopZone = findZoneOfLink(scenario, indexZones, service.getServiceLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -407,8 +397,8 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 					}
 				} else if (!carrier.getShipments().isEmpty()) {
 					for (CarrierShipment shipment : carrier.getShipments().values()) {
-						String startZone = findZoneOfLink(linksPerZone, shipment.getPickupLinkId());
-						String stopZone = findZoneOfLink(linksPerZone, shipment.getDeliveryLinkId());
+						String startZone = findZoneOfLink(scenario, indexZones, shipment.getPickupLinkId());
+						String stopZone = findZoneOfLink(scenario, indexZones, shipment.getDeliveryLinkId());
 						try {
 							reduceVolumeForThisExistingJobElement(trafficVolumePerTypeAndZone_start,
 								trafficVolumePerTypeAndZone_stop, modeORvehType, purpose, startZone, stopZone);
@@ -422,5 +412,4 @@ public class DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl implement
 			}
 		}
 	}
-
 }
