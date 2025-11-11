@@ -147,6 +147,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpOutputLegs(event.getIteration());
 		dumpOutputActivities(event.getIteration());
 		dumpExperiencedPlans(event.getIteration());
+		dumpExperiencedPartialScores(event.getIteration());
 
 		if (controllerConfigGroup.getCleanItersAtEnd() == ControllerConfigGroup.CleanIterations.delete) {
 			this.controlerIO.deleteIterationDirectory();
@@ -222,6 +223,18 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPlans),
 					this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPlans));
 			} catch (Exception ee) {
+				LogManager.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+					+ "were not generated in the final iteration", ee);
+			}
+		}
+	}
+
+	private void dumpExperiencedPartialScores(int iteration) {
+		if (this.config.scoring().isWriteExperiencedPlans() ) {
+			try {
+				IOUtils.copyFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.experiencedPartialScores),
+					this.controlerIO.getOutputFilename(Controler.DefaultFiles.experiencedPartialScores));
+			} catch ( Exception ee ) {
 				LogManager.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
 					+ "were not generated in the final iteration", ee);
 			}

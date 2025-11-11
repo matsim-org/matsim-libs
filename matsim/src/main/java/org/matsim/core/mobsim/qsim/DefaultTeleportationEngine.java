@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
@@ -72,6 +73,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private final EventsManager eventsManager;
 
 	private final boolean withTravelTimeCheck;
+	private final boolean delayInstantTeleportationArrivals;
 
 	@Inject
 	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager) {
@@ -79,9 +81,14 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, boolean withTravelTimeCheck) {
+		this(scenario, eventsManager, withTravelTimeCheck, scenario.getConfig().qsim().getDelayInstantTeleportationArrivals());
+	}
+
+	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, boolean withTravelTimeCheck, boolean delayInstantTeleportationArrivals) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withTravelTimeCheck = withTravelTimeCheck;
+		this.delayInstantTeleportationArrivals = delayInstantTeleportationArrivals;
 	}
 
 	@Override
@@ -101,6 +108,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		}
 
 		double arrivalTime = now + travelTime;
+
+		if(travelTime == 0 && !delayInstantTeleportationArrivals) {
+			handlePersonTeleportationArrival(agent, now);
+		} else {
 		this.teleportationList.add(new TeleportationEntry(arrivalTime, agent));
 
 		// === below here is only visualization, no dynamics ===
@@ -111,6 +122,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		Coord toCoord = destLink.getToNode().getCoord();
 		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
 		this.teleportationData.put(agentId, agentInfo);
+		}
 
 		return true;
 	}
@@ -135,18 +147,21 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			var entry = teleportationList.peek();
 			if (entry.arrivalTime() <= now) {
 				teleportationList.poll();
-				MobsimAgent personAgent = entry.agent();
-				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
-				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(
-					new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
-				personAgent.endLegAndComputeNextState(now);
-				this.teleportationData.remove(personAgent.getId());
-				internalInterface.arrangeNextAgentState(personAgent);
+				handlePersonTeleportationArrival(entry.agent(), now);
 			} else {
 				break;
 			}
 		}
+	}
+
+	private void handlePersonTeleportationArrival(MobsimAgent agent, double now) {
+		agent.notifyArrivalOnLinkByNonNetworkMode(agent.getDestinationLinkId());
+		double distance = agent.getExpectedTravelDistance();
+		this.eventsManager.processEvent(
+			new TeleportationArrivalEvent(now, agent.getId(), distance, agent.getMode()));
+		agent.endLegAndComputeNextState(now);
+		this.teleportationData.remove(agent.getId());
+		internalInterface.arrangeNextAgentState(agent);
 	}
 
 	@Override
