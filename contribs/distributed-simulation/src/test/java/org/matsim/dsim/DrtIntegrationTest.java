@@ -142,7 +142,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(1);
-		Controler controler = new Controler(scenario, ExecutionContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
 
 		prepareController(controler);
 
@@ -156,7 +156,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(4);
-		Controler controler = new Controler(scenario, ExecutionContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
 
 		prepareController(controler);
 
@@ -170,7 +170,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(4);
-		Controler controler = new Controler(scenario, ExecutionContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(controler.getConfig());
 		DrtConfigGroup drtConfig = multiModeDrtConfigGroup.getModalElements().iterator().next();
@@ -210,7 +210,7 @@ public class DrtIntegrationTest {
 
 				scenario.getConfig().dsim().setThreads(2);
 
-				Controler controler = new Controler(scenario, ExecutionContext.create(comm, scenario.getConfig()));
+				Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig()));
 				prepareController(controler);
 
 				controler.run();

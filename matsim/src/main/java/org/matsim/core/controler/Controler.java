@@ -57,6 +57,7 @@ import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.dsim.ExecutionContext;
+import org.matsim.dsim.LocalContext;
 
 import java.util.*;
 
@@ -137,7 +138,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
-	private AbstractModule overrides;
+	private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
@@ -187,7 +188,6 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 	/**
 	 * Create the controller.
-	 *
 	 * @param ctx if no context is given, a local one is created.
 	 */
 	private Controler(final String configFileName, final Config config, final Scenario scenario, @Nullable ExecutionContext ctx) {
@@ -215,7 +215,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
-		this.simCtx = ctx == null ? ExecutionContext.createLocal(this.config) : ctx;
+		this.simCtx = ctx == null ? LocalContext.create(this.config) : ctx;
 		this.overrides = scenario == null ?
 			new ScenarioByConfigModule() :
 			new ScenarioByInstanceModule(this.scenario);
@@ -287,8 +287,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 	@Override
 	public TravelTime getLinkTravelTimes() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {
-			}))
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
 			.get(TransportMode.car);
 	}
 
@@ -429,8 +428,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 
 	@Override
 	public TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {
-			}))
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {}))
 			.get(TransportMode.car);
 	}
 

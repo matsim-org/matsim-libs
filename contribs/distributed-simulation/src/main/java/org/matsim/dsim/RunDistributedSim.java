@@ -52,7 +52,7 @@ public class RunDistributedSim implements Callable<Integer> {
 	@CommandLine.Option(names = {"-o", "--output"}, description = "Overwrite output path in the config")
 	private String output;
 
-	static void main(String[] args) {
+	public static void main(String[] args) {
 		new CommandLine(new RunDistributedSim()).execute(args);
 	}
 
@@ -110,7 +110,7 @@ public class RunDistributedSim implements Callable<Integer> {
 
 		Scenario s = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(s, ExecutionContext.create(comm, config));
+		Controler controler = new Controler(s, DistributedContext.create(comm, config));
 
 		controler.addOverridingModule(new DistributedSimulationModule());
 

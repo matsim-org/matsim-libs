@@ -7,6 +7,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.matsim.api.core.v01.LPProvider;
 import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
+import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.DistributedScoringListener;
 import org.matsim.core.serialization.SerializationProvider;
@@ -21,9 +22,20 @@ public class DistributedSimulationModule extends AbstractModule {
 	public void install() {
 
 		ExecutionContext ctx = getSimulationContext();
-		bind(Communicator.class).toInstance(ctx.getComm());
+		DistributedContext dtx;
+
+		// Use distributed config
+		if (ctx instanceof DistributedContext o) {
+			dtx = o;
+		} else {
+			// Create a distributed contex from the local one if none was given
+			dtx = DistributedContext.createLocal(new NullCommunicator(), getSimulationContext().getTopology());
+			ctx = dtx;
+		}
+
+		bind(Communicator.class).toInstance(dtx.getComm());
 		bind(MessageBroker.class).in(Singleton.class);
-		bind(SerializationProvider.class).toInstance(ctx.getSerializer());
+		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 
@@ -38,7 +50,7 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		// If there are multiple nodes, we need to partition the population
 		if (ctx.isDistributed()) {
-			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(ctx.getComm().getRank()));
+			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 
 			addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}

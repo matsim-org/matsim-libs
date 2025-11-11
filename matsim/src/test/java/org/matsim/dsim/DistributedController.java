@@ -83,7 +83,7 @@ public class DistributedController implements ControlerI {
 
 		config.dsim().setThreads(threads);
 
-		ExecutionContext ctx = ExecutionContext.create(comm, config);
+		DistributedContext ctx = DistributedContext.create(comm, config);
 		Controler defaultController = new Controler(scenario, ctx);
 
 		Injector injector = defaultController.getInjector();

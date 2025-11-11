@@ -22,8 +22,8 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.*;
 import com.google.inject.Module;
+import com.google.inject.*;
 import com.google.inject.internal.BindingImpl;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
@@ -44,18 +44,18 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.dsim.ExecutionContext;
+import org.matsim.dsim.LocalContext;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
 
 public final class Injector {
-	private Injector() {
-	} // namespace only, do not instantiate
+	private Injector() {} // namespace only, do not instantiate
 
 	private static final Logger logger = LogManager.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
-		return createInjector(config, ExecutionContext.createLocal(config), modules);
+		return createInjector(config, LocalContext.create(config), modules);
 	}
 
 	public static com.google.inject.Injector createInjector(final Config config, final ExecutionContext ctx, Module... modules) {
@@ -87,7 +87,7 @@ public final class Injector {
 		log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
 			+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
 
-		log.log(level, "=== printInjector start ===");
+		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
 			if (entry.getKey().toString().contains("type=org.matsim")) {
 				Annotation annotation = entry.getKey().getAnnotation();
