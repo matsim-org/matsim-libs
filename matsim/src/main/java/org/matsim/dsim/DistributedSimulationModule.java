@@ -34,11 +34,10 @@ public class DistributedSimulationModule extends AbstractModule {
 		}
 
 		bind(Communicator.class).toInstance(dtx.getComm());
-		bind(MessageBroker.class).in(Singleton.class);
 		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
+		bind(MessageBroker.class).in(Singleton.class);
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
-
 		addControllerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
 		// Optional single threaded execution
@@ -50,8 +49,8 @@ public class DistributedSimulationModule extends AbstractModule {
 
 		// If there are multiple nodes, we need to partition the population
 		if (ctx.isDistributed()) {
-			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 
+			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
 			addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
 

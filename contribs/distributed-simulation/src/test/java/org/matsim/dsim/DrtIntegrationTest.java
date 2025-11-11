@@ -142,7 +142,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(1);
-		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, LocalContext.create(scenario.getConfig()));
 
 		prepareController(controler);
 
@@ -156,7 +156,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(4);
-		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, LocalContext.create(scenario.getConfig()));
 
 		prepareController(controler);
 
@@ -170,7 +170,7 @@ public class DrtIntegrationTest {
 		Scenario scenario = createScenario();
 
 		scenario.getConfig().dsim().setThreads(4);
-		Controler controler = new Controler(scenario, DistributedContext.createLocal(scenario.getConfig()));
+		Controler controler = new Controler(scenario, LocalContext.create(scenario.getConfig()));
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(controler.getConfig());
 		DrtConfigGroup drtConfig = multiModeDrtConfigGroup.getModalElements().iterator().next();
@@ -198,34 +198,34 @@ public class DrtIntegrationTest {
 	void runDistributed() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
 		int size = 3;
-		var pool = Executors.newFixedThreadPool(size);
-		var comms = LocalCommunicator.create(size);
+		java.util.List<? extends java.util.concurrent.Future<?>> futures;
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var comms = LocalCommunicator.create(size);
 
-		Files.createDirectories(Path.of(utils.getOutputDirectory()));
+			Files.createDirectories(Path.of(utils.getOutputDirectory()));
 
-		var futures = comms.stream()
-			.map(comm -> pool.submit(() -> {
+			futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
 
-				Scenario scenario = createScenario();
+					Scenario scenario = createScenario();
 
-				scenario.getConfig().dsim().setThreads(2);
+					scenario.getConfig().dsim().setThreads(2);
 
-				Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig()));
-				prepareController(controler);
+					Controler controler = new Controler(scenario, DistributedContext.create(comm, scenario.getConfig()));
+					prepareController(controler);
 
-				controler.run();
+					controler.run();
 
-				try {
-					comm.close();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}))
-			.toList();
-
-		for (var f : futures) {
-			f.get(2, TimeUnit.MINUTES);
+					try {
+						comm.close();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}))
+				.toList();
+			for (var f : futures) {
+				f.get(2, TimeUnit.MINUTES);
+			}
 		}
-
 	}
 }
