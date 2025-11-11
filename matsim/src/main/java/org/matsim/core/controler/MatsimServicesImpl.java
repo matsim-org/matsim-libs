@@ -22,10 +22,8 @@
 package org.matsim.core.controler;
 
 
+import com.google.inject.*;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -45,7 +43,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.dsim.ExecutionContext;
 
-import com.google.inject.Inject;
 import java.util.Map;
 
 class MatsimServicesImpl implements MatsimServices {

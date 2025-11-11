@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.communication.LocalCommunicator;
-import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -117,7 +116,7 @@ public class DistributedIntegrationTest {
 		local.dsim().setThreads(4);
 		Scenario scenario = prepareScenario(local);
 
-		Controler controler = new Controler(scenario, DistributedContext.create(new NullCommunicator(), local));
+		Controler controler = new Controler(scenario, ExecutionContext.createLocal(local));
 		controler.run();
 	}
 
@@ -138,7 +137,7 @@ public class DistributedIntegrationTest {
 
 					Scenario scenario = prepareScenario(local);
 
-					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+					Controler controler = new Controler(scenario, ExecutionContext.create(comm, local));
 
 					controler.run();
 

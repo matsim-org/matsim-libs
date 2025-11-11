@@ -22,8 +22,8 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Module;
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
@@ -49,7 +49,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.dsim.ExecutionContext;
-import org.matsim.dsim.LocalContext;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
@@ -112,7 +111,9 @@ public abstract class AbstractModule implements Module {
 		Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		Multibinder.newSetBinder(this.binder, EventHandler.class);
 		Multibinder.newSetBinder(this.binder, ControllerListener.class);
-		MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<AttributeConverter<?>>() {});
+		MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>() {
+		}, new TypeLiteral<AttributeConverter<?>>() {
+		});
 		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		Multibinder.newSetBinder(this.binder, AbstractQSimModule.class, Names.named("overridesFromAbstractModule"));
 	}
@@ -160,7 +161,8 @@ public abstract class AbstractModule implements Module {
 	 * @see StrategyManagerModule
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
-		return bind(new TypeLiteral<PlanSelector<Plan, Person>>() {});
+		return bind(new TypeLiteral<PlanSelector<Plan, Person>>() {
+		});
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {
@@ -190,7 +192,9 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz) {
-		return MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>() {}, new TypeLiteral<AttributeConverter<?>>() {}).addBinding(clazz);
+		return MapBinder.newMapBinder(this.binder, new TypeLiteral<Class<?>>() {
+		}, new TypeLiteral<AttributeConverter<?>>() {
+		}).addBinding(clazz);
 	}
 
 	/**
@@ -235,11 +239,13 @@ public abstract class AbstractModule implements Module {
 	 */
 	@Deprecated
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
-		return bind( carTravelTime() );
+		return bind(carTravelTime());
 	}
 
 	@Deprecated // please inline
-	protected final Key<TravelTime> networkTravelTime() { return carTravelTime(); }
+	protected final Key<TravelTime> networkTravelTime() {
+		return carTravelTime();
+	}
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelTime> carTravelTime() {
@@ -284,7 +290,8 @@ public abstract class AbstractModule implements Module {
 	public static AbstractModule emptyModule() {
 		return new AbstractModule() {
 			@Override
-			public void install() {}
+			public void install() {
+			}
 		};
 	}
 }
