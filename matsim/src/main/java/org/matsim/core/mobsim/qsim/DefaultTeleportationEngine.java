@@ -34,7 +34,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
@@ -109,19 +108,19 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 		double arrivalTime = now + travelTime;
 
-		if(travelTime == 0 && !delayInstantTeleportationArrivals) {
+		if (travelTime == 0 && !delayInstantTeleportationArrivals) {
 			handlePersonTeleportationArrival(agent, now);
 		} else {
-		this.teleportationList.add(new TeleportationEntry(arrivalTime, agent));
+			this.teleportationList.add(new TeleportationEntry(arrivalTime, agent));
 
-		// === below here is only visualization, no dynamics ===
-		Id<Person> agentId = agent.getId();
-		Link currLink = this.scenario.getNetwork().getLinks().get(linkId);
-		Link destLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId());
-		Coord fromCoord = currLink.getToNode().getCoord();
-		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
-		this.teleportationData.put(agentId, agentInfo);
+			// === below here is only visualization, no dynamics ===
+			Id<Person> agentId = agent.getId();
+			Link currLink = this.scenario.getNetwork().getLinks().get(linkId);
+			Link destLink = this.scenario.getNetwork().getLinks().get(agent.getDestinationLinkId());
+			Coord fromCoord = currLink.getToNode().getCoord();
+			Coord toCoord = destLink.getToNode().getCoord();
+			TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
+			this.teleportationData.put(agentId, agentInfo);
 		}
 
 		return true;
@@ -162,10 +161,6 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		agent.endLegAndComputeNextState(now);
 		this.teleportationData.remove(agent.getId());
 		internalInterface.arrangeNextAgentState(agent);
-	}
-
-	@Override
-	public void onPrepareSim() {
 	}
 
 	@Override
