@@ -130,6 +130,9 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		Injector injector = org.matsim.core.controler.Injector.createInjector( config, module );
 		ScoringParametersForPerson scoringParametersForPerson = injector.getInstance( ScoringParametersForPerson.class );
 
+
+
+
 		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
 		eventsManager.addHandler( vttsHandler );
 
