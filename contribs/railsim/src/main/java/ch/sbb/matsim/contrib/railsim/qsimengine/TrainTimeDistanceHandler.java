@@ -1,9 +1,15 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.PlannedArrival;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -19,6 +25,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds data for time-distance chart and writes CSV file.
@@ -27,6 +34,8 @@ public final class TrainTimeDistanceHandler {
 
 	private final BufferedWriter writer;
 
+	private final RailsimConfigGroup config;
+	private final RailResourceManager resources;
 	private final Map<Key, TimeDistanceData> targetData = new HashMap<>();
 
 	/**
@@ -35,7 +44,9 @@ public final class TrainTimeDistanceHandler {
 	private boolean collectData = false;
 
 	@Inject
-	public TrainTimeDistanceHandler(MatsimServices services) {
+	public TrainTimeDistanceHandler(MatsimServices services, RailResourceManager resources) {
+		this.config = ConfigUtils.addOrGetModule(services.getConfig(), RailsimConfigGroup.class);
+		this.resources = resources;
 		try {
 			this.writer = prepareWriter(services);
 		} catch (IOException e) {
@@ -56,7 +67,7 @@ public final class TrainTimeDistanceHandler {
 	/**
 	 * Create departure data for a simple simulation.
 	 */
-	void prepareInitialSimulation(RailsimEngine engine, TransitSchedule schedule, Vehicles vehicles) {
+	void preparePseudoSimulation(RailsimEngine engine, TransitSchedule schedule, Vehicles vehicles) {
 
 		collectData = true;
 
@@ -110,6 +121,133 @@ public final class TrainTimeDistanceHandler {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Simple calculation to approximate target time distance data.
+	 */
+	void prepareTimeDistanceApproximation(TransitSchedule schedule, Vehicles vehicles, SpeedProfile speedProfile) {
+
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+
+					Vehicle vehicle = vehicles.getVehicles().get(departure.getVehicleId());
+
+					Key key = new Key(route.getId(), vehicle.getType().getId());
+					targetData.computeIfAbsent(key, k -> initialTimeDistanceData(line, route, vehicle, speedProfile));
+
+				}
+			}
+		}
+	}
+
+	/**
+	 * Calculate the time distance data for a single route using approximation only considering acceleration.
+	 */
+	private TimeDistanceData initialTimeDistanceData(TransitLine line, TransitRoute route, Vehicle vehicle, SpeedProfile speedProfile) {
+
+		List<RailLink> links = route.getRoute().getLinkIds().stream().map(resources::getLink).collect(Collectors.toList());
+		links.addFirst(resources.getLink(route.getRoute().getStartLinkId()));
+		links.add(resources.getLink(route.getRoute().getEndLinkId()));
+
+		SimpleTrainState position = new SimpleTrainState(vehicle, route, links);
+
+		double a = RailsimUtils.getTrainAcceleration(vehicle.getType(), config);
+		double d = RailsimUtils.getTrainDeceleration(vehicle.getType(), config);
+
+		TimeDistanceData data = new TimeDistanceData(line.getId(), route.getId());
+
+		List<TransitRouteStop> stops = new ArrayList<>(route.getStops());
+
+		TransitRouteStop first = stops.removeFirst();
+
+		// Train is starting at the first stop
+		data.add(0, 0, links.getFirst().getLinkId(), first.getStopFacility().getId());
+
+		position.nextLink();
+		position.nextStop();
+
+		double departureTime = first.getDepartureOffset().orElse(0);
+		double currentTime = departureTime;
+		double cumulativeDistance = 0.0;
+
+		for (TransitRouteStop stop : stops) {
+
+			List<RailLink> segment = position.getRouteUntilNextStop();
+
+			double currentSpeed = 0.0;
+			double scheduledArrival = departureTime + stop.getArrivalOffset().or(stop.getDepartureOffset()).orElse(0);
+			double targetArrivalAtStop = Math.max(currentTime, scheduledArrival);
+
+			// compute remaining distance to the stop (over all links in this segment)
+			double remainingToStop = 0.0;
+			for (RailLink l : segment)
+				remainingToStop += l.getLength();
+
+			for (int i = 0; i < segment.size(); i++) {
+				RailLink link = segment.get(i);
+				double L = link.getLength();
+
+				// target speed from profile with graceful fallback
+				double profileTarget = speedProfile.getTargetSpeed(currentTime, position, new PlannedArrival(targetArrivalAtStop, position.getRouteUntilNextStop()));
+
+				double allowed = link.getAllowedFreespeed(position.getDriver());
+				double vLimit = Math.min(allowed, Double.isFinite(profileTarget) ? profileTarget : allowed);
+
+				boolean isLastLink = (i == segment.size() - 1);
+
+				double linkTime;
+				if (L <= 0) {
+					linkTime = 0;
+				} else if (isLastLink) {
+					// triangular motion within the last link to stop at its end
+					double vPeak = Math.min(vLimit, RailsimCalc.calcTargetSpeedForStop(L, a, d, currentSpeed));
+					double tAcc = Math.max(0, (vPeak - currentSpeed) / a);
+					double tDec = vPeak / d;
+					linkTime = tAcc + tDec;
+				} else {
+					// intermediate link: accelerate up to bounded peak and possibly cruise
+					double vReq = RailsimCalc.calcTargetSpeedForStop(remainingToStop, a, d, currentSpeed);
+					double vTarget = Math.min(vLimit, vReq);
+					// can we reach vTarget within this link?
+					double sAcc = vTarget > currentSpeed ? (vTarget * vTarget - currentSpeed * currentSpeed) / (2 * a) : 0.0;
+					if (sAcc >= L) {
+						// pure acceleration on this link
+						linkTime = RailsimCalc.solveTraveledDist(currentSpeed, L, a);
+						currentSpeed = Math.min(vTarget, Math.sqrt(Math.max(0, currentSpeed * currentSpeed + 2 * a * L)));
+					} else {
+						double tAcc = currentSpeed < vTarget ? (vTarget - currentSpeed) / a : 0.0;
+						double rem = L - sAcc;
+						double tCruise = rem / Math.max(1e-9, vTarget);
+						linkTime = tAcc + tCruise;
+						currentSpeed = vTarget;
+					}
+				}
+
+				currentTime += linkTime;
+				cumulativeDistance += L;
+
+				Id<TransitStopFacility> nextStopId = position.getNextStop() != null ? position.getNextStop().getId() : null;
+				data.add(currentTime, cumulativeDistance, link.getLinkId(), isLastLink ? nextStopId : null);
+
+				if (isLastLink) {
+					// Time at which the train is still present at the stop
+					double scheduledDeparture = departureTime + stop.getDepartureOffset().or(stop.getArrivalOffset()).orElse(0);
+					data.add(scheduledDeparture, cumulativeDistance, link.getLinkId(), nextStopId);
+				}
+
+				position.nextLink();
+				remainingToStop -= L;
+			}
+
+			// arrived at stop
+			position.nextStop();
+		}
+
+		data.createIndex();
+
+		return data;
 	}
 
 	/**

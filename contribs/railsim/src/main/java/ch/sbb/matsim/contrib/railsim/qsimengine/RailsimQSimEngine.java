@@ -129,14 +129,16 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 
 	/**
 	 * Constructs a simple engine to compute reference time-distance data.
+	 * Currently not in use. Time distance data is computed statically using a simpler approach.
 	 */
-	private void prepareTimeDistanceData() {
+	@SuppressWarnings("unused")
+	private void simulateTimeDistanceData() {
 
 		NoopResourceManager noopRes = new NoopResourceManager(res);
 		RailsimEngine engine = new RailsimEngine(new NoopEventsManager(), config, noopRes, trainManager,
 			new AlwaysApprovingDisposition(noopRes, speedProfile), ttdHandler);
 
-		ttdHandler.prepareInitialSimulation(
+		ttdHandler.preparePseudoSimulation(
 			engine,
 			qsim.getScenario().getTransitSchedule(),
 			qsim.getScenario().getTransitVehicles()
@@ -149,10 +151,20 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 		engine.doSimStep(endTime);
 		//}
 
-		// TODO: targetSpeed can be 0 in some tests, even though train should accelerate
+		// targetSpeed can be 0 in some tests, even though train should accelerate
 
 		ttdHandler.writeInitialData(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles());
 		trainManager.clear();
+	}
+
+	/**
+	 * Run simple approximation for the time distance data calculation.
+	 */
+	private void prepareTimeDistanceData() {
+
+		ttdHandler.prepareTimeDistanceApproximation(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles(), speedProfile);
+		ttdHandler.writeInitialData(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles());
+
 	}
 
 	@Override

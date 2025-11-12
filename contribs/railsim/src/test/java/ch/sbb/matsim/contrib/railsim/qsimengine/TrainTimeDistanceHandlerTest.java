@@ -1,15 +1,14 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
+import com.google.inject.Provider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.io.TempDir;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,14 +20,13 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Provider;
-
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TrainTimeDistanceHandlerTest {
 
@@ -71,8 +69,12 @@ class TrainTimeDistanceHandlerTest {
 		Path output = Path.of(io.getIterationFilename(0, "railsimTimeDistance.csv", config.controller().getCompressionType()));
 		Files.createDirectories(output.getParent());
 
+		RailResourceManager resources = new RailResourceManagerImpl(
+			EventsUtils.createEventsManager(), railsim, scenario.getNetwork(), new SimpleDeadlockAvoidance(), new TrainManager(scenario)
+		);
+
 		MatsimServices services = new StubServices(io, config, scenario);
-		TrainTimeDistanceHandler handler = new TrainTimeDistanceHandler(services);
+		TrainTimeDistanceHandler handler = new TrainTimeDistanceHandler(services, resources);
 
 		handler.close();
 
