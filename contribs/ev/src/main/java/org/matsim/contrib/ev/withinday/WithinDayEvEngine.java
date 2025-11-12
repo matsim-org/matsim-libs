@@ -68,7 +68,7 @@ import com.google.common.base.Preconditions;
  * that a planned charger is blocked. The engine maanges the successive
  * adaptation of the plan to the actions intended by the agent (pluggin the car,
  * unpluggin the car, ...).
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandler, ChargingStartEventHandler,
@@ -261,7 +261,7 @@ public class WithinDayEvEngine implements MobsimEngine, ActivityStartEventHandle
 			qsim.addParkedVehicle(vehicle, slot.charger().getLink().getId());
 		}
 
-		Id<Link> initialLinkId = vehicle.getCurrentLink().getId();
+		Id<Link> initialLinkId = vehicle.getCurrentLinkId();
 
 		QLinkI originalLink = (QLinkI) qsim.getNetsimNetwork().getNetsimLink(initialLinkId);
 		QVehicle qVehicle = originalLink.removeParkedVehicle(vehicleId);

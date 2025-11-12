@@ -803,6 +803,16 @@ public final class PopulationUtils {
 		return getFactory().createPlan();
 	}
 
+	/**
+	 * Createa a plan out of the supplied elements. The element list is referenced by the plan.
+	 * If a deep copy of a plan is required use the @PopulationUtils.copyFromTo method.
+	 *
+	 * @return a new Plan instance, which references the supplied plan elements.
+	 */
+	public static Plan createPlan(List<PlanElement> fromElements) {
+		return new PlanImpl(fromElements);
+	}
+
 	public static Activity createActivityFromLinkId(String type, Id<Link> linkId) {
 		return getFactory().createActivityFromLinkId(type, linkId);
 	}
