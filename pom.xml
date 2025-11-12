@@ -449,7 +449,7 @@
 			<dependency>
 				<groupId>io.github.classgraph</groupId>
 				<artifactId>classgraph</artifactId>
-				<version>4.8.177</version>
+				<version>4.8.184</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.fury</groupId>
