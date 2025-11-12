@@ -41,6 +41,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.speedy.SpeedyGraph;
@@ -53,6 +54,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
+@NodeSingleton
 class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 

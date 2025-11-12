@@ -35,6 +35,7 @@
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
         <jackson.version>2.20.1</jackson.version>
+		<fury.version>0.10.3</fury.version>
         <jogl.version>2.6.0</jogl.version>
 		<junit.version>6.0.1</junit.version>
 		<fastutil.version>8.5.18</fastutil.version>
@@ -443,6 +444,24 @@
 				<artifactId>byte-buddy</artifactId>
 				<version>1.18.0</version>
 				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.github.classgraph</groupId>
+				<artifactId>classgraph</artifactId>
+				<version>4.8.177</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.fury</groupId>
+				<artifactId>fury-core</artifactId>
+				<version>${fury.version}</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.fury</groupId>
+				<artifactId>fury-format</artifactId>
+				<version>${fury.version}</version>
+				<optional>true</optional>
 			</dependency>
 
 		</dependencies>

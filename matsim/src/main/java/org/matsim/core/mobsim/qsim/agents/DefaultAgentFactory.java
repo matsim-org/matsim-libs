@@ -19,12 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import com.google.inject.Inject;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.timing.TimeInterpretation;
-
-import com.google.inject.Inject;
 
 /**
  * Design decisions:<ul>
@@ -45,10 +46,12 @@ public final class DefaultAgentFactory implements AgentFactory {
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
 
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation, this.timeInterpretation);
 		// ( BasicPlanAgentImpl (inside PersonDriverAgentImpl) makes the plan unmodifiable. )
-
-		return agent;
+		return new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation, this.timeInterpretation);
 	}
 
+	@Override
+	public DistributedMobsimAgent createMobsimAgentFromMessage(Message message) {
+		return new PersonDriverAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, this.simulation, this.timeInterpretation);
+	}
 }
