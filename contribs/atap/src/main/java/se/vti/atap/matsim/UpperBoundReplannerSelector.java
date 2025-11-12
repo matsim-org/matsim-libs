@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -77,8 +77,6 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 			for (Id<Person> personId : this.myPersonIds) {
 				double b = 0.0;
 				for (Id<Person> replannerId : this.replannerIds) {
-//					b += this.populationDistance.getACoefficient(replannerId, personId)
-//							+ this.populationDistance.getACoefficient(personId, replannerId);
 					b += this.computeASum(personId, replannerId);
 				}
 				this.personId2bParam.put(personId, b);
@@ -123,22 +121,18 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 
 	private final boolean logReplanningProcess = true;
 
-//	private final Function<Double, Double> quadraticDistanceTransformation;
 	private final ATAPConfigGroup.DistanceTransformation distanceTransformation;
 
 	// -------------------- MEMBERS --------------------
 
-	private AbstractPopulationDistance populationDistance = null;
+	private PopulationDistance populationDistance = null;
 
 	private Double initialGap = null;
-
-//	private Double sbaytiCounterpartGapThreshold = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	UpperBoundReplannerSelector(final ATAPConfigGroup greedoConfig) {
 		super(greedoConfig.newIterationToTargetReplanningRate());
-//		this.quadraticDistanceTransformation = quadraticDistanceTransformation;
 		this.distanceTransformation = greedoConfig.newDistanceTransformation();
 		this.greedoConfig = greedoConfig;
 	}
@@ -146,23 +140,10 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 	// -------------------- INTERNALS --------------------
 
 	private double effectiveEta(final double currentGap) {
-//		if (ATAPConfigGroup.UpperboundStepSize.Vanilla.equals(this.stepSizeLogic)) {
 			return this.getTargetReplanningRate();
-//		} else if (ATAPConfigGroup.UpperboundStepSize.RelativeToInitialGap.equals(this.stepSizeLogic)) {
-//			return Math.min(1.0, this.getTargetReplanningRate() * this.initialGap / currentGap);
-//		} else if (ATAPConfigGroup.UpperboundStepSize.SbaytiCounterpart.equals(this.stepSizeLogic)) {
-//			return (this.sbaytiCounterpartGapThreshold / currentGap);
-//		} else if (ATAPConfigGroup.UpperboundStepSize.SbaytiCounterpartExact.equals(this.stepSizeLogic)) {
-//
-//			return (this.sbaytiGsum - this.sbaytiGcrit * this.sbaytiCnt) / currentGap;
-//
-//		} else {
-//			throw new RuntimeException("Unknown step size logic: " + this.stepSizeLogic);
-//		}
 	}
 
 	private double _Q(final double _G, final double _D2, final double epsilon, final double _D2max) {
-//		final double transformedD = this.quadraticDistanceTransformation.apply(Math.max(_D2, 0.0));
 		final double transformedD = this.distanceTransformation.transform(Math.sqrt(_D2), Math.sqrt(_D2max));
 		return (_G - epsilon) / Math.max(this.eps, transformedD);
 	}
@@ -170,39 +151,12 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 	// --------------- OVERRIDING OF AbstractReplannerSelector ---------------
 
 	@Override
-	void setDistanceToReplannedPopulation(final AbstractPopulationDistance populationDistance) {
+	void setDistanceToReplannedPopulation(final PopulationDistance populationDistance) {
 		this.populationDistance = populationDistance;
 	}
 
-//	private Double sbaytiGsum = null;
-//	private Integer sbaytiCnt = null;
-//	private Double sbaytiGcrit = null;
-
 	@Override
 	Set<Id<Person>> selectReplannersHook(Map<Id<Person>, Double> personId2gap) {
-
-//		// only consider strictly positive gaps
-//		final Map<Id<Person>, Double> personId2gap = personId2gap_POSSIBLY_NEGATIVE_GAPS.entrySet().stream().filter(e -> e.getValue() > 0.0)
-//				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-
-		/*
-		 * (1) Initialize.
-		 */
-
-//		if (ATAPConfigGroup.UpperboundStepSize.SbaytiCounterpart.equals(this.stepSizeLogic)) {
-//			final BasicReplannerSelector sbaytiSelector = new BasicReplannerSelector(true, this.iterationToStepSize);
-//			this.sbaytiCounterpartGapThreshold = sbaytiSelector
-//					.selectReplanners(personId2gap, this.getReplanIteration()).stream()
-//					.mapToDouble(id -> personId2gap.get(id)).sum();
-//
-//		} else if (ATAPConfigGroup.UpperboundStepSize.SbaytiCounterpartExact.equals(this.stepSizeLogic)) {
-//			final BasicReplannerSelector sbaytiSelector = new BasicReplannerSelector(true, this.iterationToStepSize);
-//			final Set<Id<Person>> sbaytiReplanners = sbaytiSelector.selectReplanners(personId2gap,
-//					this.getReplanIteration());
-//			this.sbaytiGsum = sbaytiReplanners.stream().mapToDouble(id -> personId2gap.get(id)).sum();
-//			this.sbaytiGcrit = sbaytiReplanners.stream().mapToDouble(id -> personId2gap.get(id)).min().getAsDouble();
-//			this.sbaytiCnt = sbaytiReplanners.size();
-//		}
 
 		// Start with a maximum amount of replanning gap.
 		final Set<Id<Person>> replannerIds = personId2gap.entrySet().stream().filter(e -> e.getValue() > 0.0)
@@ -211,7 +165,7 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 			return Collections.emptySet();
 		}
 
-		// >>>>>>>>>> PARALLEL SWITCHING >>>>>>>>>>
+		// >>>>>>>>>> PARALLEL >>>>>>>>>>
 
 		final List<Id<Person>> allPersonIds = new ArrayList<>(personId2gap.keySet());
 
@@ -231,15 +185,6 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 			}
 		}
 
-//		final ConcurrentHashMap<Id<Person>, Double> personId2bParam = new ConcurrentHashMap<>(personId2gap.size());
-//		for (Id<Person> personId : personId2gap.keySet()) {
-//			double b = 0.0;
-//			for (Id<Person> replannerId : replannerIds) {
-//				b += this.populationDistance.getACoefficient(replannerId, personId)
-//						+ this.populationDistance.getACoefficient(personId, replannerId);
-//			}
-//			personId2bParam.put(personId, b);
-//		}
 		List<Thread> threads = new ArrayList<>();
 		try {
 			for (int i = 0; i < threadCnt; i++) {
@@ -256,7 +201,7 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 			throw new RuntimeException(e);
 		}
 
-		// <<<<<<<<<< PARALLEL SWITCHING <<<<<<<<<<
+		// <<<<<<<<<< PARALLEL <<<<<<<<<<
 
 		final String logFile = "exact-replanning.log";
 		if (this.logReplanningProcess) {
@@ -272,21 +217,9 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 			this.initialGap = _Gall;
 		}
 
-//		double _G = personId2gap.entrySet().stream().filter(e -> replannerIds.contains(e.getKey()))
-//				.mapToDouble(e -> e.getValue()).sum();
-//		double _D2 = 0.5 * personId2bParam.entrySet().stream().filter(e -> replannerIds.contains(e.getKey()))
-//				.mapToDouble(e -> e.getValue()).sum();
 		double _G = replannerIds.stream().mapToDouble(r -> personId2gap.get(r)).sum();
 		double _D2 = 0.5 * replannerIds.stream().mapToDouble(r -> personId2bParam.get(r)).sum();
 		final double _D2max = _D2;
-
-		/*
-		 * (1b) Initialize parallel switching.
-		 */
-
-		/*
-		 * (2) Repeatedly switch (non)replanners.
-		 */
 
 		boolean switched = true;
 
@@ -323,7 +256,7 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 				final double oldQ = this._Q(_G, _D2, this.effectiveEta(_Gall) * _Gall, _D2max);
 				final double newQ = this._Q(_G + deltaG, _D2 + deltaD2, this.effectiveEta(_Gall) * _Gall, _D2max);
 
-				if (newQ > oldQ) {
+				if (newQ > oldQ) { // TODO robustify
 					_G = Math.max(0.0, _G + deltaG);
 					_D2 = Math.max(0.0, _D2 + deltaD2);
 
@@ -336,12 +269,6 @@ class UpperBoundReplannerSelector extends AbstractReplannerSelector {
 						deltaSign = +1.0;
 					}
 
-//					for (Id<Person> personId : personId2gap.keySet()) {
-//						final double deltaB = deltaSign
-//								* (this.populationDistance.getACoefficient(candidateId, personId)
-//										+ this.populationDistance.getACoefficient(personId, candidateId));
-//						personId2bParam.compute(personId, (id, b2) -> b2 + deltaB);
-//					}					
 					threads = new ArrayList<>();
 					try {
 						for (int i = 0; i < threadCnt; i++) {

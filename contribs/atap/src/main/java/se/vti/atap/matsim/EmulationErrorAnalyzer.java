@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 

@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -62,9 +62,6 @@ class GapAnalyzer {
 	private List<Double> absoluteGapPercentiles = null;
 
 	List<Tuple<Integer, Double>> linkCntAndAbsoluteGap = null;
-
-//	private Double meanRelativeGap = null;
-//	private List<Double> relativeGapPercentiles = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -144,19 +141,6 @@ class GapAnalyzer {
 			this.linkCntAndAbsoluteGap.add(new Tuple<>(linkCnt, personId2absoluteGap.get(personIdAndPlan.getKey())));
 		}
 		Collections.sort(this.linkCntAndAbsoluteGap, (t1, t2) -> Integer.compare(t1.getA(), t2.getA()));
-
-//		final Map<Id<Person>, Double> personId2relativeGap = population.getPersons().values().stream()
-//				.collect(Collectors.toMap(p -> p.getId(),
-//						p -> (p.getSelectedPlan().getScore() - this.person2score.get(p.getId()))
-//								/ Math.max(1e-8, Math.abs(this.person2score.get(p.getId())))));
-//		this.meanRelativeGap = personId2relativeGap.values().stream().mapToDouble(rg -> rg).average().getAsDouble();
-//		Collections.sort(sortedPersonIds, new Comparator<>() {
-//			@Override
-//			public int compare(Id<Person> personId1, Id<Person> personId2) {
-//				return Double.compare(personId2relativeGap.get(personId1), personId2relativeGap.get(personId2));
-//			}
-//		});
-//		this.relativeGapPercentiles = this.generatePercentiles(sortedPersonIds, personId2relativeGap);
 	}
 
 	void writeLinkCntAndAbsoluteGapScatterplot(String fileName) {
@@ -202,13 +186,4 @@ class GapAnalyzer {
 			return createPercentileHeader(this.percentileStep, p -> "");
 		}
 	}
-
-//	String getRelativePercentiles() {
-//		if (this.relativeGapPercentiles != null) {
-//			return this.relativeGapPercentiles.stream().map(p -> Double.toString(p)).collect(Collectors.joining("\t"));
-//		} else {
-//			return createPercentileHeader(this.percentileStep, p -> "");
-//		}
-//	}
-
 }

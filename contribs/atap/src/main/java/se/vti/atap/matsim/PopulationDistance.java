@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -49,21 +49,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author Gunnar Flötteröd
  *
  */
-class KernelPopulationDistance extends AbstractPopulationDistance {
-
-	// -------------------- INNER CLASSES --------------------
-
-	private class LinkEntry {
-
-		final Id<Person> personId;
-
-		final double time_s;
-
-		LinkEntry(final Id<Person> personId, final double time_s) {
-			this.personId = personId;
-			this.time_s = time_s;
-		}
-	}
+class PopulationDistance {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -71,26 +57,21 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 	private final double kernelHalfTime_s;
 	private final double kernelThreshold;
 
-//	private GreedoConfigGroup greedoConfig;
-
 	// -------------------- MEMBERS --------------------
 
-//	private final Map<Id<Person>, Map<Id<Person>, Double>> personId2personId2aCoeff = new LinkedHashMap<>();
 	private final ConcurrentHashMap<Id<Person>, ConcurrentHashMap<Id<Person>, Double>> personId2personId2aCoeff = new ConcurrentHashMap<>();
 
 	private final Set<Id<Link>> consideredLinkIds;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	KernelPopulationDistance(final Plans pop1, final Plans pop2, final Scenario scenario,
+	PopulationDistance(final PlansContainer pop1, final PlansContainer pop2, final Scenario scenario,
 			final Map<String, ? extends TravelTime> mode2travelTime) {
 		this.flowCapacityFactor = scenario.getConfig().qsim().getFlowCapFactor();
 		final ATAPConfigGroup greedoConfig = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				ATAPConfigGroup.class);
 		this.kernelHalfTime_s = greedoConfig.getKernelHalftime_s();
 		this.kernelThreshold = greedoConfig.getKernelThreshold();
-
-		// >>> NEW >>>
 
 		this.consideredLinkIds = new LinkedHashSet<>(
 				1 + (int) (greedoConfig.getLinkShareInDistance() * scenario.getNetwork().getLinks().size()));
@@ -99,8 +80,6 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 		for (int i = 0; i < greedoConfig.getLinkShareInDistance() * scenario.getNetwork().getLinks().size(); i++) {
 			this.consideredLinkIds.add(allLinkIds.get(i));
 		}
-
-		// <<< NEW <<<
 
 		final ConcurrentHashMap<Link, CopyOnWriteArrayList<LinkEntry>> link2entries1 = this.plans2linkEntries(pop1,
 				scenario, mode2travelTime);
@@ -116,6 +95,18 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 
 	// -------------------- INTERNALS --------------------
 
+	private class LinkEntry {
+
+		final Id<Person> personId;
+
+		final double time_s;
+
+		LinkEntry(final Id<Person> personId, final double time_s) {
+			this.personId = personId;
+			this.time_s = time_s;
+		}
+	}
+	
 	private int noNetworkRouteWarningCnt = 0;
 
 	private List<Leg> extractNetworkLegs(final Plan plan) {
@@ -155,7 +146,7 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 		return result;
 	}
 
-	private ConcurrentHashMap<Link, CopyOnWriteArrayList<LinkEntry>> plans2linkEntries(final Plans plans,
+	private ConcurrentHashMap<Link, CopyOnWriteArrayList<LinkEntry>> plans2linkEntries(final PlansContainer plans,
 			final Scenario scenario, Map<String, ? extends TravelTime> mode2travelTime) {
 		this.noNetworkRouteWarningCnt = 0;
 		final Map<Link, List<LinkEntry>> tmpResult = new LinkedHashMap<>();
@@ -176,36 +167,6 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 		}
 		return result;
 	}
-
-//	private void updateCoeffs(final Map<Link, List<LinkEntry>> link2entries1,
-//			final Map<Link, List<LinkEntry>> link2entries2, final double fact) {
-//		for (Map.Entry<Link, List<LinkEntry>> e : link2entries1.entrySet()) {
-//			final Link link = e.getKey();
-//
-//			final double flowCap_veh_s = this.flowCapacityFactor * link.getCapacity() / link.getCapacityPeriod();
-//			final double kernelMu_1_s = Math.log(2.0) / kernelHalfTime_s;
-//			final double linkFact = fact * kernelMu_1_s / flowCap_veh_s;
-//
-//			final List<LinkEntry> entries1 = e.getValue();
-//			final List<LinkEntry> entries2 = link2entries2.computeIfAbsent(link, l -> Collections.emptyList());
-//			if (entries1.size() > 0 && entries2.size() > 0) {
-//				for (LinkEntry entry1 : entries1) {
-//					for (LinkEntry entry2 : entries2) {
-//						final double muTimesDelta = kernelMu_1_s * Math.abs(entry1.time_s - entry2.time_s);
-//						final double kernel = Math.exp(-muTimesDelta) * (1.0 + muTimesDelta);
-//						if (kernel >= kernelThreshold) {
-//							this.addCoefficient(entry1.personId, entry2.personId, linkFact * kernel);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-
-//	private void addCoefficient(final Id<Person> personId1, final Id<Person> personId2, final double addend) {
-//		this.personId2personId2aCoeff.computeIfAbsent(personId1, id -> new ConcurrentHashMap<>()).compute(personId2,
-//				(id, coeff) -> coeff == null ? addend : coeff + addend);
-//	}
 
 	private class JobProcessor implements Runnable {
 
@@ -302,14 +263,10 @@ class KernelPopulationDistance extends AbstractPopulationDistance {
 		}
 	}
 
-	// --------------- OVERRIDING of PopulationDistance ---------------
-
-	@Override
 	ConcurrentHashMap<Id<Person>, ConcurrentHashMap<Id<Person>, Double>> getPersonId2personId2aCoeff() {
 		return this.personId2personId2aCoeff;
 	}
 
-	@Override
 	double getACoefficient(final Id<Person> personId1, final Id<Person> personId2) {
 		if (this.personId2personId2aCoeff.containsKey(personId1)) {
 			return this.personId2personId2aCoeff.get(personId1).getOrDefault(personId2, 0.0);

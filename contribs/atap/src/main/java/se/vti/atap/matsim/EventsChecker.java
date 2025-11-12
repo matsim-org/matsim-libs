@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -33,17 +33,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasPersonId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  *
@@ -127,14 +123,5 @@ public class EventsChecker implements BasicEventHandler, AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		this.writeReport("simulatedEventsReport." + event.getIteration() + ".txt");
-	}
-
-	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		config.plans()
-				.setInputFile("C:\\Users\\GunnarF\\OneDrive - VTI\\My Data\\ihop4\\1PctAllModes_enriched_FIXED.xml.gz");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Population population = scenario.getPopulation();
-		EventsChecker.generateObservedPersonIds(population, 5, "observedPersons.txt");
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -34,14 +34,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationUtils;
 
 /**
- * Copied and simplified from opdytsintegration.
- * 
- * TODO This should be moved into a "matsimutils" package.
  * 
  * @author Gunnar Flötteröd
  * 
  */
-public class Plans {
+public class PlansContainer {
 
 	// -------------------- MEMBERS --------------------
 
@@ -62,7 +59,7 @@ public class Plans {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public Plans(final Population population) {
+	public PlansContainer(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			if (person.getSelectedPlan() == null) {
 				this.person2selectedPlanIndex.put(person.getId(), null);
@@ -100,7 +97,6 @@ public class Plans {
 		person.setSelectedPlan(getSelectedPlan(copiedPlans, this.person2selectedPlanIndex.get(person.getId())));
 	}
 
-	// TODO 2019-07-20 NEW
 	void add(final HasPlansAndId<Plan, Person> person) {
 		final List<? extends Plan> copiedPlans = newDeepCopy(this.personId2planList.get(person.getId()));
 		for (Plan plan : copiedPlans) {

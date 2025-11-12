@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -45,10 +45,6 @@ public class LinkTravelTimeCopy implements TravelTime {
 
 	public LinkTravelTimeCopy(final TravelTime travelTimes, final Config config, final Network network) {
 
-//		final TravelTime travelTimes = services.getLinkTravelTimes();
-//		final Config config = services.getConfig();
-
-		// TODO 2025-05-20 Added cast to int when updating to matsim 2024. Gunnar
 		final int binSize_s = (int) Math.round(config.travelTimeCalculator().getTraveltimeBinSize());
 		final int binCnt = (int) ceil(((double) config.travelTimeCalculator().getMaxTime()) / binSize_s);
 

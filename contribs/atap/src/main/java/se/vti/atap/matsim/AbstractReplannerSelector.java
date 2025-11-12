@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -62,17 +62,22 @@ abstract class AbstractReplannerSelector {
 	// -------------------- CONSTRUCTION --------------------
 
 	static AbstractReplannerSelector newReplannerSelector(final ATAPConfigGroup greedoConfig) {
+
 		if (ATAPConfigGroup.ReplannerIdentifierType.UNIFORM.equals(greedoConfig.getReplannerIdentifier())) {
 			return new BasicReplannerSelector(false, greedoConfig.newIterationToTargetReplanningRate());
+
 		} else if (ATAPConfigGroup.ReplannerIdentifierType.SORTING.equals(greedoConfig.getReplannerIdentifier())) {
 			return new BasicReplannerSelector(true, greedoConfig.newIterationToTargetReplanningRate());
-		} else if (ATAPConfigGroup.ReplannerIdentifierType.ATAP_APPROXIMATE_DISTANCE.equals(greedoConfig.getReplannerIdentifier())) {
+
+		} else if (ATAPConfigGroup.ReplannerIdentifierType.ATAP_APPROXIMATE_DISTANCE
+				.equals(greedoConfig.getReplannerIdentifier())) {
 			return new UpperBoundReplannerSelector(greedoConfig);
+
 		} else if (ATAPConfigGroup.ReplannerIdentifierType.ATAP_EXACT_DISTANCE
 				.equals(greedoConfig.getReplannerIdentifier())) {
 			return new AtomicUpperBoundReplannerSelector(greedoConfig.newIterationToTargetReplanningRate(),
-//					greedoConfig.newQuadraticDistanceTransformation(), 
 					greedoConfig.newDistanceTransformation());
+
 		} else if (ATAPConfigGroup.ReplannerIdentifierType.DO_NOTHING.equals(greedoConfig.getReplannerIdentifier())) {
 			return new AbstractReplannerSelector(null) {
 				@Override
@@ -85,6 +90,7 @@ abstract class AbstractReplannerSelector {
 					return null;
 				}
 			};
+
 		} else {
 			throw new RuntimeException("Unknown replanner selector type: " + greedoConfig.getReplannerIdentifier());
 		}
@@ -116,7 +122,7 @@ abstract class AbstractReplannerSelector {
 		return this.replanIteration;
 	}
 
-	void setDistanceToReplannedPopulation(final AbstractPopulationDistance populationDistance) {
+	void setDistanceToReplannedPopulation(final PopulationDistance populationDistance) {
 		// default implementation does nothing
 	}
 

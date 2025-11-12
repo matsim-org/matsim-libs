@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -111,10 +111,7 @@ public class ATAP {
 		final Map<String, Double> subpop2expensiveStrategyWeightSum = new LinkedHashMap<>();
 		final Map<String, Double> subpop2cheapStrategyWeightSum = new LinkedHashMap<>();
 
-		// TODO 2025-05-20 Changed access to strategy settings throughout.
 		final ReplanningConfigGroup replanningConfig = (ReplanningConfigGroup) config.getModules().get("replanning");
-
-//		for (StrategySettings strategySettings : config.strategy().getStrategySettings()) {
 		for (StrategySettings strategySettings : replanningConfig.getStrategySettings()) {
 			final String strategyName = strategySettings.getStrategyName();
 			final String subpop;
@@ -178,7 +175,6 @@ public class ATAP {
 
 			double probaSum = 0;
 
-//			for (StrategySettings strategySettings : config.strategy().getStrategySettings()) {
 			for (StrategySettings strategySettings : replanningConfig.getStrategySettings()) {
 				if (subpop.equals(strategySettings.getSubpopulation() == null ? nullSubpopulationString
 						: strategySettings.getSubpopulation())) {
@@ -202,7 +198,6 @@ public class ATAP {
 				keepSelected.setSubpopulation(subpop);
 				keepSelected.setWeight(1.0 - probaSum);
 
-//				config.strategy().addStrategySettings(keepSelected);
 				replanningConfig.addStrategySettings(keepSelected);
 				logger.info("* Padding with " + DefaultSelector.KeepLastSelected + " and weight="
 						+ keepSelected.getWeight() + ".");
@@ -210,15 +205,12 @@ public class ATAP {
 			}
 		}
 
-//		config.strategy().setMaxAgentPlanMemorySize(1);
-//		config.strategy().setPlanSelectorForRemoval("WorstPlanSelector");
 		replanningConfig.setMaxAgentPlanMemorySize(1);
 		replanningConfig.setPlanSelectorForRemoval("WorstPlanSelector");
 		logger.info("Approximating a best-response simulation through the following settings:");
 		logger.info(" * maxAgentPlanMemorySize = 1");
 		logger.info(" * planSelectorForRemoval = worstPlanSelector");
 
-//		config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 		replanningConfig.setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 		logger.info("Setting fractionOfIterationsToDisableInnovation to infinity.");
 	}
@@ -244,13 +236,13 @@ public class ATAP {
 
 	public AbstractModule[] getModules() {
 
-		final AbstractModule greedoModule = new AbstractModule() {
+		final AbstractModule atapModule = new AbstractModule() {
 
 			@Override
 			public void install() {
 				bind(PlansReplanning.class).to(ATAPReplanning.class);
 			}
 		};
-		return new AbstractModule[] { greedoModule, new EmulationModule(this.emulationParameters) };
+		return new AbstractModule[] { atapModule, new EmulationModule(this.emulationParameters) };
 	}
 }

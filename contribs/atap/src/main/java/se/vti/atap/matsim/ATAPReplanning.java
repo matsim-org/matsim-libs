@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -108,12 +108,9 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 
 		this.emulationErrorAnalyzer = new EmulationErrorAnalyzer();
 
-		final int percentileStep = 10; // TODO
+		final int percentileStep = 10;
 		this.gapAnalyzer = new GapAnalyzer(percentileStep);
 
-//		this.statsWriter = new StatisticsWriter<>(
-//				new File(services.getConfig().controler().getOutputDirectory(), "GreedoReplanning.log").toString(),
-//				false);
 		this.statsWriter = new StatisticsWriter<>(
 				new File(services.getConfig().controller().getOutputDirectory(), "ATAP.log").toString(),
 				false);
@@ -270,35 +267,6 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 
 	// -------------------- INTERNALS --------------------
 
-//	private void emulate(final MatsimServices services, final Map<String, ? extends TravelTime> mode2travelTimes,
-//			EventHandler eventHandler, boolean overwritePlanTimes) {
-//		final EmulationEngine emulationEngine = this.emulationEngineProvider.get();
-//		emulationEngine.setOverwriteTravelTimes(overwritePlanTimes);
-//		emulationEngine.emulate(services.getIterationNumber(),
-//				Collections.synchronizedList(Arrays.asList(mode2travelTimes)), eventHandler);
-//	}
-//
-//	private void emulateAgainstAllTravelTimes(final List<Map<Id<Person>, Double>> personId2scorePerReplication,
-//			final EventHandler eventsHandlerForMostRecentTT, final boolean overwritePlanTimesFromMostRecentTT,
-//			final List<Map<String, LinkTravelTimeCopy>> mode2travelTimesForEmulation) {
-//
-//		for (Map<String, LinkTravelTimeCopy> mode2travelTimes : mode2travelTimesForEmulation) {
-//
-//			// Important! Iteration order is such that most recent travel times are
-//			// processed first. This has implications for overriding (right) plan times.
-//			final boolean mostRecentTravelTimes = (mode2travelTimes == mode2travelTimesForEmulation.get(0));
-//
-//			this.emulate(this.services, mode2travelTimes, mostRecentTravelTimes ? eventsHandlerForMostRecentTT : null,
-//					mostRecentTravelTimes && overwritePlanTimesFromMostRecentTT);
-//
-//			final Map<Id<Person>, Double> scores = new LinkedHashMap<>();
-//			for (Person person : this.services.getScenario().getPopulation().getPersons().values()) {
-//				scores.put(person.getId(), person.getSelectedPlan().getScore());
-//			}
-//			personId2scorePerReplication.add(scores);
-//		}
-//	}
-
 	private Map<String, LinkTravelTimeCopy> newFilteredTravelTimes() {
 		final Map<String, LinkTravelTimeCopy> result = new LinkedHashMap<>();
 
@@ -334,7 +302,6 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 					event.getServices().getConfig(), event.getServices().getScenario().getNetwork()));
 		}
 		this.listOfMode2travelTimes.addFirst(newMode2travelTime);
-
 	}
 
 	// -------------------- REPLANNING LISTENER --------------------
@@ -369,20 +336,6 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 			listOfMode2travelTimes4emulation.add(mode2travelTimes);
 		}
 
-//		final Map<String, LinkTravelTimeCopy> mode2travelTimesForReplanning;
-//		if (this.greedoConfig.getUseFilteredTravelTimesForReplanning()) {
-//			mode2travelTimesForReplanning = mode2filteredTravelTimes;
-//		} else {
-//			mode2travelTimesForReplanning = this.listOfMode2travelTimes.getFirst();
-//		}
-
-//		final List<Map<String, LinkTravelTimeCopy>> mode2travelTimesForEmulation;
-//		if (this.greedoConfig.getUseFilteredTravelTimesForEmulation()) {
-//			mode2travelTimesForEmulation = Collections.singletonList(mode2filteredTravelTimes);
-//		} else {
-//			mode2travelTimesForEmulation = this.listOfMode2travelTimes;
-//		}
-
 		/*
 		 * (1) Extract old plans and compute new plans. Evaluate both old and new plans.
 		 */
@@ -397,63 +350,30 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 			emulatedEventsChecker = null;
 		}
 
-//		final List<Map<Id<Person>, Double>> personId2oldScoreOverReplications = new ArrayList<>(memory);
 		EmulationEngine emulationEngine = this.emulationEngineProvider.get();
-//		replanningEngine.setOverwriteTravelTimes(false);
 		emulationEngine.emulate(this.replanIteration.intValue(), listOfMode2travelTimes4emulation, true);
-//		this.emulateAgainstAllTravelTimes(personId2oldScoreOverReplications, emulatedEventsChecker, true,
-//				listOfMode2travelTimes4emulation);
-		final Plans oldPlans = new Plans(this.services.getScenario().getPopulation());
-//		final double oldAvgScore = oldPlans.getSumOfSelectedPlanScores() / this.personIds.size();
+		final PlansContainer oldPlans = new PlansContainer(this.services.getScenario().getPopulation());
 
 		this.emulationErrorAnalyzer.setEmulatedScores(this.services.getScenario().getPopulation());
 		if (emulatedEventsChecker != null) {
 			emulatedEventsChecker.writeReport("emulatedEventsReport." + (event.getIteration() - 1) + ".txt");
 		}
 
-//		final List<Map<Id<Person>, Double>> personId2newScoreOverReplications = new ArrayList<>(memory);
 		final EmulationEngine replanningEngine = this.emulationEngineProvider.get();
-//		replanningEngine.setOverwriteTravelTimes(false);
 		replanningEngine.replan(event.getIteration(), listOfMode2travelTimes4emulation, true);
-		// this.emulateAgainstAllTravelTimes(personId2newScoreOverReplications, null,
-		// true, mode2travelTimesForEmulation);
-		final Plans newPlans = new Plans(event.getServices().getScenario().getPopulation());
-//		final double newAvgScore = newPlans.getSumOfSelectedPlanScores() / this.personIds.size();
+		final PlansContainer newPlans = new PlansContainer(event.getServices().getScenario().getPopulation());
 
 		/*
 		 * (2) Compute intermediate statistics.
 		 */
 
-//		this.gap = personId2newScoreOverReplications.get(0).values().stream().mapToDouble(s -> s).average()
-//				.getAsDouble()
-//				- personId2oldScoreOverReplications.get(0).values().stream().mapToDouble(s -> s).average()
-//						.getAsDouble();
-//		this.gap = null;
-
 		final Map<Id<Person>, Double> personId2FilteredGap = this.personIds.stream().collect(Collectors.toMap(id -> id,
 				id -> (newPlans.getSelectedPlan(id).getScore() - oldPlans.getSelectedPlan(id).getScore())));
 
-		/*
-		 * final double lagWeight = 1.0 / memory; final Map<Id<Person>, Double>
-		 * personId2FilteredGap = new LinkedHashMap<>(this.personIds.size()); // final
-		 * Map<Id<Person>, Double> personId2filteredOldScore = new
-		 * LinkedHashMap<>(this.personIds.size()); for (Id<Person> personId :
-		 * this.personIds) { double filteredGap = 0.0; // double filteredOldScore = 0.0;
-		 * for (int lag = 0; lag < memory; lag++) { // filteredGap += lagWeight *
-		 * (personId2newScoreOverReplications.get(lag).get(personId) // -
-		 * personId2oldScoreOverReplications.get(lag).get(personId)); filteredGap +=
-		 * lagWeight * (newPlans.getSelectedPlan(personId).getScore() -
-		 * oldPlans.getSelectedPlan(personId).getScore()); // filteredOldScore +=
-		 * lagWeight * personId2oldScoreOverReplications.get(lag).get(personId); }
-		 * personId2FilteredGap.put(personId, filteredGap); //
-		 * personId2filteredOldScore.put(personId, filteredOldScore); }
-		 */
-
 		{
-			// TODO ONLY FOR TESTING
+			// TODO Only for testing
 
 			emulationEngine = this.emulationEngineProvider.get();
-//			emulationEngine.setOverwriteTravelTimes(true);
 			oldPlans.set(this.services.getScenario().getPopulation());
 			emulationEngine.emulate(this.replanIteration.intValue(),
 					Collections.singletonList(this.listOfMode2travelTimes.getFirst()), false);
@@ -462,7 +382,6 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 			this.gapAnalyzer.registerPlansBeforeReplanning(this.services.getScenario().getPopulation());
 
 			emulationEngine = this.emulationEngineProvider.get();
-//			emulationEngine.setOverwriteTravelTimes(true);
 			newPlans.set(this.services.getScenario().getPopulation());
 			emulationEngine.emulate(this.replanIteration.intValue(),
 					Collections.singletonList(this.listOfMode2travelTimes.getFirst()), false);
@@ -482,7 +401,7 @@ public final class ATAPReplanning implements PlansReplanning, ReplanningListener
 		 * (3) Identify re-planners.
 		 */
 
-		final AbstractPopulationDistance popDist = AbstractPopulationDistance.newPopulationDistance(oldPlans, newPlans,
+		final PopulationDistance popDist = new PopulationDistance(oldPlans, newPlans,
 				this.services.getScenario(), mode2filteredTravelTimes);
 		this.replannerSelector.setDistanceToReplannedPopulation(popDist);
 

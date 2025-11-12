@@ -1,5 +1,5 @@
 /**
- * org.matsim.contrib.atap
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -48,27 +48,23 @@ class AtomicUpperBoundReplannerSelector extends AbstractReplannerSelector {
 
 	private final boolean logReplanningProcess = true;
 
-//	private final Function<Double, Double> quadraticDistanceTransformation;
 	private final ATAPConfigGroup.DistanceTransformation distanceTransformation;
 
 	// -------------------- MEMBERS --------------------
 
-	private AbstractPopulationDistance populationDistance = null;
+	private PopulationDistance populationDistance = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	AtomicUpperBoundReplannerSelector(final Function<Integer, Double> iterationToEta,
-//			final Function<Double, Double> quadraticDistanceTransformation,
 			final ATAPConfigGroup.DistanceTransformation distanceTransformation) {
 		super(iterationToEta);
-//		this.quadraticDistanceTransformation = quadraticDistanceTransformation;
 		this.distanceTransformation = distanceTransformation;
 	}
 
 	// -------------------- INTERNALS --------------------
 
 	private double _Q(final double _G, final double _Dsum, final double gamma, final double _DsumMax) {
-//		final double transformedD = this.quadraticDistanceTransformation.apply(_Dsum * _Dsum);
 		final double transformedD = this.distanceTransformation.transform(_Dsum, _DsumMax);
 		return (_G - gamma) / Math.max(this.eps, transformedD);
 	}
@@ -138,7 +134,7 @@ class AtomicUpperBoundReplannerSelector extends AbstractReplannerSelector {
 	// --------------- OVERRIDING OF AbstractReplannerSelector ---------------
 
 	@Override
-	void setDistanceToReplannedPopulation(final AbstractPopulationDistance populationDistance) {
+	void setDistanceToReplannedPopulation(final PopulationDistance populationDistance) {
 		this.populationDistance = populationDistance;
 	}
 
@@ -203,8 +199,6 @@ class AtomicUpperBoundReplannerSelector extends AbstractReplannerSelector {
 			for (Id<Person> candidateId : allPersonIds) {
 
 				final double candidateGap = personId2gap.get(candidateId);
-//				final double a = this.populationDistance.getACoefficient(candidateId, candidateId);
-//				final double b = personId2bParam.get(candidateId);
 
 				final double deltaG;
 				final double deltaDsum;
@@ -223,7 +217,7 @@ class AtomicUpperBoundReplannerSelector extends AbstractReplannerSelector {
 				final double oldQ = this._Q(_G, _Dsum, this.getTargetReplanningRate() * _Gall, _DsumMax);
 				final double newQ = this._Q(_G + deltaG, _Dsum + deltaDsum, this.getTargetReplanningRate() * _Gall, _DsumMax);
 
-				if (newQ > oldQ) {
+				if (newQ > oldQ) { // TODO robustify
 					_G = Math.max(0.0, _G + deltaG);
 					_Dsum = Math.max(0.0, _Dsum + deltaDsum);
 
