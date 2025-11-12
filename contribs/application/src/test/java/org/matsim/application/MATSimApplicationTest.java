@@ -105,7 +105,9 @@ public class MATSimApplicationTest {
 			"--name", "test",
 			"--population", input.resolve("persons.xml").toString(),
 			"--attributes", input.resolve("attributes.xml").toString(),
-			"--output", output.toString()
+			"--output", output.toString(),
+			"--max-typical-duration", "86400" // means that it will run the "split" part.  Which, however, is deprecated.
+			// The test should probably be adopted to no longer use those deprecated methods.  kai, nov'26
 		);
 
 		Path plans = output.resolve("test-100pct.plans.xml.gz");
