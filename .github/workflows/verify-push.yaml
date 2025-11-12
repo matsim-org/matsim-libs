@@ -60,6 +60,7 @@ jobs:
           - contribs/analysis
           - contribs/hybridsim
           - contribs/informed-mode-choice
+          - contribs/distributed-simulation
           - contribs/otfvis
           - contribs/osm
           - contribs/application

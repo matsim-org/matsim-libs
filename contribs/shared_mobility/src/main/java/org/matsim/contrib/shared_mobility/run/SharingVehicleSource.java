@@ -1,7 +1,5 @@
 package org.matsim.contrib.shared_mobility.run;
 
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -18,6 +16,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
+import java.util.Map;
+
 /**
  * @author steffenaxer, hrewald
  */
@@ -30,7 +30,7 @@ public class SharingVehicleSource implements AgentSource {
 	private final SharingServiceSpecification specification;
 
 	public SharingVehicleSource(QSim qSim, SharingServiceConfigGroup serviceConfig,
-			SharingServiceSpecification specification) {
+								SharingServiceSpecification specification) {
 		this.qsim = qSim;
 		this.serviceConfig = serviceConfig;
 		this.specification = specification;
@@ -59,12 +59,12 @@ public class SharingVehicleSource implements AgentSource {
 			MobsimVehicle mobsimVehicle = mobsimVehicles.get(vehicle.getId());
 			if (mobsimVehicle != null) {
 				LOG.warn("MobsimVehicle with id {} already exists. Skipping creation of sharing vehicle in QSim.",
-						vehicleId);
+					vehicleId);
 				continue;
 			}
 			// create mobsimVehicle and add to QSim
 			mobsimVehicle = new QVehicleImpl(vehicle);
-			((QVehicleImpl) mobsimVehicle).setCurrentLink(links.get(startLink));
+			((QVehicleImpl) mobsimVehicle).setCurrentLinkId(startLink);
 			qsim.addParkedVehicle(mobsimVehicle, startLink);
 		}
 	}
