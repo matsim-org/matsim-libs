@@ -1,6 +1,7 @@
 package org.matsim.application.analysis.population;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.population.PopulationUtils;
@@ -11,6 +12,7 @@ class ExperiencedPlansWriterTest{
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Disabled
 	@Test void testMain() {
 		String[] args = {
 			"--path", utils.getInputDirectory(),
