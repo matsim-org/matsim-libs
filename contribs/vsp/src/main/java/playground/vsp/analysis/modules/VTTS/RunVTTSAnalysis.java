@@ -94,8 +94,6 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		Module module= new AbstractModule(){
 			@Override
 			public void install(){
-				bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-
 				install( new NewControlerModule() );
 				install( new ControlerDefaultCoreListenersModule() );
 				install( new ScenarioByInstanceModule( scenario ) );
@@ -125,6 +123,8 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 //				} else {
 //					bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
 //				}
+
+				bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
 			}
 		};
 		Injector injector = org.matsim.core.controler.Injector.createInjector( config, module );
