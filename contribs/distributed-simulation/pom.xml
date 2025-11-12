@@ -16,7 +16,7 @@
 
 	<properties>
 		<aeron.version>1.44.1</aeron.version>
-		<hazelcast.version>5.4.0</hazelcast.version>
+		<hazelcast.version>5.6.0</hazelcast.version>
 
 		<!-- Use -DskipShaded=false to build a executable jar. -->
 		<skipShaded>true</skipShaded>
