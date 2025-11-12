@@ -392,6 +392,8 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private static String getModelType(String subpopulation) {
 		String foundModelType = "unknown";
+		if (subpopulation == null || subpopulation.isEmpty())
+			return foundModelType;
 		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
 			if (groupsOfSubpopulationsForPersonAnalysis.get(group).contains(subpopulation)) {
 				foundModelType = "personTraffic";
