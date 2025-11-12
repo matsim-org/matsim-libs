@@ -120,7 +120,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 			if (entry.activityEndTime != Double.POSITIVE_INFINITY) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
+				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null, "mobsim ends while at non-final activity"));
 			}
 		}
 		activityEndsList.clear();
