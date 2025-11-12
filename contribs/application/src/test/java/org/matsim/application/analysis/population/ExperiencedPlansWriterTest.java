@@ -12,7 +12,6 @@ class ExperiencedPlansWriterTest{
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Disabled
 	@Test void testMain() {
 		String[] args = {
 			"--path", utils.getInputDirectory(),
