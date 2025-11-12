@@ -101,7 +101,7 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 		this.requestValidator = requestValidator;
 		this.teleportationEngine = teleportationEngine;
 
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, new DvrpPassengerTracker(mode));
 	}
 
 	@Override

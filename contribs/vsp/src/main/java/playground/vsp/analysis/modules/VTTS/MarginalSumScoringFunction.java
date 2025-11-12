@@ -16,12 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.analysis.modules.vtts;
+package playground.vsp.analysis.modules.VTTS;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -58,6 +59,8 @@ public class MarginalSumScoringFunction {
 		activityScoringB = new CharyparNagelActivityScoring(params);
 	}
 
+	private static int cnt = 0;
+
 	public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
 
 		SumScoringFunction sumScoringA = new SumScoringFunction() ;
@@ -77,9 +80,16 @@ public class MarginalSumScoringFunction {
 
 		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
 		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
+		// yy Depending on how complete the later used "handleActivity" is set up, the facility may become closed at exactly this time step, and then the resulting VTTS will be zero. kai, nov'25
+		// --> However, may also work the other way around, and the facility may just become open at exactly this time step.
 
-		log.info("activity: " + activity.toString());
-		log.info("activityWithoutDelay: " + activityWithoutDelay.toString());
+		if ( cnt < 10 ){
+			cnt++;
+			log.info( "activity={}; activityWithoutDelay={}", activity, activityWithoutDelay );
+			if ( cnt==10 ) {
+				log.info( Gbl.FUTURE_SUPPRESSED );
+			}
+		}
 
 		sumScoringA.handleActivity(activity);
 		sumScoringB.handleActivity(activityWithoutDelay);
