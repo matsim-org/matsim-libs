@@ -474,7 +474,7 @@ public class PHEMTest {
 			double matsimCO = link_pollutant2grams.get(i).get(Pollutant.CO);
 			double matsimCO2 = link_pollutant2grams.get(i).get(Pollutant.CO2_TOTAL);
 			double matsimHC = link_pollutant2grams.get(i).get(Pollutant.HC);
-			double matsimPM = link_pollutant2grams.get(i).get(Pollutant.PM); // TODO PM or PM_TOTAL?
+			double matsimPM = link_pollutant2grams.get(i).get(Pollutant.PM);
 			double matsimNOx = link_pollutant2grams.get(i).get(Pollutant.NOx);
 
 			comparison.add( new CycleLinkComparison(
@@ -707,7 +707,7 @@ public class PHEMTest {
 
 		// Print out the results as csv TODO Change path back to test-output folder
 		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff/" + cycle + "/";
-		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
+		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
 		writeDiffFile(path + diff_name, comparison);
 
 		// Start the tests
@@ -872,6 +872,22 @@ public class PHEMTest {
 		writer.close();
 	}
 
+
+	@TestFactory
+	Collection<DynamicTest> aggregatedPMExpTest() {
+		return Arrays.stream(Fuel.values())
+			.map(fuel -> DynamicTest.dynamicTest(
+				"PM-Test: Fuel=" + fuel,
+				() -> startTest(
+					Cycle.CADC,
+					fuel,
+					LinkCutSetting.fixedIntervalLength.setAttr(60),
+					EmissionsConfigGroup.DuplicateSubsegments.aggregateByFleetComposition,
+					true,
+					true
+				)
+			)).toList();
+	}
 
 	// ----- Helper definitions -----
 
