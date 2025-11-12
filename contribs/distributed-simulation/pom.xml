@@ -78,7 +78,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.5.3</version>
+				<version>3.6.1</version>
 				<configuration>
 					<outputFile>sim.jar</outputFile>
 					<skip>${skipShaded}</skip>
