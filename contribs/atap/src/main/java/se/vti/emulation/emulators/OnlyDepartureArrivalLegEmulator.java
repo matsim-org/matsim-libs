@@ -1,8 +1,8 @@
 /**
- * org.matsim.contrib.emulation
+ * se.vti.emulation
  * 
- * Copyright (C) 2023 by Gunnar Flötteröd (VTI, LiU).
- * Partially based on code by Sebastian Hörl.
+ * Copyright (C) 2023, 2024, 2025 by Gunnar Flötteröd (VTI, LiU).
+ * Partially based on Sebastian Hörl's IER.
  * 
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
@@ -31,11 +31,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.Inject;
 
@@ -64,7 +62,8 @@ public class OnlyDepartureArrivalLegEmulator extends AbstractPlanElementEmulator
 	}
 
 	@Override
-	public void configure(final EventsManager eventsManager, final TravelTime travelTime, final double maxEndTime_s, final boolean overwritePlanTimes) {
+	public void configure(final EventsManager eventsManager, final TravelTime travelTime, final double maxEndTime_s,
+			final boolean overwritePlanTimes) {
 		this.configureInternally(eventsManager, maxEndTime_s, overwritePlanTimes);
 	}
 
@@ -77,7 +76,7 @@ public class OnlyDepartureArrivalLegEmulator extends AbstractPlanElementEmulator
 
 		// Every leg starts with a departure.
 		if (time_s <= this.maxEndTime_s) {
-			
+
 			this.eventsManager.processEvent(new PersonDepartureEvent(time_s, person.getId(),
 					PopulationUtils.decideOnLinkIdForActivity(previousActivity, this.scenario), leg.getMode(),
 					TripStructureUtils.getRoutingMode(leg)));

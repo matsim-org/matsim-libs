@@ -1,8 +1,8 @@
 /**
- * org.matsim.contrib.emulation
+ * se.vti.emulation
  * 
- * Copyright (C) 2023 by Gunnar Flötteröd (VTI, LiU).
- * Partially based on code by Sebastian Hörl.
+ * Copyright (C) 2023, 2024, 2025 by Gunnar Flötteröd (VTI, LiU).
+ * Partially based on Sebastian Hörl's IER.
  * 
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
@@ -120,8 +120,6 @@ public class EmulationEngine {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	// TODO ATTENTION. This now produces and uses average scores over all travel
-	// times in the list.
 	public void replan(final int matsimIteration, final List<Map<String, ? extends TravelTime>> listOfMode2travelTime,
 			final boolean overrideTravelTimesFromFirstListEntry) {
 		final ReplanningContext replanningContext = this.replanningContextProvider.get();
@@ -135,15 +133,9 @@ public class EmulationEngine {
 					String.format("Started replanning iteration %d/%d", i + 1, this.ierConfig.getIterationsPerCycle()));
 
 			logger.info("[[Suppressing logging while running StrategyManager.]]");
-			// final Level originalLogLevel = Logger.getLogger("org.matsim").getLevel();
-			// Logger.getLogger("org.matsim").setLevel(Level.ERROR);
 			final Level originalLogLevel = LogManager.getRootLogger().getLevel();
 			Configurator.setRootLevel(Level.ERROR);
-
-			// TODO 2024-05-20 Added matsim iteration number. Gunnar
 			this.strategyManager.run(this.scenario.getPopulation(), matsimIteration, replanningContext);
-
-			// Logger.getLogger("org.matsim").setLevel(originalLogLevel);
 			Configurator.setRootLevel(originalLogLevel);
 
 			this.emulate(matsimIteration, listOfMode2travelTime, overrideTravelTimesFromFirstListEntry);
@@ -155,16 +147,12 @@ public class EmulationEngine {
 		}
 	}
 
-	// TODO ATTENTION. This now produces average scores over all travel times in the
-	// list.
 	public void emulate(int iteration, final List<Map<String, ? extends TravelTime>> listOfMode2travelTime,
 			final boolean overrideTravelTimesFromFirstListEntry) {
 		this.emulate(this.scenario.getPopulation().getPersons().values(), iteration, listOfMode2travelTime, null,
 				overrideTravelTimesFromFirstListEntry);
 	}
 
-	// TODO ATTENTION. This now produces average scores over all travel times in the
-	// list.
 	public void emulate(Collection<? extends Person> persons, int iteration,
 			final List<Map<String, ? extends TravelTime>> listOfMode2travelTime, final EventHandler eventsHandler,
 			final boolean overrideTravelTimesFromFirstListEntry) {
@@ -177,12 +165,9 @@ public class EmulationEngine {
 		AtomicBoolean finished = new AtomicBoolean(false);
 
 		logger.info("[[Suppressing logging while emulating.]]");
-		// final Level originalLogLevel = Logger.getLogger("org.matsim").getLevel();
-		// Logger.getLogger("org.matsim").setLevel(Level.ERROR);
 		final Level originalLogLevel = LogManager.getRootLogger().getLevel();
 		Configurator.setRootLevel(Level.ERROR);
 
-		// Here we set up all the runner threads and start them
 		for (int i = 0; i < this.scenario.getConfig().global().getNumberOfThreads(); i++) {
 			Thread thread = new Thread(() -> {
 
@@ -197,7 +182,6 @@ public class EmulationEngine {
 				do {
 					batch.clear();
 
-					// Here we create our batch
 					synchronized (personIterator) {
 						while (personIterator.hasNext() && batch.size() < this.ierConfig.getBatchSize()) {
 							final Person person = personIterator.next();
@@ -210,8 +194,6 @@ public class EmulationEngine {
 
 					for (int travelTimeIndex = 0; travelTimeIndex < listOfMode2travelTime.size(); travelTimeIndex++) {
 						Map<String, ? extends TravelTime> mode2travelTime = listOfMode2travelTime.get(travelTimeIndex);
-						// for (Map<String, ? extends TravelTime> mode2travelTime :
-						// listOfMode2travelTime) {
 
 						final EventsManager eventsManager = EventsUtils.createEventsManager();
 						if (eventsHandler != null) {
@@ -227,7 +209,6 @@ public class EmulationEngine {
 						events2score.beginIteration(iteration,
 								this.scenario.getConfig().controller().getLastIteration() == iteration);
 
-						// Emulate batch.
 						for (Person person : batch.values()) {
 							planEmulator.emulate(person, person.getSelectedPlan(), // eventsManager,
 									mode2travelTime, eventsHandler, this.emulationHandlerProvider, iteration,
@@ -254,7 +235,6 @@ public class EmulationEngine {
 			thread.start();
 		}
 
-		// We want one additional thread to track progress and output some information
 		Thread progressThread = new Thread(() -> {
 			long currentProcessedNumberOfPersons = 0;
 			long lastProcessedNumberOfPersons = -1;
@@ -262,40 +242,30 @@ public class EmulationEngine {
 			while (!finished.get()) {
 				try {
 					currentProcessedNumberOfPersons = processedNumberOfPersons.get();
-
-					// TODO probably not useful with logger turned off
+					// not useful with logger turned off
 					if (currentProcessedNumberOfPersons > lastProcessedNumberOfPersons) {
 						logger.info(String.format("Emulating... %d / %d (%.2f%%)", currentProcessedNumberOfPersons,
 								totalNumberOfPersons, 100.0 * currentProcessedNumberOfPersons / totalNumberOfPersons));
 					}
-
 					lastProcessedNumberOfPersons = currentProcessedNumberOfPersons;
-
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
 			}
 		});
-
 		progressThread.start();
 
 		try {
-
-			// Wait for all the runners to finish
 			for (Thread thread : threads) {
 				thread.join();
 			}
-
-			// Wait for the progress thread to finish
 			finished.set(true);
 			progressThread.join();
-
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 
-		// Logger.getLogger("org.matsim").setLevel(originalLogLevel);
 		Configurator.setRootLevel(originalLogLevel);
 
 		logger.info("Emulation finished.");

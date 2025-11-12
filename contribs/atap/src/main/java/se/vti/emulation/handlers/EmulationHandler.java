@@ -1,8 +1,8 @@
 /**
- * org.matsim.contrib.emulation
+ * se.vti.emulation
  * 
- * Copyright (C) 2023 by Gunnar Flötteröd (VTI, LiU).
- * Partially based on code by Sebastian Hörl.
+ * Copyright (C) 2023, 2024, 2025 by Gunnar Flötteröd (VTI, LiU).
+ * Partially based on Sebastian Hörl's IER.
  * 
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
@@ -20,14 +20,10 @@
  */
 package se.vti.emulation.handlers;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * TODO get rid of the defaults
  *
  * @author Gunnar Flötteröd
  *
@@ -35,10 +31,6 @@ import org.matsim.core.events.handler.EventHandler;
 public interface EmulationHandler extends EventHandler {
 
 	public default void configure(EventsManager eventsManager) {		
-	}
-
-	public default void configure(EventsManager eventsManager, Set<Person> persons) {
-		this.configure(eventsManager);
 	}
 
 }

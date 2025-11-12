@@ -1,8 +1,8 @@
 /**
- * org.matsim.contrib.emulation
+ * se.vti.emulation
  * 
- * Copyright (C) 2023 by Gunnar Flötteröd (VTI, LiU).
- * Partially based on code by Sebastian Hörl.
+ * Copyright (C) 2023, 2024, 2025 by Gunnar Flötteröd (VTI, LiU).
+ * Partially based on Sebastian Hörl's IER.
  * 
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
@@ -24,6 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  *
+ * @author shoerl
  * @author Gunnar Flötteröd
  *
  */
@@ -37,9 +38,6 @@ public class EmulationConfigGroup extends ReflectiveConfigGroup {
 
 	// -------------------- iterationsPerCycle --------------------
 
-	/**
-	 * Number of replanning + scoring iterations.
-	 */
 	private int iterationsPerCycle = 10;
 
 	@StringGetter("iterationsPerCycle")
@@ -54,14 +52,6 @@ public class EmulationConfigGroup extends ReflectiveConfigGroup {
 
 	// -------------------- batchSize --------------------
 
-	/**
-	 * This is the number of agents that are simulated in a chunk on each thread. A
-	 * value that is too small will slow down the emulation because of the overhead
-	 * of creating the scoring functions. A value that is too high will lead to the
-	 * situation where some threads may have a lot of "heavy" agents that take a lot
-	 * of run time and some may have only "light" ones. This would also effectively
-	 * increase runtime.
-	 */
 	private int batchSize = 200;
 
 	@StringGetter("batchSize")
