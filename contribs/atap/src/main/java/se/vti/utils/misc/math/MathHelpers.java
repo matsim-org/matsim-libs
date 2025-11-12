@@ -153,7 +153,6 @@ public class MathHelpers {
 		}
 	}
 
-	// TODO NEW
 	public static <E> E draw(final Map<E, Double> event2proba, final Random rnd) {
 		final double x = rnd.nextDouble();
 		double pSum = 0;
@@ -168,7 +167,6 @@ public class MathHelpers {
 		return result;
 	}
 
-	// TODO NEW
 	public static <E> E draw(final Map<E, Double> event2weight,
 			final double weightSum, final Random rnd) {
 		final double x = weightSum * rnd.nextDouble();
@@ -184,7 +182,6 @@ public class MathHelpers {
 		return result;
 	}
 
-	// TODO NEW
 	public static int drawIndex(double[] probas, Random rnd) {
 		double u = rnd.nextDouble();
 		double probaSum = 0.0;
@@ -197,7 +194,6 @@ public class MathHelpers {
 		return (probas.length - 1);
 	}
 	
-	// TODO NEW
 	// the order of the bounds does not matter
 	public static double projectOnInterval(final double value,
 			final double bound1, final double bound2) {
@@ -228,5 +224,4 @@ public class MathHelpers {
 
 		System.out.println(aFreq + "\t" + bFreq + "\t" + cFreq);
 	}
-
 }

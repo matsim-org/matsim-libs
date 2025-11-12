@@ -27,8 +27,6 @@ import java.util.Set;
  *
  * @author Gunnar Flötteröd
  *
- *         TODO Move this to the utilities-project.
- * 
  */
 public class SetUtils {
 

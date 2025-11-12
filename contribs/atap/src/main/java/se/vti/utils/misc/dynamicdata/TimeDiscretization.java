@@ -50,35 +50,30 @@ public class TimeDiscretization {
 		return this.binCnt;
 	}
 
-	// TODO NEW
 	public int getBin(final double time_s) {
 		return (int) ((time_s - this.startTime_s) / this.binSize_s);
 	}
 
-	// TODO NEW
 	public int getBinStartTime_s(final int bin) {
 		return this.startTime_s + bin * this.binSize_s;
 	}
 
-	// TODO NEW
 	public int getBinCenterTime_s(final int bin) {
 		return this.getBinStartTime_s(bin) + this.binSize_s / 2;
 	}
 
-	// TODO NEW
 	public int getBinEndTime_s(final int bin) {
 		return this.getBinStartTime_s(bin + 1);
 	}
 
-	// TODO NEW
 	public int getEndTime_s() {
 		return this.getBinStartTime_s(this.binCnt);
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " start time = " + Time.strFromSec(this.startTime_s) + ", bin size = "
-				+ Time.strFromSec(this.binSize_s) + ", number of bins = " + this.binCnt + ".";
+		return this.getClass().getSimpleName() + " start time = " + this.startTime_s + "s, bin size = " + this.binSize_s
+				+ "s, number of bins = " + this.binCnt + ".";
 	}
 
 }

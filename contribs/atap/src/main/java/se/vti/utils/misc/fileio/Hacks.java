@@ -1,7 +1,7 @@
 /**
- * org.matsim.contrib.emulation
+ * se.vti.utils
  * 
- * Copyright (C) 2023 by Gunnar Flötteröd (VTI, LiU).
+ * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
