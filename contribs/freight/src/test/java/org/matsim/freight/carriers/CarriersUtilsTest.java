@@ -26,11 +26,24 @@ import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.Set;
 
 /**
  */
@@ -39,13 +52,61 @@ public class CarriersUtilsTest {
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
+    @Test
+    void testAddRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes() {
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
+		Carrier carrier = CarriersUtils.createCarrier(Id.create("carrier1", Carrier.class));
+		VehicleType vehicleTypeCar = VehicleUtils.createDefaultVehicleType();
+		vehicleTypeCar.setNetworkMode(TransportMode.car);
+		VehicleType vehicleTypeTruck = VehicleUtils.getFactory()
+			.createVehicleType(Id.create("default_truck", VehicleType.class));
+		vehicleTypeTruck.setNetworkMode(TransportMode.truck);
+		CarrierVehicle carrierVehicleCar = CarrierVehicle.newInstance(
+			Id.create("vehicle1", Vehicle.class), Id.createLinkId("link1"), vehicleTypeCar);
+		CarriersUtils.addCarrierVehicle(carrier, carrierVehicleCar);
+		CarrierVehicle carrierVehicleTruck = CarrierVehicle.newInstance(
+			Id.create("vehicle2", Vehicle.class), Id.createLinkId("link2"), vehicleTypeTruck);
+		CarriersUtils.addCarrierVehicle(carrier, carrierVehicleTruck);
+		carrier.getCarrierCapabilities().getVehicleTypes().add(vehicleTypeCar);
+		carrier.getCarrierCapabilities().getVehicleTypes().add(vehicleTypeTruck);
+		carriers.addCarrier(carrier);
+//		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		// Mock network with two links having different allowed modes
+        Network network = scenario.getNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("n1"), new Coord(1000.0, 0.0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("n2"), new Coord(2000.0, 0.0));
+
+		Link link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("link1"), node1, node2, 1000, 60, 60, 1);
+		Link link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("link2"), node2, node1, 1000, 60, 60, 1);
+
+        link1.setAllowedModes(Set.of(TransportMode.car));
+        link2.setAllowedModes(Set.of(TransportMode.car, TransportMode.truck));
+
+        CarriersUtils.addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(scenario);
+
+        // Verify road pricing scheme
+        var roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
+
+        Assertions.assertEquals("PricingForVRP", roadPricingScheme.getName());
+        Assertions.assertEquals(Set.of(link1.getId()), roadPricingScheme.getTolledLinkIds()); // Only 'link1' should have toll
+        Assertions.assertEquals(RoadPricingScheme.TOLL_TYPE_LINK, roadPricingScheme.getType());
+
+		Assertions.assertEquals(0, roadPricingScheme.getLinkCostInfo(Id.createLinkId("link1"), 0, null, carrierVehicleCar.getId()).amount);
+		Assertions.assertNull(roadPricingScheme.getLinkCostInfo(Id.createLinkId("link2"), 0, null, carrierVehicleCar.getId()));
+		Assertions.assertEquals(1000, roadPricingScheme.getLinkCostInfo(Id.createLinkId("link1"), 0, null, carrierVehicleTruck.getId()).amount);
+		Assertions.assertNull(roadPricingScheme.getLinkCostInfo(Id.createLinkId("link2"), 0, null, carrierVehicleTruck.getId()));
+	}
+
+
 	@Test
 	void testAddAndGetVehicleToCarrier() {
 		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
 
 		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
 		Id<Vehicle> testVehicleId = Id.createVehicleId("testVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"),vehicleType);
+		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(testVehicleId, Id.createLinkId("link0"), vehicleType);
 //		carrierVehicle.setType(VehicleUtils.getDefaultVehicleType());
 
 		//add Vehicle
@@ -53,14 +114,14 @@ public class CarriersUtilsTest {
 		Assertions.assertEquals(1, carrier.getCarrierCapabilities().getCarrierVehicles().size());
 		CarrierVehicle cv = (CarrierVehicle) carrier.getCarrierCapabilities().getCarrierVehicles().values().toArray()[0];
 		Assertions.assertEquals(vehicleType, cv.getType());
-		Assertions.assertEquals(Id.createLinkId("link0"), cv.getLinkId() );
+		Assertions.assertEquals(Id.createLinkId("link0"), cv.getLinkId());
 
 		//get Vehicle
-		CarrierVehicle carrierVehicle1 = CarriersUtils.getCarrierVehicle(carrier, testVehicleId );
+		CarrierVehicle carrierVehicle1 = CarriersUtils.getCarrierVehicle(carrier, testVehicleId);
 		assert carrierVehicle1 != null;
 		Assertions.assertEquals(testVehicleId, carrierVehicle1.getId());
 		Assertions.assertEquals(vehicleType, carrierVehicle1.getType());
-		Assertions.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLinkId() );
+		Assertions.assertEquals(Id.createLinkId("link0"), carrierVehicle1.getLinkId());
 	}
 
 	@Test

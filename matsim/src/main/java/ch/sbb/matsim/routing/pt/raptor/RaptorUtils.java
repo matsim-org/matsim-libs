@@ -49,6 +49,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
  */
 public final class RaptorUtils {
     private static final Logger log = LogManager.getLogger( RaptorUtils.class );
+	public static final String TOTAL_ROUTE_COST_ATTR_NAME = "totalRouteCost";
 
     private RaptorUtils() {
     }
@@ -150,6 +151,7 @@ public final class RaptorUtils {
                             leg.setDepartureTime(lastArrivalTime);
                         }
                         lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
+						leg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                     }
                     else {
                     	Activity act = (Activity) pe;
@@ -162,11 +164,8 @@ public final class RaptorUtils {
                 ptLeg.setDepartureTime(part.depTime);
                 ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
 
-				DefaultTransitPassengerRoute defaultTransitPassengerRoute = convertRoutePart(part);
-				defaultTransitPassengerRoute.totalRouteCost = route.getTotalCosts();
-
-                ptLeg.setRoute(defaultTransitPassengerRoute);
-
+                ptLeg.setRoute(convertRoutePart(part));
+				ptLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
 				legs.add(ptLeg);
                 lastArrivalTime = part.getChainedArrivalTime();
                 firstPtLegProcessed = true;
@@ -189,6 +188,7 @@ public final class RaptorUtils {
                 walkRoute.setTravelTime(travelTime);
                 walkRoute.setDistance(part.distance);
                 walkLeg.setRoute(walkRoute);
+				walkLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                 legs.add(walkLeg);
                 lastArrivalTime = part.arrivalTime;
                 if (firstPtLegProcessed) {

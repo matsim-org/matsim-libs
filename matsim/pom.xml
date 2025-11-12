@@ -227,7 +227,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.0.1.Final</version>
+			<version>9.1.0.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.validation</groupId>
@@ -239,7 +239,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.0.1.Final</version>
+			<version>9.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -341,7 +341,7 @@
 		<dependency>
 			<groupId>com.google.errorprone</groupId>
 			<artifactId>error_prone_annotations</artifactId>
-			<version>2.43.0</version>
+			<version>2.44.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
