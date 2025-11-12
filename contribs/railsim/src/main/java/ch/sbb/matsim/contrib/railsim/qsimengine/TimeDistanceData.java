@@ -47,6 +47,16 @@ final class TimeDistanceData {
 
 		int idx = Arrays.binarySearch(distances, distance);
 
+		int insertion = -idx - 1;
+
+		// Check if distances are approximately equal
+		if (insertion > 0 && FuzzyUtils.equals(distances[insertion - 1], distance)) {
+			idx = insertion - 1;
+		}
+		else if (insertion >= 0 && insertion < distances.length && FuzzyUtils.equals(distances[insertion], distance)) {
+			idx = insertion;
+		}
+
 		// The entry is contained in the array
 		if (idx >= 0) {
 
@@ -54,11 +64,11 @@ final class TimeDistanceData {
 			double lower = departureTime + rows.get(idx).time;
 			double upper = departureTime + rows.get(idx).time;
 
-			if (idx - 1 >= 0 && distances[idx - 1] == distance) {
+			if (idx - 1 >= 0 && FuzzyUtils.equals(distances[idx - 1], distance)) {
 				lower = departureTime + rows.get(idx - 1).time;
 			}
 
-			if (idx + 1 < rows.size() && distances[idx + 1] == distance) {
+			if (idx + 1 < rows.size() && FuzzyUtils.equals(distances[idx + 1], distance)) {
 				upper = departureTime + rows.get(idx + 1).time;
 			}
 
@@ -70,8 +80,6 @@ final class TimeDistanceData {
 
 			return 0;
 		}
-
-		int insertion = -idx - 1;
 
 		// Handle case where distance is before all entries
 		if (insertion == 0) {

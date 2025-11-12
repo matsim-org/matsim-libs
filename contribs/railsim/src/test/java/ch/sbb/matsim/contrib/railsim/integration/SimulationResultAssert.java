@@ -463,10 +463,15 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	 * @param predicate the predicate to test against delays
 	 * @return this assert instance
 	 */
-	public SimulationResultAssert allDelaysAtStopsSatisfy(DoublePredicate predicate) {
+	public SimulationResultAssert allDelaysAtStopsSatisfy(String train, DoublePredicate predicate) {
 		isNotNull();
 
+		if (train != null && !actual.stateEvents.containsKey(train)) {
+			failWithMessage("Expected train <%s> to have state events but found none", train);
+		}
+
 		List<String> failingDelays = actual.stateEvents.entrySet().stream()
+			.filter(trainEntry -> train == null || trainEntry.getKey().equals(train))
 			.flatMap(trainEntry -> {
 				String trainId = trainEntry.getKey();
 				return trainEntry.getValue().stream()
@@ -486,16 +491,16 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 	}
 
 	/**
-	 * Asserts that all trains arrive at the start of all links as scheduled by disposition.
+	 *  Asserts that all delays at the arrival at a stop satisfy the given predicate for a specific train,
 	 */
-	public SimulationResultAssert allLinksArrivedOnTime() {
-		return allDelaysAtLinkStartSatisfy(d -> d == 0);
+	public SimulationResultAssert allDelaysAtStopsSatisfy(DoublePredicate predicate) {
+		return allDelaysAtStopsSatisfy(null, predicate);
 	}
 
 	/**
 	 * Asserts that all trains arrive at the transit stops as scheduled by disposition.
 	 */
-	public SimulationResultAssert allStopsArrivedOnTime() {
+	public SimulationResultAssert allStopDelaysAreZero() {
 		return allDelaysAtStopsSatisfy(d -> d == 0);
 	}
 }

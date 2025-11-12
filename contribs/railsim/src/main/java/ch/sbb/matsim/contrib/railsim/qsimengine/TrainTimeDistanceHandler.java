@@ -1,12 +1,17 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.PlannedArrival;
-import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
-import com.google.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
@@ -14,18 +19,24 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.PlannedArrival;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 
 /**
  * Holds data for time-distance chart and writes CSV file.
@@ -195,21 +206,44 @@ public final class TrainTimeDistanceHandler {
 				double allowed = link.getAllowedFreespeed(position.getDriver());
 				double vLimit = Math.min(allowed, Double.isFinite(profileTarget) ? profileTarget : allowed);
 
+				// Decelration to speed limits is not considered because this would involve the whole simulation logic
+				// Instead assume the train is already at the speed limit when traversing the link
+				if (currentSpeed > vLimit) {
+					currentSpeed = vLimit;
+				}
+
 				boolean isLastLink = (i == segment.size() - 1);
 
 				double linkTime;
-				if (L <= 0) {
-					linkTime = 0;
-				} else if (isLastLink) {
-					// triangular motion within the last link to stop at its end
-					double vPeak = Math.min(vLimit, RailsimCalc.calcTargetSpeedForStop(L, a, d, currentSpeed));
+				if (isLastLink) {
+					// Calculate peak speed: either limited by vLimit or by what's needed to stop
+					double vPeakTriangular = RailsimCalc.calcTargetSpeedForStop(L, a, d, currentSpeed);
+					double vPeak = Math.min(vLimit, vPeakTriangular);
+					
+					// Calculate distances for acceleration and deceleration
 					double tAcc = Math.max(0, (vPeak - currentSpeed) / a);
+					double sAcc = RailsimCalc.calcTraveledDist(currentSpeed, tAcc, a);
 					double tDec = vPeak / d;
-					linkTime = tAcc + tDec;
+					double sDec = RailsimCalc.calcTraveledDist(vPeak, tDec, -d);
+					
+					// Check if there's a cruising phase
+					if (FuzzyUtils.lessThan(sAcc + sDec, L)) {
+						// Train can cruise at vPeak before decelerating
+						double sCruise = L - sAcc - sDec;
+						double tCruise = sCruise / Math.max(1e-9, vPeak);
+						linkTime = tAcc + tCruise + tDec;
+					} else {
+						// Triangular motion: need to recalculate vPeak to fit exactly within L
+						vPeak = vPeakTriangular;
+						tAcc = Math.max(0, (vPeak - currentSpeed) / a);
+						tDec = vPeak / d;
+						linkTime = tAcc + tDec;
+					}
 				} else {
 					// intermediate link: accelerate up to bounded peak and possibly cruise
 					double vReq = RailsimCalc.calcTargetSpeedForStop(remainingToStop, a, d, currentSpeed);
 					double vTarget = Math.min(vLimit, vReq);
+					
 					// can we reach vTarget within this link?
 					double sAcc = vTarget > currentSpeed ? (vTarget * vTarget - currentSpeed * currentSpeed) / (2 * a) : 0.0;
 					if (sAcc >= L) {
