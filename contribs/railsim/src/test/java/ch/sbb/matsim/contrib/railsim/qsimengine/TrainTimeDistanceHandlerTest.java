@@ -2,6 +2,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine;
 
 import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.AdaptiveSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TrainTimeDistanceHandlerTest {
 
@@ -38,8 +39,19 @@ class TrainTimeDistanceHandlerTest {
 		Path csv = runHandlerForScenario("microSimpleUniDirectionalTrack", new MaxSpeedProfile());
 		String content = Files.readString(csv);
 
-		assertTrue(content.startsWith("vehicle_id,line_id,route_id,departure_id,time,distance,type,link_id,stop_id"));
-		assertTrue(content.contains(",target,"));
+		assertThat(content)
+			.contains("vehicle_id,line_id,route_id,departure_id,time,distance,type,link_id,stop_id")
+			.contains(",target,");
+	}
+
+	@Test
+	void simpleAdaptiveSpeed() throws IOException {
+		Path csv = runHandlerForScenario("microSimpleUniDirectionalTrack", new AdaptiveSpeedProfile());
+		String content = Files.readString(csv);
+
+		assertThat(content)
+			.contains("vehicle_id,line_id,route_id,departure_id,time,distance,type,link_id,stop_id")
+			.contains(",target,");
 	}
 
 	private Path runHandlerForScenario(String scenarioName, SpeedProfile profile) throws IOException {
@@ -76,6 +88,9 @@ class TrainTimeDistanceHandlerTest {
 		MatsimServices services = new StubServices(io, config, scenario);
 		TrainTimeDistanceHandler handler = new TrainTimeDistanceHandler(services, resources);
 
+		handler.prepareTimeDistanceApproximation(scenario.getTransitSchedule(), scenario.getTransitVehicles(), profile);
+		handler.writeInitialData(scenario.getTransitSchedule(), scenario.getTransitVehicles());
+
 		handler.close();
 
 		return output;
@@ -92,25 +107,97 @@ class TrainTimeDistanceHandlerTest {
 			this.scenario = scenario;
 		}
 
-		@Override public OutputDirectoryHierarchy getControllerIO() { return io; }
-		@Override public Integer getIterationNumber() { return 0; }
-		@Override public Config getConfig() { return config; }
-		@Override public Scenario getScenario() { return scenario; }
+		@Override
+		public OutputDirectoryHierarchy getControllerIO() {
+			return io;
+		}
+
+		@Override
+		public Integer getIterationNumber() {
+			return 0;
+		}
+
+		@Override
+		public Config getConfig() {
+			return config;
+		}
+
+		@Override
+		public Scenario getScenario() {
+			return scenario;
+		}
 
 		// Unused methods
-		@Override public org.matsim.analysis.CalcLinkStats getLinkStats() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.analysis.IterationStopWatch getStopwatch() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.analysis.ScoreStats getScoreStats() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.analysis.VolumesAnalyzer getVolumes() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.core.api.experimental.events.EventsManager getEvents() { throw new UnsupportedOperationException(); }
-		@Override public com.google.inject.Injector getInjector() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.core.replanning.StrategyManager getStrategyManager() { throw new UnsupportedOperationException(); }
-		@Override public Provider<TripRouter> getTripRouterProvider() { return () -> { throw new UnsupportedOperationException(); }; }
-		@Override public TravelDisutility createTravelDisutilityCalculator() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.core.router.util.LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() { throw new UnsupportedOperationException(); }
-		@Override public TravelDisutilityFactory getTravelDisutilityFactory() { throw new UnsupportedOperationException(); }
-		@Override public org.matsim.core.scoring.ScoringFunctionFactory getScoringFunctionFactory() { throw new UnsupportedOperationException(); }
-		@Override public TravelTime getLinkTravelTimes() { throw new UnsupportedOperationException(); }
-		@Override public void addControllerListener(org.matsim.core.controler.listener.ControllerListener controllerListener) { throw new UnsupportedOperationException(); }
+		@Override
+		public org.matsim.analysis.CalcLinkStats getLinkStats() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.analysis.IterationStopWatch getStopwatch() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.analysis.ScoreStats getScoreStats() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.analysis.VolumesAnalyzer getVolumes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.core.api.experimental.events.EventsManager getEvents() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public com.google.inject.Injector getInjector() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.core.replanning.StrategyManager getStrategyManager() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Provider<TripRouter> getTripRouterProvider() {
+			return () -> {
+				throw new UnsupportedOperationException();
+			};
+		}
+
+		@Override
+		public TravelDisutility createTravelDisutilityCalculator() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.core.router.util.LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public TravelDisutilityFactory getTravelDisutilityFactory() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public org.matsim.core.scoring.ScoringFunctionFactory getScoringFunctionFactory() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public TravelTime getLinkTravelTimes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void addControllerListener(org.matsim.core.controler.listener.ControllerListener controllerListener) {
+			throw new UnsupportedOperationException();
+		}
 	}
 }

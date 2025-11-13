@@ -38,6 +38,8 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 
+import static ch.sbb.matsim.contrib.railsim.RailsimUtils.objectIdToString;
+
 /**
  * Holds data for time-distance chart and writes CSV file.
  */
@@ -219,13 +221,13 @@ public final class TrainTimeDistanceHandler {
 					// Calculate peak speed: either limited by vLimit or by what's needed to stop
 					double vPeakTriangular = RailsimCalc.calcTargetSpeedForStop(L, a, d, currentSpeed);
 					double vPeak = Math.min(vLimit, vPeakTriangular);
-					
+
 					// Calculate distances for acceleration and deceleration
 					double tAcc = Math.max(0, (vPeak - currentSpeed) / a);
 					double sAcc = RailsimCalc.calcTraveledDist(currentSpeed, tAcc, a);
 					double tDec = vPeak / d;
 					double sDec = RailsimCalc.calcTraveledDist(vPeak, tDec, -d);
-					
+
 					// Check if there's a cruising phase
 					if (FuzzyUtils.lessThan(sAcc + sDec, L)) {
 						// Train can cruise at vPeak before decelerating
@@ -243,7 +245,7 @@ public final class TrainTimeDistanceHandler {
 					// intermediate link: accelerate up to bounded peak and possibly cruise
 					double vReq = RailsimCalc.calcTargetSpeedForStop(remainingToStop, a, d, currentSpeed);
 					double vTarget = Math.min(vLimit, vReq);
-					
+
 					// can we reach vTarget within this link?
 					double sAcc = vTarget > currentSpeed ? (vTarget * vTarget - currentSpeed * currentSpeed) / (2 * a) : 0.0;
 					if (sAcc >= L) {
@@ -341,15 +343,15 @@ public final class TrainTimeDistanceHandler {
 		}
 
 		try {
-			writer.append(state.getPt().getVehicle().getId().toString()).append(',')
-				.append(state.getPt().getTransitLine().getId().toString()).append(',')
-				.append(state.getPt().getTransitRoute().getId().toString()).append(',')
-				.append(state.getPt().getDeparture().getId().toString()).append(',')
+			writer.append(objectIdToString(state.pt.getVehicle())).append(',')
+				.append(objectIdToString(state.pt.getTransitLine())).append(',')
+				.append(objectIdToString(state.pt.getTransitRoute())).append(',')
+				.append(objectIdToString(state.pt.getDeparture())).append(',')
 				.append(String.valueOf(RailsimUtils.round(state.timestamp))).append(',')
 				.append(String.valueOf(RailsimUtils.round(state.cumulativeDistance))).append(',')
 				.append("simulated").append(',')
 				.append(Objects.toString(state.getHeadLink(), "")).append(',')
-				.append(atStop != null ? atStop.getId().toString() : "").append('\n');
+				.append(objectIdToString(atStop)).append('\n');
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -361,6 +363,10 @@ public final class TrainTimeDistanceHandler {
 	void calculateDelay(TrainState state) {
 
 		if (state.pt == null)
+			return;
+
+		// Between routes during circulation the transit route is null
+		if (state.pt.getTransitRoute() == null)
 			return;
 
 		Id<TransitRoute> transitRoute = state.pt.getTransitRoute().getId();
