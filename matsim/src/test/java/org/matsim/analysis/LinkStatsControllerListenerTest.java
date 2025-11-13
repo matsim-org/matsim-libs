@@ -19,7 +19,9 @@
 
 package org.matsim.analysis;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -35,9 +37,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -46,9 +49,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
@@ -60,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LinkStatsControllerListenerTest {
 
 	@RegisterExtension
-	private MatsimTestUtils util = new MatsimTestUtils();
+	private final MatsimTestUtils util = new MatsimTestUtils();
 
 	@Test
 	void testlinksOutputCSV() throws IOException {
@@ -83,8 +87,8 @@ public class LinkStatsControllerListenerTest {
 		assertThat(csv).exists();
 
 		assertThat(new GZIPInputStream(new FileInputStream(csv)))
-				.asString(StandardCharsets.UTF_8)
-				.startsWith("link;from_node;to_node;length;freespeed;capacity;lanes;modes;vol_car;storageCapacityUsedInQsim;geometry");
+			.asString(StandardCharsets.UTF_8)
+			.startsWith("link;from_node;to_node;length;freespeed;capacity;lanes;modes;vol_car;storageCapacityUsedInQsim;geometry");
 
 	}
 
@@ -365,8 +369,8 @@ public class LinkStatsControllerListenerTest {
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(2);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), new Coord(1000, 0));
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
@@ -415,9 +419,9 @@ public class LinkStatsControllerListenerTest {
 		}
 		String[] parts = line.split("\t");// [0] = linkId, [1] = matsim volume, [2] = real volume
 		return new double[]{
-				Double.parseDouble(parts[7]), // min
-				Double.parseDouble(parts[8]),    // avg
-				Double.parseDouble(parts[9])    // max
+			Double.parseDouble(parts[7]), // min
+			Double.parseDouble(parts[8]), // avg
+			Double.parseDouble(parts[9])  // max
 		};
 	}
 

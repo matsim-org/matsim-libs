@@ -227,7 +227,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.0.1.Final</version>
+			<version>9.1.0.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>jakarta.validation</groupId>
@@ -239,7 +239,7 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
 			<!-- versions 7.0.3 and 7.0.4 have issues with processing java records during compilation -->
-			<version>9.0.1.Final</version>
+			<version>9.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -277,7 +277,7 @@
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-<!--			-->
+			<!--			-->
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -341,7 +341,7 @@
 		<dependency>
 			<groupId>com.google.errorprone</groupId>
 			<artifactId>error_prone_annotations</artifactId>
-			<version>2.43.0</version>
+			<version>2.44.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -357,6 +357,35 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-rng-core</artifactId>
 			<version>1.6</version>
+		</dependency>
+
+		<!-- Scan classpath to find providers -->
+		<dependency>
+			<groupId>io.github.classgraph</groupId>
+			<artifactId>classgraph</artifactId>
+		</dependency>
+
+		<!-- These are for distributed simulation -->
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-core</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-format</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.agrona</groupId>
+			<artifactId>agrona</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hdrhistogram</groupId>
+			<artifactId>HdrHistogram</artifactId>
+			<version>2.2.2</version>
 		</dependency>
 	</dependencies>
 

@@ -112,4 +112,15 @@ public interface Network extends MatsimToplevelContainer, Attributable {
 
 	double getEffectiveCellSize();
 
+	/**
+	 * Returns the network's partitioning. Always non-null.
+	 */
+	default NetworkPartitioning getPartitioning() {
+		return NetworkPartitioning.SINGLE_INSTANCE;
+	}
+
+	default void setPartitioning(NetworkPartitioning partitioning) {
+		throw new UnsupportedOperationException("Setting the partitioning is not supported.");
+	}
+
 }
