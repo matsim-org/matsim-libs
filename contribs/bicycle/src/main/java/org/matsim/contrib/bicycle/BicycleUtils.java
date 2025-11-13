@@ -32,7 +32,7 @@ public final class BicycleUtils {
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String CYCLEWAY = "cycleway";
-	public static final String WAY_TYPE = "type";
+	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
 	private BicycleUtils() {
