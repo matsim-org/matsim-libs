@@ -195,7 +195,7 @@ final class SimpleRailsimAgent implements RailsimTransitDriverAgent {
 	private final class SimpleVehicle implements MobsimVehicle {
 
 		@Override
-		public Link getCurrentLink() {
+		public Id<Link> getCurrentLinkId() {
 			return null;
 		}
 
