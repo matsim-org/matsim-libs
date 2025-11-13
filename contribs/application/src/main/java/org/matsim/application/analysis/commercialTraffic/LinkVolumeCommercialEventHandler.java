@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
@@ -23,7 +24,6 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.application.analysis.population.TripAnalysis.NO_GROUP_ASSIGNED;
 
 public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ActivityEndEventHandler {
 
@@ -173,7 +173,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 			.map(Activity::getType)
 			.collect(Collectors.toSet());
 		// only consider relations of the jobs and not the first and last activity of a commercial tour
-		if (!activitiesTypes.contains(event.getActType()) || group.equals(NO_GROUP_ASSIGNED))
+		if (!activitiesTypes.contains(event.getActType()) || group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()))
 			return;
 		numberOfJobsPerPerson.mergeInt(event.getPersonId(), 1, Integer::sum);
 		relations.computeIfAbsent(relations.size(), (k) -> new Object2DoubleOpenHashMap<>()).putIfAbsent(group + "_act_X",
@@ -221,7 +221,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		Person person = scenario.getPopulation().getPersons().get(event.getPersonId());
 		String group = getGroupOfSubpopulation(PopulationUtils.getSubpopulation(person));
 
-		if (group.equals(NO_GROUP_ASSIGNED))
+		if (group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()))
 			return;
 		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (k) -> event.getTime());
 		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), (k) -> group);
@@ -324,7 +324,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		if (group != null)
 			return group;
 		else
-			return NO_GROUP_ASSIGNED;
+			return TripAnalysis.ModelType.UNASSIGNED.toString();
 	}
 }
 

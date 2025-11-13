@@ -66,9 +66,19 @@ public class TripAnalysis implements MATSimAppCommand {
 	 * Person attribute containing its weight for analysis purposes.
 	 */
 	public static final String ATTR_REF_WEIGHT = "ref_weight";
-	public static final String NO_GROUP_ASSIGNED = "undefinedGroup";
+
 	private static Map<String, List<String>> groupsOfSubpopulationsForPersonAnalysis = new HashMap<>();
 	private static Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis = new HashMap<>();
+
+	public enum ModelType {
+		PERSON_TRAFFIC("personTraffic"),
+		COMMERCIAL_TRAFFIC("commercialTraffic"),
+		UNASSIGNED("undefinedGroup");
+
+		private final String id;
+		ModelType(String id) { this.id = id; }
+		@Override public String toString() { return id; }
+	}
 
 	private static final Logger log = LogManager.getLogger(TripAnalysis.class);
 	@CommandLine.Option(names = "--person-filter", description = "Define which persons should be included into trip analysis. Map like: Attribute name (key), attribute value (value). " +
@@ -192,7 +202,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		if (group != null)
 			return group;
 		else
-			return NO_GROUP_ASSIGNED;
+			return ModelType.UNASSIGNED.toString();
 	}
 
 	@Override
@@ -212,7 +222,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		StringColumn modelType = StringColumn.create("modelType");
 
 		for (String subpopulation : subpop) {
-			String foundModelType = getModelType(subpopulation);
+			String foundModelType = getModelType(subpopulation).toString();
 			modelType.append(foundModelType);
 		}
 		persons.addColumns(modelType);
@@ -390,21 +400,15 @@ public class TripAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private static String getModelType(String subpopulation) {
-		String foundModelType = "unknown";
-		if (subpopulation == null || subpopulation.isEmpty())
-			return foundModelType;
-		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-			if (groupsOfSubpopulationsForPersonAnalysis.get(group).contains(subpopulation)) {
-				foundModelType = "personTraffic";
-			}
-		}
-		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-			if (groupsOfSubpopulationsForCommercialAnalysis.get(group).contains(subpopulation)) {
-				foundModelType = "commercialTraffic";
-			}
-		}
-		return foundModelType;
+	private static ModelType getModelType(String subpopulation) {
+	    if (subpopulation == null || subpopulation.isEmpty()) return ModelType.UNASSIGNED;
+	    for (List<String> list : groupsOfSubpopulationsForPersonAnalysis.values()) {
+	        if (list.contains(subpopulation)) return ModelType.PERSON_TRAFFIC;
+	    }
+	    for (List<String> list : groupsOfSubpopulationsForCommercialAnalysis.values()) {
+	        if (list.contains(subpopulation)) return ModelType.COMMERCIAL_TRAFFIC;
+	    }
+	    return ModelType.UNASSIGNED;
 	}
 
 	private void tryRun(ThrowingConsumer<Table> f, Table df) {
