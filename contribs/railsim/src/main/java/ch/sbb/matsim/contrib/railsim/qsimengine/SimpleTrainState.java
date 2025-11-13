@@ -272,7 +272,7 @@ final class SimpleTrainState implements TrainPosition {
 		}
 
 		@Override
-		public Link getCurrentLink() {
+		public Id<Link> getCurrentLinkId() {
 			return null;
 		}
 
