@@ -296,7 +296,6 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		// hier verstehe ich die Logik gerade nicht.  Merken wir uns sowohl trip mode als auch act type?  Beides kann nicht "current" sein.
 
 
-
 		if( this.personId2currentActivityType.containsKey( personId ) && this.personId2currentActivityStartTime.containsKey( personId ) ){
 			// the second condition was already tested earlier.
 

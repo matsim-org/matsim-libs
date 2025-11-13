@@ -2,7 +2,6 @@ package playground.vsp.analysis.modules.VTTS;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -11,32 +10,21 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.*;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.replanning.annealing.ReplanningAnnealer;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.*;
-import org.matsim.core.scoring.functions.*;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 
 @CommandLine.Command(name = "write-experienced-plans",
 	description = "Writes experienced plans next to events file.")
