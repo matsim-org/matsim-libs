@@ -20,12 +20,9 @@
 
 package org.matsim.core.population;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,16 +31,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author mrieser
  */
 public class PersonImplTest {
-
-	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
-
 
 	private final static Logger log = LogManager.getLogger(PersonImplTest.class);
 
@@ -53,7 +47,7 @@ public class PersonImplTest {
 	@Test
 	void testGetRandomUnscoredPlan() {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = null;
+		Person person;
 		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
 		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -90,8 +84,8 @@ public class PersonImplTest {
 		plan.setScore(4.0);
 		plan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan(person);
 		assertNull(plan);
-		for (int i = 0; i < plans.length; i++) {
-			assertNotNull(plans[i].getScore());
+		for (Plan value : plans) {
+			assertNotNull(value.getScore());
 		}
 	}
 
@@ -111,7 +105,7 @@ public class PersonImplTest {
 		PersonUtils.removeUnselectedPlans(person);
 
 		assertEquals(1, person.getPlans().size(), "person should have 1 plan.");
-		assertEquals(selPlan, person.getPlans().get(0), "remaining plan should be selPlan.");
+		assertEquals(selPlan, person.getPlans().getFirst(), "remaining plan should be selPlan.");
 	}
 
 	@Test
@@ -121,7 +115,7 @@ public class PersonImplTest {
 		Plan p2 = PersonUtils.createAndAddPlan(person, true);
 		Plan p3 = PersonUtils.createAndAddPlan(person, false);
 		Plan p4 = PersonUtils.createAndAddPlan(person, false);
-		Plan p5 = PopulationUtils.createPlan(null);
+		Plan p5 = PopulationUtils.createPlan();
 
 		assertEquals(4, person.getPlans().size(), "wrong number of plans.");
 		assertEquals(p2, person.getSelectedPlan(), "expected different selected plan.");
@@ -151,7 +145,7 @@ public class PersonImplTest {
 		assertEquals(p3, person.getSelectedPlan());
 		person.setSelectedPlan(p2);
 		assertEquals(p2, person.getSelectedPlan());
-		Plan p4 = PopulationUtils.createPlan(null);
+		Plan p4 = PopulationUtils.createPlan();
 		try {
 			person.setSelectedPlan(p4);
 			fail("expected Exception when setting a plan as selected that is not part of person.");

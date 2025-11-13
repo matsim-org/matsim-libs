@@ -22,20 +22,20 @@ package org.matsim.core.mobsim.qsim.interfaces;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * @author nagel
- *
  */
-public interface MobsimVehicle extends VisVehicle{
-	
-	Link getCurrentLink();
-	
+public interface MobsimVehicle extends VisVehicle {
+
+	Id<Link> getCurrentLinkId();
+
 	double getSizeInEquivalents();
-	
+
 	/**
 	 * Adds a passenger to this vehicle.
 	 *
