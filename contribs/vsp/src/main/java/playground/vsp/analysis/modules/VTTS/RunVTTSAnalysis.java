@@ -10,6 +10,13 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkUtils;
@@ -19,12 +26,18 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 @CommandLine.Command(name = "write-experienced-plans",
 	description = "Writes experienced plans next to events file.")
@@ -52,8 +65,8 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
-		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
-		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename());
+		String runPrefix = Objects.nonNull(runId ) ? runId + "." : "";
+		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
