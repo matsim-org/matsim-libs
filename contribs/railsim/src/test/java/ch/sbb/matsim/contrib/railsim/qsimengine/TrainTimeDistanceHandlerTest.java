@@ -21,6 +21,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.dsim.ExecutionContext;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -110,6 +111,11 @@ class TrainTimeDistanceHandlerTest {
 		@Override
 		public OutputDirectoryHierarchy getControllerIO() {
 			return io;
+		}
+
+		@Override
+		public ExecutionContext getSimulationContext() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
