@@ -158,6 +158,10 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     }
 
     private void pingVehicle(double time, Id<Vehicle> vehicleId, Id<Link> linkId, boolean useFromNode) {
+        if (!electricFleet.getVehicleSpecifications().containsKey(vehicleId)) {
+            return;
+        }
+
         Link link = network.getLinks().get(linkId);
         Coord location = useFromNode ? link.getFromNode().getCoord() : link.getToNode().getCoord();
 
