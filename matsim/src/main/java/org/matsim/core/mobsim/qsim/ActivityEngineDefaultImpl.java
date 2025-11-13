@@ -19,35 +19,28 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import com.google.inject.Inject;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.dsim.DistributedActivityEngine;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 
-class ActivityEngineDefaultImpl implements ActivityEngine {
-	private static final Logger log = LogManager.getLogger( ActivityEngineDefaultImpl.class ) ;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
+
+class ActivityEngineDefaultImpl implements DistributedActivityEngine {
 
 	private final EventsManager eventsManager;
 
 	@Inject
-	ActivityEngineDefaultImpl( EventsManager eventsManager ) {
+	ActivityEngineDefaultImpl(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
-
-//	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
-//		this.eventsManager = eventsManager;
-//	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -59,7 +52,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	private static class AgentEntry {
-		AgentEntry( MobsimAgent agent, double activityEndTime ) {
+		AgentEntry(MobsimAgent agent, double activityEndTime) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
@@ -92,6 +85,11 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
+
+	@Override
+	public double priority() {
+		return Double.NEGATIVE_INFINITY;
+	}
 
 	@Override
 	public void onPrepareSim() {
@@ -133,14 +131,12 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 
 
 	/**
-	 *
 	 * This method is called by QSim to pass in agents which then "live" in the activity layer until they are handed out again
 	 * through the internalInterface.
-	 *
+	 * <p>
 	 * It is called not before onPrepareSim() and not after afterSim(), but it may be called before, after, or from doSimStep(),
 	 * and even from itself (i.e. it must be reentrant), since internalInterface.arrangeNextAgentState() may trigger
 	 * the next Activity.
-	 *
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
@@ -152,7 +148,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
 			agent.endActivityAndComputeNextState(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
-			internalInterface.arrangeNextAgentState(agent) ;
+			internalInterface.arrangeNextAgentState(agent);
 		} else {
 			// The agent commences an activity on this link.
 			final AgentEntry agentEntry = new AgentEntry(agent, agent.getActivityEndTime());
@@ -182,8 +178,8 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 	 */
 	@Override
 	public void rescheduleActivityEnd(final MobsimAgent agent) {
-		if ( agent.getState()!=State.ACTIVITY ) {
-			return ;
+		if (agent.getState() != State.ACTIVITY) {
+			return;
 		}
 
 
@@ -214,6 +210,11 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 			 */
 			activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 		}
+	}
+
+	@Override
+	public double getEnginePriority() {
+		return 10.;
 	}
 
 	private AgentEntry removeAgentFromQueue(MobsimAgent agent) {

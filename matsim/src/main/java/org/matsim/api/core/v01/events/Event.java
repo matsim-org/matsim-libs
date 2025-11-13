@@ -20,20 +20,21 @@
 
 package org.matsim.api.core.v01.events;
 
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Message;
+import org.matsim.core.utils.io.XmlUtils;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.core.utils.io.XmlUtils;
-
 import static org.matsim.core.utils.io.XmlUtils.writeEncodedAttributeValue;
 
-public abstract class Event {
+public abstract class Event implements Message {
 
 	public final static String ATTRIBUTE_TIME = "time";
 	public final static String ATTRIBUTE_TYPE = "type";
-	public static final String ATTRIBUTE_X = "x" ;
-	public static final String ATTRIBUTE_Y = "y" ;
+	public static final String ATTRIBUTE_X = "x";
+	public static final String ATTRIBUTE_Y = "y";
 
 	private double time;
 
@@ -57,7 +58,7 @@ public abstract class Event {
 			attr.put(HasLinkId.ATTRIBUTE_LINK, hasLinkId.getLinkId().toString());
 		}
 		if (this instanceof BasicLocation basicLocation && basicLocation.getCoord() != null) {
-			if (((BasicLocation)this).getCoord() != null) {
+			if (basicLocation.getCoord() != null) {
 				attr.put(ATTRIBUTE_X, String.valueOf(basicLocation.getCoord().getX()));
 				attr.put(ATTRIBUTE_Y, String.valueOf(basicLocation.getCoord().getY()));
 			}
@@ -68,7 +69,9 @@ public abstract class Event {
 		return attr;
 	}
 
-	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
+	/**
+	 * @return a unique, descriptive name for this event type, used to identify event types in files.
+	 */
 	abstract public String getEventType();
 
 	public final double getTime() {
@@ -80,7 +83,7 @@ public abstract class Event {
 	}
 
 	public String toString() {
-		Map<String,String> attr = this.getAttributes() ;
+		Map<String, String> attr = this.getAttributes();
 		StringBuilder eventXML = new StringBuilder("\t<event ");
 		for (Map.Entry<String, String> entry : attr.entrySet()) {
 			eventXML.append(entry.getKey());
@@ -94,13 +97,12 @@ public abstract class Event {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Event)) {
+		if (!(obj instanceof Event other)) {
 			return false;
 		} else {
-			Event other = (Event) obj;
 			return time == other.time &&
-					getEventType().equals(other.getEventType()) &&
-					getAttributes().equals(other.getAttributes());
+				getEventType().equals(other.getEventType()) &&
+				getAttributes().equals(other.getAttributes());
 		}
 	}
 
@@ -155,7 +157,7 @@ public abstract class Event {
 	/**
 	 * Write a xml representation of this event to the given writer.
 	 * The implementation must write the whole xml element <event ... />. Starting with \t and adding a newline at the end.
-	 *
+	 * <p>
 	 * The provided default implementation writes the whole element based on {@link #getAttributes()}. This is slow and should be overridden.
 	 * The overriding implementation must *not* call the super method.
 	 */

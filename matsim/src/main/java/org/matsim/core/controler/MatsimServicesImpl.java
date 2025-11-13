@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 
 import com.google.inject.Injector;
@@ -43,6 +43,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.ExecutionContext;
 
 import com.google.inject.Inject;
 import java.util.Map;
@@ -56,7 +57,8 @@ class MatsimServicesImpl implements MatsimServices {
 
 	@Override
 	public final TravelTime getLinkTravelTimes() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {})).get(TransportMode.car);
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {
+		})).get(TransportMode.car);
 	}
 
 	@Override
@@ -94,7 +96,9 @@ class MatsimServicesImpl implements MatsimServices {
 		return this.injector.getInstance(EventsManager.class);
 	}
 
-	@Inject Injector injector;
+	@Inject
+	Injector injector;
+
 	@Override
 	public Injector getInjector() {
 		return injector;
@@ -117,8 +121,9 @@ class MatsimServicesImpl implements MatsimServices {
 
 	@Override
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-				.get(TransportMode.car);
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>() {
+			}))
+			.get(TransportMode.car);
 	}
 
 	@Override
@@ -129,6 +134,11 @@ class MatsimServicesImpl implements MatsimServices {
 	@Override
 	public OutputDirectoryHierarchy getControllerIO() {
 		return injector.getInstance(OutputDirectoryHierarchy.class);
+	}
+
+	@Override
+	public ExecutionContext getSimulationContext() {
+		return injector.getInstance(ExecutionContext.class);
 	}
 
 	@Override

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>2026.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>distributed-simulation</artifactId>
+	<name>Distributed MATSim</name>
+	<description>Provides communication implementations for distributed simulations on multiple jvms.</description>
+
+	<properties>
+		<aeron.version>1.44.1</aeron.version>
+		<hazelcast.version>5.6.0</hazelcast.version>
+
+		<!-- Use -DskipShaded=false to build a executable jar. -->
+		<skipShaded>true</skipShaded>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.aeron</groupId>
+			<artifactId>aeron-all</artifactId>
+			<version>${aeron.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.fury</groupId>
+			<artifactId>fury-format</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>drt</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<outputFile>sim.jar</outputFile>
+					<skip>${skipShaded}</skip>
+					<transformers>
+						<!-- The following sets the main class for the executable jar as you otherwise would with the assembly plugin -->
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<manifestEntries>
+								<Main-Class>org.matsim.dsim.RunDistributedSim</Main-Class>
+								<Specification-Vendor>com.simunto</Specification-Vendor>
+								<Implementation-Vendor>com.simunto</Implementation-Vendor>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Multi-Release>true</Multi-Release>
+							</manifestEntries>
+						</transformer>
+						<!-- The following merges the various GeoTools META-INF/services files         -->
+						<transformer
+							implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+						<!-- include logger specification (log4j2.xml) -->
+						<transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer"/>
+					</transformers>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.RSA</exclude>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
