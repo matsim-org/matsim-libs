@@ -35,41 +35,50 @@ import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
-
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	protected final ChargerSpecification charger;
 	private final EventsManager eventsManager;
 	private final ChargingPriority priority;
+	private final ChargerPower chargerPower;
 
 	private final Map<Id<Vehicle>, ChargingVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ChargingVehicle> queuedVehicles = new LinkedList<>();
 	private final Queue<ChargingVehicle> arrivingVehicles = new LinkedBlockingQueue<>();
 	private final Map<Id<Vehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
-	public ChargingWithQueueingLogic(ChargerSpecification charger,  EventsManager eventsManager, ChargingPriority priority) {
+	public ChargingWithQueueingLogic(ChargerSpecification charger,  EventsManager eventsManager, ChargingPriority priority, ChargerPower chargerPower) {
 		this.charger = Objects.requireNonNull(charger);
 		this.eventsManager = Objects.requireNonNull(eventsManager);
 		this.priority = priority;
+		this.chargerPower = chargerPower;
 	}
 
 	@Override
 	public void chargeVehicles(double chargePeriod, double now) {
 		Iterator<ChargingVehicle> cvIter = pluggedVehicles.values().iterator();
+		
+		double maximumCharigingPower = chargerPower.calcMaximumChargingPower(pluggedVehicles.values());
+		
 		while (cvIter.hasNext()) {
 			ChargingVehicle cv = cvIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
 
-			double requestedEnergy = cv.strategy().calcRemainingEnergyToCharge();
+			double maxVehicleInput = cv.strategy().calcRemainingEnergyToCharge();
+			double maxChargerOutput = chargerPower.calcMaximumEnergy();
+
 			double currentCharge = cv.ev().getBattery().getCharge();
 
 			double chargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
-			
+			chargingPower = Math.min(chargingPower, maximumCharigingPower);
+
 			double chargedEnergy = chargingPower * chargePeriod;
 
 			// limited by requested energy
-			chargedEnergy = Math.min(chargedEnergy, requestedEnergy);
+			chargedEnergy = Math.min(chargedEnergy, maxVehicleInput);
+
+			// limited by maximum output
+			chargedEnergy = Math.min(chargedEnergy, maxChargerOutput);
 
 			// limited by battery capacity
 			chargedEnergy = Math.min(chargedEnergy, cv.ev().getBattery().getCapacity() - currentCharge);
@@ -102,6 +111,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 		arrivingVehicles.clear();
+
+		chargerPower.update(chargePeriod, now, pluggedVehicles.values());
 	}
 
 	@Override
@@ -186,15 +197,17 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	static public class Factory implements ChargingLogic.Factory {
 		private final EventsManager eventsManager;
 		private final ChargingPriority.Factory chargingPriorityFactory;
+		private final ChargerPower.Factory chargerPowerFactory;
 
-		public Factory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
+		public Factory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 			this.eventsManager = eventsManager;
 			this.chargingPriorityFactory = chargingPriorityFactory;
+			this.chargerPowerFactory = chargerPowerFactory;
 		}
 
 		@Override
 		public ChargingLogic create(ChargerSpecification charger) {
-			return new ChargingWithQueueingLogic(charger,  eventsManager, chargingPriorityFactory.create(charger));
+			return new ChargingWithQueueingLogic(charger,  eventsManager, chargingPriorityFactory.create(charger), chargerPowerFactory.create(charger));
 		}
 	}
 }
