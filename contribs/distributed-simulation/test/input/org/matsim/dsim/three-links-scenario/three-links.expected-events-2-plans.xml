@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="30.0" type="actend" person="b1" link="l1" x="0.0" y="100.0" actType="start"  />
+	<event time="30.0" type="departure" person="b1" link="l1" legMode="walk" computationalRoutingMode="slow-car"  />
+	<event time="31.0" type="actend" person="p1" link="l1" x="0.0" y="100.0" actType="start"  />
+	<event time="31.0" type="departure" person="p1" link="l1" legMode="walk" computationalRoutingMode="car"  />
+	<event time="60.0" type="travelled" person="b1" distance="100.0" mode="walk"  />
+	<event time="60.0" type="arrival" person="b1" link="l1" legMode="walk"  />
+	<event time="60.0" type="actstart" person="b1" link="l1" x="0.0" y="0.0" actType="slow-car interaction"  />
+	<event time="60.0" type="actend" person="b1" link="l1" x="0.0" y="0.0" actType="slow-car interaction"  />
+	<event time="60.0" type="departure" person="b1" link="l1" legMode="slow-car" computationalRoutingMode="slow-car"  />
+	<event time="60.0" type="PersonEntersVehicle" person="b1" vehicle="b1_slow-car"  />
+	<event time="61.0" type="vehicle enters traffic" person="b1" link="l1" vehicle="b1_slow-car" networkMode="slow-car" relativePosition="1.0"  />
+	<event time="61.0" type="travelled" person="p1" distance="100.0" mode="walk"  />
+	<event time="61.0" type="arrival" person="p1" link="l1" legMode="walk"  />
+	<event time="61.0" type="actstart" person="p1" link="l1" x="0.0" y="0.0" actType="car interaction"  />
+	<event time="61.0" type="actend" person="p1" link="l1" x="0.0" y="0.0" actType="car interaction"  />
+	<event time="61.0" type="departure" person="p1" link="l1" legMode="car" computationalRoutingMode="car"  />
+	<event time="61.0" type="PersonEntersVehicle" person="p1" vehicle="p1_car"  />
+	<event time="62.0" type="left link" link="l1" vehicle="b1_slow-car"  />
+	<event time="62.0" type="entered link" link="l2" vehicle="b1_slow-car"  />
+	<event time="62.0" type="vehicle enters traffic" person="p1" link="l1" vehicle="p1_car" networkMode="car" relativePosition="1.0"  />
+	<event time="63.0" type="left link" link="l1" vehicle="p1_car"  />
+	<event time="63.0" type="entered link" link="l2" vehicle="p1_car"  />
+	<event time="1063.0" type="left link" link="l2" vehicle="b1_slow-car"  />
+	<event time="1063.0" type="entered link" link="l3" vehicle="b1_slow-car"  />
+	<event time="1163.0" type="vehicle leaves traffic" person="b1" link="l3" vehicle="b1_slow-car" networkMode="slow-car" relativePosition="1.0"  />
+	<event time="1163.0" type="PersonLeavesVehicle" person="b1" vehicle="b1_slow-car"  />
+	<event time="1163.0" type="arrival" person="b1" link="l3" legMode="slow-car"  />
+	<event time="1163.0" type="actstart" person="b1" link="l3" x="1200.0" y="0.0" actType="slow-car interaction"  />
+	<event time="1163.0" type="actend" person="b1" link="l3" x="1200.0" y="0.0" actType="slow-car interaction"  />
+	<event time="1163.0" type="departure" person="b1" link="l3" legMode="walk" computationalRoutingMode="slow-car"  />
+	<event time="1164.0" type="left link" link="l2" vehicle="p1_car"  />
+	<event time="1164.0" type="entered link" link="l3" vehicle="p1_car"  />
+	<event time="1174.0" type="vehicle leaves traffic" person="p1" link="l3" vehicle="p1_car" networkMode="car" relativePosition="1.0"  />
+	<event time="1174.0" type="PersonLeavesVehicle" person="p1" vehicle="p1_car"  />
+	<event time="1174.0" type="arrival" person="p1" link="l3" legMode="car"  />
+	<event time="1174.0" type="actstart" person="p1" link="l3" x="1200.0" y="0.0" actType="car interaction"  />
+	<event time="1174.0" type="actend" person="p1" link="l3" x="1200.0" y="0.0" actType="car interaction"  />
+	<event time="1174.0" type="departure" person="p1" link="l3" legMode="walk" computationalRoutingMode="car"  />
+	<event time="1193.0" type="travelled" person="b1" distance="100.0" mode="walk"  />
+	<event time="1193.0" type="arrival" person="b1" link="l3" legMode="walk"  />
+	<event time="1193.0" type="actstart" person="b1" link="l3" x="1200.0" y="100.0" actType="end"  />
+	<event time="1204.0" type="travelled" person="p1" distance="100.0" mode="walk"  />
+	<event time="1204.0" type="arrival" person="p1" link="l3" legMode="walk"  />
+	<event time="1204.0" type="actstart" person="p1" link="l3" x="1200.0" y="100.0" actType="end"  />
+</events>

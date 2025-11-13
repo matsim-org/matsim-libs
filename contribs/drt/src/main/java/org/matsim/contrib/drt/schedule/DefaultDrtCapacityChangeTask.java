@@ -61,4 +61,9 @@ public class DefaultDrtCapacityChangeTask extends DefaultDrtStopTask implements 
 	public void removeDropoffRequest(Id<Request> requestId) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public double calcEarliestArrivalTime() {
+		return getBeginTime();
+	}
 }

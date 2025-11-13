@@ -1,0 +1,160 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.vsp.analysis.modules.VTTS;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
+
+/**
+ * @author ikaddoura
+ *
+ */
+public class MarginalSumScoringFunction {
+	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
+
+	CharyparNagelActivityScoring activityScoringA;
+	CharyparNagelActivityScoring activityScoringB;
+
+	public MarginalSumScoringFunction(ScoringParameters params) {
+
+
+		ScoringConfigGroup.ActivityParams taxiActParams = new ScoringConfigGroup.ActivityParams("TaxiPickup");
+		taxiActParams.setTypicalDurationScoreComputation(ScoringConfigGroup.TypicalDurationScoreComputation.relative);
+		taxiActParams.setTypicalDuration(1.0);
+		taxiActParams.setScoringThisActivityAtAll(false);
+
+		/*
+		ScoringParameters.ActivityParams taxiActParams = new PlanCalcScoreConfigGroup.ActivityParams("TaxiPickup");
+		taxiActParams.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+		taxiActParams.setScoringThisActivityAtAll(false);
+		taxiActParams.setTypicalDuration(1.0);
+
+		ActivityUtilityParameters actUtilityParams = new ActivityUtilityParameters.Builder(taxiActParams).build();
+		params.utilParams.put("TaxiPickup", actUtilityParams); */
+
+		activityScoringA = new CharyparNagelActivityScoring(params);
+		activityScoringB = new CharyparNagelActivityScoring(params);
+	}
+
+	private static int cnt = 0;
+
+	public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
+
+		SumScoringFunction sumScoringA = new SumScoringFunction() ;
+		sumScoringA.addScoringFunction(activityScoringA);
+
+		SumScoringFunction sumScoringB = new SumScoringFunction() ;
+		sumScoringB.addScoringFunction(activityScoringB);
+
+		if (activity.getStartTime().seconds() != Double.NEGATIVE_INFINITY && activity.getEndTime().seconds() != Double.NEGATIVE_INFINITY) {
+        	// activity is not the first and not the last activity
+        } else {
+        	throw new RuntimeException("Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
+        }
+
+		double scoreA0 = sumScoringA.getScore();
+		double scoreB0 = sumScoringB.getScore();
+
+		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
+		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
+		// yy Depending on how complete the later used "handleActivity" is set up, the facility may become closed at exactly this time step, and then the resulting VTTS will be zero. kai, nov'25
+		// --> However, may also work the other way around, and the facility may just become open at exactly this time step.
+
+		if ( cnt < 10 ){
+			cnt++;
+			log.info( "activity={}; activityWithoutDelay={}", activity, activityWithoutDelay );
+			if ( cnt==10 ) {
+				log.info( Gbl.FUTURE_SUPPRESSED );
+			}
+		}
+
+		sumScoringA.handleActivity(activity);
+		sumScoringB.handleActivity(activityWithoutDelay);
+
+		sumScoringA.finish();
+		sumScoringB.finish();
+
+		double scoreA1 = sumScoringA.getScore();
+		double scoreB1 = sumScoringB.getScore();
+
+		double scoreWithDelay = scoreA1 - scoreA0;
+		double scoreWithoutDelay = scoreB1 - scoreB0;
+
+		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
+		return activityDelayDisutility;
+	}
+
+	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {
+
+		SumScoringFunction delegateA = new SumScoringFunction() ;
+		delegateA.addScoringFunction(activityScoringA);
+
+		SumScoringFunction delegateB = new SumScoringFunction() ;
+		delegateB.addScoringFunction(activityScoringB);
+
+	//	log.info("activityMorning: " + activityMorning.toString());
+	//	log.info("activityEvening: " + activityEvening.toString());
+	//	log.info("activityEveningWithoutDelay: " + activityEveningWithoutDelay.toString());
+
+		if (activityMorning.getStartTime().isUndefined()  && activityMorning.getEndTime().isDefined()) {
+        	// 'morningActivity' is the first activity
+        } else {
+        	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
+        }
+
+        if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isUndefined()) {
+        	// 'eveningActivity' is the last activity
+        } else {
+        	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");
+        }
+
+		double scoreA0 = delegateA.getScore();
+		double scoreB0 = delegateB.getScore();
+
+		delegateA.handleActivity(activityMorning);
+		delegateB.handleActivity(activityMorning);
+
+		Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
+		activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime().seconds() - delay);
+
+
+		delegateA.handleActivity(activityEvening);
+		delegateB.handleActivity(activityEveningWithoutDelay);
+
+		delegateA.finish();
+		delegateB.finish();
+
+		double scoreA1 = delegateA.getScore();
+		double scoreB1 = delegateB.getScore();
+
+		double scoreWithDelay = scoreA1 - scoreA0;
+		double scoreWithoutDelay = scoreB1 - scoreB0;
+
+		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
+		return activityDelayDisutility;
+	}
+
+}

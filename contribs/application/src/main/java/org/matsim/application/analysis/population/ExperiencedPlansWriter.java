@@ -70,7 +70,12 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		log.info("Reading events from file: {}", eventsPath);
 		eventsManager.initProcessing();
 		EventsUtils.readEvents(eventsManager, eventsPath.toString());
+
 		eventsManager.finishProcessing();
+
+		// I just put in the following manually.  It is normally called from a mobsim listener.  There might be a better place to do this but took me
+		// already 2 hrs to get to this point here. kai, nov'25
+		eventsToActivities.finish();
 
 		log.info("Writing experienced plans to file: {}", output);
 		experiencedPlansService.writeExperiencedPlans(output.toString());
