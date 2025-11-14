@@ -422,8 +422,11 @@ public class InsertionGenerator {
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo, request);
 
-		if (vehicleEntry.getSlackTime(dropoffIdx)
-				< pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss) {
+		// Calculate effective time loss at dropoff, accounting for stay time buffers
+		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
+				insertion, pickupDetourInfo) + dropoffDetourInfo.dropoffTimeLoss;
+
+		if (vehicleEntry.getSlackTime(dropoffIdx) < effectiveDropoffTimeLoss) {
 			return null; // skip this dropoff insertion
 		}
 
