@@ -447,17 +447,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		normDistanceGroups(labels, aggr);
 
 		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "total").toFile());
-
-		// Derive mode order if not given
-		if (modeOrder == null) {
-			modeOrder = new ArrayList<>();
-			for (Row row : aggr) {
-				String mainMode = row.getString("main_mode");
-				if (!modeOrder.contains(mainMode)) {
-					modeOrder.add(mainMode);
-				}
-			}
-		}
 	}
 
 	private static Table addModeSharesPerModelType(Table aggr) {
