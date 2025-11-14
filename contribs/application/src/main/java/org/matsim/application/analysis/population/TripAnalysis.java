@@ -341,8 +341,9 @@ public class TripAnalysis implements MATSimAppCommand {
 		trips.stringColumn("main_mode")
 			.set(trips.stringColumn("main_mode").isMissing(),
 				trips.stringColumn("longest_distance_mode"));
-
-
+		if (modeOrder == null)
+			modeOrder = new ArrayList<>(trips.stringColumn("main_mode").unique().asList());
+		Collections.sort(modeOrder);
 		Table joined = new DataFrameJoiner(trips, "person").inner(persons);
 
 		log.info("Filtered {} out of {} trips", joined.rowCount(), trips.rowCount());
