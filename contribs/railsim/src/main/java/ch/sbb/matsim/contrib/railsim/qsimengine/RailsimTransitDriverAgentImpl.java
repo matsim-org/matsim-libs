@@ -33,6 +33,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Default implementation of the {@link RailsimTransitDriverAgent}.
+ */
 public final class RailsimTransitDriverAgentImpl extends TransitDriverAgentImpl implements RailsimTransitDriverAgent {
 
 	private static final Logger log = LogManager.getLogger(RailsimTransitDriverAgentImpl.class);
@@ -70,15 +73,6 @@ public final class RailsimTransitDriverAgentImpl extends TransitDriverAgentImpl 
 
 		if (nextStop != null) {
 
-			Id<TransitStopArea> areaId = nextStop.getStopAreaId();
-
-			if (areaId == null) {
-				log.warn("Could not re-route vehicle {} to a replacement transit stop for {} because it has no stop area",
-					getVehicle().getId(), nextStop);
-
-				return null;
-			}
-
 			boolean adjust = false;
 			for (RailLink link : original) {
 				if (nextStop.getLinkId().equals(link.getLinkId())) {
@@ -89,6 +83,15 @@ public final class RailsimTransitDriverAgentImpl extends TransitDriverAgentImpl 
 
 			// pt stop needs to be remapped
 			if (adjust) {
+
+				Id<TransitStopArea> areaId = nextStop.getStopAreaId();
+
+				if (areaId == null) {
+					log.warn("Could not re-route vehicle {} to a replacement transit stop for {} because it has no stop area",
+						getVehicle().getId(), nextStop);
+
+					return null;
+				}
 
 				List<TransitStopFacility> inArea = stopAreas.get(areaId);
 
