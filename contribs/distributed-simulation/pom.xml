@@ -15,7 +15,7 @@
 	<description>Provides communication implementations for distributed simulations on multiple jvms.</description>
 
 	<properties>
-		<aeron.version>1.44.1</aeron.version>
+		<aeron.version>1.49.1</aeron.version>
 		<hazelcast.version>5.6.0</hazelcast.version>
 
 		<!-- Use -DskipShaded=false to build a executable jar. -->
