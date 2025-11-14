@@ -57,6 +57,8 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 		bind(ChargingInfrastructureSpecification.class)
 				.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class);
 
+		addControllerListenerBinding().to(ChargerWriterListener.class);
+
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {

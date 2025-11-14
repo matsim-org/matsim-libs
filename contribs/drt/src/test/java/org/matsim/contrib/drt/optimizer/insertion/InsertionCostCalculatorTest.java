@@ -72,7 +72,12 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<StopWaypoint>builder().build(), null);
+
+		StopWaypoint[] stops = new StopWaypoint[1];
+		DrtStopTask existingStopTask = new DefaultDrtStopTask(0, 60, link("a"));
+		stops[0] = new StopWaypointImpl(existingStopTask, loadType.fromInt(1), loadType, false);
+
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.copyOf(stops), null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
