@@ -25,6 +25,10 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import ch.sbb.matsim.contrib.railsim.events.NoopEventsManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.AlwaysApprovingDisposition;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SpeedProfile;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.NoopResourceManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -68,7 +72,9 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private final RailsimConfigGroup config;
 	private final RailResourceManager res;
 	private final TrainDisposition disposition;
+	private final SpeedProfile speedProfile;
 	private final TrainManager trainManager;
+	private final TrainTimeDistanceHandler ttdHandler;
 	private final Set<String> modes;
 	private final Queue<NetworkChangeEvent> networkChangeEvents;
 	private final TransitStopAgentTracker agentTracker;
@@ -77,12 +83,15 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 	private RailsimEngine engine;
 
 	@Inject
-	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, TransitStopAgentTracker agentTracker, TrainManager trainManager) {
+	public RailsimQSimEngine(QSim qsim, RailResourceManager res, TrainDisposition disposition, SpeedProfile speedProfile,
+							 TransitStopAgentTracker agentTracker, TrainManager trainManager, TrainTimeDistanceHandler ttdHandler) {
 		this.qsim = qsim;
 		this.config = ConfigUtils.addOrGetModule(qsim.getScenario().getConfig(), RailsimConfigGroup.class);
 		this.res = res;
 		this.disposition = disposition;
+		this.speedProfile = speedProfile;
 		this.trainManager = trainManager;
+		this.ttdHandler = ttdHandler;
 		this.modes = config.getNetworkModes();
 		this.agentTracker = agentTracker;
 		this.networkChangeEvents = new PriorityQueue<>(Comparator.comparing(NetworkChangeEvent::getStartTime));
@@ -113,12 +122,59 @@ public class RailsimQSimEngine implements DepartureHandler, MobsimEngine {
 			networkChangeEvents.addAll(events);
 		}
 
-		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition);
+		prepareTimeDistanceData();
+
+		engine = new RailsimEngine(qsim.getEventsManager(), config, res, trainManager, disposition, ttdHandler);
+	}
+
+	/**
+	 * Constructs a simple engine to compute reference time-distance data.
+	 * Currently not in use. Time distance data is computed statically using a simpler approach.
+	 */
+	@SuppressWarnings("unused")
+	private void simulateTimeDistanceData() {
+
+		NoopResourceManager noopRes = new NoopResourceManager(res);
+		RailsimEngine engine = new RailsimEngine(new NoopEventsManager(), config, noopRes, trainManager,
+			new AlwaysApprovingDisposition(noopRes, speedProfile), ttdHandler);
+
+		ttdHandler.preparePseudoSimulation(
+			engine,
+			qsim.getScenario().getTransitSchedule(),
+			qsim.getScenario().getTransitVehicles()
+		);
+
+		// Simulates trajectories with simplified disposition and resources
+		double endTime = qsim.getScenario().getConfig().qsim().getEndTime().orElse(24 * 3600);
+
+		//for (double time = 0; time < endTime; time += 1) {
+		engine.doSimStep(endTime);
+		//}
+
+		// targetSpeed can be 0 in some tests, even though train should accelerate
+
+		ttdHandler.writeInitialData(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles());
+		trainManager.clear();
+	}
+
+	/**
+	 * Run simple approximation for the time distance data calculation.
+	 */
+	private void prepareTimeDistanceData() {
+
+		ttdHandler.prepareTimeDistanceApproximation(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles(), speedProfile);
+		ttdHandler.writeInitialData(qsim.getScenario().getTransitSchedule(), qsim.getScenario().getTransitVehicles());
+
 	}
 
 	@Override
 	public void afterSim() {
-		engine.clearTrains(qsim.getSimTimer().getTimeOfDay());
+
+		// It might be null if prepare sim fails
+		if (engine != null)
+			engine.clearTrains(qsim.getSimTimer().getTimeOfDay());
+
+		ttdHandler.close();
 	}
 
 	@Override
