@@ -12,9 +12,11 @@
 		<!-- Using default configuration, see EmulationConfigGroup for options. -->
 	</module>
 
+	<!-- Configuration not specfic to ATAP below. -->
+
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-    	<param name="numberOfThreads" value="16" />
+    	<param name="numberOfThreads" value="4" />
 		<param name="coordinateSystem" value="epsg:32633" />
 	</module>
  

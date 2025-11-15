@@ -29,27 +29,24 @@ import se.vti.atap.matsim.ATAP;
 import se.vti.atap.matsim.ATAPConfigGroup;
 import se.vti.emulation.EmulationConfigGroup;
 
-
 /**
- * Oslo scenario used in the article
- * <i>"A simulation heuristic for traveler- and vehicle-discrete dynamic traffic assignment"</i>.
+ * Berlin scenario used in the article: <i>"A simulation heuristic for traveler-
+ * and vehicle-discrete dynamic traffic assignment"</i>.
  *
- * <ul>
- *   <li><b>Network:</b> https://zenodo.org/records/17610274https://zenodo.org/records/17610274</li>
- *   <li><b>Population:</b> https://zenodo.org/records/17609947https://zenodo.org/records/17609947</li>
- * </ul>
+ * <b>Scenario data:</b>
+ * https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/zz_archive/2014-08-01_car_1pct
  * 
  * @author Gunnar Flötteröd
- * 
  */
-public class RunOsloExample {
+
+public class RunBerlinExample {
 
 	public static void main(String[] args) {
 
 		// Only the config file is in this repo, network and population URL indicated in
 		// header and config file.
 		String pathToConfigInResources = "./src/test/resources/se/vti/atap/matsim/examples/";
-		String configFileName = pathToConfigInResources + "oslo_config_atap_example.xml";
+		String configFileName = pathToConfigInResources + "berlin_config_atap_example.xml";
 
 		// This class is the entry point to all ATAP functionality.
 		ATAP atap = new ATAP();
