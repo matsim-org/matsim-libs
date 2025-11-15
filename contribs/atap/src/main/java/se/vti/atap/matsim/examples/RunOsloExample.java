@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import se.vti.atap.matsim.ATAP;
@@ -36,28 +35,30 @@ import se.vti.emulation.EmulationConfigGroup;
 public class RunOsloExample {
 
 	public static void main(String[] args) {
+
+		// Only the config file is in this repo, network and popluation are one zenodo
+		// (URLs in config file).
+		String pathToConfigInResources = "./src/test/resources/se/vti/atap/matsim/examples/";
+		String configFileName = pathToConfigInResources + "oslo_config_atap_example.xml";
+
+		// This class is the entry point to all ATAP functionality.
 		ATAP atap = new ATAP();
 
-		Config config = ConfigUtils.loadConfig("./oslo/input/oslo_config_atap_example.xml", new ATAPConfigGroup(),
-				new EmulationConfigGroup());
+		// MATSim standard: load configuration file.
+		Config config = ConfigUtils.loadConfig(configFileName, new ATAPConfigGroup(), new EmulationConfigGroup());
+
+		// ATAP scans the config, configures internally, and reorganizes and -weights
+		// the strategies for greatest speed.
 		atap.configure(config);
 
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
+		// MATSim standard: load scenario file, create controler.
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
 		Controler controler = new Controler(scenario);
+
+		// ATAP installs itself in the controller.
 		atap.configure(controler);
 
-//		controler.addControlerListener(new StartupListener() {
-//			@Override
-//			public void notifyStartup(StartupEvent event) {
-//				// TODO 2025-05-21 Changed this when updating to matsim 2024. Gunnar
-////				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
-//				Configurator.setLevel(EventsManagerImpl.class, Level.OFF);
-//			}
-//		});
-
+		// MATSim standard: run the simulation.
 		controler.run();
 	}
 
