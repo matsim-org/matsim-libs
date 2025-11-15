@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.examples.minimalframework.parallel_links
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -181,7 +181,7 @@ public class ExampleRunner {
 
 	//
 
-	private static class Percentile implements Function<List<Double>, String> {
+	static class Percentile implements Function<List<Double>, String> {
 		private final double fractionalPercentile;
 
 		Percentile(double percentile) {
@@ -215,7 +215,7 @@ public class ExampleRunner {
 		}
 	}
 
-	private static class Mean implements Function<List<Double>, String> {
+	static class Mean implements Function<List<Double>, String> {
 
 		@Override
 		public String apply(List<Double> data) {
@@ -226,7 +226,7 @@ public class ExampleRunner {
 		}
 	}
 
-	private static class Max implements Function<List<Double>, String> {
+	static class Max implements Function<List<Double>, String> {
 
 		@Override
 		public String apply(List<Double> data) {
@@ -237,7 +237,7 @@ public class ExampleRunner {
 		}
 	}
 
-	private static class Realization implements Function<List<Double>, String> {
+	static class Realization implements Function<List<Double>, String> {
 
 		int index;
 
@@ -265,16 +265,14 @@ public class ExampleRunner {
 		comparison.addLogger("OneAtATime", oneAtATimeLogger).addLogger("Uniform", uniformLogger)
 				.addLogger("Sorting", sortingLogger).addLogger("Proposed", proposedLogger);
 		comparison.addStatistic("10Percentile", new Percentile(10)).addStatistic("50Percentile", new Percentile(50))
-				.addStatistic("90Percentile", new Percentile(90)).addStatistic("Mean", new Mean())
-				.addStatistic("Max", new Max());
+				.addStatistic("90Percentile", new Percentile(90));
 
-		// TODO ATTENTION
 		double iterationExp = -1.0;
 		boolean randomize = false;
 
-		for (int i = 0; i < 10; i++) {
-			comparison.addStatistic("Realization[" + i + "]", new Realization(i));
-		}
+//		for (int i = 0; i < 10; i++) {
+//			comparison.addStatistic("Realization[" + i + "]", new Realization(i));
+//		}
 
 		for (int replication = 0; replication < this.replications; replication++) {
 			System.out.println((replication + 1) + "/" + this.replications);
@@ -320,7 +318,7 @@ public class ExampleRunner {
 		new ExampleRunner(new Random(4711)).setMode(Mode.ODPAIRS).seMinT0_s(60.0).setMaxT0_s(600.0)
 				.setMinCap_veh(1000.0).setMaxCap_veh(3000.0).setNumberOfLinks(100).setNumberOfODPairs(100)
 				.setNumberOfPaths(10).setVolumeCapacityRatio(volumeCapacityRatio).setIterations(1000)
-				.setReplications(1000).setFileName("SmallODFlowExample.tsv").run();
+				.setReplications(10).setFileName("SmallODFlowExample.tsv").run();
 	}
 
 	static void runArticleExample() {
@@ -331,8 +329,8 @@ public class ExampleRunner {
 	}
 
 	public static void main(String[] args) {
-//		runSmallTripMakerExample();
-		runSmallODExample();
+		runSmallTripMakerExample();
+//		runSmallODExample();
 //		runArticleExample();
 	}
 

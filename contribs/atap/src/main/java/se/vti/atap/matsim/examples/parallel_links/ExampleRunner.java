@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.examples.parallel_links
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -21,11 +21,8 @@ package se.vti.atap.matsim.examples.parallel_links;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -115,14 +112,14 @@ public class ExampleRunner {
 	}
 
 	public static void main(String[] args) {
-		// System.out.println("UNIFORM METHOD");
-		// runSmallExampleWithUniform();
+//		 System.out.println("UNIFORM METHOD");
+//		 runSmallExampleWithUniform();
 
-		// System.out.println("SORTING METHOD");
-		// runSmallExampleWithSorting();
+//		 System.out.println("SORTING METHOD");
+//		 runSmallExampleWithSorting();
 
-		// System.out.println("PROPOSED METHOD");
-		// runSmallExampleWithProposed();
+		 System.out.println("PROPOSED METHOD");
+		 runSmallExampleWithProposed();
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.examples.parallel_links
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 

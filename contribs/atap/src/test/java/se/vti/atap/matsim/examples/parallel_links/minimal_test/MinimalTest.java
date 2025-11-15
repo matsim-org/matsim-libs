@@ -1,5 +1,5 @@
 /**
- * se.vti.atap.matsim.examples.parallel_links.minimal_test
+ * se.vti.atap
  * 
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
  * 
@@ -51,8 +51,6 @@ import se.vti.emulation.EmulationConfigGroup;
  * @author GunnarF
  */
 public class MinimalTest {
-
-
 
 	@TempDir
     private Path tempDir;
