@@ -450,31 +450,25 @@ public class TripAnalysis implements MATSimAppCommand {
 	}
 
 	private static Table addModeSharesPerModelType(Table aggr) {
-		List<String> modelVals = aggr.stringColumn("modelType").unique().asList();
+		List<String> modelTypes = aggr.stringColumn("modelType").unique().asList();
 
-		// Schlüsselspalten, über die wir je modelType die Counts „quer“ reinjoinen
 		String[] keys = new String[] {"dist_group", "main_mode", "subpopulation"};
 
-		for (String mt : modelVals) {
-			// 1) Counts für diesen modelType extrahieren
+		for (String mt : modelTypes) {
 			Table countsMt = aggr.where(aggr.stringColumn("modelType").isEqualTo(mt))
 				.selectColumns("dist_group", "main_mode", "subpopulation", "Count [trip_id]")
 				.copy();
 			String countCol = "count_" + mt;
 			countsMt.column("Count [trip_id]").setName(countCol);
 
-			// 2) In die Haupttabelle reinjoinen (ohne modelType im Join),
-			//    sodass jede Zeile die Zählung für diesen modelType „quer“ stehen hat
 			aggr = aggr.joinOn(keys).leftOuter(countsMt);
 
-			// 3) fehlende Counts -> 0
 			DoubleColumn c = aggr.numberColumn(countCol).asDoubleColumn();
 			for (int row : c.isMissing().toArray()) c.set(row, 0.0);
 			aggr.replaceColumn(countCol, c);
 
-			// 4) Denominator: Summe über alle Zeilen dieses modelType
 			double denom = c.sum();
-			String shareCol = "mode_share_" + mt;
+			String shareCol = "share_" + mt;
 
 			DoubleColumn share;
 			if (denom == 0.0) {
@@ -485,7 +479,6 @@ public class TripAnalysis implements MATSimAppCommand {
 			}
 			aggr.addColumns(share);
 
-			// 5) Hilfsspalte wieder entfernen
 			aggr.removeColumns(countCol);
 		}
 		return aggr;
@@ -504,7 +497,6 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table usedModesOnly = sumsByMode.where(sumsByMode.numberColumn(sumColName).isGreaterThan(0));
 		Set<String> usedModes = new HashSet<>(usedModesOnly.stringColumn("main_mode").asList());
 
-		// 3) subset auf benutzte Modi filtern
 		subset = subset.where(subset.stringColumn("main_mode").isIn(usedModes));
 
 		DoubleColumn share = subset.numberColumn("Count [trip_id]")
