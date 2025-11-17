@@ -1,6 +1,8 @@
 package org.matsim.application.prepare.population;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -25,6 +27,7 @@ import java.util.Set;
 	showDefaultValues = true
 )
 public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgorithm {
+	private static final Logger log = LogManager.getLogger( SplitActivityTypesDuration.class );
 
 	@CommandLine.Option(names = "--input", description = "Path to input population", required = true)
 	private Path input;
@@ -37,6 +40,11 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 
 	@CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds.")
 	private int maxTypicalDuration = 86400;
+
+	@CommandLine.Option(names={"--overlong-plans-factor"}, description = "Plans where adding up their durations becomes larger than overlongPlansFactor * 24hrs lead to an abort.  " +
+																			 "Set to very large value if you want to accept all plans.")
+		// yyyy unclear how all of this work work with simulations > 24 hrs.  kai, nov'25
+	double overlongPlansFactor = 1.2;
 
 	@CommandLine.Option(names = {"--end-time-to-duration"}, description = "Remove the end time and encode as duration for activities shorter than this value.")
 	private int endTimeToDuration = 1800;
@@ -114,16 +122,18 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 
 			List<Activity> activities = TripStructureUtils.getActivities(plan, stageActivityHandling);
 
+			double sumDurations = 0.;
 			for (Activity act : activities) {
 
 				if (exclude.contains(act.getType()))
 					continue;
 
 				double duration;
-				if (act.getMaximumDuration().isDefined())
+				if (act.getMaximumDuration().isDefined()){
 					duration = act.getMaximumDuration().seconds();
-				else
-					duration = act.getEndTime().orElse(maxTypicalDuration) - act.getStartTime().orElse(0);
+				} else{
+					duration = act.getEndTime().orElse( maxTypicalDuration ) - act.getStartTime().orElse( 0 );
+				}
 				// (Under normal circumstances, maxTypicalDuration is NOT changed from its default value, which is 24*3600.   Then, we
 				// generate durations from or to midnight.  Note that overnight activities are merged below.  kai, feb'25)
 
@@ -132,15 +142,29 @@ public class SplitActivityTypesDuration implements MATSimAppCommand, PersonAlgor
 
 				// kn, ts, feb'25
 
-				String newType = String.format("%s_%d", act.getType(), roundDuration(duration));
+				final int roundedDuration = roundDuration( duration );
+				sumDurations += roundedDuration;
+				String newType = String.format("%s_%d", act.getType(), roundedDuration );
 				act.setType(newType);
 
 				// activities that are shorter than endTimeToDuration will be forced to have their initial duration.
 				// Talk to KN or to Tilmann if you need to understand this.
+				//
+				// !! --> One also needs to set "mutateDuration=false" for TimeAllocationMutator.  <-- !!
+				//
+				// This was not done in most if not all VSP model implementations up to nov'25 :-(. kai, nov'25
+				//
 				if (duration <= endTimeToDuration && act.getEndTime().isDefined()) {
 					act.setEndTimeUndefined();
 					act.setMaximumDuration(duration);
 				}
+			}
+
+			if ( sumDurations > maxTypicalDuration * this.overlongPlansFactor ) {
+				log.error( "sumDurations={} is considerably longer than maxTypicalDuration={}, despite the fact travel is not even included.  " +
+								   "Implies some issue with the incoming data.  The default is to fail here; ignoring the issue can be forced with --overlong-plans-factor = <some very large value>."
+						 , sumDurations, maxTypicalDuration );
+				throw new RuntimeException( "See error message above." );
 			}
 
 			mergeOvernightActivities(activities);

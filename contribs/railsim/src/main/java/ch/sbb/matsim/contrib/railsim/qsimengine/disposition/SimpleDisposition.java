@@ -29,6 +29,7 @@ import com.google.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Simple disposition without deadlock avoidance.
@@ -125,6 +126,12 @@ public class SimpleDisposition implements TrainDisposition {
 	}
 
 	private Detour checkDetour(double time, List<RailLink> segment, TrainPosition position) {
+
+		// No detour is calculated if a train is already on a link with the current transit stop
+		if (segment.size() == 1 && Objects.equals(position.getHeadLink(), segment.getFirst().getLinkId())
+			&& position.isStop(position.getHeadLink())) {
+			return null;
+		}
 
 		if (position.getPt() != null && considerReRouting(segment, resources.getLink(position.getHeadLink()))) {
 

@@ -21,6 +21,8 @@ package org.matsim.contrib.ev;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import org.matsim.contrib.ev.analysis.EvAnalysisModule;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -36,6 +38,7 @@ public class EvModule extends AbstractModule {
 	@Override
 	public void install() {
 		install( new EvBaseModule() );
+		install(new EvAnalysisModule());
 
 		// this is not for DynVehicles.  Does that mean that we cannot combine charging for normal vehicles with charging for eTaxis?  Can't say ...  kai, dec'22
 		installQSimModule(new AbstractQSimModule() {

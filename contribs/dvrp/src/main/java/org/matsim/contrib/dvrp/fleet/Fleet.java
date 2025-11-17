@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import org.matsim.api.core.v01.Id;
 
 import com.google.common.collect.ImmutableMap;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * Contains all DvrpVehicles generated for a given iteration. Its lifespan is limited to a single QSim simulation.
@@ -31,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author michalm
  */
+@NodeSingleton
 public interface Fleet {
 	ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles();
 }

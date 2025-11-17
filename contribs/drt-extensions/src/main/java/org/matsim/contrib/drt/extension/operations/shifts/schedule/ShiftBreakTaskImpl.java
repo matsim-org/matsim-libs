@@ -85,6 +85,25 @@ public class ShiftBreakTaskImpl extends DefaultStayTask implements ShiftBreakTas
 		delegate.removeDropoffRequest(requestId);
 	}
 
+	public double calcEarliestArrivalTime() {
+		return shiftBreak.getEarliestBreakStartTime();
+	}
+
+	@Override
+	public double calcLatestArrivalTime() {
+		return shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration();
+	}
+
+	@Override
+	public double calcLatestDepartureTime() {
+		return shiftBreak.getLatestBreakEndTime();
+	}
+
+	@Override
+	public double calcEarliestDepartureTime() {
+		return shiftBreak.getEarliestBreakStartTime() + shiftBreak.getDuration();
+	}
+
 	@Override
 	public Id<OperationFacility> getFacilityId() {
 		return facilityId;

@@ -2,8 +2,10 @@ package org.matsim.contrib.ev.strategic.scoring;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -35,8 +37,12 @@ import org.matsim.contrib.ev.discharging.IdlingEnergyConsumptionEventHandler;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEvent;
+import org.matsim.contrib.ev.strategic.reservation.AdvanceReservationEventHandler;
+import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters.ChargerTypeParams;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEvent;
 import org.matsim.contrib.ev.withinday.events.AbortChargingAttemptEventHandler;
@@ -67,6 +73,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		AbortChargingAttemptEventHandler, DrivingEnergyConsumptionEventHandler, IdlingEnergyConsumptionEventHandler,
 		ChargingEndEventHandler, QueuedAtChargerEventHandler, QuitQueueAtChargerEventHandler, ChargingStartEventHandler,
 		LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, EnergyChargedEventHandler,
+		AdvanceReservationEventHandler,
 		MobsimEngine {
 	static public final String MINIMUM_SOC_PERSON_ATTRIBUTE = "sevc:minimumSoc";
 	static public final String MINIMUM_END_SOC_PERSON_ATTRIBUTE = "sevc:minimumEndSoc";
@@ -77,7 +84,9 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 	private final Population population;
 	private final Network network;
+
 	private final ElectricFleetSpecification fleet;
+	private final ChargingInfrastructureSpecification infrastructure;
 
 	private final ChargingPlanScoringParameters parameters;
 	private final ChargingCostCalculator costCalculator;
@@ -89,6 +98,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 	public ChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
 			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
+			ChargingInfrastructureSpecification infrastructure,
 			ChargingCostCalculator costCalculator,
 			ChargingPlanScoringParameters parameters, String chargingMode, ScoringTracker tracker) {
 		this.eventsManager = eventsManager;
@@ -96,12 +106,14 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		this.network = network;
 		this.timeInterpretation = timeInterpretation;
 		this.fleet = fleet;
+		this.infrastructure = infrastructure;
 		this.costCalculator = costCalculator;
 		this.parameters = parameters;
 		this.chargingMode = chargingMode;
 		this.tracker = tracker;
 
 		initializePersons();
+		initializeChargerTypeConstants();
 	}
 
 	// PERSONS for vehicles: vehicle-related scoring is added to the score of the
@@ -166,7 +178,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
+	public void trackScoreForPerson(double time, Id<Person> personId, String dimension, double score, Double value) {
 		if (score != 0.0) {
 			tracker.trackScore(time, personId, dimension, score, value);
 		}
@@ -180,7 +192,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
+	public void trackScoreForVehicle(double time, Id<Vehicle> vehicleId, String dimension, double score,
 			Double value) {
 		Id<Person> personId = getPerson(vehicleId);
 
@@ -356,6 +368,17 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				null);
 	}
 
+	// RESERVATION scoring
+
+	@Override
+	public void handleEvent(AdvanceReservationEvent event) {
+		if (!event.getSuccessful()) {
+			addScoreForPerson(event.getPersonId(), parameters.getFailedReservation());
+		} else {
+			handleReservationCost(event);
+		}
+	}
+
 	// WAITING scoring
 
 	private final IdMap<Vehicle, Double> enterQueueTimes = new IdMap<>(Vehicle.class);
@@ -389,6 +412,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	public void handleEvent(ChargingStartEvent event) {
 		handleQuitQueue(event.getVehicleId(), event.getTime());
 		handleStartCharging(event);
+		handleChargerType(event);
 	}
 
 	// COST scoring
@@ -429,6 +453,31 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 			if (cost != 0.0) {
 				moneyEvents.add(new MoneyRecord(personId, event.getChargerId(), cost));
 			}
+		}
+	}
+
+	private void handleReservationCost(AdvanceReservationEvent event) {
+		double cost = costCalculator.calculateReservationCost(event.getPersonId(), event.getChargerId(),
+				event.getEndTime() - event.getStartTime());
+		moneyEvents.add(new MoneyRecord(event.getPersonId(), event.getChargerId(), cost));
+	}
+
+	// CHARGER TYPE SCORING
+
+	private final Map<String, Double> chargerTypeConstants = new HashMap<>();
+
+	private void initializeChargerTypeConstants() {
+		for (ChargerTypeParams type : parameters.getChargerTypeParams()) {
+			chargerTypeConstants.put(type.getChargerType(), type.getConstant());
+		}
+	}
+
+	private void handleChargerType(ChargingStartEvent event) {
+		String chargerType = infrastructure.getChargerSpecifications().get(event.getChargerId()).getChargerType();
+		Double score = chargerTypeConstants.get(chargerType);
+
+		if (score != null) {
+			trackScoreForVehicle(event.getTime(), event.getVehicleId(), "charger_type", score, score);
 		}
 	}
 

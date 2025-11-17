@@ -33,6 +33,9 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 	@Parameter
 	private String dynamicCostPerEnergy_kWh = null;
 
+	@Parameter
+	private double costPerReservation = 0.0;
+
 	public double getCostPerUse() {
 		return costPerUse;
 	}
@@ -79,5 +82,13 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 
 	public void setDynamicCostPerEnergy_kWh(String val) {
 		this.dynamicCostPerEnergy_kWh = val;
+	}
+
+	public double getCostPerReservation() {
+		return costPerReservation;
+	}
+
+	public void setCostPerReservation(double costPerReservation) {
+		this.costPerReservation = costPerReservation;
 	}
 }

@@ -19,12 +19,10 @@
 
 package ch.sbb.matsim.contrib.railsim.integration;
 
-import java.io.File;
-import java.net.URL;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
+import ch.sbb.matsim.contrib.railsim.RailsimModule;
+import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -46,21 +44,17 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import ch.sbb.matsim.contrib.railsim.RailsimModule;
-import ch.sbb.matsim.contrib.railsim.events.RailsimDetourEvent;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimQSimModule;
-import org.opentest4j.AssertionFailedError;
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
@@ -265,7 +259,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		//assertThat(result).allTrainsArrived(); this fails, some don't arrive...
 		assertThat(result).hasNumberOfTrains(210);
 		// check the number of events... we could see if something changes significantly in the future
-		Assertions.assertEquals(2605247, result.getEvents().size(), 1000);
+		Assertions.assertEquals(2505837, result.getEvents().size(), 1000);
 	}
 
 	@Test
@@ -681,9 +675,9 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			.trainHasLastArrival("v_IC_2", 29650.0)
 			.trainHasLastArrival("v_IC_3", 31383.0)
 			.trainHasLastArrival("v_IC_4", 31450.0)
-			.trainHasLastArrival("v_IR_1", 30321.0)
+			.trainHasLastArrival("v_IR_1", 30342.0)
 			.trainHasLastArrival("v_IR_2", 30609.0)
-			.trainHasLastArrival("v_IR_3", 32121.0)
+			.trainHasLastArrival("v_IR_3", 32142.0)
 			.trainHasLastArrival("v_IR_4", 32409.0);
 
 	}
@@ -696,7 +690,39 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
 
 		assertThat(result).hasNumberOfTrains(71).allTrainsArrived();
-		Assertions.assertEquals(result.getEvents().size(), 31731, 10);
+		Assertions.assertEquals(32888, result.getEvents().size(), 10);
+	}
+
+
+	@Test
+	void testScenarioParallelTracks() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "parallelTracks"));
+		assertThat(result)
+			.allTrainsArrived();
+
+	}
+
+	@Test
+	void testpScenarioParallelTracksNonStopingAreaRerouting() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "parallelTracksNonStopingAreaRerouting"));
+		assertThat(result)
+			.allTrainsArrived();
+
+	}
+
+	@Test
+	void testVaryingVMax() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "varyingVMax"));
+
+		// Train 2 is slower on the infrastructure
+		assertThat(result)
+			.trainHasLastArrival("train1", 30000)
+			.trainHasLastArrival("train2", 30960)
+			.allTrainsArrived();
+
 	}
 
 	private void assertSingleTrainOnLink(List<Event> events, String linkId) {

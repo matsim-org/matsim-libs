@@ -18,25 +18,21 @@
  * *********************************************************************** */
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+
+import java.util.*;
 
 /**
  * Notes:<ul>
@@ -87,6 +83,7 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 	private PlanSelector<PL, AG> removalPlanSelector = new GenericWorstPlanForRemovalSelector<>();
 
 	private final StrategyChooser<PL, AG> strategyChooser;
+	private final PopulationPartition partition;
 
 
 //	private String subpopulationAttributeName = null;
@@ -96,7 +93,12 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 	}
 
 	public GenericStrategyManagerImpl( StrategyChooser<PL, AG> strategyChooser ) {
+		this( strategyChooser, PopulationPartition.SINGLE_INSTANCE );
+	}
+
+	public GenericStrategyManagerImpl(StrategyChooser<PL, AG>  strategyChooser, PopulationPartition partition) {
 		this.strategyChooser = strategyChooser;
+		this.partition = partition;
 	}
 
 	//	/**
@@ -219,6 +221,10 @@ public class GenericStrategyManagerImpl<PL extends BasicPlan, AG extends HasPlan
 
 		// then go through the population and ...
 		for (HasPlansAndId<PL, AG> person : persons ) {
+
+			// skip replanning for persons that are not in the partition
+			if (person instanceof Person p && !partition.contains(p.getId()))
+				continue;
 
 			// ... reduce the number of plans to the allowed maximum (in evol comp lang this is "selection")
 			if ((this.maxPlansPerAgent > 0) && (person.getPlans().size() > this.maxPlansPerAgent)) {
