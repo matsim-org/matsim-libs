@@ -7,5 +7,5 @@ import org.matsim.api.core.v01.Id;
  * @author nkuehhnel / MOIA
  */
 public interface OperationFacilities {
-    ImmutableMap<Id<OperationFacility>, OperationFacility> getDrtOperationFacilities();
+    ImmutableMap<Id<OperationFacility>, OperationFacility> getFacilities();
 }

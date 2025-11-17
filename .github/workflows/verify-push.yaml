@@ -60,6 +60,7 @@ jobs:
           - contribs/analysis
           - contribs/hybridsim
           - contribs/informed-mode-choice
+          - contribs/distributed-simulation
           - contribs/otfvis
           - contribs/osm
           - contribs/application
@@ -87,7 +88,7 @@ jobs:
         if: ${{matrix.module != 'matsim' || steps.detect-changes.outputs.outside-contribs == 'true'}}
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'zulu'
           cache: 'maven'
 

@@ -525,7 +525,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public void setPersonInitializedEventsSetting(PersonInitializedEventsSetting setting) {
 		this.personInitializedEventsSetting = setting;
 	}
-	
+
 	@StringGetter(PERSON_INITIALIZED_EVENTS)
 	public PersonInitializedEventsSetting getPersonInitializedEventsSetting() {
 		return personInitializedEventsSetting;
@@ -690,6 +690,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
+	}
+
+	public static final String DELAY_INSTANT_TELEPORTATION_ARRIVALS = "delayInstantTeleportationArrivals";
+	public boolean delayInstantTeleportationArrivals = true;
+
+	@StringGetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
+	public boolean getDelayInstantTeleportationArrivals() {
+		return this.delayInstantTeleportationArrivals;
+	}
+
+	@StringSetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
+	public void setDelayInstantTeleportationArrivals(boolean val) {
+		this.delayInstantTeleportationArrivals = val;
 	}
 
 	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING = //

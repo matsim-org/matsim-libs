@@ -40,7 +40,7 @@ public class AcceptedDrtRequest {
 				.earliestStartTime(request.getEarliestStartTime())
 				.latestStartTime(request.getLatestStartTime())
 				.latestArrivalTime(request.getLatestArrivalTime())
-				.maxRideDuration(request.getMaxRideDuration())
+				.maxRideDuration(request.getConstraints().maxRideDuration())
 				.dropoffDuration(dropoffDuration)
 				.build();
 	}

@@ -30,6 +30,12 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 	@Parameter
 	private double blockingDuration_min = 0.0;
 
+	@Parameter
+	private String dynamicCostPerEnergy_kWh = null;
+
+	@Parameter
+	private double costPerReservation = 0.0;
+
 	public double getCostPerUse() {
 		return costPerUse;
 	}
@@ -68,5 +74,21 @@ public class DefaultChargingCostsParameters extends ReflectiveConfigGroup implem
 
 	public void setBlockingDuration_min(double blockingDuration_min) {
 		this.blockingDuration_min = blockingDuration_min;
+	}
+
+	public String getDynamicCostPerEnergy_kWh() {
+		return dynamicCostPerEnergy_kWh;
+	}
+
+	public void setDynamicCostPerEnergy_kWh(String val) {
+		this.dynamicCostPerEnergy_kWh = val;
+	}
+
+	public double getCostPerReservation() {
+		return costPerReservation;
+	}
+
+	public void setCostPerReservation(double costPerReservation) {
+		this.costPerReservation = costPerReservation;
 	}
 }

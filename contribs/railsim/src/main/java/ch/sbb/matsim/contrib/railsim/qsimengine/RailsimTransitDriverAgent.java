@@ -54,6 +54,13 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 	}
 
 	/**
+	 * Get the current stop index of this driver schedule.
+	 */
+	public int getCurrentStopIndex() {
+		return stopIterator.nextIndex() - 1;
+	}
+
+	/**
 	 * Add a detour to this driver schedule.
 	 *
 	 * @return next transit stop, if it needs to be changed.
@@ -70,8 +77,6 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 
 		if (nextStop != null) {
 
-			Id<TransitStopArea> areaId = nextStop.getStopAreaId();
-
 			boolean adjust = false;
 			for (RailLink link : original) {
 				if (nextStop.getLinkId().equals(link.getLinkId())) {
@@ -82,6 +87,15 @@ public final class RailsimTransitDriverAgent extends TransitDriverAgentImpl {
 
 			// pt stop needs to be remapped
 			if (adjust) {
+				
+				Id<TransitStopArea> areaId = nextStop.getStopAreaId();
+
+				if (areaId == null) {
+					log.warn("Could not re-route vehicle {} to a replacement transit stop for {} because it has no stop area",
+						getVehicle().getId(), nextStop);
+
+					return null;
+				}
 
 				List<TransitStopFacility> inArea = stopAreas.get(areaId);
 

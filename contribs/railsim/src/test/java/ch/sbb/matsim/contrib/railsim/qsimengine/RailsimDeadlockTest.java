@@ -5,6 +5,7 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.DeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.NoDeadlockAvoidance;
 import ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks.SimpleDeadlockAvoidance;
+import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.MaxSpeedProfile;
 import ch.sbb.matsim.contrib.railsim.qsimengine.disposition.SimpleDisposition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.ResourceType;
@@ -53,10 +54,12 @@ public class RailsimDeadlockTest {
 			}
 		}
 
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla);
+		TrainManager trains = new TrainManager();
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, dla, trains);
+		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 
-		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, new SimpleDisposition(res, router)), net);
+		return new RailsimTestUtils.Holder(new RailsimEngine(eventsManager, config, res, trains, new SimpleDisposition(res, speed, router)), net);
 	}
 
 	@Test
@@ -221,9 +224,9 @@ public class RailsimDeadlockTest {
 
 		RailsimTestUtils.assertThat(collector)
 			.hasTrainState("regio1a", 670, "EF", 0)
-			.hasTrainState("regio1b", 790, "EF", 0)
+			.hasTrainState("regio1b", 795, "EF", 0)
 			.hasTrainState("regio2a", 1120, "CD", 0)
-			.hasTrainState("regio2b", 1243, "CD", 0);
+			.hasTrainState("regio2b", 1245, "CD", 0);
 
 	}
 }

@@ -31,4 +31,11 @@ public interface DashboardProvider {
 		return 0;
 	}
 
+	/**
+	 * If true, this provider will be automatically added if defaultDashboards in {@link SimWrapperConfigGroup} is enabled.
+	 */
+	default boolean isDefault() {
+		return false;
+	}
+
 }

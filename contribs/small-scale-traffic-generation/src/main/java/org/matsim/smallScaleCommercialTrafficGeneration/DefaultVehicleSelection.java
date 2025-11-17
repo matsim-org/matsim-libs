@@ -19,7 +19,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 
 
 	@Override
-	public OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, String smallScaleCommercialTrafficType) {
+	public OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
 		VehicleSelection.OdMatrixEntryInformation information = new OdMatrixEntryInformation();
 		information.occupancyRate = 0;
 		information.possibleVehicleTypes = null;
@@ -27,7 +27,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 		information.possibleStopCategories = new ArrayList<>(getAllCategories());
 
 		if (purpose == 1) {
-			if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
 				information.occupancyRate = 1.5;
 			}
@@ -35,26 +35,26 @@ public class DefaultVehicleSelection implements VehicleSelection{
 			information.possibleStopCategories.clear();
 			information.possibleStopCategories.add("Employee Secondary Sector Rest");
 		} else if (purpose == 2) {
-			if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
 				information.occupancyRate = 1.6;
 			}
 			information.possibleStartCategories.add("Employee Secondary Sector Rest");
 		} else if (purpose == 3) {
-			if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
 				information.occupancyRate = 1.2;
 			}
 			information.possibleStartCategories.add("Employee Retail");
 			information.possibleStartCategories.add("Employee Tertiary Sector Rest");
 		} else if (purpose == 4) {
-			if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
 				information.occupancyRate = 1.2;
 			}
 			information.possibleStartCategories.add("Employee Traffic/Parcels");
 		} else if (purpose == 5) {
-			if (smallScaleCommercialTrafficType.equals("commercialPersonTraffic")) {
+			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
 				information.occupancyRate = 1.7;
 			}
@@ -63,7 +63,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 			information.possibleStartCategories.add("Inhabitants");
 		}
 
-		if (smallScaleCommercialTrafficType.equals("goodsTraffic")) {
+		if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic)) {
 			information.occupancyRate = 1.;
 			switch (modeORvehType) {
 				case "vehTyp1" ->

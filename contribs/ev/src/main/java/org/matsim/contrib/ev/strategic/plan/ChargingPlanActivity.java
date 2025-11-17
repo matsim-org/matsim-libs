@@ -40,6 +40,9 @@ public class ChargingPlanActivity {
 	@JsonProperty
 	private double duration = 0.0;
 
+	@JsonProperty("reserved")
+	private boolean isReserved = false;
+
 	@JsonProperty
 	@JsonSerialize(using = IdSerializer.class)
 	@JsonDeserialize(using = IdDeserializer.class)
@@ -48,7 +51,8 @@ public class ChargingPlanActivity {
 	ChargingPlanActivity() {
 	}
 
-	public ChargingPlanActivity(int startActivityIndex, int endActivityIndex, Id<Charger> chargerId) {
+	public ChargingPlanActivity(int startActivityIndex, int endActivityIndex, Id<Charger> chargerId,
+			boolean isReserved) {
 		Preconditions.checkArgument(startActivityIndex >= 0);
 		Preconditions.checkArgument(endActivityIndex >= startActivityIndex);
 		Preconditions.checkNotNull(chargerId);
@@ -56,9 +60,11 @@ public class ChargingPlanActivity {
 		this.startActivityIndex = startActivityIndex;
 		this.endActivityIndex = endActivityIndex;
 		this.chargerId = chargerId;
+		this.isReserved = isReserved;
 	}
 
-	public ChargingPlanActivity(int followingActivityIndex, double duration, Id<Charger> chargerId) {
+	public ChargingPlanActivity(int followingActivityIndex, double duration, Id<Charger> chargerId,
+			boolean isReserved) {
 		Preconditions.checkArgument(followingActivityIndex >= 0);
 		Preconditions.checkArgument(duration > 0.0);
 		Preconditions.checkNotNull(chargerId);
@@ -66,6 +72,7 @@ public class ChargingPlanActivity {
 		this.followingActivityIndex = followingActivityIndex;
 		this.duration = duration;
 		this.chargerId = chargerId;
+		this.isReserved = isReserved;
 	}
 
 	public int getStartActivityIndex() {
@@ -86,6 +93,10 @@ public class ChargingPlanActivity {
 
 	public Id<Charger> getChargerId() {
 		return chargerId;
+	}
+
+	public boolean isReserved() {
+		return isReserved;
 	}
 
 	// Convenience accessors
@@ -122,6 +133,7 @@ public class ChargingPlanActivity {
 		copy.followingActivityIndex = followingActivityIndex;
 		copy.duration = duration;
 		copy.chargerId = chargerId;
+		copy.isReserved = isReserved;
 
 		return copy;
 	}

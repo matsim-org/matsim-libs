@@ -20,7 +20,7 @@
 
 package org.matsim.freight.logistics;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,8 +145,7 @@ class LSPControllerListener
 		}
 
 		LSPs lsps = LSPUtils.getLSPs(scenario);
-		strategyManager.run(
-			lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
+		strategyManager.run(lsps.getLSPs().values(), event.getIteration(), event.getReplanningContext());
 
 		for (LSP lsp : lsps.getLSPs().values()) {
 			lsp.getSelectedPlan()

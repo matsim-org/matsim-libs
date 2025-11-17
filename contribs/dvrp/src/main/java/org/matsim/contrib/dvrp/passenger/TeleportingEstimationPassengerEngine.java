@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.passenger;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.doubles.DoubleObjectPair;
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -101,7 +101,7 @@ public class TeleportingEstimationPassengerEngine implements PassengerEngine, Vi
 		this.requestValidator = requestValidator;
 		this.teleportationEngine = teleportationEngine;
 
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, new DvrpPassengerTracker(mode));
 	}
 
 	@Override
