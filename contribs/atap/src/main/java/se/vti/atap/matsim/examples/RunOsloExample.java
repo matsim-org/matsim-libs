@@ -35,8 +35,8 @@ import se.vti.emulation.EmulationConfigGroup;
  * <i>"A simulation heuristic for traveler- and vehicle-discrete dynamic traffic assignment"</i>.
  *
  * <ul>
- *   <li><b>Network:</b> https://zenodo.org/records/17610274https://zenodo.org/records/17610274</li>
- *   <li><b>Population:</b> https://zenodo.org/records/17609947https://zenodo.org/records/17609947</li>
+ *   <li><b>Network:</b> https://zenodo.org/records/17610274</li>
+ *   <li><b>Population:</b> https://zenodo.org/records/17609947</li>
  * </ul>
  * 
  * @author Gunnar Flötteröd
