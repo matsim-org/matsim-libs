@@ -163,5 +163,32 @@ public final class Injector {
 		return Injector.createInjector(config, theModules.toArray(new Module[0]));
 	}
 
+	// If one cannot override the above, then for everything that needs overriding (e.g. income dep scoring fct) one needs to
+	// construct a full controller.  In general, guice allows the overriding of Modules before the injector is created.  However,
+	// with MATSim we need the bootstrap injector at an even earlier phase.  The following is an early attempt, but I don't think it quite works yet.
+
+//	public static com.google.inject.Injector createMinimalMatsimInjector(Scenario scenario, List<AbstractModule> modules, List<AbstractModule> overridingModules ) {
+//
+//		Collection<AbstractModule> theModules = new ArrayList<>();
+//		theModules.add(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				install(new NewControlerModule());
+//				install(new ControlerDefaultCoreListenersModule());
+//				install(new ControlerDefaultsModule());
+//				install(new ScenarioByInstanceModule(scenario));
+//			}
+//		});
+//		theModules.addAll(modules);
+//
+//		Module combinedModule = Modules.combine( theModules );
+//
+//		for( AbstractModule overridingModule : overridingModules ){
+//			combinedModule = AbstractModule.override( combinedModule, overridingModule );
+//		}
+//
+//		return Injector.createInjector(scenario.getConfig(), theModules.toArray(new Module[0]));
+//	}
+
 
 }
