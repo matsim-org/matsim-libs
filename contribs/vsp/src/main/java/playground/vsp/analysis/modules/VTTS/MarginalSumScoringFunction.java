@@ -20,13 +20,16 @@ package playground.vsp.analysis.modules.VTTS;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
+
+import java.math.BigDecimal;
 
 /**
  * @author ikaddoura
@@ -40,28 +43,13 @@ public class MarginalSumScoringFunction {
 
 	public MarginalSumScoringFunction(ScoringParameters params) {
 
-
-		ScoringConfigGroup.ActivityParams taxiActParams = new ScoringConfigGroup.ActivityParams("TaxiPickup");
-		taxiActParams.setTypicalDurationScoreComputation(ScoringConfigGroup.TypicalDurationScoreComputation.relative);
-		taxiActParams.setTypicalDuration(1.0);
-		taxiActParams.setScoringThisActivityAtAll(false);
-
-		/*
-		ScoringParameters.ActivityParams taxiActParams = new PlanCalcScoreConfigGroup.ActivityParams("TaxiPickup");
-		taxiActParams.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-		taxiActParams.setScoringThisActivityAtAll(false);
-		taxiActParams.setTypicalDuration(1.0);
-
-		ActivityUtilityParameters actUtilityParams = new ActivityUtilityParameters.Builder(taxiActParams).build();
-		params.utilParams.put("TaxiPickup", actUtilityParams); */
-
 		activityScoringA = new CharyparNagelActivityScoring(params);
 		activityScoringB = new CharyparNagelActivityScoring(params);
 	}
 
 	private static int cnt = 0;
 
-	public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
+	public final double getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double delay ) {
 
 		SumScoringFunction sumScoringA = new SumScoringFunction() ;
 		sumScoringA.addScoringFunction(activityScoringA);
@@ -83,14 +71,6 @@ public class MarginalSumScoringFunction {
 		// yy Depending on how complete the later used "handleActivity" is set up, the facility may become closed at exactly this time step, and then the resulting VTTS will be zero. kai, nov'25
 		// --> However, may also work the other way around, and the facility may just become open at exactly this time step.
 
-		if ( cnt < 10 ){
-			cnt++;
-			log.info( "activity={}; activityWithoutDelay={}", activity, activityWithoutDelay );
-			if ( cnt==10 ) {
-				log.info( Gbl.FUTURE_SUPPRESSED );
-			}
-		}
-
 		sumScoringA.handleActivity(activity);
 		sumScoringB.handleActivity(activityWithoutDelay);
 
@@ -103,8 +83,14 @@ public class MarginalSumScoringFunction {
 		double scoreWithDelay = scoreA1 - scoreA0;
 		double scoreWithoutDelay = scoreB1 - scoreB0;
 
-		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
-		return activityDelayDisutility;
+		final double deltaScore = scoreWithoutDelay - scoreWithDelay;
+
+		if ( deltaScore==0. ) {
+			log.warn( "actDelayDisutil=0; presumably actStart outside opening times; personId={}; actType={}; actStart={}; actEnd={}", personId, activity.getType(), activity.getStartTime().seconds()/3600., activity.getEndTime().seconds()/3600. );
+			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreWithoutDelay), new BigDecimal( scoreWithDelay) );
+		}
+
+		return deltaScore;
 	}
 
 	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {
@@ -153,8 +139,7 @@ public class MarginalSumScoringFunction {
 		double scoreWithDelay = scoreA1 - scoreA0;
 		double scoreWithoutDelay = scoreB1 - scoreB0;
 
-		double activityDelayDisutility = scoreWithoutDelay - scoreWithDelay;
-		return activityDelayDisutility;
+		return scoreWithoutDelay - scoreWithDelay;
 	}
 
 }

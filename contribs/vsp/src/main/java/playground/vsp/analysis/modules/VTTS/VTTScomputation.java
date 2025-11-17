@@ -30,9 +30,9 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class VTTScomputation implements StartupListener, AfterMobsimListener {
 
-	private final VTTSHandler vttsHandler;
+	private final VTTSHandlerDeprecated vttsHandler;
 
-	public VTTScomputation(VTTSHandler vttsHandler) {
+	public VTTScomputation( VTTSHandlerDeprecated vttsHandler ) {
 		this.vttsHandler = vttsHandler;
 	}
 

@@ -24,13 +24,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.commons.math.stat.StatUtils;
-import org.mapdb.Atomic;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -64,26 +62,9 @@ import org.matsim.core.utils.io.IOUtils;
  * @author ikaddoura
  *
  */
-public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
+public class VTTSHandlerDeprecated implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 
-	private static class TripData {
-		double VTTSh;
-		String mode;
-	}
-
-	private static class SimData {
-		double currentActivityStartTime = Double.NaN;
-		String currentActivityType;
-		int currentTripNr = 0;
-		String currentTripMode;
-		List<TripData> tripdata = new ArrayList<>();
-		double firstActivityEndTime = Double.NaN;
-		String firstActivityType ;
-	}
-	private final Map<Id<Person>,SimData> simDataMap = new HashMap<>();
-	// I think that the above might be much faster during events reading.  If possible, also replace the number objects by primitive types.
-
-	private static final Logger log = LogManager.getLogger( VTTSHandler.class );
+	private static final Logger log = LogManager.getLogger( VTTSHandlerDeprecated.class );
 	private static int incompletedPlanWarning = 0;
 	private static int noCarVTTSWarning = 0;
 	private static int noTripVTTSWarning = 0;
@@ -115,8 +96,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
 
-	@Inject
-	VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
+	@Inject VTTSHandlerDeprecated( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
 		// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 		// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 		// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  Also see a similar comment further
@@ -178,17 +158,12 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} else {
 			this.departedPersonIds.add(event.getPersonId());
 			this.personId2currentTripMode.put(event.getPersonId(), event.getRoutingMode());
-			//
-//			SimData simData = simDataMap.computeIfAbsent( event.getPersonId(), k -> new SimData() );
-//			simData.currentTripMode = event.getRoutingMode();
 
 			if (this.personId2currentTripNr.containsKey(event.getPersonId())){
 				this.personId2currentTripNr.put(event.getPersonId(), this.personId2currentTripNr.get(event.getPersonId()) + 1);
 			} else {
 				this.personId2currentTripNr.put(event.getPersonId(), 1);
 			}
-			//
-//			simData.currentTripNr++;
 
 			if (this.personId2TripNr2DepartureTime.containsKey(event.getPersonId())) {
 				this.personId2TripNr2DepartureTime.get(event.getPersonId()).put(this.personId2currentTripNr.get(event.getPersonId()), event.getTime());
@@ -197,7 +172,6 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 				tripNr2departureTime.put(this.personId2currentTripNr.get(event.getPersonId()), event.getTime());
 				this.personId2TripNr2DepartureTime.put(event.getPersonId(), tripNr2departureTime);
 			}
-			//
 
 		}
 	}
@@ -327,7 +301,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 				Activity activity = PopulationUtils.createActivityFromLinkId( this.personId2currentActivityType.get( personId ), null );
 				activity.setStartTime( this.personId2currentActivityStartTime.get( personId ) );
 				activity.setEndTime( activityEndTime );
-				activityDelayDisutilityOneSec = marginalSumScoringFunction.getNormalActivityDelayDisutility( activity, 1.0 );
+				activityDelayDisutilityOneSec = marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
 			}
 
 		} else{

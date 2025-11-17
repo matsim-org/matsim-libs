@@ -20,7 +20,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.examples.ExamplesUtils;
-import playground.vsp.analysis.modules.VTTS.VTTSHandler;
+import playground.vsp.analysis.modules.VTTS.VTTSHandlerDeprecated;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,14 +67,14 @@ public class TestVTTSScoring {
 			@Override public void install(){
 				//this.addEventHandlerBinding().toInstance( new VTTSHandler( new String[]{"freight"} ) );
 				//this.addEventHandlerBinding().to( VTTSHandler.class ); // this would be better
-				bind(VTTSHandler.class).in(Singleton.class);
-				addEventHandlerBinding().to(VTTSHandler.class);
+				bind( VTTSHandlerDeprecated.class ).in(Singleton.class );
+				addEventHandlerBinding().to( VTTSHandlerDeprecated.class );
 			}
 		} );
 
 		controler.run();
 
-		VTTSHandler vttsHandler = controler.getInjector().getInstance( VTTSHandler.class );
+		VTTSHandlerDeprecated vttsHandler = controler.getInjector().getInstance( VTTSHandlerDeprecated.class );
 
 		vttsHandler.computeFinalVTTS();
 		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
@@ -134,15 +134,15 @@ public class TestVTTSScoring {
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind(VTTSHandler.class).in(Singleton.class);
-				addEventHandlerBinding().to(VTTSHandler.class);
+				bind( VTTSHandlerDeprecated.class ).in(Singleton.class );
+				addEventHandlerBinding().to( VTTSHandlerDeprecated.class );
 				bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class).asEagerSingleton();
 			}
 		} );
 
 		controler.run();
 
-		VTTSHandler vttsHandler = controler.getInjector().getInstance( VTTSHandler.class );
+		VTTSHandlerDeprecated vttsHandler = controler.getInjector().getInstance( VTTSHandlerDeprecated.class );
 
 		vttsHandler.computeFinalVTTS();
 		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
