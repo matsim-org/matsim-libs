@@ -486,7 +486,11 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private void subSetAnalysisForModeShares(List<String> labels, String group, Table aggr, Comparator<Row> cmp,
 											 Map<String, List<String>> groupsOfSubpopulationsForAnalysis) {
-		Table subset = aggr.where(
+		Table subset;
+		if (groupsOfSubpopulationsForAnalysis.isEmpty())
+			subset = aggr;
+		else
+			subset = aggr.where(
 			aggr.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForAnalysis.get(group)));
 		Table sumsByMode = subset.summarize("Count [trip_id]", sum).by("main_mode");
 
@@ -1078,10 +1082,11 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table joined = new DataFrameJoiner(trips, "trip_id").inner(true, originalTrips);
 
-		// filters for all subpopulations that are used for person analysis
-		joined = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
-			.flatMap(Collection::stream)
-			.collect(Collectors.toSet())));
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty())
+			// filters for all subpopulations that are used for person analysis
+			joined = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
+				.flatMap(Collection::stream)
+				.collect(Collectors.toSet())));
 
 		Table aggr = joined.summarize("trip_id", count).by("original_mode", "main_mode");
 
