@@ -266,7 +266,9 @@ public class TripDashboard implements Dashboard {
 
 				if (modeShareDistRefCsv != null) {
 					viz.addDataset(data.resource(modeShareDistRefCsv))
-						.constant("source", "Ref");
+						.constant("source", "Ref")
+						.constant("subpopulation", "total")
+						.constant("modelType", "total");// TODO make this optional if data is not set for different groups
 					viz.multiIndex = Map.of("dist_group", "source");
 					viz.mergeDatasets = true;
 				}
@@ -300,7 +302,8 @@ public class TripDashboard implements Dashboard {
 						ds.constant("source", "sim");
 
 						viz.addDataset(data.resource(modeUsersRefCsv))
-							.constant("source", "ref");
+							.constant("source", "ref")
+							.constant("group", personGroup); //TODO stimmt das hier so? // TODO make this optional if data is not set for different groups
 
 						viz.multiIndex = Map.of("main_mode", "source");
 						viz.mergeDatasets = true;
