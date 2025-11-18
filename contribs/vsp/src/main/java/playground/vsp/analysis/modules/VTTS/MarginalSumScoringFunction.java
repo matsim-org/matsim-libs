@@ -47,7 +47,7 @@ public class MarginalSumScoringFunction {
 		activityScoringB = new CharyparNagelActivityScoring(params);
 	}
 
-	private static int cnt = 0;
+	private static int deltaScoreZeroWrnCnt = 0;
 
 	public final double getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double delay ) {
 
@@ -85,9 +85,13 @@ public class MarginalSumScoringFunction {
 
 		final double deltaScore = scoreWithoutDelay - scoreWithDelay;
 
-		if ( deltaScore==0. ) {
+		if ( deltaScore==0. && deltaScoreZeroWrnCnt<10 ) {
+			deltaScoreZeroWrnCnt++;
 			log.warn( "actDelayDisutil=0; presumably actStart outside opening times; personId={}; actType={}; actStart={}; actEnd={}", personId, activity.getType(), activity.getStartTime().seconds()/3600., activity.getEndTime().seconds()/3600. );
 			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreWithoutDelay), new BigDecimal( scoreWithDelay) );
+			if ( deltaScoreZeroWrnCnt==10 ) {
+				log.warn( Gbl.FUTURE_SUPPRESSED );
+			}
 		}
 
 		return deltaScore;

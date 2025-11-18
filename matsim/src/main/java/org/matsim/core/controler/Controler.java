@@ -138,7 +138,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 	private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
-	private AbstractModule overrides = AbstractModule.emptyModule();
+	private AbstractModule overridingModule = AbstractModule.emptyModule();
 
 	private final List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
@@ -216,7 +216,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		this.config.eventsManager().makeLocked();
 		this.scenario = scenario;
 		this.simCtx = ctx == null ? LocalContext.create(this.config) : ctx;
-		this.overrides = scenario == null ?
+		this.overridingModule = scenario == null ?
 			new ScenarioByConfigModule() :
 			new ScenarioByInstanceModule(this.scenario);
 
@@ -229,13 +229,13 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		if (!injectorCreated) {
 			this.injectorCreated = true;
 
-			this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), new AbstractModule() {
+			this.overridingModule = AbstractModule.override(Collections.singletonList(this.overridingModule ), new AbstractModule() {
 				@Override
 				public void install() {
 					bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
 					}, Names.named("overrides"))).toInstance(overridingQSimModules);
 				}
-			});
+			} );
 
 			// check config consistency just before creating injector; sometimes, we can provide better error messages there:
 			config.removeConfigConsistencyChecker(UnmaterializedConfigGroupChecker.class);
@@ -256,7 +256,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 					}
 				}
 			);
-			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overrides));
+			this.injector = Injector.createInjector(config, simCtx, AbstractModule.override(standardModules, overridingModule ) );
 		}
 	}
 
@@ -499,7 +499,7 @@ public final class Controler implements Controller, ControlerI, MatsimServices, 
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
-		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+		this.overridingModule = AbstractModule.override(Collections.singletonList(this.overridingModule ), abstractModule );
 		return this;
 	}
 

@@ -41,6 +41,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.misc.OptionalTime;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
@@ -204,7 +205,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 			// this is NOT the first activity ...
 
 			// ... now process the events thrown during the trip to the activity which has just ended, ...
-			computeVTTS( personId, event.getTime() );
+			computeVTTS( personId, OptionalTime.defined( event.getTime() ) );
 
 			simData.currentActivityType = null;
 			simData.currentActivityStartTime = Double.NaN;
@@ -219,11 +220,11 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 	 */
 	public void computeFinalVTTS() {
 		for (Id<Person> affectedPersonId : this.departedPersonIds) {
-			computeVTTS(affectedPersonId, Double.NEGATIVE_INFINITY);
+			computeVTTS( affectedPersonId, OptionalTime.undefined() );
 		}
 	}
 
-	public Table returnTablesawTripTable() {
+	public Table returnTablesawTripsTable() {
 		StringColumn personIds = StringColumn.create( HeadersKN.personId );
 		IntColumn tripIndices = IntColumn.create( HeadersKN.tripIdx );
 		StringColumn modes = StringColumn.create( HeadersKN.mode );
@@ -249,7 +250,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 
 	private static int mUoMCnt =0;
 
-	private void computeVTTS(Id<Person> personId, double activityEndTime){
+	private void computeVTTS(Id<Person> personId, OptionalTime activityEndTime ){
 
 		final SimData simData = this.simDataMap.get( personId );
 		if ( simData.trips.getLast().mode == null ) {
@@ -283,7 +284,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 			// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  kai, gr, jul'25
 
-			if( activityEndTime == Double.NEGATIVE_INFINITY ){
+			if( activityEndTime.isUndefined() ){
 				// The end time is undefined...
 
 				// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
@@ -301,7 +302,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 
 				Activity activity = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
 				activity.setStartTime( simData.currentActivityStartTime );
-				activity.setEndTime( activityEndTime );
+				activity.setEndTime( activityEndTime.seconds() );
 				activityDelayDisutility_h = 3600. * marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
 			}
 

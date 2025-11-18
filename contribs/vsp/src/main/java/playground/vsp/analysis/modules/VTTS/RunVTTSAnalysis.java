@@ -1,8 +1,5 @@
 package playground.vsp.analysis.modules.VTTS;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import org.apache.commons.math3.stat.StatUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -12,46 +9,27 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.NewControlerModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
-import org.matsim.core.scenario.ScenarioChecker;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.aggregate.AggregateFunctions;
-import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvWriteOptions;
-import tech.tablesaw.plotly.Plot;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
 import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 @CommandLine.Command(name = "write-experienced-plans",
@@ -122,57 +100,20 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 			}
 		}
 
-		ScenarioChecker scenarioChecker = new ScenarioChecker( scenario );
-		scenarioChecker.addScenarioChecker( new ScenarioChecker.ActivityChecker() );
-		scenarioChecker.run();
+		// this is awfully slow:
+//		ScenarioChecker scenarioChecker = new ScenarioChecker( scenario );
+//		scenarioChecker.addScenarioChecker( new ScenarioChecker.ActivityChecker() );
+//		scenarioChecker.run();
 
-		System.exit(-1);
+		com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario )
+												  .addStandardModules()
+												  .addOverridingModule( new AbstractModule(){
+													  @Override public void install(){
+														  bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
+													  }
+												  } )
+												  .build();
 
-		// ---
-
-		// there is probably a better way of doing the following, but I haven't figured out how to use the override syntax w/o Controller.
-		Module module= new AbstractModule(){
-			@Override
-			public void install(){
-
-				// the following three come from the "minimal injector" (minus ControlerDefaultsModule):
-				install( new NewControlerModule() );
-				install( new ControlerDefaultCoreListenersModule() );
-				install( new ScenarioByInstanceModule( scenario ) );
-
-				// the following come from ControlerDefaultsModule (minus CharyparNagelScoringModule, minus the oberserver modules):
-				install(new EventsManagerModule() );
-				install(new DefaultMobsimModule() );
-				install(new TravelTimeCalculatorModule() );
-				install(new TravelDisutilityModule() );
-				install(new TripRouterModule() );
-				install(new StrategyManagerModule() );
-				install(new TimeInterpretationModule() );
-//				if (getConfig().replanningAnnealer().isActivateAnnealingModule()) {
-//					addControllerListenerBinding().to( ReplanningAnnealer.class );
-//				}
-
-				// the following comes from CharyparNagelScoringModule; we comment most of it out:
-				bind( ScoringFunctionFactory.class ).to( CharyparNagelScoringFunctionFactory.class );
-
-//				Map<String, ScoringConfigGroup.ScoringParameterSet> scoringParameter = getConfig().scoring().getScoringParametersPerSubpopulation();
-//
-//				boolean tasteVariations = scoringParameter.values().stream().anyMatch(s -> s.getTasteVariationsParams() != null);
-//
-//				// If there are taste variations, the individual scoring parameters are used
-//				if (tasteVariations) {
-//					bind(ScoringParametersForPerson.class).to( IndividualPersonScoringParameters.class ).in( Singleton.class );
-//					addControllerListenerBinding().to( IndividualPersonScoringOutputWriter.class ).in(Singleton.class );
-//
-//				} else {
-//					bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
-//				}
-
-				// THIS is the reason why we are doing all this ... since we cannot override this binding with the syntax here:
-				bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-			}
-		};
-		Injector injector = org.matsim.core.controler.Injector.createInjector( config, module );
 		ScoringParametersForPerson scoringParametersForPerson = injector.getInstance( ScoringParametersForPerson.class );
 
 
@@ -196,7 +137,7 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 //		format1.setMinimumFractionDigits( 1 );
 
 
-		Table tripTable = vttsHandler.returnTablesawTripTable();
+		Table tripTable = vttsHandler.returnTablesawTripsTable();
 
 		System.out.println( tripTable );
 

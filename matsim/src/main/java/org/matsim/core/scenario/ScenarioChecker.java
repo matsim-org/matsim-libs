@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeTracker;
 
@@ -33,9 +34,11 @@ public final class ScenarioChecker{
 
 		@Override public void checkScenario( Scenario scenario ){
 			log.info( "start checking if activities are roughly within opening times ...");
+			Counter counter = new Counter( "# person " );
 			final TimeTracker timeTracker = new TimeTracker( TimeInterpretation.create( scenario.getConfig() ) );
 			double violationCnt = 0.;
 			for( Person person : scenario.getPopulation().getPersons().values() ){
+				counter.incCounter();
 				timeTracker.setTime( 0. );
 				for( Activity activity : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
 					ScoringConfigGroup.ActivityParams actParams = scenario.getConfig().scoring().getActivityParams( activity.getType() );
