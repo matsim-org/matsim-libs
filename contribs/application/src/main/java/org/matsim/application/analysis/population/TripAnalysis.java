@@ -567,7 +567,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		StringColumn modelType = StringColumn.create("modelType");
 
 		for (String subpopulation : subpop) {
-			String foundModelType = getModelType(subpopulation);
+			String foundModelType = getModelType(subpopulation).toString();
 			modelType.append(foundModelType);
 		}
 		aggr.replaceColumn("modelType", modelType);
