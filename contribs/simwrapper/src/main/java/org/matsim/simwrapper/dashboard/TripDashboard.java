@@ -265,14 +265,11 @@ public class TripDashboard implements Dashboard {
 				);
 
 				if (modeShareDistRefCsv != null) {
-
-					Plotly.DataSet ref = viz.addDataset(data.resource(modeShareDistRefCsv))
+					viz.addDataset(data.resource(modeShareDistRefCsv))
 						.constant("source", "Ref");
-
 					viz.multiIndex = Map.of("dist_group", "source");
 					viz.mergeDatasets = true;
 				}
-
 			});
 
 		layout.row("third", tab)
@@ -362,11 +359,9 @@ public class TripDashboard implements Dashboard {
 		if (groupedRefCsv != null) {
 			createGroupedTab(layout, args);
 		}
-
 		if (choiceEvaluation) {
 			createChoiceTab(layout, args);
 		}
-
 	}
 
 	private void createDistancePlot(Layout layout, String[] args, String tab) {
@@ -418,9 +413,7 @@ public class TripDashboard implements Dashboard {
 						.y("share")
 				);
 			}
-
 		});
-
 	}
 
 	private void createChoiceTab(Layout layout, String[] args) {
@@ -518,11 +511,9 @@ public class TripDashboard implements Dashboard {
 						.x("source")
 						.y("share");
 
-
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
 						.orientation(BarTrace.Orientation.VERTICAL)
 						.build(), ds);
-
 				});
 
 			layout.row("category_2_" + cat, "By Groups")
@@ -554,10 +545,7 @@ public class TripDashboard implements Dashboard {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
 						.orientation(BarTrace.Orientation.VERTICAL)
 						.build(), ds);
-
 				});
-
 		}
 	}
-
 }
