@@ -247,7 +247,7 @@ public class TripDashboard implements Dashboard {
 		layout.row("second", tab).el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Modal distance distribution";
-
+				viz.description = "Mode share within distance groups.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Distance group").build())
 					.yAxis(Axis.builder().title("Share").build())
