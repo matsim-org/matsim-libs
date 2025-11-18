@@ -158,8 +158,19 @@ public class TripDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 
-		header.title = "Trips (Persons)";
-		header.description = "General information about modal share and trip distributions of the persons.";
+		String columnForModeShare;
+		if (groupsOfPersonSubpopulations.isEmpty()) {
+			columnForModeShare = "share";
+			groupsOfPersonSubpopulations.add("total");
+			header.title = "Trips";
+			header.description = "General information about modal share and trip distributions.";
+		}
+		else {
+			columnForModeShare = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
+			header.title = "Trips (Persons)";
+			header.description = "General information about modal share and trip distributions of the selected subpopulations of the persons: **"+ groupsOfPersonSubpopulations +
+			"**.";
+		}
 
 		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
 		System.arraycopy(this.args, 0, args, 0, this.args.length);
@@ -181,9 +192,9 @@ public class TripDashboard implements Dashboard {
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
 
-			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","person", args))// TODO make configurable
+			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","total", args))
 				.constant("source", "Simulated")
-				.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
+				.aggregate(List.of("main_mode"), columnForModeShare, Plotly.AggrFunc.SUM);
 
 			if (modeShareRefCsv != null) {
 				viz.addDataset(data.resource(modeShareRefCsv))
@@ -197,7 +208,7 @@ public class TripDashboard implements Dashboard {
 				ds.mapping()
 					.name("main_mode")
 					.y("source")
-					.x("share")
+					.x(columnForModeShare)
 			);
 		});
 
@@ -207,11 +218,11 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
-				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","person", args))// TODO make configurable
-					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","total", args))
+					.aggregate(List.of("dist_group"), columnForModeShare, Plotly.AggrFunc.SUM)
 					.mapping()
 					.x("dist_group")
-					.y("share")
+					.y(columnForModeShare)
 			);
 
 			if (modeShareRefCsv != null) {
@@ -225,14 +236,15 @@ public class TripDashboard implements Dashboard {
 			}
 		});
 
-		layout.row("second", tab)
-			.el(Table.class, (viz, data) -> {
+		for (String personGroup : groupsOfPersonSubpopulations) {
+			layout.row("second", tab).el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics";
 				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "person", args);// TODO make configurable
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", personGroup, args);
 				viz.showAllRows = true;
-			})
-			.el(Plotly.class, (viz, data) -> {
+			});
+		}
+		layout.row("second", tab).el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Modal distance distribution";
 
@@ -242,14 +254,14 @@ public class TripDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
-				Plotly.DataSet sim = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", "person"))// TODO make configurable
+				Plotly.DataSet sim = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", "total"))
 					.constant("source", "Sim");
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 					sim.mapping()
 						.name("main_mode")
 						.x("dist_group")
-						.y("share")
+						.y(columnForModeShare)
 				);
 
 				if (modeShareDistRefCsv != null) {
@@ -279,23 +291,23 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode usage";
 				viz.description = "Share of persons using a main mode at least once per day";
 				viz.width = 2d;
+				for (String personGroup : groupsOfPersonSubpopulations) {
+					Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", personGroup));
+					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
+						.x("main_mode")
+						.y("user")
+						.name("main_mode")
+					);
+					if (modeUsersRefCsv != null) {
+						ds.constant("source", "sim");
 
-				Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", "person"));// TODO make configurable
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
-					.x("main_mode")
-					.y("user")
-					.name("main_mode")
-				);
+						viz.addDataset(data.resource(modeUsersRefCsv))
+							.constant("source", "ref");
 
-				if (modeUsersRefCsv != null) {
-					ds.constant("source", "sim");
-
-					viz.addDataset(data.resource(modeUsersRefCsv))
-						.constant("source", "ref");
-
-					viz.multiIndex = Map.of("main_mode", "source");
-					viz.mergeDatasets = true;
+						viz.multiIndex = Map.of("main_mode", "source");
+						viz.mergeDatasets = true;
+					}
 				}
 
 			}).el(Sankey.class, (viz, data) -> {
@@ -316,14 +328,15 @@ public class TripDashboard implements Dashboard {
 				.yAxis(Axis.builder().title("Share").build())
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
-
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", "person")).mapping()// TODO make configurable
-					.name("purpose", ColorScheme.Spectral)
-					.x("h")
-					.y("departure")
-			);
-
+			for (String personGroup : groupsOfPersonSubpopulations) {
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", personGroup)).mapping()
+						.name("purpose", ColorScheme.Spectral)
+						.x("h")
+						.y("departure")
+				);
+			}
 		});
 
 		layout.row("arrivals", tab).el(Plotly.class, (viz, data) -> {
@@ -335,14 +348,15 @@ public class TripDashboard implements Dashboard {
 				.yAxis(Axis.builder().title("Share").build())
 				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 				.build();
-
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", "person")).mapping()// TODO make configurable
-					.name("purpose", ColorScheme.Spectral)
-					.x("h")
-					.y("arrival")
-			);
-
+			for (String personGroup : groupsOfPersonSubpopulations) {
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", personGroup)).mapping()
+						.name("purpose", ColorScheme.Spectral)
+						.x("h")
+						.y("arrival")
+				);
+			}
 		});
 
 		if (groupedRefCsv != null) {
@@ -370,14 +384,15 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
 
-			for (String groups: groupsOfPersonSubpopulations) {
+			for (String personGroup: groupsOfPersonSubpopulations) {
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", groups, args))
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", personGroup, args))
 					.pivot(List.of("dist"), "main_mode", "share")
 					.constant("source", "Sim");
 
 				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.mode(ScatterTrace.Mode.LINE)
+						.name(personGroup)
 						.build(),
 					ds.mapping()
 						.name("main_mode")
