@@ -86,7 +86,7 @@ public class PublicChargerProvider implements ChargerProvider {
 		locations.add(location);
 
 		return locations.stream().flatMap(point -> index.getDisk(point.getX(), point.getY(), legBasedRadius).stream())
-				.filter(charger -> access.hasAccess(person, charger)).toList();
+				.filter(charger -> access.hasAccess(person, charger)).distinct().toList();
 	}
 
 	static public PublicChargerProvider create(Scenario scenario, ChargingInfrastructureSpecification infrastrcuture,
