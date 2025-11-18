@@ -428,8 +428,8 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		// Sort by dist_group and mode
 		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("dist_group")));
-		aggr = aggr.sortOn(cmp.thenComparing(row -> row.getString("main_mode")).thenComparing(row -> row.getString("subpopulation")));
-
+		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("main_mode")));
+		aggr = aggr.sortOn(cmp.thenComparing(cmp_modes).thenComparing(row -> row.getString("subpopulation")));
 		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
 			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
 		}
@@ -1089,7 +1089,8 @@ public class TripAnalysis implements MATSimAppCommand {
 				.collect(Collectors.toSet())));
 
 		Table aggr = joined.summarize("trip_id", count).by("original_mode", "main_mode");
-
+		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("original_mode")));
+		aggr = aggr.sortOn(cmp_modes);
 		aggr.write().csv(output.getPath("mode_shift.csv").toFile());
 	}
 
