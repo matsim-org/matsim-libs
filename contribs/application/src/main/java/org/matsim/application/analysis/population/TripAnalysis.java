@@ -442,7 +442,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share");
 		aggr.replaceColumn("Count [trip_id]", shareSum);
 
-		aggr = addModeSharesPerModelType(aggr);
+//		aggr = addModeSharesPerModelType(aggr);
 		aggr.write().csv(output.getPath("mode_share_%s.csv", "total").toFile());
 
 		// Norm each dist_group to 1
