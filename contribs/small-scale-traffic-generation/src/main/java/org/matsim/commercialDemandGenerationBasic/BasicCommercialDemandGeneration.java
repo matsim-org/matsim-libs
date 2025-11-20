@@ -40,7 +40,6 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import picocli.CommandLine;
 
-import javax.management.InvalidAttributeValueException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -177,7 +176,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	}
 
 	@Override
-	public Integer call() throws IOException, InvalidAttributeValueException, ExecutionException, InterruptedException {
+	public Integer call() throws IOException, ExecutionException, InterruptedException {
 
 		String vehicleTypesFileLocation = carrierVehicleFilePath.toString();
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
