@@ -240,19 +240,14 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(outputLocation.toString());
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(lastMATSimIteration);
-		config.global().setRandomSeed(4177);
 		config.global().setCoordinateSystem(coordinateSystem);
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setTravelTimeSliceWidth(1800);
-		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		if (carrierFilePath != null)
 			freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		return config;
 	}
 
