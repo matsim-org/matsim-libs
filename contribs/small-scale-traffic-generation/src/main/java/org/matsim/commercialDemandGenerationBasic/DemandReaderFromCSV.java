@@ -381,7 +381,7 @@ final class DemandReaderFromCSV {
 	 */
 	static Set<DemandInformationElement> readDemandInformation(Path csvLocationDemand) throws IOException {
 
-		Set<DemandInformationElement> demandInformation = new HashSet<>();
+		Set<DemandInformationElement> demandInformation = new LinkedHashSet<>();
 		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationDemand),
 			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
 
