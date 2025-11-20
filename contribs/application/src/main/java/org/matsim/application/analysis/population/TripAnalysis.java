@@ -371,10 +371,15 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		if (groups != null) {
 			// filters for all subpopulations that are used for person analysis
-			Table filteredForPersons = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
-					.flatMap(Collection::stream)
-					.collect(Collectors.toSet())));
-			groups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+				Table filteredForPersons = joined.where(
+					joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
+						.flatMap(Collection::stream)
+						.collect(Collectors.toSet())));
+				groups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+			}
+			else
+				groups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {
