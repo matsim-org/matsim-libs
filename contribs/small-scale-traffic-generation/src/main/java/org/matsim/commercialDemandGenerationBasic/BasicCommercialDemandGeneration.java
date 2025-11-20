@@ -171,7 +171,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		log.info("Using {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		System.exit(new CommandLine(new BasicCommercialDemandGeneration()).execute(args ) );
 	}
 
@@ -239,7 +239,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	 */
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
-//		ScenarioUtils.loadScenario(config);
 		config.controller().setOutputDirectory(outputLocation.toString());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
