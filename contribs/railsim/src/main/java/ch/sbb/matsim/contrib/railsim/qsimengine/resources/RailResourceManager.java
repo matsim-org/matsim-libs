@@ -251,9 +251,10 @@ public final class RailResourceManager {
 				double dist = RailResourceInternal.NO_RESERVATION;
 				for (RailLink l : links) {
 					dist = l.resource.reserve(time, l, track, position);
-					eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
-						position.getDriver().getVehicle().getId(), l.resource.getState(l)));
 					dla.onReserve(time, l.resource, position);
+					eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(),
+						position.getDriver().getVehicle().getId(), l.resource.getState(l), dla.isReserved(l.getResource()))
+					);
 				}
 
 				return dist;
@@ -271,10 +272,11 @@ public final class RailResourceManager {
 			}
 
 			double dist = link.resource.reserve(time, link, track, position, blockedByRelatedTrain);
-			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
-				position.getDriver().getVehicle().getId(), link.resource.getState(link)));
 
 			dla.onReserve(time, link.resource, position);
+
+			eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(),
+				position.getDriver().getVehicle().getId(), link.resource.getState(link), dla.isReserved(link.getResource())));
 
 			assert dist >= 0 : "Reserved distance must be equal or larger than 0.";
 
@@ -348,12 +350,12 @@ public final class RailResourceManager {
 					continue;
 
 				eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(), driver.getVehicle().getId(),
-					link.resource.getState(l)));
+					link.resource.getState(l), dla.isReserved(link.getResource())));
 			}
 		}
 
 		eventsManager.processEvent(new RailsimLinkStateChangeEvent(Math.ceil(time), link.getLinkId(), driver.getVehicle().getId(),
-			link.resource.getState(link)));
+			link.resource.getState(link), dla.isReserved(link.getResource())));
 	}
 
 	/**

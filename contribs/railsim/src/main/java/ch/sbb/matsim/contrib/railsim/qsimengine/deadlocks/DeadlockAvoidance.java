@@ -29,6 +29,11 @@ public interface DeadlockAvoidance {
 	boolean checkLink(double time, RailLink link, TrainPosition position);
 
 	/**
+	 * Return whether any train holds a reservation for this resource. Links not under consideration should return false.
+	 */
+	boolean isReserved(RailResource resource);
+
+	/**
 	 * Check if reserving these links may produce a deadlock. All links will be reserved together.
 	 * @return true if all links can be reserved, false otherwise.
 	 */

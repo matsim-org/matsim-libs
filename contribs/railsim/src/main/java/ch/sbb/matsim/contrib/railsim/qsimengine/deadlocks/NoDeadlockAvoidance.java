@@ -24,6 +24,11 @@ public class NoDeadlockAvoidance implements DeadlockAvoidance {
 	}
 
 	@Override
+	public boolean isReserved(RailResource resource) {
+		return false;
+	}
+
+	@Override
 	public boolean checkReroute(double time, RailLink start, RailLink end, List<RailLink> subRoute, List<RailLink> detour, TrainPosition position) {
 		return true;
 	}
