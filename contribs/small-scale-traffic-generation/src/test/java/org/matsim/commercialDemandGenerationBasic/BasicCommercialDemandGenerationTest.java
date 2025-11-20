@@ -71,24 +71,24 @@ public class BasicCommercialDemandGenerationTest{
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenarioSolution = ScenarioUtils.createScenario(config);
-		Scenario scenarioInput = ScenarioUtils.createScenario(config);
+		Scenario scenarioToCompare = ScenarioUtils.createScenario(config);
 
-		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "output_carriers.xml.gz";
-		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "output_carriers.xml.gz";
+		String carriersToCompareLocation = utils.getPackageInputDirectory() + "output_carriers.xml.gz";
+		String carriersSolutionLocation = utils.getOutputDirectory() + "output_carriers.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
 
-		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
+		freightCarriersConfigGroup.setCarriersFile(carriersToCompareLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioSolution);
-		freightCarriersConfigGroup.setCarriersFile(carriersWSolutionFileLocation);
-		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioInput);
+		freightCarriersConfigGroup.setCarriersFile(carriersSolutionLocation);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioToCompare);
 
-		Carriers carriersWithSolution = CarriersUtils.getCarriers(scenarioSolution);
-		Carriers carriersInput = CarriersUtils.getCarriers(scenarioInput);
+		Carriers carriersSolution = CarriersUtils.getCarriers(scenarioSolution);
+		Carriers carriersToCompare = CarriersUtils.getCarriers(scenarioToCompare);
 
-		for (Carrier thisCarrier : carriersWithSolution.getCarriers().values()){
-			Assertions.assertTrue(carriersInput.getCarriers().containsKey(thisCarrier.getId()));
-			Carrier inputCarrier = carriersInput.getCarriers().get(thisCarrier.getId());
+		for (Carrier thisCarrier : carriersSolution.getCarriers().values()){
+			Assertions.assertTrue(carriersToCompare.getCarriers().containsKey(thisCarrier.getId()));
+			Carrier inputCarrier = carriersToCompare.getCarriers().get(thisCarrier.getId());
 			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore());
 			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScheduledTours().size(), thisCarrier.getSelectedPlan().getScheduledTours().size());
 		}
