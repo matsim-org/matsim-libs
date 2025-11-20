@@ -4,7 +4,17 @@ import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
 import java.nio.file.Path;
 
@@ -58,6 +68,36 @@ public class BasicCommercialDemandGenerationTest{
 			// if one catches an exception, then one needs to explicitly fail the test:
 			Assertions.fail();
 		}
+
+		Config config = ConfigUtils.createConfig();
+		Scenario scenarioSolution = ScenarioUtils.createScenario(config);
+		Scenario scenarioToCompare = ScenarioUtils.createScenario(config);
+
+		String carriersToCompareLocation = utils.getPackageInputDirectory() + "output_carriers.xml.gz";
+		String carriersSolutionLocation = utils.getOutputDirectory() + "output_carriers.xml.gz";
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getPackageInputDirectory() + "testVehicleTypes.xml");
+
+		freightCarriersConfigGroup.setCarriersFile(carriersToCompareLocation);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioSolution);
+		freightCarriersConfigGroup.setCarriersFile(carriersSolutionLocation);
+		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioToCompare);
+
+		Carriers carriersSolution = CarriersUtils.getCarriers(scenarioSolution);
+		Carriers carriersToCompare = CarriersUtils.getCarriers(scenarioToCompare);
+
+		for (Carrier thisCarrier : carriersSolution.getCarriers().values()){
+			Assertions.assertTrue(carriersToCompare.getCarriers().containsKey(thisCarrier.getId()));
+			Carrier inputCarrier = carriersToCompare.getCarriers().get(thisCarrier.getId());
+			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore());
+			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScheduledTours().size(), thisCarrier.getSelectedPlan().getScheduledTours().size());
+		}
+
+		// compare events
+		String expected = utils.getPackageInputDirectory() + "output_events.xml.gz";
+		String actual = utils.getOutputDirectory() + "output_events.xml.gz" ;
+		ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
+		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 	}
 
 	@Test

@@ -288,6 +288,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				readVehicleTypes.keySet().removeIf(vehicleType -> !usedCarrierVehicleTypes.contains(vehicleType));
 
 				if (Objects.requireNonNull(usedCreationOption) == CreationOption.useExistingCarrierFileWithoutSolution) {
+					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
+						carrier.getPlans().clear();
+					});
 					solveSeparatedVRPs(scenario);
 				}
 			}

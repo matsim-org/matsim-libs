@@ -40,7 +40,6 @@ import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import picocli.CommandLine;
 
-import javax.management.InvalidAttributeValueException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -93,7 +92,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger( BasicCommercialDemandGeneration.class );
 
-	@CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
+	@CommandLine.Option(names = "--output", description = "Path to output folder")
 	private Path outputLocation;
 
 	@CommandLine.Option(names = "--carrierOption", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
@@ -172,18 +171,19 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		log.info("Using {} for job duration calculation", demandGenerationSpecification.getClass().getSimpleName());
 	}
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		System.exit(new CommandLine(new BasicCommercialDemandGeneration()).execute(args ) );
 	}
 
 	@Override
-	public Integer call() throws IOException, InvalidAttributeValueException, ExecutionException, InterruptedException {
+	public Integer call() throws IOException, ExecutionException, InterruptedException {
 
 		String vehicleTypesFileLocation = carrierVehicleFilePath.toString();
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
 
 		// create and prepare MATSim config
-		outputLocation = outputLocation
+		if (outputLocation == null)
+			outputLocation = Path.of("output/basicCommercialDemandGeneration/")
 			.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
 		int lastMATSimIteration = 0;
 
@@ -239,21 +239,15 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	 */
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
-//		ScenarioUtils.loadScenario(config);
 		config.controller().setOutputDirectory(outputLocation.toString());
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
 			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(lastMATSimIteration);
-		config.global().setRandomSeed(4177);
 		config.global().setCoordinateSystem(coordinateSystem);
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setTravelTimeSliceWidth(1800);
-		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		if (carrierFilePath != null)
 			freightCarriersConfigGroup.setCarriersFile(carrierFilePath.toString());
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		return config;
 	}
 
