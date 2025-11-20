@@ -92,7 +92,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger( BasicCommercialDemandGeneration.class );
 
-	@CommandLine.Option(names = "--output", description = "Path to output folder", required = true)
+	@CommandLine.Option(names = "--output", description = "Path to output folder")
 	private Path outputLocation;
 
 	@CommandLine.Option(names = "--carrierOption", description = "Set the choice of getting/creating carrier. Options: readCarrierFile, createCarriersFromCSV, addCSVDataToExistingCarrierFileData", required = true)
@@ -182,7 +182,8 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		CoordinateTransformation crsTransformationFromNetworkToShape = null;
 
 		// create and prepare MATSim config
-		outputLocation = outputLocation
+		if (outputLocation == null)
+			outputLocation = Path.of("output/basicCommercialDemandGeneration/")
 			.resolve(java.time.LocalDate.now() + "_" + java.time.LocalTime.now().toSecondOfDay());
 		int lastMATSimIteration = 0;
 
