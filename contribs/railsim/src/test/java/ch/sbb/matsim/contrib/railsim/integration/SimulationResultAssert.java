@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.integration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SequencedMap;
+import java.util.function.DoublePredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -402,4 +403,104 @@ final class SimulationResultAssert extends AbstractAssert<SimulationResultAssert
 		return trainHasLastArrival(trainId, org.matsim.core.utils.misc.Time.parseTime(expectedArrivalTime));
 	}
 
+	/**
+	 * Asserts that all delays satisfy the given predicate.
+	 *
+	 * @param predicate the predicate to test against delays
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert allDelaysSatisfy(DoublePredicate predicate) {
+		isNotNull();
+
+		List<String> failingDelays = actual.stateEvents.entrySet().stream()
+			.flatMap(trainEntry -> {
+				String trainId = trainEntry.getKey();
+				return trainEntry.getValue().stream()
+					.filter(e -> !predicate.test(e.getDelay()))
+					.map(e -> String.format("train %s at link %s @ %s: %s", trainId, e.getHeadLink(), Time.writeTime(e.getTime()), e.getDelay()));
+			})
+			.toList();
+
+		if (!failingDelays.isEmpty()) {
+			failWithMessage("Expected all delays to satisfy the predicate but the following failed:\n\t%s",
+				String.join("\n\t", failingDelays));
+		}
+
+		return this;
+	}
+
+	/**
+	 * Asserts that all delays at the start of a link satisfy the given predicate.
+	 *
+	 * @param predicate the predicate to test against delays
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert allDelaysAtLinkStartSatisfy(DoublePredicate predicate) {
+		isNotNull();
+
+		List<String> failingDelays = actual.stateEvents.entrySet().stream()
+			.flatMap(trainEntry -> {
+				String trainId = trainEntry.getKey();
+				return trainEntry.getValue().stream()
+					.filter(e -> e.getHeadPosition() == 0)
+					.filter(e -> !predicate.test(e.getDelay()))
+					.map(e -> String.format("train %s at link %s @ %s: %s", trainId, e.getHeadLink(), Time.writeTime(e.getTime()), e.getDelay()));
+			})
+			.toList();
+
+		if (!failingDelays.isEmpty()) {
+			failWithMessage("Expected all delays at the start of a link to satisfy the predicate but the following failed:\n\t%s",
+				String.join("\n\t", failingDelays));
+		}
+
+		return this;
+	}
+
+	/**
+	 * Asserts that all delays at the arrival at a stop satisfy the given predicate.
+	 * The delay is based on the time from the disposition, which might be earlier than the schedule time.
+	 *
+	 * @param predicate the predicate to test against delays
+	 * @return this assert instance
+	 */
+	public SimulationResultAssert allDelaysAtStopsSatisfy(String train, DoublePredicate predicate) {
+		isNotNull();
+
+		if (train != null && !actual.stateEvents.containsKey(train)) {
+			failWithMessage("Expected train <%s> to have state events but found none", train);
+		}
+
+		List<String> failingDelays = actual.stateEvents.entrySet().stream()
+			.filter(trainEntry -> train == null || trainEntry.getKey().equals(train))
+			.flatMap(trainEntry -> {
+				String trainId = trainEntry.getKey();
+				return trainEntry.getValue().stream()
+					.filter(e -> e.getSpeed() == 0 && Math.abs(e.getHeadPosition() - actual.getScenario().getNetwork().getLinks().get(e.getHeadLink()).getLength()) < 1e-6)
+					.filter(e -> actual.stopTimes.get(trainId).values().stream().anyMatch(s -> s.arrivalTime == e.getTime()))
+					.filter(e -> !predicate.test(e.getDelay()))
+					.map(e -> String.format("train %s at link %s @ %s: %s", trainId, e.getTailLink(), Time.writeTime(e.getTime()), e.getDelay()));
+			})
+			.toList();
+
+		if (!failingDelays.isEmpty()) {
+			failWithMessage("Expected all delays at the start of a link to satisfy the predicate but the following failed:\n\t%s",
+				String.join("\n\t", failingDelays));
+		}
+
+		return this;
+	}
+
+	/**
+	 *  Asserts that all delays at the arrival at a stop satisfy the given predicate for a specific train,
+	 */
+	public SimulationResultAssert allDelaysAtStopsSatisfy(DoublePredicate predicate) {
+		return allDelaysAtStopsSatisfy(null, predicate);
+	}
+
+	/**
+	 * Asserts that all trains arrive at the transit stops as scheduled by disposition.
+	 */
+	public SimulationResultAssert allStopDelaysAreZero() {
+		return allDelaysAtStopsSatisfy(d -> d == 0);
+	}
 }
