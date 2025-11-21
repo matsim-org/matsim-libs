@@ -19,7 +19,8 @@ class ExperiencedPlansWriterTest{
 			"--threads", "1"
 		};
 
-		// yy the way ExperiencedPlansWriter is set up, it is not possible to have the output in a directory different from the input directory. kai, nov'25
+		// yy the way ExperiencedPlansWriter is set up, it is not possible to have the output in a directory different from the
+		// input directory.  In consequence, the test output goes into the test input directory.  kai, nov'25
 
 		ExperiencedPlansWriter.main( args );
 
