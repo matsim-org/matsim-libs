@@ -3,6 +3,8 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
+import com.google.common.annotations.VisibleForTesting;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;
@@ -12,6 +14,10 @@ import java.util.List;
  */
 public class NoDeadlockAvoidance implements DeadlockAvoidance {
 
+
+	@VisibleForTesting
+	public NoDeadlockAvoidance(Network network) {
+	}
 
 	@Override
 	public void onReserve(double time, RailResource resource, TrainPosition position) {

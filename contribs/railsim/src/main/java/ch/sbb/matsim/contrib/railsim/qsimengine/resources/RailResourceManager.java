@@ -147,7 +147,7 @@ public final class RailResourceManager {
 			resources.put(e.getKey(), r);
 		}
 
-		dla.initResources(resources);
+		dla.initResources(this);
 	}
 
 	/**

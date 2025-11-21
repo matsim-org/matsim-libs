@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
@@ -18,7 +19,7 @@ public interface DeadlockAvoidance {
 	/**
 	 * Let the strategy known about the resources that are available.
 	 */
-	default void initResources(Map<Id<RailResource>, RailResource> resources) {
+	default void initResources(RailResourceManager rrm) {
 	}
 
 

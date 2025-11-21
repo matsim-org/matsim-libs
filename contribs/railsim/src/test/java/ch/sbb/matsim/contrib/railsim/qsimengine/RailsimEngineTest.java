@@ -69,7 +69,7 @@ public class RailsimEngineTest {
 			}
 		}
 		TrainManager trains = new TrainManager();
-		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance(), trains);
+		RailResourceManager res = new RailResourceManager(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 
