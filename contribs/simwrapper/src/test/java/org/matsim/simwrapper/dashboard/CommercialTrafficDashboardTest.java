@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.*;
@@ -69,7 +68,7 @@ public class CommercialTrafficDashboardTest {
 				new ReplanningConfigGroup.StrategySettings().setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute).setWeight(
 					0.1).setSubpopulation(subpopulation));
 		});
-		Set<String> modes = Set.of("ride","truck8t", "truck18t", "truck26t", "truck40t");
+		Set<String> modes = Set.of("ride", "truck8t", "truck18t", "truck26t", "truck40t");
 
 		modes.forEach(mode -> {
 			ScoringConfigGroup.ModeParams thisModeParams = new ScoringConfigGroup.ModeParams(mode);
@@ -84,12 +83,11 @@ public class CommercialTrafficDashboardTest {
 		config.routing().removeTeleportedModeParams("ride");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getNetwork().getLinks().forEach((linkId, link) -> {
-			if (link.getAllowedModes().contains("car") && !link.getAllowedModes().contains("car2")){
+			if (link.getAllowedModes().contains("car") && !link.getAllowedModes().contains("car2")) {
 				Set<String> newModes = new HashSet<>(link.getAllowedModes());
 				newModes.add("ride");
-
-				// zurückschreiben
-				link.setAllowedModes(newModes);}
+				link.setAllowedModes(newModes);
+			}
 		});
 		PopulationFactory popFactory = PopulationUtils.getFactory();
 		for (int i = 1; i < 8; i++) {
@@ -103,10 +101,10 @@ public class CommercialTrafficDashboardTest {
 			person.getAttributes().putAttribute("home_y", homelink.getCoord().getY());
 			String mode = i % 3 == 0 ? "ride" : "car";
 			Activity act1 = PopulationUtils.createAndAddActivityFromCoord(plan, "home", homelink.getCoord());
-			act1.setEndTime(i*1.5 * 3600);
+			act1.setEndTime(i * 1.5 * 3600);
 			if (i != 1) {
 				PopulationUtils.createAndAddLeg(plan, mode);
-				PopulationUtils.createAndAddActivityFromCoord(plan, "work", worklink.getCoord()).setMaximumDuration(i*1.1 * 3600);
+				PopulationUtils.createAndAddActivityFromCoord(plan, "work", worklink.getCoord()).setMaximumDuration(i * 1.1 * 3600);
 				PopulationUtils.createAndAddLeg(plan, mode);
 				PopulationUtils.createAndAddActivityFromCoord(plan, "home", homelink.getCoord());
 			}
@@ -126,8 +124,11 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().defaultParams().setMapCenter(center);
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-		sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("person=person").setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
-		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("person=person").setGroupsOfSubpopulationsForCommercialAnalysis(
+				"commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
+			"commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 
