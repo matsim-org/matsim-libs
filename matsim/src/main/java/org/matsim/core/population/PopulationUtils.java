@@ -922,10 +922,17 @@ public final class PopulationUtils {
 		/*
 		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
 		 */
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
 		copyFromTo(in, out, false);
 	}
 
 	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
+		// yyyy Also, I think that this ended up being a bit of a misnomer ... since "isInteractionActivity" can now be understood
+		// in two different ways: (1) it is what is returned by isStageActivity (a conceptual thing); (2) it is what is returned by
+		// instanceof InteractionActivity (an implementation thing).  kai, nov'25
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
