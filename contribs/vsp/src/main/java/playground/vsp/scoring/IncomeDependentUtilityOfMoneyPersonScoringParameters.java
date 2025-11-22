@@ -55,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the #PlanCalcScoreConfigGroup
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+	Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
     private final ScoringConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
@@ -147,7 +147,10 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
                 // (getIncome returns Double, i.e. "null" is an option.  Not sure what happens if this is now converted to the primitive type.  kai, apr'22)
 
                 if (personalIncome > 0) {
-                    builder.setMarginalUtilityOfMoney(subpopulationScoringParams.getMarginalUtilityOfMoney() * globalAvgIncome / personalIncome);
+					final double marginalUtilityOfMoney = subpopulationScoringParams.getMarginalUtilityOfMoney() * globalAvgIncome / personalIncome;
+					builder.setMarginalUtilityOfMoney( marginalUtilityOfMoney );
+					PersonUtils.setMarginalUtilityOfMoney( person, marginalUtilityOfMoney );
+					// yy not sure if this ends up in the experienced plans
                 } else {
                     // (not sure what this means.  "null" would have been an option, but is made impossible, see above.  An income of 0 may be possible, but with the 1/y that we often use it should be avoided.)
                     log.warn("you have set income to " + personalIncome + " for person " + person + ". This is invalid and gets ignored." +

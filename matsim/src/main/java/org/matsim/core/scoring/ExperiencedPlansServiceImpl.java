@@ -121,8 +121,9 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the
 				// end we never know.  kai, oct'25
 			}
-			entry.getValue().setScore( originalPerson.getSelectedPlan().getScore() );
+//			entry.getValue().setScore( originalPerson.getSelectedPlan().getScore() );
 			// yyyy this is somewhat dangerous ... since there is no guarantee that this is indeed the correct plan.
+			// --> I just found an instance where this is totally wrong!
 
 			// ... up to here.
 
@@ -143,12 +144,12 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 		// if the design might be better served by an iteration ends listener.  kai, feb'17
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Plan plan = entry.getValue();
-//			if (scoringFunctionsForPopulation != null) {
-//				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
-//				if (plan.getScore().isNaN()) {
-//					log.warn("score is NaN; plan:" + plan.toString());
-//				}
-//			}
+			if (scoringFunctionsForPopulation != null) {
+				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
+				if (plan.getScore().isNaN()) {
+					log.warn("score is NaN; plan:" + plan.toString());
+				}
+			}
 			// yyyy  other code, above, copies the score from the selected plan.  Needs to be sorted out.
 		}
 		hasFinished = true;

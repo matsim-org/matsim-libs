@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -15,15 +16,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.EventsToActivities;
-import org.matsim.core.scoring.EventsToLegs;
-import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.tablesaw.TablesawUtils;
@@ -39,6 +36,7 @@ import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
 import tech.tablesaw.plotly.traces.HistogramTrace;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.List;
@@ -46,22 +44,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-@CommandLine.Command(name = "generate-experienced-plans-with-vtts", description = "")
-public class GenerateExperiencedPlansWithVTTS implements MATSimAppCommand {
-	// yyyy in the maybe not so long term it would be good to give this class an explicit output directory since otherwise the test
-	// method around this class will clutter the test input directory.  And possibly we would want to put the output from classes
-	// such as this one into different directories to differentiate explicit run output from postprocessed material.
+@CommandLine.Command(name = "run-vtts-analysis", description = "")
+public class AddVttsToActivities implements MATSimAppCommand {
+	private static final Logger log = LogManager.getLogger( AddVttsToActivities.class );
 
-	private static final Logger log = LogManager.getLogger( GenerateExperiencedPlansWithVTTS.class );
-
-	@CommandLine.Option(names = "--path", description = "Path to input folder", required = true)
+	@CommandLine.Option(names = "--path", description = "Path to output folder", required = true)
 	private Path path;
-
-	@CommandLine.Option(names = "--output", description = "Overwrite output folder defined by the application")
-	protected Path output;
 
 	@CommandLine.Option(names = "--runId", description = "Run id (i.e. prefixes of files)")
 	private String runId;
+
+	@CommandLine.Option(names = "--output", description = "Overwrite output folder defined by the application")
+	protected Path output;
 
 //	@CommandLine.Option(names = "--prefix", description = "Prefix for filtered events output file, optional." )
 //	private String prefix;
@@ -70,34 +64,29 @@ public class GenerateExperiencedPlansWithVTTS implements MATSimAppCommand {
 	private int numberOfThreads = 1;
 
 	public static void main(String[] args) {
-		new GenerateExperiencedPlansWithVTTS().execute(args );
+		new AddVttsToActivities().execute(args );
 	}
 
 	@Override
 	public Integer call() throws Exception {
-		String runPrefix = Objects.nonNull( runId ) ? runId + "." : "";
-
+		String runPrefix = Objects.nonNull(runId ) ? runId + "." : "";
 		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
 //		if ( prefix!=null ){
 //			eventsPath = ApplicationUtils.globFile( path, "*" + prefix + "output_events_filtered.xml.gz" );
 //		}
-		// yy Full events reading for Lausitz v2.0 10pct is actually somewhat slow to maybe we should keep this option?
 
-		Path populationFilename = /* path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
+		Path populationFilename = path.resolve( runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
 		if ( !Files.exists( populationFilename ) ){
-			populationFilename = */ path.resolve( runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz" );
-//		}
-		// yy Population reading for Lausitz v2.0 10pct is reasonably fast so presumably we should not worry about the option to use the shorter pre-existing experienced plans file
+			populationFilename = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
+		}
 
 		// ---
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		// (yyyy this is dangerous; in particular someone might change it to "deleteDirectory")
-
 		config.counts().setInputFile( null );
 
 		// ---
@@ -111,95 +100,49 @@ public class GenerateExperiencedPlansWithVTTS implements MATSimAppCommand {
 			// the original was eventsPath.getParent() instead of just "path", where the getParent() presumably just strips the filename.  Don't know why it used that indirection.
 		}
 
-		Path outputExpPlansPath = outputDir.resolve(config.controller().getRunId() + ".output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		Path outputExpPlansPath = outputDir.resolve(config.controller().getRunId() + ".vtts_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 
 		// ---
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
-								.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
+//								.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
 								.setPopulation(PopulationUtils.readPopulation( populationFilename.toString() ) )
 								.build();
 
-		new TransitScheduleReader(scenario).readFile(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz").toString());
-
-/*
-		{
-			List<Person> toRemove = new ArrayList<>();
-			for( Person person : scenario.getPopulation().getPersons().values() ){
-				if ( ! "person".equals( PopulationUtils.getSubpopulation( person ) ) ) {
-					toRemove.add( person );
-				}
-			}
-			for( Person person : toRemove ){
-				scenario.getPopulation().removePerson( person.getId() );
-			}
-		}
-*/
-		// The above removes persons of the "null" subpopulation, which one probably does not want.
-		// The question now is what we will do with commercial agents who do not have income.
-
-		// this is awfully slow:
-//		ScenarioChecker scenarioChecker = new ScenarioChecker( scenario );
-//		scenarioChecker.addScenarioChecker( new ScenarioChecker.ActivityChecker() );
-//		scenarioChecker.run();
-
-		// ===
-
-		EventsToActivities eventsToActivities = new EventsToActivities();
-		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
+//		new TransitScheduleReader(scenario).readFile(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz").toString());
 
 		com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario )
 												  .addStandardModules()
 												  .addOverridingModule( new AbstractModule(){
 													  @Override public void install(){
 														  bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-														  bind( EventsToActivities.class ).toInstance( eventsToActivities );
-														  bind( EventsToLegs.class ).toInstance( eventsToLegs );
 													  }
 												  } )
 												  .build();
-
-		// ===
-
-//		ExperiencedPlansService experiencedPlansService = ExperiencedPlansServiceFactory.create(scenario, eventsToActivities, eventsToLegs);
-		ExperiencedPlansService experiencedPlansService = injector.getInstance( ExperiencedPlansService.class );
-		((IterationStartsListener) experiencedPlansService).notifyIterationStarts( null );
-
-		// (The way in which this is plugged together is a little odd: ExperiencedPlansService will be plugged into
-		// EventsToActivities and EventsToLegs in the same way in which a scoring fct is plugged into those handlers.)
 
 		ScoringParametersForPerson scoringParametersForPerson = injector.getInstance( ScoringParametersForPerson.class );
 
 		// ===
 
-		VTTSHandlerKN vttsHandler = new VTTSHandlerKN( scenario, scoringParametersForPerson );
-
 		EventsManager eventsManager = EventsUtils.createEventsManager(config);
 
-		eventsManager.addHandler(eventsToActivities); // activity start/end events
-		eventsManager.addHandler(eventsToLegs); // lots of events types
-		eventsManager.addHandler( vttsHandler ); // act start, act end, transit driver start
+		VTTSHandlerKN vttsHandler = new VTTSHandlerKN( scenario, scoringParametersForPerson );
+		eventsManager.addHandler( vttsHandler );
 
 		eventsManager.initProcessing();
 		log.info("Reading events from file: {}", eventsPath);
 		EventsUtils.readEvents(eventsManager, eventsPath.toString());
 		eventsManager.finishProcessing();
-
 		vttsHandler.computeFinalVTTS();
-		eventsToActivities.finish();
-
-		// yy There is, in many places in the above, the issue that handlers need to start and to finish.  Sometimes this
-		// functionality is hardcoded, sometimes this goes via notifyIterationStarts, sometimes this is implicit in the constructor,
-		// sometimes this is passed on by the eventsManager to the handlers (e.g. reset).  Would be nice if we got this a bit more
-		// consistent. kai, nov'25
 
 		// ===
 
+		Population population = scenario.getPopulation();
+
 		Map<Id<Person>, List<VTTSHandlerKN.TripData>> tripDataMap = vttsHandler.getTripDataMap();
-		Population expPlans = experiencedPlansService.getPopulationWithExperiencedPlans();
 
 		// The following is a really complicated way to do a join.  Maybe first convert to tablesaw and then do this?
-		for( Person person : expPlans.getPersons().values() ){
+		for( Person person : population.getPersons().values() ){
 			final List<Activity> activities = TripStructureUtils.getActivities( person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
 			List<VTTSHandlerKN.TripData> tripDataList = tripDataMap.get( person.getId() );
 			for ( int ii=1; ii<activities.size(); ii++ ) {
@@ -211,7 +154,7 @@ public class GenerateExperiencedPlansWithVTTS implements MATSimAppCommand {
 		}
 
 		log.info("Writing experienced plans to file: {}", outputExpPlansPath);
-		PopulationUtils.writePopulation( expPlans, outputExpPlansPath.toString() );
+		PopulationUtils.writePopulation( population, outputExpPlansPath.toString() );
 
 		// ===
 
