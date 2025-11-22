@@ -102,6 +102,8 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
         if (scoringParametersForThisPerson == null) {
             final String subpopulation = PopulationUtils.getSubpopulation(person) == null ? "default" : PopulationUtils.getSubpopulation(person) ;
             // (weird, but so be it.  kai, apr'22)
+			// --> For the scoring params, the subpop name needs to be a valid string.  So we provide scoring params for a "default"
+			// subpop, and use it for those persons who do not have a subpop arg in the attribs.  kai, nov'25
 
             //the following is a comment that was orinally put into SubpopulationScoringParams, which is the template for this class...
             /* lazy initialization of params. not strictly thread safe, as different threads could

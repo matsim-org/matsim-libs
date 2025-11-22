@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.VTTS;
+package org.matsim.application.analysis.population;
 
 import java.io.BufferedWriter;
 import java.io.File;

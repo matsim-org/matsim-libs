@@ -1,16 +1,14 @@
-package playground.vsp.analysis.modules.VTTS;
+package org.matsim.application.analysis.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -28,16 +26,10 @@ import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-@CommandLine.Command(name = "write-experienced-plans",
-	description = "Writes experienced plans next to events file.")
+@CommandLine.Command(name = "run-vtts-analysis", description = "")
 public class RunVTTSAnalysis implements MATSimAppCommand {
-
-	// yyyyyy FIXME: Think about good name for this class!
-
 	private static final Logger log = LogManager.getLogger(RunVTTSAnalysis.class);
 
 	@CommandLine.Option(names = "--path", description = "Path to output folder", required = true)
@@ -59,7 +51,6 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 	@Override
 	public Integer call() throws Exception {
 		String runPrefix = Objects.nonNull(runId ) ? runId + "." : "";
-
 		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
@@ -67,7 +58,7 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 			eventsPath = ApplicationUtils.globFile( path, "*" + prefix + "output_events_filtered.xml.gz" );
 		}
 
-		Path populationFilename = path.resolve( runPrefix + "output_" + PlansScoring.EXPERIENCED_PLANS_XML + ".gz" );
+		Path populationFilename = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz" );
 		if ( !Files.exists( populationFilename ) ){
 			populationFilename = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz" );
 		}
@@ -88,6 +79,7 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 
 		new TransitScheduleReader(scenario).readFile(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz").toString());
 
+/*
 		{
 			List<Person> toRemove = new ArrayList<>();
 			for( Person person : scenario.getPopulation().getPersons().values() ){
@@ -99,6 +91,9 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 				scenario.getPopulation().removePerson( person.getId() );
 			}
 		}
+*/
+		// The above removes persons of the "null" subpopulation, which one probably does not want.
+		// The question now is what we will do with commercial agents who do not have income.
 
 		// this is awfully slow:
 //		ScenarioChecker scenarioChecker = new ScenarioChecker( scenario );
@@ -136,8 +131,7 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 //		format1.setMaximumFractionDigits( 1 );
 //		format1.setMinimumFractionDigits( 1 );
 
-
-		Table tripTable = vttsHandler.returnTablesawTripsTable();
+		Table tripTable = vttsHandler.getTablesawTripsTable();
 
 		System.out.println( tripTable );
 
@@ -150,9 +144,11 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		log.info( tripTable.summarize( HeadersKN.vttsh, AggregateFunctions.mean, AggregateFunctions.quartile1, AggregateFunctions.median, AggregateFunctions.quartile3, AggregateFunctions.percentile95 ).apply() );
 
 		var options = CsvWriteOptions.builder( eventsPath.getParent().resolve( config.controller().getRunId() + ".tablesawVTTS.tsv" ).toString()  ).separator( '\t' );
-		tripTable.write().usingOptions( options.build() );
+//		tripTable.write().usingOptions( options.build() );
 
-//		vttsHandler.printVTTSHistogram( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsHistogram.tsv" ).toString() );
+		/// yyyy Look into [GenerateExperiencedPlansWithVTTS] for a better way how to deal with a test output dir that is separate from the test input dir.
+
+		//		vttsHandler.printVTTSHistogram( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsHistogram.tsv" ).toString() );
 //		vttsHandler.printVTTS( eventsPath.getParent().resolve( config.controller().getRunId() + ".vtts.tsv" ).toString() );
 //		vttsHandler.printAvgVTTSperPerson( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsPerPerson.tsv" ).toString() );
 

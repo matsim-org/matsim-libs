@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.VTTS;
+package org.matsim.application.analysis.population;
 
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
@@ -58,16 +59,21 @@ import java.util.*;
  * @author ikaddoura
  *
  */
-public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
+public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
+	// the constructor is package-private so having the class public final is ok. kai, nov'25
 
-	private static class TripData {
+	public static class TripData {
 		public double mUTTSh;
+		public String actType;
+		public double actTypDur_h;
+		public double actDur_h;
 		double VTTSh;
 		String mode;
 		double departureTime = Double.NaN;
 	}
 
 	private static class SimData {
+		public double margUtlOfMoney;
 		double currentActivityStartTime = Double.NaN;
 		String currentActivityType;
 //		String currentOrIncomingTripMode;
@@ -112,6 +118,16 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 				(this.scenario.getConfig().scoring().getPerforming_utils_hr()
 						 + this.scenario.getConfig().scoring().getModes().get( TransportMode.car ).getMarginalUtilityOfTraveling() * (-1.0)
 				) / this.scenario.getConfig().scoring().getMarginalUtilityOfMoney();
+	}
+
+	public Map<Id<Person>,List<TripData>> getTripDataMap() {
+		Map<Id<Person>,List<TripData>> tripDataMap = new LinkedHashMap<>();
+		for( Map.Entry<Id<Person>, SimData> simDataEntry : simDataMap.entrySet() ){
+			Id<Person> personId = simDataEntry.getKey();
+			List<TripData> tripData = simDataEntry.getValue().trips;
+			tripDataMap.put( personId, Collections.unmodifiableList( tripData ) );
+		}
+		return Collections.unmodifiableMap( tripDataMap );
 	}
 
 	@Override
@@ -224,13 +240,17 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 		}
 	}
 
-	public Table returnTablesawTripsTable() {
+	public Table getTablesawTripsTable() {
 		StringColumn personIds = StringColumn.create( HeadersKN.personId );
 		IntColumn tripIndices = IntColumn.create( HeadersKN.tripIdx );
 		StringColumn modes = StringColumn.create( HeadersKN.mode );
+		StringColumn acts = StringColumn.create( HeadersKN.activity );
+		DoubleColumn typDurs = DoubleColumn.create( HeadersKN.typicalDuration );
+		DoubleColumn actDurs = DoubleColumn.create( HeadersKN.activityDuration );
 		DoubleColumn muttsValues = DoubleColumn.create( HeadersKN.muttsh );
 		DoubleColumn vttsValues = DoubleColumn.create( HeadersKN.vttsh );
-		Table table = Table.create( personIds, tripIndices, modes, muttsValues, vttsValues );
+		DoubleColumn mUoMs = DoubleColumn.create( HeadersKN.mUoM );
+		Table table = Table.create( personIds, mUoMs, tripIndices, modes, acts, actDurs, typDurs, muttsValues, vttsValues );
 
 		for( Map.Entry<Id<Person>, SimData> entry : simDataMap.entrySet() ){
 			Id<Person> personId = entry.getKey();
@@ -242,6 +262,10 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 				modes.append( trip.mode );
 				muttsValues.append( trip.mUTTSh);
 				vttsValues.append( trip.VTTSh );
+				acts.append( trip.actType );
+				actDurs.append( trip.actDur_h );
+				typDurs.append( trip.actTypDur_h );
+				mUoMs.append( simData.margUtlOfMoney );
 			}
 		}
 
@@ -260,6 +284,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 		}
 
 		double activityDelayDisutility_h;
+		final ScoringConfigGroup scoringConfigGroup = this.scenario.getConfig().scoring();
 		if ( simData.currentActivityType==null || Double.isNaN( simData.currentActivityStartTime ) ) {
 			// the second condition was already tested earlier. (??)
 
@@ -279,7 +304,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 
 			final MarginalSumScoringFunction marginalSumScoringFunction =
 					new MarginalSumScoringFunction(
-							new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( subpop ), scenario.getConfig().scenario() ).build() );
+							new ScoringParameters.Builder( scoringConfigGroup, scoringConfigGroup.getScoringParameters( subpop ), scenario.getConfig().scenario() ).build() );
 			// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 			// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  kai, gr, jul'25
@@ -297,6 +322,8 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 
 				activityDelayDisutility_h = 3600. * marginalSumScoringFunction.getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
 
+				simData.trips.getLast().actDur_h = (simData.firstActivityEndTime + 3600.*24 - simData.currentActivityStartTime)/3600. ;
+
 			} else{
 				// The activity has an end time indicating a 'normal' activity.
 
@@ -304,16 +331,17 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 				activity.setStartTime( simData.currentActivityStartTime );
 				activity.setEndTime( activityEndTime.seconds() );
 				activityDelayDisutility_h = 3600. * marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
-			}
+				simData.trips.getLast().actDur_h = (activityEndTime.seconds() - simData.currentActivityStartTime)/3600. ;
 
+			}
 		}
 
 		// Calculate the agent's trip delay disutility.
 		// (Could be done similarly to the activity delay disutility. As long as it is computed linearly, the following should be okay.)
 		String mode = simData.trips.getLast().mode;
 		double directMarginalUtilityOfTraveling = 0.;
-		if( this.scenario.getConfig().scoring().getModes().get( mode ) != null ){
-			directMarginalUtilityOfTraveling = this.scenario.getConfig().scoring().getModes().get( mode ).getMarginalUtilityOfTraveling();
+		if( scoringConfigGroup.getModes().get( mode ) != null ){
+			directMarginalUtilityOfTraveling = scoringConfigGroup.getModes().get( mode ).getMarginalUtilityOfTraveling();
 		} else{
 			log.warn( "Could not identify the marginal utility of traveling for mode={}. Setting this value to zero. (Probably using subpopulations...)", mode );
 		}
@@ -325,6 +353,7 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 
 		// Translate the disutility into monetary units.
 		double marginalUtilityOfMoney = scoringParametersForPerson.getScoringParameters(scenario.getPopulation().getPersons().get(personId)).marginalUtilityOfMoney;
+		simData.margUtlOfMoney = marginalUtilityOfMoney;
 		if ( mUoMCnt < 10 ){
 			mUoMCnt++;
 			log.info( "personId={}, actDelayDisutil={}; tripDelayDisutl={}; mUM={}", personId, activityDelayDisutility_h, tripDelayDisutility_h, marginalUtilityOfMoney );
@@ -334,6 +363,9 @@ public class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEven
 		}
 
 		simData.trips.getLast().VTTSh = mUTTS_h / marginalUtilityOfMoney;
+
+		simData.trips.getLast().actType = simData.currentActivityType;
+		simData.trips.getLast().actTypDur_h = scoringConfigGroup.getActivityParams( simData.currentActivityType ).getTypicalDuration().seconds() / 3600. ;
 
 	}
 	private static double handleIncompletePlan( Id<Person> personId, double performing_utils_hr ){

@@ -25,13 +25,16 @@
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 
 public interface ExperiencedPlansService {
+	// yy I am not so certain if we really want an interface here.  kai, nov'25
 
 	void writeExperiencedPlans(String filename);
 
 	IdMap<Person, Plan> getExperiencedPlans();
 
+	Population getPopulationWithExperiencedPlans();
 	void finishIteration();
 
 }
