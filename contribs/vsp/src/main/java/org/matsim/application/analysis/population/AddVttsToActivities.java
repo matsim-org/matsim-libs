@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -17,12 +16,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
@@ -126,7 +123,7 @@ public class AddVttsToActivities implements MATSimAppCommand {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager(config);
 
-		VTTSHandlerKN vttsHandler = new VTTSHandlerKN( scenario, scoringParametersForPerson );
+		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
 		eventsManager.addHandler( vttsHandler );
 
 		eventsManager.initProcessing();
@@ -139,15 +136,15 @@ public class AddVttsToActivities implements MATSimAppCommand {
 
 		Population population = scenario.getPopulation();
 
-		Map<Id<Person>, List<VTTSHandlerKN.TripData>> tripDataMap = vttsHandler.getTripDataMap();
+		Map<Id<Person>, List<VTTSHandler.TripData>> tripDataMap = vttsHandler.getTripDataMap();
 
 		// The following is a really complicated way to do a join.  Maybe first convert to tablesaw and then do this?
 		for( Person person : population.getPersons().values() ){
 			final List<Activity> activities = TripStructureUtils.getActivities( person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
-			List<VTTSHandlerKN.TripData> tripDataList = tripDataMap.get( person.getId() );
+			List<VTTSHandler.TripData> tripDataList = tripDataMap.get( person.getId() );
 			for ( int ii=1; ii<activities.size(); ii++ ) {
 				Activity activity = activities.get( ii );
-				VTTSHandlerKN.TripData tripData = tripDataList.get( ii-1 );  // activity # 1 belongs to trip # 0!
+				VTTSHandler.TripData tripData = tripDataList.get( ii-1 );  // activity # 1 belongs to trip # 0!
 				setVTTS_h( activity, tripData.VTTSh );
 				setMUTTS_h( activity, tripData.mUTTSh );
 			}

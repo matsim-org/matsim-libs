@@ -59,7 +59,7 @@ import java.util.*;
  * @author ikaddoura
  *
  */
-public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
+public final class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 	// the constructor is package-private so having the class public final is ok. kai, nov'25
 
 	public static class TripData {
@@ -83,7 +83,7 @@ public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityE
 	}
 	private final Map<Id<Person>,SimData> simDataMap = new HashMap<>();
 
-	private static final Logger log = LogManager.getLogger( VTTSHandlerKN.class );
+	private static final Logger log = LogManager.getLogger( VTTSHandler.class );
 	private static int incompletedPlanWarning = 0;
 	private static int noCarVTTSWarning = 0;
 	private static int noTripVTTSWarning = 0;
@@ -101,7 +101,7 @@ public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityE
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
 
-	@Inject VTTSHandlerKN( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
+	@Inject VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
 		// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 		// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 		// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  Also see a similar comment further
@@ -154,7 +154,7 @@ public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityE
 	public void handleEvent(PersonDepartureEvent event) {
 
 		final Id<Person> personId = event.getPersonId();
-		if (isModeToBeSkipped(event.getRoutingMode() ) || this.personIdsToBeIgnored.contains( personId )){
+		if ( this.personIdsToBeIgnored.contains( personId )){
 			return;
 		}
 
@@ -382,19 +382,6 @@ public final class VTTSHandlerKN implements ActivityStartEventHandler, ActivityE
 		}
 		activityDelayDisutilityOneSec = (1.0 / 3600.) * performing_utils_hr;
 		return activityDelayDisutilityOneSec;
-	}
-
-	private boolean isModeToBeSkipped(String legMode) {
-		/*for (String modeToBeSkipped : this.modesToBeSkipped) {
-			if (legMode==null) {
-				return true;
-			}
-			if (legMode.equals(modeToBeSkipped)) {
-				return true;
-			}
-
-		} */
-		return false;
 	}
 
 

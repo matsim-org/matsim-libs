@@ -55,19 +55,6 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
         eventsToLegs.addLegHandler(this);
     }
 
-/*
-    ExperiencedPlansServiceImpl(EventsToActivities eventsToActivities, EventsToLegs eventsToLegs, Scenario scenario) {
-        this.population = scenario.getPopulation();
-
-        for (Person person : population.getPersons().values()) {
-            agentRecords.put(person.getId(), PopulationUtils.createPlan());
-        }
-        eventsToActivities.addActivityHandler(this);
-        eventsToLegs.addLegHandler(this);
-        this.config = scenario.getConfig();
-    }
-*/
-
 	@Override public void notifyIterationStarts(IterationStartsEvent event) {
 		for (Person person : population.getPersons().values()) {
 			agentRecords.put(person.getId(), PopulationUtils.createPlan());
@@ -121,9 +108,6 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 				// note that this is not a completely deep copy.  Should not be a problem since we only write to file, but in the
 				// end we never know.  kai, oct'25
 			}
-//			entry.getValue().setScore( originalPerson.getSelectedPlan().getScore() );
-			// yyyy this is somewhat dangerous ... since there is no guarantee that this is indeed the correct plan.
-			// --> I just found an instance where this is totally wrong!
 
 			// ... up to here.
 
@@ -150,7 +134,6 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 					log.warn("score is NaN; plan:" + plan.toString());
 				}
 			}
-			// yyyy  other code, above, copies the score from the selected plan.  Needs to be sorted out.
 		}
 		hasFinished = true;
 	}
