@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -71,7 +70,7 @@ public class DefaultUnplannedRequestInserterTest {
 	private static final String mode = "DRT_MODE";
 
 	private final DrtRequest request1 = request("r1", "from1", "to1");
-	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1);
+	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1, 60);
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
 
