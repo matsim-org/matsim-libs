@@ -66,13 +66,16 @@ final class RailsimEngine implements Steppable {
 	private final RailResourceManager resources;
 	private final TrainManager trainManager;
 	private final TrainDisposition disposition;
+	private final TrainTimeDistanceHandler ttdHandler;
 
-	RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources, TrainManager trainManager, TrainDisposition disposition) {
+	RailsimEngine(EventsManager eventsManager, RailsimConfigGroup config, RailResourceManager resources,
+				  TrainManager trainManager, TrainDisposition disposition, TrainTimeDistanceHandler ttdHandler) {
 		this.eventsManager = eventsManager;
 		this.config = config;
 		this.resources = resources;
 		this.trainManager = trainManager;
 		this.disposition = disposition;
+		this.ttdHandler = ttdHandler;
 	}
 
 	@Override
@@ -552,6 +555,8 @@ final class RailsimEngine implements Steppable {
 		state.driver.notifyMoveOverNode(state.headLink);
 		createEvent(new LinkEnterEvent(time, state.driver.getVehicle().getId(), state.headLink));
 
+		ttdHandler.writePosition(state, null);
+
 		decideTargetSpeed(event, state);
 
 		createEvent(state.asEvent(time));
@@ -708,6 +713,7 @@ final class RailsimEngine implements Steppable {
 			state.acceleration = 0;
 		}
 
+		state.cumulativeDistance += dist;
 		state.headPosition += dist;
 		state.tailPosition += dist;
 		state.approvedDist -= dist;
@@ -726,6 +732,8 @@ final class RailsimEngine implements Steppable {
 
 		state.timestamp = time;
 
+		ttdHandler.calculateDelay(state);
+
 		// Only emit events on certain occasions
 		if (event.type == UpdateEvent.Type.ENTER_LINK || event.type == UpdateEvent.Type.LEAVE_LINK || event.type == UpdateEvent.Type.POSITION || event.type == UpdateEvent.Type.SPEED_CHANGE)
 			createEvent(state.asEvent(time));
@@ -739,6 +747,8 @@ final class RailsimEngine implements Steppable {
 	private double handleTransitStop(double time, TrainState state) {
 
 		assert state.pt != null : "Pt driver must be present";
+
+		ttdHandler.writePosition(state, state.nextStop);
 
 		// Time needs to be rounded to current sim step
 		double stopTime = state.pt.handleTransitStop(state.nextStop, Math.ceil(time));
