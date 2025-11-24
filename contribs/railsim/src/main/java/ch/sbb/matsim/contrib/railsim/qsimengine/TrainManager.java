@@ -19,13 +19,9 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,9 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.*;
 
 /**
  * Manager active trains and can access the state of all trains in the simulation.
@@ -269,5 +263,12 @@ public class TrainManager {
 	 */
 	public List<Id<Vehicle>> getRelatedVehicles(Id<Vehicle> vehicleId) {
 		return relatedVehicles.getOrDefault(vehicleId, Collections.emptyList());
+	}
+
+	/**
+	 * Remove active trains.
+	 */
+	public void clear() {
+		activeTrains.clear();
 	}
 }
