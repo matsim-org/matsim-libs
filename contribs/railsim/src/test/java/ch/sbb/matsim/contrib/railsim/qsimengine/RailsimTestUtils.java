@@ -19,11 +19,11 @@
 
 package ch.sbb.matsim.contrib.railsim.qsimengine;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
+import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
+import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
+import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -39,19 +39,14 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
-import ch.sbb.matsim.contrib.railsim.RailsimUtils;
-import ch.sbb.matsim.contrib.railsim.analysis.RailsimCsvWriter;
-import ch.sbb.matsim.contrib.railsim.events.RailsimLinkStateChangeEvent;
-import ch.sbb.matsim.contrib.railsim.events.RailsimTrainStateEvent;
-import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class for test cases.
@@ -71,6 +66,13 @@ public class RailsimTestUtils {
 		vehicles.put(TestVehicle.Express, veh.getVehicleTypes().get(Id.create("Express", VehicleType.class)));
 		vehicles.put(TestVehicle.Regio, veh.getVehicleTypes().get(Id.create("Regio", VehicleType.class)));
 		vehicles.put(TestVehicle.Cargo, veh.getVehicleTypes().get(Id.create("Cargo", VehicleType.class)));
+	}
+
+	/**
+	 * Create a mock for the TrainTimeDistanceHandler.
+	 */
+	public static TrainTimeDistanceHandler createTrainTimeDistanceHandler() {
+		return Mockito.mock(TrainTimeDistanceHandler.class);
 	}
 
 	/**
