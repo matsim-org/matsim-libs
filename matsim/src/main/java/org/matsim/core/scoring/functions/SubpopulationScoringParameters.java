@@ -35,6 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author thibautd
  */
 public class SubpopulationScoringParameters implements ScoringParametersForPerson {
+
+	private static final String DEFAULT_SUBPOPULATION_KEY = "placeholder-for-null-subpopulation";
+
 	private final ScoringConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
@@ -56,9 +59,11 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
 
-		final String subpopulation = PopulationUtils.getSubpopulation( person );
+		String subpopulation = PopulationUtils.getSubpopulation( person );
+		// concurrent hash map does not allow for null keys, so use a placeholder.
+		String key = subpopulation == null ? DEFAULT_SUBPOPULATION_KEY : subpopulation;
 		// Use atomic computeIfAbsent, to ensure consistent results when being called from multiple threads.
-		return this.params.computeIfAbsent(subpopulation, this::newScoringParameters);
+		return this.params.computeIfAbsent(key, this::newScoringParameters);
 	}
 
 	private ScoringParameters newScoringParameters(String subpopulation) {
