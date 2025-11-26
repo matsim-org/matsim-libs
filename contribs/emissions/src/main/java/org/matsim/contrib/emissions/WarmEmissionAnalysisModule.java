@@ -324,10 +324,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				ef_gpkm = getEf(vehicleInformationTuple, efkey).getFactor();
 			} else if (ecg.getEmissionsComputationMethod() == InterpolationFraction) {
 
-				// Determine higher speed class
+				// Determine higher traffic-situation class
 				HbefaTrafficSituation higher = getTrafficSituation(efkey, averageSpeed_kmh, freeVelocity_ms * 3.6);
 
-				// Determine the lower speed class
+				// Determine the lower traffic-situation class
 				HbefaTrafficSituation lower = getLowerTrafficSituation(efkey, higher);
 
 				// compute faction.
@@ -358,10 +358,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				// TODO This is a temporary and inefficient implementation. The final solutions should not determine the keys each time but save them
 
 				// Determine the keys for higher and lower V-class (using just the freespeed)
-				HbefaWarmEmissionFactorKey higherVClassKey = getHigherVClass(vehicleInformationTuple, efkey, freeVelocity_ms * 3.6);
-				HbefaWarmEmissionFactorKey lowerVClassKey = getLowerVClass(vehicleInformationTuple, efkey, freeVelocity_ms * 3.6);
+				HbefaWarmEmissionFactorKey higherVClassKey = new HbefaWarmEmissionFactorKey(getHigherVClass(vehicleInformationTuple, efkey, freeVelocity_ms * 3.6));
+				HbefaWarmEmissionFactorKey lowerVClassKey = new HbefaWarmEmissionFactorKey(getLowerVClass(vehicleInformationTuple, efkey, freeVelocity_ms * 3.6));
 
-				if (higherVClassKey != lowerVClassKey){
+				if (!higherVClassKey.equals(lowerVClassKey)){
+					// Approach 1
+					/*
 					// Determine the interpolation-triangle
 					List<Tuple<HbefaWarmEmissionFactorKey, Double>> triangle = determineInterpolationTriangle(lowerVClassKey, higherVClassKey, vehicleInformationTuple, freeVelocity_ms *3.6, averageSpeed_kmh);
 
@@ -370,6 +372,43 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						triangle.get(0).getSecond() * getEf(vehicleInformationTuple, triangle.get(0).getFirst()).getFactor() +
 							triangle.get(1).getSecond() * getEf(vehicleInformationTuple, triangle.get(1).getFirst()).getFactor() +
 							triangle.get(2).getSecond() * getEf(vehicleInformationTuple, triangle.get(2).getFirst()).getFactor();
+					 */
+
+					// Approach 2
+					double higherVValue = getEf(vehicleInformationTuple, higherVClassKey).getSpeed();
+					double lowerVValue = getEf(vehicleInformationTuple, lowerVClassKey).getSpeed();
+
+					double higherVClassFraction = (higherVValue - (freeVelocity_ms*3.6)) / (higherVValue - lowerVValue);
+					double lowerVClassFraction = 1 - higherVClassFraction;
+
+					HbefaTrafficSituation higherVClassHigherTrafficSit = getTrafficSituation(efkey, averageSpeed_kmh, freeVelocity_ms * 3.6);
+					HbefaTrafficSituation higherVClassLowerTrafficSit = getLowerTrafficSituation(efkey, higherVClassHigherTrafficSit);
+
+					HbefaTrafficSituation lowerVClassHigherTrafficSit = getTrafficSituation(efkey, averageSpeed_kmh, freeVelocity_ms * 3.6);
+					HbefaTrafficSituation lowerVClassLowerTrafficSit = getLowerTrafficSituation(efkey, lowerVClassHigherTrafficSit);
+
+					double fractionHighLow = getFractionInterpolation(higherVClassHigherTrafficSit, higherVClassLowerTrafficSit, averageSpeed_kmh, vehicleInformationTuple, efkey);
+					double fractionLowLow = getFractionInterpolation(lowerVClassHigherTrafficSit, lowerVClassLowerTrafficSit, averageSpeed_kmh, vehicleInformationTuple, efkey);
+
+					higherVClassKey.setTrafficSituation(higherVClassHigherTrafficSit);
+					double efHighHigh_gpkm = getEf(vehicleInformationTuple, higherVClassKey).getFactor();
+					higherVClassKey.setTrafficSituation(higherVClassLowerTrafficSit);
+					double efHighLow_gpkm = getEf(vehicleInformationTuple, higherVClassKey).getFactor();
+
+					lowerVClassKey.setTrafficSituation(lowerVClassHigherTrafficSit);
+					double efLowHigh_gpkm = getEf(vehicleInformationTuple, lowerVClassKey).getFactor();
+					lowerVClassKey.setTrafficSituation(lowerVClassLowerTrafficSit);
+					double efLowLow_gpkm = getEf(vehicleInformationTuple, lowerVClassKey).getFactor();
+
+					assert higherVClassFraction >= -1e-6 && higherVClassFraction <= 1+1e-6;
+					assert lowerVClassFraction >= -1e-6 && lowerVClassFraction <= 1+1e-6;
+					assert fractionHighLow >= -1e-6 && fractionHighLow <= 1+1e-6;
+					assert fractionLowLow >= -1e-6 && fractionLowLow <= 1+1e-6;
+
+					ef_gpkm =
+						higherVClassFraction*(fractionHighLow*efHighLow_gpkm + (1-fractionHighLow)*efHighHigh_gpkm) +
+						lowerVClassFraction*(fractionLowLow*efLowLow_gpkm + (1-fractionLowLow)*efLowHigh_gpkm);
+
 				} else{
 					// If keys are the same, we are outside the possible interpolation range. Thus we have to use basic interpolation fraction with the boundary v-class
 
@@ -381,7 +420,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					HbefaTrafficSituation lower = getLowerTrafficSituation(efkey, higher);
 
 					// compute faction.
-					fractionLow = getFractionInterpolation(higher, lower, averageSpeed_kmh, vehicleInformationTuple, efkey);
+					fractionLow = getFractionInterpolation(higher, lower, averageSpeed_kmh, vehicleInformationTuple, higherVClassKey);
 
 					double efLow_gpkm = 0.;
 					if (fractionLow > 0) {
@@ -832,7 +871,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		// Round to next higher v-class
 		double lastVValue = Double.POSITIVE_INFINITY;
 
-		for(var k : keys){
+		for(final var k : keys){
 			var ef = getEf(vehicleInformationTuple, k);
 			if (lastVValue < freeFlowSpeed_kmh && freeFlowSpeed_kmh < ef.getSpeed()){
 				return k;
@@ -882,7 +921,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		// Round to next higher v-class
 		double lastVValue = Double.NEGATIVE_INFINITY;
 
-		for(var k : keys){
+		for(final var k : keys){
 			var ef = getEf(vehicleInformationTuple, k);
 			if( ef != null){
 				if (ef.getSpeed() < freeFlowSpeed_kmh && freeFlowSpeed_kmh < lastVValue){
@@ -929,14 +968,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			trafficSituation = SATURATED;
 		}
 		if (trafficSpeeds.containsKey(STOPANDGO) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO)) {
-			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+			if (averageSpeed_kmh - trafficSpeeds.get(FREEFLOW) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
 				trafficSituation = STOPANDGO;
 			}
 		}
 		/*FIXME The following lines should be added to account for the HBEFA 4.1's additional traffic situation,
 		   but it currently causes a test failure (jwj, Nov'20) */
 		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
-			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+			if (averageSpeed_kmh - trafficSpeeds.get(FREEFLOW) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
 				trafficSituation = STOPANDGO_HEAVY;
 			}
 		}
