@@ -65,6 +65,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		// trains depart in 10min intervals
 		assertThat(result).allTrainsArrived()
+			.allDelaysAtStopsSatisfy(d -> d <= 0)
 			.trainHasLastArrival("train1", 29180.0)
 			.trainHasLastArrival("train2", 29180.0 + 1 * 600)
 			.trainHasLastArrival("train3", 29180.0 + 2 * 600)
@@ -308,7 +309,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		// two train starts from a station (low speed) and accelerate once their tail reaches the end of the station link
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microTrainFollowingConstantSpeed"));
 
-		assertThat(result).allTrainsArrived()
+		assertThat(result).allTrainsArrived().allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 29820.0)
 			.trainHasLastArrival("train2", 30111.0);
 
@@ -336,6 +337,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		assertThat(result)
 			.allTrainsArrived()
+			.allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 29525.0)
 			.trainHasLastArrival("train2", 29782.0);
 
@@ -720,9 +722,11 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "varyingVMax"));
 
-		// Train 2 is slower on the infrastructure
 		assertThat(result)
+			// Train is not delayed anywhere
+			.allDelaysAtStopsSatisfy("train1", d -> d == 0)
 			.trainHasLastArrival("train1", 30000)
+			// Train 2 is slower on the infrastructure
 			.trainHasLastArrival("train2", 30960)
 			.allTrainsArrived();
 
