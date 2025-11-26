@@ -4,6 +4,7 @@ import ch.sbb.matsim.contrib.railsim.config.RailsimConfigGroup;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManagerImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -25,7 +26,7 @@ class SimpleDeadlockAvoidanceTest {
 
 	private Map<Id<RailResource>, SimpleDeadlockAvoidance.ConflictFreeLinks> computeConflictFreeLinks(String network) {
 		Network net = NetworkUtils.readNetwork(Path.of("test/input/ch/sbb/matsim/contrib/railsim/integration", network).toString());
-		RailResourceManager res = new RailResourceManager(EventsUtils.createEventsManager(), new RailsimConfigGroup(), net, new NoDeadlockAvoidance(null), Mockito.mock(TrainManager.class));
+		RailResourceManager res = new RailResourceManagerImpl(EventsUtils.createEventsManager(), new RailsimConfigGroup(), net, new NoDeadlockAvoidance(null), Mockito.mock(TrainManager.class));
 		return SimpleDeadlockAvoidance.computeConflictFreeLinks(net, res);
 	}
 
