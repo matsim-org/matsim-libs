@@ -568,7 +568,7 @@
 
 # ==== Inverted Time axis ====
 {
-  fuel <- "diesel"
+  fuel <- "petrol"
 
   # Clear old data
   rm(list = ls(pattern = "^data\\."))
@@ -838,7 +838,7 @@
 # ==== CADC Test (using phem_lib)
 {
   #TODO init phem_lib
-  fuel <- "petrol"
+  fuel <- "diesel"
 
   # WLTP
   plot_main()
@@ -846,16 +846,14 @@
   compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("{sumo_path}/sumo_{fuel}_output_pl5.csv") )
 
   # CADC
-  plot_main(title = glue("Comparison across CADC-cycle for {fuel}"), pl_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output.csv"), pl5_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"), fuel=fuel)
+  plot_main(title = glue("Comparison across CADC-cycle for {fuel}"), matsim_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/CADC/diff_{fuel}_output_fixedIntervalLength_60.csv"), pl_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output.csv"), pl5_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"), fuel=fuel)
   compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
 
-  plot_main(title = glue("Comparison across CADC-cycle for {fuel}"), pl_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output.csv"), pl5_data=glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"), fuel=fuel)
-  compute_emission_difference(glue("{diff_path}/diff_{fuel}_output_fixedIntervalLength_60.csv"), glue("/Users/aleksander/Documents/VSP/PHEMTest/CADC/sumo_{fuel}_output_pl5.csv"))
 }
 
 # ==== CADC Segent wise comparison
 {
-  fuel <- "diesel"
+  fuel <- "petrol"
   # Compare WLTP <-> CADC
   # Low [0:589] <-> Urban [0:993]
   # Med+High [590:1477] <-> Rural Roads [994:2075]
@@ -1261,4 +1259,47 @@
   sum(pretoria_output$CO2_original)/sum(pretoria_output$CO2_pems)-1
   sum(pretoria_output$NOx_original)/sum(pretoria_output$NOx_pems)-1
 
+}
+
+# ==== Highway-Overestimation ====
+{
+  fuel <- "petrol"
+
+  r <- read_matsim(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/highwayOverestimation/diff_WLTP_{fuel}130+_output.csv"), "130o")
+  matsim_130o_data <- r[[1]]
+
+  plot_main(plot = "bar", matsim_data = glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/highwayOverestimation/diff_WLTP_{fuel}130_output.csv"), matsim_130o_data)
+}
+
+# ==== HBEFA data ====
+{
+  road_type <- "URB/Local"
+  fuel <- "diesel"
+
+  hbefa <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim=";") %>%
+    filter(Subsegment == glue("PC {fuel} Euro-4")) %>%
+    mutate(V = as.double(V), EFA = as.double(EFA))
+
+  hbefa.mw <- hbefa %>%
+    filter(startsWith(TrafficSit, road_type), Component %in% c("CO", "CO2(total)", "HC", "NOx", "PM")) %>%
+    separate(TrafficSit, c("RoadCat", "RoadType", "SpeedLimit", "TrafficSit"), sep="/")
+
+  ggplot() +
+    geom_line(data=hbefa.mw, aes(x=V, y=EFA, color=SpeedLimit)) +
+    geom_point(data=hbefa.mw, aes(x=V, y=EFA, color=SpeedLimit)) +
+    facet_wrap(~Component, scale="free") +
+    theme(text = element_text(size=18)) +
+    ggtitle(glue("EFA values for different speed limits of RoadType {road_type} and {fuel} passenger cars"))
+}
+
+# ==== BiLinearInterpolation ====
+{
+  fuel <- "diesel"
+
+  r <- read_matsim(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_fixedIntervalLength_60.csv"), model_suffix = "BiLin")
+  matsim_bilin <- r[[1]]
+
+  plot_main(matsim_bilin, fuel = fuel)
+  compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_fixedIntervalLength_60.csv"),
+                              glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_pl5.csv"))
 }
