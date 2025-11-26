@@ -71,7 +71,7 @@ read_sumo <- function(path, intervals, model_suffix = ""){
 # Creates the default plot with all components
 # Additional datasets, can be attached (however, the function assumes, that it is formatted correctly)
 # Example: plot_main(extra_notes = "Test", data.TEST)
-plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLength_60", extra_notes = "",
+plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLength_60", extra_notes = "", plot = "line",
                       title = glue("Comparison across WLTP-cycle for {fuel}"),
                       matsim_data = glue("{diff_path}/diff_{fuel}_output_{segment_method}.csv"),
                       pl_data = glue("{sumo_path}/sumo_{fuel}_output.csv"),
@@ -102,28 +102,30 @@ plot_main <- function(..., fuel = "petrol", segment_method = "fixedIntervalLengt
   all_colors <- c(colors, hcl.colors(extra, palette = "viridis"))
   names(all_colors) <- c("MATSIM_", "SUMO_PHEMLight", "SUMO_PHEMLight5", unlist(lapply(list(...), function(df) unique(df$model))))
 
-  # Bar-Plot
-  ggplot(data) +
-  geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
-  scale_fill_manual(values=all_colors) +
-  facet_wrap(~component, scales="free") +
-  ylab("emissions in g/km") +
-  theme(text = element_text(size=18)) +
-  #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
-  ggtitle(title) +
-  theme_minimal()
-
-  # Line-Plot (for scenarios with more links)
-  ggplot(data) +
-  geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
-  geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
-  scale_color_manual(values=all_colors) +
-  facet_wrap(~component, scales="free") +
-  ylab("emissions in g/km") +
-  theme(text = element_text(size=18)) +
-  ggtitle(title,
-          subtitle=glue("{segment_method} {extra_notes}")) +
-  theme_minimal()
+  if (plot == "bar"){
+    # Bar-Plot
+    ggplot(data) +
+      geom_bar(aes(x=segment, y=gPkm, fill=model), stat="identity", position="dodge") +
+      scale_fill_manual(values=all_colors) +
+      facet_wrap(~component, scales="free") +
+      ylab("emissions in g/km") +
+      theme(text = element_text(size=18)) +
+      #geom_rect(data=min_max_vals_used, aes(xmin=0, xmax=3, ymin=min, ymax=max, fill=table), alpha=0.2) +
+      ggtitle(title) +
+      theme_minimal()
+  } else if (plot == "line"){
+    # Line-Plot (for scenarios with more links)
+    ggplot(data) +
+      geom_line(aes(x=startTime, y=gPkm, color=model), size=12/nrow(intervals)) +
+      geom_point(aes(x=startTime, y=gPkm, color=model), size=6/nrow(intervals)) +
+      scale_color_manual(values=all_colors) +
+      facet_wrap(~component, scales="free") +
+      ylab("emissions in g/km") +
+      theme(text = element_text(size=18)) +
+      ggtitle(title,
+              subtitle=glue("{segment_method} {extra_notes}")) +
+      theme_minimal()
+  }
 
 }
 
