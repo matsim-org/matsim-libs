@@ -157,7 +157,11 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 			// check for all conflict points at and beyond the resource
 			if (isConflictPoint(r)) {
 
+				boolean wasNotReserved = !conflictPoints.containsKey(r);
 				Reservation reservation = conflictPoints.computeIfAbsent(r, k -> new Reservation(r.getId()));
+
+				if (reservation.entry == null)
+					wasNotReserved = true;
 
 				RailLink lastLink = findLastUsedLink(position, r, i);
 
@@ -168,8 +172,9 @@ public class SimpleDeadlockAvoidance implements DeadlockAvoidance {
 				reservation.entry = new LinkTuple(link, lastLink);
 				reservation.trains.add(position.getDriver());
 
-				for (RailLink l : resource.getLinks()) {
-					if (eventsManager != null)
+				// Only throw events when the resource was not currently reserved
+				if (eventsManager != null && wasNotReserved)
+					for (RailLink l : r.getLinks()) {
 						eventsManager.processEvent(
 							new RailsimLinkStateChangeEvent(Math.ceil(time), l.getLinkId(), position.getDriver().getPlannedVehicleId(),
 								resource.getState(l), true)

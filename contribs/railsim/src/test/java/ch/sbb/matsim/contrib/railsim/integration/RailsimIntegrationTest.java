@@ -261,9 +261,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		// check the number of events... we could see if something changes significantly in the future
 
-		// TODO: too many events now
-
-		Assertions.assertEquals(2_505_837, result.getEvents().size(), 1000);
+		Assertions.assertEquals(2_680_063, result.getEvents().size(), 1000);
 	}
 
 	@Test
