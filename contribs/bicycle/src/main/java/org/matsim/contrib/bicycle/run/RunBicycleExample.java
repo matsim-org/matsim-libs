@@ -37,6 +37,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
@@ -170,10 +171,10 @@ public class RunBicycleExample {
 
 		@Inject private AdditionalBicycleLinkScoreDefaultImpl delegate;
 
-		@Override public double computeLinkBasedScore( Link link ){
+		@Override public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode ){
 			double result = (double) link.getAttributes().getAttribute( "carFreeStatus" );  // from zero to one
 
-			double amount = delegate.computeLinkBasedScore( link );
+			double amount = delegate.computeLinkBasedScore( link, vehicleId, bicycleMode );
 
 			return amount + result ;  // or some other way to augment the score
 
