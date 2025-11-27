@@ -163,16 +163,20 @@ public class TripDashboard implements Dashboard {
 
 		String columnForModeShare;
 		if (groupsOfPersonSubpopulations.isEmpty()) {
-			columnForModeShare = "share";
+			columnForModeShare = "share_total";
 			groupsOfPersonSubpopulations.add("total");
 			header.title = "Trips";
 			header.description = "General information about modal share and trip distributions.";
-		}
-		else {
+		} else {
 			columnForModeShare = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			header.title = "Trips (Persons)";
-			header.description = "General information about modal share and trip distributions of the selected subpopulations of the persons: **"+ groupsOfPersonSubpopulations +
-			"**.";
+			header.description = "General information about modal share and trip distributions of the selected groups of the persons: **" + groupsOfPersonSubpopulations +
+				"**.";
+			if (groupsOfPersonSubpopulations.size() > 1)
+				groupsOfPersonSubpopulations.addFirst("total");
+			else {
+				groupsOfPersonSubpopulations.set(0, "total");
+			}
 		}
 
 		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
@@ -183,184 +187,13 @@ public class TripDashboard implements Dashboard {
 			args[this.args.length] = "--input-ref-data";
 			args[this.args.length + 1] = groupedRefCsv;
 		}
-
-		// A tab will only be present if one of the other tabs is used as well
-		String tab = (groupedRefCsv != null || choiceEvaluation) ? header.title : null;
-
-		Layout.Row first = layout.row("first", tab);
-		first.el(Plotly.class, (viz, data) -> {
-			viz.title = "Modal split";
-
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
-
-			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","total", args))
-				.constant("source", "Simulated")
-				.aggregate(List.of("main_mode"), columnForModeShare, Plotly.AggrFunc.SUM);
-
-			if (modeShareRefCsv != null) {
-				viz.addDataset(data.resource(modeShareRefCsv))
-					.constant("source", "Reference")
-					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
-
-				viz.mergeDatasets = true;
+		for (String group : groupsOfPersonSubpopulations) {
+			if (groupsOfPersonSubpopulations.size() == 1) {
+				String tab = (groupedRefCsv != null || choiceEvaluation) ? header.title : null;
+				createTripsDashboardTab(layout, tab, args, columnForModeShare);
 			}
-
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
-				ds.mapping()
-					.name("main_mode")
-					.y("source")
-					.x(columnForModeShare)
-			);
-		});
-
-		first.el(Plotly.class, (viz, data) -> {
-
-			viz.title = "Trip distance distribution";
-			viz.colorRamp = ColorScheme.Viridis;
-
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
-				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv","total", args))
-					.aggregate(List.of("dist_group"), columnForModeShare, Plotly.AggrFunc.SUM)
-					.mapping()
-					.x("dist_group")
-					.y(columnForModeShare)
-			);
-
-			if (modeShareRefCsv != null) {
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Reference").build(),
-					viz.addDataset(data.resource(modeShareRefCsv))
-						.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
-						.mapping()
-						.x("dist_group")
-						.y("share")
-				);
-			}
-		});
-
-		for (String personGroup : groupsOfPersonSubpopulations) {
-			layout.row("second", tab).el(Table.class, (viz, data) -> {
-				viz.title = "Mode Statistics";
-				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", personGroup, args);
-				viz.showAllRows = true;
-			});
+			createTripsDashboardTab(layout, group, args, columnForModeShare);
 		}
-		layout.row("second", tab).el(Plotly.class, (viz, data) -> {
-
-				viz.title = "Modal distance distribution";
-				viz.description = "Mode share within distance groups.";
-				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Distance group").build())
-					.yAxis(Axis.builder().title("Share").build())
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-					.build();
-
-				Plotly.DataSet sim = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", "total"))
-					.constant("source", "Sim");
-
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					sim.mapping()
-						.name("main_mode")
-						.x("dist_group")
-						.y(columnForModeShare)
-				);
-
-				if (modeShareDistRefCsv != null) {
-					viz.addDataset(data.resource(modeShareDistRefCsv))
-						.constant("source", "Ref")
-						.constant("subpopulation", "total")
-						.constant("modelType", "total");// TODO make this optional if data is not set for different groups
-					viz.multiIndex = Map.of("dist_group", "source");
-					viz.mergeDatasets = true;
-				}
-			});
-
-		layout.row("third", tab)
-			.el(Table.class, (viz, data) -> {
-				viz.title = "Population statistics";
-				viz.description = "over simulated persons (not scaled by sample size)";
-				viz.showAllRows = true;
-				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
-				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
-				headerPopStats.addAll(groupsOfPersonSubpopulations);
-				headerPopStats.add("total");
-				viz.show = headerPopStats;
-			})
-			.el(Plotly.class, (viz, data) -> {
-
-				viz.title = "Mode usage";
-				viz.description = "Share of persons using a main mode at least once per day";
-				viz.width = 2d;
-				for (String personGroup : groupsOfPersonSubpopulations) {
-					Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", personGroup));
-					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
-						.x("main_mode")
-						.y("user")
-						.name("main_mode")
-					);
-					if (modeUsersRefCsv != null) {
-						ds.constant("source", "sim");
-
-						viz.addDataset(data.resource(modeUsersRefCsv))
-							.constant("source", "ref")
-							.constant("group", personGroup); //TODO stimmt das hier so? // TODO make this optional if data is not set for different groups
-
-						viz.multiIndex = Map.of("main_mode", "source");
-						viz.mergeDatasets = true;
-					}
-				}
-
-			}).el(Sankey.class, (viz, data) -> { //TODO perhaps find way to have the same colors for the modes as in the other plots
-				viz.title = "Mode shift";
-				viz.width = 1.5d;
-				viz.description = "by main mode. Compares initial input with output after the last iteration";
-				viz.csv = data.compute(TripAnalysis.class, "mode_shift.csv", args);
-			});
-
-		createDistancePlot(layout, args, tab);
-
-		layout.row("departures", tab).el(Plotly.class, (viz, data) -> {
-
-			viz.title = "Departures";
-			viz.description = "by hour and purpose";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Hour").build())
-				.yAxis(Axis.builder().title("Share").build())
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
-			for (String personGroup : groupsOfPersonSubpopulations) {
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", personGroup)).mapping()
-						.name("purpose", ColorScheme.Spectral)
-						.x("h")
-						.y("departure")
-				);
-			}
-		});
-
-		layout.row("arrivals", tab).el(Plotly.class, (viz, data) -> {
-
-			viz.title = "Arrivals";
-			viz.description = "by hour and purpose";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Hour").build())
-				.yAxis(Axis.builder().title("Share").build())
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
-			for (String personGroup : groupsOfPersonSubpopulations) {
-				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", personGroup)).mapping()
-						.name("purpose", ColorScheme.Spectral)
-						.x("h")
-						.y("arrival")
-				);
-			}
-		});
 
 		if (groupedRefCsv != null) {
 			createGroupedTab(layout, args);
@@ -370,9 +203,205 @@ public class TripDashboard implements Dashboard {
 		}
 	}
 
-	private void createDistancePlot(Layout layout, String[] args, String tab) {
+	private void createTripsDashboardTab(Layout layout, String tab, String[] args, String columnForModeShare) {
+		String finalColumnForModeShare;
+		if (tab != null && !tab.equals("total") && (!columnForModeShare.equals("total")))
+			finalColumnForModeShare = "share_" + tab;
+		else
+			finalColumnForModeShare = columnForModeShare;
+		String tabTitle;
+		if (tab.equals("total")) {
+			tabTitle = "All Persons";
+		}
+		else
+			tabTitle = tab;
+		Layout.Row first = layout.row("first_" + tab, tabTitle); //TODO vielleicht analog im commercialDashboard
 
-		layout.row("dist-dist", tab).el(Plotly.class, (viz, data) -> {
+		first.el(Plotly.class, (viz, data) -> {
+			viz.title = "Modal split";
+
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+			Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", tab, args))
+				.constant("source", "Simulated")
+				.aggregate(List.of("main_mode"), finalColumnForModeShare, Plotly.AggrFunc.SUM);
+
+			if (modeShareRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareRefCsv))
+					.constant("source", "Reference");
+
+				if (!finalColumnForModeShare.equals(columnForModeShare)) {
+					refDs.rename(columnForModeShare, finalColumnForModeShare);
+				}
+				refDs.aggregate(List.of("main_mode"), columnForModeShare, Plotly.AggrFunc.SUM);
+
+				viz.mergeDatasets = true;
+			}
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
+				ds.mapping()
+					.name("main_mode")
+					.y("source")
+					.x(finalColumnForModeShare)
+			);
+		});
+
+		first.el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Trip distance distribution";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
+				viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", tab, args))
+					.aggregate(List.of("dist_group"), finalColumnForModeShare, Plotly.AggrFunc.SUM)
+					.mapping()
+					.x("dist_group")
+					.y(finalColumnForModeShare)
+			);
+
+			if (modeShareRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareRefCsv))
+					.aggregate(List.of("dist_group"), columnForModeShare, Plotly.AggrFunc.SUM);
+
+				if (!finalColumnForModeShare.equals(columnForModeShare)) {
+					refDs.rename(columnForModeShare, finalColumnForModeShare);
+				}
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Reference").build(),
+					refDs.mapping()
+						.x("dist_group")
+						.y(finalColumnForModeShare)
+				);
+			}
+		});
+
+		layout.row("second_" + tab, tabTitle).el(Table.class, (viz, data) -> {
+			viz.title = "Mode Statistics * " + "personGroup" + " *"; //TODO
+			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", tab, args);
+			viz.showAllRows = true;
+		});
+		layout.row("second_" + tab, tabTitle).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Modal distance distribution";
+			viz.description = "Mode share within distance groups.";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Distance group").build())
+				.yAxis(Axis.builder().title("Share").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+
+			Plotly.DataSet sim = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", tab))
+				.constant("source", "Sim");
+
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				sim.mapping()
+					.name("main_mode")
+					.x("dist_group")
+					.y(finalColumnForModeShare)
+			);
+
+			if (modeShareDistRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareDistRefCsv))
+					.constant("source", "Ref")
+					.constant("subpopulation", "total")
+					.constant("modelType", "total")
+					.constant("share_total", 0d);
+				if (!finalColumnForModeShare.equals(columnForModeShare))
+					refDs.rename(columnForModeShare, finalColumnForModeShare);
+				viz.multiIndex = Map.of("dist_group", "source");
+				viz.mergeDatasets = true;
+			}
+		});
+
+		layout.row("third_" + tab, tabTitle)
+			.el(Table.class, (viz, data) -> {
+				viz.title = "Population statistics";
+				viz.description = "over simulated persons (not scaled by sample size)";
+				viz.showAllRows = true;
+				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
+				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
+				if (tab.equals("total")) {
+					headerPopStats.addAll(groupsOfPersonSubpopulations);
+					headerPopStats.add("total");
+				}
+				else
+					headerPopStats.add(tab);
+				viz.show = headerPopStats;
+			})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Mode usage";
+				viz.description = "Share of persons using a main mode at least once per day";
+				viz.width = 2d;
+				Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", tab));
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
+					.x("main_mode")
+					.y("user")
+					.name("main_mode")
+				);
+				if (modeUsersRefCsv != null) {
+					ds.constant("source", "sim");
+
+					viz.addDataset(data.resource(modeUsersRefCsv))
+						.constant("source", "ref")
+						.constant("group", "total"); //TODO stimmt das hier so? // TODO make this optional if data is not set for different groups
+
+					viz.multiIndex = Map.of("main_mode", "source");
+					viz.mergeDatasets = true;
+				}
+
+			}).el(Sankey.class, (viz, data) -> { //TODO perhaps find way to have the same colors for the modes as in the other plots
+				viz.title = "Mode shift";
+				viz.width = 1.5d;
+				viz.description = "by main mode. Compares initial input with output after the last iteration";
+				viz.csv = data.compute(TripAnalysis.class, "mode_shift.csv", args);
+			});
+
+		createDistancePlot(layout, args, tab, columnForModeShare, tabTitle);
+
+		layout.row("departures_" + tab, tabTitle).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Departures";
+			viz.description = "by hour and purpose";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Hour").build())
+				.yAxis(Axis.builder().title("Share").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", tab)).mapping()
+					.name("purpose", ColorScheme.Spectral)
+					.x("h")
+					.y("departure")
+			);
+		});
+
+		layout.row("arrivals_" + tab, tabTitle).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Arrivals";
+			viz.description = "by hour and purpose";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.xAxis(Axis.builder().title("Hour").build())
+				.yAxis(Axis.builder().title("Share").build())
+				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+				.build();
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", tab)).mapping()
+					.name("purpose", ColorScheme.Spectral)
+					.x("h")
+					.y("arrival")
+			);
+		});
+	}
+
+	private void createDistancePlot(Layout layout, String[] args, String tab, String columnForModeShare, String tabTitle) {
+
+		layout.row("dist-dist_" + tab, tabTitle).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Detailed mode share distance distribution";
 			viz.description = "by mode.";
@@ -385,22 +414,20 @@ public class TripDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
 
-			for (String personGroup: groupsOfPersonSubpopulations) {
-				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", personGroup, args))
-					.pivot(List.of("dist"), "main_mode", "share")
-					.constant("source", "Sim");
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", tab, args))
+				.pivot(List.of("dist"), "main_mode", "share")
+				.constant("source", "Sim");
 
-				viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-						.mode(ScatterTrace.Mode.LINE)
-						.name(personGroup)
-						.build(),
-					ds.mapping()
-						.name("main_mode")
-						.x("dist")
-						.y("share")
-				);
-			}
+			viz.addTrace(ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+					.mode(ScatterTrace.Mode.LINE)
+					.name("total")
+					.build(),
+				ds.mapping()
+					.name("main_mode")
+					.x("dist")
+					.y("share")
+			);
 			if (distanceRefCsv != null) {
 				viz.description += " Dashed line represents the reference data.";
 

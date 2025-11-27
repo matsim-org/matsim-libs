@@ -444,15 +444,16 @@ public class TripAnalysis implements MATSimAppCommand {
 			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
 		}
 
-		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share");
-		aggr.replaceColumn("Count [trip_id]", shareSum);
+		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share_total");
+		aggr.addColumns(shareSum);
 
-//		aggr = addModeSharesPerModelType(aggr);
+		aggr = addModeSharesPerModelType(aggr);
 		aggr.write().csv(output.getPath("mode_share_%s.csv", "total").toFile());
 
 		// Norm each dist_group to 1
 		normDistanceGroups(labels, aggr);
-
+		aggr.removeColumns("Count [trip_id]");
+		//TODO sind die spalten count, subpopulation, modelType hier noch sinnvoll?
 		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "total").toFile());
 	}
 
@@ -512,7 +513,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		DoubleColumn share = subset.numberColumn("Count [trip_id]")
 			.divide(subset.numberColumn("Count [trip_id]").sum())
-			.setName("share");
+			.setName("share_"+group);
 
 		subset = subset.replaceColumn("Count [trip_id]", share)
 			.sortOn(cmp);
@@ -524,13 +525,16 @@ public class TripAnalysis implements MATSimAppCommand {
 	}
 
 	private void normDistanceGroups(List<String> labels, Table aggr) {
-		for (String label : labels) {
-			DoubleColumn dist_group = aggr.doubleColumn("share");
-			Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
+		List<String> share_Columns = aggr.columnNames().stream().filter(n -> n.toLowerCase().contains("share_")).toList();
+		for (String shareCol : share_Columns) {
+			for (String label : labels) {
+				DoubleColumn dist_group = aggr.doubleColumn(shareCol);
+				Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
 
-			double total = dist_group.where(sel).sum();
-			if (total > 0)
-				dist_group.set(sel, dist_group.divide(total));
+				double total = dist_group.where(sel).sum();
+				if (total > 0)
+					dist_group.set(sel, dist_group.divide(total));
+			}
 		}
 	}
 
