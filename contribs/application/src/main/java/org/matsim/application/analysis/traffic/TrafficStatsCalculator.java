@@ -2,13 +2,16 @@ package org.matsim.application.analysis.traffic;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
 import jakarta.annotation.Nullable;
+
 import java.util.Map;
 
 /**
@@ -19,15 +22,88 @@ public final class TrafficStatsCalculator {
 
 	private final Network network;
 	private final TravelTime travelTime;
+	private final VolumesAnalyzer volumesAnalyzer;
+	private final QSimFreeSpeedTravelTime qSimFreeSpeedTravelTime = new QSimFreeSpeedTravelTime(1);
 
 	private final int timeSlice;
 
-	public TrafficStatsCalculator(Network network, TravelTime travelTime, int timeSlice) {
+
+	public TrafficStatsCalculator(Network network, TravelTime travelTime, VolumesAnalyzer volumesAnalyzer, int timeSlice) {
 		this.network = network;
 		this.travelTime = travelTime;
+		this.volumesAnalyzer = volumesAnalyzer;
 		this.timeSlice = timeSlice;
 	}
 
+	/**
+	 * The expected extra travel time on a link at a specific time. Based on the idea of TomTom travel time index
+	 * @param link the link to be analyzed
+	 * @param time time of the day
+	 * @return excess travel time (in absolute value).
+	 */
+	public double getLinkExcessTravelTime(Link link, double time) {
+		double congestedTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
+		double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
+		return Math.max(0., congestedTravelTime - freeSpeedTravelTime);
+	}
+
+	/**
+	 * The expected percentage of extra travel time on a link over a period of time. Based on the idea of TomTom travel time index
+	 * @return average value of excess travel time index for the time period
+	 */
+	public double getLinkExcessTravelTimeIndex(Link link, int startTime, int endTime) {
+		int observedPeriodCounter = 0;
+		double sumExcessTravelTimeIndexValue = 0.;
+		for (int time = startTime; time < endTime; time += timeSlice) {
+			double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
+			sumExcessTravelTimeIndexValue += this.getLinkExcessTravelTime(link, time) / freeSpeedTravelTime;
+			observedPeriodCounter++;
+		}
+
+		if (observedPeriodCounter == 0)
+			return 0.;
+		return sumExcessTravelTimeIndexValue / observedPeriodCounter;
+	}
+
+	/**
+	 * Calculates the network TomTom congestion index (normalized excess travel time) for a given time period. Can be done for a certain road type.
+	 */
+	public double getTomTomNetworkCongestionIndex(int startTime, int endTime, @Nullable String roadType) {
+		double sumExcessTravelTime = 0.;
+		double sumFreeSpeedTravelTime = 0.;
+
+		for (Map.Entry<Id<Link>, ? extends Link> entry : this.network.getLinks().entrySet()) {
+			Link link = entry.getValue();
+
+			String type = NetworkUtils.getHighwayType(link);
+			if (roadType != null && !type.equals(roadType))
+				continue;
+
+			for (int time = startTime; time < endTime; time += timeSlice) {
+				double excessTravelTime = this.getLinkExcessTravelTime(link, time);
+				double freeSpeedTravelTime = qSimFreeSpeedTravelTime.getLinkTravelTime(link, time, null, null);
+
+				// by default, every link contributes for 1 unit of weight
+				double volumeDuringTimeSlice = 1.0;
+
+				if (volumesAnalyzer.getLinkIds().contains(link.getId())){
+					// We cannot get time-bin-size of the Volumes (as it is private). In the analysis, time-bin-size is always 3600, so we enter the value
+					// by hand.
+					int volumeIdx = (int) Math.floor(time / 3600.);
+					double volumeRatio = timeSlice / 3600.;
+					// additional weight for links with higher volumes
+					volumeDuringTimeSlice += volumesAnalyzer.getVolumesForLink(link.getId())[volumeIdx] * volumeRatio;
+				}
+
+				sumExcessTravelTime += excessTravelTime * volumeDuringTimeSlice;
+				sumFreeSpeedTravelTime += freeSpeedTravelTime * volumeDuringTimeSlice;
+			}
+		}
+		return sumExcessTravelTime / sumFreeSpeedTravelTime;
+	}
+
+
+	// Previous analysis from here
 	/**
 	 * Calculates the speed performance index, which is the ratio of actual travel time and free speed travel time.
 	 */
@@ -35,13 +111,11 @@ public final class TrafficStatsCalculator {
 
 		double length = link.getLength();
 
-		double allowedSpeed = NetworkUtils.getAllowedSpeed(link);
-
 		double actualTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
 
 		double actualSpeed = length / actualTravelTime;
 
-		double ratio = actualSpeed / allowedSpeed;
+		double ratio = actualSpeed / link.getFreespeed();
 
 		return ratio > 1 ? 1 : ratio;
 	}
@@ -59,7 +133,11 @@ public final class TrafficStatsCalculator {
 
 	/**
 	 * Calculates the congestion index based on the ratio of actual travel time and free speed travel time.
+	 *
+	 * @deprecated -- // kai does not like this quantity.  In particular, he finds the re-weighting by the fraction of non-congested time arbitrary;
+	 * //	this is consistent with the fact that it cannot be interpreted in ecomics terms (other than, say, the TomTom congestion index).
 	 */
+	@Deprecated
 	public double getLinkCongestionIndex(Link link, int startTime, int endTime) {
 
 		DoubleList speedPerformance = new DoubleArrayList();
@@ -86,6 +164,7 @@ public final class TrafficStatsCalculator {
 	/**
 	 * Calculates the network congestion index for a given time period. Can be done for a certain road type.
 	 */
+	@Deprecated
 	public double getNetworkCongestionIndex(int startTime, int endTime, @Nullable String roadType) {
 
 		double sumOfLinkLengthMultipiesLinkCongestionIndex = 0.0;
