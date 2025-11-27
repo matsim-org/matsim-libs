@@ -59,7 +59,7 @@ public class RunOfflineAccessibilityBerlin {
 	private enum economicStatusScenario{base, lowIncome, highIncome};
 
 	//		static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
-	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/fabilut/output-1pct/policy";
+	static String OUTPUT_DIR = "../public-svn/matsim/scenarios/countries/de/berlin/projects/autofrei/2025-11-13-scratch";
 
 	private static final ageScenario age = ageScenario.base;
 	private static final economicStatusScenario economicStatus = economicStatusScenario.base;
@@ -165,11 +165,11 @@ public class RunOfflineAccessibilityBerlin {
 
 		String coordinateSystem = config.global().getCoordinateSystem();
 		SimWrapper sw = SimWrapper.create(config)
-			.addDashboard(new OverviewDashboardHeart(relevantPois, coordinateSystem))
-			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.car))
-			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.pt))
-			.addDashboard(new EquityBerlinDashboard(coordinateSystem, relevantPois));
-//			.addDashboard(new NoiseDashboard(coordinateSystem, shpFile));
+//			.addDashboard(new OverviewDashboardHeart(relevantPois, coordinateSystem))
+//			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.car))
+//			.addDashboard(new AccessibilityBerlinDashboard(coordinateSystem, relevantPois, Modes4Accessibility.pt))
+//			.addDashboard(new EquityBerlinDashboard(coordinateSystem, relevantPois))
+			.addDashboard(new NoiseDashboard(coordinateSystem, shpFile));
 
 
 		boolean append = false;

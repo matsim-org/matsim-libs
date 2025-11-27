@@ -78,7 +78,7 @@ public class PrepareDrtStops implements MATSimAppCommand {
 		typeBuilder.add("type",String.class);
 		builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 
-		String inputPath = input.getRunDirectory() + "/drt-stops-stadt-und-land.xml";
+		String inputPath = input.getRunDirectory() + "/drt-stops-stadt-und-land-und-neustadt.xml";
 		String outputPath = input.getRunDirectory() + "/analysis/accessibility/stops.shp";
 
 		try {
