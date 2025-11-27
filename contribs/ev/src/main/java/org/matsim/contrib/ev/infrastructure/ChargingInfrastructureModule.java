@@ -55,7 +55,9 @@ public final class ChargingInfrastructureModule extends AbstractModule {
 		bind(Network.class).annotatedWith(Names.named(CHARGERS)).to(networkKey).asEagerSingleton();
 
 		bind(ChargingInfrastructureSpecification.class)
-				.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class);
+				.toProvider(XmlChargingInfrasturcutreSpecificationProvider.class).asEagerSingleton();
+
+		addControllerListenerBinding().to(ChargerWriterListener.class);
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override
