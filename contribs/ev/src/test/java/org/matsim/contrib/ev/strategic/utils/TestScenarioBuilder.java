@@ -5,7 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -50,6 +54,7 @@ import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PublicChargerProvider;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
+import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.scoring.ChargingPlanScoringParameters;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.WithinDayEvEngine;
@@ -225,7 +230,7 @@ public class TestScenarioBuilder {
 				Collections.emptySet(), true);
 	}
 
-	private void prepareInfrastructure(Controler controller) {
+	private ChargingInfrastructureSpecification prepareInfrastructure(Controler controller) {
 		ChargingInfrastructureSpecification infrastructure = new ChargingInfrastructureSpecificationDefaultImpl();
 
 		for (ChargerItem item : chargers) {
@@ -263,6 +268,8 @@ public class TestScenarioBuilder {
 				bind(ChargingInfrastructureSpecification.class).toInstance(infrastructure);
 			}
 		});
+
+		return infrastructure;
 	}
 
 	// DEMAND PART
@@ -468,6 +475,9 @@ public class TestScenarioBuilder {
 			ChargingPlanScoringParameters scoringParameters = new ChargingPlanScoringParameters();
 			strategicConfig.addParameterSet(scoringParameters);
 
+			RandomChargingPlanInnovator.Parameters innovationParameters = new RandomChargingPlanInnovator.Parameters();
+			strategicConfig.addParameterSet(innovationParameters);
+
 			// only strategic charging
 			StrategySettings chargingStrategy = new StrategySettings();
 			chargingStrategy.setStrategyName(StrategicChargingReplanningStrategy.STRATEGY);
@@ -503,7 +513,8 @@ public class TestScenarioBuilder {
 			}
 		});
 
-		prepareInfrastructure(controller);
+		ChargingInfrastructureSpecification infrastructure = prepareInfrastructure(controller);
+		scenario.addScenarioElement("infrastructure", infrastructure);
 
 		controller.addOverridingModule(new WithinDayEvModule());
 
@@ -573,7 +584,8 @@ public class TestScenarioBuilder {
 
 		@Override
 		synchronized public void handleEvent(ActivityStartEvent event) {
-			if (!TripStructureUtils.isStageActivityType(event.getActType()) || WithinDayEvEngine.isManagedActivityType(event.getActType())) {
+			if (!TripStructureUtils.isStageActivityType(event.getActType())
+					|| WithinDayEvEngine.isManagedActivityType(event.getActType())) {
 				activityStartEvents.add(event);
 
 				if (event.getActType().equals(WithinDayEvEngine.PLUG_ACTIVITY_TYPE)) {

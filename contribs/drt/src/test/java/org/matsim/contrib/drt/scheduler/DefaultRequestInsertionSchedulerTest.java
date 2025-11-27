@@ -1,55 +1,45 @@
 package org.matsim.contrib.drt.scheduler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
+import org.matsim.contrib.drt.schedule.*;
 import org.matsim.contrib.drt.stops.MinimumStopDurationAdapter;
 import org.matsim.contrib.drt.stops.PrebookingStopTimeCalculator;
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTaskUpdater;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.fakes.FakeLink;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.dvrp.path.VrpPaths.NODE_TRANSITION_TIME;
 
 /**
  * @author nkuehnel / MOIA
@@ -146,9 +136,9 @@ public class DefaultRequestInsertionSchedulerTest {
 
         // vehicle entry
         Waypoint.Start start = start(null, CURRENT_TIME, startLink, integerLoadType.fromInt(1));//not a STOP -> pickup cannot be appended
-        Waypoint.Stop stop0 = stop(stopTask0, integerLoadType.fromInt(2));
-        Waypoint.Stop stop1 = stop(stopTask1, integerLoadType.fromInt(1));
-        Waypoint.Stop stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
+        StopWaypoint stop0 = stop(stopTask0, integerLoadType.fromInt(2));
+        StopWaypoint stop1 = stop(stopTask1, integerLoadType.fromInt(1));
+        StopWaypoint stop2 = stop(stopTask2, integerLoadType.getEmptyLoad());
         var vehicleEntry = entry(vehicle, start, stop0, stop1, stop2);
 
         InsertionWithDetourData.InsertionDetourData detour = detourData(0, 10, 10, 10.);
@@ -198,7 +188,7 @@ public class DefaultRequestInsertionSchedulerTest {
 
     private static DefaultRequestInsertionScheduler getDefaultRequestInsertionScheduler(Fleet fleet, MobsimTimer timer) {
         MinimumStopDurationAdapter stopDuration = new MinimumStopDurationAdapter(new PrebookingStopTimeCalculator(StaticPassengerStopDurationProvider.of(STOP_DURATION, 0.0)), 60.);
-        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdater(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
+        ScheduleTimingUpdater scheduleTimingUpdater = new ScheduleTimingUpdaterImpl(timer, new DrtStayTaskEndTimeCalculator(stopDuration), DriveTaskUpdater.NOOP);
         DefaultRequestInsertionScheduler insertionScheduler = new DefaultRequestInsertionScheduler(fleet, timer, TRAVEL_TIME, scheduleTimingUpdater,
                 new DrtTaskFactoryImpl(), stopDuration, true);
         return insertionScheduler;
@@ -224,7 +214,7 @@ public class DefaultRequestInsertionSchedulerTest {
     }
 
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
@@ -233,8 +223,8 @@ public class DefaultRequestInsertionSchedulerTest {
         return new Waypoint.Start(task, link, time, occupancy);
     }
 
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy, integerLoadType);
+    private StopWaypoint stop(DefaultDrtStopTask stopTask, DvrpLoad outgoingOccupancy) {
+        return new StopWaypointImpl(stopTask, outgoingOccupancy, integerLoadType, false);
     }
 
 
@@ -244,9 +234,17 @@ public class DefaultRequestInsertionSchedulerTest {
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
+                .earliestDepartureTime(earliestStartTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                latestArrivalTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode(mode)

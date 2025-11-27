@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips;
 
-import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -41,8 +40,6 @@ import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouterFactory;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 
-import jakarta.inject.Provider;
-
 /**
  * @author thibautd
  */
@@ -58,7 +55,7 @@ public class JointTripsModule extends AbstractModule {
 		bind( ScoringFunctionFactory.class ).to(CharyparNagelWithJointModesScoringFunctionFactory.class);
 		install(new JointTripRouterModule());
 		// TODO: extract in files (messy and not modular)
-		addControlerListenerBinding().toInstance(
+		addControllerListenerBinding().toInstance(
 				new AbstractPrepareForSimListener() {
 					@Override
 					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(final ReplanningContext replanningContext) {

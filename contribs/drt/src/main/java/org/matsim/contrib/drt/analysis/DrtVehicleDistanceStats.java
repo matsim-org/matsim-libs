@@ -29,6 +29,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,6 +53,7 @@ import com.google.common.base.Preconditions;
  * @author jbischoff
  * @author Michal Maciejewski
  */
+@DistributedEventHandler(async = true)
 public class DrtVehicleDistanceStats
 		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
 		TeleportationArrivalEventHandler {

@@ -19,7 +19,7 @@ public class MemoryObserver {
 		startMillis(interval_seconds * 1000L);
 	}
 
-	static void startMillis(long interval) {
+	static synchronized void startMillis(long interval) {
 		stop();
 
 		runnable = new MemoryPrinter(interval);
@@ -39,7 +39,8 @@ public class MemoryObserver {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
 		long usedMem = totalMem - freeMem;
-		LOG.info("used RAM: " + (usedMem/1024/1024) + " MB  free: " + (freeMem/1024/1024) + " MB  total: " + (totalMem/1024/1024) + " MB");
+		long maxMem = Runtime.getRuntime().maxMemory();
+		LOG.info("used RAM: " + (usedMem/1024/1024) + " MB  free: " + (freeMem/1024/1024) + " MB  total: " + (totalMem/1024/1024) + " MB  max: " + (maxMem/1024/1024) + " MB");
 	}
 
 	private static class MemoryPrinter implements Runnable {

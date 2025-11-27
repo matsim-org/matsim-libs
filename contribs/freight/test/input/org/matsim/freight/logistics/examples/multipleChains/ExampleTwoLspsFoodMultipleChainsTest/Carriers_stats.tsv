@@ -1,0 +1,9 @@
+carrierId	nuOfJspritIterations	fleetSize	nuOfPossibleVehicleTypes	nuOfPossibleVehicles	nuOfServiceLocations_planned	nuOfPickupLocations_planned	nuOfDeliveryLocations_planned	MATSimScoreSelectedPlan	jspritScoreSelectedPlan	nuOfTours	jobType	nuOfJobs_planned	nuOfJobs_handled	noOfJobs_notHandled	demandSize_planned	demandSize_handled	jspritComputationTime
+Kaufland_DIRECT_directCarrier	-2147483648	INFINITE	1	1	16	0	0	-47147.86636895519	-5116.279839419997	15	services	17	17	0	347	347	null
+Kaufland_directCarrier	-2147483648	INFINITE	1	1	11	0	0	-4009.2743971086666	-3986.1849688004277	12	services	12	12	0	262	262	null
+Kaufland_distributionCarrier	-2147483648	INFINITE	1	1	5	0	0	-1026.4299370900371	-1023.4349153044184	4	services	5	5	0	85	85	null
+Kaufland_mainCarrier	-2147483648	INFINITE	1	1	1	0	0	-1221.2600596756874	null	4	services	5	5	0	85	85	null
+Rewe_DIRECT_directCarrier	-2147483648	INFINITE	1	1	24	0	0	-2517.99083633865	-2502.3688091858003	10	services	24	24	0	258	258	null
+Rewe_directCarrier	-2147483648	INFINITE	1	1	16	0	0	-1795.7113498981107	-1784.2519441602772	7	services	16	16	0	184	184	null
+Rewe_distributionCarrier	-2147483648	INFINITE	1	1	8	0	0	-893.1443784464076	-889.1939150043179	3	services	8	8	0	74	74	null
+Rewe_mainCarrier	-2147483648	INFINITE	1	1	1	0	0	-615.9049461389442	null	3	services	8	8	0	74	74	null

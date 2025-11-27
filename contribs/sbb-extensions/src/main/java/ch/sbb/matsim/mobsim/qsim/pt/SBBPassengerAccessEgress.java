@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -35,15 +35,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.core.mobsim.qsim.pt.*;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -58,12 +51,15 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
     private final TransitStopAgentTracker agentTracker;
     private final EventsManager eventsManager;
     private final boolean isGeneratingDeniedBoardingEvents;
+	private final TransitSchedule transitSchedule;
+	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
 
     SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
         this.internalInterface = internalInterface;
         this.agentTracker = agentTracker;
         this.eventsManager = eventsManager;
         this.isGeneratingDeniedBoardingEvents = scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
+		this.transitSchedule = scenario.getTransitSchedule();
     }
 
     /**
@@ -76,11 +72,15 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
      */
     double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
         ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
+
+		// Relocating passengers are only determined at the very last stop.
+		List<PTPassengerAgent> passengersRelocating = upcomingStops.isEmpty() ? findPassengersRelocating(vehicle, stop) : List.of();
+
         int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
         List<PTPassengerAgent> passengersEntering = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
 
         TransitStopHandler stopHandler = vehicle.getStopHandler();
-        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, this, vehicle);
+        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, passengersRelocating, this, vehicle);
         if (stopTime == 0.0) { // (de-)boarding is complete when the additional stopTime is 0.0
             if (this.isGeneratingDeniedBoardingEvents) {
                 List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
@@ -101,6 +101,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         }
 
         int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size();
+
+
 
         List<PTPassengerAgent> boardingPassengers = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
         for (PTPassengerAgent passenger : boardingPassengers) {
@@ -126,7 +128,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         return removed;
     }
 
-    @Override
+	@Override
     public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
         boolean entered = vehicle.addPassenger(passenger);
         if (entered) {
@@ -140,6 +142,65 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         return entered;
     }
 
+	@Override
+	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+
+		boolean handled = vehicle.removePassenger(passenger);
+		if (handled) {
+			// Store passengers wanting to relocate at the stop facility
+			agentRelocating.computeIfAbsent(stopFacilityId, k -> new ArrayList<>()).add(passenger);
+
+		} else
+			throw new IllegalStateException("Agent " + passenger.getId() + " was not removed from vehicle " + vehicle.getId() + " when relocating.");
+
+	}
+
+	@Override
+	public void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> departures, double time) {
+
+		TransitRouteStop stop = vehicle.getTransitRoute().getStops().getLast();
+		List<PTPassengerAgent> passengers = agentRelocating.getOrDefault(stop.getStopFacility().getId(), List.of());
+
+		for (ChainedDeparture chain : departures) {
+			TransitLine line = transitSchedule.getTransitLines().get(chain.getChainedTransitLineId());
+			TransitRoute route = line.getRoutes().get(chain.getChainedRouteId());
+			Departure departure = route.getDepartures().get(chain.getChainedDepartureId());
+
+			Id<Person> newDriver = Id.createPersonId("pt_" + SBBTransitQSimEngine.createId(line, route, departure));
+			Id<Vehicle> newVehicle = departure.getVehicleId();
+			boolean sameVehicle = newVehicle.equals(vehicle.getVehicle().getId());
+
+			MobsimDriverAgent nextDriver = (MobsimDriverAgent) internalInterface.getMobsim().getAgents().get(newDriver);
+
+			Iterator<PTPassengerAgent> it = passengers.iterator();
+
+			while (it.hasNext()) {
+
+				PTPassengerAgent passenger = it.next();
+
+				// Use the chained departure if it contains a stop the passenger uses as exit stop
+				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
+					continue;
+
+				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(),
+					vehicle.getVehicle().getId(), newVehicle, route.getStops().getFirst().getStopFacility().getId()));
+
+				// Chains can be defined on the same vehicle, only need to move the passenger if vehicle is different
+				if (!sameVehicle) {
+					nextDriver.getVehicle().addPassenger(passenger);
+					passenger.setVehicle(nextDriver.getVehicle());
+				}
+
+				it.remove();
+			}
+		}
+
+		if (!passengers.isEmpty()) {
+			throw new IllegalStateException("There are still passengers at stop " + stop.getStopFacility().getId() + " that were not relocated to the next vehicle: " + passengers);
+		}
+
+	}
+
     private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
             final TransitStopFacility stop) {
         ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
@@ -150,6 +211,18 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
         }
         return passengersLeaving;
     }
+
+	private List<PTPassengerAgent> findPassengersRelocating(TransitVehicle vehicle, final TransitStopFacility stop) {
+
+		List<PTPassengerAgent> relocatingPassengers = new ArrayList<>();
+		for (PassengerAgent passenger : vehicle.getPassengers()) {
+			if (((PTPassengerAgent) passenger).getRelocationAtStop(stop)) {
+				relocatingPassengers.add((PTPassengerAgent) passenger);
+			}
+		}
+
+		return relocatingPassengers;
+	}
 
     /**
      * Finds all agents that want to enter the specified line.

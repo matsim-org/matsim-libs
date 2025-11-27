@@ -124,13 +124,13 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 	}
 
 	@Override
-	public double getGradient(Link link) {
+	public double getGradient_pct( Link link ) {
 
 		if (!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()) return 0.;
 
 		var fromZ = link.getFromNode().getCoord().getZ();
 		var toZ = link.getToNode().getCoord().getZ();
-		var gradient = (toZ - fromZ) / link.getLength();
+		var gradient = (toZ - fromZ) / link.getLength() * 100;
 		// No positive utility for downhill, only negative for uphill
 		return Math.max(0, gradient);
 	}

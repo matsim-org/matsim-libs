@@ -24,11 +24,13 @@ import com.google.common.base.Verify;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
 import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
@@ -41,6 +43,7 @@ import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSe
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
 import org.matsim.contrib.drt.optimizer.insertion.repeatedselective.RepeatedSelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -105,9 +108,19 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	private boolean idleVehiclesReturnToDepots = false;
 
 	@Parameter
-	@Comment("Specifies the duration (seconds) a vehicle needs to be idle in order to get send back to the depot." +
-		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets send back to depot.")
+	@Comment("Specifies the minimum duration (seconds) a vehicle needs to be idle in order to get send back to the depot. " +
+		"Please be aware, that returnToDepotEvaluationInterval describes the minimal time a vehicle will be idle before it gets sent back to depot. " +
+			"The default is 60 [s]")
+	@PositiveOrZero
 	private double returnToDepotTimeout = 60;
+
+	@Parameter
+	@Comment("Specifies the _remaining_ duration (seconds) a vehicle needs to be idle before the next task in order to be sent back to depot. " +
+			"This can be used to avoid vehicle returns within smaller time gaps, e.g. before a prebooked stop. " +
+			"This only applies to idle times that are followed by additional tasks (i.e., inter-task gaps). " +
+			"Idle times at the end of the schedule are not affected by this threshold. Default is 3600 [s].")
+	@PositiveOrZero
+	private double returnToDepotMinIdleGap = 3600;
 
 	@Parameter
 	@Comment("Specifies the time interval (seconds) a vehicle gets evaluated to be send back to depot.")
@@ -272,6 +285,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 	@Nullable
 	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
+	@Nullable
+	private DrtParallelInserterParams drtParallelInserterParams;
+
 	private ZoneSystemParams analysisZoneSystemParams;
 
 	public DrtConfigGroup() {
@@ -324,6 +340,11 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 				() -> prebookingParams,
 				params -> prebookingParams = (PrebookingParams)params);
 
+		//parallel inserter (optional)
+		addDefinition(DrtParallelInserterParams.SET_NAME, DrtParallelInserterParams::new,
+			() -> drtParallelInserterParams,
+			params -> drtParallelInserterParams = (DrtParallelInserterParams)params);
+
 		// estimator (optional)
 		addDefinition(DrtEstimatorParams.SET_NAME, DrtEstimatorParams::new,
 			() -> drtEstimatorParams,
@@ -334,21 +355,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 			() -> loadParams,
 			params -> loadParams = (DvrpLoadParams) params);
 
-		addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (SquareGridZoneSystemParams)params);
-
-		addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (GISFileZoneSystemParams)params);
-
-		addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (H3GridZoneSystemParams)params);
-
-		addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
-				() -> analysisZoneSystemParams,
-				params -> analysisZoneSystemParams = (GeometryFreeZoneSystemParams)params);
+		// analysis zone systems
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> analysisZoneSystemParams = params, // 
+			() -> analysisZoneSystemParams);
 
 		addDefinition(ZonalSystemWrapper.SET_NAME, ZonalSystemWrapper::new,
 				() -> analysisZoneSystemParams,
@@ -456,6 +466,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 		return Optional.ofNullable(rebalancingParams);
 	}
 
+	public Optional<DrtParallelInserterParams> getDrtParallelInserterParams() {
+		return Optional.ofNullable(drtParallelInserterParams);
+	}
+
 	public Optional<DrtFareParams> getDrtFareParams() {
 		return Optional.ofNullable(drtFareParams);
 	}
@@ -550,6 +564,14 @@ public class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParamet
 
 	public void setReturnToDepotTimeout(double returnToDepotTimeout) {
 		this.returnToDepotTimeout = returnToDepotTimeout;
+	}
+
+	public double getReturnToDepotMinIdleGap() {
+		return returnToDepotMinIdleGap;
+	}
+
+	public void setReturnToDepotMinIdleGap(double returnToDepotIdleHorizon) {
+		this.returnToDepotMinIdleGap = returnToDepotIdleHorizon;
 	}
 
 	public double getReturnToDepotEvaluationInterval() {

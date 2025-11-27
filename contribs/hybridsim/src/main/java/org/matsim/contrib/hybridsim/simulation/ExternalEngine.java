@@ -60,14 +60,14 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	private final Netsim sim;
 	private final Network net;
 	private final Scenario sc;
-    private final IdIntMapper mapper;
+	private final IdIntMapper mapper;
 //	private final CyclicBarrier clientBarrier = new CyclicBarrier(2);
 
 	private GRPCExternalClient client;
 
-    public ExternalEngine(EventsManager eventsManager, Netsim sim, IdIntMapper mapper) {
-        this.mapper = mapper;
-        this.em = eventsManager;
+	public ExternalEngine(EventsManager eventsManager, Netsim sim, IdIntMapper mapper) {
+		this.mapper = mapper;
+		this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
 		this.client = new GRPCExternalClient(RunExample.REMOTE_HOST, RunExample.REMOTE_PORT);
@@ -76,7 +76,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 	public void registerAdapter(QLinkInternalIAdapter external2qAdapterLink) {
 		this.adapters.put(external2qAdapterLink.getLink().getId(),
-				external2qAdapterLink);
+			external2qAdapterLink);
 	}
 
 	public EventsManager getEventsManager() {
@@ -84,13 +84,12 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	}
 
 
-
 	@Override
 	public void doSimStep(double time) {
 		double to = time + 1;
 		HybridSimProto.LeftClosedRightOpenTimeInterval req = HybridSimProto.LeftClosedRightOpenTimeInterval.newBuilder()
-				.setFromTimeIncluding(time)
-				.setToTimeExcluding(to).build();
+			.setFromTimeIncluding(time)
+			.setToTimeExcluding(to).build();
 		HybridSimProto.Empty resp = this.client.getBlockingStub().simulatedTimeInerval(req);
 
 		//retrieve trajectories
@@ -101,7 +100,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 			Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 			if (veh.getDriver().chooseNextLinkId().toString().equals(tr.getLinkId())) {
 
-				this.em.processEvent(new LinkLeaveEvent(time, veh.getId(), veh.getCurrentLink().getId()));
+				this.em.processEvent(new LinkLeaveEvent(time, veh.getId(), veh.getCurrentLinkId()));
 				veh.getDriver().notifyMoveOverNode(nextLinkId);
 				this.em.processEvent(new LinkEnterEvent(time, veh.getId(), nextLinkId));
 			}
@@ -118,7 +117,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 			if (!ql.isAcceptingFromUpstream()) {
 				throw new RuntimeException("DS link is full, spill-back to external is not yet implemented!");
 			}
-			this.em.processEvent(new LinkLeaveEvent(time, v.getId(), v.getCurrentLink().getId()));
+			this.em.processEvent(new LinkLeaveEvent(time, v.getId(), v.getCurrentLinkId()));
 			v.getDriver().notifyMoveOverNode(ql.getLink().getId());
 			ql.addFromUpstream(v);
 		}
@@ -187,8 +186,8 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 					break;
 				}
 				HybridSimProto.Link.Builder llb = HybridSimProto.Link.newBuilder();
-                llb.setId(mapper.getIntLink(linkId));
-                HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
+				llb.setId(mapper.getIntLink(linkId));
+				HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
 				cb.setX(l.getCoord().getX());
 				cb.setY(l.getCoord().getY());
 				llb.setCentroid(cb);

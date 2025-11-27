@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint.Dropoff;
 import org.matsim.contrib.drt.optimizer.Waypoint.End;
 import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -67,9 +68,17 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.earliestDepartureTime(100)
+			.constraints(
+					new DrtRouteConstraints(
+							400,
+							Double.POSITIVE_INFINITY,
+							100,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);

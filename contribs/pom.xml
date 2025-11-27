@@ -61,6 +61,7 @@
 		<module>analysis</module>
 		<module>application</module>
 		<module>av</module>
+		<module>aws</module>
 		<module>bicycle</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
@@ -68,6 +69,7 @@
 		<module>common</module>
 		<module>decongestion</module>
 		<module>discrete_mode_choice</module>
+		<module>distributed-simulation</module>
 		<module>drt</module>
 		<module>drt-extensions</module>
 		<module>dvrp</module>

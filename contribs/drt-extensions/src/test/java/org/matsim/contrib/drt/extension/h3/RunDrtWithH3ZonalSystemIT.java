@@ -69,7 +69,7 @@ public class RunDrtWithH3ZonalSystemIT {
 									return new DrtZonalWaitTimesAnalyzer(drtConfig, getter.getModal(DrtEventSequenceCollector.class),
 											zoneSystem, config.global().getDefaultDelimiter());
                                 })).asEagerSingleton();
-							addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
+							addControllerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 						}
 					});
 				}

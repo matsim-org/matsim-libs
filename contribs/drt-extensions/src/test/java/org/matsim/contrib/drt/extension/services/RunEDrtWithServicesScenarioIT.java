@@ -11,8 +11,12 @@ import org.matsim.contrib.drt.extension.services.services.params.DrtServiceParam
 import org.matsim.contrib.drt.extension.services.services.params.DrtServicesParams;
 import org.matsim.contrib.drt.extension.services.trackers.ChargingTracker;
 import org.matsim.contrib.drt.extension.services.trackers.ServiceTracker;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;

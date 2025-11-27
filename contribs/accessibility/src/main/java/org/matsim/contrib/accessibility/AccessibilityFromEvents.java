@@ -8,7 +8,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -89,16 +89,16 @@ public final class AccessibilityFromEvents{
 		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , module );
 
 		// The following is more awkward than it should be because of Java type erasure; essentially, it says ...getInstance( Set<ControlerListener>.class ):
-		Set<ControlerListener> result = injector.getInstance( Key.get( new TypeLiteral<Set<ControlerListener>>(){} ) );
+		Set<ControllerListener> result = injector.getInstance( Key.get(new TypeLiteral<Set<ControllerListener>>(){} ) );
 
 		// We do not have named ControlerListeners, so we have to go through all of them (if the AccessibilityListener had a class name, then one might
 		// be able to get around that):
-		for( ControlerListener controlerListener : result ) {
-			if ( controlerListener instanceof ShutdownListener ) {
+		for( ControllerListener controllerListener : result ) {
+			if ( controllerListener instanceof ShutdownListener ) {
 				MatsimServices controler = null ;
 				boolean unexpected = false ;
 				ShutdownEvent shutdownEvent = new ShutdownEvent( controler, unexpected, 0, null) ;
-				((ShutdownListener) controlerListener).notifyShutdown( shutdownEvent );
+				((ShutdownListener) controllerListener).notifyShutdown( shutdownEvent );
 			}
 		}
 	}
