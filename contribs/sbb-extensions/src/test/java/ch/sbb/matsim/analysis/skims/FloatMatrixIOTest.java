@@ -39,7 +39,7 @@ public class FloatMatrixIOTest {
         zoneIds.add("un");
         zoneIds.add("dos");
         zoneIds.add("tres");
-        FloatMatrix<String> matrix = new FloatMatrix<>(zoneIds, 0.0f);
+        FloatMatrix<String> matrix = FloatMatrix.createFloatMatrix(zoneIds, 0.0f);
 
         matrix.set("un", "un", 2.0f);
         matrix.set("un", "dos", 3.0f);
@@ -56,7 +56,7 @@ public class FloatMatrixIOTest {
         outStream.close();
 
         ByteArrayInputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-        FloatMatrix<String> matrix2 = new FloatMatrix<>(zoneIds, Float.NaN);
+        FloatMatrix<String> matrix2 = FloatMatrix.createFloatMatrix(zoneIds, Float.NaN);
         FloatMatrixIO.readAsCSV(matrix2, inStream, id -> id);
         inStream.close();
 

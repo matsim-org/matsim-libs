@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
+ * Controller.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -62,7 +62,7 @@ import java.util.Objects;
 public class RunGenerateSmallScaleCommercialTrafficTest {
 
 	@RegisterExtension
-	private MatsimTestUtils utils = new MatsimTestUtils();
+	private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testMainRunAndResults() {
@@ -80,29 +80,33 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		String resultPopulation = "testPopulation.xml.gz";
 
 		new GenerateSmallScaleCommercialTrafficDemand().execute(
-				pathToConfig,
-				"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
-				"--pathToCommercialFacilities", pathToCommercialFacilities,
-				"--sample", sample,
-				"--jspritIterations", jspritIterations,
-				"--creationOption", creationOption,
-				"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
-				"--includeExistingModels",
-				"--zoneShapeFileName", zoneShapeFileName,
-				"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
-				"--shapeCRS", shapeCRS,
-				"--nameOutputPopulation", resultPopulation,
-				"--pathOutput", output);
+			pathToConfig,
+			"--pathToDataDistributionToZones", pathToDataDistributionToZones.toString(),
+			"--pathToCommercialFacilities", pathToCommercialFacilities,
+			"--sample", sample,
+			"--jspritIterations", jspritIterations,
+			"--creationOption", creationOption,
+			"--smallScaleCommercialTrafficType", smallScaleCommercialTrafficType,
+			"--additionalTravelBufferPerIterationInMinutes", "10",
+			"--includeExistingModels",
+			"--zoneShapeFileName", zoneShapeFileName,
+			"--zoneShapeFileNameColumn", zoneShapeFileNameColumn,
+			"--shapeCRS", shapeCRS,
+			"--nameOutputPopulation", resultPopulation,
+			"--pathOutput", output,
+			"--resistanceFactor_commercialPersonTraffic", "0.005",
+			"--resistanceFactor_goodsTraffic", "0.005",
+			"--MATSimIterationsAfterDemandGeneration", "0");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
 		Scenario scenarioWOSolution = ScenarioUtils.createScenario(config);
 		Scenario scenarioWSolution = ScenarioUtils.createScenario(config);
 		Population population = PopulationUtils.readPopulation(utils.getOutputDirectory() + "testPopulation.xml.gz");
-		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemand.xml";
-		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_CarrierDemandWithPlans.xml";
+		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml.gz";
+		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_carriersVehicleTypes.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_allVehicles.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
@@ -162,7 +166,7 @@ public class RunGenerateSmallScaleCommercialTrafficTest {
 		Map<String, Object2DoubleMap<String>> dataDistribution = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(calculatedFile)) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-				.setSkipHeaderRecord(true).build().parse(reader);
+				.setSkipHeaderRecord(true).get().parse(reader);
 			for (CSVRecord record : parse) {
 				System.out.println(record);
 				dataDistribution.computeIfAbsent(record.get(0), k -> new Object2DoubleOpenHashMap<>());

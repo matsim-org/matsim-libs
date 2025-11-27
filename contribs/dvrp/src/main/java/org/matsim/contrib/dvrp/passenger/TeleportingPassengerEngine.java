@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.*;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -81,14 +81,14 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
-		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, network, requestValidator,
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
+		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, tracker, network, requestValidator,
 				new DefaultTeleportationEngine(scenario, eventsManager, false));
 	}
 
 	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
+			DvrpPassengerTracker tracker, Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -97,8 +97,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		this.network = network;
 		this.requestValidator = requestValidator;
 		this.teleportationEngine = teleportationEngine;
-
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		this.internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
 	@Override
@@ -143,7 +142,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+				List.of(passenger.getId()), List.of(route), getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		eventsManager.processEvent(new PassengerWaitingEvent(now, mode, request.getId(), request.getPassengerIds()));
 
@@ -225,7 +224,9 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 			public TeleportingPassengerEngine get() {
 				return new TeleportingPassengerEngine(getMode(), eventsManager, mobsimTimer,
 						getModalInstance(PassengerRequestCreator.class),
-						getModalInstance(TeleportedRouteCalculator.class), getModalInstance(Network.class),
+						getModalInstance(TeleportedRouteCalculator.class),
+						getModalInstance(DvrpPassengerTracker.class),
+						getModalInstance(Network.class),
 						getModalInstance(PassengerRequestValidator.class), scenario);
 			}
 		};

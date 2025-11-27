@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -27,6 +28,10 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 
 	public PtFareConfigGroup() {
 		super(MODULE_NAME);
+	}
+
+	public void addPtFareParameterSet(PtFareParams ptFareParams) {
+		addParameterSet(ptFareParams);
 	}
 
 	@Override
@@ -58,16 +63,23 @@ public class PtFareConfigGroup extends ReflectiveConfigGroup {
 		this.upperBoundFactor = upperBoundFactor;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Collection<FareZoneBasedPtFareParams> getFareZoneBasedPtFareParams() {
+		return (Collection<FareZoneBasedPtFareParams>) getParameterSets(FareZoneBasedPtFareParams.SET_TYPE);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<DistanceBasedPtFareParams> getDistanceBasedPtFareParams() {
+		return (Collection<DistanceBasedPtFareParams>) getParameterSets(DistanceBasedPtFareParams.SET_TYPE);
+	}
+
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
-		switch (type) {
-			case DistanceBasedPtFareParams.SET_TYPE:
-				return new DistanceBasedPtFareParams();
-			case FareZoneBasedPtFareParams.SET_TYPE:
-				return new FareZoneBasedPtFareParams();
-			default:
-				throw new IllegalArgumentException(type);
-		}
+		return switch (type) {
+			case DistanceBasedPtFareParams.SET_TYPE -> new DistanceBasedPtFareParams();
+			case FareZoneBasedPtFareParams.SET_TYPE -> new FareZoneBasedPtFareParams();
+			default -> throw new IllegalArgumentException(type);
+		};
 	}
 
 	@Override

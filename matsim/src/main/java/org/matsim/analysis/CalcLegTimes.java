@@ -27,16 +27,13 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -51,6 +48,7 @@ import java.util.TreeMap;
  * Also calculates the average leg duration.
  * Legs ended because of vehicles being stuck are not counted.
  */
+@DistributedEventHandler(async = true)
 public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
@@ -65,11 +63,6 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	private final IdMap<Person, String> previousActivityTypes = new IdMap<>(Person.class);
 	private double sumLegDurations = 0;
 	private int sumLegs = 0;
-
-	@Inject
-	CalcLegTimes(EventsManager eventsManager) {
-		eventsManager.addHandler(this);
-	}
 
 	public CalcLegTimes() {
 

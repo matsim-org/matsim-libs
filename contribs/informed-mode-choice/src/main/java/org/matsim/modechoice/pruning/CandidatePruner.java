@@ -1,6 +1,6 @@
 package org.matsim.modechoice.pruning;
 
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
@@ -11,7 +11,7 @@ import java.util.Random;
  * Class used for pruning unpromising candidates, i.e. their score is below the calculated threshold.
  * All methods of implementations must be thread safe! They will be invoked in parallel during planning!
  * <p>
- * Implementations can also implement {@link ControlerListener} to get notified simulation progress.
+ * Implementations can also implement {@link ControllerListener} to get notified simulation progress.
  */
 public interface CandidatePruner {
 
@@ -41,13 +41,12 @@ public interface CandidatePruner {
 		return -1;
 	}
 
-
 	/**
 	 * Calculate threshold to be applied on a single trip. Modes worse than this threshold on this trip will be discarded.
 	 *
 	 * @return positive threshold, if negative it will not be applied
 	 */
 	default double tripThreshold(PlanModel planModel, int idx) {
-		return -1;
+		return planThreshold(planModel);
 	}
 }

@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when

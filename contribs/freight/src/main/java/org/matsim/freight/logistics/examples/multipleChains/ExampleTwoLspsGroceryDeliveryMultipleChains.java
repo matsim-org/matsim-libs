@@ -42,7 +42,6 @@
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
-import java.io.IOException;
 import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,14 +58,16 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
-import org.matsim.freight.carriers.analysis.RunFreightAnalysisEventBased;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
 import org.matsim.freight.logistics.examples.ExampleConstants;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.CarrierSchedulerUtils;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
@@ -90,7 +91,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
   private static final String CARRIER_PLAN_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/CarrierLEH_v2_withFleet_Shipment_OneTW_PickupTime_ICEVandBEV.xml";
   private static final String VEHICLE_TYPE_FILE = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/projects/freight/foodRetailing_wo_rangeConstraint/input/vehicleTypesBVWP100_DC_noTax.xml";
-  private static final String EDEKA_SUPERMARKT_TROCKEN = "edeka_SUPERMARKT_TROCKEN";
+  private static final String rewe_DISCOUNTER_TROCKEN = "rewe_DISCOUNTER_TROCKEN";
   private static final String KAUFLAND_VERBRAUCHERMARKT_TROCKEN = "kaufland_VERBRAUCHERMARKT_TROCKEN";
 
   private static final String OUTPUT_DIRECTORY = "output/groceryDelivery_kmt_1000_1LSPb";
@@ -117,16 +118,16 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
     CarrierPlanXmlReader carrierReader = new CarrierPlanXmlReader(carriers, vehicleTypes);
     carrierReader.readFile(CARRIER_PLAN_FILE);
 
-    Carrier carrierEdeka = carriers.getCarriers().get(Id.create(EDEKA_SUPERMARKT_TROCKEN, CarrierImpl.class));
+    Carrier carrierRewe = carriers.getCarriers().get(Id.create(rewe_DISCOUNTER_TROCKEN, CarrierImpl.class));
     Carrier carrierKaufland = carriers.getCarriers().get(Id.create(KAUFLAND_VERBRAUCHERMARKT_TROCKEN, CarrierImpl.class));
 
     log.info("Add LSP(s) to the scenario");
     Collection<LSP> lsps = new LinkedList<>();
-    lsps.add(createLspWithTwoChains(scenario, "Edeka", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
+    lsps.add(createLspWithTwoChains(scenario, "Rewe", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierRewe), getDepotLinkFromVehicle(carrierRewe), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
     lsps.add(createLspWithTwoChains(scenario, "Kaufland", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), HUB_LINK_ID_NEUKOELLN, vehicleTypes, vehicleTypes, vehicleTypes));
-    lsps.add(createLspWithDirectChain(scenario, "Edeka_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierEdeka), getDepotLinkFromVehicle(carrierEdeka), vehicleTypes));
+    lsps.add(createLspWithDirectChain(scenario, "Rewe_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierRewe), getDepotLinkFromVehicle(carrierRewe), vehicleTypes));
     lsps.add(createLspWithDirectChain(scenario, "Kaufland_DIRECT", MultipleChainsUtils.createLSPShipmentsFromCarrierShipments(carrierKaufland), getDepotLinkFromVehicle(carrierKaufland), vehicleTypes));
-    LSPUtils.addLSPs(scenario, new LSPs(lsps));
+    LSPUtils.loadLspsIntoScenario(scenario, lsps);
 
     Controller controller = prepareController(scenario);
 
@@ -134,7 +135,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     controller.run();
 
-    runCarrierAnalysis(controller.getControlerIO().getOutputPath(), config);
+    runCarrierAnalysis(controller.getControllerIO().getOutputPath(), config);
 
     log.info("Done.");
   }
@@ -202,7 +203,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
                                 () -> {
                                   LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                                   strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                                  strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 4);
+
+									GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+									strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+									strategyManager.addStrategy(strategy, null, 4);
                                   strategyManager.setMaxPlansPerAgent(5);
                                   strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                                   return strategyManager;
@@ -213,12 +217,8 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
   }
 
   private static void runCarrierAnalysis(String outputPath, Config config) {
-    RunFreightAnalysisEventBased freightAnalysis = new RunFreightAnalysisEventBased(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
-    try {
-      freightAnalysis.runCompleteAnalysis();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    CarriersAnalysis carriersAnalysis = new CarriersAnalysis(outputPath +"/", outputPath +"/Analysis/", config.global().getCoordinateSystem());
+	carriersAnalysis.runCarrierAnalysis(CarriersAnalysis.CarrierAnalysisType.carriersAndEvents);
   }
 
   /**
@@ -240,6 +240,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
    * @param vehicleTypesDirect          vehicle types for the direct run (direct chain)
    * @return the LSP
    */
+  @SuppressWarnings("SameParameterValue")
   private static LSP createLspWithTwoChains(Scenario scenario, String lspName, Collection<LspShipment> lspShipments, Id<Link> depotLinkId, Id<Link> hubLinkId, CarrierVehicleTypes vehicleTypesMainRun, CarrierVehicleTypes vehicleTypesDistributionRun, CarrierVehicleTypes vehicleTypesDirect) {
     log.info("create LSP");
     //Chains
@@ -263,7 +264,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
@@ -402,7 +403,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChains {
 
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");

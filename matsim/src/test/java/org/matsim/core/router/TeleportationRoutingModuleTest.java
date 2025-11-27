@@ -57,7 +57,7 @@ public class TeleportationRoutingModuleTest {
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
 						"mode",
-						scenario, 10.0, 1.0);
+						scenario, 10.0, 1.0, null);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assertions.assertEquals(100.0, tt, 10e-7);
 		Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 10e-7);
@@ -68,7 +68,7 @@ public class TeleportationRoutingModuleTest {
 						"mode",
 					  scenario,
 						20.0,
-						1.0);
+						1.0, null);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assertions.assertEquals(50.0, tt, 10e-7);
 		Assertions.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
@@ -83,10 +83,60 @@ public class TeleportationRoutingModuleTest {
 						"mode",
 				scenario,
 						10.0,
-						manhattanBeelineDistanceFactor);
+						manhattanBeelineDistanceFactor, null);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);
 		Assertions.assertEquals(200.0, tt, 10e-7);
 		Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 10e-7);
 		Assertions.assertEquals(200.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+	}
+
+	@Test
+	void testRouteLegWithAttribute() {
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		RouteFactories routeFactory = new RouteFactories();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
+		Facility fromAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
+				new Coord(0,0), Id.createLinkId( "h" ) ) ;
+		Facility toAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
+				new Coord(1000,0), Id.createLinkId( "h" ) ) ;
+
+		{ // without attribute
+			TeleportationRoutingModule router =
+					new TeleportationRoutingModule(
+							"mode",
+							scenario, 10.0, 1.0, null);
+			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
+			Assertions.assertEquals(100.0, tt, 10e-7);
+			Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(100.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		}
+		
+		{ // with attribute
+			person.getAttributes().putAttribute("customSpeed", 20.0);
+
+			TeleportationRoutingModule router =
+					new TeleportationRoutingModule(
+							"mode",
+							scenario, 10.0, 1.0, "customSpeed");
+			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
+			Assertions.assertEquals(50.0, tt, 10e-7);
+			Assertions.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(50.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		}
+
+		{ // fallback
+			person.getAttributes().removeAttribute("customSpeed");
+
+			TeleportationRoutingModule router =
+					new TeleportationRoutingModule(
+							"mode",
+							scenario, 30.0, 1.0, "customSpeed");
+			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
+			Assertions.assertEquals(33.0, tt, 10e-7);
+			Assertions.assertEquals(33.0, leg.getTravelTime().seconds(), 10e-7);
+			Assertions.assertEquals(33.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
+		}
 	}
 }

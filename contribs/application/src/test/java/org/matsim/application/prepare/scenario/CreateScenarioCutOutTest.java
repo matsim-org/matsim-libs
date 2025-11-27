@@ -35,7 +35,7 @@ class CreateScenarioCutOutTest {
 	 */
 	@Test
 	void testBasicCutout() {
-		// TODO Rueckfrage: Soll die cap auch auf inf gesetzt werden, wenn es keine Events gibt, die die freespeed anpassen?
+
 		new CreateScenarioCutOut().execute(
 			"--buffer", "100",
 			"--population", utils.getClassInputDirectory() + "plans_without_facilities.xml",

@@ -15,7 +15,7 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		if (operationFacilitiesParams.operationFacilityInputFile != null) {
+		if (operationFacilitiesParams.getOperationFacilityInputFile() != null) {
 			bindModal(OperationFacilitiesSpecification.class).toProvider(() -> {
 				OperationFacilitiesSpecification operationFacilitiesSpecification = new OperationFacilitiesSpecificationImpl();
 				new OperationFacilitiesReader(operationFacilitiesSpecification)
@@ -23,5 +23,8 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 				return operationFacilitiesSpecification;
 			}).asEagerSingleton();
 		}
+		bindModal(OperationFacilityReservationManager.class).toProvider(modalProvider(getter ->
+				new OperationFacilityReservationManager())).asEagerSingleton();
+		addControllerListenerBinding().to(modalKey(OperationFacilityReservationManager.class));
 	}
 }

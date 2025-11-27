@@ -145,6 +145,8 @@ class BicycleScoreEventsCreator implements
 
 				// yyyy in the link based scoring, it actually uses event.getReleativePositionOnLink.  Good idea!  kai, jul'23
 
+//				TODO: I am pretty sure that here the last link is scored twice. It is already scored for LinkLeaveEvent, so why are we doing it again here? -sm0325
+
 				double amount = additionalBicycleLinkScore.computeLinkBasedScore( network.getLinks().get( event.getLinkId() ) );
 
 				final Id<Person> driverOfVehicle = vehicle2driver.getDriverOfVehicle( event.getVehicleId() );

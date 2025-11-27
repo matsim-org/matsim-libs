@@ -2,7 +2,7 @@ name: CodeQL
 
 on:
   push:
-    branches: 'master'
+    branches: 'main'
 
 jobs:
   analyze:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'zulu'
           cache: 'maven'
 

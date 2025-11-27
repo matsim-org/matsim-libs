@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -69,7 +69,7 @@ public final class RunChessboard {
 		CarriersUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers( scenario );
-		CarrierVehicleTypes types = CarriersUtils.getCarrierVehicleTypes( scenario );
+		CarrierVehicleTypes types = CarriersUtils.getOrAddCarrierVehicleTypes( scenario );
 
 		Controller controller = ControllerUtils.createController( scenario );
 
@@ -88,8 +88,8 @@ public final class RunChessboard {
 				final LegHistogram withoutFreight = new LegHistogram(900);
 				addEventHandlerBinding().toInstance(withoutFreight);
 
-				addControlerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
-				addControlerListenerBinding().toInstance( new IterationEndsListener() {
+				addControllerListenerBinding().toInstance( new CarrierScoreStats(carriers, config.controller().getOutputDirectory() +"/carrier_scores", true) );
+				addControllerListenerBinding().toInstance(new IterationEndsListener() {
 
 					@Inject private OutputDirectoryHierarchy controlerIO;
 
@@ -97,7 +97,7 @@ public final class RunChessboard {
 						String dir = controlerIO.getIterationPath(event.getIteration());
 
 						//write plans
-						new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+						CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 						//write stats
 						freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

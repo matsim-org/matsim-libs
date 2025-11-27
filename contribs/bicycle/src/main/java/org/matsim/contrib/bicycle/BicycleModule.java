@@ -22,12 +22,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.C;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -74,16 +70,21 @@ public final class BicycleModule extends AbstractModule {
 		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 		// (this computes the value of the per-link scoring event.  yyyy Very unfortunately, it is a re-implementation of the BicycleTravelDisutility (mentioned above).)
 
+
+//		here, different values for surface types and infrastructure factors can be defined.
+//		by default, the default values in BicycleParamsDefaultImpl are bound
+		this.bind(BicycleParams.class).to(BicycleParamsDefaultImpl.class);
+
 		this.installOverridingQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
-				this.addLinkSpeedCalculator().to( BicycleLinkSpeedCalculator.class );
+				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
 			}
 		} );
 
 		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
 		// (both the router and the mobsim need this)
 
-		addControlerListenerBinding().to(ConsistencyCheck.class);
+		addControllerListenerBinding().to(ConsistencyCheck.class);
 	}
 
 	static class ConsistencyCheck implements StartupListener {
@@ -99,18 +100,21 @@ public final class BicycleModule extends AbstractModule {
 			} else {
 
 				double mobsimSpeed = scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity();
-				if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeedForRouting()) > 0.1) {
-					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
-							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
-							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
-					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
-						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
-					}
-				}
+//				if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeedForRouting()) > 0.1) {
+//					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
+//							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
+//							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
+//					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
+//						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
+//					}
+//				}
 			}
+
 			if (!scenario.getConfig().qsim().getMainModes().contains(bicycleConfigGroup.getBicycleMode())) {
 				LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
 			}
+			// (yy should move into the config consistency checker)
+
 		}
 	}
 }

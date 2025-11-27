@@ -29,12 +29,15 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.Waypoint.Stop;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.testcases.fakes.FakeLink;
 
 /**
@@ -44,61 +47,134 @@ public class VehicleDataEntryFactoryImplTest {
 	private final Link depot = new FakeLink(Id.createLinkId("depot"));
 
 	//time slack: 20 (arrival is the constraint)
-	private final Stop stop0 = stop(100, 120, 200, 230);
+	private final StopWaypoint stop0 = stop(100, 120, 200, 230);
 
 	//time slack: 30 (departure is the constraint)
-	private final Stop stop1 = stop(300, 340, 400, 430);
+	private final StopWaypoint stop1 = stop(300, 340, 400, 430);
+	
+	private static final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void computeSlackTimes_withStops() {
 		final List<Double> precedingStayTimes = Arrays.asList(0.0, 0.0);
-		
+
 		//final stay task not started - vehicle slack time is 50
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 30, 50);
+		assertThat(computeSlackTimes(vehicle(500, 450), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 30, 50);
 
 		//final stay task not started - vehicle slack time is 25 and limits the slack times at stop1
-		assertThat(computeSlackTimes(vehicle(500, 475), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 25, 25);
+		assertThat(computeSlackTimes(vehicle(500, 475), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 25, 25);
 
 		//final stay task not started - vehicle slack time is 10 and limits the slack times at all stops
-		assertThat(computeSlackTimes(vehicle(500, 490), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(10, 10, 10, 10);
+		assertThat(computeSlackTimes(vehicle(500, 490), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(10, 10, 10, 10);
 	}
+
+	@Test
+	void computeSlackTimes_withRideDurationConstraints_a() {
+
+		//time slack: 20 (arrival is the constraint)
+		StopWaypoint pickupStop =  stop(100, 120, 200, 230);
+		//time slack: 30 (departure is the constraint)
+		StopWaypoint dropoffStop = stop(300, 340, 400, 430);
+
+		AcceptedDrtRequest mockRequest = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("mock", Request.class)).build())
+				.latestArrivalTime(340)
+				.maxRideDuration(200)
+				.earliestStartTime(100)
+				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		// stop duration == 0 --> pickup time == stop begin time
+		// ---> ride duration == 200 == max ride duration --> slack should be == 0
+
+		pickupStop.getTask().addPickupRequest(mockRequest);
+		dropoffStop.getTask().addDropoffRequest(mockRequest);
+
+		StopWaypoint[] stops = new StopWaypoint[] {pickupStop, dropoffStop};
+
+		var precedingStayTimes = List.of(0.0, 0.0);
+
+		// initial vehicle slack == 1000
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
+		assertThat(slackTimes).containsExactly(0, 0, 0, 1000);
+	}
+
+	@Test
+	void computeSlackTimes_withRideDurationConstraints_b() {
+
+		//time slack: 20 (arrival is the constraint)
+		StopWaypoint pickupStop =  stop(100, 120, 200, 230);
+		//time slack: 30 (departure is the constraint)
+		StopWaypoint dropoffStop = stop(300, 340, 400, 430);
+
+		AcceptedDrtRequest mockRequest = AcceptedDrtRequest.newBuilder()
+				.request(DrtRequest.newBuilder().id(Id.create("mock", Request.class)).build())
+				.latestArrivalTime(340)
+				.maxRideDuration(210)
+				.earliestStartTime(100)
+				.latestStartTime(230)
+				.plannedPickupTime(100.)
+				.plannedDropoffTime(300.)
+				.build();
+
+		// stop duration == 0 --> pickup time == stop begin time
+		// ---> ride duration == 200 == max ride duration --> slack should be == 0
+
+		pickupStop.getTask().addPickupRequest(mockRequest);
+		dropoffStop.getTask().addDropoffRequest(mockRequest);
+
+		StopWaypoint[] stops = new StopWaypoint[] {pickupStop, dropoffStop};
+
+		var precedingStayTimes = List.of(0.0, 0.0);
+
+		// initial vehicle slack == 1000
+		DvrpVehicle vehicle = vehicle(2000, 1000);
+
+		double[] slackTimes = computeSlackTimes(vehicle, 0, stops, null, precedingStayTimes);
+		assertThat(slackTimes).containsExactly(10, 10, 10, 1000);
+	}
+
 
 	@Test
 	void computeSlackTimes_withoutStops() {
 		final List<Double> precedingStayTimes = Arrays.asList();
-		
+
 		//final stay task not started yet - vehicle slack time is 10
-		assertThat(computeSlackTimes(vehicle(500, 490), 485, new Stop[] {}, null, precedingStayTimes)).containsExactly(10, 10);
+		assertThat(computeSlackTimes(vehicle(500, 490), 485, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(10, 10);
 
 		//final stay task just started - vehicle slack time is 10
-		assertThat(computeSlackTimes(vehicle(500, 490), 490, new Stop[] {}, null, precedingStayTimes)).containsExactly(10, 10);
+		assertThat(computeSlackTimes(vehicle(500, 490), 490, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(10, 10);
 
 		//final stay task half completed - vehicle slack time is 5
-		assertThat(computeSlackTimes(vehicle(500, 490), 495, new Stop[] {}, null, precedingStayTimes)).containsExactly(5, 5);
+		assertThat(computeSlackTimes(vehicle(500, 490), 495, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(5, 5);
 
 		//final stay task just completed - vehicle slack time is 0
-		assertThat(computeSlackTimes(vehicle(500, 490), 500, new Stop[] {}, null, precedingStayTimes)).containsExactly(0, 0);
+		assertThat(computeSlackTimes(vehicle(500, 490), 500, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(0, 0);
 
 		//final stay task started, but delayed - vehicle slack time is 0
-		assertThat(computeSlackTimes(vehicle(500, 510), 510, new Stop[] {}, null, precedingStayTimes)).containsExactly(0, 0);
+		assertThat(computeSlackTimes(vehicle(500, 510), 510, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(0, 0);
 
 		//final stay task planned after vehicle end time - vehicle slack time is 0s
-		assertThat(computeSlackTimes(vehicle(500, 510), 300, new Stop[] {}, null, precedingStayTimes)).containsExactly(0, 0);
+		assertThat(computeSlackTimes(vehicle(500, 510), 300, new StopWaypoint[] {}, null, precedingStayTimes)).containsExactly(0, 0);
 	}
 
 	@Test
 	void computeSlackTimes_withStart() {
 		final List<Double> noPrecedingStayTimes = Arrays.asList();
 		final List<Double> onePrecedingStayTime = Arrays.asList(0.0);
-		
-		//start without stop
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] {}, stop0, noPrecedingStayTimes)).containsExactly(30, 50);
 
 		//start without stop
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] {}, stop1, noPrecedingStayTimes)).containsExactly(30, 50);
+		assertThat(computeSlackTimes(vehicle(500, 450), 100, new StopWaypoint[] {}, stop0, noPrecedingStayTimes)).containsExactly(30, 50);
+
+		//start without stop
+		assertThat(computeSlackTimes(vehicle(500, 450), 100, new StopWaypoint[] {}, stop1, noPrecedingStayTimes)).containsExactly(30, 50);
 
 		//start with stop
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop1 }, stop0, onePrecedingStayTime)).containsExactly(30, 30, 50);
+		assertThat(computeSlackTimes(vehicle(500, 450), 100, new StopWaypoint[] { stop1 }, stop0, onePrecedingStayTime)).containsExactly(30, 30, 50);
 	}
 
 	@Test
@@ -107,24 +183,24 @@ public class VehicleDataEntryFactoryImplTest {
 				0.0, //
 				33.0 // second stop is a prebooked pickup, so slack for insertion after first stop is longer
 				);
-		
+
 		// note that these examples are naively adapted from computeSlackTimes_withStops
 		// in practice the slack would never pass the service end time slack (ie the
 		// last value in the list) if the preceding insertions were done correctly and
 		// there was no congestion
 
 		//final stay task not started - vehicle slack time is 50
-		assertThat(computeSlackTimes(vehicle(500, 450), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 63, 50);
+		assertThat(computeSlackTimes(vehicle(500, 450), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 63, 50);
 
 		//final stay task not started - vehicle slack time is 25 and limits the slack times at stop1
-		assertThat(computeSlackTimes(vehicle(500, 475), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 58, 25);
+		assertThat(computeSlackTimes(vehicle(500, 475), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 58, 25);
 
 		//final stay task not started - vehicle slack time is 10 and limits the slack times at all stops
-		assertThat(computeSlackTimes(vehicle(500, 490), 100, new Stop[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 43, 10);
+		assertThat(computeSlackTimes(vehicle(500, 490), 100, new StopWaypoint[] { stop0, stop1 }, null, precedingStayTimes)).containsExactly(20, 20, 43, 10);
 	}
 
-	private Stop stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
-		return new Stop(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
+	private StopWaypoint stop(double beginTime, double latestArrivalTime, double endTime, double latestDepartureTime) {
+		return new StopWaypointImpl(new DefaultDrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, loadType.getEmptyLoad(), loadType);
 	}
 
 	private DvrpVehicle vehicle(double vehicleEndTime, double lastStayTaskBeginTime) {

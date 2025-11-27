@@ -29,9 +29,13 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@PositiveOrZero
-	@Comment("1/beta parameter to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice." +
-		" POSITIVE_INFINITY will select randomly from the best k.")
+	@Comment("1/beta parameter (or temperature tau) to trade-off of exploration for alternatives. Parameter of 0 is equal to best choice." +
+		" POSITIVE_INFINITY will select randomly.")
 	private double invBeta = Double.POSITIVE_INFINITY;
+
+	@Parameter
+	@Comment("Normalize utility values when selecting")
+	private boolean normalizeUtility = false;
 
 	@Parameter
 	@Comment("Name of the candidate pruner to apply, needs to be bound with guice.")
@@ -43,7 +47,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Require that new plan modes are always different from the current one.")
-	private boolean requireDifferentModes = true;
+	private boolean requireDifferentModes = false;
 
 	@Parameter
 	@Comment("Defines how constraint violations are handled.")
@@ -51,7 +55,7 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@PositiveOrZero
-	@Comment("Probability to re-estimate an existing plan model.")
+	@Comment("Probability to drop all estimates for a plan.")
 	private double probaEstimate = 0;
 
 	public InformedModeChoiceConfigGroup() {
@@ -140,6 +144,14 @@ public class InformedModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> comments = super.getComments();
 		comments.put(CONFIG_PARAM_MODES, "Defines all modes that are available and open for mode choice.");
 		return comments;
+	}
+
+	public boolean isNormalizeUtility() {
+		return normalizeUtility;
+	}
+
+	public void setNormalizeUtility(boolean normalizeUtility) {
+		this.normalizeUtility = normalizeUtility;
 	}
 
 	public enum Schedule {

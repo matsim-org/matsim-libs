@@ -26,6 +26,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = LogManager.getLogger(GlobalConfigGroup.class);
@@ -41,19 +42,24 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_CMT ) ;
 		return map ;
 	}
-
-	/* direct access */
 	// ---
-	private double relativePositionOfEntryExitOnLink = 1. ;
-////	private static final String RELATIVE_POSITION_ON_LINK="relativePositionOfEntryExitOnLink" ;
-//	private static final String RELATIVE_POSITION_ON_LINK_CMT="where along the link the vehicle entry/exit is located.  Depends on the mobsim!"
+	/**
+	 *
+	 * @deprecated -- yyyy this needs to move elsewhere.  See discussion points below.  kai, feb'25
+	 * <p><ul>
+	 *     <li>Since it is determined by the type of the Netsim, it presumably should be gettable from
+	 * there?  (If I see this directly, it is currently not settable, which is good, since with that this here just is a first place where to put this
+	 * as a global variable.)  kai, feb'25</li>
+	 * <li> On the other hand, if it is available from the Netsim, something like {@link
+	 * org.matsim.core.population.routes.RouteUtils#calcDistance(NetworkRoute, double, double, Network)} will need the {@link
+	 * org.matsim.core.mobsim.qsim.interfaces.Netsim} to be plausibly callable, which is clunky.  It would thus be better to somehow pull if from the
+	 * config. There used to be a MobsimConfigGroup which attempted to set some standards between different mobsims, but that seems to be gone.  kai,
+	 * feb'25</li>
+	 * </ul></p>
+	 */
 	public double getRelativePositionOfEntryExitOnLink() {
-		return relativePositionOfEntryExitOnLink ;
+		return 1.;
 	}
-//	public void setRelativePositionOfEntryExitOnLink( double relativePositionOfEntryExitOnLink ){
-//		testForLocked();
-//		this.relativePositionOfEntryExitOnLink = relativePositionOfEntryExitOnLink ;
-//	}
 	// ---
 	private long randomSeed = 4711L;
 	private static final String RANDOM_SEED = "randomSeed";

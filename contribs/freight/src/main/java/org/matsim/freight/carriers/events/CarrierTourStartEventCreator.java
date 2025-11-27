@@ -74,7 +74,7 @@ import org.matsim.vehicles.Vehicle;
 	 * @return CarrierTourStartEvent
 	 */
 	private CarrierTourStartEvent createFreightTourStartsEvent(Id<Person> personId, Carrier carrier, ScheduledTour scheduledTour) {
-		assert endEventMap.containsKey(personId);
+		assert endEventMap.containsKey(personId) : "endEventMap does not contain personId: " + personId;
 		final var endEvent = endEventMap.get(personId);
 
 		assert personEntersVehicleEventMap.containsKey(personId);

@@ -21,9 +21,10 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,16 +34,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.ForkJoinPoolExtension;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData.InsertionDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ExtensiveInsertionProviderTest {
+
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
+
 	@RegisterExtension
 	public final ForkJoinPoolExtension rule = new ForkJoinPoolExtension();
 
@@ -72,8 +82,8 @@ public class ExtensiveInsertionProviderTest {
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
-		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
+		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
+		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint(), loadType.fromInt(1));
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
 				.thenReturn(List.of(insertionWithDetourData(feasibleInsertion),
@@ -88,7 +98,7 @@ public class ExtensiveInsertionProviderTest {
 
 		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams();
-		params.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
+		params.setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
 		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, insertionGenerator,
@@ -103,6 +113,6 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData(insertion, new InsertionDetourData(null, null, null, null),
-				new DetourTimeInfo(new PickupDetourInfo(11, Double.NaN), null));
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, Double.NaN), null));
 	}
 }

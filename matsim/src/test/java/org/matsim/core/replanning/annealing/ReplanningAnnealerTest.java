@@ -213,7 +213,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -230,7 +230,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedMsaAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedMsaAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -247,7 +247,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedGeometricAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedGeometricAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -264,7 +264,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedExponentialAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedExponentialAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -282,7 +282,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedSigmoidAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedSigmoidAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -300,7 +300,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedParameterAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
         Assertions.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
     }
 
@@ -320,7 +320,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedTwoParameterAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedTwoParameterAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
         Assertions.assertEquals(0.0, controler.getConfig().scoring().getBrainExpBeta(), 1e-4);
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
@@ -339,7 +339,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedInnovationSwitchoffAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedInnovationSwitchoffAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -357,7 +357,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedFreezeEarlyAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedFreezeEarlyAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(null);
@@ -404,7 +404,7 @@ public class ReplanningAnnealerTest {
         Controler controler = new Controler(this.scenario);
         controler.run();
 
-        Assertions.assertEquals(expectedLinearAnnealMultipleSubpopulations, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+        Assertions.assertEquals(expectedLinearAnnealMultipleSubpopulations, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
         StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
         List<Double> weights = sm.getWeights(targetSubpop);
@@ -426,7 +426,7 @@ public class ReplanningAnnealerTest {
 		Controler controler = new Controler(this.scenario);
 		controler.run();
 
-		Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControlerIO().getOutputFilename(FILENAME_ANNEAL)));
+		Assertions.assertEquals(expectedLinearAnneal, readResult(controler.getControllerIO().getOutputFilename(FILENAME_ANNEAL)));
 
 		StrategyManager sm = controler.getInjector().getInstance(StrategyManager.class);
 		List<Double> weights = sm.getWeights(targetSubpop);

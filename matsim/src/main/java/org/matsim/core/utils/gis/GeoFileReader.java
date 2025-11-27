@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.gis;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.api.data.*;
@@ -31,22 +32,27 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
-import org.geotools.jdbc.JDBCDataStore;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 
+import com.google.common.base.Preconditions;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
  * @author glaemmel
  * @author dgrether
  * @author mrieser // switch to GeoTools 2.7.3
- * @author nkuehnel / MOIA // add gpkg suuport
+ * @author nkuehnel / MOIA // add gpkg support
  */
 public class GeoFileReader implements MatsimSomeReader {
     	private static final Logger log = LogManager.getLogger(GeoFileReader.class);
@@ -79,12 +85,17 @@ public class GeoFileReader implements MatsimSomeReader {
                 FileDataStore dataStore = FileDataStoreFinder.getDataStore(dataFile);
 				return getSimpleFeatures(dataStore);
 			} else if(filename.endsWith(".gpkg")){
-				Gbl.assertNotNull(layerName);
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put("read-only", true);
+				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
 				DataStore dataStore = DataStoreFinder.getDataStore(params);
+
+				if (layerName == null) {
+					Preconditions.checkState(dataStore.getNames().size() == 1, "Expecting exactly one layer if no layer name is specified.");
+					layerName = dataStore.getNames().get(0);
+				}
+
 				return getSimpleFeatures(dataStore, layerName);
 			} else {
 				throw new RuntimeException("Unsupported file type.");
@@ -99,10 +110,46 @@ public class GeoFileReader implements MatsimSomeReader {
 	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
 		try {
 			log.info( "will try to read from " + url.getPath() ) ;
+			if (url.getFile().endsWith(".gpkg")) {
+				return getAllFeaturesGPKG(url);
+			}
 			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException(e);
 		}
+	}
+
+	/**
+	 * Loads geo package like normal shape files using the first layer found in the file.
+	 */
+	private static Collection<SimpleFeature> getAllFeaturesGPKG(final URL url) throws URISyntaxException, IOException {
+
+		File file;
+		// Remote files have to be downloaded
+		if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar")) {
+
+			String name = FilenameUtils.getBaseName(url.getFile());
+
+			Path tmp = Files.createTempFile(name, ".gpkg");
+			Files.copy(url.openStream(), tmp, StandardCopyOption.REPLACE_EXISTING);
+
+			file = tmp.toFile();
+			file.deleteOnExit();
+		} else
+		 	file = new File(url.toURI());
+
+		Map<String, Object> params = new HashMap<>();
+		params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
+		params.put(GeoPkgDataStoreFactory.DATABASE.key, file.toString());
+		params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
+		DataStore dataStore = DataStoreFinder.getDataStore(params);
+
+		String[] typeNames = dataStore.getTypeNames();
+
+		// Use first layer
+		return getSimpleFeatures(dataStore, typeNames[0]);
 	}
 
 	/**
@@ -195,7 +242,7 @@ public class GeoFileReader implements MatsimSomeReader {
 		 * <p></p>
 		 * Then, get the features by
 		 * <p></p>
-		 * <pre> Set<{@link Feature}> features = geoFileReader.getFeatureSet(); </pre>
+		 * <pre> Set<{@link org.geotools.api.feature.Feature}> features = geoFileReader.getFeatureSet(); </pre>
 		 * <p></p>
 		 * If you need metadata you can use
 		 * <p></p>
@@ -235,7 +282,7 @@ public class GeoFileReader implements MatsimSomeReader {
 				Map<String, Object> params = new HashMap<>();
 				params.put(GeoPkgDataStoreFactory.DBTYPE.key, "geopkg");
 				params.put(GeoPkgDataStoreFactory.DATABASE.key, filename);
-				params.put("read-only", true);
+				params.put(GeoPkgDataStoreFactory.READ_ONLY.key, true);
 
 				DataStore datastore = DataStoreFinder.getDataStore(params);
 				featureSource = datastore.getFeatureSource(layerName);

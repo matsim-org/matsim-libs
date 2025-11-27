@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -75,7 +75,7 @@ public final class PassengerEngineWithPrebooking
 
 	PassengerEngineWithPrebooking(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, PassengerRequestValidator requestValidator) {
+			Network network, DvrpPassengerTracker tracker, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.preplanningEngine = preplanningEngine;
@@ -85,7 +85,7 @@ public final class PassengerEngineWithPrebooking
 		this.requestValidator = requestValidator;
 		this.eventsManager = eventsManager;
 
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
 	@Override public void setInternalInterface(InternalInterface internalInterface) {
@@ -134,7 +134,7 @@ public final class PassengerEngineWithPrebooking
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
 		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
-				List.of(passenger.getId()), tripInfo.getOriginalRequest().getPlannedRoute(),
+				List.of(passenger.getId()), List.of(tripInfo.getOriginalRequest().getPlannedRoute()),
 				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
 				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);
@@ -292,7 +292,8 @@ public final class PassengerEngineWithPrebooking
 			@Override public PassengerEngineWithPrebooking get() {
 				return new PassengerEngineWithPrebooking(getMode(), eventsManager, mobsimTimer, preplanningEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
+						getModalInstance(Network.class), getModalInstance(DvrpPassengerTracker.class),
+						getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}

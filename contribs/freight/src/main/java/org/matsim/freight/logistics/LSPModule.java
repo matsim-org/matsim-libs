@@ -20,8 +20,8 @@
 
 package org.matsim.freight.logistics;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +49,7 @@ public class LSPModule extends AbstractModule {
         ConfigUtils.addOrGetModule(getConfig(), FreightCarriersConfigGroup.class);
 
     bind(LSPControllerListener.class).in(Singleton.class);
-    addControlerListenerBinding().to(LSPControllerListener.class);
+    addControllerListenerBinding().to(LSPControllerListener.class);
 
     install(new CarrierModule());
     install(new LspScoreStatsModule());
@@ -64,8 +64,7 @@ public class LSPModule extends AbstractModule {
         break;
       case enforceBeginnings:
         ////				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
-        log.warn(
-            "LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
+        log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
         //				break;
       default:
         throw new IllegalStateException(
@@ -88,8 +87,7 @@ public class LSPModule extends AbstractModule {
                 ////
                 //	this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME).to(
                 // WithinDayActivityReScheduling.class );
-                log.warn(
-                    "LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
+                log.warn("LSP has never hedged against time window openings; this is probably wrong; but I don't know what to do ...");
                 //						break;
               default:
                 throw new IllegalStateException(
@@ -105,7 +103,7 @@ public class LSPModule extends AbstractModule {
     // else, there are "empty implementations" that do nothing.  kai, jul'22
     bind(LSPStrategyManager.class).toProvider(() -> null);
 
-    this.addControlerListenerBinding().to(DumpLSPPlans.class);
+    this.addControllerListenerBinding().to(DumpLSPPlans.class);
   }
 
   private static class LSPScoringFunctionFactoryDummyImpl implements LSPScorerFactory {

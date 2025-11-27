@@ -21,19 +21,23 @@ package org.matsim.contrib.drt.extension.edrt.optimizer;
 import java.util.List;
 
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.run.DvrpMode;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.evrp.ETask;
 import org.matsim.contrib.evrp.EvDvrpVehicle;
 import org.matsim.contrib.evrp.tracker.ETaskTracker;
+import org.matsim.core.modal.ModalProviders;
 
-import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 /**
  * @author michalm
@@ -51,9 +55,9 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 	private final double minimumRelativeSoc;
 	private final VehicleDataEntryFactoryImpl entryFactory;
 
-	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc) {
+	public EDrtVehicleDataEntryFactory(double minimumRelativeSoc, DvrpLoadType loadType, StopWaypointFactory stopWaypointFactory) {
 		this.minimumRelativeSoc = minimumRelativeSoc;
-		entryFactory = new VehicleDataEntryFactoryImpl();
+		entryFactory = new VehicleDataEntryFactoryImpl(loadType, stopWaypointFactory);
 	}
 
 	@Override
@@ -101,16 +105,19 @@ public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
 		return entry == null ? null : new EVehicleEntry(entry, chargeBeforeNextTask);
 	}
 
-	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<VehicleEntry.EntryFactory> {
+	@Singleton
+	public static class EDrtVehicleDataEntryFactoryProvider extends ModalProviders.AbstractProvider<DvrpMode, EDrtVehicleDataEntryFactory> {
 		private final double minimumRelativeSoc;
 
-		public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+		public EDrtVehicleDataEntryFactoryProvider(String mode, double minimumRelativeSoc) {
+			super(mode, DvrpModes::mode);
 			this.minimumRelativeSoc = minimumRelativeSoc;
 		}
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(minimumRelativeSoc, getModalInstance(DvrpLoadType.class),
+					getModalInstance(StopWaypointFactory.class));
 		}
 	}
 }

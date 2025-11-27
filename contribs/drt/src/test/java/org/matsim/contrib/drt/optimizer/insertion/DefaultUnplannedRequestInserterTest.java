@@ -29,11 +29,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -41,9 +44,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.passenger.DefaultOfferAcceptor;
-import org.matsim.contrib.drt.passenger.DrtOfferAcceptor;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -51,6 +54,7 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler.PickupDropoffT
 import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
@@ -70,6 +74,8 @@ public class DefaultUnplannedRequestInserterTest {
 	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1);
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
+
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@RegisterExtension
 	public final ForkJoinPoolExtension forkJoinPoolExtension = new ForkJoinPoolExtension();
@@ -130,8 +136,8 @@ public class DefaultUnplannedRequestInserterTest {
 		int retryInterval = 10;
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
-		drtRequestInsertionRetryParams.retryInterval = retryInterval;
+		drtRequestInsertionRetryParams.setMaxRequestAge(Double.POSITIVE_INFINITY);
+		drtRequestInsertionRetryParams.setRetryInterval(retryInterval);
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				drtRequestInsertionRetryParams);//retry ON, empty queue
 		DrtInsertionSearch insertionSearch = //
@@ -151,8 +157,8 @@ public class DefaultUnplannedRequestInserterTest {
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
-						.latestStartTime(request1.getLatestStartTime() + retryInterval)
-						.latestArrivalTime(request1.getLatestArrivalTime() + retryInterval)
+						.earliestDepartureTime(request1.getEarliestStartTime())
+						.constraints(request1.getConstraints())
 						.build());
 
 		//ensure rejection event is NOT emitted
@@ -168,8 +174,8 @@ public class DefaultUnplannedRequestInserterTest {
 		VehicleEntry.EntryFactory entryFactory = null;//should not be used
 
 		var drtRequestInsertionRetryParams = new DrtRequestInsertionRetryParams();
-		drtRequestInsertionRetryParams.maxRequestAge = Double.POSITIVE_INFINITY;
-		drtRequestInsertionRetryParams.retryInterval = retryInterval;
+		drtRequestInsertionRetryParams.setMaxRequestAge(Double.POSITIVE_INFINITY);
+		drtRequestInsertionRetryParams.setRetryInterval(retryInterval);
 		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
 				drtRequestInsertionRetryParams);//retry ON
 		var oldRequest = request("r0", "from0", "to0");
@@ -216,7 +222,7 @@ public class DefaultUnplannedRequestInserterTest {
 
 		DrtInsertionSearch insertionSearch = (drtRequest, vEntries) -> drtRequest == request1 ?
 				Optional.of(new InsertionWithDetourData(
-						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null), null,
+						new InsertionGenerator.Insertion(vEntries.iterator().next(), null, null, loadType.fromInt(1)), null,
 						new InsertionDetourTimeCalculator.DetourTimeInfo(
 								mock(InsertionDetourTimeCalculator.PickupDetourInfo.class),
 								mock(InsertionDetourTimeCalculator.DropoffDetourInfo.class)))) :
@@ -285,9 +291,10 @@ public class DefaultUnplannedRequestInserterTest {
 	private DefaultUnplannedRequestInserter newInserter(Fleet fleet, double now,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
-		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, insertionSearch, new DefaultOfferAcceptor(),
-				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0));
+		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, () -> insertionScheduler,
+				vehicleEntryFactory, insertionRetryQueue, () -> insertionSearch, new DefaultOfferAcceptor(),
+				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0),
+				RequestFleetFilter.none);
 	}
 
 	private Link link(String id) {

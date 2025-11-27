@@ -24,8 +24,13 @@ import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
+import org.matsim.contrib.dvrp.passenger.DefaultDvrpLoadFromTrip;
+import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -54,21 +59,30 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.useModeFilteredSubnetwork));
+		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
-		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.stopDuration));
+		bindModal(StopTimeCalculator.class).toInstance(new DefaultStopTimeCalculator(drtCfg.getStopDuration()));
 
-		install(new FleetModule(getMode(), drtCfg.vehiclesFile == null ?
+		bindModal(DvrpLoadFromTrip.class).toProvider(modalProvider(getter -> {
+			DvrpLoadType loadType = getter.getModal(DvrpLoadType.class);
+			return new DefaultDvrpLoadFromTrip(loadType, drtCfg.addOrGetLoadParams().getDefaultRequestDimension());
+		})).asEagerSingleton();
+
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFile() == null ?
 				null :
-				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.vehiclesFile),
-				drtCfg.changeStartLinkToLastLinkInSchedule));
+				ConfigGroup.getInputFileURL(getConfig().getContext(), drtCfg.getVehiclesFile()),
+				drtCfg.isChangeStartLinkToLastLinkInSchedule(), drtCfg.addOrGetLoadParams()));
 
 		Preconditions.checkArgument(drtCfg.getRebalancingParams().isEmpty(), "Rebalancing must not be enabled."
 				+ " It would interfere with simulation of pre-calculated vehicle schedules."
 				+ " Remove the rebalancing params from the drt config");
 
 		install(new DrtModeRoutingModule(drtCfg));
+
+		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
+			return StaticPassengerStopDurationProvider.of(drtCfg.getStopDuration(), 0.0);
+		}));
 
 		drtCfg.getDrtFareParams()
 				.ifPresent(params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));

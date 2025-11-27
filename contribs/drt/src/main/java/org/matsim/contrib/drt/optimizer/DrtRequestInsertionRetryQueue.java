@@ -25,11 +25,14 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
+@NodeSingleton
 public class DrtRequestInsertionRetryQueue {
 	private final DrtRequestInsertionRetryParams params;
 
@@ -41,7 +44,7 @@ public class DrtRequestInsertionRetryQueue {
 	private final Deque<RequestRetryEntry> requestQueue = new LinkedList<>();
 
 	public boolean tryAddFailedRequest(DrtRequest request, double now) {
-		if (request.getSubmissionTime() + params.maxRequestAge < now + params.retryInterval) {
+		if (request.getSubmissionTime() + params.getMaxRequestAge() < now + params.getRetryInterval()) {
 			return false;//request is too old, not eligible for retry
 		}
 		requestQueue.addLast(new RequestRetryEntry(request, now));
@@ -49,7 +52,7 @@ public class DrtRequestInsertionRetryQueue {
 	}
 
 	public boolean hasRequestsToRetryNow(double now) {
-		double maxLastAttemptTimeForRetry = now - params.retryInterval;
+		double maxLastAttemptTimeForRetry = now - params.getRetryInterval();
 		return !requestQueue.isEmpty() && requestQueue.getFirst().lastAttemptTime <= maxLastAttemptTimeForRetry;
 	}
 
@@ -61,10 +64,20 @@ public class DrtRequestInsertionRetryQueue {
 			//directly using the retry interval
 			double timeDelta = now - entry.lastAttemptTime;
 			var oldRequest = entry.request;
+
+			DrtRouteConstraints updatedConstraints = new DrtRouteConstraints(
+					oldRequest.getConstraints().maxTravelDuration() + timeDelta,
+					oldRequest.getConstraints().maxRideDuration() ,
+					oldRequest.getConstraints().maxWaitDuration() + timeDelta,
+					oldRequest.getConstraints().maxPickupDelay(),
+					oldRequest.getConstraints().lateDiversionThreshold(),
+					oldRequest.getConstraints().allowRejection()
+			);
+
 			//XXX alternatively make both latest start/arrival times modifiable
 			var newRequest = DrtRequest.newBuilder(oldRequest)
-					.latestStartTime(oldRequest.getLatestStartTime() + timeDelta)
-					.latestArrivalTime(oldRequest.getLatestArrivalTime() + timeDelta)
+					.constraints(updatedConstraints)
+					.earliestDepartureTime(oldRequest.getEarliestStartTime())
 					.build();
 			requests.add(newRequest);
 		}

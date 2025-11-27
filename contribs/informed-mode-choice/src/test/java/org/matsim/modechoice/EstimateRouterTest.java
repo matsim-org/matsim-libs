@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.application.MATSimApplication;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Map;
@@ -38,19 +38,19 @@ public class EstimateRouterTest {
 
 		Injector injector = controler.getInjector();
 		router = injector.getInstance(EstimateRouter.class);
+		injector.getInstance( PrepareForSim.class ).run();
 
 	}
 
 	@Test
 	void routing() {
 
-
 		Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 
 		Plan plan = persons.get(TestScenario.Agents.get(1)).getSelectedPlan();
 		PlanModel planModel = PlanModel.newInstance(plan);
 
-		router.routeModes(planModel, group.getModes());
+		router.routeModes(planModel, group.getModes(), TripModeFilter.ACCEPT_ALL);
 
 		assertThat(planModel)
 				.isNotNull();

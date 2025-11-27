@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -47,7 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,22 +65,26 @@ import java.util.Map;
 public final class EventsToLegs
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
 		TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+		PersonContinuesInVehicleEventHandler,
 		VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
 	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
-	private static class PendingTransitTravel {
-		final Id<Vehicle> vehicleId;
-		final Id<TransitStopFacility> accessStop;
-		final double boardingTime;
-
-		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop, double boardingTime) {
-			this.vehicleId = vehicleId;
-			this.accessStop = accessStop;
-			this.boardingTime = boardingTime;
-		}
+	private record PendingTransitTravel (
+		Id<Vehicle> vehicleId,
+		Id<TransitStopFacility> accessStop,
+		double boardingTime) {
 	}
+
+	/**
+	 * Stores change of vehicles within a single transit trip (without transferring).
+	 */
+	private record PendingTransitChain(
+		double boardingTime,
+		Id<Vehicle> vehicleId,
+		Id<TransitStopFacility> accessStop
+	) {}
 
 	private static class LineAndRoute {
 		final Id<TransitLine> transitLineId;
@@ -131,7 +135,7 @@ public final class EventsToLegs
 		void handleLeg(PersonExperiencedLeg leg);
 	}
 
-	private Network network;
+	private final Network network;
 	private TransitSchedule transitSchedule = null;
 
 	@Inject(optional = true)
@@ -139,19 +143,20 @@ public final class EventsToLegs
 		this.transitSchedule = transitSchedule;
 	}
 
-	private Map<Id<Person>, Leg> legs = new HashMap<>();
-	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
-	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new HashMap<>();
-	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new HashMap<>();
+	private final Map<Id<Person>, Leg> legs = new IdMap<>(Person.class);
+	private final Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new IdMap<>(Person.class);
+	private final Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new IdMap<>(Person.class);
+	private final Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new IdMap<>(Person.class);
 
-	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
-	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
-	private Map<Id<Person>, PendingVehicleTravel> vehicleTravels = new HashMap<>();
+	private final Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new IdMap<>(Person.class);
+	private final Map<Id<Person>, PendingTransitTravel> transitTravels = new IdMap<>(Person.class);
+	private final Map<Id<Person>, List<PendingTransitChain>> transitChains = new IdMap<>(Person.class);
+	private final Map<Id<Person>, PendingVehicleTravel> vehicleTravels = new IdMap<>(Person.class);
 
-	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
-	private Map<Id<Vehicle>, VehicleRoute> vehicle2route = new HashMap<>();
+	private final Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new IdMap<>(Vehicle.class);
+	private final Map<Id<Vehicle>, VehicleRoute> vehicle2route = new IdMap<>(Vehicle.class);
 
-	private List<LegHandler> legHandlers = new ArrayList<>();
+	private final List<LegHandler> legHandlers = new ArrayList<>();
 
 	public EventsToLegs(Scenario scenario) {
 		this.network = scenario.getNetwork();
@@ -215,6 +220,12 @@ public final class EventsToLegs
 	}
 
 	@Override
+	public void handleEvent(PersonContinuesInVehicleEvent event) {
+		transitChains.computeIfAbsent(event.getPersonId(), (k) -> new ArrayList<>())
+			.add(new PendingTransitChain(event.getTime(), event.getVehicleId(), event.getStopFacilityId()));
+	}
+
+	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		VehicleRoute route = vehicle2route.get(event.getVehicleId());
 		if (route != null) {
@@ -269,7 +280,7 @@ public final class EventsToLegs
 				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
-		assert experiencedRoute.size() >= 1;
+		assert !experiencedRoute.isEmpty() : "Experienced route for personId: " + event.getPersonId() + " is empty.";
 		PendingTransitTravel pendingTransitTravel;
 		PendingVehicleTravel pendingVehicleTravel;
 		if (experiencedRoute.size() > 1) { // different links processed
@@ -291,28 +302,30 @@ public final class EventsToLegs
 			// i.e. experiencedRoute.size()==1 && pending transit travel (= person has entered a vehicle)
 
 			final LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
-			assert lineAndRoute != null;
+			assert lineAndRoute != null : "lineAndRoute for vehicle " + pendingTransitTravel.vehicleId + "is null";
 
 			final TransitStopFacility accessFacility = transitSchedule.getFacilities()
 					.get(pendingTransitTravel.accessStop);
-			assert accessFacility != null;
+			assert accessFacility != null : "accessFacility for " + pendingTransitTravel.accessStop + " is null.";
 
 			final TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
-			assert line != null;
+			assert line != null : "Transit line for transitLineId " + lineAndRoute.transitLineId + " is null.";
 
 			final TransitRoute route = line.getRoutes().get(lineAndRoute.transitRouteId);
-			assert route != null;
+			assert route != null : "route for transitRouteId " + lineAndRoute.transitRouteId + " is null.";
 
 			final Id<TransitStopFacility> lastFacilityId = lineAndRoute.lastFacilityId;
 			if (lastFacilityId == null) {
 				LogManager.getLogger(this.getClass()).warn("breakpoint");
 			}
-			assert lastFacilityId != null;
+			assert lastFacilityId != null : "lastFacilityId for " + lineAndRoute + "is null";
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
-			assert egressFacility != null;
+			assert egressFacility != null : "egressFacility for lastFacilityId " + lastFacilityId + " is null.";
 
-			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
+			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility,
+				createChainedRoute(transitChains.remove(event.getPersonId())));
+
 			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);
 			passengerRoute.setTravelTime(travelTime);
 			passengerRoute.setDistance(RouteUtils.calcDistance(passengerRoute, transitSchedule, network));
@@ -323,7 +336,7 @@ public final class EventsToLegs
 					vehicleRoute.links.size());
 			Route route;
 			if (traveledLinks.isEmpty()) {//special case: enter and leave vehicle without entering traffic
-				route = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
+				route = RouteUtils.createGenericRouteImpl(experiencedRoute.getFirst(), event.getLinkId());
 				route.setDistance(0.0);
 			} else {
 				route = RouteUtils.createNetworkRoute(traveledLinks );
@@ -339,7 +352,7 @@ public final class EventsToLegs
 		} else {
 			// i.e. experiencedRoute.size()==1 and no pendingTransitTravel
 			TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
-			Route genericRoute = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
+			Route genericRoute = RouteUtils.createGenericRouteImpl(experiencedRoute.getFirst(), event.getLinkId());
 			genericRoute.setTravelTime(travelTime);
 			if (travelEvent != null) {
 				genericRoute.setDistance(travelEvent.getDistance());
@@ -349,9 +362,36 @@ public final class EventsToLegs
 			leg.setRoute(genericRoute);
 		}
 
+		PersonExperiencedLeg personExperiencedLeg = new PersonExperiencedLeg(event.getPersonId(), leg);
 		for (LegHandler legHandler : legHandlers) {
-			legHandler.handleLeg(new PersonExperiencedLeg(event.getPersonId(), leg));
+			legHandler.handleLeg(personExperiencedLeg);
 		}
+	}
+
+	/**
+	 * Reconstruct information of used chained departures within a single transit trip.
+	 */
+	private DefaultTransitPassengerRoute createChainedRoute(List<PendingTransitChain> chains) {
+		if (chains == null || chains.isEmpty())
+			return null;
+
+		PendingTransitChain chain = chains.removeFirst();
+		TransitStopFacility stop = transitSchedule.getFacilities().get(chain.accessStop);
+
+		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(chain.vehicleId);
+
+		TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
+		TransitRoute route = line.getRoutes().get(lineAndRoute.transitRouteId);
+
+		TransitStopFacility last = transitSchedule.getFacilities().get(lineAndRoute.lastFacilityId);
+
+		DefaultTransitPassengerRoute r = new DefaultTransitPassengerRoute(
+			stop, line, route, last,
+			createChainedRoute(chains)
+		);
+		r.setBoardingTime(chain.boardingTime);
+
+		return r;
 	}
 
 	@Override

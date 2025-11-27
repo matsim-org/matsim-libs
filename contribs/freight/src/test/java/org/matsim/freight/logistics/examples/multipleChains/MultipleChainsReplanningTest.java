@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -48,6 +49,7 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentPlan;
@@ -91,13 +93,13 @@ public class MultipleChainsReplanningTest {
 			link.setCapacity(1000);
 		}
 
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
 		return scenario;
 	}
 
 	private static LSP createLSP(Scenario scenario) {
-        scenario.getNetwork();
+
 
         // A plan with two different logistic chains on the left and right, with respective carriers is created
 		LSPPlan multipleOneEchelonChainsPlan;
@@ -158,7 +160,7 @@ public class MultipleChainsReplanningTest {
 				.build();
 
 		for (LspShipment shipment : createInitialLSPShipments()) {
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 
 		lsp.scheduleLogisticChains();
@@ -244,7 +246,10 @@ public class MultipleChainsReplanningTest {
 				});
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
-					strategyManager.addStrategy( RandomShiftingStrategyFactory.createStrategy(), null, 1);
+
+                    GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+                    strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+                    strategyManager.addStrategy(strategy, null, 1);
 					return strategyManager;
 				});
 			}

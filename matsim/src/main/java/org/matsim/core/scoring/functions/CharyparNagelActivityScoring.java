@@ -147,7 +147,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 			double duration = activityEnd - activityStart;
 
-			// disutility if too early
+			// disutility if too early:
 			if (arrivalTime < activityStart) {
 				// agent arrives to early, has to wait
 				double waitTime = activityStart - arrivalTime;
@@ -155,8 +155,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				tmpScore.actWaiting_util += this.params.marginalUtilityOfWaiting_s * waitTime;
 			}
 
-			// disutility if too late
-
+			// disutility if too late:
 			OptionalTime latestStartTime = actParams.getLatestStartTime();
 			if (latestStartTime.isDefined() && (activityStart > latestStartTime.seconds())) {
 				double lateTime = activityStart - latestStartTime.seconds();
@@ -165,7 +164,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
+			// (why is duration >=1?  Also, the computations below would allow for duration <= 0.  kai, nov'25)
 			double typicalDuration = actParams.getTypicalDuration();
+
 			tmpScore.actPerforming_s += duration;
 
 			if ( this.params.usingOldScoringBelowZeroUtilityDuration ) {
@@ -195,6 +196,8 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
+					// (this slope is actually always beta_perf * e !!)
+
 					if ( slopeAtZeroUtility < 0. ) {
 						// (beta_perf might be = 0)
 						System.err.println("beta_perf: " + this.params.marginalUtilityOfPerforming_s);

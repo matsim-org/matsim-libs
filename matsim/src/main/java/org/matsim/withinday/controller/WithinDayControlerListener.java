@@ -39,8 +39,8 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ import java.util.Set;
 
 /**
  * Attempt to realize functionality provided by WithinDayController by
- * a ControlerListener (similar to what is done by the MultiModalControlerListener).
+ * a ControllerListener (similar to what is done by the MultiModalControlerListener).
  *
  * Note: this class has to be registered as Controller Listener!
  *

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.analysis.zonal.DrtZoneSystemParams;
 import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsControlerCreator;
 import org.matsim.contrib.drt.extension.operations.DrtOperationsParams;
@@ -15,7 +14,7 @@ import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShif
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.*;
 import org.matsim.contrib.drt.fare.DrtFareParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
@@ -53,40 +52,40 @@ public class RunOnTheFlyShiftDrtScenarioIT {
 
         DrtWithExtensionsConfigGroup drtWithShiftsConfigGroup = (DrtWithExtensionsConfigGroup) multiModeDrtConfigGroup.createParameterSet("drt");
 
-        drtWithShiftsConfigGroup.mode = TransportMode.drt;
-        DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-                (DefaultDrtOptimizationConstraintsSet) drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+        drtWithShiftsConfigGroup.setMode(TransportMode.drt);
+        DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtWithShiftsConfigGroup.addOrGetDrtOptimizationConstraintsParams()
                         .addOrGetDefaultDrtOptimizationConstraintsSet();
-        drtWithShiftsConfigGroup.stopDuration = 30.;
-        defaultConstraintsSet.maxTravelTimeAlpha = 1.5;
-        defaultConstraintsSet.maxTravelTimeBeta = 10. * 60.;
-        defaultConstraintsSet.maxWaitTime = 600.;
-        defaultConstraintsSet.rejectRequestIfMaxWaitOrTravelTimeViolated = true;
-        defaultConstraintsSet.maxWalkDistance = 1000.;
-        drtWithShiftsConfigGroup.useModeFilteredSubnetwork = false;
-        drtWithShiftsConfigGroup.vehiclesFile = fleetFile;
-        drtWithShiftsConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.door2door;
-        drtWithShiftsConfigGroup.plotDetailedCustomerStats = true;
-        drtWithShiftsConfigGroup.idleVehiclesReturnToDepots = false;
+        drtWithShiftsConfigGroup.setStopDuration(30.);
+        defaultConstraintsSet.setMaxTravelTimeAlpha(1.5);
+        defaultConstraintsSet.setMaxTravelTimeBeta(10. * 60.);
+        defaultConstraintsSet.setMaxWaitTime(600.);
+        defaultConstraintsSet.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
+        defaultConstraintsSet.setMaxWalkDistance(1000.);
+        drtWithShiftsConfigGroup.setUseModeFilteredSubnetwork(false);
+        drtWithShiftsConfigGroup.setVehiclesFile(fleetFile);
+        drtWithShiftsConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.door2door);
+        drtWithShiftsConfigGroup.setPlotDetailedCustomerStats(true);
+        drtWithShiftsConfigGroup.setIdleVehiclesReturnToDepots(false);
 
         drtWithShiftsConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 
         ConfigGroup rebalancing = drtWithShiftsConfigGroup.createParameterSet("rebalancing");
         drtWithShiftsConfigGroup.addParameterSet(rebalancing);
-        ((RebalancingParams) rebalancing).interval = 600;
+        ((RebalancingParams) rebalancing).setInterval(600);
 
         MinCostFlowRebalancingStrategyParams strategyParams = new MinCostFlowRebalancingStrategyParams();
-        strategyParams.targetAlpha = 0.3;
-        strategyParams.targetBeta = 0.3;
+        strategyParams.setTargetAlpha(0.3);
+        strategyParams.setTargetBeta(0.3);
 
-        drtWithShiftsConfigGroup.getRebalancingParams().get().addParameterSet(strategyParams);
+        RebalancingParams rebalancingParams = drtWithShiftsConfigGroup.getRebalancingParams().get();
+        rebalancingParams.addParameterSet(strategyParams);
 
-        DrtZoneSystemParams drtZoneSystemParams = new DrtZoneSystemParams();
-        SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) drtZoneSystemParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
-        zoneParams.cellSize = 500.;
-        drtZoneSystemParams.addParameterSet(zoneParams);
-        drtZoneSystemParams.targetLinkSelection = DrtZoneSystemParams.TargetLinkSelection.mostCentral;
-        drtWithShiftsConfigGroup.addParameterSet(drtZoneSystemParams);
+        SquareGridZoneSystemParams zoneParams = (SquareGridZoneSystemParams) rebalancingParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME);
+        zoneParams.setCellSize(500.);
+        drtWithShiftsConfigGroup.addParameterSet(zoneParams);
+        rebalancingParams.addParameterSet(zoneParams);
+        rebalancingParams.setTargetLinkSelection(RebalancingParams.TargetLinkSelection.mostCentral);
 
         multiModeDrtConfigGroup.addParameterSet(drtWithShiftsConfigGroup);
 
@@ -147,13 +146,13 @@ public class RunOnTheFlyShiftDrtScenarioIT {
         operationsParams.addParameterSet(shiftsParams);
         operationsParams.addParameterSet(operationFacilitiesParams);
 
-        operationFacilitiesParams.operationFacilityInputFile = opFacilitiesFile;
-        shiftsParams.allowInFieldChangeover = true;
+        operationFacilitiesParams.setOperationFacilityInputFile(opFacilitiesFile);
+        shiftsParams.setAllowInFieldChangeover(true);
         drtWithShiftsConfigGroup.addParameterSet(operationsParams);
 
         DrtFareParams drtFareParams = new DrtFareParams();
-        drtFareParams.baseFare = 1.;
-        drtFareParams.distanceFare_m = 1. / 1000;
+        drtFareParams.setBaseFare(1.);
+        drtFareParams.setDistanceFare_m(1. / 1000);
         drtWithShiftsConfigGroup.addParameterSet(drtFareParams);
 
         final Controler run = DrtOperationsControlerCreator.createControler(config, false);
@@ -164,7 +163,7 @@ public class RunOnTheFlyShiftDrtScenarioIT {
                 this.bindModal(OnTheFlyScheduler.class).toProvider(modalProvider(getter ->
                         new OnTheFlyScheduler())).asEagerSingleton();
                 this.bindModal(ShiftScheduler.class).toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
-                this.addControlerListenerBinding().toProvider(modalProvider( getter -> getter.getModal(OnTheFlyScheduler.class)));
+                this.addControllerListenerBinding().toProvider(modalProvider(getter -> getter.getModal(OnTheFlyScheduler.class)));
             }
         });
 

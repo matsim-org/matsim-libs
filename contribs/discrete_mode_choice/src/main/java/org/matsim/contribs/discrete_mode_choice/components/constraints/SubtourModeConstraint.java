@@ -11,7 +11,6 @@ import org.matsim.contribs.discrete_mode_choice.components.utils.IndexUtils;
 import org.matsim.contribs.discrete_mode_choice.components.utils.LocationUtils;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.constraints.AbstractTourConstraint;
-import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraint;
 import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraintFactory;
 
 /**
@@ -23,7 +22,7 @@ import org.matsim.contribs.discrete_mode_choice.model.tour_based.TourConstraintF
  * covered by one and a single mode. If singleLegProbability was > 0.0, then
  * only the "chain based" modes should be set as constrained modes. In that case
  * only those tours cannot be interrupted by other modes.
- * 
+ *
  * @author sebhoerl
  *
  */
@@ -82,7 +81,7 @@ public class SubtourModeConstraint extends AbstractTourConstraint {
 		}
 
 		@Override
-		public TourConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
+		public SubtourModeConstraint createConstraint(Person person, List<DiscreteModeChoiceTrip> trips,
 				Collection<String> availableModes) {
 			List<Id<? extends BasicLocation>> originLocations = new ArrayList<>(trips.size());
 			List<Id<? extends BasicLocation>> destinationLocations = new ArrayList<>(trips.size());

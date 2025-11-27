@@ -35,11 +35,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
+import org.matsim.core.mobsim.messagequeue.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -166,7 +167,7 @@ public class NetworkChangeEventsEngineTest {
 		}
 
 		@Override
-		public QSim getMobsim() {
+		public Netsim getMobsim() {
 			return this.qsim;
 		}
 

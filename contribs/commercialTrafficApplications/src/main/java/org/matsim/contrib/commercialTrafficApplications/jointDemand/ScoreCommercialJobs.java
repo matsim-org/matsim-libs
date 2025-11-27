@@ -112,9 +112,9 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
     }
 
     private double calcDifference(CarrierService service, double time) {
-        if (time < service.getServiceStartTimeWindow().getStart()) return (service.getServiceStartTimeWindow().getStart() - time);
-        else if (time >= service.getServiceStartTimeWindow().getStart() && time <= service.getServiceStartTimeWindow().getEnd()) return 0;
-        else return (time - service.getServiceStartTimeWindow().getEnd());
+        if (time < service.getServiceStaringTimeWindow().getStart()) return (service.getServiceStaringTimeWindow().getStart() - time);
+        else if (time >= service.getServiceStaringTimeWindow().getStart() && time <= service.getServiceStaringTimeWindow().getEnd()) return 0;
+        else return (time - service.getServiceStaringTimeWindow().getEnd());
     }
 
     @Override

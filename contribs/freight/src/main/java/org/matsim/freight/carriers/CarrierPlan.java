@@ -22,6 +22,8 @@
 package org.matsim.freight.carriers;
 
 import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -36,7 +38,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesImpl;
  */
 public class CarrierPlan implements BasicPlan, Attributable {
 
-	private final Carrier carrier;
+	private Carrier carrier;
 	private final Collection<ScheduledTour> scheduledTours;
 	private Double score = null;
 
@@ -47,13 +49,36 @@ public class CarrierPlan implements BasicPlan, Attributable {
 		return "carrierPlan=[carrierId=" + carrier.getId() + "][score=" + score + "][#tours=" + scheduledTours.size() + "]";
 	}
 
+	/**
+	 * @deprecated Use the constructor without carrier argument.
+	 * The carrier is set automatically when using Carrier.addPlan().
+	 */
+	@Deprecated(since = "Feb 2025", forRemoval = true)
 	public CarrierPlan(final Carrier carrier, final Collection<ScheduledTour> scheduledTours) {
+		this(scheduledTours);
+		setCarrier(carrier);
+	}
+
+	/**
+	 * Creates a new plan for a carrier based on its scheduled tours.
+	 */
+	public CarrierPlan(final Collection<ScheduledTour> scheduledTours) {
 		this.scheduledTours = scheduledTours;
-		this.carrier = carrier;
+
 	}
 
 	public Carrier getCarrier() {
 		return carrier;
+	}
+
+	/**
+	 * Sets the reference to the carrier.
+	 * This is done automatically if using Carrier.addPlan().
+	 * <p
+	 * <b>!! Make sure that the bidirectional reference is set correctly if you are using this method!! </b>
+	 */
+	public void setCarrier(final Carrier carrier) {
+		this.carrier = carrier;
 	}
 
 	/**
@@ -94,6 +119,21 @@ public class CarrierPlan implements BasicPlan, Attributable {
 
 	public Collection<ScheduledTour> getScheduledTours() {
 		return scheduledTours;
+	}
+
+	/**
+	 * Returns a specific scheduledTour
+	 *
+	 * @param tourId
+	 * @return the scheduled tour with the tourId
+	 */
+	public Tour getScheduledTour(Id<Tour> tourId) {
+		//This can be even shorter, once the scheduledTours is a Map and no longer a Collection. KMT Aug'25
+		return scheduledTours.stream()
+			.filter(st -> st.getTour().getId().equals(tourId))
+			.findFirst()
+			.orElseThrow(() -> new IllegalStateException("Could not find scheduled tour for id " + tourId))
+			.getTour();
 	}
 
 	@Override

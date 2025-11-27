@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.core.mobsim.qsim.QSim;
 
@@ -52,8 +52,8 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 //		this(sim, null);
 //	}
 
-	@Inject QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
-		super(sim, netsimNetworkFactory);
+	@Inject QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory, NetworkModeDepartureHandler networkModeDepartureHandler) {
+		super(sim, netsimNetworkFactory, networkModeDepartureHandler);
 		this.numOfRunners = this.numOfThreads;
 	}
 

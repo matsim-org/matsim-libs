@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.usecases.chessboard;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.net.URL;
 import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
@@ -110,7 +110,7 @@ final class RunPassengerAlongWithCarriers {
 	}
 
 
-	private static void prepareFreightOutputDataAndStats(Scenario scenario, EventsManager eventsManager, MatsimServices controler, final Carriers carriers) {
+	private static void prepareFreightOutputDataAndStats(Scenario scenario, EventsManager eventsManager, MatsimServices controller, final Carriers carriers) {
 		final LegHistogram freightOnly = new LegHistogram(900);
 		freightOnly.setPopulation(scenario.getPopulation());
 		freightOnly.setInclPop(false);
@@ -121,11 +121,11 @@ final class RunPassengerAlongWithCarriers {
 
 		eventsManager.addHandler(withoutFreight);
 		eventsManager.addHandler(freightOnly);
-		controler.addControlerListener(scores);
-		controler.addControlerListener((IterationEndsListener) event -> {
+		controller.addControllerListener(scores);
+		controller.addControllerListener((IterationEndsListener) event -> {
 			//write plans
-			String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
-			new CarrierPlanWriter(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+			String dir = event.getServices().getControllerIO().getIterationPath(event.getIteration());
+			CarriersUtils.writeCarriers(carriers, dir, "carrierPlans.xml", String.valueOf(event.getIteration()));
 
 			//write stats
 			freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");

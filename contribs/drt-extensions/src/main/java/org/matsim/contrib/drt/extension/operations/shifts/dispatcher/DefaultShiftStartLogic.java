@@ -1,10 +1,21 @@
 /*
- * Copyright (C) 2022 MOIA GmbH - All Rights Reserved
- *
- * You may use, distribute and modify this code under the terms
- * of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License,
- * or (at your option) any later version.
+ * *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2025 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** *
  */
 package org.matsim.contrib.drt.extension.operations.shifts.dispatcher;
 
@@ -19,6 +30,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author nkuehnel / MOIA
  */
 public class DefaultShiftStartLogic implements ShiftStartLogic {
+
 	@Override
 	public boolean shiftStarts(DrtShiftDispatcher.ShiftEntry peek) {
 		// old shift hasn't ended yet
@@ -38,7 +50,7 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 			//check if optional location requirement is met
 			if(peek.shift().getOperationFacilityId().isPresent()) {
 				Id<OperationFacility> operationFacilityId = peek.shift().getOperationFacilityId().get();
-				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacility().getId())),
+				Verify.verify((operationFacilityId.equals(((WaitForShiftTask) currentTask).getFacilityId())),
 						"Vehicle and shift start locations do not match.");
 			}
 			return true;
@@ -46,4 +58,5 @@ public class DefaultShiftStartLogic implements ShiftStartLogic {
 			return false;
 		}
 	}
+
 }

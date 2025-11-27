@@ -97,7 +97,7 @@ import org.matsim.vehicles.VehicleType;
 			close();
 			logger.info("done");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Exception occurred while writing", e);
 			logger.error(e);
 			System.exit(1);
 		}
@@ -159,15 +159,15 @@ import org.matsim.vehicles.VehicleType;
 	private void writeShipment(CarrierShipment s, Id<CarrierShipment> shipmentId, boolean closeElement, boolean lineBreak) {
 		this.writeStartTag(SHIPMENT, List.of(
 				createTuple(ID, shipmentId.toString()),
-				createTuple(FROM, s.getFrom().toString()),
-				createTuple(TO, s.getTo().toString()),
-				createTuple(SIZE, s.getSize()),
-				createTuple(START_PICKUP, getTime(s.getPickupTimeWindow().getStart())),
-				createTuple(END_PICKUP, getTime(s.getPickupTimeWindow().getEnd())),
-				createTuple(START_DELIVERY, getTime(s.getDeliveryTimeWindow().getStart())),
-				createTuple(END_DELIVERY, getTime(s.getDeliveryTimeWindow().getEnd())),
-				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupServiceTime())),
-				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryServiceTime()))), closeElement, lineBreak
+				createTuple(FROM, s.getPickupLinkId().toString()),
+				createTuple(TO, s.getDeliveryLinkId().toString()),
+				createTuple(SIZE, s.getCapacityDemand()),
+				createTuple(START_PICKUP, getTime(s.getPickupStartingTimeWindow().getStart())),
+				createTuple(END_PICKUP, getTime(s.getPickupStartingTimeWindow().getEnd())),
+				createTuple(START_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getStart())),
+				createTuple(END_DELIVERY, getTime(s.getDeliveryStartingTimeWindow().getEnd())),
+				createTuple(PICKUP_SERVICE_TIME, getTime(s.getPickupDuration())),
+				createTuple(DELIVERY_SERVICE_TIME, getTime(s.getDeliveryDuration()))), closeElement, lineBreak
 		);
 	}
 
@@ -190,10 +190,10 @@ import org.matsim.vehicles.VehicleType;
 	private void writeService(CarrierService s, boolean closeElement, boolean lineBreak) {
 		this.writeStartTag(SERVICE, List.of(
 				createTuple(ID, s.getId().toString()),
-				createTuple(TO, s.getLocationLinkId().toString()),
+				createTuple(TO, s.getServiceLinkId().toString()),
 				createTuple(CAPACITY_DEMAND, s.getCapacityDemand()),
-				createTuple(EARLIEST_START, getTime(s.getServiceStartTimeWindow().getStart())),
-				createTuple(LATEST_END, getTime(s.getServiceStartTimeWindow().getEnd())),
+				createTuple(EARLIEST_START, getTime(s.getServiceStaringTimeWindow().getStart())),
+				createTuple(LATEST_END, getTime(s.getServiceStaringTimeWindow().getEnd())),
 				createTuple(SERVICE_DURATION, getTime(s.getServiceDuration()))), closeElement, lineBreak
 		);
 	}

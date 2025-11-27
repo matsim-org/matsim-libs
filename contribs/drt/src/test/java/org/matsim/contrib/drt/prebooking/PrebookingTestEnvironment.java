@@ -22,7 +22,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
+import org.matsim.contrib.drt.optimizer.insertion.DetourTimeEstimator;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -38,6 +39,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
@@ -45,6 +48,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -62,6 +66,11 @@ import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -74,13 +83,16 @@ public class PrebookingTestEnvironment {
 	private final double edgeLength = 200.0;
 	private final double speed = 10.0;
 
-	private int vehicleCapacity = 4;
+	private IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
+	private DvrpLoad vehicleCapacity = integerLoadType.fromInt(4);
 
 	private double maximumWaitTime = 3600.0;
 	private double detourRelative = 1.3;
 	private double detourAbsolute = 300.0;
 	private double stopDuration = 60.0;
 	private double endTime = 30.0 * 3600.0;
+
+	private boolean useExactTravelTimeEstimates = false;
 
 	public PrebookingTestEnvironment(MatsimTestUtils utils) {
 		this.utils = utils;
@@ -153,8 +165,18 @@ public class PrebookingTestEnvironment {
 		return this;
 	}
 
-	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+	public PrebookingTestEnvironment setVehicleCapacity(DvrpLoad vehicleCapacity) {
 		this.vehicleCapacity = vehicleCapacity;
+		return this;
+	}
+
+	public PrebookingTestEnvironment setVehicleCapacity(int vehicleCapacity) {
+		this.vehicleCapacity = integerLoadType.fromInt(vehicleCapacity);
+		return this;
+	}
+
+	public PrebookingTestEnvironment useExactTravelTimeEstimates() {
+		this.useExactTravelTimeEstimates = true;
 		return this;
 	}
 
@@ -180,6 +202,7 @@ public class PrebookingTestEnvironment {
 
 		return controller;
 	}
+
 
 	private void buildFleet(Controler controller) {
 		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
@@ -209,6 +232,24 @@ public class PrebookingTestEnvironment {
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = MultiModeDrtConfigGroup.get(controller.getConfig());
 		controller.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfigGroup));
+
+		if (useExactTravelTimeEstimates) {
+			for (var mode : MultiModeDrtConfigGroup.get(controller.getConfig()).getModalElements()) {
+				controller.addOverridingQSimModule(new AbstractDvrpModeQSimModule(mode.getMode()) {
+					@Override
+					protected void configureQSim() {
+						bindModal(DetourTimeEstimator.class).toProvider(modalProvider(getter -> {
+							Network network = getter.getModal(Network.class);
+							TravelTime travelTime = getter.getModal(TravelTime.class);
+							TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+
+							LeastCostPathCalculator router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
+							return DetourTimeEstimator.createExactEstimator(router, travelTime);
+						}));
+					}
+				});
+			}
+		}
 	}
 
 	private void buildConfig(Config config) {
@@ -239,16 +280,16 @@ public class PrebookingTestEnvironment {
 
 		DrtConfigGroup modeConfig = new DrtConfigGroup();
 		drtConfig.addParameterSet(modeConfig);
-		modeConfig.mode = "drt";
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet = (DefaultDrtOptimizationConstraintsSet) modeConfig
+		modeConfig.setMode("drt");
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet = modeConfig
 				.addOrGetDrtOptimizationConstraintsParams()
 				.addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxWaitTime = maximumWaitTime;
-		defaultConstraintsSet.maxTravelTimeAlpha = detourRelative;
-		defaultConstraintsSet.maxTravelTimeBeta = detourAbsolute;
-		modeConfig.stopDuration = stopDuration;
-		modeConfig.idleVehiclesReturnToDepots = false;
-		modeConfig.vehiclesFile = null;
+		defaultConstraintsSet.setMaxWaitTime(maximumWaitTime);
+		defaultConstraintsSet.setMaxTravelTimeAlpha(detourRelative);
+		defaultConstraintsSet.setMaxTravelTimeBeta(detourAbsolute);
+		modeConfig.setStopDuration(stopDuration);
+		modeConfig.setIdleVehiclesReturnToDepots(false);
+		modeConfig.setVehiclesFile(null);
 
 		DrtInsertionSearchParams searchParams = new SelectiveInsertionSearchParams();
 		modeConfig.addDrtInsertionSearchParams(searchParams);

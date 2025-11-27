@@ -103,7 +103,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
 		// 2nd major Cadyts method is "analyzer.addToDemand", dz 09/15
-		
+
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
@@ -118,7 +118,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
-			String analysisFilepath = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), ANALYSIS_FILENAME);
+			String analysisFilepath = event.getServices().getControllerIO().getIterationFilename(event.getIteration(), ANALYSIS_FILENAME);
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
 
@@ -126,7 +126,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		this.calibrator.afterNetworkLoading(this.measurementListener);
 
 		// write some output
-		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
+		String filename = event.getServices().getControllerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
 		try {
 			new CadytsCostOffsetsXMLFileIO<Measurement>( this.measurements, Measurement.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());

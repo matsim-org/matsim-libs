@@ -14,12 +14,16 @@ import org.matsim.contrib.drt.extension.operations.shifts.config.ShiftsParams;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.ShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.dispatcher.DefaultShiftScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.io.DrtShiftsReader;
+import org.matsim.contrib.drt.extension.operations.shifts.optimizer.ShiftStopWaypointFactory;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftBreakTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.ShiftChangeoverTaskImpl;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.WaitForShiftTask;
 import org.matsim.contrib.drt.extension.operations.shifts.scheduler.ShiftTaskScheduler;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecification;
 import org.matsim.contrib.drt.extension.operations.shifts.shift.DrtShiftsSpecificationImpl;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
@@ -31,6 +35,7 @@ import org.matsim.contrib.dvrp.analysis.VehicleOccupancyProfileView;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileCalculator;
 import org.matsim.contrib.dvrp.analysis.VehicleTaskProfileView;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.config.Config;
@@ -85,8 +90,8 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 		ShiftsParams shiftsParams = drtOperationsParams.getShiftsParams().orElseThrow();
 
 		DrtShiftsSpecification drtShiftsSpecification = new DrtShiftsSpecificationImpl();
-		if (shiftsParams.shiftInputFile != null) {
-			new DrtShiftsReader(drtShiftsSpecification).readURL(shiftsParams.getShiftInputUrl(getConfig().getContext()));
+		if (shiftsParams.getShiftInputFile() != null) {
+			new DrtShiftsReader(drtShiftsSpecification).parse(shiftsParams.getShiftInputUrl(getConfig().getContext()));
 		}
 
 		bindModal(ShiftScheduler.class).toProvider(modalProvider(getter -> new DefaultShiftScheduler(drtShiftsSpecification)));
@@ -100,17 +105,17 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				getter -> new BreakCorridorXY(getMode(), getter.getModal(new TypeLiteral<Provider<DrtShiftsSpecification>>(){}))
 		)).asEagerSingleton();
 
-		bindModal(ShiftHistogram.class).toProvider(modalProvider(
-				getter -> new ShiftHistogram(getMode(), getter.get(Config.class)))).asEagerSingleton();
+		bindModal(MultiTypeShiftHistogram.class).toProvider(modalProvider(
+				getter -> new MultiTypeShiftHistogram(getMode(), getter.get(Config.class)))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ShiftDurationXY.class));
 		addEventHandlerBinding().to(modalKey(BreakCorridorXY.class));
-		addEventHandlerBinding().to(modalKey(ShiftHistogram.class));
+		addEventHandlerBinding().to(modalKey(MultiTypeShiftHistogram.class));
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> new ShiftHistogramListener(drtConfigGroup,
-						getter.get(MatsimServices.class), getter.getModal(ShiftHistogram.class)))).asEagerSingleton();
-		addControlerListenerBinding().toProvider(modalProvider(
+						getter.get(MatsimServices.class), getter.getModal(MultiTypeShiftHistogram.class)))).asEagerSingleton();
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> new ShiftAnalysisControlerListener(getConfig(), drtConfigGroup,
 						getter.getModal(ShiftDurationXY.class), getter.getModal(BreakCorridorXY.class),
 						getter.get(MatsimServices.class)))).asEagerSingleton();
@@ -123,20 +128,20 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				))
 		).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(DumpShiftDataAtEndImpl.class)
 		));
 		bindModal(VehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new VehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						300, getter.get(QSimConfigGroup.class), ImmutableSet.of(DrtDriveTask.TYPE,
 						DefaultDrtStopTask.TYPE, ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_BREAK_TASK_TYPE,
-						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE)))).asEagerSingleton();
+						ShiftTaskScheduler.RELOCATE_VEHICLE_SHIFT_CHANGEOVER_TASK_TYPE), getter.getModal(DvrpLoadType.class)))).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+		addControllerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleOccupancyProfileView(getter.getModal(VehicleOccupancyProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_occupancy_time_profiles"))).in(Singleton.class);
 
-		addControlerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
+		addControllerListenerBinding().toProvider(modalProvider(getter -> new ProfileWriter(getter.get(MatsimServices.class), drtConfigGroup.getMode(),
 				new VehicleTaskProfileView(getter.getModal(VehicleTaskProfileCalculator.class), taskTypeComparator, taskTypePaints),
 				"shift_task_time_profiles"))).in(Singleton.class);
 
@@ -147,8 +152,16 @@ public class ShiftDrtModeModule extends AbstractDvrpModeModule {
 				))
 		).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
+		addControllerListenerBinding().toProvider(modalProvider(
 				getter -> getter.getModal(RegularShiftDump.class)
+		));
+
+		boolean scheduleWaitBeforeDrive = drtConfigGroup.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
+		bindModal(StopWaypointFactory.class).toProvider(modalProvider(
+			getter -> new ShiftStopWaypointFactory(
+				new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive),
+				getter.getModal(DvrpLoadType.class)
+			)
 		));
 	}
 }

@@ -22,6 +22,9 @@ import org.matsim.modechoice.*;
 import org.matsim.modechoice.estimators.MinMaxEstimate;
 import org.matsim.modechoice.estimators.TripEstimator;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import playground.vsp.TestScenario;
 
 import java.util.ArrayList;
@@ -48,15 +51,11 @@ public class PtTripFareEstimatorTest {
 	private PtTripWithDistanceBasedFareEstimator estimator;
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	public void setUp() {
 
 		Config config = TestScenario.loadConfig(utils);
 
 		Map<String, ScoringConfigGroup.ModeParams> modes = config.scoring().getScoringParameters("person").getModes();
-
-		ScoringConfigGroup.ModeParams pt = modes.get(TransportMode.pt);
-		ScoringConfigGroup.ModeParams walk = modes.get(TransportMode.walk);
-
 		group = ConfigUtils.addOrGetModule(config, InformedModeChoiceConfigGroup.class);
 
 		PtFareConfigGroup fare = ConfigUtils.addOrGetModule(config, PtFareConfigGroup.class);
@@ -76,9 +75,24 @@ public class PtTripFareEstimatorTest {
 		distanceClassLongFareParams.setFareIntercept(1.0);
 		distanceClassLongFareParams.setFareSlope(0.01);
 
-		fare.addParameterSet(distanceFare);
+		fare.addPtFareParameterSet(distanceFare);
 
 		controler = MATSimApplication.prepare(TestScenario.class, config);
+
+		// We need to add a vehicle, it however does not affect the results
+		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
+		// Cannot be solved via PrepareForSim because it freight network is empty
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		controler.getScenario().getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		controler.getScenario().getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), controler.getScenario().getVehicles().getVehicleTypes().get(typeId)));
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		vehicles.addModeVehicle(TransportMode.ride, Id.createVehicleId(1));
+		for (Person p : controler.getScenario().getPopulation().getPersons().values()){
+			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
+		}
+
 		injector = controler.getInjector();
 
 		injector.injectMembers(this);
@@ -95,7 +109,7 @@ public class PtTripFareEstimatorTest {
 
 		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car), TripModeFilter.ACCEPT_ALL);
 
 		List<MinMaxEstimate> ests = new ArrayList<>();
 
@@ -103,7 +117,7 @@ public class PtTripFareEstimatorTest {
 
 			List<Leg> trip = model.getLegs(TransportMode.pt, i);
 
-			if (trip == null) {
+			if (trip == null || !model.doesNotConsistOfOnlyWalksLegs(TransportMode.pt, i)) {
 				continue;
 			}
 
@@ -124,7 +138,7 @@ public class PtTripFareEstimatorTest {
 		assertThat(est)
 			.allMatch(e -> e.getMin() < e.getMax(), "Min smaller max")
 			.first().extracting(MinMaxEstimate::getMin, InstanceOfAssertFactories.DOUBLE)
-			.isCloseTo(-379.4, Offset.offset(0.1));
+			.isCloseTo(-379.3, Offset.offset(0.1));
 
 	}
 
@@ -150,7 +164,7 @@ public class PtTripFareEstimatorTest {
 
 		PlanModel model = PlanModel.newInstance(plan);
 
-		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car));
+		router.routeModes(model, Set.of(TransportMode.pt, TransportMode.walk, TransportMode.bike, TransportMode.car), TripModeFilter.ACCEPT_ALL);
 
 		List<MinMaxEstimate> singleTrips = estimateAgent(TestScenario.Agents.get(2));
 
@@ -160,23 +174,23 @@ public class PtTripFareEstimatorTest {
 		System.out.println(singleTrips);
 
 		// 2nd one does hat have a pt connection
-		double estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
+		double estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "pt", "pt", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-2738.72, Offset.offset(0.1));
+			.isCloseTo(-2738.7, Offset.offset(0.1));
 
 
-		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
+		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "pt"}, model, ModeAvailability.YES);
 
 		assertThat(estimate)
 			.isLessThanOrEqualTo(maxSum)
 			.isGreaterThanOrEqualTo(minSum)
-			.isCloseTo(-1222.91, Offset.offset(0.1));
+			.isCloseTo( -1222.9, Offset.offset(0.1));
 
 		// Essentially single trip
-		estimate = estimator.estimate(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
+		estimate = estimator.estimatePlan(context, TransportMode.pt, new String[]{"pt", "car", "car", "car", "car"}, model, ModeAvailability.YES);
 		assertThat(estimate)
 			.isCloseTo(singleTrips.get(0).getMin(), Offset.offset(0.1));
 

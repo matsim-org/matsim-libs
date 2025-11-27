@@ -88,7 +88,7 @@ public class ResourceImplementationUtils {
         writer.write(str1 + "\n");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipments of LSP", e);
     }
   }
 
@@ -109,7 +109,7 @@ public class ResourceImplementationUtils {
         writeShipmentWithPlanElements(writer, shipment, elementList);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipmentPlan of LSP", e);
     }
   }
 
@@ -158,7 +158,7 @@ public class ResourceImplementationUtils {
         writeShipmentWithPlanElements(writer, lspShipment, elementList);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out shipmentLog of LSP", e);
     }
   }
 
@@ -189,7 +189,7 @@ public class ResourceImplementationUtils {
       writer.write("### \n");
 
     } catch (IOException e) {
-      e.printStackTrace();
+		log.error("IOException while writing out scores of LSP", e);
     }
   }
 
@@ -412,8 +412,9 @@ public class ResourceImplementationUtils {
 
   @SuppressWarnings("ClassEscapesDefinedScope")
   public static class TranshipmentHubSchedulerBuilder {
-    private double capacityNeedLinear;
-    private double capacityNeedFixed;
+	//Todo: Rename is to something related with duration.
+    private double capacityNeedLinear; // (variable) duration (in seconds) for handling the LspShipment.
+    private double capacityNeedFixed; // (fixed  Duration (in seconds) for handling the LspShipment.
 
     private TranshipmentHubSchedulerBuilder() {}
 
@@ -425,10 +426,19 @@ public class ResourceImplementationUtils {
       return new TransshipmentHubScheduler(this);
     }
 
-    double getCapacityNeedLinear() {
-      return capacityNeedLinear;
-    }
+	  /**
+	   * @param capacityNeedFixed Duration (in seconds) for handling the LspShipment, which is independent of the size of the LspShipment.
+	   * @return the Builder itself, for chaining.
+	   */
+	  public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
+		  this.capacityNeedFixed = capacityNeedFixed;
+		  return this;
+	  }
 
+	  /**
+	   * @param capacityNeedLinear Duration (in seconds) for handling the LspShipment, which is variable and depends on the size of the LspShipment.
+	   * @return The Builder itself, for chaining.
+	   */
     public TranshipmentHubSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear) {
       this.capacityNeedLinear = capacityNeedLinear;
       return this;
@@ -436,14 +446,19 @@ public class ResourceImplementationUtils {
 
     // --- Getters ---
 
+	  /**
+	   * @return The fixed duration (in seconds) for handling the LspShipment, which is independent of the size of the LspShipment.
+	   */
     double getCapacityNeedFixed() {
       return capacityNeedFixed;
     }
 
-    public TranshipmentHubSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed) {
-      this.capacityNeedFixed = capacityNeedFixed;
-      return this;
-    }
+	  /**
+	   * @return The duration (in seconds) for handling the LspShipment, which is variable and depends on the size of the LspShipment.
+	   */
+	  double getCapacityNeedLinear() {
+		  return capacityNeedLinear;
+	  }
   }
 
   public static final class TransshipmentHubBuilder {

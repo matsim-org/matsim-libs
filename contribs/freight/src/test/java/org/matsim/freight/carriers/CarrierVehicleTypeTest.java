@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 public class CarrierVehicleTypeTest {
 

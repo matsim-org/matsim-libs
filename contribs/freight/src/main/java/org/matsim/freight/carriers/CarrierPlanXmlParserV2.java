@@ -123,7 +123,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				double end;
 				String endString = atts.getValue("latestEnd");
 				end = parseTimeToDouble(endString);
-				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
+				serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(start, end));
 				String serviceTimeString = atts.getValue("serviceDuration");
 				if (serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 				currentService = serviceBuilder.build();
@@ -157,13 +157,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
 				if (startPickup != null && endPickup != null)
-					shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+					shipmentBuilder.setPickupStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 				if (startDelivery != null && endDelivery != null)
-					shipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+					shipmentBuilder.setDeliveryStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
 				if (pickupServiceTime != null)
-					shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
+					shipmentBuilder.setPickupDuration(parseTimeToDouble(pickupServiceTime));
 				if (deliveryServiceTime != null)
-					shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
+					shipmentBuilder.setDeliveryDuration(parseTimeToDouble(deliveryServiceTime));
 
 				currentShipment = shipmentBuilder.build();
 				currentShipments.put(atts.getValue(ID), currentShipment);
@@ -202,7 +202,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 				String typeId = atts.getValue("typeId");
 				if (typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.create(typeId, VehicleType.class));
+				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(typeId));
 				if (vehicleType == null) {
 					throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
 				}
@@ -261,26 +261,26 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getFrom());
+						finishLeg(s.getPickupLinkId());
 						currentTourBuilder.schedulePickup(s);
-						previousActLoc = s.getFrom();
+						previousActLoc = s.getPickupLinkId();
 					}
 					case "delivery" -> {
 						String id = atts.getValue(SHIPMENT_ID);
 						if (id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
 						CarrierShipment s = currentShipments.get(id);
-						finishLeg(s.getTo());
+						finishLeg(s.getDeliveryLinkId());
 						currentTourBuilder.scheduleDelivery(s);
-						previousActLoc = s.getTo();
+						previousActLoc = s.getDeliveryLinkId();
 					}
 					case "service" -> {
 						String id = atts.getValue("serviceId");
 						if (id == null) throw new IllegalStateException("act.serviceId is missing.");
 						CarrierService s = serviceMap.get(Id.create(id, CarrierService.class));
 						if (s == null) throw new IllegalStateException("serviceId is not known.");
-						finishLeg(s.getLocationLinkId());
+						finishLeg(s.getServiceLinkId());
 						currentTourBuilder.scheduleService(s);
-						previousActLoc = s.getLocationLinkId();
+						previousActLoc = s.getServiceLinkId();
 					}
 					case "end" -> {
 						finishLeg(currentVehicle.getLinkId());
@@ -324,9 +324,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				currentCarrier = null;
 			}
 			case "plan" -> {
-				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
+				CarrierPlan currentPlan = new CarrierPlan(scheduledTours);
 				currentPlan.setScore(currentScore);
-				currentCarrier.getPlans().add(currentPlan);
+				currentCarrier.addPlan(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}

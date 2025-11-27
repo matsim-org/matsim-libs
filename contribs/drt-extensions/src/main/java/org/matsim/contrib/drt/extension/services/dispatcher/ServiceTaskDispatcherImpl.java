@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.extension.services.services.tracker.ServiceExecuti
 import org.matsim.contrib.drt.extension.services.services.triggers.ServiceExecutionTrigger;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
+import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -44,7 +45,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -104,19 +104,19 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 		List<ServiceScheduleEntry> servicesToBeScheduled = new ArrayList<>();
 		ServiceExecutionTracker serviceExecutionTracker = this.executionTrackers.getTrackers().get(dvrpVehicle.getId());
 		for (DrtServiceParams drtServiceParams : serviceExecutionTracker.getServices()) {
-			int executionLimit = drtServiceParams.executionLimit;
-			int currentExecutions = serviceExecutionTracker.getScheduledCounter(drtServiceParams.name);
-			boolean stackable = drtServiceParams.enableTaskStacking;
+			int executionLimit = drtServiceParams.getExecutionLimit();
+			int currentExecutions = serviceExecutionTracker.getScheduledCounter(drtServiceParams.getServiceName());
+			boolean stackable = drtServiceParams.isEnableTaskStacking();
 
 			if (currentExecutions == executionLimit) {
-				LOG.debug("Execution limit for vehicle {} and service {} reached.", drtServiceParams.name, dvrpVehicle.getId());
+				LOG.debug("Execution limit for vehicle {} and service {} reached.", drtServiceParams.getServiceName(), dvrpVehicle.getId());
 				continue;
 			}
 
 			for (ServiceExecutionTrigger serviceExecutionTrigger : serviceExecutionTracker.getTriggers(drtServiceParams)) {
 				if (serviceExecutionTrigger.requiresService(dvrpVehicle, timeStep)) {
-					LOG.debug("{} scheduled service {} for vehicle {} at {}.", serviceExecutionTrigger.getName(), drtServiceParams.name, dvrpVehicle.getId(), timeStep);
-					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle), drtServiceParams, stackable));
+					LOG.debug("{} scheduled service {} for vehicle {} at {}.", serviceExecutionTrigger.getName(), drtServiceParams.getServiceName(), dvrpVehicle.getId(), timeStep);
+					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle, timeStep), drtServiceParams, stackable));
 				}
 			}
 		}
@@ -139,7 +139,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 		}
 	}
 
-	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle) {
+	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle, double timeStep) {
 		final Schedule schedule = dvrpVehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		Link lastLink;
@@ -156,7 +156,13 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			lastLink = ((DrtStayTask) schedule.getTasks()
 				.get(schedule.getTaskCount() - 1)).getLink();
 		}
-		return operationFacilityFinder.findFacility(lastLink.getCoord()).orElseThrow();
+		Optional<OperationFacilityFinder.FacilityWithPath> facility = operationFacilityFinder.findFacility(
+				lastLink, dvrpVehicle, Set.of());
+		if(facility.isPresent()) {
+			return facility.get().operationFacility();
+		} else {
+			throw new RuntimeException("Could not find operation facility for vehicle " + dvrpVehicle.getId());
+		}
 	}
 
 }

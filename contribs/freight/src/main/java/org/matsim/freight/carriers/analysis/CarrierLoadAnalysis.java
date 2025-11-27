@@ -27,15 +27,12 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.events.CarrierShipmentDeliveryStartEvent;
 import org.matsim.freight.carriers.events.CarrierShipmentPickupStartEvent;
 import org.matsim.freight.carriers.events.eventhandler.CarrierShipmentDeliveryStartEventHandler;
@@ -47,17 +44,16 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author Kai Martins-Turner (kturner)
  */
-public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
+/*package-private*/ class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandler, CarrierShipmentDeliveryStartEventHandler {
 
 	private static final Logger log = LogManager.getLogger(CarrierLoadAnalysis.class);
 	private final String delimiter;
-	final Carriers carriers;
 
 	private final Map<Id<Vehicle>, LinkedList<Integer>> vehicle2Load = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Integer> vehicle2DemandPerTour = new HashMap<>();
 
-	public CarrierLoadAnalysis(String delimiter, Carriers carriers) {
+	/*package-private*/ CarrierLoadAnalysis(String delimiter) {
 		this.delimiter = delimiter;
-		this.carriers = carriers;
 	}
 
 	@Override
@@ -66,12 +62,14 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		Integer demand = Integer.valueOf(event.getAttributes().get(ATTRIBUTE_CAPACITYDEMAND));
 
 		LinkedList<Integer> list;
-		if (! vehicle2Load.containsKey(vehicleId)){
+		if (!vehicle2Load.containsKey(vehicleId)) {
 			list = new LinkedList<>();
 			list.add(demand);
+			vehicle2DemandPerTour.put(vehicleId, demand);
 		} else {
 			list = vehicle2Load.get(vehicleId);
 			list.add(list.getLast() + demand);
+			vehicle2DemandPerTour.put(vehicleId, vehicle2DemandPerTour.get(vehicleId) + demand);
 		}
 		vehicle2Load.put(vehicleId, list);
 	}
@@ -86,38 +84,49 @@ public class CarrierLoadAnalysis implements CarrierShipmentPickupStartEventHandl
 		vehicle2Load.put(vehicleId, list);
 	}
 
-	void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) throws IOException {
+	/*package-private*/ void writeLoadPerVehicle(String analysisOutputDirectory, Scenario scenario) {
 		log.info("Writing out vehicle load analysis ...");
 		//Load per vehicle
 		String fileName = Path.of(analysisOutputDirectory).resolve("Load_perVehicle.tsv").toString();
 
-		BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName));
+		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 
-		//Write headline:
-		bw1.write(String.join(delimiter,"vehicleId",
-			"vehicleTypeId",
-			"capacity",
-			"maxLoad",
-			"load state during tour"));
-		bw1.newLine();
-
-		for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
-
-			final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
-			final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
-
-			final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
-			final Double capacity = vehicleType.getCapacity().getOther();
-
-			bw1.write(vehicleId.toString());
-			bw1.write(delimiter + vehicleType.getId().toString());
-			bw1.write(delimiter + capacity);
-			bw1.write(delimiter + maxLoad);
-			bw1.write(delimiter + load);
+			//Write headline:
+			bw1.write(String.join(delimiter, "vehicleId",
+				"vehicleTypeId",
+				"capacity",
+				"maxLoad",
+				"maxLoadPercentage",
+				"handledDemand",
+				"load state during tour"));
 			bw1.newLine();
-		}
 
-		bw1.close();
-		log.info("Output written to {}", fileName);
+			for (Id<Vehicle> vehicleId : vehicle2Load.keySet()) {
+
+				final LinkedList<Integer> load = vehicle2Load.get(vehicleId);
+				final Integer maxLoad = load.stream().max(Comparator.naturalOrder()).orElseThrow();
+
+				final VehicleType vehicleType = VehicleUtils.findVehicle(vehicleId, scenario).getType();
+				final Double capacity = vehicleType.getCapacity().getOther();
+
+				final Integer demand = vehicle2DemandPerTour.get(vehicleId);
+				final double maxLoadPercentage = Math.round(maxLoad / capacity * 10000) / 100.0;
+
+				bw1.write(vehicleId.toString());
+				bw1.write(delimiter + vehicleType.getId().toString());
+				bw1.write(delimiter + capacity);
+				bw1.write(delimiter + maxLoad);
+				bw1.write(delimiter + maxLoadPercentage);
+				bw1.write(delimiter + demand);
+				bw1.write(delimiter + load);
+				bw1.newLine();
+			}
+
+			bw1.close();
+			log.info("Output written to {}", fileName);
+		}
+		catch (IOException e) {
+			log.error("Could not write output file: {}", e.getMessage());
+		}
 	}
 }

@@ -42,7 +42,7 @@ public final class CarrierServiceEndEvent extends AbstractCarrierEvent {
 	private final double serviceDuration;
 
 	public CarrierServiceEndEvent(double time, Id<Carrier> carrierId, CarrierService service, Id<Vehicle> vehicleId) {
-		super(time, carrierId, service.getLocationLinkId(), vehicleId);
+		super(time, carrierId, service.getServiceLinkId(), vehicleId);
 		this.serviceId = service.getId();
 		this.serviceDuration = service.getServiceDuration();
 	}

@@ -63,7 +63,7 @@ public class RailsimDriverAgentFactory implements TransitDriverAgentFactory {
 		String mode = umlauf.getUmlaufStuecke().get(0).getRoute().getTransportMode();
 
 		if (this.modes.contains(mode)) {
-			return new RailsimTransitDriverAgent(stopAreas, umlauf, mode, transitStopAgentTracker, internalInterface);
+			return new RailsimTransitDriverAgentImpl(stopAreas, umlauf, mode, transitStopAgentTracker, internalInterface);
 		}
 
 		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);

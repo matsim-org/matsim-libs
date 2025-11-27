@@ -28,14 +28,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Provides helper methods to work with routes.
@@ -44,7 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class RouteUtils {
 	private static final Logger log = LogManager.getLogger( RouteUtils.class ) ;
-	
+
 	private RouteUtils(){} // do not instantiate
 
 	/**
@@ -134,7 +137,7 @@ public class RouteUtils {
 	}
 
 	/**
-	 * Calculates the distance of the complete route, <b>excluding</b> the distance traveled
+	 * Calculates the distance of the route, <b>excluding</b> the distance traveled
 	 * on the start- and end-link of the route.
 	 *
 	 * @param route
@@ -148,12 +151,20 @@ public class RouteUtils {
 		}
 		return dist;
 	}
-	
+
+	public static double calcTravelTimeExcludingStartEndLink( final NetworkRoute networkRoute, double now, Person person, Vehicle vehicle, final
+	Network network, TravelTime travelTime ) {
+		double newTravelTime = 0.0;
+		for (Id<Link> routeLinkId : networkRoute.getLinkIds()) newTravelTime += travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
+					now + newTravelTime, person, vehicle);
+		return newTravelTime;
+	}
+
 
 	/**
 	 * Calculates the distance of the complete route, <b>including</b> the distance traveled
 	 * on the start- and end-link of the route.
-	 * 
+	 *
 	 * @param networkRoute
 	 * @param relPosOnDepartureLink relative position on the departure link where vehicles start traveling
 	 * @param relPosOnArrivalLink relative position on the arrival link where vehicles stop traveling
@@ -174,7 +185,28 @@ public class RouteUtils {
 		}
 		return routeDistance;
 	}
-	
+
+	public static double calcTravelTime( final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink,
+					     double now, Person person, Vehicle vehicle, final Network network, TravelTime travelTime) {
+
+		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
+			return 0.;
+		}
+		double startTime = now;
+
+		// add relative distance of departure link
+		now += (1.0 - relPosOnDepartureLink) * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getStartLinkId() ), now, person, vehicle );
+
+		// sum distance of all link besides departure and arrival link
+		 now += calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime);
+
+		// add time on arrival link
+		now += relPosOnArrivalLink * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getEndLinkId() ), now, person, vehicle );
+
+		return now - startTime;
+	}
+
+	@Deprecated // rename to calcDistanceExcludingStartEndLink.  kai, feb'25
 	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
 		double length = 0. ;
 		for ( Link link : path.links ) {
@@ -194,26 +226,32 @@ public class RouteUtils {
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}
-	
+
 	public static double calcDistance(TransitPassengerRoute route, TransitSchedule ts, Network network) {
+
+		// exit condition for recursion
+		if (route == null) {
+			return 0;
+		}
+
 		Id<TransitLine> lineId = route.getLineId();
 		Id<TransitRoute> routeId = route.getRouteId();
 		Id<TransitStopFacility> enterStopId = route.getAccessStopId();
 		Id<TransitStopFacility> exitStopId = route.getEgressStopId();
-	
+
 		TransitLine line = ts.getTransitLines().get(lineId);
 		TransitRoute tr = line.getRoutes().get(routeId);
-		
+
 		TransitStopFacility accessFacility = ts.getFacilities().get(enterStopId);
 		TransitStopFacility egressFacility = ts.getFacilities().get(exitStopId);
-		
-		return calcDistance(tr, accessFacility, egressFacility, network);
+
+		return calcDistance(tr, accessFacility, egressFacility, network) + calcDistance(route.getChainedRoute(), ts, network);
 	}
-	
+
 	public static double calcDistance(TransitRoute tr, TransitStopFacility accessFacility, TransitStopFacility egressFacility, Network network) {
 		Id<Link> enterLinkId = accessFacility.getLinkId();
 		Id<Link> exitLinkId = egressFacility.getLinkId();
-	
+
 		NetworkRoute nr = tr.getRoute();
 		double dist = 0;
 		boolean count = false;
@@ -246,7 +284,7 @@ public class RouteUtils {
 	/**
 	 * How much of route is "covered" by the links of route2.  Based on Ramming.  Note that this is not symmetric,
 	 * i.e. route1 can be fully covered by route2, but not the other way around.  kai, nov'13
-	 * 
+	 *
 	 * @param route1
 	 * @param route2
 	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
@@ -255,7 +293,7 @@ public class RouteUtils {
 		Gbl.assertNotNull( route1 );
 		Gbl.assertNotNull( route2 );
 		Gbl.assertNotNull( network );
-		
+
 		double routeLength = 0. ;
 		double coveredLength = 0. ;
 		for ( Id<Link> id : route1.getLinkIds() ) {

@@ -25,7 +25,7 @@ package org.matsim.contrib.ev.charging;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -207,7 +207,7 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		if (evCfg.enforceChargingInteractionDuration){
+		if (evCfg.isEnforceChargingInteractionDuration()){
 			//this could actually happen when combining with edrt/etaxi/evrp
 			throw new RuntimeException("should currently not happen, as this event is only triggered in case the agent quits the charger queue without charging afterwards, " +
 				" and this should not happen with fixed charging activity duration.\n" +
