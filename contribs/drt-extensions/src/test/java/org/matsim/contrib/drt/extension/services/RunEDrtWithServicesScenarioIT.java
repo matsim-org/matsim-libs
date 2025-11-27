@@ -81,11 +81,6 @@ public class RunEDrtWithServicesScenarioIT {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtConfigGroup.getMode()) {
 			@Override
 			public void install() {
-
-				boolean scheduleWaitBeforeDrive = drtConfigGroup.getPrebookingParams().map(PrebookingParams::isScheduleWaitBeforeDrive).orElse(false);
-				bindModal(StopWaypointFactory.class).toProvider(modalProvider(getter ->
-						new StopWaypointFactoryImpl(getter.getModal(DvrpLoadType.class), scheduleWaitBeforeDrive)));
-
 				bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
 					new EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider(getMode(), MINIMUM_RELATIVE_SOC)
 				);

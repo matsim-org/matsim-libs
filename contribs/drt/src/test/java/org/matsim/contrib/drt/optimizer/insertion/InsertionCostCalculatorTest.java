@@ -52,11 +52,12 @@ import com.google.common.collect.ImmutableList;
 public class InsertionCostCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder()
+
+		private final DrtRequest drtRequest = DrtRequest.newBuilder()
 			.fromLink(fromLink)
 			.toLink(toLink)
+			.earliestDepartureTime(0)
 			.constraints(new DrtRouteConstraints(
-					0,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
 					Double.POSITIVE_INFINITY,
@@ -71,7 +72,12 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<StopWaypoint>builder().build(), null);
+
+		StopWaypoint[] stops = new StopWaypoint[1];
+		DrtStopTask existingStopTask = new DefaultDrtStopTask(0, 60, link("a"));
+		stops[0] = new StopWaypointImpl(existingStopTask, loadType.fromInt(1), loadType, false);
+
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.copyOf(stops), null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
@@ -121,12 +127,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								180.,
 								true
@@ -148,12 +154,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								120.,
 								false
@@ -202,12 +208,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								300.,
 								true
@@ -225,12 +231,12 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
 				.constraints(
 						new DrtRouteConstraints(
-								Double.POSITIVE_INFINITY,
-								120,
 								300,
 								Double.POSITIVE_INFINITY,
+								120,
 								Double.POSITIVE_INFINITY,
 								200.,
 								true

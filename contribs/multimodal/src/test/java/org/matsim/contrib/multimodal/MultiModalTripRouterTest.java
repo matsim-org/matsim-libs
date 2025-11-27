@@ -54,6 +54,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
+import org.matsim.vehicles.PersonVehicles;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -86,6 +89,13 @@ public class MultiModalTripRouterTest {
 		multiModalConfigGroup.setSimulatedModes(TransportMode.bike + ", " + TransportMode.walk + ", " + TransportMode.ride + ", " + TransportMode.pt);
 
 		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
+
+		// We need to add a vehicle, it however does not affect the results
+		// Vehicles are needed due to the NetworkRoutingInclAccessEgressModule
+		// Cannot be solved via PrepareForSim because persons are inserted into the scenario at the end of the test
+		Id<VehicleType> typeId = Id.create(1, VehicleType.class);
+		scenario.getVehicles().addVehicleType(VehicleUtils.createVehicleType(typeId));
+		scenario.getVehicles().addVehicle(VehicleUtils.createVehicle(Id.createVehicleId(1), scenario.getVehicles().getVehicleTypes().get(typeId)));
 
 		/*
 		 * Use a ...
@@ -167,6 +177,11 @@ public class MultiModalTripRouterTest {
 	private void checkMode(Scenario scenario, String transportMode, PlanRouter planRouter) {
 		// XXX transportMode parameter is NOT USED, hence this test is NOT DOING WHAT IT SHOULD! td oct 15
 		Person person = createPerson(scenario);
+
+		PersonVehicles vehicles = new PersonVehicles();
+		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(person, vehicles.getModeVehicles());
+
 		planRouter.run(person);
 		checkRoute((Leg) person.getSelectedPlan().getPlanElements().get(1), scenario.getNetwork());
 	}

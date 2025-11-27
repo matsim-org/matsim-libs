@@ -38,12 +38,12 @@ public class DrtRequestInsertionRetryQueueTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.id(Id.create("r", Request.class))
 			.submissionTime(SUBMISSION_TIME)
+			.earliestDepartureTime(SUBMISSION_TIME)
 			.constraints(
 					new DrtRouteConstraints(
-							SUBMISSION_TIME,
-							SUBMISSION_TIME + MAX_WAIT_TIME,
-							SUBMISSION_TIME + MAX_TRAVEL_TIME,
-							Double.POSITIVE_INFINITY,
+							MAX_TRAVEL_TIME,
+							Double.POSITIVE_INFINITY ,
+							MAX_WAIT_TIME ,
 							Double.POSITIVE_INFINITY,
 							0,
 							false
@@ -74,21 +74,23 @@ public class DrtRequestInsertionRetryQueueTest {
 		assertThat(queue.getRequestsToRetryNow(SUBMISSION_TIME + 1)).isEmpty();
 
 		//retry
-		double now = SUBMISSION_TIME + 2;
-		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
-				.containsExactly(DrtRequest.newBuilder(request)
-						.constraints(
-								new DrtRouteConstraints(
-										request.getEarliestStartTime(),
-										now + MAX_WAIT_TIME,
-										now + MAX_TRAVEL_TIME,
-										request.getConstraints().maxRideDuration(),
-										request.getConstraints().maxPickupDelay(),
-										request.getConstraints().lateDiversionThreshold(),
-										false
-								)
+		double delta = 2;
+		double now = SUBMISSION_TIME + delta;
+		DrtRequest ref = DrtRequest.newBuilder(request)
+				.earliestDepartureTime(request.getEarliestStartTime())
+				.constraints(
+						new DrtRouteConstraints(
+								MAX_TRAVEL_TIME + delta,
+								request.getConstraints().maxRideDuration(),
+								MAX_WAIT_TIME + delta,
+								request.getConstraints().maxPickupDelay(),
+								request.getConstraints().lateDiversionThreshold(),
+								false
 						)
-						.build());
+				)
+				.build();
+		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
+				.containsExactly(ref);
 
 		//empty queue
 		assertThat(queue.getRequestsToRetryNow(SUBMISSION_TIME + 3)).isEmpty();
@@ -101,14 +103,16 @@ public class DrtRequestInsertionRetryQueueTest {
 
 		//retry
 		double now = 999999;// no guarantee the method is called every second, so let's make a very late call
+		double delta = now - SUBMISSION_TIME;
+
 		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
+						.earliestDepartureTime(request.getEarliestStartTime())
 						.constraints(
 								new DrtRouteConstraints(
-										request.getEarliestStartTime(),
-										now + MAX_WAIT_TIME,
-										now + MAX_TRAVEL_TIME,
+										delta + MAX_TRAVEL_TIME,
 										request.getConstraints().maxRideDuration(),
+										delta + MAX_WAIT_TIME,
 										request.getConstraints().maxPickupDelay(),
 										request.getConstraints().lateDiversionThreshold(),
 										false

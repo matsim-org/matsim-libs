@@ -19,7 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;

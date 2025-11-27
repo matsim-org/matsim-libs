@@ -1,0 +1,7 @@
+vehicleId	vehicleTypeId	capacity	maxLoad	maxLoadPercentage	handledDemand	load state during tour
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_1	heavy40t	33.0	28	84.85	36	[9, 19, 27, 19, 28, 18, 9, 0]
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_2	heavy40t	33.0	33	100.0	45	[12, 23, 11, 23, 33, 22, 10, 0]
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_3	heavy40t	33.0	28	84.85	53	[9, 25, 16, 0, 13, 28, 15, 0]
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_4	heavy40t	33.0	33	100.0	56	[7, 20, 30, 17, 7, 15, 24, 33, 24, 16, 9, 0]
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_5	heavy40t	33.0	28	84.85	53	[12, 28, 16, 0, 8, 17, 25, 17, 9, 0]
+freight_Edeka_DIRECT_directCarrier_veh_directCarrierTruck_heavy40t_6	heavy40t	33.0	15	45.45	15	[15, 0]

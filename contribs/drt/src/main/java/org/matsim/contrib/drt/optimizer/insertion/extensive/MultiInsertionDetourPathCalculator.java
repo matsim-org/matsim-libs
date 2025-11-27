@@ -41,6 +41,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.speedy.SpeedyGraph;
@@ -53,6 +54,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author michalm
  */
+@NodeSingleton
 class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener {
 	public static final int MAX_THREADS = 4;
 
@@ -122,7 +124,7 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 
 	private Map<Link, PathData> calcPathsToDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc backward dijkstra from dropoff to ends of selected stops
-		double latestDropoffTime = drtRequest.getConstraints().latestArrivalTime(); // pessimistic
+		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup)),
 				insertion -> insertion.dropoff.previousWaypoint.getLink());
@@ -131,7 +133,7 @@ class MultiInsertionDetourPathCalculator implements MobsimBeforeCleanupListener 
 
 	private Map<Link, PathData> calcPathsFromDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc forward dijkstra from dropoff to beginnings of selected stops
-		double latestDropoffTime = drtRequest.getConstraints().latestArrivalTime(); // pessimistic
+		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.nextWaypoint instanceof Waypoint.End)),
 				insertion -> insertion.dropoff.nextWaypoint.getLink());

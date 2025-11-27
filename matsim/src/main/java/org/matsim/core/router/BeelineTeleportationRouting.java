@@ -24,8 +24,8 @@
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 class BeelineTeleportationRouting implements Provider<RoutingModule> {
 

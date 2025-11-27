@@ -1,6 +1,6 @@
 package org.matsim.contribs.discrete_mode_choice.replanning;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;

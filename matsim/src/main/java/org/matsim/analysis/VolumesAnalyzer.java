@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -33,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ import java.util.TreeSet;
  *
  * @author mrieser
  */
+@DistributedEventHandler(async = true)
 public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler {
 
 	private final static Logger log = LogManager.getLogger(VolumesAnalyzer.class);

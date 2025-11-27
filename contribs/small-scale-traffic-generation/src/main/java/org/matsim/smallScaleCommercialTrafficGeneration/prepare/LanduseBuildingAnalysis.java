@@ -205,7 +205,7 @@ public class LanduseBuildingAnalysis {
 				}
 				zoneIdRegionConnection.put(zoneID, regionName);
 			} else
-				log.warn("The zone {} has no region assigned. This may lead to problems in the analysis.", (String) singleZone.getAttribute(shapeFileZoneNameColumn));
+				log.warn("The zone {} has no region assigned. This may lead to problems in the analysis.", singleZone.getAttribute(shapeFileZoneNameColumn));
 		}
 
 		if (usedLanduseConfiguration.equals("useOSMBuildingsAndLanduse")) {
@@ -260,7 +260,7 @@ public class LanduseBuildingAnalysis {
 	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
 		double buildingLevels;
 		double buildingLevelsPerType;
-		if (building.getAttribute("levels") == null)
+		if (building.getAttribute("levels") == null || String.valueOf(building.getAttribute("levels")).isEmpty())
 			buildingLevels = 1;
 		else {
 			Object levelsAttribute = building.getAttribute("levels");
@@ -293,7 +293,7 @@ public class LanduseBuildingAnalysis {
 			log.error("Required input data file {} not found", pathToInvestigationAreaData);
 		}
 		try (CSVParser parser = new CSVParser(Files.newBufferedReader(pathToInvestigationAreaData),
-				CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build())) {
+			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).get())) {
 
 			for (CSVRecord record : parser) {
 				Map<String, Integer> lookUpTable = new HashMap<>();
@@ -327,6 +327,9 @@ public class LanduseBuildingAnalysis {
 			Coord centroidPointOfBuildingPolygon = MGC
 					.point2Coord(((Geometry) singleBuildingFeature.getDefaultGeometry()).getCentroid());
 			String singleZone = indexZones.query(centroidPointOfBuildingPolygon);
+			// if the building is not in a zone, it is not considered
+			if (singleZone == null)
+				continue;
 			String buildingType = String.valueOf(singleBuildingFeature.getAttribute(shapeFileBuildingTypeColumn));
 			if (buildingType.isEmpty() || buildingType.equals("null") || buildingType.equals("yes")) {
 				buildingType = indexLanduse.query(centroidPointOfBuildingPolygon);
@@ -349,11 +352,10 @@ public class LanduseBuildingAnalysis {
 			}
 			if (isEmployeeCategory)
 				categoriesOfBuilding.add("Employee");
-			if (singleZone != null) {
-				categoriesOfBuilding.forEach(c -> buildingsPerZone
-						.computeIfAbsent(singleZone, k -> new HashMap<>())
-						.computeIfAbsent(c, k -> new ArrayList<>()).add(singleBuildingFeature));
-			}
+
+			categoriesOfBuilding.forEach(c -> buildingsPerZone
+				.computeIfAbsent(singleZone, k -> new HashMap<>())
+				.computeIfAbsent(c, k -> new ArrayList<>()).add(singleBuildingFeature));
 		}
 		log.info("Finished analyzing buildings types.");
 	}
