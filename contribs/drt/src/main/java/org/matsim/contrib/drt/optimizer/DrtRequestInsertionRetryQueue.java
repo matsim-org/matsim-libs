@@ -25,11 +25,14 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
+@NodeSingleton
 public class DrtRequestInsertionRetryQueue {
 	private final DrtRequestInsertionRetryParams params;
 
@@ -61,10 +64,20 @@ public class DrtRequestInsertionRetryQueue {
 			//directly using the retry interval
 			double timeDelta = now - entry.lastAttemptTime;
 			var oldRequest = entry.request;
+
+			DrtRouteConstraints updatedConstraints = new DrtRouteConstraints(
+					oldRequest.getConstraints().maxTravelDuration() + timeDelta,
+					oldRequest.getConstraints().maxRideDuration() ,
+					oldRequest.getConstraints().maxWaitDuration() + timeDelta,
+					oldRequest.getConstraints().maxPickupDelay(),
+					oldRequest.getConstraints().lateDiversionThreshold(),
+					oldRequest.getConstraints().allowRejection()
+			);
+
 			//XXX alternatively make both latest start/arrival times modifiable
 			var newRequest = DrtRequest.newBuilder(oldRequest)
-					.latestStartTime(oldRequest.getLatestStartTime() + timeDelta)
-					.latestArrivalTime(oldRequest.getLatestArrivalTime() + timeDelta)
+					.constraints(updatedConstraints)
+					.earliestDepartureTime(oldRequest.getEarliestStartTime())
 					.build();
 			requests.add(newRequest);
 		}

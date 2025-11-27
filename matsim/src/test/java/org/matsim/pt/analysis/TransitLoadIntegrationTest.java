@@ -52,7 +52,7 @@ public class TransitLoadIntegrationTest {
 		final Controler c = new Controler(s);
 		final TransitLoad transitload = new TransitLoad();
 
-		c.addControlerListener(new StartupListener() {
+		c.addControllerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				c.getEvents().addHandler(transitload);

@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Queue;
 
 class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {

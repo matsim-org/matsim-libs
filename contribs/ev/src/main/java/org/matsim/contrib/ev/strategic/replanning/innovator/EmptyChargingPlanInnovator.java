@@ -15,4 +15,12 @@ public class EmptyChargingPlanInnovator implements ChargingPlanInnovator {
 	public ChargingPlan createChargingPlan(Person person, Plan plan, ChargingPlans chargingPlans) {
 		return new ChargingPlan();
 	}
+
+	static public class Parameters extends ChargingInnovationParameters {
+		static public final String SET_NAME = "innovation:empty";
+
+		public Parameters() {
+			super(SET_NAME);
+		}
+	}
 }

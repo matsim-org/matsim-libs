@@ -336,4 +336,44 @@ public class LinkImplTest {
 		Assertions.assertEquals(3, s_3.size());
 	}
 
+	@Test
+	void testGetCoord_noZ_onBothNodes() {
+		Network network = new NetworkImpl(new LinkFactoryImpl());
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord(0.0, 0.0));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord(10.0, 20.0));
+		Link l = NetworkUtils.createAndAddLink(network, Id.create(1, Link.class), n1, n2, 100.0, 10.0, 1000.0, 1.0);
+
+		Coord c = l.getCoord();
+		Assertions.assertFalse(c.hasZ(), "coord should not have Z when neither node has Z");
+		Assertions.assertEquals(5.0, c.getX(), EPSILON);
+		Assertions.assertEquals(10.0, c.getY(), EPSILON);
+	}
+
+	@Test
+	void testGetCoord_oneNodeHasZ() {
+		Network network = new NetworkImpl(new LinkFactoryImpl());
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord(0.0, 0.0, 5.0));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord(10.0, 20.0));
+		Link l = NetworkUtils.createAndAddLink(network, Id.create(2, Link.class), n1, n2, 100.0, 10.0, 1000.0, 1.0);
+
+		Coord c = l.getCoord();
+		Assertions.assertFalse(c.hasZ(), "coord should not have Z when only one node has Z");
+		Assertions.assertEquals(5.0, c.getX(), EPSILON);
+		Assertions.assertEquals(10.0, c.getY(), EPSILON);
+	}
+
+	@Test
+	void testGetCoord_bothNodesHaveZ() {
+		Network network = new NetworkImpl(new LinkFactoryImpl());
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord(0.0, 0.0, 4.0));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord(10.0, 20.0, 6.0));
+		Link l = NetworkUtils.createAndAddLink(network, Id.create(3, Link.class), n1, n2, 100.0, 10.0, 1000.0, 1.0);
+
+		Coord c = l.getCoord();
+		Assertions.assertTrue(c.hasZ(), "coord should have Z when both nodes have Z");
+		Assertions.assertEquals(5.0, c.getX(), EPSILON);
+		Assertions.assertEquals(10.0, c.getY(), EPSILON);
+		Assertions.assertEquals(5.0, c.getZ(), EPSILON);
+	}
+
 }

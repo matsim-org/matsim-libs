@@ -39,7 +39,7 @@ import playground.vsp.parkAndRide.PRConfigGroup;
 import playground.vsp.parkAndRide.PRFacility;
 import playground.vsp.parkAndRide.PRFileReader;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyLocation" />

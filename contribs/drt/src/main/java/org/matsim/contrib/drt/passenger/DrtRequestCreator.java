@@ -57,33 +57,50 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public DrtRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink, Link toLink,
 									double departureTime, double submissionTime) {
-		double latestDepartureTime = Double.POSITIVE_INFINITY;
-		double latestArrivalTime = Double.POSITIVE_INFINITY;
+
+		double maxWaitDuration = Double.POSITIVE_INFINITY;
+		double maxTravelDuration = Double.POSITIVE_INFINITY;
 		double maxRideDuration = Double.POSITIVE_INFINITY;
         double maxPickupDelay = Double.POSITIVE_INFINITY;
+
         double lateDiversionThreshold = 0;
+		boolean allowRejection = true;
 		DvrpLoad load = emptyLoad;
 
 		Preconditions.checkArgument(!passengerIds.isEmpty());
 		for (Route route : routes) {
 			DrtRoute drtRoute = (DrtRoute)route;
-
             DrtRouteConstraints constraints = drtRoute.getConstraints();
-            latestDepartureTime =  Math.min(latestDepartureTime, departureTime + constraints.maxWaitTime());
-            latestArrivalTime = Math.min(latestArrivalTime, departureTime + constraints.maxTravelTime());
-            maxRideDuration = Math.min(maxRideDuration, constraints.maxRideTime());
+
+			maxWaitDuration = Math.min(maxWaitDuration, constraints.maxWaitDuration());
+			maxTravelDuration = Math.min(maxTravelDuration, constraints.maxTravelDuration());
+			maxRideDuration = Math.min(maxRideDuration, constraints.maxRideDuration());
             maxPickupDelay = Math.min(maxPickupDelay, constraints.maxPickupDelay());
             lateDiversionThreshold = Math.max(lateDiversionThreshold, constraints.lateDiversionThreshold());
             load = load.add(drtRoute.getLoad(dvrpLoadType));
+			allowRejection = allowRejection && constraints.allowRejection();
 		}
+
+		DrtRouteConstraints consolidatedConstrains = new DrtRouteConstraints(
+				maxTravelDuration,
+				maxRideDuration,
+				maxWaitDuration,
+				maxPickupDelay,
+				lateDiversionThreshold,
+				allowRejection
+		);
 
 		// get one representative route, we assume that distance and direct ride time are equivalent
 		DrtRoute drtRoute = (DrtRoute) routes.get(0);
 		String serializedLoad = this.dvrpLoadType.serialize(load);
 
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(), toLink.getId(),
-						drtRoute.getDirectRideTime(), drtRoute.getDistance(), departureTime, latestDepartureTime, latestArrivalTime, maxRideDuration, load, serializedLoad));
+				new DrtRequestSubmittedEvent(submissionTime, mode, id, passengerIds, fromLink.getId(),
+						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance(),
+						departureTime, departureTime + maxWaitDuration,
+						departureTime + maxTravelDuration, maxRideDuration,
+						load, serializedLoad)
+		);
 
 		DrtRequest request = DrtRequest.newBuilder()
 				.id(id)
@@ -91,12 +108,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				.mode(mode)
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.earliestStartTime(departureTime)
-				.latestStartTime(latestDepartureTime)
-				.latestArrivalTime(latestArrivalTime)
-				.maxRideDuration(maxRideDuration)
-				.maxPickupDelay(maxPickupDelay)
-				.lateDiversionThreshold(lateDiversionThreshold)
+				.earliestDepartureTime(departureTime)
+				.constraints(consolidatedConstrains)
 				.submissionTime(submissionTime)
 				.load(load)
 				.build();

@@ -23,7 +23,7 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;

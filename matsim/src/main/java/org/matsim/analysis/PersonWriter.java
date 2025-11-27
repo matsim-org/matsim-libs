@@ -1,6 +1,6 @@
 package org.matsim.analysis;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;

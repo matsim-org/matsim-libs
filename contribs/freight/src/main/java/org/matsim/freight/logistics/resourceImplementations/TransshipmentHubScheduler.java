@@ -40,7 +40,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   private final double capacityNeedLinear;
   private final double capacityNeedFixed;
   private TransshipmentHubResource transshipmentHubResource;
-  private TransshipmentHubTourEndEventHandler eventHandler;
+  private TransshipmentHubEventHandler eventHandler;
 
   TransshipmentHubScheduler(TranshipmentHubSchedulerBuilder builder) {
     this.lspShipmentsToSchedule = new ArrayList<>();
@@ -72,8 +72,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   private void addShipmentHandleElement(LspShipment lspShipment) {
-    LspShipmentUtils.ScheduledShipmentHandleBuilder builder =
-        LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
+    LspShipmentUtils.ScheduledShipmentHandleBuilder builder = LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
     builder.setStartTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment));
     builder.setEndTime(LspShipmentUtils.getTimeOfLspShipment(lspShipment) + capacityNeedFixed + capacityNeedLinear * lspShipment.getSize());
     builder.setResourceId(transshipmentHubResource.getId());
@@ -84,13 +83,8 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
     }
     LspShipmentPlanElement handle = builder.build();
 
-    String idString =
-        handle.getResourceId()
-            + String.valueOf(handle.getLogisticChainElement().getId())
-            + handle.getElementType();
-    Id<LspShipmentPlanElement> id = Id.create(idString, LspShipmentPlanElement.class);
-    LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId())
-        .addPlanElement(id, handle);
+    String idString = handle.getResourceId() + String.valueOf(handle.getLogisticChainElement().getId()) + handle.getElementType();
+	  LspShipmentUtils.getOrCreateShipmentPlan(super.lspPlan, lspShipment.getId()).addPlanElement(Id.create(idString, LspShipmentPlanElement.class), handle);
   }
 
   private void addShipmentToEventHandler(LspShipment lspShipment) {
@@ -117,7 +111,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
   }
 
   public void setTransshipmentHubTourEndEventHandler(
-      TransshipmentHubTourEndEventHandler eventHandler) {
+      TransshipmentHubEventHandler eventHandler) {
     this.eventHandler = eventHandler;
   }
 }

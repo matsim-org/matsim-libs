@@ -44,7 +44,7 @@ public class DecongestionModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		
+
 		if (decongestionConfigGroup.isEnableDecongestionPricing()) {
 			switch( decongestionConfigGroup.getDecongestionApproach() ){
 				case BangBang -> {
@@ -63,23 +63,23 @@ public class DecongestionModule extends AbstractModule {
 				}
 				default -> throw new RuntimeException( "not implemented" );
 			}
-			
+
 		} else {
 			// no pricing
-			
+
 		}
 		addTravelDisutilityFactoryBinding( TransportMode.car ).to( TollTimeDistanceTravelDisutilityFactory.class );
 
 		this.bind(DecongestionInfo.class).in( Singleton.class );
-		
+
 		this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class).in( Singleton.class );
 		this.addEventHandlerBinding().to(IntervalBasedTolling.class);
-		
+
 		this.addEventHandlerBinding().to(DelayAnalysis.class).in( Singleton.class );
-		
+
 		this.addEventHandlerBinding().to(PersonVehicleTracker.class).in( Singleton.class );
-		
-		this.addControlerListenerBinding().to(DecongestionControlerListener.class).in( Singleton.class );
+
+		this.addControllerListenerBinding().to(DecongestionControllerListener.class).in( Singleton.class );
 	}
 
 }

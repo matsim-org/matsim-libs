@@ -24,7 +24,6 @@ import java.io.File;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PAnalysisManager;
-import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.contrib.minibus.stats.operatorLogger.POperatorLogger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -32,9 +31,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
- * 
+ *
  * Registers all stats modules with MATSim
- * 
+ *
  * @author aneumann
  *
  */
@@ -43,22 +42,22 @@ public final class PStatsModule extends AbstractModule {
 	@Override
 	public void install() {
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(this.getConfig(), PConfigGroup.class ) ;
-		
-		this.addControlerListenerBinding().to(PStatsOverview.class);
-		this.addControlerListenerBinding().toInstance(new POperatorLogger());
-		this.addControlerListenerBinding().toInstance(new GexfPStat(false, pConfig));
-		this.addControlerListenerBinding().to(GexfPStatLight.class);
-		this.addControlerListenerBinding().to(Line2GexfPStat.class);
+
+		this.addControllerListenerBinding().to(PStatsOverview.class);
+		this.addControllerListenerBinding().toInstance(new POperatorLogger());
+		this.addControllerListenerBinding().toInstance(new GexfPStat(false, pConfig));
+		this.addControllerListenerBinding().to(GexfPStatLight.class);
+		this.addControllerListenerBinding().to(Line2GexfPStat.class);
 
 		if (pConfig.getWriteMetrics()) {
-			this.addControlerListenerBinding().toInstance(new PAnalysisManager(pConfig));
+			this.addControllerListenerBinding().toInstance(new PAnalysisManager(pConfig));
 		}
 
-		this.addControlerListenerBinding().to(ActivityLocationsParatransitUser.class);
+		this.addControllerListenerBinding().to(ActivityLocationsParatransitUser.class);
 
-		this.addControlerListenerBinding().toInstance(new StartupListener() {
+		this.addControllerListenerBinding().toInstance(new StartupListener() {
 			@Override public void notifyStartup(StartupEvent event) {
-				String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
+				String outFilename = event.getServices().getControllerIO().getOutputPath() + PConstants.statsOutputFolder;
 				new File(outFilename).mkdir();
 			}
 		});

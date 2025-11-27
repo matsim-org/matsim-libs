@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd">
+
+	<!-- Closes while train is on these links -->
+	<networkChangeEvent startTime="08:15:00">
+		<link refId="A2"/>
+		<link refId="A3"/>
+		<link refId="B2"/>
+		<link refId="B3"/>
+
+		<attribute name="railsimTrainCapacity"  type="absolute" value="0"/>
+	</networkChangeEvent>
+
+
+	<networkChangeEvent startTime="09:00:00">
+		<link refId="A2"/>
+		<link refId="A3"/>
+		<link refId="B2"/>
+		<link refId="B3"/>
+
+		<attribute name="railsimTrainCapacity"  type="absolute" value="1"/>
+	</networkChangeEvent>
+
+
+</networkChangeEvents>

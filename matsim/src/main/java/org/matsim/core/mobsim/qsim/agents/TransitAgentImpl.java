@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +34,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * @author nagel
@@ -58,9 +58,34 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 	private static final Logger log = LogManager.getLogger(TransitAgentImpl.class);
 
 	@Override
-	public final  boolean getExitAtStop(final TransitStopFacility stop) {
+	public final boolean getExitAtStop(final TransitStopFacility stop) {
 		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
+	}
+
+	@Override
+	public boolean getRelocationAtStop(final TransitStopFacility stop) {
+		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
+		return checkRelocationStop(stop, route.getChainedRoute());
+	}
+
+	/**
+	 * The difference to an exit stop is, that this method checks the access stop.
+	 * The very last stop of a chained route will not be considered for relocation.
+	 */
+	private boolean checkRelocationStop(final TransitStopFacility stop, TransitPassengerRoute route) {
+		// Routes without chains never have relocation stops
+		if (route == null) {
+			return false;
+		}
+
+		if (route.getAccessStopId().equals(stop.getId())) {
+			return true;
+		}
+
+		// Check other routes as well
+		TransitPassengerRoute chainedRoute = route.getChainedRoute();
+		return checkRelocationStop(stop, chainedRoute);
 	}
 
 	@Override
@@ -68,19 +93,18 @@ public final class TransitAgentImpl implements PTPassengerAgent {
 		TransitPassengerRoute route = (TransitPassengerRoute) basicAgentDelegate.getCurrentLeg().getRoute();
 		switch ( boardingAcceptance ) {
 			case checkLineAndStop:
-				return line.getId().equals(route.getLineId()) && containsId(stopsToCome, route.getEgressStopId());
+				return line.getId().equals(route.getLineId()) && containsDesiredStop(route, stopsToCome);
 			case checkStopOnly:
-				return containsId(stopsToCome, route.getEgressStopId());
+				return containsDesiredStop(route, stopsToCome);
 			default:
 				throw new RuntimeException("not implemented");
 		}
 	}
 
 	@SuppressWarnings("static-method")
-	private final boolean containsId(List<TransitRouteStop> stopsToCome,
-			Id<TransitStopFacility> egressStopId) {
+	private final boolean containsDesiredStop(TransitPassengerRoute route, List<TransitRouteStop> stopsToCome) {
 		for (TransitRouteStop stop : stopsToCome) {
-			if (egressStopId.equals(stop.getStopFacility().getId())) {
+			if (getExitAtStop(stop.getStopFacility()) || checkRelocationStop(stop.getStopFacility(), route.getChainedRoute())) {
 				return true;
 			}
 		}

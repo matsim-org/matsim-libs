@@ -88,7 +88,7 @@ public abstract class BuildingEnergyRunnerMain {
 				overwrite ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.addControlerListener(new MyControlerListener(c, sc.getNetwork()));
+		controler.addControllerListener(new MyControlerListener(c, sc.getNetwork()));
 		controler.run();
 	}
 
@@ -158,7 +158,7 @@ public abstract class BuildingEnergyRunnerMain {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			if(event.getIteration() == event.getServices().getConfig().controller().getLastIteration()){
                 analyzer.run(event.getServices().getScenario().getPopulation());
-				String path = event.getServices().getControlerIO().getOutputPath() + System.getProperty("file.separator");
+				String path = event.getServices().getControllerIO().getOutputPath() + System.getProperty("file.separator");
 				String prefix = event.getServices().getConfig().controller().getRunId() + ".";
 				analyzer.dumpData(path, prefix);
 				calcWriteDistanceDistribution(analyzer.getTraveller(), path + prefix + "distanceShare.csv.gz");

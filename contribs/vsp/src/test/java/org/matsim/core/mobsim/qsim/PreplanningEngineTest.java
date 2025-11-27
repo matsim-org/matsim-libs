@@ -17,7 +17,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 
 class PreplanningEngineTest{
 	// Cannot use otfvis if in core matsim.  --> In vsp contrib for time being.  kai, apr'24

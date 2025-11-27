@@ -22,6 +22,9 @@
 package org.matsim.freight.logistics.resourceImplementations;
 
 import java.util.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,6 +53,8 @@ import org.matsim.vehicles.VehicleType;
  * shipments into the vehicle * has passed.
  */
 /*package-private*/ class MainRunCarrierScheduler extends LSPResourceScheduler {
+
+	Logger log = LogManager.getLogger(MainRunCarrierScheduler.class.getName());
 
 	private Carrier carrier;
 	private MainRunCarrierResource resource;
@@ -83,11 +88,16 @@ import org.matsim.vehicles.VehicleType;
 		//		ArrayList<ScheduledTour> scheduledTours = new ArrayList<>();
 		List<CarrierPlan> scheduledPlans = new LinkedList<>();
 
+		log.warn("The main run carrier scheduler does not perform any tour planning, but simply bundles the shipments together until the vehicle is full. This is a temporary solution and should be replaced by a proper tour planning algorithm in the future.");
+
 		for (LspShipment lspShipment : copyOfAssignedShipments) {
 			// Add job as "services" to the carrier. So the carrier has this available
 			CarrierService carrierService = convertToCarrierService(lspShipment);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 
+			//TODO: Include all vehicle(types) here and perform a jsprit run for tour planning.
+			// Maybe only, of the the vehicleType collection fo the carrier has more than one vehicleType.
+			//kmt may'25
 			VehicleType vehicleType =
 				ResourceImplementationUtils.getVehicleTypeCollection(carrier).iterator().next();
 			if ((load + lspShipment.getSize())
@@ -114,6 +124,8 @@ import org.matsim.vehicles.VehicleType;
 		plan.setScore(CarrierSchedulerUtils.sumUpScore(scheduledPlans));
 		carrier.addPlan(plan);
 		carrier.setSelectedPlan(plan);
+
+		updateShipments();
 	}
 
 	private CarrierPlan createCarrierPlan(Carrier carrier, List<LspShipment> lspShipments) {
@@ -238,9 +250,7 @@ import org.matsim.vehicles.VehicleType;
 				Tour tour = scheduledTour.getTour();
 				for (TourElement element : tour.getTourElements()) {
 					if (element instanceof Tour.ServiceActivity serviceActivity) {
-						LSPShipmentCarrierServicePair carrierPair =
-							new LSPShipmentCarrierServicePair(
-								LspShipment, serviceActivity.getService());
+						LSPShipmentCarrierServicePair carrierPair = new LSPShipmentCarrierServicePair(LspShipment, serviceActivity.getService());
 						for (LSPShipmentCarrierServicePair pair : pairs) {
 							if (pair.lspShipment == carrierPair.lspShipment
 								&& pair.carrierService.getId() == carrierPair.carrierService.getId()) {
@@ -332,7 +342,7 @@ import org.matsim.vehicles.VehicleType;
 		for (LogisticChainElement element : this.resource.getClientElements()) {
 			if (element.getIncomingShipments().getLspShipmentsWTime().contains(lspShipment)) {
 				LSPTourStartEventHandler handler =
-					new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour, null);
+            new LSPTourStartEventHandler(lspShipment, carrierService, element, resource, tour);
 				lspShipment.addSimulationTracker(handler);
 				break;
 			}

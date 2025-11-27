@@ -30,10 +30,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultRoutingRequest;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.RoutingRequest;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.Facility;
@@ -49,6 +51,7 @@ public class SharingLogic {
 	private final RoutingModule accessEgressRoutingModule;
 	private final RoutingModule mainModeRoutingModule;
 
+	private final Scenario scenario;
 	private final Network network;
 	private final PopulationFactory populationFactory;
 	private final EventsManager eventsManager;
@@ -64,9 +67,10 @@ public class SharingLogic {
 
 		this.accessEgressRoutingModule = accessEgressRoutingModule;
 		this.mainModeRoutingModule = mainModeRoutingModule;
-
-		this.network = scenario.getNetwork();
-		this.populationFactory = scenario.getPopulation().getFactory();
+		
+		this.scenario = scenario;
+		this.network = this.scenario.getNetwork();
+		this.populationFactory = this.scenario.getPopulation().getFactory();
 		this.timeInterpretation = timeInterpretation;
 	}
 
@@ -84,6 +88,8 @@ public class SharingLogic {
 
 		if (closestVehicleInteraction.isPresent()) {
 			Id<Link> vehicleLinkId = closestVehicleInteraction.get().getLinkId();
+			SharingVehicle sharingVehicle = closestVehicleInteraction.get().getVehicle();
+			Id<Vehicle> routingVehicleId = sharingVehicle.getVehicleId();
 
 			// We need to get to the closest vehicle after this activity ...
 
@@ -102,8 +108,9 @@ public class SharingLogic {
 			// If the pickup location is the same as dropoff location we return false
 			// and consider agent stuck
 
-			if (dropoffActivity.getLinkId().equals(vehicleLinkId))
+			if (dropoffActivity.getLinkId().equals(vehicleLinkId)) {
 				return false;
+			}
 
 			plan.getPlanElements().subList(bookingActivityIndex + 1, dropoffActivityIndex).clear();
 
@@ -123,17 +130,17 @@ public class SharingLogic {
 
 			// 3) Leg to dropoff activity
 			List<? extends PlanElement> mainElements = routeMainStage(vehicleLinkId, dropoffActivity.getLinkId(), now,
-					agent);
+					agent, routingVehicleId);
 			updatedElements.addAll(mainElements);
 
 			// Insert new plan elements
 			plan.getPlanElements().addAll(bookingActivityIndex + 1, updatedElements);
-			setVehicle(plan,mainElements, closestVehicleInteraction.get().getVehicle());
+			setVehicle(plan, mainElements, sharingVehicle);
 
-			service.reserveVehicle(agent,closestVehicleInteraction.get().getVehicle());
+			service.reserveVehicle(agent, sharingVehicle);
 			eventsManager.processEvent(new SharingReservingEvent(currentTime, service.getId(),
-					agent.getId(), bookingActivity.getLinkId(), closestVehicleInteraction.get().getVehicle().getId(),
-					closestVehicleInteraction.get().getStationId(), dropoffActivity.getLinkId()));
+					agent.getId(), bookingActivity.getLinkId(), sharingVehicle.getId(),
+							closestVehicleInteraction.get().getStationId(), dropoffActivity.getLinkId()));
 
 			return true;
 		} else {
@@ -170,15 +177,17 @@ public class SharingLogic {
 
 		if (selectedVehicleInteraction.isPresent()) {
 			Id<Link> vehicleLinkId = selectedVehicleInteraction.get().getLinkId();
+			SharingVehicle sharingVehicle = selectedVehicleInteraction.get().getVehicle();
+			Id<Vehicle> vehicleId = sharingVehicle.getVehicleId();
 
 			if (vehicleLinkId.equals(pickupActivity.getLinkId())) {
 				// We are at the current location. We can pick up the vehicle.
-				service.pickupVehicle(selectedVehicleInteraction.get().getVehicle(), agent);
-				activeVehicles.put(agent.getId(), selectedVehicleInteraction.get().getVehicle());
+				service.pickupVehicle(sharingVehicle, agent);
+				activeVehicles.put(agent.getId(), sharingVehicle);
 
 				eventsManager.processEvent(new SharingPickupEvent(now, service.getId(), agent.getId(), vehicleLinkId,
-						selectedVehicleInteraction.get().getVehicle().getId(),
-						selectedVehicleInteraction.get().getStationId()));
+						sharingVehicle.getId(),
+								selectedVehicleInteraction.get().getStationId()));
 			} else {
 				// The closest vehicle is not here, we need to get there after this activity ...
 
@@ -218,9 +227,9 @@ public class SharingLogic {
 
 				// 3) Leg to dropoff activity
 				List<? extends PlanElement> mainElements = routeMainStage(vehicleLinkId, dropoffActivity.getLinkId(),
-						now, agent);
+						now, agent, vehicleId);
 				updatedElements.addAll(mainElements);
-				setVehicle(plan, mainElements, selectedVehicleInteraction.get().getVehicle());
+				setVehicle(plan, mainElements, sharingVehicle);
 
 				// Insert new plan elements
 				plan.getPlanElements().addAll(pickupActivityIndex + 1, updatedElements);
@@ -287,25 +296,28 @@ public class SharingLogic {
 		Activity dropoffActivity = (Activity) plan.getPlanElements().get(dropoffActivityIndex);
 		Verify.verify(dropoffActivity.getType().equals(SharingUtils.DROPOFF_ACTIVITY));
 
-		SharingVehicle vehicle = activeVehicles.get(agent.getId());
-		Verify.verifyNotNull(vehicle);
+		SharingVehicle sharingVehicle = activeVehicles.get(agent.getId());
+		Id<Vehicle> routingVehicleId = sharingVehicle.getVehicleId();
+		Verify.verifyNotNull(sharingVehicle);
 
 		// Find the closest place to drop off the vehicle and hope we're already there ...
-		InteractionPoint closestDropoffInteraction = service.findClosestDropoffLocation(vehicle, agent);
+		InteractionPoint closestDropoffInteraction = service.findClosestDropoffLocation(sharingVehicle, agent);
 
 		if (closestDropoffInteraction.getLinkId().equals(dropoffActivity.getLinkId())) {
 			// We're at the right spot. Drop the vehicle here.
-			service.dropoffVehicle(vehicle, agent);
+			service.dropoffVehicle(sharingVehicle, agent);
 			activeVehicles.remove(agent.getId());
 
 			eventsManager.processEvent(new SharingDropoffEvent(now, service.getId(), agent.getId(),
-					closestDropoffInteraction.getLinkId(), vehicle.getId(), closestDropoffInteraction.getStationId()));
+					closestDropoffInteraction.getLinkId(), sharingVehicle.getId(),
+					closestDropoffInteraction.getStationId()));
 			service.releaseReservation(agent); // Release the reservation after successful drop off
 		} else {
 			// We cannot drop the vehicle here, so let's try the proposed place
 
 			eventsManager.processEvent(new SharingFailedDropoffEvent(now, service.getId(), agent.getId(),
-					closestDropoffInteraction.getLinkId(), vehicle.getId(), closestDropoffInteraction.getStationId()));
+					closestDropoffInteraction.getLinkId(), sharingVehicle.getId(),
+					closestDropoffInteraction.getStationId()));
 
 			// Remove everything until the end of the trip
 			int destinationActivityIndex = findNextOrdinaryActivityIndex(dropoffActivityIndex, plan);
@@ -318,11 +330,11 @@ public class SharingLogic {
 
 			// 1) Leg to new dropoff activity
 			List<? extends PlanElement> mainElements = routeMainStage(dropoffActivity.getLinkId(),
-					closestDropoffInteraction.getLinkId(), now, agent);
+					closestDropoffInteraction.getLinkId(), now, agent, routingVehicleId);
 			updatedElements.addAll(mainElements);
 			now = timeInterpretation.decideOnElementsEndTime(mainElements, now).seconds();
 
-			setVehicle(plan,mainElements,vehicle);
+			setVehicle(plan, mainElements, sharingVehicle);
 
 			// 2) Dropoff activity
 			Activity updatedPickupActivity = createDropoffActivity(now, closestDropoffInteraction);
@@ -330,8 +342,9 @@ public class SharingLogic {
 			now = timeInterpretation.decideOnElementEndTime(updatedPickupActivity, now).seconds();
 
 			// 3) Leg to destination
+			Id<Link> destinationLinkId = PopulationUtils.decideOnLinkIdForActivity(destinationActivity, this.scenario);
 			List<? extends PlanElement> accessElements = routeAccessEgressStage(closestDropoffInteraction.getLinkId(),
-					destinationActivity.getLinkId(), now, agent);
+					destinationLinkId, now, agent);
 			updatedElements.addAll(accessElements);
 
 			// Insert new plan elements
@@ -377,12 +390,23 @@ public class SharingLogic {
 	}
 
 	private List<? extends PlanElement> routeMainStage(Id<Link> originId, Id<Link> destinationId, double departureTime,
-													   MobsimAgent agent) {
+			MobsimAgent agent, Id<Vehicle> routingVehicleId) {
 		Facility originFacility = new LinkWrapperFacility(network.getLinks().get(originId));
 		Facility destinationFacility = new LinkWrapperFacility(network.getLinks().get(destinationId));
 
-		return mainModeRoutingModule.calcRoute(DefaultRoutingRequest.of(originFacility, destinationFacility,
-				departureTime, ((PlanAgent) agent).getCurrentPlan().getPerson(), getCurrentTripAttributes(agent)));
+		// we set the vehicle id attribute to the sharing vehicle used by the person
+		RoutingRequest routingRequest = DefaultRoutingRequest.of(originFacility, destinationFacility,
+				departureTime, ((PlanAgent) agent).getCurrentPlan().getPerson(), getCurrentTripAttributes(agent));
+		routingRequest.getAttributes().putAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID, routingVehicleId);
+
+		List<? extends PlanElement> route = mainModeRoutingModule.calcRoute(routingRequest);
+
+		if (routingVehicleId != null) {
+			// we remove it, because the attributes object might be referenced elsewhere
+			routingRequest.getAttributes().removeAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		}
+
+		return route;
 	}
 
 	private int findNextOrdinaryActivityIndex(int currentIndex, Plan plan) {

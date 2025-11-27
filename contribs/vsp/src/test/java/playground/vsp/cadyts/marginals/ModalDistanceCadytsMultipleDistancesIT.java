@@ -30,7 +30,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;

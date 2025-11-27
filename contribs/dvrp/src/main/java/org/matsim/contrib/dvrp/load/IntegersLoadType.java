@@ -96,9 +96,13 @@ public class IntegersLoadType implements DvrpLoadType {
             // list of numbers
 
             String[] components = representation.split(",");
-            int[] values = new int[components.length];
+            if (components.length > dimensions.size()) {
+                throw new IllegalStateException("Too many load values given: " + representation);
+            }
 
-            for (int k = 0; k < values.length; k++) {
+            int[] values = new int[dimensions.size()];
+
+            for (int k = 0; k < components.length; k++) {
                 values[k] = Integer.parseInt(components[k].trim());
             }
 

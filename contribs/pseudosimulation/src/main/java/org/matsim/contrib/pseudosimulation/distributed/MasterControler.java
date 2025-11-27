@@ -147,7 +147,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         masterInitialLogString.append("Estimated memory use per plan is " + bytesPerPlan + " bytes\n");
 
         matsimControler = new Controler(scenario);
-        matsimControler.addControlerListener(new SlaveScoreWriter(this));
+        matsimControler.addControllerListener(new SlaveScoreWriter(this));
 
         //split the population to be sent to the slaveHandlers
 
@@ -198,7 +198,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 addPlanStrategyBinding("ReplacePlanFromSlave").toProvider(new ReplacePlanFromSlaveFactory(newPlans));
             }
         });
-        matsimControler.addControlerListener(this);
+        matsimControler.addControllerListener(this);
 
 
 
@@ -208,7 +208,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 //                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 //                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         if (TrackGenome) {
-            matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
+            matsimControler.addControllerListener(new GenomeAnalysis(true, false, true));
         }
 
     }

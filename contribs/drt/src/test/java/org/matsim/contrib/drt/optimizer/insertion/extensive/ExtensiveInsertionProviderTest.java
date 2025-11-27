@@ -113,6 +113,6 @@ public class ExtensiveInsertionProviderTest {
 
 	private InsertionWithDetourData insertionWithDetourData(Insertion insertion) {
 		return new InsertionWithDetourData(insertion, new InsertionDetourData(null, null, null, null),
-				new DetourTimeInfo(new PickupDetourInfo(11, Double.NaN), null));
+				new DetourTimeInfo(new PickupDetourInfo(11, 11, Double.NaN), null));
 	}
 }

@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 

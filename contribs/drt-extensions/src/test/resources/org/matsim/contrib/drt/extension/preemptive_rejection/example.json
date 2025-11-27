@@ -1,0 +1,16 @@
+{
+    "rejections": [
+        {
+            "start_time": 21600.0,
+            "end_time": 43200.0,
+            "booking_class": "business",
+            "rejection_rate": 0.25
+        },
+        {
+            "start_time": 46800.0,
+            "end_time": 72000.0,
+            "booking_class": "business",
+            "rejection_rate": 0.5
+        }
+    ]
+}

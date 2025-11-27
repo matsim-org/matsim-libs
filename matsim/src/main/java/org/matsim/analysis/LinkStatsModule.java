@@ -37,8 +37,8 @@ public final class LinkStatsModule extends AbstractModule {
 		    15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
 		    traveltimes in linkStats are the avg. traveltimes between xx.00 and
 		    xx.15, and not between xx.00 and xx.59*/
-            bind(LinkStatsControlerListener.class).asEagerSingleton();
-            addControlerListenerBinding().to(LinkStatsControlerListener.class);
+            bind(LinkStatsControllerListener.class).asEagerSingleton();
+            addControllerListenerBinding().to(LinkStatsControllerListener.class);
         }
     }
 

@@ -27,5 +27,5 @@ public interface VehicleSelection{
 	 * @param smallScaleCommercialTrafficType Selected traffic types. Options: commercialPersonTraffic, goodsTraffic
 	 * @return class holding the information that is specified by the given entry.
 	 */
-	OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, String smallScaleCommercialTrafficType);
+	OdMatrixEntryInformation getOdMatrixEntryInformation(int purpose, String modeORvehType, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType);
 }

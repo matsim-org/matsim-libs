@@ -28,7 +28,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.

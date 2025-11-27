@@ -127,7 +127,7 @@ public class InnovationSwitchOffTest {
 				}));
 				install(new ScenarioByConfigModule());
 				final Provider<StrategyManager> strategyManagerProvider = binder().getProvider(StrategyManager.class );
-				addControlerListenerBinding().toInstance(new BeforeMobsimListener() {
+				addControllerListenerBinding().toInstance(new BeforeMobsimListener() {
 					@Override
 					public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 						System.out.flush();

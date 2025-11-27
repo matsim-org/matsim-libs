@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.shared_mobility.run.SharingConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingModule;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup;
 import org.matsim.contrib.shared_mobility.run.SharingServiceConfigGroup.ServiceScheme;
+import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.contrib.shared_mobility.service.SharingUtils;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.CommandLine.ConfigurationException;
@@ -56,7 +58,7 @@ public class RunTeleportationBikesharing {
 		sharingConfig.addService(serviceConfig);
 
 		// ... with a service id. The respective mode will be "sharing:velib".
-		serviceConfig.setId("velib");
+		serviceConfig.setIdFromString("velib");
 
 		// ... with freefloating characteristics
 		serviceConfig.setMaximumAccessEgressDistance(100000);
@@ -64,7 +66,8 @@ public class RunTeleportationBikesharing {
 		serviceConfig.setServiceAreaShapeFile(null);
 
 		// ... with a number of available vehicles and their initial locations
-		// the following file is an example and it works with the siouxfalls-2014 scenario
+		// the following file is an example and it works with the siouxfalls-2014
+		// scenario
 		serviceConfig.setServiceInputFile("shared_taxi_vehicles_stations.xml");
 
 		// ... and, we need to define the underlying mode, here "bike".

@@ -28,7 +28,7 @@ import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 
 /**

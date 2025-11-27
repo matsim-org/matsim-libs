@@ -34,7 +34,7 @@ import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.Arrays;
 
 public class TripRouterFactoryBuilderWithDefaults {

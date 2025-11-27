@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.DoubleStream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +35,7 @@ import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
 import com.google.common.base.MoreObjects;
 
 /**
- * A task representing stopping at a bus stop with at least one or more passengers being picked up or dropped off.
+ * A task representing stopping at a bus stop where one or more passengers may be picked up or dropped off.
  * <p>
  * Note that we can have both dropoff requests and pickup requests for the same stop.  kai, nov'18
  *
@@ -93,5 +94,47 @@ public class DefaultDrtStopTask extends DefaultStayTask implements DrtStopTask {
 	@Override
 	public void removeDropoffRequest(Id<Request> requestId) {
 		dropoffRequests.remove(requestId);
+	}
+
+	@Override
+	public double calcLatestArrivalTime() {
+		return getMaxTimeConstraint(
+					getDropoffRequests().values()
+							.stream()
+							.mapToDouble(request -> request.getLatestArrivalTime() - request.getDropoffDuration()),
+					getBeginTime()
+		);
+	}
+
+	@Override
+	public double calcLatestDepartureTime() {
+		return getMaxTimeConstraint(
+					getPickupRequests().values()
+							.stream()
+							.mapToDouble(AcceptedDrtRequest::getLatestStartTime),
+					getEndTime()
+		);
+	}
+
+	@Override
+	public double calcEarliestArrivalTime() {
+		return getPickupRequests().values()
+					.stream()
+					.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
+					.min()
+					.orElse(0);
+	}
+
+	@Override
+	public double calcEarliestDepartureTime() {
+		// no restriction on earliest departure time in default implementation
+		return Double.NEGATIVE_INFINITY;
+	}
+
+	private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
+		//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
+		//thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
+		//but we cannot add a new stop before the delayed task
+		return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
 	}
 }

@@ -55,6 +55,7 @@ public class ConfigUtils implements MatsimExtensionPoint {
 	public static Config createConfig() {
 		Config config = new Config();
 		config.addCoreModules();
+		config.global().setInsistingOnDeprecatedConfigVersion(false); // IMO: The default should be "false". -> Change in {@link GlobalConfigGroup}.  kmt, Aug'24
 		return config;
 	}
 

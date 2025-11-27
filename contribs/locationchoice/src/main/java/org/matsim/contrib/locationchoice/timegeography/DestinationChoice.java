@@ -42,7 +42,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 class DestinationChoice extends AbstractMultithreadedModule {
 

@@ -81,5 +81,12 @@
 
     </module>
 
+	<module name="routing">
+
+		<param name="networkModes" value="car" />
+		<param name="accessEgressType" value="accessEgressModeToLink"/>
+
+	</module>
+
 
 </config>

@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
- * 
+ *
  * @author aneumann
  *
  */
@@ -54,7 +54,7 @@ final class OperatorInitializer {
 			TimeProvider timeProvider) {
 		this.pConfig = pConfig;
 		this.operatorFactory = new OperatorFactory(this.pConfig, franchise);
-		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
+		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControllerIO().getOutputPath(), controler.getEvents());
 
 		if (this.pConfig.getStartWith24Hours()) {
 			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
@@ -69,7 +69,7 @@ final class OperatorInitializer {
 
 	/**
 	 * Creates operators from a given transit schedule
-	 *  
+	 *
 	 * @param originalSchedule The transit schedule given
 	 * @return A list containing the operators created
 	 */
@@ -79,7 +79,7 @@ final class OperatorInitializer {
 
 	/**
 	 * Create the number of additional operators
-	 * 
+	 *
 	 * @param pStrategyManager
 	 * @param iteration
 	 * @param numberOfNewOperators

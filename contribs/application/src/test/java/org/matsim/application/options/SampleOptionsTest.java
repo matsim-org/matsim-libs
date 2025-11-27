@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.matsim.application.MATSimAppCommand;
 import picocli.CommandLine;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SampleOptionsTest {
 
 	@Test
 	void flexible() {
 
-		AtomicInteger size = new AtomicInteger();
+		AtomicDouble size = new AtomicDouble();
 		AtomicDouble dSize = new AtomicDouble();
 
 		MATSimAppCommand command = new MATSimAppCommand() {
@@ -32,16 +32,20 @@ public class SampleOptionsTest {
 		command.execute("--sample-size", "0.5");
 
 		Assertions.assertThat(size.get())
-				.isEqualTo(50);
+			.isEqualTo(50);
 
 		Assertions.assertThat(dSize.get())
-				.isEqualTo(0.5);
+			.isEqualTo(0.5);
 	}
+
 
 	@Test
 	void fixed() {
 
-		AtomicInteger size = new AtomicInteger();
+		AtomicDouble size = new AtomicDouble();
+
+		String name = "plans-42pct.xml";
+		AtomicReference<String> adjustedName = new AtomicReference<>();
 
 		MATSimAppCommand command = new MATSimAppCommand() {
 
@@ -51,6 +55,7 @@ public class SampleOptionsTest {
 			@Override
 			public Integer call() throws Exception {
 				size.set(sample.getSize());
+				adjustedName.set(sample.adjustName(name));
 				return 0;
 			}
 		};
@@ -58,8 +63,43 @@ public class SampleOptionsTest {
 		command.execute("--10pct");
 
 		Assertions.assertThat(size.get())
-				.isEqualTo(10);
+			.isEqualTo(10);
+
+		Assertions.assertThat(adjustedName.get().equals("plans-10pct.xml")).isTrue();
 	}
 
 
+	@Test
+	void smallSample() {
+
+		AtomicDouble size = new AtomicDouble();
+		AtomicDouble dSize = new AtomicDouble();
+
+		String name = "plans-42pct.xml";
+		AtomicReference<String> adjustedName = new AtomicReference<>();
+
+		MATSimAppCommand command = new MATSimAppCommand() {
+
+			@CommandLine.Mixin
+			private SampleOptions sample;
+
+			@Override
+			public Integer call() throws Exception {
+				size.set(sample.getSize());
+				dSize.set(sample.getSample());
+				adjustedName.set(sample.adjustName(name));
+				return 0;
+			}
+		};
+
+		command.execute("--sample-size", "0.001");
+
+		Assertions.assertThat(size.get())
+			.isEqualTo(0.1);
+
+		Assertions.assertThat(dSize.get())
+			.isEqualTo(0.001);
+
+		Assertions.assertThat(adjustedName.get().equals("plans-0.1pct.xml")).isTrue();
+	}
 }

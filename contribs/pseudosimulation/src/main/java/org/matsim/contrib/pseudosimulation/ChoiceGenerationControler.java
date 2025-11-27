@@ -21,7 +21,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.pt.router.TransitRouter;
 
 import com.google.inject.Provider;
 
@@ -89,7 +88,7 @@ public ChoiceGenerationControler(String[] args) {
             });
         }
     });
-    controler.addControlerListener(this);
+    controler.addControllerListener(this);
 }
     public void run(){
 

@@ -26,7 +26,7 @@ import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @author nagel
@@ -54,7 +54,8 @@ public final class DefaultRoutingModules {
 				mode,
 			  scenario,
 				params.getTeleportedModeSpeed(),
-                params.getBeelineDistanceFactor() );
+                params.getBeelineDistanceFactor(),
+				params.getPersonSpeedAttribute() );
 	}
 
 	/**
@@ -63,11 +64,12 @@ public final class DefaultRoutingModules {
 	@Deprecated // use AccessEgressNetworkRouter instead
 	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
 		return new NetworkRoutingModule(
-				mode,
-				popFact,
-				net,
-				routeAlgo);
+			mode,
+			popFact,
+			net,
+			routeAlgo);
 	}
+
 
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19

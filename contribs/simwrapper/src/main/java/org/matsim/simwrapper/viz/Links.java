@@ -26,6 +26,12 @@ public class Links extends Viz {
 	public double[] center;
 
 	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+
+	/**
 	 * Sets the display options for the map.
 	 */
 	public Display display = new Display();

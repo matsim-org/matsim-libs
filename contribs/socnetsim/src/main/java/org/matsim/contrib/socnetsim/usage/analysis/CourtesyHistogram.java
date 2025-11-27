@@ -23,7 +23,7 @@ import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
 import org.matsim.contrib.socnetsim.framework.events.CourtesyEventHandler;
 import org.matsim.core.utils.misc.Time;
 
-import jakarta.inject.Singleton;
+import com.google.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -77,7 +77,7 @@ public class CourtesyHistogram implements CourtesyEventHandler {
 	public void handleEvent(final CourtesyEvent event) {
 		int index = getBinIndex(event.getTime());
 		final DataFrame data = getData( event.getActType() );
-		switch ( event.getType() ) {
+		switch ( event.getTypeEnum() ) {
 			case sayHelloEvent:
 				data.countsHello[ index ]++;
 				break;

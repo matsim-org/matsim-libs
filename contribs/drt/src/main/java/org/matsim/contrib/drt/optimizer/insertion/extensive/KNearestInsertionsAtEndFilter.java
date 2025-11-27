@@ -49,7 +49,7 @@ class KNearestInsertionsAtEndFilter {
 			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion);
 			} else if (k > 0) {
-				nearestInsertionsAtEnd.add(new InsertionWithCost(i, i.detourTimeInfo.pickupDetourInfo.departureTime));
+				nearestInsertionsAtEnd.add(new InsertionWithCost(i, i.detourTimeInfo.pickupDetourInfo.requestPickupTime));
 			}
 		}
 

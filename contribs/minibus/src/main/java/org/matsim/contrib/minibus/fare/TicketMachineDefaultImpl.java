@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.minibus.fare;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.contrib.minibus.PConfigGroup;
 

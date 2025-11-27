@@ -45,16 +45,6 @@ By default, one person is mapped to one slot of the capacity. This is set by def
 
 This example indicates that, if no other load information is provided for a trip/person, a unit load is assumed for the slot *passengers*. An exception will be thrown if the option is set to null. This way, the user can enforce that a load is defined for every request.
 
-### Defining vehicle capacities from the fleet file
-
-One option of loading vehicles for a DVRP mode is to use a fleet file with its respective format. In the fleet file, each *vehicle* has a *capacity* given as an integer. This value is transformed into a capacity by assigning the given integer to a slot that is configurable:
-
-```xml
-<parameterset name="load">
-  <param name="mapFleetCapacity" value="passengers">
-</parameterset>
-```
-
 ### Defining vehicle capacities from the vehicles file
 
 When reading the vehicles for the DVRP fleet from a vehicles file, each vehicle can have a `dvrp:capacity` attribute defining the quantities that are assigned to each capacity slot:
@@ -82,6 +72,14 @@ If neither the vehicle, nor the vehilce type, define capacities, the quantities 
   <param name="mapVehicleTypeWeight" value="luggage">
   <param name="mapVehicleTypeOther" value="null">
 </parameterset>
+```
+
+### Defining vehicle capacities from the fleet file
+
+One option of loading vehicles for a DVRP mode is to use a fleet file with its respective format. In the fleet file, each *vehicle* has a *capacity*. This value can either be given as an integer (referring to the first dimension of the load, i.e., passengers by default) or as a complex capacity of the format described above:
+
+```xml
+<vehicle id="drt1" ... capacity="passengers=4,luggage=8" />
 ```
 
 ### Defining an even more complex load/capacity logic

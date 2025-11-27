@@ -36,13 +36,13 @@ public class VehicleEntry {
 
 	public final DvrpVehicle vehicle;
 	public final Waypoint.Start start;
-	public final ImmutableList<Waypoint.Stop> stops;
+	public final ImmutableList<StopWaypoint> stops;
 	public final Waypoint.End end;
 	private final double[] slackTimes;// for all insertion points (start, stops, end)
 	private final List<Double> precedingStayTimes;// for all stops
 	public final double createTime;
 
-	public VehicleEntry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<Waypoint.Stop> stops,
+	public VehicleEntry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<StopWaypoint> stops,
 			double[] slackTimes, List<Double> precedingStayTimes, double createTime) {
 		this.vehicle = vehicle;
 		this.start = start;

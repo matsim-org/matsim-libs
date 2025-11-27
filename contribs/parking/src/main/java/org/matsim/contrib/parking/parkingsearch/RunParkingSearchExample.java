@@ -82,7 +82,7 @@ public class RunParkingSearchExample {
 			public void install() {
 				ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
 				addEventHandlerBinding().toInstance(visualiser);
-				addControlerListenerBinding().toInstance(visualiser);
+				addControllerListenerBinding().toInstance(visualiser);
 			}
 		});
 		if (otfvis) {

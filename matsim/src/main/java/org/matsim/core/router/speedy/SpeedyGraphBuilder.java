@@ -1,10 +1,12 @@
 package org.matsim.core.router.speedy;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
 import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 
 import java.util.ArrayList;
@@ -26,25 +28,34 @@ public class SpeedyGraphBuilder {
 	private Link[] links;
 	private Node[] nodes;
 
+	@Deprecated // use build-method with additional mode argument
 	public static SpeedyGraph build(Network network) {
-		if (hasTurnRestrictions(network)) {
-			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network);
+		return build(network, null);
+	}
+
+	/**
+	 * Builds a routing graph from a network considering all links without caring
+	 * about allowedModes but considering {@link DisallowedNextLinks} (aka turn
+	 * restrictions) of the given {@code turnRestrictionsMode}.
+	 *
+	 * If turnRestrictionsMode == null, see
+	 * {@link TurnRestrictionsContext#build(Network, String)} for how this is
+	 * handled.
+	 *
+	 * @param network
+	 * @param turnRestrictionsMode
+	 * @return
+	 */
+	public static SpeedyGraph build(Network network, @Nullable String turnRestrictionsMode) {
+		if (NetworkUtils.hasTurnRestrictions(network)) {
+			return new SpeedyGraphBuilder().buildWithTurnRestrictions(network, turnRestrictionsMode);
 		}
 		return new SpeedyGraphBuilder().buildWithoutTurnRestrictions(network);
 	}
 
-	private static boolean hasTurnRestrictions(Network network) {
-		for (Link link : network.getLinks().values()) {
-			if (NetworkUtils.getDisallowedNextLinks(link) != null) {
-				return true;
-			}
-		}
-		return false;
-	}
+	private SpeedyGraph buildWithTurnRestrictions(Network network, @Nullable String turnRestrictionsMode) {
 
-	private SpeedyGraph buildWithTurnRestrictions(Network network) {
-
-		TurnRestrictionsContext context = TurnRestrictionsContext.build(network);
+		TurnRestrictionsContext context = TurnRestrictionsContext.build(network, turnRestrictionsMode);
 
 		// create routing graph from context
 		this.nodeCount = context.getNodeCount();
@@ -76,7 +87,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, true);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, context);
 	}
 
 	private SpeedyGraph buildWithoutTurnRestrictions(Network network) {
@@ -101,7 +112,7 @@ public class SpeedyGraphBuilder {
 			addLink(link);
 		}
 
-		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, false);
+		return new SpeedyGraph(this.nodeData, this.linkData, this.nodes, this.links, null);
 	}
 
 	private void addLink(Link link) {

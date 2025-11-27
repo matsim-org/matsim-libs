@@ -217,7 +217,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	private Table createDataset(Network network, TrafficStatsCalculator calc, VolumesAnalyzer volumes) {
 
 		Table all = Table.create(
-			TextColumn.create("link_id"),
+			StringColumn.create("link_id"),
 			IntColumn.create("hour"),
 			StringColumn.create("road_type"),
 			DoubleColumn.create("lane_km"),

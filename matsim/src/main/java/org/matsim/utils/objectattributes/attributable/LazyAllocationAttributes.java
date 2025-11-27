@@ -45,36 +45,56 @@ public final class LazyAllocationAttributes implements Attributes {
 			attributes = new AttributesImpl();
 			this.consumer.accept(attributes);
 		}
-		attributes.putAttribute(attribute, value);
-		return null;
+		return attributes.putAttribute(attribute, value);
 	}
 
 	@Override
 	public Object getAttribute(String attribute) {
-		return null;
+		Attributes attributes = this.supplier.get();
+		if (Objects.isNull(attributes)) {
+			return null;
+		}
+		return attributes.getAttribute(attribute);
 	}
 
 	@Override
 	public Object removeAttribute(String attribute) {
-		return null;
+		Attributes attributes = this.supplier.get();
+		if (Objects.isNull(attributes)) {
+			return null;
+		}
+		return attributes.removeAttribute(attribute);
 	}
 
 	@Override
 	public void clear() {
+		Attributes attributes = this.supplier.get();
+		if (!Objects.isNull(attributes)) {
+			attributes.clear();
+		}
 	}
 
 	@Override
 	public Map<String, Object> getAsMap() {
-		return Collections.emptyMap();
+		Attributes attributes = this.supplier.get();
+		if (Objects.isNull(attributes)) {
+			return Collections.emptyMap();
+		}
+		return attributes.getAsMap();
 	}
 
 	@Override
 	public int size() {
-		return 0;
+		Attributes attributes = this.supplier.get();
+		if (Objects.isNull(attributes)) {
+			return 0;
+		}
+		return attributes.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return true;
+		Attributes attributes = this.supplier.get();
+		return Objects.isNull(attributes) || attributes.isEmpty();
 	}
 }

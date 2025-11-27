@@ -181,6 +181,13 @@ public final class EmissionModule {
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}
 
+		if(emissionConfigGroup.getHbefaConsistencyChecker() == EmissionsConfigGroup.UseHbefaConsistencyChecker.check){
+			logger.info("Checking consistency of hbefa-tables");
+			HbefaConsistencyChecker.checkConsistency(emissionConfigGroup.getDetailedVsAverageLookupBehavior(), avgHbefaWarmTable, detailedHbefaWarmTable, avgHbefaColdTable, detailedHbefaColdTable);
+		} else {
+			logger.warn("Consistency Checker for HBEFA Tables is disabled. Make sure that your HBEFA files are valid!");
+		}
+
 		logger.info("leaving createLookupTables");
 
 		//create HBEFA Speed tables. try on detailed values first.

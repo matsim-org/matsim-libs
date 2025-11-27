@@ -1,5 +1,6 @@
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -9,13 +10,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import jakarta.inject.Inject;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.Objects;
 
 public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCalculator {
 	private static final Logger log = LogManager.getLogger(BicycleLinkSpeedCalculatorDefaultImpl.class );
+	@Inject private BicycleParams params;
 	@Inject private BicycleConfigGroup bicycleConfigGroup;
 	@Inject private QSimConfigGroup qSimConfigGroup;
 	@Inject private Config config;
@@ -45,9 +46,12 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
 
 		// prior to matsim 12.0 routers would not pass a vehicle. This is why we have a fallback for a default value from the config
-		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
+//		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
+		// when using bicycle, one should always have vehicles with individual maximum speeds, possibly by using modeVehicleTypes.
+
+		double maxBicycleSpeed = vehicle.getType().getMaximumVelocity();
 		double bicycleInfrastructureFactor = computeInfrastructureFactor(link);
-		double surfaceFactor = computeSurfaceFactor(link);
+		double surfaceFactor = params.computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);
 		double speed = maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
 		return Math.min(speed, link.getFreespeed());
@@ -79,69 +83,12 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 		return factor;
 	}
 
-	// TODO combine this with comfort
-	private double computeSurfaceFactor(Link link) {
-		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
-				|| BicycleUtils.CYCLEWAY.equals(link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE))
-				|| hasNotAttribute(link, BicycleUtils.SURFACE)
-		) {
-			return 1.0;
-		}
-
-		//so, the link is NOT a cycleway, and has a surface attribute
-		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
-		switch (Objects.requireNonNull(surface)) {
-			case "paved":
-			case "asphalt":
-				return 1.0;
-
-			case "cobblestone (bad)":
-			case "grass":
-				return 0.4;
-
-			case "cobblestone;flattened":
-			case "cobblestone:flattened":
-			case "sett":
-			case "earth":
-				return 0.6;
-
-			case "concrete":
-			case "asphalt;paving_stones:35":
-			case "compacted":
-				return 0.9;
-
-			case "concrete:lanes":
-			case "concrete_plates":
-			case "concrete:plates":
-			case "paving_stones:3":
-				return 0.8;
-
-			case "paving_stones":
-			case "paving_stones:35":
-			case "paving_stones:30":
-			case "compressed":
-			case "bricks":
-			case "stone":
-			case "pebblestone":
-			case "fine_gravel":
-			case "gravel":
-			case "ground":
-				return 0.7;
-
-			case "sand":
-				return 0.2;
-
-			default:
-				return 0.5;
-		}
-	}
-
 	private double computeInfrastructureFactor(Link link) {
 		var speedFactor = link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR);
 		return speedFactor == null ? 1.0 : Double.parseDouble(speedFactor.toString());
 	}
 
-	private boolean hasNotAttribute(Link link, String attributeName) {
+	static boolean hasNotAttribute(Link link, String attributeName) {
 		return link.getAttributes().getAttribute(attributeName) == null;
 	}
 
@@ -155,7 +102,7 @@ public final class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkS
 		final VehicleType vehicleType = qVehicle.getVehicle().getType();
 
 		// the below consistentcy check is to broad; need a version that is more narrow ...
-		
+
 //		if ( qSimConfigGroup.getVehiclesSource()== QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData ) {
 //			if ( !vehicleType.getId().toString().equals( vehicleType.getNetworkMode() ) ) {
 //				throw new RuntimeException( "You are using mode vehicles but the network mode of the vehicle type is wrong: vehType.id=" + vehicleType.getId()

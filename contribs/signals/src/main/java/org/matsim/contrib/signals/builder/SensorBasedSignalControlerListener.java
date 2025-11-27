@@ -34,7 +34,7 @@ import com.google.inject.Inject;
 
 /**
  * also works without sensor-based signals, i.e. plan-based signals and also without signals at all.
- * 
+ *
  * @author dgrether, tthunig
  */
 final class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
@@ -42,7 +42,7 @@ final class SensorBasedSignalControlerListener implements SignalControlerListene
 
 	@Inject(optional = true) SignalSystemsManager signalManager = null;
 	@Inject(optional = true) LinkSensorManager sensorManager = null;
-	
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (this.sensorManager != null)
@@ -51,11 +51,11 @@ final class SensorBasedSignalControlerListener implements SignalControlerListene
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
+		this.writeData(event.getServices().getScenario(), event.getServices().getControllerIO());
 	}
-	
+
 	private void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
-	}	
-	
+	}
+
 }

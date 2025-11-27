@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 /**
  * @author dgrether
  */
-public interface BeforeMobsimListener extends ControlerListener {
+public interface BeforeMobsimListener extends ControllerListener {
 	/**
 	 * Notifies all observers of the Controler that the mobility simulation will start next.
 	 * @param event

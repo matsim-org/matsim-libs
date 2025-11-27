@@ -166,8 +166,8 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		this.durationHistory = new double[this.sortedModes.size() + 1][iterations + 1];
 
 		if (autoConfig) {
-			this.tripsFileName = event.getServices().getControlerIO().getOutputFilename(defaultTripsFileName);
-			this.durationsFileName = event.getServices().getControlerIO().getOutputFilename(defaultDurationsFileName);
+			this.tripsFileName = event.getServices().getControllerIO().getOutputFilename(defaultTripsFileName);
+			this.durationsFileName = event.getServices().getControllerIO().getOutputFilename(defaultDurationsFileName);
 
 			controler.getEvents().addHandler(this);
 		}

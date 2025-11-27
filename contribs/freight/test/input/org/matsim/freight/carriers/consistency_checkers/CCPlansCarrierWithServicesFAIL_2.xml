@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers>
+	<carrier id="carrier1">
+		<attributes>
+			<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+		</attributes>
+		<capabilities fleetSize="INFINITE">
+			<vehicles>
+				<vehicle id="heavy_truck" depotLinkId="j(0,1)R" typeId="heavy_truck" earliestStart="06:00:00" latestEnd="16:00:00"/>
+			</vehicles>
+
+		</capabilities>
+
+		<services>
+			<service id="parcel_1" to="j(9,7)" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_2" to="j(6,1)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_3" to="i(5,6)" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_4" to="j(4,2)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_5" to="j(9,2)" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_6" to="i(3,7)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_7" to="i(7,7)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+			<service id="parcel_8" to="i(7,7)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="22:00:00" serviceDuration="00:05:00"/>
+		</services>
+
+		<plan score="-210.81333333333333" selected="true">
+			<tour vehicleId="heavy_truck">
+				<act type="start" end_time="08:00:00"/>
+				<leg expected_dep_time="06:00:00" expected_transp_time="00:15:33">
+					<route>i(1,0) j(1,1) j(1,2) i(2,2) i(3,2) i(4,2)</route>
+				</leg>
+				<act type="service" serviceId="parcel_1" />
+				<leg expected_dep_time="06:20:33" expected_transp_time="00:15:33">
+					<route>i(4,1)R j(3,2) i(4,2) i(5,2) i(6,2) j(6,2)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_2" />
+				<leg expected_dep_time="06:41:06" expected_transp_time="00:11:06">
+					<route>i(7,0) i(8,0) i(9,0) j(9,1)</route>
+				</leg>
+				<act type="service" serviceId="parcel_3" />
+				<leg expected_dep_time="06:57:13" expected_transp_time="00:11:06">
+					<route>j(9,3) j(9,4) j(9,5) j(9,6)</route>
+				</leg>
+				<act type="service" serviceId="parcel_4" />
+				<leg expected_dep_time="07:13:19" expected_transp_time="00:06:39">
+					<route>i(9,7)R i(8,7)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_5" />
+				<leg expected_dep_time="07:24:59" expected_transp_time="00:08:53">
+					<route>i(6,7)R i(5,7)R j(4,7)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_6" />
+				<leg expected_dep_time="07:38:53" expected_transp_time="00:08:53">
+					<route>j(5,7) i(5,7)R i(4,7)R</route>
+				</leg>
+				<act type="service" serviceId="parcel_7" />
+				<leg expected_dep_time="07:52:46" expected_transp_time="00:19:59">
+					<route>i(2,7)R i(1,7)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R</route>
+				</leg>
+				<act type="end"/>
+			</tour>
+		</plan>
+
+	</carrier>
+
+</carriers>
+

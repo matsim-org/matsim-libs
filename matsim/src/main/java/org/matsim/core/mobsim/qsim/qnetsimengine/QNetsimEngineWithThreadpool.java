@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.core.mobsim.qsim.QSim;
 

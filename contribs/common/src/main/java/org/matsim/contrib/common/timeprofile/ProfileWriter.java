@@ -137,6 +137,6 @@ public class ProfileWriter implements IterationEndsListener {
 	}
 
 	private String filename(String prefix) {
-		return matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
+		return matsimServices.getControllerIO().getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + mode);
 	}
 }

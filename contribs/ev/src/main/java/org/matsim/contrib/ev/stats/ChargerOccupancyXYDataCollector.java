@@ -52,7 +52,7 @@ public final class ChargerOccupancyXYDataCollector implements MobsimInitializedL
 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(), "charger_occupancy_absolute");
+		String file = matsimServices.getControllerIO().getIterationFilename(matsimServices.getIterationNumber(), "charger_occupancy_absolute");
 		writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy.gz"));
 		writer.writeNext(new CSVLineBuilder().addAll("time", "id", "x", "y", "plugs", "plugged", "queued", "assigned"));
 	}

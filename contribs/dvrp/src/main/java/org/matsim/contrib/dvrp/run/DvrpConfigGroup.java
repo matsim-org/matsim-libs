@@ -31,7 +31,7 @@ import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Set;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {

@@ -21,12 +21,12 @@ public class DrtShiftBreakEndedEvent extends AbstractShiftEvent {
 
     public static final String EVENT_TYPE = "DRT shift break ended";
 
-    public DrtShiftBreakEndedEvent(double time, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId) {
-        super(time, mode, shiftId);
+    public DrtShiftBreakEndedEvent(double time, String mode, Id<DrtShift> shiftId,
+                                   Id<DvrpVehicle> vehicleId, Id<Link> linkId, String shiftType) {
+        super(time, mode, shiftId, shiftType);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
     }
-
 
     public Id<DvrpVehicle> getVehicleId() {
         return vehicleId;

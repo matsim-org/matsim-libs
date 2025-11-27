@@ -7,7 +7,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.modechoice.ModeChoiceWeightScheduler;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * Creates mnl selector with current set weights.

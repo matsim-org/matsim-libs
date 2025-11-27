@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.parking.parkingsearch.sim;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Id;

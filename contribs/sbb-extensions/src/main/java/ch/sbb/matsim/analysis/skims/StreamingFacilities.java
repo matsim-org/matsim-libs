@@ -24,7 +24,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
@@ -68,12 +67,6 @@ public class StreamingFacilities implements ActivityFacilities {
     @Override
     public void addActivityFacility(ActivityFacility facility) {
         this.consumer.accept(facility);
-    }
-
-    @Override
-    @Deprecated
-    public FailingObjectAttributes getFacilityAttributes() {
-        return null;
     }
 
     @Override

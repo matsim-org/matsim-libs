@@ -14,7 +14,7 @@ import com.google.inject.Singleton;
 
 public final class RoadPricingModule extends AbstractModule {
 	final private static Logger LOG = LogManager.getLogger(RoadPricingModule.class);
-	
+
 	private RoadPricingScheme scheme;
 
 	public RoadPricingModule() {	}
@@ -24,11 +24,11 @@ public final class RoadPricingModule extends AbstractModule {
 	public RoadPricingModule( RoadPricingScheme scheme ) {
 		this.scheme = scheme;
 	}
-	
+
 	@Override
 	public void install() {
 		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.class);
-		
+
 		// TODO sort out different ways to set toll schemes; reduce automagic
 		// TODO JWJ: is this still too "automagic"?
 		if ( scheme != null) {
@@ -51,12 +51,12 @@ public final class RoadPricingModule extends AbstractModule {
 		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 		addTravelDisutilityFactoryBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()) );
 		addRoutingModuleBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting() );
-		
+
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16
 
 		// this is what makes the mobsim compute tolls and generate money events
-		addControlerListenerBinding().to(RoadPricingControlerListener.class);
-		
+		addControllerListenerBinding().to(RoadPricingControllerListener.class);
+
 	}
 }

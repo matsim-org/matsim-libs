@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
@@ -33,6 +35,10 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+
+import java.util.Map;
+
+import static org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule.REBALANCING_ZONE_SYSTEM;
 
 /**
  * @author michalm
@@ -54,9 +60,13 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			@Override
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
-						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
-								getter.getModal(ZoneSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(ZonalRelocationCalculator.class), params))).asEagerSingleton();
+						getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+									.get(REBALANCING_ZONE_SYSTEM).get();
+                            return new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
+                                    zoneSystem, getter.getModal(Fleet.class),
+                                    getter.getModal(ZonalRelocationCalculator.class), params);
+                        })).asEagerSingleton();
 
 				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case EstimatedDemand:
@@ -64,23 +74,46 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(ZonalDemandEstimator.class), strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 						break;
 
-					case EqualRebalancableVehicleDistribution:
-						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
+					case EstimatedRelativeDemand:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+								.get(REBALANCING_ZONE_SYSTEM).get();
+							return new RelativeDemandEstimatorAsTargetCalculator(
 								getter.getModal(ZonalDemandEstimator.class),
-								getter.getModal(ZoneSystem.class), strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
+								zoneSystem, strategyParams.getDemandEstimationPeriod(),
+								strategyParams.getTargetBeta()
+							);
+						})).asEagerSingleton();
+						break;
+
+					case EqualRebalancableVehicleDistribution:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+									.get(REBALANCING_ZONE_SYSTEM).get();
+                            return new EqualRebalancableVehicleDistributionTargetCalculator(
+                                    getter.getModal(ZonalDemandEstimator.class),
+                                    zoneSystem, strategyParams.getDemandEstimationPeriod());
+                        })).asEagerSingleton();
 						break;
 
 					case EqualVehicleDensity:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-								getter -> new EqualVehicleDensityTargetCalculator(getter.getModal(ZoneSystem.class),
-										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+								getter -> {
+									ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+											.get(REBALANCING_ZONE_SYSTEM).get();
+                                    return new EqualVehicleDensityTargetCalculator(zoneSystem, getter.getModal(FleetSpecification.class));
+                                })).asEagerSingleton();
 						break;
 
 					case EqualVehiclesToPopulationRatio:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-								getter -> new EqualVehiclesToPopulationRatioTargetCalculator(
-										getter.getModal(ZoneSystem.class), getter.get(Population.class),
-										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+								getter -> {
+									ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+											.get(REBALANCING_ZONE_SYSTEM).get();
+                                    return new EqualVehiclesToPopulationRatioTargetCalculator(
+                                            zoneSystem, getter.get(Population.class),
+                                            getter.getModal(FleetSpecification.class));
+                                })).asEagerSingleton();
 						break;
 
 					default:
@@ -97,11 +130,15 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		switch (strategyParams.getZonalDemandEstimatorType()) {
 			case PreviousIterationDemand:
 				bindModal(PreviousIterationDrtDemandEstimator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationDrtDemandEstimator(getter.getModal(ZoneSystem.class), drtCfg,
-								strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
+						getter -> {
+							ZoneSystem zoneSystem = getter.getModal(new TypeLiteral<Map<String, Provider<ZoneSystem>>>() {})
+									.get(REBALANCING_ZONE_SYSTEM).get();
+                            return new PreviousIterationDrtDemandEstimator(zoneSystem, drtCfg,
+                                    strategyParams.getDemandEstimationPeriod());
+                        })).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
-				addControlerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addControllerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:

@@ -23,7 +23,21 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm
+ * @author nkuehnel / MOIA, add elapsed and remaining idle times
  */
 public interface ScheduleInquiry {
+
+	/**
+	 * Baseline notion of idle (no thresholds).
+	 */
 	boolean isIdle(DvrpVehicle vehicle);
+
+	/**
+	 * Idle with explicit elapsed/remaining thresholds.
+	 */
+	boolean isIdle(DvrpVehicle vehicle, IdleCriteria criteria);
+
+	record IdleCriteria(double minIdleElapsed, double minIdleGapRemaining) {
+		public static IdleCriteria none() { return new IdleCriteria(0, 0); }
+	}
 }

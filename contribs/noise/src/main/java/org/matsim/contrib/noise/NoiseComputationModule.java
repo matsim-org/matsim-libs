@@ -78,17 +78,17 @@ public final class NoiseComputationModule extends AbstractModule {
 
 		this.bind(NoiseTimeTracker.class).in(Singleton.class); // needed!
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);
-		
+
 		if (noiseParameters.isUseActualSpeedLevel()) {
 			this.bind(LinkSpeedCalculation.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(LinkSpeedCalculation.class);
 		}
-		
+
 		if (noiseParameters.isComputePopulationUnits()) {
 			this.bind(PersonActivityTracker.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(PersonActivityTracker.class);
 		}
-				
+
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 
 			this.bind(NoisePricingHandler.class).in( Singleton.class ) ;
@@ -96,8 +96,8 @@ public final class NoiseComputationModule extends AbstractModule {
 
 			log.info("Internalizing noise damages. This requires that the default travel disutility is replaced by a travel distuility which accounts for noise tolls.");
 		}
-		
-		this.addControlerListenerBinding().to(NoiseCalculationOnline.class);
+
+		this.addControllerListenerBinding().to(NoiseCalculationOnline.class);
 	}
 
 }

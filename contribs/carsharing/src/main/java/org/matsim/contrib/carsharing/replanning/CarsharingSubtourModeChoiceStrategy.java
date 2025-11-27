@@ -1,7 +1,7 @@
 package org.matsim.contrib.carsharing.replanning;
 
 import com.google.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;

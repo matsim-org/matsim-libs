@@ -2,7 +2,7 @@ package org.matsim.core.controler.events;
 
 import org.matsim.core.controler.MatsimServices;
 
-public class AbstractIterationEvent extends ControlerEvent {
+public class AbstractIterationEvent extends ControllerEvent {
 	private final int iteration;
 	private final boolean isLastIteration;
 

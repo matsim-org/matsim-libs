@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 

@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
@@ -37,9 +38,17 @@ public class DrtRequestInsertionRetryQueueTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.id(Id.create("r", Request.class))
 			.submissionTime(SUBMISSION_TIME)
-			.earliestStartTime(SUBMISSION_TIME)
-			.latestStartTime(SUBMISSION_TIME + MAX_WAIT_TIME)
-			.latestArrivalTime(SUBMISSION_TIME + MAX_TRAVEL_TIME)
+			.earliestDepartureTime(SUBMISSION_TIME)
+			.constraints(
+					new DrtRouteConstraints(
+							MAX_TRAVEL_TIME,
+							Double.POSITIVE_INFINITY ,
+							MAX_WAIT_TIME ,
+							Double.POSITIVE_INFINITY,
+							0,
+							false
+					)
+			)
 			.build();
 
 	@Test
@@ -65,12 +74,23 @@ public class DrtRequestInsertionRetryQueueTest {
 		assertThat(queue.getRequestsToRetryNow(SUBMISSION_TIME + 1)).isEmpty();
 
 		//retry
-		double now = SUBMISSION_TIME + 2;
+		double delta = 2;
+		double now = SUBMISSION_TIME + delta;
+		DrtRequest ref = DrtRequest.newBuilder(request)
+				.earliestDepartureTime(request.getEarliestStartTime())
+				.constraints(
+						new DrtRouteConstraints(
+								MAX_TRAVEL_TIME + delta,
+								request.getConstraints().maxRideDuration(),
+								MAX_WAIT_TIME + delta,
+								request.getConstraints().maxPickupDelay(),
+								request.getConstraints().lateDiversionThreshold(),
+								false
+						)
+				)
+				.build();
 		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
-				.containsExactly(DrtRequest.newBuilder(request)
-						.latestStartTime(now + MAX_WAIT_TIME)
-						.latestArrivalTime(now + MAX_TRAVEL_TIME)
-						.build());
+				.containsExactly(ref);
 
 		//empty queue
 		assertThat(queue.getRequestsToRetryNow(SUBMISSION_TIME + 3)).isEmpty();
@@ -83,10 +103,21 @@ public class DrtRequestInsertionRetryQueueTest {
 
 		//retry
 		double now = 999999;// no guarantee the method is called every second, so let's make a very late call
+		double delta = now - SUBMISSION_TIME;
+
 		assertThat(queue.getRequestsToRetryNow(now)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request)
-						.latestStartTime(now + MAX_WAIT_TIME)
-						.latestArrivalTime(now + MAX_TRAVEL_TIME)
+						.earliestDepartureTime(request.getEarliestStartTime())
+						.constraints(
+								new DrtRouteConstraints(
+										delta + MAX_TRAVEL_TIME,
+										request.getConstraints().maxRideDuration(),
+										delta + MAX_WAIT_TIME,
+										request.getConstraints().maxPickupDelay(),
+										request.getConstraints().lateDiversionThreshold(),
+										false
+								)
+						)
 						.build());
 	}
 

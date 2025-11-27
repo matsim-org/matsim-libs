@@ -21,8 +21,8 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 
 import com.google.inject.name.Named;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

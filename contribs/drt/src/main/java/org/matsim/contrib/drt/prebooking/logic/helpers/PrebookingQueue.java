@@ -47,6 +47,11 @@ public class PrebookingQueue implements MobsimBeforeSimStepListener {
 		Map<Id<PassengerGroupIdentifier.PassengerGroup>, List<ScheduledSubmission>> groups = new LinkedHashMap<>();
 		while (!queue.isEmpty() && queue.peek().submissionTime <= time) {
 			var item = queue.poll();
+
+			if(item.agent.getState().equals(MobsimAgent.State.ABORT)) {
+				continue;
+			}
+
 			Optional<Id<PassengerGroupIdentifier.PassengerGroup>> groupId = groupIdentifier.getGroupId((MobsimPassengerAgent) item.agent);
 			if(groupId.isEmpty()) {
 				prebookingManager.prebook(item.agent(), item.leg(), item.departureTime());

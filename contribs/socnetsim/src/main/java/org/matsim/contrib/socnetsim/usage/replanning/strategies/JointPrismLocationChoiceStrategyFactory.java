@@ -44,13 +44,13 @@ public class JointPrismLocationChoiceStrategyFactory extends AbstractConfigurabl
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private jakarta.inject.Provider<TripRouter> tripRouterProvider;
+	private Provider<TripRouter> tripRouterProvider;
 	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	public JointPrismLocationChoiceStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 												   Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier,
-												   jakarta.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier) {
+			Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

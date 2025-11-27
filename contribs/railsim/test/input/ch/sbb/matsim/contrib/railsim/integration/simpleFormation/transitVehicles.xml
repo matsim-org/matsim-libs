@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="pt">
+		<attributes>
+			<attribute name="railsimAcceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimDeceleration" class="java.lang.Double">0.5</attribute>
+			<attribute name="railsimReversible" class="java.lang.Double">60.0</attribute>
+		</attributes>
+		<description>Public transport vehicle</description>
+		<capacity seats="200" standingRoomInPersons="200">
+		</capacity>
+		<length meter="200.0"/>
+		<width meter="3.0"/>
+		<maximumVelocity meterPerSecond="30.0"/>
+		<costInformation>
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="rail"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<!-- Vehicles for route A1 -> A2 (through junction) -->
+	<vehicle id="train_A_1" type="pt"/>
+	<vehicle id="train_A_1b" type="pt"/>
+
+	<vehicle id="train_A_2" type="pt"/>
+	<vehicle id="train_A_2b" type="pt"/>
+
+	<!-- Vehicles for route C2 -> C1 (through junction) -->
+	<vehicle id="train_B_1" type="pt"/>
+	<vehicle id="train_B_1b" type="pt"/>
+
+	<vehicle id="train_B_2" type="pt"/>
+	<vehicle id="train_B_2b" type="pt"/>
+
+
+</vehicleDefinitions>

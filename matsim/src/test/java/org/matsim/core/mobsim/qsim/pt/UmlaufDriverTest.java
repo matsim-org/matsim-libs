@@ -655,7 +655,6 @@ public class UmlaufDriverTest {
 		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
-
 		@Override
 		public String getMode() {
 			throw new RuntimeException("not implemented") ;

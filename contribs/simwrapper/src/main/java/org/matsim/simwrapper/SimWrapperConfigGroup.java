@@ -18,7 +18,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	private final Map<String, ContextParams> params = new HashMap<>();
 
 	@Parameter
-	@Comment("Whether default dashboards are loaded via SPI.")
+	@Comment("Whether default dashboards are created.")
 	private Mode defaultDashboards = Mode.enabled;
 
 	@Parameter

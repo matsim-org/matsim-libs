@@ -1,0 +1,37 @@
+Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted;EFA_WTT_weighted;EFA_WTT_km_weighted;EFA_WTW_weighted;EFA_WTW_km_weighted
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;HC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CO;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;NOx;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;FC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;FC_MJ;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;PM;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;PN;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CO2(rep);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CO2(total);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;NO2;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CH4;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;NMHC;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;Pb;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;SO2;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;Benzene;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;PM2.5;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;BC (exhaust);Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CO2e;Urban;TØ,0-1h,0-1km;0;NA;NA;NA;NA;NA

@@ -19,10 +19,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 /**
  * @author mrieser
@@ -34,9 +36,14 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 	public SimpleTransitStopHandler() {
 	}
 
+	SimpleTransitStopHandler(TransitStopFacility stop) {
+		this.lastHandledStop = stop;
+	}
+
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress accessEgress, MobsimVehicle vehicle) {
+									List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
+									PassengerAccessEgress accessEgress, MobsimVehicle vehicle) {
 		int cntEgress = leavingPassengers.size();
 		int cntAccess = enteringPassengers.size();
 		double stopTime = 0;
@@ -46,14 +53,24 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
 			}
 			for (PTPassengerAgent passenger : leavingPassengers) {
-				accessEgress.handlePassengerLeaving(passenger, vehicle, stop.getLinkId() , now);
+				accessEgress.handlePassengerLeaving(passenger, vehicle, stop.getLinkId(), now);
 			}
 			for (PTPassengerAgent passenger : enteringPassengers) {
 				accessEgress.handlePassengerEntering(passenger, vehicle, stop.getId(), now);
+			}
+			for (PTPassengerAgent passenger : relocatingPassengers) {
+				accessEgress.handlePassengerRelocating(passenger, vehicle, stop.getId(), now);
 			}
 		}
 		this.lastHandledStop = stop;
 		return stopTime;
 	}
 
+	@Override
+	public Message toMessage() {
+		return new Msg(lastHandledStop.getId());
+	}
+
+	record Msg(Id<TransitStopFacility> lastHandledStop) implements Message {
+	}
 }

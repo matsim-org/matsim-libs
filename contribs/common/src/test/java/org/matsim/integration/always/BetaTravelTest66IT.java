@@ -25,10 +25,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -151,7 +151,7 @@ public class BetaTravelTest66IT {
 				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
 			}
 		});
-		controler.addControlerListener(new TestControlerListener());
+		controler.addControllerListener(new TestControlerListener());
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
@@ -357,7 +357,7 @@ public class BetaTravelTest66IT {
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
+				this.ttAnalyzer.plot(event.getServices().getControllerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
 				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {

@@ -24,8 +24,9 @@ public class DrtShiftBreakScheduledEvent extends AbstractShiftEvent {
 
     public static final String EVENT_TYPE = "DRT shift break scheduled";
 
-    public DrtShiftBreakScheduledEvent(double timeOfDay, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId, Id<Link> linkId, double latestArrival) {
-        super(timeOfDay, mode, shiftId);
+    public DrtShiftBreakScheduledEvent(double timeOfDay, String mode, Id<DrtShift> shiftId, Id<DvrpVehicle> vehicleId,
+                                       Id<Link> linkId, double latestArrival, String shiftType) {
+        super(timeOfDay, mode, shiftId, shiftType);
         this.vehicleId = vehicleId;
         this.linkId = linkId;
         this.latestArrival = latestArrival;

@@ -73,6 +73,9 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		}
 	}
 
+	/**
+	 * @deprecated -- use typed {@link #addDrtConfigGroup(DrtConfigGroup) instead}
+	 */
 	@Override
 	public void addParameterSet(ConfigGroup set) {
 		if (set instanceof DrtConfigGroup) {
@@ -80,6 +83,10 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 		} else {
 			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
 		}
+		// the above is a runtime check that allows only a single type.  Would be better to disallow completely and replace by typed adder (see next).  kai, jun'25
+	}
+	public void addDrtConfigGroup( DrtConfigGroup drtConfigGroup ) {
+		addParameterSet( drtConfigGroup );
 	}
 
 	@Override

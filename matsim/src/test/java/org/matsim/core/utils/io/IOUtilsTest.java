@@ -42,7 +42,7 @@ import java.nio.file.Paths;
  */
 public class IOUtilsTest {
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension private final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void testInitOutputDirLogging() throws IOException {
@@ -198,7 +198,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_gzipped() throws IOException {
+	void testGetBufferedWriter_append_gzipped() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.gz";
 			URL url = IOUtils.getFileUrl(filename);
@@ -221,7 +221,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_lz4() throws IOException {
+	void testGetBufferedWriter_append_lz4() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.lz4";
 			URL url = IOUtils.getFileUrl(filename);
@@ -247,7 +247,7 @@ public class IOUtilsTest {
 	}
 
 	@Test
-	void testGetBufferedWriter_append_bz2() throws IOException {
+	void testGetBufferedWriter_append_bz2() {
 		assertThrows(UncheckedIOException.class, () -> {
 			String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
 			URL url = IOUtils.getFileUrl(filename);
@@ -266,7 +266,7 @@ public class IOUtilsTest {
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assertions.assertTrue(file.length() == 51, "compressed file should be equal 51 bytes, but is " + file.length());
+		Assertions.assertEquals(51, file.length(), "compressed file should be equal 51 bytes, but is " + file.length());
 	}
 
 	@Test
@@ -547,16 +547,16 @@ public class IOUtilsTest {
 	@Test
 	void testNewUrl() throws MalformedURLException {
 		URL context = Paths.get("").toUri().toURL();
-		System.out.println(context.toString());
+		System.out.println(context);
 		URL url = IOUtils.extendUrl(context, "C:\\windows\\directory\\filename.txt");
-		System.out.println(url.toString());
+		System.out.println(url);
 	}
 
 	@Test
 	void testResolveFileOrResource() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/testfile.jar");
-		String jarUrlString = "file:" + jarFile.getAbsolutePath(); // URLs require absolute paths
+		String jarUrlString = jarFile.toURI().toString(); // URLs require absolute paths
 		String fileUrlString = "jar:" + jarUrlString + "!/the_file.txt";
 
 		URL url = IOUtils.resolveFileOrResource(fileUrlString);
@@ -572,7 +572,7 @@ public class IOUtilsTest {
 	void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
 
 		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/test directory/testfile.jar");
-		String fileUrlString = "jar:" + jarFile.toURI().toString() + "!/the_file.txt";
+		String fileUrlString = "jar:" + jarFile.toURI() + "!/the_file.txt";
 		Assertions.assertTrue(fileUrlString.contains("test%20directory")); // just make sure the space is correctly URL-encoded
 
 		URL url = IOUtils.resolveFileOrResource(fileUrlString);

@@ -20,12 +20,14 @@
 
 package org.matsim.core.network.algorithms.intersectionSimplifier;
 
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
@@ -59,9 +61,9 @@ public class RunIntersectionSimplifier {
 		nct.run(newNetwork);
 
 		LOG.info("Simplifying the network...");
-		new NetworkSimplifier().run(newNetwork);
+		NetworkUtils.simplifyNetwork(newNetwork);
 		LOG.info("Cleaning the network...");
-		new NetworkCleaner().run(newNetwork);
+		NetworkUtils.cleanNetwork(newNetwork, Set.of(TransportMode.car));
 
 		IntersectionSimplifier.reportNetworkStatistics(newNetwork);
 		new NetworkWriter(newNetwork).write(output);

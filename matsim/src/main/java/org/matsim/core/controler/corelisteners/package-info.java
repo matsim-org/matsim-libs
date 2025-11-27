@@ -20,7 +20,7 @@
  * *********************************************************************** */
 
  /**
- * Core listeners are {@link org.matsim.core.controler.listener.ControlerListener}s
+ * Core listeners are {@link org.matsim.core.controler.listener.ControllerListener}s
  * that are loaded automatically by the {@link org.matsim.core.controler.Controler}.
  */
 package org.matsim.core.controler.corelisteners;

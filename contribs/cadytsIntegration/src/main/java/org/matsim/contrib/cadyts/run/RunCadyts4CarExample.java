@@ -38,7 +38,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
  * Script-in-java to include cadyts into a matsim run.

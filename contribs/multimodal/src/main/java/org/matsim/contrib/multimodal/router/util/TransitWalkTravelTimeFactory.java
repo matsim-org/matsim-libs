@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.Map;
 
 public class TransitWalkTravelTimeFactory implements Provider<TravelTime> {

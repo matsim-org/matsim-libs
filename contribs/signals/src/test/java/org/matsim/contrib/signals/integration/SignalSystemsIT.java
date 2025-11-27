@@ -134,7 +134,7 @@ public class SignalSystemsIT {
 			}
 			Assertions.assertTrue(works, "different population files after iteration 10 ");
 		}
-		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
 		Assertions.assertTrue(file.exists());
 		file = new File(writer.getSignalGroupsOutputFilename());
@@ -228,7 +228,7 @@ public class SignalSystemsIT {
 			}
 			Assertions.assertTrue(works, "different population files after iteration 10 ");
 		}
-		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControllerIO());
 		File file = new File(writer.getSignalSystemsOutputFilename());
 		Assertions.assertTrue(file.exists());
 		file = new File(writer.getSignalGroupsOutputFilename());

@@ -22,7 +22,7 @@
 
 package org.matsim.core.replanning;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.Person;

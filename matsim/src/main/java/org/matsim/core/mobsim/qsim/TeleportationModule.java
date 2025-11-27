@@ -19,14 +19,16 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.mobsim.qsim;
+package org.matsim.core.mobsim.qsim;
+
+import jakarta.inject.Singleton;
 
 public class TeleportationModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "TeleportationEngine";
 
 	@Override
 	protected void configureQSim() {
-		bind(DefaultTeleportationEngine.class).asEagerSingleton();
-		addQSimComponentBinding( COMPONENT_NAME ).to( DefaultTeleportationEngine.class );
+		bind(TeleportationEngine.class).to(DefaultTeleportationEngine.class).in(Singleton.class);
+		addQSimComponentBinding(COMPONENT_NAME).to(DefaultTeleportationEngine.class);
 	}
 }

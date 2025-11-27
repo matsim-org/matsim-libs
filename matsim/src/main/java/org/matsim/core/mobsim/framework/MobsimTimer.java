@@ -28,7 +28,7 @@ public class MobsimTimer {
 	private double simStartTime = 24*3600; // initialized to 24h so as that the time can be successively
 	           // set down when an agent starts earlier until the earliest point of time an agent starts
 	private double time = 0.0;
-	private double stepSize = 1.0;
+	private final double stepSize;
 
 	public MobsimTimer(){
 		this(1.0);
@@ -44,7 +44,7 @@ public class MobsimTimer {
 	public final double getSimStartTime() {
 		return this.simStartTime;
 	}
-	
+
 	public double getTimeOfDay() {
 		return this.time;
 	}

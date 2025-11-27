@@ -56,7 +56,7 @@ public class TripsAnalysisIT {
 		Controler controller = new Controler(scenario);
 		controller.run();
 
-		String tripsCsvFilename = controller.getControlerIO().getOutputFilename(Controler.DefaultFiles.tripscsv);
+		String tripsCsvFilename = controller.getControllerIO().getOutputFilename(Controler.DefaultFiles.tripscsv);
 		try (Reader reader = IOUtils.getBufferedReader(tripsCsvFilename)) {
 			CSVParser parser = new CSVParser(reader, CSVFormat.newFormat(config.global().getDefaultDelimiter().charAt(0)));
 			List<CSVRecord> records = parser.getRecords();

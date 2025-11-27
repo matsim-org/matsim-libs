@@ -87,24 +87,31 @@ final class ScheduleImpl implements Schedule {
 
 	private void validateArgsBeforeAddingTask(int taskIdx, Task task) {
 		failIfCompleted();
-		Preconditions.checkState(status != ScheduleStatus.STARTED || taskIdx > currentTask.getTaskIdx());
+		Preconditions.checkState(status != ScheduleStatus.STARTED || taskIdx > currentTask.getTaskIdx(),
+				"Schedule hasn't started; vehicle %s", vehicleSpecification.getId());
 
 		double beginTime = task.getBeginTime();
 		double endTime = task.getEndTime();
 		Link beginLink = Tasks.getBeginLink(task);
 		int taskCount = tasks.size();
 
-		Preconditions.checkArgument(taskIdx >= 0 && taskIdx <= taskCount);
-		Preconditions.checkArgument(beginTime <= endTime);
+		Preconditions.checkArgument(taskIdx >= 0 && taskIdx <= taskCount,
+				"Task index %s out of bounds [0,%s]; vehicle %s", taskIdx, taskCount, vehicleSpecification.getId());
+		Preconditions.checkArgument(beginTime <= endTime,
+				"Begin time %s > end time %s; vehicle %s", beginTime, endTime, vehicleSpecification.getId());
 
 		if (taskIdx > 0) {
 			Task previousTask = tasks.get(taskIdx - 1);
-			Preconditions.checkArgument(previousTask.getEndTime() == beginTime);
+			Preconditions.checkArgument(previousTask.getEndTime() == beginTime,
+					"Previous task end time %s != next task begin time %s; Vehicle %s",
+					previousTask.getEndTime(), beginTime, vehicleSpecification.getId());
 			Preconditions.checkArgument(Tasks.getEndLink(previousTask) == beginLink,
-					"Last task end link: %s; Next task start link: %s", Tasks.getEndLink(previousTask).getId(),
-					beginLink.getId());
+					"Last task end link: %s; Next task start link: %s; vehicle %s", Tasks.getEndLink(previousTask).getId(),
+					beginLink.getId(), vehicleSpecification.getId());
 		} else { // taskIdx == 0
-			Preconditions.checkArgument(vehicleSpecification.getStartLinkId().equals(beginLink.getId()));
+			Preconditions.checkArgument(vehicleSpecification.getStartLinkId().equals(beginLink.getId()),
+					"First task link %s != vehicle start link %s; vehicle %s",
+					beginLink.getId(), vehicleSpecification.getStartLinkId(), vehicleSpecification.getId());
 		}
 	}
 
@@ -122,7 +129,8 @@ final class ScheduleImpl implements Schedule {
 		failIfUnplanned();
 		failIfCompleted();
 
-		Preconditions.checkState(tasks.get(taskIdx).getStatus() == TaskStatus.PLANNED);
+		Preconditions.checkState(tasks.get(taskIdx).getStatus() == TaskStatus.PLANNED,
+				"Task %s is not in planned state but in %s; vehicle %s", taskIdx, tasks.get(taskIdx).getStatus(), vehicleSpecification.getId());
 		tasks.remove(taskIdx);
 
 		for (int i = taskIdx; i < tasks.size(); i++) {
@@ -189,19 +197,37 @@ final class ScheduleImpl implements Schedule {
 	}
 
 	@Override
+	public void update(Schedule schedule) {
+
+		if (!(schedule instanceof ScheduleImpl s)) {
+			throw new IllegalArgumentException("Schedule must be of type ScheduleImpl");
+		}
+
+		tasks.clear();
+		tasks.addAll(s.tasks);
+
+		status = s.status;
+		currentTask = s.currentTask;
+	}
+
+	@Override
 	public String toString() {
 		return "Schedule_" + vehicleSpecification.getId();
 	}
 
 	private void failIfUnplanned() {
-		Preconditions.checkState(status != ScheduleStatus.UNPLANNED);
+		Preconditions.checkState(status != ScheduleStatus.UNPLANNED,
+				"Schedule hasn't been planned yet; vehicle %s", vehicleSpecification.getId());
 	}
 
 	private void failIfCompleted() {
-		Preconditions.checkState(status != ScheduleStatus.COMPLETED);
+		Preconditions.checkState(status != ScheduleStatus.COMPLETED,
+				"Schedule has been completed; " +
+				"vehicle %s", vehicleSpecification.getId());
 	}
 
 	private void failIfNotStarted() {
-		Preconditions.checkState(status == ScheduleStatus.STARTED);
+		Preconditions.checkState(status == ScheduleStatus.STARTED,
+				"Schedule hasn't been started yet; vehicle %s", vehicleSpecification.getId());
 	}
 }

@@ -91,7 +91,7 @@ final class ReceiverScoreStats implements StartupListener, IterationEndsListener
 		/* Write the carrier and receiver plans at specific iterations */
 		if ((event.getIteration() + 1) % (ConfigUtils.addOrGetModule(sc.getConfig(), ReceiverConfigGroup.class).getReceiverReplanningInterval()) != 0)
 			return;
-		String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+		String dir = event.getServices().getControllerIO().getIterationPath(event.getIteration());
 		CarriersUtils.writeCarriers(CarriersUtils.getCarriers(sc), dir + File.separator + event.getIteration() + CARRIER_PLANS_XML);
 		new ReceiversWriter(ReceiverUtils.getReceivers(sc)).write(dir + File.separator + event.getIteration() + RECEIVER_PLANS_XML);
 	}

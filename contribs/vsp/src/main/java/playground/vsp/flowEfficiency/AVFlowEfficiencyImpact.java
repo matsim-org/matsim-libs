@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.VehicleType;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 

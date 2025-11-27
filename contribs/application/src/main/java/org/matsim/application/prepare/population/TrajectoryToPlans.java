@@ -60,7 +60,7 @@ public class TrajectoryToPlans implements MATSimAppCommand {
     private int activityBinSize = 600;
 
     @CommandLine.Option(names = {"--max-typical-duration", "--mtd"}, description = "Max duration of activities for which a typical activity duration type is created in seconds. Default is 86400s (24h). if set to 0, activities are not split.")
-    private int maxTypicalDuration = 86400;
+    private Integer maxTypicalDuration = null;
 
     @CommandLine.Option(names = "--output", description = "Output folder", defaultValue = "scenarios/input")
     private Path output;
@@ -113,6 +113,12 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         }
         // (if set by command line, this will overwrite the above targetCRS.  How is this to be interpreted?  kai, feb'2024)
 
+        if ( maxTypicalDuration==null ){
+            throw new RuntimeException( "maxTypicalDuration needs to be set explicitly.  The old default was 86400, which would run splitActivityTypesBasedOnDuration, " +
+                                                "which, however, is deprecated.  Normally, it should be set to 0, which means that splitActivityTypesBasedOnDuration is skipped.  Then, " +
+                                                "use separate class SplitActivityTypesDuration.  kai (with input from Simon M.), nov'25" );
+        }
+
         if (maxTypicalDuration > 0) {
             splitActivityTypesBasedOnDuration(scenario.getPopulation());
         }
@@ -141,11 +147,11 @@ public class TrajectoryToPlans implements MATSimAppCommand {
         return 0;
     }
 
-	@Deprecated
     /**
-     * Deprecated, use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
+     * @deprecated  use {@link org.matsim.application.prepare.population.SplitActivityTypesDuration} instead. <br>
      * Split activities into typical durations to improve value of travel time savings calculation.
      */
+    @Deprecated
     private void splitActivityTypesBasedOnDuration(Population population) {
 
 

@@ -1,9 +1,12 @@
 package org.matsim.contrib.ev.reservation;
 
+import org.matsim.contrib.common.util.reservation.ReservationManager.ReservationInfo;
 import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
 import org.matsim.contrib.ev.charging.ChargingPriority;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
-import org.matsim.contrib.ev.reservation.ChargerReservationManager.Reservation;
+
+import java.util.Optional;
 
 /**
  * This is an implementation of a charging priority which is backed by the
@@ -28,21 +31,21 @@ public class ReservationBasedChargingPriority implements ChargingPriority {
 
     @Override
     public boolean requestPlugNext(ChargingVehicle cv, double now) {
-        Reservation reservation = manager.findReservation(charger, cv.ev(), now);
+        Optional<ReservationInfo<ChargerSpecification, ElectricVehicle>> reservation = manager.findReservation(charger, cv.ev(), now);
 
-        if (reservation != null) {
+        if (reservation.isPresent()) {
             // vehicle has a reservation, can be plugged right away, consume reservation
-            manager.removeReservation(reservation);
+            manager.removeReservation(reservation.get().resource().getId(), reservation.get().reservationId());
             return true;
         }
 
         double endTime = cv.strategy().calcRemainingTimeToCharge() + now;
         reservation = manager.addReservation(charger, cv.ev(), now, endTime);
 
-        if (reservation != null) {
+        if (reservation.isPresent()) {
             // vehicle did not have a reservation, but managed to create one on the fly,
             // consume it directly
-            manager.removeReservation(reservation);
+            manager.removeReservation(reservation.get().resource().getId(), reservation.get().reservationId());
             return true;
         }
 

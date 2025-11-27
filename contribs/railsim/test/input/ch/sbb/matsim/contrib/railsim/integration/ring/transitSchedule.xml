@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="stop_North" x="-4700.0" y="10000.0" linkRefId="station_North" isBlocking="false" />
+		<stopFacility id="stop_East" x="10000.0" y="4700.0" linkRefId="station_East" isBlocking="false" />
+		<stopFacility id="stop_South" x="4700.0" y="-10000.0" linkRefId="station_South" isBlocking="false" />
+		<stopFacility id="stop_West" x="-10000.0" y="-4700.0" linkRefId="station_West" isBlocking="false" />
+	</transitStops>
+	<transitLine id="line_1">
+		<transitRoute id="route_1">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="stop_South" departureOffset="00:00:00" arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="stop_West" departureOffset="00:15:00" arrivalOffset="00:15:00" awaitDeparture="true" />
+				<stop refId="stop_North" departureOffset="00:30:00" arrivalOffset="00:30:00" awaitDeparture="true" />
+				<stop refId="stop_East" departureOffset="00:45:00" arrivalOffset="00:45:00" awaitDeparture="true" />
+				<stop refId="stop_South" arrivalOffset="01:00:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<!-- Ring route: South -> West -> North -> East -->
+				<link refId="station_South" />
+				<link refId="link_South" />
+				<link refId="link_SouthWest" />
+				<link refId="station_West" />
+				<link refId="link_West" />
+				<link refId="link_WestNorth" />
+				<link refId="station_North" />
+				<link refId="link_North" />
+				<link refId="link_NorthEast" />
+				<link refId="station_East" />
+				<link refId="link_East" />
+				<link refId="link_EastSouth" />
+				<link refId="station_South" />
+			</route>
+			<departures>
+				<departure id="dep_1" departureTime="00:00:00" vehicleRefId="train_1" />
+				<departure id="dep_2" departureTime="01:00:00" vehicleRefId="train_1" />
+				<departure id="dep_3" departureTime="02:00:00" vehicleRefId="train_1" />
+				<departure id="dep_4" departureTime="03:00:00" vehicleRefId="train_1" />
+				<departure id="dep_5" departureTime="04:00:00" vehicleRefId="train_1" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

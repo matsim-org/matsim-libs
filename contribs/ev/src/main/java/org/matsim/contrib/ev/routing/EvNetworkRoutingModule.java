@@ -42,10 +42,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.DefaultRoutingRequest;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.RoutingRequest;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
@@ -104,11 +101,18 @@ final class EvNetworkRoutingModule implements RoutingModule {
 		final Person person = request.getPerson();
 
 		List<? extends PlanElement> basicRoute = delegate.calcRoute(request);
+
+		List<Leg> nonWalkLegs = TripStructureUtils.getLegs(basicRoute).stream()
+			.filter(leg -> !"walk".equals(leg.getMode()))
+			.toList();
+
+		Leg basicLeg = (Leg) nonWalkLegs.get(nonWalkLegs.size() - 1);
 		Id<Vehicle> evId = Id.create(person.getId() + vehicleSuffix, Vehicle.class);
-		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
+
+		// Skip if the main leg is not truck mode (e.g. access/egress walk)
+		if (!this.mode.equals(basicLeg.getMode()) || !electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
 		} else {
-			Leg basicLeg = (Leg)basicRoute.get(0);
 			ElectricVehicleSpecification ev = electricFleet.getVehicleSpecifications().get(evId);
 
 			Map<Link, Double> estimatedEnergyConsumption = estimateConsumption(ev, basicLeg);
@@ -150,7 +154,10 @@ final class EvNetworkRoutingModule implements RoutingModule {
 					}
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(DefaultRoutingRequest.of(lastFrom, nexttoFacility,
 							lastArrivaltime, person, request.getAttributes()));
-					Leg lastLeg = (Leg)routeSegment.get(0);
+					List<Leg> lastLegNonWalks = TripStructureUtils.getLegs(routeSegment).stream()
+						.filter(leg -> !"walk".equals(leg.getMode()))
+						.toList();
+					Leg lastLeg = (Leg) lastLegNonWalks.get(lastLegNonWalks.size() - 1);
 					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
@@ -176,6 +183,8 @@ final class EvNetworkRoutingModule implements RoutingModule {
 
 	private Map<Link, Double> estimateConsumption(ElectricVehicleSpecification ev, Leg basicLeg) {
 		Map<Link, Double> consumptions = new LinkedHashMap<>();
+
+
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 		ElectricVehicle pseudoVehicle = ElectricFleetUtils.create(ev, driveConsumptionFactory, auxConsumptionFactory,

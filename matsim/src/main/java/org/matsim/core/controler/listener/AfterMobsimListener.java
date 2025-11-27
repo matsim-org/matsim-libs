@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 /**
  * @author dgrether
  */
-public interface AfterMobsimListener extends ControlerListener {
+public interface AfterMobsimListener extends ControllerListener {
 	/**
 	 * Notifies all observers of the Controler that the mobility simulation just finished.
 	 * @param event

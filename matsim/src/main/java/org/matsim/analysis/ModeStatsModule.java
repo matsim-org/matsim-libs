@@ -28,9 +28,9 @@ import org.matsim.core.controler.AbstractModule;
 public class ModeStatsModule extends AbstractModule {
     @Override
     public void install() {
-        bind(ModeStatsControlerListener.class).in(Singleton.class);
-        addControlerListenerBinding().to(ModeStatsControlerListener.class);
+        bind(ModeStatsControllerListener.class).in(Singleton.class);
+        addControllerListenerBinding().to(ModeStatsControllerListener.class);
 //		KN: if this is a somewhat standard analysis it should be added by default rather than adding it in every scenario run class
-		addControlerListenerBinding().to(ModeChoiceCoverageControlerListener.class);
+		addControllerListenerBinding().to(ModeChoiceCoverageControllerListener.class);
     }
 }

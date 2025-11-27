@@ -49,7 +49,7 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 			.addBinding(DvrpModes.mode(getMode()))
 			.to(modalKey(DrtEstimator.class));
 
-		addControlerListenerBinding().to(modalKey(DrtEstimator.class));
+		addControllerListenerBinding().to(modalKey(DrtEstimator.class));
 
 		bindModal(DrtEstimatorParams.class).toInstance(params);
 
@@ -63,7 +63,7 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 				)
 				.in(Singleton.class);
 
-			addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
+			addControllerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
 		}
 	}
 }

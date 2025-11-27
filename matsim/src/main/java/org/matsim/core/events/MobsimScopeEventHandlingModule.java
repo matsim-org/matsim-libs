@@ -22,7 +22,7 @@ package org.matsim.core.events;
 
 import java.util.Set;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -36,7 +36,7 @@ public class MobsimScopeEventHandlingModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(MobsimScopeEventHandling.class).asEagerSingleton();
-		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
+		addControllerListenerBinding().to(MobsimScopeEventHandling.class);
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override

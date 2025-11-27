@@ -47,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class RouteUtils {
 	private static final Logger log = LogManager.getLogger( RouteUtils.class ) ;
-	
+
 	private RouteUtils(){} // do not instantiate
 
 	/**
@@ -226,26 +226,32 @@ public class RouteUtils {
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}
-	
+
 	public static double calcDistance(TransitPassengerRoute route, TransitSchedule ts, Network network) {
+
+		// exit condition for recursion
+		if (route == null) {
+			return 0;
+		}
+
 		Id<TransitLine> lineId = route.getLineId();
 		Id<TransitRoute> routeId = route.getRouteId();
 		Id<TransitStopFacility> enterStopId = route.getAccessStopId();
 		Id<TransitStopFacility> exitStopId = route.getEgressStopId();
-	
+
 		TransitLine line = ts.getTransitLines().get(lineId);
 		TransitRoute tr = line.getRoutes().get(routeId);
-		
+
 		TransitStopFacility accessFacility = ts.getFacilities().get(enterStopId);
 		TransitStopFacility egressFacility = ts.getFacilities().get(exitStopId);
-		
-		return calcDistance(tr, accessFacility, egressFacility, network);
+
+		return calcDistance(tr, accessFacility, egressFacility, network) + calcDistance(route.getChainedRoute(), ts, network);
 	}
-	
+
 	public static double calcDistance(TransitRoute tr, TransitStopFacility accessFacility, TransitStopFacility egressFacility, Network network) {
 		Id<Link> enterLinkId = accessFacility.getLinkId();
 		Id<Link> exitLinkId = egressFacility.getLinkId();
-	
+
 		NetworkRoute nr = tr.getRoute();
 		double dist = 0;
 		boolean count = false;
@@ -278,7 +284,7 @@ public class RouteUtils {
 	/**
 	 * How much of route is "covered" by the links of route2.  Based on Ramming.  Note that this is not symmetric,
 	 * i.e. route1 can be fully covered by route2, but not the other way around.  kai, nov'13
-	 * 
+	 *
 	 * @param route1
 	 * @param route2
 	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
@@ -287,7 +293,7 @@ public class RouteUtils {
 		Gbl.assertNotNull( route1 );
 		Gbl.assertNotNull( route2 );
 		Gbl.assertNotNull( network );
-		
+
 		double routeLength = 0. ;
 		double coveredLength = 0. ;
 		for ( Id<Link> id : route1.getLinkIds() ) {

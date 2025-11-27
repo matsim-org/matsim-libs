@@ -34,11 +34,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * physical Resources to be used by several {@link LogisticChain}s and thus transport chains.
  */
 @SuppressWarnings("GrazieInspection")
-public interface LogisticChain
-    extends Identifiable<LogisticChain>,
-        KnowsLSP,
-        HasSimulationTrackers<LogisticChain>,
-        Attributable {
+public interface LogisticChain extends Identifiable<LogisticChain>, KnowsLSP, HasSimulationTrackers<LogisticChain>, Attributable {
 
   Collection<LogisticChainElement> getLogisticChainElements();
 

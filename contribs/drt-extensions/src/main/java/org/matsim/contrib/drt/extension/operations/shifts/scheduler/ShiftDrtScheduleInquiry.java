@@ -11,8 +11,6 @@ import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-
 /**
  * @author nkuehnel / MOIA
  */
@@ -28,25 +26,36 @@ public class ShiftDrtScheduleInquiry extends DrtScheduleInquiry implements Sched
 
     @Override
     public boolean isIdle(DvrpVehicle vehicle) {
-        Schedule schedule = vehicle.getSchedule();
-        if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
+        if (isWithinShift(vehicle)) {
+            return super.isIdle(vehicle);
+        }
+        return false;
+    }
+
+    public boolean isIdle(DvrpVehicle vehicle, IdleCriteria criteria) {
+        if (isWithinShift(vehicle)) {
+            return super.isIdle(vehicle, criteria);
+        }
+        return false;
+    }
+
+    private static boolean isWithinShift(DvrpVehicle vehicle) {
+        if(vehicle.getSchedule().getStatus() != Schedule.ScheduleStatus.STARTED) {
             return false;
         }
-
-        if(((ShiftDvrpVehicle) vehicle).getShifts().isEmpty()) {
+        Task currentTask = vehicle.getSchedule().getCurrentTask();
+        if (currentTask instanceof WaitForShiftTask) {
+            return false;
+        }
+        if (((ShiftDvrpVehicle) vehicle).getShifts().isEmpty()) {
             return false;
         } else {
             final DrtShift peek = ((ShiftDvrpVehicle) vehicle).getShifts().peek();
-            if(!peek.isStarted() || peek.isEnded()) {
+            if (!peek.isStarted() || peek.isEnded()) {
                 return false;
+            } else {
+                return true;
             }
         }
-        Task currentTask = schedule.getCurrentTask();
-        if(currentTask instanceof WaitForShiftTask) {
-            return false;
-        }
-        return currentTask.getTaskIdx() == schedule.getTaskCount() - 1
-                && STAY.isBaseTypeOf(currentTask);
     }
-
 }

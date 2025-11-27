@@ -13,6 +13,13 @@ public final class MapPlot extends Viz {
 	private final Map<String, String> datasets = new HashMap<>();
 	public double[] center;
 	public Double zoom;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
+
+
 	public Display display = new Display();
 	public Double minValue;
 	public Double maxValue;

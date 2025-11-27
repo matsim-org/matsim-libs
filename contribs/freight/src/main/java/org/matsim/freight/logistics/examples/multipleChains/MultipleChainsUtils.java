@@ -1,22 +1,22 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.examples.multipleChains;
@@ -29,70 +29,97 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.ReplanningUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierShipment;
+import org.matsim.freight.logistics.LSP;
+import org.matsim.freight.logistics.LSPPlan;
+import org.matsim.freight.logistics.LSPStrategyManager;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
 class MultipleChainsUtils {
-  private MultipleChainsUtils() {}
+	private MultipleChainsUtils() {}
 
-  public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
-    return new RandomLogisticChainShipmentAssigner();
-  }
+	public static RandomLogisticChainShipmentAssigner createRandomLogisticChainShipmentAssigner() {
+		return new RandomLogisticChainShipmentAssigner();
+	}
 
-  public static RoundRobinLogisticChainShipmentAssigner
-      createRoundRobinLogisticChainShipmentAssigner() {
-    return new RoundRobinLogisticChainShipmentAssigner();
-  }
+	public static RoundRobinLogisticChainShipmentAssigner
+	createRoundRobinLogisticChainShipmentAssigner() {
+		return new RoundRobinLogisticChainShipmentAssigner();
+	}
 
-  public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
-    return new PrimaryLogisticChainShipmentAssigner();
-  }
+	public static PrimaryLogisticChainShipmentAssigner createPrimaryLogisticChainShipmentAssigner() {
+		return new PrimaryLogisticChainShipmentAssigner();
+	}
 
-  public static Collection<LspShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
-    List<LspShipment> shipmentList = new ArrayList<>();
+	public static Collection<LspShipment> createLSPShipmentsFromCarrierShipments(Carrier carrier) {
+		List<LspShipment> shipmentList = new ArrayList<>();
 
-    List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream().toList();
+		List<CarrierShipment> carrierShipments = carrier.getShipments().values().stream().toList();
 
-    for (CarrierShipment shipment : carrierShipments) {
-      LspShipmentUtils.LspShipmentBuilder builder =
-          LspShipmentUtils.LspShipmentBuilder.newInstance(
-              Id.create(shipment.getId().toString(), LspShipment.class));
-        builder.setCapacityDemand(shipment.getCapacityDemand());
-      builder.setFromLinkId(shipment.getPickupLinkId());
-      builder.setToLinkId(shipment.getDeliveryLinkId());
-		builder.setStartTimeWindow(shipment.getPickupStartingTimeWindow());
-		builder.setEndTimeWindow(shipment.getDeliveryStartingTimeWindow());
-      builder.setPickupServiceTime(shipment.getPickupDuration());
-      builder.setDeliveryServiceTime(shipment.getDeliveryDuration());
-      shipmentList.add(builder.build());
-    }
-    return shipmentList;
-  }
+		for (CarrierShipment shipment : carrierShipments) {
+			LspShipmentUtils.LspShipmentBuilder builder = LspShipmentUtils.LspShipmentBuilder.newInstance(Id.create(shipment.getId().toString(), LspShipment.class));
+			builder.setCapacityDemand(shipment.getCapacityDemand());
+			builder.setFromLinkId(shipment.getPickupLinkId());
+			builder.setToLinkId(shipment.getDeliveryLinkId());
+			builder.setStartTimeWindow(shipment.getPickupStartingTimeWindow());
+			builder.setEndTimeWindow(shipment.getDeliveryStartingTimeWindow());
+			builder.setPickupServiceTime(shipment.getPickupDuration());
+			builder.setDeliveryServiceTime(shipment.getDeliveryDuration());
+			shipmentList.add(builder.build());
+		}
+		return shipmentList;
+	}
 
-  public enum LspPlanTypes {
-    SINGLE_ONE_ECHELON_CHAIN("singleOneEchelonChain"),
-    SINGLE_TWO_ECHELON_CHAIN("singleTwoEchelonChain"),
-    MULTIPLE_ONE_ECHELON_CHAINS("multipleOneEchelonChains"),
-    MULTIPLE_TWO_ECHELON_CHAINS("multipleTwoEchelonChains"),
-    MULTIPLE_MIXED_ECHELON_CHAINS("multipleMixedEchelonChains");
+	/**
+	 * Take care of innovation control according to config.
+	 * This is a modified copy from StrategyManager.
+	 * It was necessary, because I was unable to bind that StrategyManger in a way, that it uses its internal structure -.-.
+	 *
+	 * @param strategyManager
+	 * @param subpopulation
+	 * @param config
+	 */
+	static void applyInnovationDisable(LSPStrategyManager strategyManager, String subpopulation, Config config) {
+		for (GenericPlanStrategy<LSPPlan, LSP> planStrategy : strategyManager.getStrategies(subpopulation)) {
+			int globalInnovationDisableAfter = (int) ((config.controller().getLastIteration() - config.controller().getFirstIteration())
+				* config.replanning().getFractionOfIterationsToDisableInnovation() + config.controller().getFirstIteration());
+			int maxIter = -1;
+			if (ReplanningUtils.isInnovativeStrategy(planStrategy)) {
+				maxIter = globalInnovationDisableAfter;
+			}
+			if (maxIter >= config.controller().getFirstIteration() && maxIter >= 0) {
+				strategyManager.addChangeRequest(maxIter + 1, planStrategy, subpopulation, 0.0);
+			}
+		}
+	}
 
-    private static final Map<String, LspPlanTypes> stringToEnum =
-        Stream.of(values()).collect(toMap(Object::toString, e -> e));
-    private final String label;
+	public enum LspPlanTypes {
+		SINGLE_ONE_ECHELON_CHAIN("singleOneEchelonChain"),
+		SINGLE_TWO_ECHELON_CHAIN("singleTwoEchelonChain"),
+		MULTIPLE_ONE_ECHELON_CHAINS("multipleOneEchelonChains"),
+		MULTIPLE_TWO_ECHELON_CHAINS("multipleTwoEchelonChains"),
+		MULTIPLE_MIXED_ECHELON_CHAINS("multipleMixedEchelonChains");
 
-    LspPlanTypes(String label) {
-      this.label = label;
-    }
+		private static final Map<String, LspPlanTypes> stringToEnum =
+			Stream.of(values()).collect(toMap(Object::toString, e -> e));
+		private final String label;
 
-    public static LspPlanTypes fromString(String label) {
-      return stringToEnum.get(label);
-    }
+		LspPlanTypes(String label) {
+			this.label = label;
+		}
 
-    @Override
-    public String toString() {
-      return label;
-    }
-  }
+		public static LspPlanTypes fromString(String label) {
+			return stringToEnum.get(label);
+		}
+
+		@Override
+		public String toString() {
+			return label;
+		}
+	}
 }

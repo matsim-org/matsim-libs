@@ -2,6 +2,12 @@
 
 <vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
 
+	<vehicleType id="car">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+	</vehicleType>
 	<vehicleType id="golf1.4">
 
 		<description>Golf 1.4 Trendline</description>

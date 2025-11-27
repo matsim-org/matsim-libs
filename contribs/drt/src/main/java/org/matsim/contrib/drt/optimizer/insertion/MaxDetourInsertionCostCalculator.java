@@ -26,8 +26,8 @@ public class MaxDetourInsertionCostCalculator implements InsertionCostCalculator
 
 	private boolean violatesDetour(DrtRequest drtRequest, InsertionDetourTimeCalculator.DetourTimeInfo detourTimeInfo) {
 		// Check if the max travel time constraint for the newly inserted request is violated
-		double rideDuration = detourTimeInfo.dropoffDetourInfo.arrivalTime - detourTimeInfo.pickupDetourInfo.departureTime;
-		return drtRequest.getMaxRideDuration() < rideDuration;
+		double rideDuration = detourTimeInfo.dropoffDetourInfo.requestDropoffTime - detourTimeInfo.pickupDetourInfo.requestPickupTime;
+		return drtRequest.getConstraints().maxRideDuration() < rideDuration;
 	}
 
 }

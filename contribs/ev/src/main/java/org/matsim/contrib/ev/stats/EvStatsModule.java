@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.charging.ChargingEventSequenceCollector;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
@@ -45,7 +45,7 @@ public class EvStatsModule extends AbstractModule {
 	public void install() {
 		bind(ChargingEventSequenceCollector.class).asEagerSingleton();
 		addEventHandlerBinding().to(ChargingEventSequenceCollector.class);
-		addControlerListenerBinding().to(ChargingProceduresCSVWriter.class).in(Singleton.class);
+		addControllerListenerBinding().to(ChargingProceduresCSVWriter.class).in(Singleton.class);
 
 		if (evCfg.getAnalysisOutputs().contains(EvAnalysisOutput.TimeProfiles)) {
 			installQSimModule(new AbstractQSimModule() {
@@ -70,6 +70,7 @@ public class EvStatsModule extends AbstractModule {
 			});
 			bind(ChargerPowerTimeProfileCalculator.class).asEagerSingleton();
 			addEventHandlerBinding().to(ChargerPowerTimeProfileCalculator.class);
+			addControlerListenerBinding().to(ChargerPowerTimeProfileCalculator.class);
 			addControlerListenerBinding().toProvider(new Provider<>() {
 				@Inject
 				private ChargerPowerTimeProfileCalculator calculator;
@@ -77,7 +78,7 @@ public class EvStatsModule extends AbstractModule {
 				private MatsimServices matsimServices;
 
 				@Override
-				public ControlerListener get() {
+				public ControllerListener get() {
 					var profileView = new ChargerPowerTimeProfileView(calculator);
 					return new ProfileWriter(matsimServices, "ev", profileView, "charger_power_time_profiles");
 
