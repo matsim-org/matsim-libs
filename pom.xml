@@ -184,68 +184,10 @@
             </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
-                <artifactId>gt-main</artifactId>
+                <artifactId>gt-bom</artifactId>
                 <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-geotiff</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-geojson</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-metadata</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-geopkg</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-jdbc</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-coverage</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-referencing</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-shapefile</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-hsql</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-extension</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-api</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
-            <dependency>
-                <groupId>org.geotools.jdbc</groupId>
-                <artifactId>gt-jdbc-postgis</artifactId>
-                <version>${geotools.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.locationtech.jts</groupId>
