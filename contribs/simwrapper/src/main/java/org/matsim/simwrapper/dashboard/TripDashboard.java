@@ -146,15 +146,18 @@ public class TripDashboard implements Dashboard {
 		return setAnalysisArgs("--groups-of-subpopulations-personAnalysis", joined);
 	}
 
-	/** Set the groups of supopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
+	/**
+	 * Set the groups of supopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
 	 * Different groups are separated by ';' and subpopulations within a group by ','.
 	 * See {@link TripAnalysis}.
+	 *
 	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
 	 */
 	public TripDashboard setGroupsOfSubpopulationsForCommercialAnalysis(String... groupsOfSubpopulations) {
 		String joined = String.join(";", groupsOfSubpopulations);
 		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", joined);
 	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 
