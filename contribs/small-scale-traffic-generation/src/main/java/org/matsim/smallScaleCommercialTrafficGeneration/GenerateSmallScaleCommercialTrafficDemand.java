@@ -757,7 +757,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								Id.create(possibleVehicleType, VehicleType.class)))
 								vehicleTypes.add(possibleVehicleType);
 						}
-
+						if (vehicleTypes.isEmpty())
+							throw new RuntimeException("The possible vehicle types found for purpose " + purpose + ", modeORvehType "
+								+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficType +" do not exist in the given vehicle types file. PLease check your input file.");
 						String selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry);
 
 						// Generate carrierName

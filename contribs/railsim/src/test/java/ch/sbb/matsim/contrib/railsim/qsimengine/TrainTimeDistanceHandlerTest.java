@@ -83,7 +83,7 @@ class TrainTimeDistanceHandlerTest {
 		Files.createDirectories(output.getParent());
 
 		RailResourceManager resources = new RailResourceManagerImpl(
-			EventsUtils.createEventsManager(), railsim, scenario.getNetwork(), new SimpleDeadlockAvoidance(), new TrainManager(scenario)
+			EventsUtils.createEventsManager(), railsim, scenario.getNetwork(), new SimpleDeadlockAvoidance(scenario.getNetwork()), new TrainManager(scenario)
 		);
 
 		MatsimServices services = new StubServices(io, config, scenario);

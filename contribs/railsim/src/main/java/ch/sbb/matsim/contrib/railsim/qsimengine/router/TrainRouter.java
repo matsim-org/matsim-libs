@@ -109,6 +109,18 @@ public final class TrainRouter {
 	}
 
 	/**
+	 * Calculate shortest path, independent of train position.
+	 */
+	public List<RailLink> calcRoute(RailLink from, RailLink to) {
+
+		Link fromLink = network.getLinks().get(from.getLinkId());
+		Link toLink = network.getLinks().get(to.getLinkId());
+
+		List<Link> path = dijkstra(fromLink, toLink, null, Set.of());
+		return path.stream().map(l -> resources.getLink(l.getId())).toList();
+	}
+
+	/**
 	 * Simple Dijkstra algorithm that supports loop links and always traverses stop links.
 	 */
 	private List<Link> dijkstra(Link fromLink, Link toLink, TrainPosition position, Set<Link> stopLinks) {
@@ -214,9 +226,15 @@ public final class TrainRouter {
 	 * Calculate the cost of traversing a link.
 	 */
 	private double calculateLinkCost(Link link, TrainPosition position, boolean isStopLink) {
+
 		// Stop loop links should always be traversed once, so give them negative cost
 		if (isStopLink) {
 			return -0.5;
+		}
+
+		// When the method is called without position, just try with constant cost
+		if (position == null) {
+			return 1;
 		}
 
 		// Links without capacity have higher cost
