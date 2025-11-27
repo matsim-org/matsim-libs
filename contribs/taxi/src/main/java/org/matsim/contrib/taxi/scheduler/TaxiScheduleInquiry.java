@@ -58,6 +58,11 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 				&& STAY.isBaseTypeOf(currentTask);
 	}
 
+	@Override
+	public boolean isIdle(DvrpVehicle vehicle, IdleCriteria criteria) {
+		return isIdle(vehicle);
+	}
+
 	/**
 	 * If the returned LinkTimePair is not null, then time is not smaller than the current time
 	 */

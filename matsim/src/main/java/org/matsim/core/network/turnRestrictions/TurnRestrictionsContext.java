@@ -157,6 +157,7 @@ public final class TurnRestrictionsContext {
             // see if there are already colored link copies available for this starting link
             List<ColoredLink> coloredLinks = context.coloredLinksPerLinkMap.get(startingLink.getId());
             if (coloredLinks != null) {
+                coloredLinks = new ArrayList<>(coloredLinks);
                 for (ColoredLink coloredLink : coloredLinks) {
                     // optimization: re-point toNode instead of re-applying full turn restrictions
                     if (coloredLink.toColoredNode == null) {

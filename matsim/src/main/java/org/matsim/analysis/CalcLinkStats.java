@@ -30,7 +30,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
@@ -53,7 +54,7 @@ public interface CostCalculationStrategy {
                                                              DetourTimeInfo detourTimeInfo) {
             double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
             if (detourTimeInfo.pickupDetourInfo.requestPickupTime > request.getLatestStartTime()
-                    || detourTimeInfo.dropoffDetourInfo.requestDropoffTime > request.getConstraints().latestArrivalTime()) {
+                    || detourTimeInfo.dropoffDetourInfo.requestDropoffTime > request.getLatestArrivalTime()) {
                 //no extra time is lost => do not check if the current slack time is long enough (can be even negative)
                 return InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
             }
@@ -103,7 +104,7 @@ public interface CostCalculationStrategy {
         double waitTimeViolation = Math.max(0, detourTimeInfo.pickupDetourInfo.requestPickupTime - request.getLatestStartTime());
         // (if drt vehicle picks up too late) (max wait time (often 600 sec) after submission)
 
-        double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getConstraints().latestArrivalTime());
+        double travelTimeViolation = Math.max(0, detourTimeInfo.dropoffDetourInfo.requestDropoffTime - request.getLatestArrivalTime());
         // (if drt vehicle drops off too late) (submission time + alpha * directTravelTime + beta)
 
         double detourViolation = Math.max(0,
@@ -145,8 +146,8 @@ public interface CostCalculationStrategy {
     private static double lateDiversionViolationBetweenStopIndices(VehicleEntry vehicleEntry, int start, int end, double lateDiversionThreshold) {
         double violation = 0;
         for (int s = start; s < end; s++) {
-            Waypoint.Stop stop = vehicleEntry.stops.get(s);
-            if (!stop.task.getDropoffRequests().isEmpty()) {
+            StopWaypoint stop = vehicleEntry.stops.get(s);
+            if (!stop.getTask().getDropoffRequests().isEmpty()) {
                 double remainingRideDuration = stop.getArrivalTime() - vehicleEntry.start.getDepartureTime();
                 if (remainingRideDuration < lateDiversionThreshold) {
                     violation += lateDiversionThreshold - remainingRideDuration;

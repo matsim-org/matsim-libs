@@ -23,5 +23,8 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 				return operationFacilitiesSpecification;
 			}).asEagerSingleton();
 		}
+		bindModal(OperationFacilityReservationManager.class).toProvider(modalProvider(getter ->
+				new OperationFacilityReservationManager())).asEagerSingleton();
+		addControllerListenerBinding().to(modalKey(OperationFacilityReservationManager.class));
 	}
 }

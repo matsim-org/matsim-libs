@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
@@ -70,7 +71,7 @@ public class SpatIalRequestFleetFilterTest {
 		params.setMaxExpansion(10);
 		params.setReturnAllIfEmpty(true);
 
-		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, timer, params);
+		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, params);
 
 		int threadCount = 10;
 		int iterationsPerThread = 100;
@@ -117,7 +118,7 @@ public class SpatIalRequestFleetFilterTest {
         params.setMinExpansion(1);
         params.setMaxExpansion(0);
         params.setReturnAllIfEmpty(false);
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isEmpty();
     }
@@ -142,7 +143,7 @@ public class SpatIalRequestFleetFilterTest {
         params.setMinExpansion(1);
         params.setMaxExpansion(0);
         params.setReturnAllIfEmpty(true);
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isNotEmpty();
     }
@@ -194,14 +195,14 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .earliestDepartureTime(submissionTime)
                 .constraints(
                         new DrtRouteConstraints(
-                                submissionTime,
-                                earliestStartTime,
-                                latestStartTime,
-                                latestArrivalTime,
+                                latestArrivalTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
                                 Double.POSITIVE_INFINITY,
+                                0.,
                                 false
                         )
                 )
@@ -212,7 +213,7 @@ public class SpatIalRequestFleetFilterTest {
                 .build();
     }
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }

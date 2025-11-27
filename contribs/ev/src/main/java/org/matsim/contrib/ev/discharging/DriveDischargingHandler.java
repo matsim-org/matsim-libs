@@ -52,7 +52,7 @@ import com.google.inject.Inject;
  * calculating the drive-related energy consumption. However, the time spent on the first link is used by the time-based
  * idle discharge process (see {@link IdleDischargingHandler}).
  */
-public final class DriveDischargingHandler
+public class DriveDischargingHandler
 	implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, MobsimScopeEventHandler, MobsimEngine {
 
 	private static class EvDrive {
@@ -75,10 +75,13 @@ public final class DriveDischargingHandler
 	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-
+	
+	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
+	
 	private final QSim qsim;
+
 	@Inject
 	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
 		this.qsim = qsim;
@@ -88,25 +91,30 @@ public final class DriveDischargingHandler
 		evDrives = new ConcurrentHashMap<>(eVehicles.size() / 10);
 	}
 
+	private ElectricVehicle getElectricVehicle(Id<Vehicle> vehicleId) {
+		return eVehicles.get(vehicleId);
+	}
+
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		Id<Vehicle> vehicleId = event.getVehicleId();
-		ElectricVehicle ev = eVehicles.get(vehicleId);
-		if (ev != null) {// handle only our EVs
-			evDrives.put(vehicleId, new EvDrive(vehicleId, ev));
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
+			trafficEnterEvents.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
 			linkLeaveEvents.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if (evDrives.containsKey(event.getVehicleId())) {// handle only our EVs
+		if (getElectricVehicle(event.getVehicleId()) != null) {
+			// handle only evs
 			trafficLeaveEvents.add(event);
 		}
 	}
@@ -127,6 +135,18 @@ public final class DriveDischargingHandler
 
 	@Override
 	public void doSimStep(double time) {
+		while (!trafficEnterEvents.isEmpty()) {
+			var event = trafficEnterEvents.peek();
+
+			if (event.getTime() == time) {
+				break; // see below
+			}
+
+			ElectricVehicle ev = getElectricVehicle(event.getVehicleId());
+			evDrives.put(ev.getId(), new EvDrive(ev.getId(), ev));
+			trafficEnterEvents.remove();
+		}
+
 		handleQueuedEvents(linkLeaveEvents, time, false);
 		handleQueuedEvents(trafficLeaveEvents, time, true);
 	}

@@ -47,7 +47,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.*;
 
 /**

@@ -34,7 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -26,10 +26,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -52,6 +55,7 @@ public class RoadPricingByConfigfileTest {
 					IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil-extended" ), "config-with-roadpricing.xml" ).toString()
 					, "--config:controler.outputDirectory=" + utils.getOutputDirectory()
 					, "--config:controler.lastIteration=5"
+					, "--config:routing.accessEgressType=none"
 			} );
 			{
 				String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;

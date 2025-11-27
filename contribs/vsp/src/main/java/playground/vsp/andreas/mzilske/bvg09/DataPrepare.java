@@ -64,7 +64,7 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 import playground.vsp.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.Collection;
 
 public class DataPrepare {

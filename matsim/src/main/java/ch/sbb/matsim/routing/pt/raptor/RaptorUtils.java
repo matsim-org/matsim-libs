@@ -49,6 +49,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
  */
 public final class RaptorUtils {
     private static final Logger log = LogManager.getLogger( RaptorUtils.class );
+	public static final String TOTAL_ROUTE_COST_ATTR_NAME = "totalRouteCost";
 
     private RaptorUtils() {
     }
@@ -150,6 +151,7 @@ public final class RaptorUtils {
                             leg.setDepartureTime(lastArrivalTime);
                         }
                         lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
+						leg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                     }
                     else {
                     	Activity act = (Activity) pe;
@@ -163,7 +165,7 @@ public final class RaptorUtils {
                 ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
 
                 ptLeg.setRoute(convertRoutePart(part));
-
+				ptLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
 				legs.add(ptLeg);
                 lastArrivalTime = part.getChainedArrivalTime();
                 firstPtLegProcessed = true;
@@ -186,6 +188,7 @@ public final class RaptorUtils {
                 walkRoute.setTravelTime(travelTime);
                 walkRoute.setDistance(part.distance);
                 walkLeg.setRoute(walkRoute);
+				walkLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                 legs.add(walkLeg);
                 lastArrivalTime = part.arrivalTime;
                 if (firstPtLegProcessed) {
@@ -208,8 +211,10 @@ public final class RaptorUtils {
 
 		DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop, convertRoutePart(part.chainedPart));
 		ptRoute.setBoardingTime(part.boardingTime);
-		ptRoute.setTravelTime(part.arrivalTime - part.depTime);
-		ptRoute.setDistance(part.distance);
+		ptRoute.setTravelTime(part.getChainedArrivalTime() - part.depTime);
+		ptRoute.setDistance(part.getChainedDistance());
+		// End link is always set to the last destination
+		ptRoute.setEndLinkId(part.getChainedEgressStop().getLinkId());
 
 		return ptRoute;
 	}

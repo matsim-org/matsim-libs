@@ -289,6 +289,9 @@ public final class EventsManagerImpl implements EventsManager {
 		} else if (klass == PersonLeavesVehicleEvent.class) {
 			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
 			return true;
+		} else if (klass == PersonContinuesInVehicleEvent.class) {
+			((PersonContinuesInVehicleEventHandler) handler).handleEvent((PersonContinuesInVehicleEvent) ev);
+			return true;
 		} else if (klass == VehicleDepartsAtFacilityEvent.class) {
 			((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);
 			return true;

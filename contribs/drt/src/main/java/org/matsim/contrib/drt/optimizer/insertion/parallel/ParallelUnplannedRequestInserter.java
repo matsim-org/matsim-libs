@@ -18,7 +18,6 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel;/* *****************
  * *********************************************************************** */
 
 
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Verify;
 import com.google.inject.Provider;
@@ -54,10 +53,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -90,8 +90,8 @@ import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequest
  *
  * @author Steffen Axer
  */
-
-public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, MobsimEngine, MobsimBeforeCleanupListener {
+@NodeSingleton
+public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, DistributedMobsimEngine, MobsimBeforeCleanupListener {
 	private static final Logger LOG = LogManager.getLogger(ParallelUnplannedRequestInserter.class);
 	private Double lastProcessingTime;
 	private static final Comparator<DrtRequest> drtRequestComparator = Comparator.comparingDouble(DrtRequest::getSubmissionTime).thenComparing(req -> req.getId().toString());
@@ -418,7 +418,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 					|| (lastUnsolvedConflicts != null && toBeRejected.size() == lastUnsolvedConflicts) // not getting better
 					|| i == this.maxIter - 1) { // reached iter limit
 					LOG.debug("Stopped with rejections #{} ", toBeRejected.size());
-					toBeRejected.forEach(s -> retryOrReject(s, time, NO_INSERTION_FOUND_CAUSE));
 					break;
 				}
 

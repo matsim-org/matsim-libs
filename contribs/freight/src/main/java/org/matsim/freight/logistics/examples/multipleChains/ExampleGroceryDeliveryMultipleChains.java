@@ -40,6 +40,7 @@ import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
@@ -105,7 +106,10 @@ final class ExampleGroceryDeliveryMultipleChains {
                     () -> {
                       LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
                       strategyManager.addStrategy(new GenericPlanStrategyImpl<>(new ExpBetaPlanSelector<>(new ScoringConfigGroup())), null, 1);
-                        strategyManager.addStrategy(RandomShiftingStrategyFactory.createStrategy(), null, 1);
+
+						GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+						strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+						strategyManager.addStrategy(strategy, null, 1);
                         strategyManager.setMaxPlansPerAgent(5);
                       strategyManager.setPlanSelectorForRemoval(new GenericWorstPlanForRemovalSelector<>());
                       return strategyManager;
@@ -320,7 +324,7 @@ final class ExampleGroceryDeliveryMultipleChains {
     log.info("create initial LSPShipments");
     log.info("assign the shipments to the LSP");
     for (LspShipment lspShipment : createLSPShipmentsFromCarrierShipments(carrier)) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<!-- Branch A1 stops (top-left) -->
+		<stopFacility id="A1_start" x="-14000.0" y="5000.0" linkRefId="A1_start_to_A1_1" name="A1 Start" isBlocking="false"/>
+		<stopFacility id="A1_1" x="-10000.0" y="4000.0" linkRefId="A1_1_to_A1_2" name="A1 Station 1" isBlocking="false"/>
+		<stopFacility id="A1_2" x="-6000.0" y="3000.0" linkRefId="A1_2_to_A1_3" name="A1 Station 2" isBlocking="false"/>
+		<stopFacility id="A1_3" x="-2000.0" y="1000.0" linkRefId="A1_3_to_junction" name="A1 Station 3" isBlocking="false"/>
+
+		<!-- Branch A2 stops (bottom-right, after middle section) -->
+		<stopFacility id="A2_1" x="20000.0" y="-1000.0" linkRefId="middle_end_to_A2_1" name="A2 Station 1" isBlocking="false"/>
+		<stopFacility id="A2_2" x="24000.0" y="-3000.0" linkRefId="A2_1_to_A2_2" name="A2 Station 2" isBlocking="false"/>
+		<stopFacility id="A2_3" x="28000.0" y="-4000.0" linkRefId="A2_2_to_A2_3" name="A2 Station 3" isBlocking="false"/>
+		<stopFacility id="A2_end" x="32000.0" y="-5000.0" linkRefId="A2_3_to_A2_end" name="A2 End" isBlocking="false"/>
+
+		<!-- Branch C1 stops (top-right, after middle section) -->
+		<stopFacility id="C1_1" x="20000.0" y="1000.0" linkRefId="middle_end_to_C1_1" name="C1 Station 1" isBlocking="false"/>
+		<stopFacility id="C1_2" x="24000.0" y="3000.0" linkRefId="C1_1_to_C1_2" name="C1 Station 2" isBlocking="false"/>
+		<stopFacility id="C1_3" x="28000.0" y="4000.0" linkRefId="C1_2_to_C1_3" name="C1 Station 3" isBlocking="false"/>
+		<stopFacility id="C1_end" x="32000.0" y="5000.0" linkRefId="C1_3_to_C1_end" name="C1 End" isBlocking="false"/>
+
+		<!-- Branch C2 stops (bottom-left) -->
+		<stopFacility id="C2_start" x="-14000.0" y="-5000.0" linkRefId="C2_start_to_C2_1" name="C2 Start" isBlocking="false"/>
+		<stopFacility id="C2_1" x="-10000.0" y="-4000.0" linkRefId="C2_1_to_C2_2" name="C2 Station 1" isBlocking="false"/>
+		<stopFacility id="C2_2" x="-6000.0" y="-3000.0" linkRefId="C2_2_to_C2_3" name="C2 Station 2" isBlocking="false"/>
+		<stopFacility id="C2_3" x="-2000.0" y="-1000.0" linkRefId="C2_3_to_junction" name="C2 Station 3" isBlocking="false"/>
+
+		<!-- Middle section stops (for merged train) -->
+		<stopFacility id="middle_1" x="600.0" y="0.0" linkRefId="junction_to_middle_1" name="Middle Station 1" isBlocking="false"/>
+		<stopFacility id="middle_2" x="8000.0" y="0.0" linkRefId="middle_1_to_middle_2" name="Middle Station 2" isBlocking="false"/>
+		<stopFacility id="middle_3" x="12000.0" y="0.0" linkRefId="middle_2_to_middle_3" name="Middle Station 3" isBlocking="false"/>
+		<stopFacility id="middle_end" x="12600.0" y="0.0" linkRefId="middle_3_to_middle_end" name="Split Point" isBlocking="false"/>
+	</transitStops>
+
+	<transitLine id="lineA_to_junction">
+		<transitRoute id="routeA_to_junction">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="A1_start" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="A1_1" arrivalOffset="00:02:00" departureOffset="00:02:30" awaitDeparture="true"/>
+				<stop refId="A1_2" arrivalOffset="00:05:00" departureOffset="00:05:30" awaitDeparture="true"/>
+				<stop refId="A1_3" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
+				<stop refId="middle_1" arrivalOffset="00:10:00"/>
+			</routeProfile>
+			<route>
+				<link refId="A1_start_to_A1_1"/>
+				<link refId="A1_1_to_A1_2"/>
+				<link refId="A1_2_to_A1_3"/>
+				<link refId="A1_3_to_junction"/>
+				<link refId="junction_to_middle_1"/>
+			</route>
+			<departures>
+				<departure id="dep_A_1" departureTime="08:00:00" vehicleRefId="train_A_1">
+					<chainedDeparture toDeparture="dep_formation_1" toTransitLine="line_formation" toTransitRoute="route_formation"/>
+				</departure>
+				<departure id="dep_A_2" departureTime="09:00:00" vehicleRefId="train_A_2">
+					<chainedDeparture toDeparture="dep_formation_2" toTransitLine="line_formation" toTransitRoute="route_formation"/>
+				</departure>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="lineB_to_junction">
+		<transitRoute id="routeB_to_junction">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="C2_start" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C2_1" arrivalOffset="00:02:00" departureOffset="00:02:30" awaitDeparture="true"/>
+				<stop refId="C2_2" arrivalOffset="00:05:00" departureOffset="00:05:30" awaitDeparture="true"/>
+				<stop refId="C2_3" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
+				<stop refId="middle_1" arrivalOffset="00:10:00"/>
+			</routeProfile>
+			<route>
+				<link refId="C2_start_to_C2_1"/>
+				<link refId="C2_1_to_C2_2"/>
+				<link refId="C2_2_to_C2_3"/>
+				<link refId="C2_3_to_junction"/>
+				<link refId="junction_to_middle_1"/>
+			</route>
+			<departures>
+				<departure id="depB_1" departureTime="08:00:00" vehicleRefId="train_B_1">
+					<chainedDeparture toDeparture="dep_formation_1" toTransitLine="line_formation" toTransitRoute="route_formation"/>
+				</departure>
+				<departure id="depB_2" departureTime="09:00:00" vehicleRefId="train_B_2">
+					<chainedDeparture toDeparture="dep_formation_2" toTransitLine="line_formation" toTransitRoute="route_formation"/>
+				</departure>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<transitLine id="line_formation">
+		<transitRoute id="route_formation">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<!-- Formation needs 1 minute until it can depart -->
+				<stop refId="middle_1" arrivalOffset="00:00:00" departureOffset="00:01:00" awaitDeparture="true"/>
+				<stop refId="middle_2" arrivalOffset="00:08:00" departureOffset="00:08:30" awaitDeparture="true"/>
+				<stop refId="middle_3" arrivalOffset="00:12:00" departureOffset="00:12:30" awaitDeparture="true"/>
+				<stop refId="middle_end" arrivalOffset="00:16:00" departureOffset="00:16:30" awaitDeparture="true"/>
+			</routeProfile>
+			<route>
+				<link refId="junction_to_middle_1"/>
+				<link refId="middle_1_to_middle_2"/>
+				<link refId="middle_2_to_middle_3"/>
+				<link refId="middle_3_to_middle_end"/>
+			</route>
+			<departures>
+				<departure id="dep_formation_1" departureTime="08:10:00" vehicleRefId="formation_1">
+					<attributes>
+						<attribute name="railsimFormation" class="java.lang.String">train_A_1,train_B_1</attribute>
+					</attributes>
+					<chainedDeparture toDeparture="dep_train_A_1" toTransitLine="line_train_A" toTransitRoute="route_train_A"/>
+					<chainedDeparture toDeparture="dep_train_B_1" toTransitLine="line_train_B" toTransitRoute="route_train_B"/>
+				</departure>
+				<departure id="dep_formation_2" departureTime="09:10:00" vehicleRefId="formation_2">
+					<attributes>
+						<attribute name="railsimFormation" class="java.lang.String">train_A_2,train_B_2</attribute>
+					</attributes>
+					<chainedDeparture toDeparture="dep_train_A_2" toTransitLine="line_train_A" toTransitRoute="route_train_A"/>
+					<chainedDeparture toDeparture="dep_train_B_2" toTransitLine="line_train_B" toTransitRoute="route_train_B"/>
+				</departure>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<!-- Individual train A after formation split: A2 branch -->
+	<transitLine id="line_train_A">
+		<transitRoute id="route_train_A">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="middle_end" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="A2_1" arrivalOffset="00:04:00" departureOffset="00:04:30" awaitDeparture="true"/>
+				<stop refId="A2_2" arrivalOffset="00:07:00" departureOffset="00:07:30" awaitDeparture="true"/>
+				<stop refId="A2_3" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
+				<stop refId="A2_end" arrivalOffset="00:13:00"/>
+			</routeProfile>
+			<route>
+				<link refId="middle_3_to_middle_end"/>
+				<link refId="middle_end_to_A2_1"/>
+				<link refId="A2_1_to_A2_2"/>
+				<link refId="A2_2_to_A2_3"/>
+				<link refId="A2_3_to_A2_end"/>
+			</route>
+			<departures>
+				<departure id="dep_train_A_1" departureTime="08:20:00" vehicleRefId="train_A_1b"/>
+				<departure id="dep_train_A_2" departureTime="09:20:00" vehicleRefId="train_A_2b"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+	<!-- Individual train B after formation split: C1 branch -->
+	<transitLine id="line_train_B">
+		<transitRoute id="route_train_B">
+			<transportMode>rail</transportMode>
+			<routeProfile>
+				<stop refId="middle_end" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
+				<stop refId="C1_1" arrivalOffset="00:04:00" departureOffset="00:04:30" awaitDeparture="true"/>
+				<stop refId="C1_2" arrivalOffset="00:07:00" departureOffset="00:07:30" awaitDeparture="true"/>
+				<stop refId="C1_3" arrivalOffset="00:10:00" departureOffset="00:10:30" awaitDeparture="true"/>
+				<stop refId="C1_end" arrivalOffset="00:13:00"/>
+			</routeProfile>
+			<route>
+				<link refId="middle_3_to_middle_end"/>
+				<link refId="middle_end_to_C1_1"/>
+				<link refId="C1_1_to_C1_2"/>
+				<link refId="C1_2_to_C1_3"/>
+				<link refId="C1_3_to_C1_end"/>
+			</route>
+			<departures>
+				<departure id="dep_train_B_1" departureTime="08:30:00" vehicleRefId="train_B_1b"/>
+				<departure id="dep_train_B_2" departureTime="09:30:00" vehicleRefId="train_B_2b"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+
+
+</transitSchedule>

@@ -157,17 +157,8 @@ public class DefaultUnplannedRequestInserterTest {
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
-						.constraints(
-								new DrtRouteConstraints(
-										request1.getEarliestStartTime(),
-										request1.getLatestStartTime() + retryInterval,
-										request1.getConstraints().latestArrivalTime() + retryInterval,
-										Double.POSITIVE_INFINITY,
-										Double.POSITIVE_INFINITY,
-										0.,
-										false
-								)
-						)
+						.earliestDepartureTime(request1.getEarliestStartTime())
+						.constraints(request1.getConstraints())
 						.build());
 
 		//ensure rejection event is NOT emitted

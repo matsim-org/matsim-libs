@@ -65,13 +65,19 @@ import com.google.inject.name.Names;
  */
 public final class QSimModule extends AbstractModule {
 	private final boolean addDefaultQSimModules;
+	private final boolean addDefaultQSim;
 
 	public QSimModule() {
-		this(true);
+		this(true, true);
 	}
 
 	public QSimModule(boolean addDefaultQSimModules) {
+		this(addDefaultQSimModules, true);
+	}
+
+	public QSimModule(boolean addDefaultQSimModules, boolean addDefaultQSim) {
 		this.addDefaultQSimModules = addDefaultQSimModules;
+		this.addDefaultQSim = addDefaultQSim;
 	}
 
 	@Override
@@ -97,7 +103,10 @@ public final class QSimModule extends AbstractModule {
 		// I think that the result of this that you can use @Inject Collection<AbstractQSimModule> in addition to @Inject
 		// Set<AbstractQSimModule>.  Don't know why this is needed.  kai, jun'23
 
-		bind(Mobsim.class).toProvider(QSimProvider.class);
+		// Allow to use alternative mobsim implementations
+		if (addDefaultQSim) {
+			bind(Mobsim.class).toProvider(QSimProvider.class);
+		}
 	}
 
 	static public Collection<AbstractQSimModule> getDefaultQSimModules() {
