@@ -622,54 +622,72 @@ public class TripAnalysis implements MATSimAppCommand {
 			if (Double.isFinite(speed) && !Double.isNaN(speed))
 				speeds.computeIfAbsent(mainMode, s -> new DoubleArrayList()).add(speed);
 		}
-
-		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-			analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
-				beelineDistanceBySubpopulationGroup,
-				speedsBySubpopulationGroup);
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+				analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+					beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
+			}
+			analyseAndWriteTripStatsPerGroup("personTraffic", nBySubpopulationGroup, travelTimeBySubpopulationGroup,
+				travelDistanceBySubpopulationGroup, beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, groupsOfSubpopulationsForPersonAnalysis.keySet());
 		}
-		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-			analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
-				beelineDistanceBySubpopulationGroup,
-				speedsBySubpopulationGroup);
+		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+					beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
+			}
+			analyseAndWriteTripStatsPerGroup("commercialTraffic", nBySubpopulationGroup, travelTimeBySubpopulationGroup,
+				travelDistanceBySubpopulationGroup, beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, groupsOfSubpopulationsForCommercialAnalysis.keySet());
 		}
 		analyseAndWriteTripStatsPerGroup("total", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
-			beelineDistanceBySubpopulationGroup,
-			speedsBySubpopulationGroup);
+			beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
 	}
 
 	private void analyseAndWriteTripStatsPerGroup(String group, Map<String, Object2IntMap<String>> nBySubpopulationGroup,
 												  Map<String, Object2LongMap<String>> travelTimeBySubpopulationGroup,
 												  Map<String, Object2LongMap<String>> travelDistanceBySubpopulationGroup,
 												  Map<String, Object2LongMap<String>> beelineDistanceBySubpopulationGroup,
-												  Map<String, Map<String, DoubleList>> speedsBySubpopulationGroup) throws IOException {
+												  Map<String, Map<String, DoubleList>> speedsBySubpopulationGroup, Set<String> groupsOfThisTrafficType) throws IOException {
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("trip_stats_%s.csv", group)), CSVFormat.DEFAULT)) {
 
 			printer.print("Info");
+			List<String> modesToIgnore = new  ArrayList<>();
 			for (String m : modeOrder) {
-				if (Objects.equals(group, "total") || nBySubpopulationGroup.get(group).getInt(m) > 0)
+				if (Objects.equals(group, "total") || nBySubpopulationGroup.containsKey(group) && nBySubpopulationGroup.get(group).getInt(
+					m) > 0 || groupsOfThisTrafficType != null && groupsOfThisTrafficType.stream().anyMatch(
+					g -> nBySubpopulationGroup.get(g).getInt(m) > 0))
 					printer.print(m);
+				else
+					modesToIgnore.add(m);
 			}
 			printer.println();
 
 			printer.print("Number of trips");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				if (group.equals("total")) {
 					int sum = 0;
 					for (Object2IntMap<String> n : nBySubpopulationGroup.values()) {
 						sum += n.getInt(m);
 					}
 					printer.print(sum);
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					int sum = 0;
+					for (String g : groupsOfThisTrafficType) {
+						Object2IntMap<String> n = nBySubpopulationGroup.get(g);
+						sum += n.getInt(m);
+					}
+					printer.print(sum);
+				}
+				else {
 					Object2IntMap<String> n = nBySubpopulationGroup.get(group);
-					if (n.containsKey(m))
-						printer.print(n.getInt(m));
+					printer.print(n.getInt(m));
 				}
 			}
 			printer.println();
 
 			printer.print("Total time traveled [h]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				long seconds;
 				if (group.equals("total")) {
 					long sum = 0L;
@@ -677,12 +695,17 @@ public class TripAnalysis implements MATSimAppCommand {
 						sum += tt.getLong(m);
 					}
 					seconds = sum;
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					long sum = 0L;
+					for (String g : groupsOfThisTrafficType) {
+						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(g);
+						sum += tt.getLong(m);
+					}
+					seconds = sum;
+				}
+				 else {
 					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
-					if (!tt.containsKey(m))
-						continue;
-					else
-						seconds = tt.getLong(m);
+					seconds = tt.getLong(m);
 				}
 				printer.print(new BigDecimal(seconds / 3600d).setScale(0, RoundingMode.HALF_UP));
 			}
@@ -690,6 +713,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Total distance traveled [km]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				long meters;
 				if (group.equals("total")) {
 					long sum = 0L;
@@ -697,12 +721,17 @@ public class TripAnalysis implements MATSimAppCommand {
 						sum += td.getLong(m);
 					}
 					meters = sum;
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					long sum = 0L;
+					for (String g : groupsOfThisTrafficType) {
+						Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(g);
+						sum += td.getLong(m);
+					}
+					meters = sum;
+				}
+				else {
 					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
-					if (!td.containsKey(m))
-						continue;
-					else
-						meters = td.getLong(m);
+					meters = td.getLong(m);
 				}
 				printer.print(new BigDecimal(meters / 1000d).setScale(0, RoundingMode.HALF_UP));
 			}
@@ -710,6 +739,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. speed [km/h]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				long seconds;
 				long meters;
 				if (group.equals("total")) {
@@ -722,11 +752,20 @@ public class TripAnalysis implements MATSimAppCommand {
 					}
 					seconds = secSum;
 					meters = mSum;
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					long secSum = 0L, mSum = 0L;
+					for (String sub : groupsOfThisTrafficType) {
+						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
+						Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(sub);
+						if (tt != null) secSum += tt.getLong(m);
+						if (td != null) mSum += td.getLong(m);
+					}
+					seconds = secSum;
+					meters = mSum;
+				}
+				else {
 					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
 					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
-					if (!td.containsKey(m))
-						continue;
 					seconds = (tt == null) ? 0L : tt.getLong(m);
 					meters = td.getLong(m);
 				}
@@ -739,6 +778,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. beeline speed [km/h]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				long seconds;
 				long metersBee;
 				if (group.equals("total")) {
@@ -751,11 +791,20 @@ public class TripAnalysis implements MATSimAppCommand {
 					}
 					seconds = secSum;
 					metersBee = beeSum;
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					long secSum = 0L, beeSum = 0L;
+					for (String sub : groupsOfThisTrafficType) {
+						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
+						Object2LongMap<String> bee = beelineDistanceBySubpopulationGroup.get(sub);
+						if (tt != null) secSum += tt.getLong(m);
+						if (bee != null) beeSum += bee.getLong(m);
+					}
+					seconds = secSum;
+					metersBee = beeSum;
+				}
+				else {
 					Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(group);
 					Object2LongMap<String> bee = beelineDistanceBySubpopulationGroup.get(group);
-					if (!tt.containsKey(m))
-						continue;
 					seconds = tt.getLong(m);
 					metersBee = (bee == null) ? 0L : bee.getLong(m);
 				}
@@ -768,6 +817,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. distance per trip [km]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				long meters;
 				int nTrips;
 				if (group.equals("total")) {
@@ -781,11 +831,21 @@ public class TripAnalysis implements MATSimAppCommand {
 					}
 					meters = mSum;
 					nTrips = nSum;
-				} else {
+				} else if (groupsOfThisTrafficType != null) {
+					long mSum = 0L;
+					int nSum = 0;
+					for (String sub : groupsOfThisTrafficType) {
+						Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(sub);
+						Object2IntMap<String> n = nBySubpopulationGroup.get(sub);
+						if (td != null) mSum += td.getLong(m);
+						if (n != null) nSum += n.getInt(m);
+					}
+					meters = mSum;
+					nTrips = nSum;
+				}
+				else {
 					Object2LongMap<String> td = travelDistanceBySubpopulationGroup.get(group);
 					Object2IntMap<String> n = nBySubpopulationGroup.get(group);
-					if (!n.containsKey(m))
-						continue;
 					meters = (td == null) ? 0L : td.getLong(m);
 					nTrips = n.getInt(m);
 				}
@@ -796,6 +856,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. speed per trip [km]");
 			for (String m : modeOrder) {
+				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
 				double avg;
 				if (group.equals("total")) {
 					double sum = 0d;
@@ -803,16 +864,27 @@ public class TripAnalysis implements MATSimAppCommand {
 					for (Map.Entry<String, Map<String, DoubleList>> e : speedsBySubpopulationGroup.entrySet()) {
 						DoubleList dl = e.getValue() == null ? null : e.getValue().get(m);
 						if (dl != null && !dl.isEmpty()) {
-							// Summe und Anzahl der Samples sammeln (gewichtetes Mittel)
 							for (int i = 0; i < dl.size(); i++) sum += dl.getDouble(i);
 							cnt += dl.size();
 						}
 					}
 					avg = cnt > 0 ? (sum / cnt) : 0d;
-				} else {
+				} else  if (groupsOfThisTrafficType != null) {
+					double sum = 0d;
+					long cnt = 0L;
+					for (String g : groupsOfThisTrafficType) {
+						Map<String, DoubleList> map = speedsBySubpopulationGroup.get(g);
+						if (map == null) continue;
+						DoubleList dl = map.get(m);
+						if (dl != null && !dl.isEmpty()) {
+							for (int i = 0; i < dl.size(); i++) sum += dl.getDouble(i);
+							cnt += dl.size();
+						}
+					}
+					avg = cnt > 0 ? (sum / cnt) : 0d;
+				}
+				else {
 					Map<String, DoubleList> map = speedsBySubpopulationGroup.get(group);
-					if (!map.containsKey(m))
-						continue;
 					DoubleList dl = map.get(m);
 					avg = (dl == null || dl.isEmpty())
 						? 0d

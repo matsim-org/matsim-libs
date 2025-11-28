@@ -252,15 +252,20 @@ public class CommercialTrafficDashboard implements Dashboard {
 //						.y("share")
 //				);
 //			});
-
-			for (String group : groupsOfCommercialSubpopulations) {
-				layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
-					viz.title = "Mode Statistics of group: *" + group + "*";
-					viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
-					viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
-					viz.showAllRows = true;
-				});
-			}
+		layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
+			viz.title = "Mode Statistics of group: *commercialTraffic*";
+			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "commercialTraffic");
+			viz.showAllRows = true;
+		});
+		for (String group : groupsOfCommercialSubpopulations) {
+			layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
+				viz.title = "Mode Statistics of group: *" + group + "*";
+				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
+				viz.showAllRows = true;
+			});
+		}
 		layout.row("trips_fifth", "Trips")
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
