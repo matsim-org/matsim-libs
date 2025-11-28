@@ -113,7 +113,7 @@ public class DefaultRequestInsertionSchedulerTest {
         vehicle.getSchedule().addTask(new DrtDriveTask(vrpPath, DrtDriveTask.TYPE));
 
         DefaultDrtStopTask stopTask0 = new DefaultDrtStopTask(R1_PU_TIME - STOP_DURATION, R1_PU_TIME, from1);
-        AcceptedDrtRequest acceptedExistingRequest = AcceptedDrtRequest.createFromOriginalRequest(existingRequest1);
+        AcceptedDrtRequest acceptedExistingRequest = AcceptedDrtRequest.createFromOriginalRequest(existingRequest1, 60);
         stopTask0.addPickupRequest(acceptedExistingRequest);
         vehicle.getSchedule().addTask(stopTask0);
 
@@ -129,7 +129,7 @@ public class DefaultRequestInsertionSchedulerTest {
         vehicle.getSchedule().addTask(new DrtDriveTask(vrpPath3, DrtDriveTask.TYPE));
 
         DefaultDrtStopTask stopTask2 = new DefaultDrtStopTask(stopTask1.getEndTime() + longPath.travelTime + 10., stopTask1.getEndTime() + longPath.travelTime + STOP_DURATION, to2);
-        AcceptedDrtRequest acceptedExistingRequest2 = AcceptedDrtRequest.createFromOriginalRequest(existingRequest2);
+        AcceptedDrtRequest acceptedExistingRequest2 = AcceptedDrtRequest.createFromOriginalRequest(existingRequest2, 60);
         stopTask2.addDropoffRequest(acceptedExistingRequest2);
         vehicle.getSchedule().addTask(stopTask2);
 
@@ -147,7 +147,7 @@ public class DefaultRequestInsertionSchedulerTest {
                 detourTimeInfo);
 
         RequestInsertionScheduler.PickupDropoffTaskPair pickupDropoffTaskPair =
-                insertionScheduler.scheduleRequest(AcceptedDrtRequest.createFromOriginalRequest(newRequest), insertion);
+                insertionScheduler.scheduleRequest(AcceptedDrtRequest.createFromOriginalRequest(newRequest, 60), insertion);
 
         ScheduleInfo actualScheduleInfo = getScheduleInfo(vehicle.getSchedule());
         ScheduleInfo expectedScheduleInfo = ScheduleInfo.newBuilder()
