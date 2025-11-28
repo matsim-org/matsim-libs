@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.ev.charging;
 
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -59,7 +60,7 @@ public class ChargingModule extends AbstractModule {
 		bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
 	
 		// standard charger output power 
-		bind(ChargerPower.Factory.class).toInstance(DefaultChargerPower::new);
+		bind(ChargerPower.Factory.class).to(DefaultChargerPower.Factory.class);
 	}
 
 	@Provides @Singleton
@@ -70,5 +71,10 @@ public class ChargingModule extends AbstractModule {
 	@Provides @Singleton
 	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
 		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
+	}
+
+	@Provides @Singleton
+	DefaultChargerPower.Factory provideDefaultChargerPowerFactory(EvConfigGroup evConfig) {
+		return new DefaultChargerPower.Factory(evConfig.getChargeTimeStep());
 	}
 }

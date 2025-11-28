@@ -31,14 +31,9 @@ public interface ChargerPower {
     void unplugVehicle(double now, ElectricVehicle vehicle);
 
     /**
-     * returns the maximum available energy that can be charged by the vehicle
+     * returns the maximum energy that can be charged by the vehicle
      */
-    double calcAvailableEnergyToCharge(double now, ElectricVehicle vehicle);
-
-    /**
-     * returns the maximum power with which the vehicle can charge
-     */
-    double calcChargingPower(double now, ElectricVehicle vehicle);
+    double calcMaximumEnergyToCharge(double now, ElectricVehicle vehicle);
 
     /**
      * energy is consumed from the charger

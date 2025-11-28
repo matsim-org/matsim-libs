@@ -62,24 +62,24 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		while (cvIter.hasNext()) {
 			ChargingVehicle cv = cvIter.next();
 
-			double requestedVehicleEnergy = cv.strategy().calcRemainingEnergyToCharge();
-			double availableChargerEnergy = chargerPower.calcAvailableEnergyToCharge(now, cv.ev());
+			// how much the vehicle would like to charge
+			double requestedEnergy = cv.strategy().calcRemainingEnergyToCharge();
 
+			// current state of the vehicle
 			double currentVehicleCharge = cv.ev().getBattery().getCharge();
 
-			double vehicleChargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
-			double chargerChargingPower = chargerPower.calcChargingPower(now, cv.ev());
-			double chargingPower = Math.min(vehicleChargingPower, chargerChargingPower);
-
+			// maximum power with which the vehicle can charge
+			double chargingPower = cv.ev().getChargingPower().calcChargingPower(charger);
+			
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
 			double chargedEnergy = chargingPower * chargePeriod;
 
 			// limited by requested energy
-			chargedEnergy = Math.min(chargedEnergy, requestedVehicleEnergy);
+			chargedEnergy = Math.min(chargedEnergy, requestedEnergy);
 
-			// limited by available energy
-			chargedEnergy = Math.min(chargedEnergy, availableChargerEnergy);
+			// limited by available energy that can be given by charger in that period
+			chargedEnergy = Math.min(chargedEnergy, chargerPower.calcMaximumEnergyToCharge(now, cv.ev()));
 
 			// limited by battery capacity
 			chargedEnergy = Math.min(chargedEnergy, cv.ev().getBattery().getCapacity() - currentVehicleCharge);
