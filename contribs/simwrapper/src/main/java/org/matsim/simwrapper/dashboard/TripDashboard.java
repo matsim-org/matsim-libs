@@ -47,8 +47,7 @@ public class TripDashboard implements Dashboard {
 	private String[] args;
 
 	private boolean choiceEvaluation;
-	private List<String> groupsOfPersonSubpopulations = new ArrayList<>();
-
+	private final LinkedHashMap<String, List<String>> groupsOfPersonSubpopulations = new LinkedHashMap<>();
 	/**
 	 * Default trip dashboard constructor.
 	 */
@@ -139,11 +138,17 @@ public class TripDashboard implements Dashboard {
 	 * @param groupsOfSubpopulations e.g. "personGroup1=berlin_person,brandenburg_person;personGroup2=berlin_person_under18"
 	 */
 	public TripDashboard setGroupsOfSubpopulationsForPersonAnalysis(String... groupsOfSubpopulations) {
-		String joined = String.join(";", groupsOfSubpopulations);
-		groupsOfPersonSubpopulations = Arrays.stream(joined.split(";"))
-			.map(entry -> entry.split("=")[0])
-			.collect(Collectors.toList());
-		return setAnalysisArgs("--groups-of-subpopulations-personAnalysis", joined);
+		String groupsOfPersonSubpopulationsString = String.join(";", groupsOfSubpopulations);
+		for (String part : groupsOfPersonSubpopulationsString.split(";")) {
+			if (part.isBlank()) continue;
+			String[] kv = part.split("=", 2);
+			String groupName = kv[0].trim();
+			List<String> subpops = kv.length > 1 && !kv[1].isBlank()
+				? Arrays.stream(kv[1].split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())
+				: new ArrayList<>();
+			groupsOfPersonSubpopulations.put(groupName, subpops);
+		}
+		return setAnalysisArgs("--groups-of-subpopulations-personAnalysis", groupsOfPersonSubpopulationsString);
 	}
 
 	/**
@@ -164,19 +169,16 @@ public class TripDashboard implements Dashboard {
 		String columnForModeShare;
 		if (groupsOfPersonSubpopulations.isEmpty()) {
 			columnForModeShare = "share_total";
-			groupsOfPersonSubpopulations.add("total");
+			groupsOfPersonSubpopulations.put("total", new ArrayList<>());
 			header.title = "Trips";
 			header.description = "General information about modal share and trip distributions.";
 		} else {
 			columnForModeShare = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			header.title = "Trips (Persons)";
-			header.description = "General information about modal share and trip distributions of the selected groups of the persons: **" + groupsOfPersonSubpopulations +
+			header.description = "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsOfPersonSubpopulations +
 				"**.";
 			if (groupsOfPersonSubpopulations.size() > 1)
-				groupsOfPersonSubpopulations.addFirst("total");
-			else {
-				groupsOfPersonSubpopulations.set(0, "total");
-			}
+				groupsOfPersonSubpopulations.putFirst("total", new ArrayList<>());
 		}
 
 		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
@@ -187,7 +189,7 @@ public class TripDashboard implements Dashboard {
 			args[this.args.length] = "--input-ref-data";
 			args[this.args.length + 1] = groupedRefCsv;
 		}
-		for (String group : groupsOfPersonSubpopulations) {
+		for (String group : groupsOfPersonSubpopulations.keySet()) {
 			if (groupsOfPersonSubpopulations.size() == 1) { // this is to check if a tab is needed
 				String tab = (groupedRefCsv != null || choiceEvaluation) ? header.title : null;
 				createTripsDashboardTab(layout, tab, args, columnForModeShare);
@@ -331,7 +333,7 @@ public class TripDashboard implements Dashboard {
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
 				if (finalTab.equals("total")) {
-					headerPopStats.addAll(groupsOfPersonSubpopulations);
+					headerPopStats.addAll(groupsOfPersonSubpopulations.keySet());
 					headerPopStats.add("total");
 				}
 				else
