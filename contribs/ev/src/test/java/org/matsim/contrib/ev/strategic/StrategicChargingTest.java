@@ -108,7 +108,7 @@ public class StrategicChargingTest {
         ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
                 .setLegInclusionProbability(1.0);
 
-        // motivate agent to charge enroute
+        // motivate agent to charge enroute (both on way there and back)
         config.setMaximumActivityChargingDuration(0.0);
         config.setMinimumEnrouteDriveTime(0.0);
 
@@ -119,19 +119,19 @@ public class StrategicChargingTest {
         Controler controller = scenario.controller();
         controller.run();
 
-        assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
-        assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+        assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
+        assertEquals(2, scenario.tracker().finishChargingProcessEvents.size());
         assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
 
-        assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+        assertEquals(2, scenario.tracker().startChargingAttemptEvents.size());
         assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
-        assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+        assertEquals(2, scenario.tracker().finishChargingAttemptEvents.size());
         assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
 
         assertTrue(scenario.tracker().startChargingAttemptEvents.getFirst().isEnroute());
 
-        assertEquals(1, scenario.tracker().chargingStartEvents.size());
-        assertEquals(1, scenario.tracker().chargingEndEvents.size());
+        assertEquals(2, scenario.tracker().chargingStartEvents.size());
+        assertEquals(2, scenario.tracker().chargingEndEvents.size());
     }
 
     @Test

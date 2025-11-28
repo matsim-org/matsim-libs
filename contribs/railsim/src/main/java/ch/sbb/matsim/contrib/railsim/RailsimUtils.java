@@ -28,6 +28,7 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.vehicles.VehicleType;
@@ -283,6 +284,14 @@ public final class RailsimUtils {
 		} else {
 			departure.getAttributes().putAttribute(FORMATION, String.join(",", formations));
 		}
+	}
+
+	/**
+	 * Return the id string representation of an identifiable object.
+	 */
+	public static String objectIdToString(Identifiable<?> obj) {
+		if (obj == null) return "";
+		return Objects.toString(obj.getId(), "");
 	}
 
 }

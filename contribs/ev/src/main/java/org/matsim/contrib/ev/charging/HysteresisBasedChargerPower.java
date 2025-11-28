@@ -4,10 +4,47 @@ import java.util.Collection;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class HysteresisBasedChargerPower implements ChargerPower {
 
-    static public record Settings( //
+    @Override
+    public void plugVehicle(double now, ElectricVehicle vehicle) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'plugVehicle'");
+    }
+
+    @Override
+    public void unplugVehicle(double now, ElectricVehicle vehicle) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unplugVehicle'");
+    }
+
+    @Override
+    public double calcAvailableEnergyToCharge(double now, ElectricVehicle vehicle) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'calcAvailableEnergyToCharge'");
+    }
+
+    @Override
+    public double calcChargingPower(double now, ElectricVehicle vehicle) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'calcChargingPower'");
+    }
+
+    @Override
+    public void consumeEnergy(double energy) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'consumeEnergy'");
+    }
+
+    @Override
+    public void update(double now) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    /*static public record Settings( //
             double batteryChargingPower_kW, //
             double maximumGridPower_kW, //
 
@@ -51,7 +88,7 @@ public class HysteresisBasedChargerPower implements ChargerPower {
     }
 
     @Override
-    public double calcMaximumEnergy() {
+    public double getMaximumEnergy() {
         return Double.POSITIVE_INFINITY;
     }
 
@@ -82,5 +119,5 @@ public class HysteresisBasedChargerPower implements ChargerPower {
         }
 
         previousChargingState_Ws = chargingState_Ws;
-    }
+    }*/
 }

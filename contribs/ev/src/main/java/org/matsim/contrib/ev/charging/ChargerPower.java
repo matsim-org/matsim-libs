@@ -1,8 +1,6 @@
 package org.matsim.contrib.ev.charging;
 
-import java.util.Collection;
-
-import org.matsim.contrib.ev.charging.ChargingLogic.ChargingVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
@@ -22,11 +20,33 @@ public interface ChargerPower {
         ChargerPower create(ChargerSpecification charger);
     }
 
-    double calcMaximumChargingPower(Collection<ChargingVehicle> vehicles);
+    /**
+     * a vehicle is plugged to the charger
+     */
+    void plugVehicle(double now, ElectricVehicle vehicle);
 
-    double calcMaximumEnergy();
+    /**
+     * a vehicle is unplugged from the charger
+     */
+    void unplugVehicle(double now, ElectricVehicle vehicle);
 
+    /**
+     * returns the maximum available energy that can be charged by the vehicle
+     */
+    double calcAvailableEnergyToCharge(double now, ElectricVehicle vehicle);
+
+    /**
+     * returns the maximum power with which the vehicle can charge
+     */
+    double calcChargingPower(double now, ElectricVehicle vehicle);
+
+    /**
+     * energy is consumed from the charger
+     */
     void consumeEnergy(double energy);
 
-    void update(double chargePeriod, double now, Collection<ChargingVehicle> vehicles);
+    /**
+     * regular update whenever charging is simulated
+     */
+    void update(double now);
 }

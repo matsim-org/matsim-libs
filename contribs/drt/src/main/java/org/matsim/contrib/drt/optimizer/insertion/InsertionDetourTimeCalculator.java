@@ -217,7 +217,7 @@ public class InsertionDetourTimeCalculator {
 		VehicleEntry vEntry = insertion.vehicleEntry;
 		double remainingPickupTimeLoss = pickupDetourInfo.pickupTimeLoss;
 
-		for (int i = insertion.pickup.index + 1; i < insertion.dropoff.index; i++) {
+		for (int i = insertion.pickup.index; i < insertion.dropoff.index; i++) {
 			remainingPickupTimeLoss = Math.max(remainingPickupTimeLoss - vEntry.getPrecedingStayTime(i), 0.0);
 		}
 

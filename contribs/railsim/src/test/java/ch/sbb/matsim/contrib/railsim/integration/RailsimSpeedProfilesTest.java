@@ -22,6 +22,7 @@ public class RailsimSpeedProfilesTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCrossLarge"));
 
 		assertThat(result)
+			.allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 30497)
 			.trainHasLastArrival("train2", 30707);
 
@@ -38,6 +39,7 @@ public class RailsimSpeedProfilesTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "microJunctionCrossLarge"), setup);
 
 		assertThat(result)
+			.allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 31052)
 			.trainHasLastArrival("train2", 31262);
 
@@ -67,6 +69,7 @@ public class RailsimSpeedProfilesTest extends AbstractIntegrationTest {
 		// Train 2 has to wait longer, but still arrives at the same time (1 sec before due to rounding)
 
 		assertThat(result)
+			.allStopDelaysAreZero()
 			.trainHasLastArrival("train1", 31052)
 			.trainHasLastArrival("train2", 31261);
 

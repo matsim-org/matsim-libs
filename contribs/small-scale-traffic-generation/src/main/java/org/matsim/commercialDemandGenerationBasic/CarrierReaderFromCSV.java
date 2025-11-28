@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -36,7 +37,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -262,8 +262,8 @@ final class CarrierReaderFromCSV {
 	static Set<CarrierInformationElement> readCarrierInformation(Path csvLocationCarrier) throws IOException {
 		log.info("Start reading carrier csv file: {}", csvLocationCarrier);
 		Set<CarrierInformationElement> allNewCarrierInformation = new HashSet<>();
-		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationCarrier),
-			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
+		CSVParser parse = CSVFormat.Builder.create(CSVFormat.TDF).setDelimiter('\t').setHeader()
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(csvLocationCarrier.toString()));
 		for (CSVRecord record : parse) {
 			CarrierInformationElement.Builder builder;
 			if (!record.get("carrierName").isBlank())
