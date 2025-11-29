@@ -36,10 +36,10 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -381,9 +381,9 @@ final class DemandReaderFromCSV {
 	 */
 	static Set<DemandInformationElement> readDemandInformation(Path csvLocationDemand) throws IOException {
 
-		Set<DemandInformationElement> demandInformation = new HashSet<>();
-		CSVParser parse = new CSVParser(Files.newBufferedReader(csvLocationDemand),
-			CSVFormat.Builder.create(CSVFormat.TDF).setHeader().setSkipHeaderRecord(true).build());
+		Set<DemandInformationElement> demandInformation = new LinkedHashSet<>();
+		CSVParser parse = CSVFormat.Builder.create(CSVFormat.TDF).setDelimiter('\t').setHeader()
+			.setSkipHeaderRecord(true).get().parse(IOUtils.getBufferedReader(csvLocationDemand.toString()));
 
 		for (CSVRecord record : parse) {
 			DemandInformationElement.Builder builder;

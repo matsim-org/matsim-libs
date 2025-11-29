@@ -34,39 +34,13 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
-	/**
-	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
-	 * */
-	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY = "marginalUtilityOfUserDefinedNetworkAttribute_m";
-	/**
-	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
-	 * */
-	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_NAME = "userDefinedNetworkAttributeName";
-	/**
-	 * @deprecated  -- I think that the "user defined material" should be removed.  If someone wants more flexibility, he/she should bind a custom AdditionalBicycleLinkScore.  kai, jun'25
-	 * */
-	private static final String USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE = "userDefinedNetworkAttributeDefaultValue";
-	/**
-	 * @deprecated  -- I think that this has been superseeded by mode vehicles.
-	 * */
-	private static final String MAX_BICYCLE_SPEED_FOR_ROUTING = "maxBicycleSpeedForRouting";
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
 
 	private double marginalUtilityOfComfort;
 
-//	@Deprecated
-//	@StringGetter(MAX_BICYCLE_SPEED_FOR_ROUTING)
-//	public double getMaxBicycleSpeedForRouting() {
-//		return this.maxBicycleSpeedForRouting;
-//	}
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
-	private double marginalUtilityOfUserDefinedNetworkAttribute;
-	private String userDefinedNetworkAttributeName;
-	private double userDefinedNetworkAttributeDefaultValue;
-//	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
-//	private double maxBicycleSpeedForRouting = 25.0/3.6;
 	private String bicycleMode = "bicycle";
 	private boolean motorizedInteraction = false;
 
@@ -80,10 +54,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
-		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_MARGINAL_UTILITY, "marginalUtilityOfUserDefinedNetworkAttribute");
-		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_NAME, "userDefinedNetworkAttributeName");
-		map.put(USER_DEFINED_NETWORK_ATTRIBUTE_DEFAULT_VALUE, "userDefinedNetworkAttributeDefaultValue");
-		map.put(MAX_BICYCLE_SPEED_FOR_ROUTING, "maxBicycleSpeed");
 		return map;
 	}
 	/**
@@ -121,27 +91,6 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 		return this.marginalUtilityOfGradient;
 	}
 
-
-//	public BicycleConfigGroup setBicycleScoringType( final BicycleScoringType value ) {
-//		this.bicycleScoringType = value;
-//		return this;
-//	}
-//	public BicycleScoringType getBicycleScoringType() {
-//		return this.bicycleScoringType;
-//	}
-
-//	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
-//	/**
-//	 * @deprecated
-//	 * Please only change this
-//	 */
-//	@Deprecated
-//	public BicycleConfigGroup setMaxBicycleSpeedForRouting( final double value ) {
-//		this.maxBicycleSpeedForRouting = value;
-//		return this;
-//	}
-
-//	public enum BicycleScoringType {legBased, @Deprecated linkBased}
 	@StringGetter( BICYCLE_MODE )
 	public String getBicycleMode() {
 		return this.bicycleMode;
@@ -168,9 +117,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 				throw new RuntimeException( "cannot use qsim.getVehiclesSource = defaultVehicle with bicycle contrib.  Instead use " +
 				"modeVehicles ... or fromVehiclesData; it is important that bicycles have speeds.  See RunBicycleContribExample in matsim-code-examples." );
 			}
-			case modeVehicleTypesFromVehiclesData -> {
-			}
-			case fromVehiclesData -> {
+			case modeVehicleTypesFromVehiclesData, fromVehiclesData -> {
 			}
 			default -> throw new IllegalStateException("Unexpected value: " + config.qsim().getVehiclesSource());
 		}
@@ -179,11 +126,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 				throw new RuntimeException( "cannot use the bicycle contrib together with accessEgressType==none.  See " +
 				"RunBicycleContribExample in matsim-code-examples." );
 			}
-			case accessEgressModeToLink -> {
-			}
-			case walkConstantTimeToLink -> {
-			}
-			case accessEgressModeToLinkPlusTimeConstant -> {
+			case accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant -> {
 			}
 			default -> throw new IllegalStateException("Unexpected value: " + config.routing().getAccessEgressType());
 		}

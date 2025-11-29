@@ -42,7 +42,13 @@ public class ChargerReservationModule extends AbstractModule {
 
     @Provides
     @Singleton
-    ChargerReservationManager provideChargerReservationManager() {
-        return new ChargerReservationManager();
+    ChargerReservationManager provideChargerReservationManager(ChargerReservability chargerReservability) {
+        return new ChargerReservationManager(chargerReservability);
+    }
+
+    @Provides
+    @Singleton
+    ChargerReservability provideChargerReservability() {
+        return new ChargerReservability();
     }
 }

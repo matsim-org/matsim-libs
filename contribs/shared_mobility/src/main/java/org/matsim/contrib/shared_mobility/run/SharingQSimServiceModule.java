@@ -65,7 +65,7 @@ public class SharingQSimServiceModule extends AbstractModalQSimModule<SharingMod
 			QSim qsim = getter.get(QSim.class);
 			SharingServiceSpecification specification = getter.getModal(SharingServiceSpecification.class);
 
-			return new SharingVehicleSource(qsim, specification);
+			return new SharingVehicleSource(qsim, serviceConfig, specification);
 
 		}));
 

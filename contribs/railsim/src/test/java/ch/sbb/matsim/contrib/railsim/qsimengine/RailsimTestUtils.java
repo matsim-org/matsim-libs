@@ -38,13 +38,8 @@ import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
-import org.matsim.vehicles.MatsimVehicleReader;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
@@ -71,6 +66,13 @@ public class RailsimTestUtils {
 		vehicles.put(TestVehicle.Express, veh.getVehicleTypes().get(Id.create("Express", VehicleType.class)));
 		vehicles.put(TestVehicle.Regio, veh.getVehicleTypes().get(Id.create("Regio", VehicleType.class)));
 		vehicles.put(TestVehicle.Cargo, veh.getVehicleTypes().get(Id.create("Cargo", VehicleType.class)));
+	}
+
+	/**
+	 * Create a mock for the TrainTimeDistanceHandler.
+	 */
+	public static TrainTimeDistanceHandler createTrainTimeDistanceHandler() {
+		return Mockito.mock(TrainTimeDistanceHandler.class);
 	}
 
 	/**

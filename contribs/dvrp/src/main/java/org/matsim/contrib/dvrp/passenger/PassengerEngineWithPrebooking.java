@@ -75,7 +75,7 @@ public final class PassengerEngineWithPrebooking
 
 	PassengerEngineWithPrebooking(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, PassengerRequestValidator requestValidator) {
+			Network network, DvrpPassengerTracker tracker, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.preplanningEngine = preplanningEngine;
@@ -85,7 +85,7 @@ public final class PassengerEngineWithPrebooking
 		this.requestValidator = requestValidator;
 		this.eventsManager = eventsManager;
 
-		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager, tracker);
 	}
 
 	@Override public void setInternalInterface(InternalInterface internalInterface) {
@@ -292,7 +292,8 @@ public final class PassengerEngineWithPrebooking
 			@Override public PassengerEngineWithPrebooking get() {
 				return new PassengerEngineWithPrebooking(getMode(), eventsManager, mobsimTimer, preplanningEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
+						getModalInstance(Network.class), getModalInstance(DvrpPassengerTracker.class),
+						getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}

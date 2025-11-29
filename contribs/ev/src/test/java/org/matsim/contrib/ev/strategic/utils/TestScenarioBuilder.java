@@ -230,7 +230,7 @@ public class TestScenarioBuilder {
 				Collections.emptySet(), true);
 	}
 
-	private void prepareInfrastructure(Controler controller) {
+	private ChargingInfrastructureSpecification prepareInfrastructure(Controler controller) {
 		ChargingInfrastructureSpecification infrastructure = new ChargingInfrastructureSpecificationDefaultImpl();
 
 		for (ChargerItem item : chargers) {
@@ -268,6 +268,8 @@ public class TestScenarioBuilder {
 				bind(ChargingInfrastructureSpecification.class).toInstance(infrastructure);
 			}
 		});
+
+		return infrastructure;
 	}
 
 	// DEMAND PART
@@ -511,7 +513,8 @@ public class TestScenarioBuilder {
 			}
 		});
 
-		prepareInfrastructure(controller);
+		ChargingInfrastructureSpecification infrastructure = prepareInfrastructure(controller);
+		scenario.addScenarioElement("infrastructure", infrastructure);
 
 		controller.addOverridingModule(new WithinDayEvModule());
 

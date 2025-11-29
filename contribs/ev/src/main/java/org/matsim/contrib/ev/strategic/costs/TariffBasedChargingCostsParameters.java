@@ -75,6 +75,9 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 		@Parameter
 		private String dynamicCostPerEnergy_kWh = null;
 
+		@Parameter
+		private double costPerReservation = 0.0;
+
 		public String getTariffName() {
 			return name;
 		}
@@ -137,6 +140,14 @@ public class TariffBasedChargingCostsParameters extends ReflectiveConfigGroup im
 
 		public void setDynamicCostPerEnergy_kWh(String dynamicCostPerEnergy_kWh) {
 			this.dynamicCostPerEnergy_kWh = dynamicCostPerEnergy_kWh;
+		}
+
+		public double getCostPerReservation() {
+			return costPerReservation;
+		}
+
+		public void setCostPerReservation(double costPerReservation) {
+			this.costPerReservation = costPerReservation;
 		}
 
 		@Override

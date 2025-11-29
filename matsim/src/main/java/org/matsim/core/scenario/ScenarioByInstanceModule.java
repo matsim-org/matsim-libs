@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
@@ -54,6 +55,9 @@ public final class ScenarioByInstanceModule extends AbstractModule {
 			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
 			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
 		}
+
+		if (!getSimulationContext().isDistributed())
+			bind(PopulationPartition.class).toInstance(PopulationPartition.SINGLE_INSTANCE);
 	}
 
 	@Provides Network provideNetwork(Scenario scenario) {

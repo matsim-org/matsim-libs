@@ -26,8 +26,16 @@ import jakarta.validation.constraints.PositiveOrZero;
 public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public static final String GROUP_NAME = "strategic_charging";
 
-	public static StrategicChargingConfigGroup get(Config config) {
+	public static StrategicChargingConfigGroup get(Config config, boolean create) {
+		if (!config.getModules().containsKey(GROUP_NAME)) {
+			config.addModule(new StrategicChargingConfigGroup());
+		}
+
 		return (StrategicChargingConfigGroup) config.getModules().get(GROUP_NAME);
+	}
+
+	public static StrategicChargingConfigGroup get(Config config) {
+		return get(config, false);
 	}
 
 	public StrategicChargingConfigGroup() {
@@ -99,14 +107,23 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 	private double maximumEnrouteChargingDuration = 3600.0;
 
 	@Parameter
-	@Comment("Euclidean search radius to find candidates for charging")
+	@Comment("Euclidean search radius to find candidates for activity-based charging")
 	@PositiveOrZero
-	private double chargerSearchRadius = 1000.0;
+	private double activityBasedChargerSearchRadius = 1000.0;
+
+	@Parameter
+	@Comment("Euclidean search radius to find candidates for leg-based charging")
+	@PositiveOrZero
+	private double legBasedChargerSearchRadius = 1000.0;
 
 	@Parameter
 	@Comment("Defines the probability with which a charging plan is selected among the existing ones versus creating a new charging plan")
 	@DecimalMin("0.0")
 	@DecimalMax("1.0")
+	/**
+	 * I think we should phase out selection for strategic charging and just rely on
+	 * the standard selection mechanisms. / sebhoerl oct 2025
+	 */
 	private double selectionProbability = 0.8;
 
 	@Parameter
@@ -223,12 +240,20 @@ public class StrategicChargingConfigGroup extends ReflectiveConfigGroupWithConfi
 		this.maximumEnrouteChargingDuration = maximumEnrouteChargingDuration;
 	}
 
-	public double getChargerSearchRadius() {
-		return chargerSearchRadius;
+	public double getActivityBasedChargerSearchRadius() {
+		return activityBasedChargerSearchRadius;
 	}
 
-	public void setChargerSearchRadius(double chargerSearchRadius) {
-		this.chargerSearchRadius = chargerSearchRadius;
+	public void setActivityBasedChargerSearchRadius(double activityBasedChargerSearchRadius) {
+		this.activityBasedChargerSearchRadius = activityBasedChargerSearchRadius;
+	}
+
+	public double getLegBasedChargerSearchRadius() {
+		return legBasedChargerSearchRadius;
+	}
+
+	public void setLegBasedChargerSearchRadius(double legBasedChargerSearchRadius) {
+		this.legBasedChargerSearchRadius = legBasedChargerSearchRadius;
 	}
 
 	public double getSelectionProbability() {

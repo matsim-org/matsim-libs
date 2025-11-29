@@ -20,20 +20,14 @@
 package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Inject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.IdSet;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -50,7 +44,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,13 +60,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author dgrether
  * @author mrieser
  */
-public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler,
-									     VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler,
-									     VehicleAbortsEventHandler {
+@DistributedEventHandler(value = DistributedMode.PARTITION_SINGLETON, directProcessing = true)
+public final class TravelTimeCalculator implements AggregatingEventHandler<TravelTimeSyncMessage>,
+	LinkEnterEventHandler, LinkLeaveEventHandler,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, VehicleArrivesAtFacilityEventHandler,
+	VehicleAbortsEventHandler {
 	private static final Logger log = LogManager.getLogger(TravelTimeCalculator.class);
 
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
-											     "agent is not known the turning move travel time cannot be calculated!";
+		"agent is not known the turning move travel time cannot be calculated!";
 
 	private final double timeSlice;
 	private final int numSlots;
@@ -93,6 +89,11 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	private final boolean calculateLinkTravelTimes;
 
 	private final boolean calculateLinkToLinkTravelTimes;
+
+	/**
+	 * These have been received from other partitions and will not be sent out,
+	 */
+	private final IdSet<Link> receivedIds = new IdSet(Link.class);
 
 	@Inject private QSimConfigGroup qsimConfig ;
 	TravelTimeGetter travelTimeGetter ;
@@ -142,6 +143,49 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		this(network, timeslice, maxTime, ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(),
 			  CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModesAsString() ) );
 	}
+
+	@Override
+	public String getName() {
+		return "TravelTimeCalculator{" + String.join(",", analyzedModes) + "}";
+	}
+
+	@Override
+	public TravelTimeSyncMessage send() {
+		TravelTimeSyncMessage msg = new TravelTimeSyncMessage();
+
+		if (this.calculateLinkTravelTimes) {
+			for (Map.Entry<Id<Link>, TravelTimeDataArray> entry : this.linkData.entrySet()) {
+
+				if (receivedIds.contains(entry.getKey())) {
+					continue;
+				}
+
+				TravelTimeDataArray dataArray = entry.getValue();
+				if (dataArray.isNeedingConsolidation()) {
+					consolidateData(dataArray);
+				}
+
+				msg.travelTimes.put(entry.getKey().index(), dataArray.getData());
+			}
+		}
+
+		return msg;
+	}
+
+	@Override
+	public void receive(List<TravelTimeSyncMessage> messages) {
+		for (TravelTimeSyncMessage msg : messages) {
+			for (Int2ObjectMap.Entry<long[]> e : msg.travelTimes.int2ObjectEntrySet()) {
+
+				Id<Link> linkId = Id.get(e.getIntKey(), Link.class);
+				TravelTimeDataArray dataArray = linkData.computeIfAbsent(linkId, k -> createTravelTimeData(linkId));
+
+				dataArray.setData(e.getValue());
+				receivedIds.add(linkId);
+			}
+		}
+	}
+
 
 	public final static class Builder {
 		// The idea here is that the config group will NOT be passed into this object any more. kai, feb'19
@@ -195,7 +239,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 		public TravelTimeCalculator build() {
 			TravelTimeCalculator abc = new TravelTimeCalculator( network, timeslice, maxTime, calculateLinkTravelTimes, calculateLinkToLinkTravelTimes, filterModes,
-				  analyzedModes );
+				analyzedModes );
 			if( toBeConfigured ){
 				TravelTimeCalculator.configure( abc, this.ttcConfig, this.network );
 			}
@@ -226,7 +270,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 		// if we just look at one mode, we need to ignore all vehicles with a different mode. However, the info re the mode is only in
 		// the vehicleEntersTraffic event.  So we need to memorize the ignored vehicles from there ...
-		this.vehiclesToIgnore = new HashSet<>();
+		this.vehiclesToIgnore = ConcurrentHashMap.newKeySet();
 
 		this.reset(0);
 	}
@@ -304,7 +348,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			// this functionality is no longer there.
 
 			if (this.calculateLinkToLinkTravelTimes
-					&& event.getTime() < qsimConfig.getEndTime().seconds()
+				&& event.getTime() < qsimConfig.getEndTime().seconds()
 				// (we think that this only makes problems when the abort is not just because of mobsim end time. kai & theresa, jan'17)
 			){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
@@ -348,13 +392,13 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			return this.travelTimeGetter.getTravelTime( data, time );
 		}
 		throw new IllegalStateException("No link travel time is available " +
-								    "if calculation is switched off by config option!");
+			"if calculation is switched off by config option!");
 	}
 
 	private double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
-									    "if calculation is switched off by config option!");
+				"if calculation is switched off by config option!");
 		}
 		TravelTimeData data = this.getLinkToLinkTravelTimeData(new Tuple<>(fromLinkId, toLinkId) );
 		if ( data.isNeedingConsolidation() ) {
@@ -379,6 +423,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		}
 		this.linkEnterEvents.clear();
 		this.vehiclesToIgnore.clear();
+		this.receivedIds.clear();
 	}
 
 	/**

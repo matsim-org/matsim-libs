@@ -20,12 +20,13 @@
 package ch.sbb.matsim.contrib.railsim.qsimengine.resources;
 
 import ch.sbb.matsim.contrib.railsim.RailsimUtils;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.Objects;
 import java.util.Set;
@@ -52,7 +53,13 @@ public final class RailLink implements HasLinkId {
 	public final double minimumHeadwayTime;
 
 	final int tracks;
+
 	private double freeSpeed;
+
+	/**
+	 * Maximum speed by vehicle type, which overrides the free speed if set.
+	 */
+	private final Object2DoubleMap<Id<VehicleType>> vMax;
 
 	/**
 	 * Resource this link belongs to.
@@ -60,10 +67,10 @@ public final class RailLink implements HasLinkId {
 	RailResourceInternal resource;
 
 	public RailLink(Link link, Link opposite) {
-		this(link, opposite, null);
+		this(link, opposite, Object2DoubleMap.ofEntries(), null);
 	}
 
-	public RailLink(Link link, Link opposite, Set<Id<Link>> disallowedNextLinks) {
+	public RailLink(Link link, Link opposite, Object2DoubleMap<Id<VehicleType>> vMax, Set<Id<Link>> disallowedNextLinks) {
 		this.id = link.getId();
 		this.length = link.getLength();
 		this.tracks = RailsimUtils.getTrainCapacity(link);
@@ -73,6 +80,7 @@ public final class RailLink implements HasLinkId {
 		this.isExitLink = RailsimUtils.isExitLink(link);
 		this.isNonBlockingArea = RailsimUtils.isLinkNonBlockingArea(link);
 		this.oppositeLinkId = opposite != null ? opposite.getId() : null;
+		this.vMax = vMax;
 		this.disallowedNextLinks = disallowedNextLinks;
 	}
 
@@ -96,7 +104,13 @@ public final class RailLink implements HasLinkId {
 	 * Returns the allowed freespeed, depending on the context, which is given via driver.
 	 */
 	public double getAllowedFreespeed(MobsimDriverAgent driver) {
-		return Math.min(getFreeSpeed(), driver.getVehicle().getVehicle().getType().getMaximumVelocity());
+		VehicleType type = driver.getVehicle().getVehicle().getType();
+
+		double vMax = this.vMax.getOrDefault(type.getId(), -1);
+		if (vMax > -1)
+			return Math.min(vMax, type.getMaximumVelocity());
+
+		return Math.min(getFreeSpeed(), type.getMaximumVelocity());
 	}
 
 	/**

@@ -31,6 +31,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.management.InvalidAttributeValueException;
 
 import org.apache.logging.log4j.Level;
@@ -41,10 +42,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
@@ -343,6 +345,56 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Adds a roadPricing scheme (RoadPricingSchemeUsingTollFactor) to the scenario that adds a toll for all vehicles on a link that are not networkMode on this link.
+	 * This is needed to ensure that VRP solutions consider the network modes defined on links.
+	 *
+	 * @param scenario scenario to which the roadPricing scheme is added
+	 */
+	public static void addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(Scenario scenario) {
+
+		Map<Id<Carrier>, Carrier> carries = CarriersUtils.getCarriers(scenario).getCarriers();
+		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = carries.values().stream()
+			.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
+			.collect(Collectors.toMap(CarrierVehicle::getId, cv -> cv, (a, b) -> a, HashMap::new));
+		//Create Rp Scheme from code.
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createRoadPricingSchemeImpl();
+
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme, "PricingForVRP");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Adds a toll for all vehicles on a link that are not networkMode on this link.");
+		Set<String> networkModes = NetworkUtils.getModes(scenario.getNetwork());
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().size() < networkModes.size()) {
+				RoadPricingUtils.addLink(scheme, link.getId());
+			}
+		}
+
+		RoadPricingUtils.createAndAddGeneralCost(scheme,
+			Time.parseTime("00:00:00"),
+			Time.parseTime("72:00:00"),
+			1000); // high value to ensure that by solving a VRP a vehicle which is tolled avoids tolled links (e.g. forbitten zones or restrictions for specific trucks
+
+		TollFactor tollFactor =
+			(personId, vehicleId, linkId, time) -> {
+				if (!scheme.getTolledLinkIds().contains(linkId))
+					return 0;
+				var veh = carrierVehicles.get(vehicleId);
+				if (veh == null) {
+					return 0;
+				}
+				var vehType = veh.getType();
+				Link link = scenario.getNetwork().getLinks().get(linkId);
+				if (!link.getAllowedModes().contains(vehType.getNetworkMode())) {
+					return 1;
+				} else {
+					return 0;
+				} // no toll for allowed vehicles
+			};
+		RoadPricingUtils.addRoadPricingScheme(scenario, new RoadPricingSchemeUsingTollFactor(scheme, tollFactor));
 	}
 
 	/**
