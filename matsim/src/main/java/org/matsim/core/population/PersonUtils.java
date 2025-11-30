@@ -44,7 +44,6 @@ public final class PersonUtils {
 	private static final String PERSONAL_SCORING_MODE_CONSTANTS_ATTRIBUTE_NAME = "modeConstants";
 	private static final String MODE_TASTE_VARIATIONS = "modeTasteVariations";
 	private final static Logger log = LogManager.getLogger(Person.class);
-	public static final String MARGINAL_UTILITY_OF_MONEY = "marginalUtilityOfMoney";
 
 	private PersonUtils() {
 	} // do not instantiate
@@ -97,6 +96,7 @@ public final class PersonUtils {
 		return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
 	}
 
+	public static final String MARGINAL_UTILITY_OF_MONEY = "marginalUtilityOfMoney";
 	public static Double getMarginalUtilityOfMoney( Person person ) {
 		return (Double) person.getAttributes().getAttribute( MARGINAL_UTILITY_OF_MONEY );
 	}

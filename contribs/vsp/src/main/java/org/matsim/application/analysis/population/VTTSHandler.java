@@ -68,6 +68,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		public double actTypDur_h;
 		public double actDur_h;
 		double VTTSh;
+		double musl_h;
 		String mode;
 		double departureTime = Double.NaN;
 	}
@@ -247,10 +248,11 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		StringColumn acts = StringColumn.create( HeadersKN.activity );
 		DoubleColumn typDurs = DoubleColumn.create( HeadersKN.typicalDuration );
 		DoubleColumn actDurs = DoubleColumn.create( HeadersKN.activityDuration );
+		DoubleColumn muslValues = DoubleColumn.create( HeadersKN.muslh );
 		DoubleColumn muttsValues = DoubleColumn.create( HeadersKN.muttsh );
 		DoubleColumn vttsValues = DoubleColumn.create( HeadersKN.vttsh );
 		DoubleColumn mUoMs = DoubleColumn.create( HeadersKN.mUoM );
-		Table table = Table.create( personIds, mUoMs, tripIndices, modes, acts, actDurs, typDurs, muttsValues, vttsValues );
+		Table table = Table.create( personIds, mUoMs, tripIndices, modes, acts, actDurs, typDurs, muslValues, muttsValues, vttsValues );
 
 		for( Map.Entry<Id<Person>, SimData> entry : simDataMap.entrySet() ){
 			Id<Person> personId = entry.getKey();
@@ -266,6 +268,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				actDurs.append( trip.actDur_h );
 				typDurs.append( trip.actTypDur_h );
 				mUoMs.append( simData.margUtlOfMoney );
+				muslValues.append( trip.musl_h );
 			}
 		}
 
@@ -345,6 +348,8 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			log.warn( "Could not identify the marginal utility of traveling for mode={}. Setting this value to zero. (Probably using subpopulations...)", mode );
 		}
 		double tripDelayDisutility_h = directMarginalUtilityOfTraveling * (-1);
+
+		simData.trips.getLast().musl_h = activityDelayDisutility_h;
 
 		final double mUTTS_h = (activityDelayDisutility_h + tripDelayDisutility_h) ;
 

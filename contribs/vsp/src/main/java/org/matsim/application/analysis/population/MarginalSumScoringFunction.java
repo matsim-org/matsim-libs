@@ -26,29 +26,35 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
-
-import java.math.BigDecimal;
 
 /**
  * @author ikaddoura
  *
  */
-public class MarginalSumScoringFunction {
+public final class MarginalSumScoringFunction {
 	private final static Logger log = LogManager.getLogger(MarginalSumScoringFunction.class);
+	private final ScoringParameters params;
 
 	CharyparNagelActivityScoring activityScoringA;
 	CharyparNagelActivityScoring activityScoringB;
 
 	public MarginalSumScoringFunction(ScoringParameters params) {
-
+		this.params = params;
 		activityScoringA = new CharyparNagelActivityScoring(params);
 		activityScoringB = new CharyparNagelActivityScoring(params);
 	}
 
 	private static int deltaScoreZeroWrnCnt = 0;
 
+	/**
+	 * @param personId
+	 * @param activity
+	 * @param delay -- in the current implementation, this will be treated as a negative delay!
+	 * @return
+	 */
 	public final double getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double delay ) {
 
 		SumScoringFunction sumScoringA = new SumScoringFunction() ;
@@ -87,8 +93,11 @@ public class MarginalSumScoringFunction {
 
 		if ( deltaScore==0. && deltaScoreZeroWrnCnt<10 ) {
 			deltaScoreZeroWrnCnt++;
-			log.warn( "actDelayDisutil=0; presumably actStart outside opening times; personId={}; actType={}; actStart={}; actEnd={}", personId, activity.getType(), activity.getStartTime().seconds()/3600., activity.getEndTime().seconds()/3600. );
-			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreWithoutDelay), new BigDecimal( scoreWithDelay) );
+			final ActivityUtilityParameters activityUtilityParameters = params.actParams.get( activity.getType() );
+			log.warn( "actDelayDisutil=0; presumably actStart outside opening times; personId={}; actType={}; actStart={}; actEnd={}; actOpening={}; actClosing={}",
+				personId, activity.getType(), activity.getStartTime().seconds()/3600., activity.getEndTime().seconds()/3600.,
+				activityUtilityParameters.getOpeningTime(), activityUtilityParameters.getClosingTime() );
+//			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreWithoutDelay), new BigDecimal( scoreWithDelay) );
 			if ( deltaScoreZeroWrnCnt==10 ) {
 				log.warn( Gbl.FUTURE_SUPPRESSED );
 			}

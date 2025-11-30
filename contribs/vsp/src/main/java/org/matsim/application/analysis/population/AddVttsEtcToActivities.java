@@ -23,7 +23,6 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
-import tech.tablesaw.aggregate.AggregateFunctions;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.NumberColumn;
 import tech.tablesaw.api.Table;
@@ -41,9 +40,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static tech.tablesaw.aggregate.AggregateFunctions.*;
+
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
-public class AddVttsToActivities implements MATSimAppCommand {
-	private static final Logger log = LogManager.getLogger( AddVttsToActivities.class );
+public class AddVttsEtcToActivities implements MATSimAppCommand {
+	private static final Logger log = LogManager.getLogger( AddVttsEtcToActivities.class );
 
 	@CommandLine.Option(names = "--path", description = "Path to output folder", required = true)
 	private Path path;
@@ -61,7 +62,7 @@ public class AddVttsToActivities implements MATSimAppCommand {
 	private int numberOfThreads = 1;
 
 	public static void main(String[] args) {
-		new AddVttsToActivities().execute(args );
+		new AddVttsEtcToActivities().execute(args );
 	}
 
 	@Override
@@ -147,6 +148,7 @@ public class AddVttsToActivities implements MATSimAppCommand {
 				VTTSHandler.TripData tripData = tripDataList.get( ii-1 );  // activity # 1 belongs to trip # 0!
 				setVTTS_h( activity, tripData.VTTSh );
 				setMUTTS_h( activity, tripData.mUTTSh );
+				setMUSL_h( activity, tripData.musl_h );
 			}
 		}
 
@@ -184,9 +186,9 @@ public class AddVttsToActivities implements MATSimAppCommand {
 		TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
 
 		log.info( "print summary statistics:");
-		final Table muttsStats = tripsTable.summarize( HeadersKN.muttsh, AggregateFunctions.mean, AggregateFunctions.quartile1, AggregateFunctions.median, AggregateFunctions.quartile3, AggregateFunctions.percentile95 ).apply();
+		final Table muttsStats = tripsTable.summarize( HeadersKN.muttsh, mean, quartile1, median, quartile3, percentile95 ).apply();
 		System.out.println( System.lineSeparator() + muttsStats + System.lineSeparator() );
-		final Table vttsStats = tripsTable.summarize( HeadersKN.vttsh, AggregateFunctions.mean, AggregateFunctions.quartile1, AggregateFunctions.median, AggregateFunctions.quartile3, AggregateFunctions.percentile95 ).apply();
+		final Table vttsStats = tripsTable.summarize( HeadersKN.vttsh, mean, quartile1, median, quartile3, percentile95 ).apply();
 		System.out.println( vttsStats + System.lineSeparator() );
 
 
@@ -206,9 +208,7 @@ public class AddVttsToActivities implements MATSimAppCommand {
 		return 0;
 	}
 
-	private static final String VTTS_H = "VTTS_h (incoming trip)";
 	private static final String MUTTS_H = "mUTTS_h (incoming trip)";
-
 	public static void setMUTTS_h( Activity activity, double mUTTSh ){
 		activity.getAttributes().putAttribute( MUTTS_H, mUTTSh );
 	}
@@ -216,10 +216,19 @@ public class AddVttsToActivities implements MATSimAppCommand {
 		return (Double) activity.getAttributes().getAttribute( MUTTS_H );
 	}
 
+	private static final String VTTS_H = "VTTS_h (incoming trip)";
 	public static void setVTTS_h( Activity activity, double vttSh ){
 		activity.getAttributes().putAttribute( VTTS_H, vttSh );
 	}
 	public static Double getVTTS_h( Activity activity ) {
 		return (Double) activity.getAttributes().getAttribute( VTTS_H );
+	}
+
+	private static final String MUSL_h = "marginal_utility_of_starting_later_h";
+	public static void setMUSL_h( Activity activity, double musl_h ){
+		activity.getAttributes().putAttribute( MUSL_h, musl_h );
+	}
+	public static Double getMUSL_h( Activity activity ) {
+		return (Double) activity.getAttributes().getAttribute( MUSL_h );
 	}
 }

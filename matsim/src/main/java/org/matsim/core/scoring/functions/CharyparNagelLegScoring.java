@@ -153,6 +153,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
+		// --> I think that it is deducted below!
 
 		// account for the daily constants
 		if (!modesAlreadyConsideredForDailyConstants.contains(leg.getMode())) {
