@@ -2,14 +2,13 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class XYTime extends Viz {
+public class XYTime extends VizMap {
 
 	/**
 	 * The filepath containing the data.
@@ -58,13 +57,6 @@ public class XYTime extends Viz {
 	@JsonProperty(required = false)
 	private Object breakpoints;
 
-	/**
-	 * Background layers that can be displayed on the map.
-	 * Each layer is identified by a unique name (the map key).
-	 */
-	@JsonProperty(required = false)
-	public Map<String, BackgroundLayer> backgroundLayers;
-
 	public XYTime() {
 		super("xytime");
 	}
@@ -90,18 +82,9 @@ public class XYTime extends Viz {
 		return this;
 	}
 
-	/**
-	 * Adds a background layer to this visualization.
-	 *
-	 * @param name  Unique identifier for this layer
-	 * @param layer The background layer configuration
-	 * @return this XYTime for method chaining
-	 */
+	@Override
 	public XYTime addBackgroundLayer(String name, BackgroundLayer layer) {
-		if (backgroundLayers == null) {
-			backgroundLayers = new LinkedHashMap<>();
-		}
-		backgroundLayers.put(name, layer);
+		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

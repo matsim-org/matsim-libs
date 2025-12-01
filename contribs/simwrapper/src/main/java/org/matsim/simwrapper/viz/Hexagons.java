@@ -3,14 +3,13 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Produces a hexagon plot on a map.
  */
-public final class Hexagons extends Viz {
+public final class Hexagons extends VizMap {
 
 	/**
 	 * The filepath containing the data.
@@ -41,13 +40,6 @@ public final class Hexagons extends Viz {
 	 */
 	private Map<String, List<Aggregations.FromToObject>> aggregations = new HashMap<>();
 
-	/**
-	 * Background layers that can be displayed on the map.
-	 * Each layer is identified by a unique name (the map key).
-	 */
-	@JsonProperty(required = false)
-	public Map<String, BackgroundLayer> backgroundLayers;
-
 	public Hexagons() {
 		super("hexagons");
 	}
@@ -67,18 +59,9 @@ public final class Hexagons extends Viz {
 		return this;
 	}
 
-	/**
-	 * Adds a background layer to this visualization.
-	 *
-	 * @param name  Unique identifier for this layer
-	 * @param layer The background layer configuration
-	 * @return this Hexagons for method chaining
-	 */
+	@Override
 	public Hexagons addBackgroundLayer(String name, BackgroundLayer layer) {
-		if (backgroundLayers == null) {
-			backgroundLayers = new LinkedHashMap<>();
-		}
-		backgroundLayers.put(name, layer);
+		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

@@ -2,13 +2,12 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class GridMap extends Viz {
+public class GridMap extends VizMap {
 
 	/**
 	 * Defines the time selector types
@@ -99,13 +98,6 @@ public class GridMap extends Viz {
 	public TimeSelector timeSelector;
 
 	/**
-	 * Background layers that can be displayed on the map.
-	 * Each layer is identified by a unique name (the map key).
-	 */
-	@JsonProperty(required = false)
-	public Map<String, BackgroundLayer> backgroundLayers;
-
-	/**
 	 * Sets the full color ramps settings.
 	 */
 	public GridMap setColorRamp(double[] breakpoints, String[] colors) {
@@ -118,18 +110,9 @@ public class GridMap extends Viz {
 		return this;
 	}
 
-	/**
-	 * Adds a background layer to this visualization.
-	 *
-	 * @param name  Unique identifier for this layer
-	 * @param layer The background layer configuration
-	 * @return this GridMap for method chaining
-	 */
+	@Override
 	public GridMap addBackgroundLayer(String name, BackgroundLayer layer) {
-		if (backgroundLayers == null) {
-			backgroundLayers = new LinkedHashMap<>();
-		}
-		backgroundLayers.put(name, layer);
+		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

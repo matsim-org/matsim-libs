@@ -2,13 +2,10 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Creates a vehicle (DRT) animation visualization for simwrapper.
  */
-public class Vehicles extends Viz {
+public class Vehicles extends VizMap {
 
 	/**
 	 * Sets the path of the processed trips file in JSON format
@@ -41,29 +38,13 @@ public class Vehicles extends Viz {
 	 */
 	public Boolean leftside;
 
-	/**
-	 * Background layers that can be displayed on the map.
-	 * Each layer is identified by a unique name (the map key).
-	 */
-	@JsonProperty(required = false)
-	public Map<String, BackgroundLayer> backgroundLayers;
-
 	public Vehicles() {
 		super("vehicles");
 	}
 
-	/**
-	 * Adds a background layer to this visualization.
-	 *
-	 * @param name  Unique identifier for this layer
-	 * @param layer The background layer configuration
-	 * @return this Vehicles for method chaining
-	 */
+	@Override
 	public Vehicles addBackgroundLayer(String name, BackgroundLayer layer) {
-		if (backgroundLayers == null) {
-			backgroundLayers = new LinkedHashMap<>();
-		}
-		backgroundLayers.put(name, layer);
+		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 }
