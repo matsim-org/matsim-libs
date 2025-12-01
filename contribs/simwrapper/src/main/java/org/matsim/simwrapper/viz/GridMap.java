@@ -2,12 +2,21 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
 public class GridMap extends Viz {
+
+	/**
+	 * Defines the time selector types
+	 */
+	public enum TimeSelector {
+		discrete,
+		slider
+	}
 
 	/**
 	 * The unit of the values.
@@ -83,6 +92,20 @@ public class GridMap extends Viz {
 	}
 
 	/**
+	 * Defines which type of time selector to use.
+	 * Possible values are `discrete` and `slider`.
+	 */
+	@JsonProperty(required = false)
+	public TimeSelector timeSelector;
+
+	/**
+	 * Background layers that can be displayed on the map.
+	 * Each layer is identified by a unique name (the map key).
+	 */
+	@JsonProperty(required = false)
+	public Map<String, BackgroundLayer> backgroundLayers;
+
+	/**
 	 * Sets the full color ramps settings.
 	 */
 	public GridMap setColorRamp(double[] breakpoints, String[] colors) {
@@ -92,6 +115,21 @@ public class GridMap extends Viz {
 
 	public GridMap setColorRamp(String ramp, int steps, boolean reverse) {
 		colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
+		return this;
+	}
+
+	/**
+	 * Adds a background layer to this visualization.
+	 *
+	 * @param name  Unique identifier for this layer
+	 * @param layer The background layer configuration
+	 * @return this GridMap for method chaining
+	 */
+	public GridMap addBackgroundLayer(String name, BackgroundLayer layer) {
+		if (backgroundLayers == null) {
+			backgroundLayers = new LinkedHashMap<>();
+		}
+		backgroundLayers.put(name, layer);
 		return this;
 	}
 

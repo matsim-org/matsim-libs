@@ -3,10 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.noise.NoiseAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.*;
-import org.matsim.simwrapper.viz.ColorScheme;
-import org.matsim.simwrapper.viz.GridMap;
-import org.matsim.simwrapper.viz.MapPlot;
-import org.matsim.simwrapper.viz.Tile;
+import org.matsim.simwrapper.viz.*;
 
 /**
  * Shows emission in the scenario.
@@ -83,6 +80,13 @@ public class NoiseDashboard implements Dashboard {
 				viz.description = "Noise Damages per hour [€]";
 				DashboardUtils.setGridMapStandards(viz, data, this.coordinateSystem);
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_hour.%s", "avro");
+			});
+
+		layout.row("bg-layer")
+			.el(GridMap.class, (viz, data) -> {
+				viz.addBackgroundLayer("bg-1", new BackgroundLayer(
+
+				));
 			});
 
 

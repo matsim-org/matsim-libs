@@ -2,6 +2,9 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Creates a Link Volume Map for simwrapper.
  */
@@ -30,6 +33,12 @@ public class Links extends Viz {
 	 */
 	public Boolean mapIsIndependent;
 
+	/**
+	 * Background layers that can be displayed on the map.
+	 * Each layer is identified by a unique name (the map key).
+	 */
+	@JsonProperty(required = false)
+	public Map<String, BackgroundLayer> backgroundLayers;
 
 	/**
 	 * Sets the display options for the map.
@@ -38,6 +47,21 @@ public class Links extends Viz {
 
 	public Links() {
 		super("links");
+	}
+
+	/**
+	 * Adds a background layer to this visualization.
+	 *
+	 * @param name  Unique identifier for this layer
+	 * @param layer The background layer configuration
+	 * @return this Links for method chaining
+	 */
+	public Links addBackgroundLayer(String name, BackgroundLayer layer) {
+		if (backgroundLayers == null) {
+			backgroundLayers = new LinkedHashMap<>();
+		}
+		backgroundLayers.put(name, layer);
+		return this;
 	}
 
 	/**

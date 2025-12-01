@@ -3,6 +3,7 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -19,6 +20,12 @@ public final class MapPlot extends Viz {
 	 */
 	public Boolean mapIsIndependent;
 
+	/**
+	 * Background layers that can be displayed on the map.
+	 * Each layer is identified by a unique name (the map key).
+	 */
+	@JsonProperty(required = false)
+	public Map<String, BackgroundLayer> backgroundLayers;
 
 	public Display display = new Display();
 	public Double minValue;
@@ -51,6 +58,21 @@ public final class MapPlot extends Viz {
 	 */
 	public MapPlot addDataset(String name, String file) {
 		datasets.put(name, file);
+		return this;
+	}
+
+	/**
+	 * Adds a background layer to this visualization.
+	 *
+	 * @param name  Unique identifier for this layer
+	 * @param layer The background layer configuration
+	 * @return this MapPlot for method chaining
+	 */
+	public MapPlot addBackgroundLayer(String name, BackgroundLayer layer) {
+		if (backgroundLayers == null) {
+			backgroundLayers = new LinkedHashMap<>();
+		}
+		backgroundLayers.put(name, layer);
 		return this;
 	}
 
