@@ -3,7 +3,10 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.noise.NoiseAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.*;
-import org.matsim.simwrapper.viz.*;
+import org.matsim.simwrapper.viz.ColorScheme;
+import org.matsim.simwrapper.viz.GridMap;
+import org.matsim.simwrapper.viz.MapPlot;
+import org.matsim.simwrapper.viz.Tile;
 
 /**
  * Shows emission in the scenario.
