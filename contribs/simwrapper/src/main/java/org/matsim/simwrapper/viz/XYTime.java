@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class XYTime extends VizMap {
+public class XYTime extends VizMap<XYTime> {
 
 	/**
 	 * The filepath containing the data.
@@ -79,12 +79,6 @@ public class XYTime extends VizMap {
 	 */
 	public XYTime setBreakpoints(double... values) {
 		this.breakpoints = List.of(values);
-		return this;
-	}
-
-	@Override
-	public XYTime addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

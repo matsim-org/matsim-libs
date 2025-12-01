@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Creates a Link Volume Map for simwrapper.
  */
-public class Links extends VizMap {
+public class Links extends VizMap<Links> {
 
 	/**
 	 * Sets the path of the network file.
@@ -37,12 +37,6 @@ public class Links extends VizMap {
 
 	public Links() {
 		super("links");
-	}
-
-	@Override
-	public Links addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
-		return this;
 	}
 
 	/**

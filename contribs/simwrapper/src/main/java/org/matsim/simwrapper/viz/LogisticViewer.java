@@ -2,7 +2,7 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LogisticViewer extends VizMap {
+public class LogisticViewer extends VizMap<LogisticViewer> {
 
 	@JsonProperty(required = true)
 	public String network;
@@ -15,12 +15,6 @@ public class LogisticViewer extends VizMap {
 
 	public LogisticViewer() {
 		super("lsp");
-	}
-
-	@Override
-	public LogisticViewer addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
-		return this;
 	}
 
 }

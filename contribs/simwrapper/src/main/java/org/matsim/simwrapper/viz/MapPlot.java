@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Provide map based plots.
  */
-public final class MapPlot extends VizMap {
+public final class MapPlot extends VizMap<MapPlot> {
 
 	private final Map<String, String> datasets = new HashMap<>();
 	public double[] center;
@@ -50,12 +50,6 @@ public final class MapPlot extends VizMap {
 	 */
 	public MapPlot addDataset(String name, String file) {
 		datasets.put(name, file);
-		return this;
-	}
-
-	@Override
-	public MapPlot addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

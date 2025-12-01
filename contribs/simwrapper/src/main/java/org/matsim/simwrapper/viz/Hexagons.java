@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Produces a hexagon plot on a map.
  */
-public final class Hexagons extends VizMap {
+public final class Hexagons extends VizMap<Hexagons> {
 
 	/**
 	 * The filepath containing the data.
@@ -56,12 +56,6 @@ public final class Hexagons extends VizMap {
 	public Hexagons addAggregation(String aggregationTitle, String fromTitle, String fromX, String fromY) {
 		this.aggregations.put(aggregationTitle, List.of(new Aggregations.FromToObject(fromTitle, fromX, fromY)));
 
-		return this;
-	}
-
-	@Override
-	public Hexagons addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

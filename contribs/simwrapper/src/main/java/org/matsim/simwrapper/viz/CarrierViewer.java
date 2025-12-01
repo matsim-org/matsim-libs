@@ -2,7 +2,7 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CarrierViewer extends VizMap {
+public class CarrierViewer extends VizMap<CarrierViewer> {
 
 	@JsonProperty(required = true)
 	public String network;
@@ -12,12 +12,6 @@ public class CarrierViewer extends VizMap {
 
 	public CarrierViewer() {
 		super("carriers");
-	}
-
-	@Override
-	public CarrierViewer addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
-		return this;
 	}
 
 }

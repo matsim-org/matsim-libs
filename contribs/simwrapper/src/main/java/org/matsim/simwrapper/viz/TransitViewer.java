@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Transit viewer for pt schedules.
  */
-public class TransitViewer extends VizMap {
+public class TransitViewer extends VizMap<TransitViewer> {
 
 	@JsonProperty(required = true)
 	public String network;
@@ -22,12 +22,6 @@ public class TransitViewer extends VizMap {
 
 	public TransitViewer() {
 		super("transit");
-	}
-
-	@Override
-	public TransitViewer addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
-		return this;
 	}
 
 	public static CustomRouteType customRouteType(String label, String color) {

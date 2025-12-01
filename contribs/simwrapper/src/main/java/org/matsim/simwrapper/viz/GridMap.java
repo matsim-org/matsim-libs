@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class GridMap extends VizMap {
+public class GridMap extends VizMap<GridMap> {
 
 	/**
 	 * Defines the time selector types
@@ -107,12 +107,6 @@ public class GridMap extends VizMap {
 
 	public GridMap setColorRamp(String ramp, int steps, boolean reverse) {
 		colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
-		return this;
-	}
-
-	@Override
-	public GridMap addBackgroundLayer(String name, BackgroundLayer layer) {
-		super.addBackgroundLayer(name, layer);
 		return this;
 	}
 

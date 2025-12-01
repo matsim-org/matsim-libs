@@ -8,8 +8,10 @@ import java.util.Map;
 /**
  * Base class for map-based visualizations that support background layers.
  * Extends {@link Viz} with functionality to add and manage background layers.
+ *
+ * @param <T> The specific type of VizMap for method chaining.
  */
-public abstract class VizMap extends Viz {
+public abstract class VizMap<T extends VizMap<T>> extends Viz {
 
 	/**
 	 * Background layers that can be displayed on the map.
@@ -29,11 +31,12 @@ public abstract class VizMap extends Viz {
 	 * @param layer The background layer configuration
 	 * @return this VizMap for method chaining
 	 */
-	public VizMap addBackgroundLayer(String name, BackgroundLayer layer) {
+	@SuppressWarnings("unchecked")
+	public T addBackgroundLayer(String name, BackgroundLayer layer) {
 		if (backgroundLayers == null) {
 			backgroundLayers = new LinkedHashMap<>();
 		}
 		backgroundLayers.put(name, layer);
-		return this;
+		return (T) this;
 	}
 }
