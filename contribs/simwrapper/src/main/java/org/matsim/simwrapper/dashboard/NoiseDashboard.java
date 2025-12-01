@@ -82,13 +82,6 @@ public class NoiseDashboard implements Dashboard {
 				viz.file = data.computeWithPlaceholder(NoiseAnalysis.class, "damages_receiverPoint_per_hour.%s", "avro");
 			});
 
-		layout.row("bg-layer")
-			.el(GridMap.class, (viz, data) -> {
-				viz.addBackgroundLayer("bg-1", new BackgroundLayer(
-
-				));
-			});
-
 
 	}
 
