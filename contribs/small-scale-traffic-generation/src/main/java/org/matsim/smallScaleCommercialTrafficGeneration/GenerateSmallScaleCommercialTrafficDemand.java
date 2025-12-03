@@ -291,8 +291,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
-					solveSeparatedVRPs(scenario);
 				}
+				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
+				solveSeparatedVRPs(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
