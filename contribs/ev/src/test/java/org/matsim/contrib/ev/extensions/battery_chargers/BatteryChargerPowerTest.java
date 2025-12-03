@@ -19,7 +19,8 @@ public class BatteryChargerPowerTest {
                 Controller controller = new TestScenarioBuilder(utils, 50.0, 3000.0) //
                                 .addVehicle("veh1", 250.0, 2000.0, 0.2) //
                                 .addCharger("charger1", 1, 70.0, attributes -> {
-                                        BatteryChargerPower.adaptAttributes(attributes, 20.0, 100.0, 0.15);
+                                        BatteryChargerSettings.write(attributes,
+                                                        new BatteryChargerSettings(20.0, 100.0, 0.15));
                                 }) //
                                 .build();
 
@@ -35,7 +36,8 @@ public class BatteryChargerPowerTest {
                                 .addVehicle("veh1", 250.0, 2000.0, 0.2) //
                                 .addVehicle("veh2", 1600.0, 3000.0, 0.2) //
                                 .addCharger("charger1", 2, 70.0, attributes -> {
-                                        BatteryChargerPower.adaptAttributes(attributes, 20.0, 100.0, 0.15);
+                                        BatteryChargerSettings.write(attributes,
+                                                        new BatteryChargerSettings(20.0, 100.0, 0.15));
                                 }) //
                                 .build();
 

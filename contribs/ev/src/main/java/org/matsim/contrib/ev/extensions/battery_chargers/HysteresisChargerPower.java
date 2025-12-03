@@ -8,9 +8,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
@@ -36,22 +34,8 @@ public class HysteresisChargerPower implements ChargerPower {
     static public final String CHARGER_POWER_NAME = "HysteresisBatteryChargerPower";
     static public final String BATTERY_CHARGER_ATTRIBUTE = "hysteresisSettings";
 
-    static public record Settings( //
-            double batteryChargingPower_kW, //
-            double maximumGridPower_kW, //
-
-            double highOutputPower_kW, //
-            double lowOutputPower_kW, //
-
-            double highToLowPowerThreshold_kWh, //
-            double lowToHighPowerThreshold_kWh, //
-
-            double batteryCapacity_kWh, //
-            double initialSoc) {
-    }
-
     private final Id<Charger> chargerId;
-    private final Settings settings;
+    private final HysteresisChargerSettings settings;
     private final double chargingPeriod;
     private final EventsManager eventsManager;
 
@@ -66,14 +50,15 @@ public class HysteresisChargerPower implements ChargerPower {
 
     private boolean vehiclePlugged = false;
 
-    public HysteresisChargerPower(Settings settings, double chargingPeriod, EventsManager eventsManager,
+    public HysteresisChargerPower(HysteresisChargerSettings settings, double chargingPeriod,
+            EventsManager eventsManager,
             Id<Charger> chargerId) {
         this.settings = settings;
         this.chargingPeriod = chargingPeriod;
         this.eventsManager = eventsManager;
         this.chargerId = chargerId;
 
-        this.batteryState_kWh = settings.batteryCapacity_kWh * settings.initialSoc;
+        this.batteryState_kWh = settings.capacity_kWh * settings.initialSoc;
 
         this.logicState = batteryState_kWh < settings.highToLowPowerThreshold_kWh ? LogicState.LOW_POWER
                 : LogicState.HIGH_POWER;
@@ -122,20 +107,20 @@ public class HysteresisChargerPower implements ChargerPower {
     @Override
     public void update(double now) {
         // I) Battery charging
-        double chargingPower_kW = Math.min(settings.batteryChargingPower_kW, settings.maximumGridPower_kW);
+        double chargingPower_kW = Math.min(settings.batteryChargingPower_kW, settings.gridPower_kW);
 
         if (vehiclePlugged) {
             if (logicState.equals(LogicState.HIGH_POWER)) {
                 chargingPower_kW = Math.max(0.0,
-                        Math.min(chargingPower_kW, settings.maximumGridPower_kW - settings.highOutputPower_kW));
+                        Math.min(chargingPower_kW, settings.gridPower_kW - settings.highOutputPower_kW));
             } else {
                 chargingPower_kW = Math.max(0.0,
-                        Math.min(chargingPower_kW, settings.maximumGridPower_kW - settings.lowOutputPower_kW));
+                        Math.min(chargingPower_kW, settings.gridPower_kW - settings.lowOutputPower_kW));
             }
         }
 
         batteryState_kWh += chargingPower_kW * chargingPeriod / 3600.0;
-        batteryState_kWh = Math.min(batteryState_kWh, settings.batteryCapacity_kWh);
+        batteryState_kWh = Math.min(batteryState_kWh, settings.capacity_kWh);
 
         // II) Logic
         if (Double.isFinite(previousBatteryState_kWh)) {
@@ -158,7 +143,7 @@ public class HysteresisChargerPower implements ChargerPower {
             previousBatteryState_kWh = batteryState_kWh;
 
             eventsManager.processEvent(new BatteryChargerStateEvent(now, chargerId, batteryState_kWh,
-                    batteryState_kWh / settings.batteryCapacity_kWh));
+                    batteryState_kWh / settings.capacity_kWh));
         }
     }
 
@@ -181,29 +166,8 @@ public class HysteresisChargerPower implements ChargerPower {
 
         @Override
         public ChargerPower create(ChargerSpecification charger) {
-            try {
-                String raw = (String) charger.getAttributes().getAttribute(BATTERY_CHARGER_ATTRIBUTE);
-
-                if (raw != null) {
-                    Settings settings = objectMapper.readValue(raw, Settings.class);
-                    return new HysteresisChargerPower(settings, chargingPeriod, eventsManager, charger.getId());
-                } else {
-                    return delegate.create(charger);
-                }
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    static public void adaptAttributes(Attributes attributes, HysteresisChargerPower.Settings settings) {
-        try {
-            attributes.putAttribute(CompositeChargerPowerFactory.CHARGER_ATTRIBUTE,
-                    HysteresisChargerPower.CHARGER_POWER_NAME);
-            attributes.putAttribute(BATTERY_CHARGER_ATTRIBUTE,
-                    objectMapper.writeValueAsString(settings));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            HysteresisChargerSettings settings = HysteresisChargerSettings.read(charger.getAttributes());
+            return new HysteresisChargerPower(settings, chargingPeriod, eventsManager, charger.getId());
         }
     }
 }

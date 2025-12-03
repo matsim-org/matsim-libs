@@ -2,14 +2,9 @@ package org.matsim.contrib.ev.extensions.battery_chargers;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.charging.ChargerPower;
-import org.matsim.contrib.ev.charging.DefaultChargerPower;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This is an implementation of ChargerPower that assumes a charger with a
@@ -25,15 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class BatteryChargerPower implements ChargerPower {
     static public final String CHARGER_POWER_NAME = "BatteryChargerPower";
-    static public final String BATTERY_CHARGER_ATTRIBUTE = "batterySettings";
 
-    static public record Settings(
-            double gridPower_kW, //
-            double capacity_kWh, //
-            double initialSoc) {
-    }
-
-    private final Settings settings;
+    private final BatteryChargerSettings settings;
     private final double chargingPeriod;
     private final EventsManager eventsManager;
 
@@ -46,7 +34,8 @@ public class BatteryChargerPower implements ChargerPower {
 
     private final ChargerSpecification specification;
 
-    public BatteryChargerPower(ChargerSpecification specification, Settings settings, double chargingPeriod,
+    public BatteryChargerPower(ChargerSpecification specification, BatteryChargerSettings settings,
+            double chargingPeriod,
             EventsManager eventsManager) {
         this.settings = settings;
         this.specification = specification;
@@ -114,57 +103,19 @@ public class BatteryChargerPower implements ChargerPower {
         chargingVehicles = 0;
     }
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
-
     static public class Factory implements ChargerPower.Factory {
-        private final ChargerPower.Factory delegate;
         private final double chargingPeriod;
         private final EventsManager eventsManager;
 
-        public Factory(ChargerPower.Factory delegate, double chargingPeriod, EventsManager eventsManager) {
-            this.delegate = delegate;
+        public Factory(double chargingPeriod, EventsManager eventsManager) {
             this.chargingPeriod = chargingPeriod;
             this.eventsManager = eventsManager;
         }
 
-        public Factory(double chargingPeriod, EventsManager eventsManager) {
-            this(new DefaultChargerPower.Factory(chargingPeriod), chargingPeriod, eventsManager);
-        }
-
         @Override
         public ChargerPower create(ChargerSpecification charger) {
-            try {
-                String raw = (String) charger.getAttributes().getAttribute(BATTERY_CHARGER_ATTRIBUTE);
-
-                if (raw != null) {
-                    Settings settings = objectMapper.readValue(raw, Settings.class);
-                    return new BatteryChargerPower(charger, settings, chargingPeriod, eventsManager);
-                } else {
-                    return delegate.create(charger);
-                }
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    static public void configure(ChargerSpecification charger, Settings settings) {
-        try {
-            charger.getAttributes().putAttribute(BATTERY_CHARGER_ATTRIBUTE, objectMapper.writeValueAsString(charger));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static public void adaptAttributes(Attributes attributes, double gridPower_kW, double capacity_kWh,
-            double initialSoc) {
-        try {
-            attributes.putAttribute(CompositeChargerPowerFactory.CHARGER_ATTRIBUTE,
-                    BatteryChargerPower.CHARGER_POWER_NAME);
-            attributes.putAttribute(BATTERY_CHARGER_ATTRIBUTE,
-                    objectMapper.writeValueAsString(new Settings(gridPower_kW, capacity_kWh, initialSoc)));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            BatteryChargerSettings settings = BatteryChargerSettings.read(charger.getAttributes());
+            return new BatteryChargerPower(charger, settings, chargingPeriod, eventsManager);
         }
     }
 }
