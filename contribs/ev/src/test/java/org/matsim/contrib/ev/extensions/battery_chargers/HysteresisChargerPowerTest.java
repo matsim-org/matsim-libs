@@ -20,7 +20,8 @@ public class HysteresisChargerPowerTest {
                                 .addVehicle("veh1", 1000.0, 8000.0, 0.2) //
                                 .addCharger("charger1", 1, 100.0, attributes -> {
                                         HysteresisChargerSettings.write(attributes, new HysteresisChargerSettings(85.0,
-                                                        100.0, 0.2, 75.0, 100.0, 15.0, 25.0, 75.0));
+                                                        100.0, 75.0, 100.0, 15.0, 25.0, 75.0));
+                                        BatteryChargerSettings.setInitialSoc(attributes, 0.2);
                                 }) //
                                 .build();
 

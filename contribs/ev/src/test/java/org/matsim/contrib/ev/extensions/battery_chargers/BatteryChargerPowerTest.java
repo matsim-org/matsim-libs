@@ -20,7 +20,8 @@ public class BatteryChargerPowerTest {
                                 .addVehicle("veh1", 250.0, 2000.0, 0.2) //
                                 .addCharger("charger1", 1, 70.0, attributes -> {
                                         BatteryChargerSettings.write(attributes,
-                                                        new BatteryChargerSettings(20.0, 100.0, 0.15));
+                                                        new BatteryChargerSettings(20.0, 100.0));
+                                        BatteryChargerSettings.setInitialSoc(attributes, 0.15);
                                 }) //
                                 .build();
 
@@ -37,7 +38,8 @@ public class BatteryChargerPowerTest {
                                 .addVehicle("veh2", 1600.0, 3000.0, 0.2) //
                                 .addCharger("charger1", 2, 70.0, attributes -> {
                                         BatteryChargerSettings.write(attributes,
-                                                        new BatteryChargerSettings(20.0, 100.0, 0.15));
+                                                        new BatteryChargerSettings(20.0, 100.0));
+                                        BatteryChargerSettings.setInitialSoc(attributes, 0.15);
                                 }) //
                                 .build();
 

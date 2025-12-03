@@ -3,8 +3,10 @@ package org.matsim.contrib.ev.extensions.battery_chargers;
 import java.util.Map;
 
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.InitialSocBehavior;
 import org.matsim.contrib.ev.charging.ChargerPower;
 import org.matsim.contrib.ev.charging.DefaultChargerPower;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -31,6 +33,12 @@ public class BatteryChargerModule extends AbstractModule {
         addControllerListenerBinding().to(BatteryChargerStateListener.class);
 
         bind(ChargerPower.Factory.class).to(CompositeChargerPowerFactory.class);
+
+        EvConfigGroup evConfig = EvConfigGroup.get(getConfig());
+        if (evConfig.getInitialSocBehavior().equals(InitialSocBehavior.UpdateAfterIteration)) {
+            addEventHandlerBinding().to(BatteryUpdater.class);
+            addControllerListenerBinding().to(BatteryUpdater.class);
+        }
     }
 
     private void prepareMapBinder() {
@@ -66,5 +74,11 @@ public class BatteryChargerModule extends AbstractModule {
     BatteryChargerStateListener provideBatteryChargerStateListener(OutputDirectoryHierarchy outputDirectoryHierarchy,
             EventsManager eventsManager) {
         return new BatteryChargerStateListener(outputDirectoryHierarchy, eventsManager);
+    }
+
+    @Provides
+    @Singleton
+    BatteryUpdater provideUpdater(ChargingInfrastructureSpecification infrastructure) {
+        return new BatteryUpdater(infrastructure);
     }
 }

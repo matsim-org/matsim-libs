@@ -41,7 +41,7 @@ public class BatteryChargerPower implements ChargerPower {
         this.specification = specification;
         this.chargingPeriod = chargingPeriod;
         this.eventsManager = eventsManager;
-        this.state_kWh = settings.capacity_kWh * settings.initialSoc;
+        this.state_kWh = settings.capacity_kWh * BatteryChargerSettings.getInitialSoc(specification.getAttributes(), 1.0);
         this.plugOutput_kW = EvUnits.W_to_kW(specification.getPlugPower());
     }
 

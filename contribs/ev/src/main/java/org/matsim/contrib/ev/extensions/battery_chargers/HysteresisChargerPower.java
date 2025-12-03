@@ -52,13 +52,13 @@ public class HysteresisChargerPower implements ChargerPower {
 
     public HysteresisChargerPower(HysteresisChargerSettings settings, double chargingPeriod,
             EventsManager eventsManager,
-            Id<Charger> chargerId) {
+            Id<Charger> chargerId, double initialSoc) {
         this.settings = settings;
         this.chargingPeriod = chargingPeriod;
         this.eventsManager = eventsManager;
         this.chargerId = chargerId;
 
-        this.batteryState_kWh = settings.capacity_kWh * settings.initialSoc;
+        this.batteryState_kWh = settings.capacity_kWh * initialSoc;
 
         this.logicState = batteryState_kWh < settings.highToLowPowerThreshold_kWh ? LogicState.LOW_POWER
                 : LogicState.HIGH_POWER;
@@ -167,7 +167,8 @@ public class HysteresisChargerPower implements ChargerPower {
         @Override
         public ChargerPower create(ChargerSpecification charger) {
             HysteresisChargerSettings settings = HysteresisChargerSettings.read(charger.getAttributes());
-            return new HysteresisChargerPower(settings, chargingPeriod, eventsManager, charger.getId());
+            return new HysteresisChargerPower(settings, chargingPeriod, eventsManager, charger.getId(),
+                    BatteryChargerSettings.getInitialSoc(charger.getAttributes(), 1.0));
         }
     }
 }

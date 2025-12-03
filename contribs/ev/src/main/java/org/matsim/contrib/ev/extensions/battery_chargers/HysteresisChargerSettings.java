@@ -15,11 +15,11 @@ public class HysteresisChargerSettings extends BatteryChargerSettings {
     public double highToLowPowerThreshold_kWh;
     public double lowToHighPowerThreshold_kWh;
 
-    public HysteresisChargerSettings(double gridPower_kW, double capacity_kWh, double initialSoc, //
+    public HysteresisChargerSettings(double gridPower_kW, double capacity_kWh, //
             double batteryChargingPower_kW, //
             double highOutputPower_kW, double lowOutputPower_kW, //
             double highToLowPowerThreshold_kWh, double lowToHighPowerThreshold_kWh) {
-        super(gridPower_kW, capacity_kWh, initialSoc);
+        super(gridPower_kW, capacity_kWh);
 
         this.batteryChargingPower_kW = batteryChargingPower_kW;
         this.highOutputPower_kW = highOutputPower_kW;
@@ -32,7 +32,7 @@ public class HysteresisChargerSettings extends BatteryChargerSettings {
             double batteryChargingPower_kW, //
             double highOutputPower_kW, double lowOutputPower_kW, //
             double highToLowPowerThreshold_kWh, double lowToHighPowerThreshold_kWh) {
-        super(settings.gridPower_kW, settings.capacity_kWh, settings.initialSoc);
+        super(settings.gridPower_kW, settings.capacity_kWh);
 
         this.batteryChargingPower_kW = batteryChargingPower_kW;
         this.highOutputPower_kW = highOutputPower_kW;
