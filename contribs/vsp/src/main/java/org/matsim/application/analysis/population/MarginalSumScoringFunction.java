@@ -49,19 +49,23 @@ public final class MarginalSumScoringFunction {
 
 	private static int deltaScoreZeroWrnCnt = 0;
 
+	static record Scores( double scoreNormal, double deltaScore ) {
+	}
+
 	/**
 	 * @param personId
 	 * @param activity
-	 * @param delay -- in the current implementation, this will be treated as a negative delay!
+	 * @param earlier -- in the current implementation, this will be treated as a negative earlier!
 	 * @return
 	 */
-	public final double getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double delay ) {
+	public final Scores getNormalActivityDelayDisutility( Id<Person> personId, Activity activity, double earlier ) {
 
-		SumScoringFunction sumScoringA = new SumScoringFunction() ;
-		sumScoringA.addScoringFunction(activityScoringA);
+		SumScoringFunction sumScoringNormal = new SumScoringFunction() ;
+		sumScoringNormal.addScoringFunction(activityScoringA);
+		// yyyyyy it is not clear to me why this does not add the same scoring fct contribution multiple times.  kai, dec'25
 
-		SumScoringFunction sumScoringB = new SumScoringFunction() ;
-		sumScoringB.addScoringFunction(activityScoringB);
+		SumScoringFunction sumScoringEarly = new SumScoringFunction() ;
+		sumScoringEarly.addScoringFunction(activityScoringB);
 
 		if (activity.getStartTime().seconds() != Double.NEGATIVE_INFINITY && activity.getEndTime().seconds() != Double.NEGATIVE_INFINITY) {
         	// activity is not the first and not the last activity
@@ -69,27 +73,27 @@ public final class MarginalSumScoringFunction {
         	throw new RuntimeException("Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
         }
 
-		double scoreA0 = sumScoringA.getScore();
-		double scoreB0 = sumScoringB.getScore();
+		double scoreBeforeActNormal = sumScoringNormal.getScore();
+		double scoreBeforeActEarly = sumScoringEarly.getScore();
 
-		Activity activityWithoutDelay = PopulationUtils.createActivity(activity);
-		activityWithoutDelay.setStartTime(activity.getStartTime().seconds() - delay);
+		Activity earlyActivity = PopulationUtils.createActivity(activity);
+		earlyActivity.setStartTime(activity.getStartTime().seconds() - earlier);
 		// yy Depending on how complete the later used "handleActivity" is set up, the facility may become closed at exactly this time step, and then the resulting VTTS will be zero. kai, nov'25
 		// --> However, may also work the other way around, and the facility may just become open at exactly this time step.
 
-		sumScoringA.handleActivity(activity);
-		sumScoringB.handleActivity(activityWithoutDelay);
+		sumScoringNormal.handleActivity(activity);
+		sumScoringEarly.handleActivity(earlyActivity);
 
-		sumScoringA.finish();
-		sumScoringB.finish();
+		sumScoringNormal.finish();
+		sumScoringEarly.finish();
 
-		double scoreA1 = sumScoringA.getScore();
-		double scoreB1 = sumScoringB.getScore();
+		double scoreAfterActNormal = sumScoringNormal.getScore();
+		double scoreAfterActEarly = sumScoringEarly.getScore();
 
-		double scoreWithDelay = scoreA1 - scoreA0;
-		double scoreWithoutDelay = scoreB1 - scoreB0;
+		double scoreNormal = scoreAfterActNormal - scoreBeforeActNormal;
+		double scoreForLongerActivity = scoreAfterActEarly - scoreBeforeActEarly;
 
-		final double deltaScore = scoreWithoutDelay - scoreWithDelay;
+		final double deltaScore = scoreForLongerActivity - scoreNormal;
 
 		if ( deltaScore==0. && deltaScoreZeroWrnCnt<10 ) {
 			deltaScoreZeroWrnCnt++;
@@ -97,26 +101,26 @@ public final class MarginalSumScoringFunction {
 			log.warn( "actDelayDisutil=0; presumably actStart outside opening times; personId={}; actType={}; actStart={}; actEnd={}; actOpening={}; actClosing={}",
 				personId, activity.getType(), activity.getStartTime().seconds()/3600., activity.getEndTime().seconds()/3600.,
 				activityUtilityParameters.getOpeningTime(), activityUtilityParameters.getClosingTime() );
-//			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreWithoutDelay), new BigDecimal( scoreWithDelay) );
+//			log.warn( "score0={}; scoreWDelay={}", new BigDecimal( scoreForLongerActivity), new BigDecimal( scoreNormal) );
 			if ( deltaScoreZeroWrnCnt==10 ) {
 				log.warn( Gbl.FUTURE_SUPPRESSED );
 			}
 		}
 
-		return deltaScore;
+		return new Scores( scoreNormal, deltaScore );
 	}
 
-	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {
+	public final Scores getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEveningNormal, double earlier) {
 
-		SumScoringFunction delegateA = new SumScoringFunction() ;
-		delegateA.addScoringFunction(activityScoringA);
+		SumScoringFunction normalScoring = new SumScoringFunction() ;
+		normalScoring.addScoringFunction(activityScoringA);
 
-		SumScoringFunction delegateB = new SumScoringFunction() ;
-		delegateB.addScoringFunction(activityScoringB);
+		SumScoringFunction earlyScoring = new SumScoringFunction() ;
+		earlyScoring.addScoringFunction(activityScoringB);
 
 	//	log.info("activityMorning: " + activityMorning.toString());
-	//	log.info("activityEvening: " + activityEvening.toString());
-	//	log.info("activityEveningWithoutDelay: " + activityEveningWithoutDelay.toString());
+	//	log.info("activityEveningNormal: " + activityEveningNormal.toString());
+	//	log.info("activityEveningWithEarlyStart: " + activityEveningWithEarlyStart.toString());
 
 		if (activityMorning.getStartTime().isUndefined()  && activityMorning.getEndTime().isDefined()) {
         	// 'morningActivity' is the first activity
@@ -124,35 +128,33 @@ public final class MarginalSumScoringFunction {
         	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
         }
 
-        if (activityEvening.getStartTime().isDefined() && activityEvening.getEndTime().isUndefined()) {
+        if (activityEveningNormal.getStartTime().isDefined() && activityEveningNormal.getEndTime().isUndefined()) {
         	// 'eveningActivity' is the last activity
         } else {
-        	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");
+        	throw new RuntimeException("activityEveningNormal is not the last activity. Or why does it have an end time? Aborting...");
         }
 
-		double scoreA0 = delegateA.getScore();
-		double scoreB0 = delegateB.getScore();
+		double scoreA0 = normalScoring.getScore();
+		double scoreB0 = earlyScoring.getScore();
 
-		delegateA.handleActivity(activityMorning);
-		delegateB.handleActivity(activityMorning);
+		normalScoring.handleActivity(activityMorning);
+		earlyScoring.handleActivity(activityMorning);
 
-		Activity activityEveningWithoutDelay = PopulationUtils.createActivity(activityEvening);
-		activityEveningWithoutDelay.setStartTime(activityEvening.getStartTime().seconds() - delay);
+		Activity activityEveningWithEarlyStart = PopulationUtils.createActivity(activityEveningNormal);
+		activityEveningWithEarlyStart.setStartTime(activityEveningNormal.getStartTime().seconds() - earlier);
 
 
-		delegateA.handleActivity(activityEvening);
-		delegateB.handleActivity(activityEveningWithoutDelay);
+		normalScoring.handleActivity(activityEveningNormal);
+		earlyScoring.handleActivity(activityEveningWithEarlyStart);
 
-		delegateA.finish();
-		delegateB.finish();
+		normalScoring.finish();
+		earlyScoring.finish();
 
-		double scoreA1 = delegateA.getScore();
-		double scoreB1 = delegateB.getScore();
+		double scoreNormal = normalScoring.getScore() - scoreA0;
+		double scoreWithEarlierStart = earlyScoring.getScore() - scoreB0;
 
-		double scoreWithDelay = scoreA1 - scoreA0;
-		double scoreWithoutDelay = scoreB1 - scoreB0;
-
-		return scoreWithoutDelay - scoreWithDelay;
+		final double deltaScore = scoreWithEarlierStart - scoreNormal;
+		return new Scores( scoreNormal, deltaScore );
 	}
 
 }

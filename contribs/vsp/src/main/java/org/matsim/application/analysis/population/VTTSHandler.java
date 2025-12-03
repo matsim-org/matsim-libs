@@ -67,6 +67,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 		public String actType;
 		public double actTypDur_h;
 		public double actDur_h;
+		public double actScore;
 		double VTTSh;
 		double musl_h;
 		String mode;
@@ -311,6 +312,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 			// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  kai, gr, jul'25
 
+			MarginalSumScoringFunction.Scores scores = null;
 			if( activityEndTime.isUndefined() ){
 				// The end time is undefined...
 
@@ -322,7 +324,8 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				Activity activityEvening = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
 				activityEvening.setStartTime( simData.currentActivityStartTime );
 
-				activityDelayDisutility_h = 3600. * marginalSumScoringFunction.getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
+				scores = marginalSumScoringFunction.getOvernightActivityDelayDisutility( activityMorning, activityEvening, 1.0 );
+				activityDelayDisutility_h = 3600. * scores.deltaScore();
 
 				simData.trips.getLast().actDur_h = (simData.firstActivityEndTime + 3600.*24 - simData.currentActivityStartTime)/3600. ;
 
@@ -332,10 +335,12 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 				Activity activity = PopulationUtils.createActivityFromLinkId( simData.currentActivityType, null );
 				activity.setStartTime( simData.currentActivityStartTime );
 				activity.setEndTime( activityEndTime.seconds() );
-				activityDelayDisutility_h = 3600. * marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
+				scores = marginalSumScoringFunction.getNormalActivityDelayDisutility( personId, activity, 1.0 );
+				activityDelayDisutility_h = 3600. * scores.deltaScore();
 				simData.trips.getLast().actDur_h = (activityEndTime.seconds() - simData.currentActivityStartTime)/3600. ;
 
 			}
+			simData.trips.getLast().actScore = scores.scoreNormal();
 		}
 
 		// Calculate the agent's trip delay disutility.

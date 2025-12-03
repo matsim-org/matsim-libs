@@ -149,6 +149,7 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 				setVTTS_h( activity, tripData.VTTSh );
 				setMUTTS_h( activity, tripData.mUTTSh );
 				setMUSL_h( activity, tripData.musl_h );
+				setActScore( activity, tripData.actScore );
 			}
 		}
 
@@ -230,5 +231,9 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 	}
 	public static Double getMUSL_h( Activity activity ) {
 		return (Double) activity.getAttributes().getAttribute( MUSL_h );
+	}
+
+	public static void setActScore( Activity activity, double score ) {
+		activity.getAttributes().putAttribute( "activityScore", score );
 	}
 }
