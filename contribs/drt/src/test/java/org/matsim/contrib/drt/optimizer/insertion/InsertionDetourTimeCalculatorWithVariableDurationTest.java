@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 import java.util.Collections;
 import java.util.List;
@@ -118,7 +117,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 	void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
 		DrtStopTask stopTask = new DefaultDrtStopTask(20, 20 + STOP_DURATION_INITIAL, fromLink);
-		stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
+		stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial, 60));
 		// sh 03/08/23: Updated this test, according to VehicleDataEntryFactoryImpl start time should be task end time
 		Waypoint.Start start = start(stopTask, 20 + STOP_DURATION_INITIAL, fromLink);
 		VehicleEntry entry = entry(start);
@@ -318,7 +317,7 @@ public class InsertionDetourTimeCalculatorWithVariableDurationTest {
 
 	private StopWaypoint stop(double beginTime, Link link) {
 		DrtStopTask stopTask = new DefaultDrtStopTask(beginTime, beginTime + STOP_DURATION_INITIAL, link);
-		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial));
+		stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(drtRequestInitial, 60));
 		return new StopWaypointImpl(stopTask, loadType.getEmptyLoad(), loadType, false);
 	}
 

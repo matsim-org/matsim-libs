@@ -319,16 +319,16 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		var req = requestData.getDrtRequest();
 		var insertion = requestData.getSolution().insertion().get();
 
-		double dropoffDuration = insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime -
-			insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime;
+		var vehicle = insertion.insertion.vehicleEntry.vehicle;
+		double pickupDuration = stopDurationProvider.calcPickupDuration(vehicle, req);
+		double dropoffDuration = stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 		var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
 			insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
 			insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
-			dropoffDuration);
+			pickupDuration, dropoffDuration);
 
 		if (acceptedRequest.isPresent()) {
-			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
 			double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
