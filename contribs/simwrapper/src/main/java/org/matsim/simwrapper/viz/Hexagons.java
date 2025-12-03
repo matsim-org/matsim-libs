@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Produces a hexagon plot on a map.
  */
-public final class Hexagons extends Viz {
+public final class Hexagons extends VizMap<Hexagons> {
 
 	/**
 	 * The filepath containing the data.
