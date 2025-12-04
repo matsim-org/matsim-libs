@@ -440,6 +440,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
 			}
+			else
+				CarriersUtils.setJspritIterations(carrier, jspritIterations);
 		});
 		int carrierSteps = 30;
 		for (int i = 0; i < allCarriers.size(); i++) {
