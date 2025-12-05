@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+	<vehicleType id="FV">
+		<attributes>
+			<attribute class="java.lang.Double" name="accessTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="egressTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="railsimAcceleration">0.6</attribute>
+			<attribute class="java.lang.Double" name="railsimDeceleration">0.7</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999" />
+		<length meter="400.0" />
+		<width meter="1.0" />
+		<maximumVelocity meterPerSecond="44.444" />
+		<costInformation />
+		<passengerCarEquivalents pce="0.0" />
+		<networkMode networkMode="rail" />
+		<flowEfficiencyFactor factor="1.0" />
+	</vehicleType>
+	<vehicleType id="GV">
+		<attributes>
+			<attribute class="java.lang.Double" name="accessTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="egressTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="railsimAcceleration">0.2</attribute>
+			<attribute class="java.lang.Double" name="railsimDeceleration">0.4</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999" />
+		<length meter="400.0" />
+		<width meter="1.0" />
+		<maximumVelocity meterPerSecond="27.7778" />
+		<costInformation />
+		<passengerCarEquivalents pce="0.0" />
+		<networkMode networkMode="rail" />
+		<flowEfficiencyFactor factor="1.0" />
+	</vehicleType>
+	<vehicleType id="RV">
+		<attributes>
+			<attribute class="java.lang.Double" name="accessTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="egressTimeInSecondsPerPerson">0.0</attribute>
+			<attribute class="java.lang.Double" name="railsimAcceleration">1.0</attribute>
+			<attribute class="java.lang.Double" name="railsimDeceleration">0.7</attribute>
+		</attributes>
+		<capacity seats="9999" standingRoomInPersons="9999" />
+		<length meter="200.0" />
+		<width meter="1.0" />
+		<maximumVelocity meterPerSecond="44.444" />
+		<costInformation />
+		<passengerCarEquivalents pce="0.0" />
+		<networkMode networkMode="rail" />
+		<flowEfficiencyFactor factor="1.0" />
+	</vehicleType>
+	<vehicle id="FV_AB" type="FV" />
+	<vehicle id="FV_BA" type="FV" />
+	<vehicle id="FV_AC" type="FV" />
+	<vehicle id="FV_CA" type="FV" />
+	<vehicle id="GV_AB" type="GV" />
+	<vehicle id="GV_BA" type="GV" />
+	<vehicle id="GV_AC" type="GV" />
+	<vehicle id="GV_CA" type="GV" />
+	<vehicle id="RV_AB" type="RV" />
+	<vehicle id="RV_BA" type="RV" />
+	<vehicle id="RV_AC" type="RV" />
+	<vehicle id="RV_CA" type="RV" />
+</vehicleDefinitions>

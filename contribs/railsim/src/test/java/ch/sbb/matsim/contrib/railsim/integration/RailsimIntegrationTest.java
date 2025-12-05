@@ -716,6 +716,15 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 			.allTrainsArrived();
 
 	}
+	
+	@Test
+	void testAbzweigung() {
+
+		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "abzweigung"));
+		assertThat(result)
+			.allTrainsArrived();
+	}
+
 
 	@Test
 	void testVaryingVMax() {

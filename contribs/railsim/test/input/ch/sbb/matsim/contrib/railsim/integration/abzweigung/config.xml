@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+    <module name="global">
+        <param name="randomSeed" value="4711"/>
+        <param name="coordinateSystem" value="Atlantis"/>
+    </module>
+
+    <module name="controller">
+        <param name="runId" value="uc2_bb1_template"/>
+        <param name="firstIteration" value="0"/>
+        <param name="lastIteration" value="0"/>
+    </module>
+
+    <module name="railsim">
+        <!-- Global acceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (railsimAcceleration); used to compute the train velocity per link. -->
+        <param name="accelerationDefault" value="0.5"/>
+        <!-- Global deceleration in meters per second^2 which is used if there is no value provided in the vehicle attributes (railsimDeceleration); used to compute the reserved train path and the train velocity per link. -->
+        <param name="decelerationDefault" value="0.5"/>
+        <!-- Comma separated set of modes that are handled by the railsim qsim engine in the simulation. Defaults to 'rail'. -->
+        <param name="networkModes" value="rail"/>
+        <!-- Time interval in seconds a train has to wait until trying again to request a track reservation if the track was blocked by another train. -->
+        <param name="pollInterval" value="1.0"/>
+        <!-- Speed profile to use within train disposition to calculate the target speed -->
+        <param name="speedProfile" value="maxSpeed"/>
+        <!-- Maximum time interval in seconds which is used to update the train position update events. -->
+        <param name="updateInterval" value="1.0"/>
+        <!-- Defines how trains circulate in the network if the same vehicle is used for multiple trips. -->
+        <param name="vehicleCirculation" value="yes"/>
+    </module>
+
+    <module name="qsim">
+        <!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+        <param name="startTime" value="00:00:00"/>
+        <param name="endTime" value="24:00:00"/>
+
+        <param name="snapshotperiod" value="00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
+        <param name="mainMode" value="car"/>
+
+        <!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+        <param name="stuckTime" value="999999."/>
+    </module>
+
+    <module name="transit">
+        <param name="routingAlgorithmType" value="SwissRailRaptor"/>
+        <param name="transitScheduleFile" value="schedule.xml"/>
+        <param name="useTransit" value="true"/>
+        <param name="usingTransitInMobsim" value="true"/>
+        <param name="vehiclesFile" value="vehicles.xml"/>
+    </module>
+
+    <module name="network">
+        <param name="inputNetworkFile" value="network.xml"/>
+    </module>
+
+</config>
