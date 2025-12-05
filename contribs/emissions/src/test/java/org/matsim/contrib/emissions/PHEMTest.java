@@ -8,7 +8,9 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +34,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
 import static org.apache.commons.lang3.math.IEEE754rUtils.min;
@@ -126,8 +129,6 @@ public class PHEMTest {
 				The minimum is determined by computing the delta value.
 				If the sign changed form negative to positive, the minimum must be somewhere between this point and the last.
 				NOTE: We are not using the acceleration as the data does not match numerically with the velocity.
-				TODO currently, it is impossible to simulate standing times. How do we want to overcome this?
-				TODO -> currently, the program creates links with 0 speed and length, which will probably cause problems
 				 */
 
 				if (lastDelta <= 0 && currentDelta > 0) {
@@ -887,6 +888,80 @@ public class PHEMTest {
 					true
 				)
 			)).toList();
+	}
+
+	static Stream<Arguments> scaledWLTPExpProvider() {
+		return Stream.of(0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5)
+			.flatMap(scale ->
+				Arrays.stream(Fuel.values())
+					.map(fuel -> Arguments.of(scale, fuel))
+			);
+	}
+
+
+	@ParameterizedTest
+	@MethodSource("scaledWLTPExpProvider")
+	void scaledWLTPExpTest(double scale, Fuel fuel) throws IOException {
+
+		// Create config
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+
+		// Define the cycleLinkAttributes
+		Path cyclePath;
+		if(Math.abs(scale - 1) < 1e-6){
+			cyclePath = Paths.get(utils.getClassInputDirectory()).resolve("/Users/aleksander/Documents/VSP/PHEMTest/scaled/wltp1.csv");
+		} else {
+			cyclePath = Paths.get(utils.getClassInputDirectory()).resolve("/Users/aleksander/Documents/VSP/PHEMTest/scaled/wltp" + scale + ".csv");
+		}
+
+		List<CycleLinkAttributes> cycleLinkAttributes = configureLinks(cyclePath, LinkCutSetting.fixedIntervalLength.setAttr(60));
+
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
+		List<SumoEntry> sumoSegments = null;
+
+		// Define vehicle
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+
+		// Calculate MATSim-emissions
+		List<Map<Pollutant, Double>> link_pollutant2grams = calculateMATSIMEmissions(config, vehHbefaInfo, cycleLinkAttributes);
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
+
+		// Print out the results as csv
+		String path = "/Users/aleksander/Documents/VSP/PHEMTest/scaled/";
+		String diff_name = Math.abs(scale - 1) < 1e-6 ? "diff_" + fuel + "1.csv" : "diff_" + fuel + "_" + scale + ".csv";
+		writeDiffFile(path + diff_name, comparison);
+	}
+
+	@ParameterizedTest
+	@EnumSource(Fuel.class)
+	void highwayOverestimationExpTest(Fuel fuel) throws IOException {
+		// Create config
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+
+		// Define the cycleLinkAttributes
+		Path cyclePath = Paths.get(utils.getClassInputDirectory()).resolve( "WLTP.csv");
+		List<CycleLinkAttributes> cycleLinkAttributes = configureLinks(cyclePath, LinkCutSetting.fromLinkAttributes);
+
+		// Set SUMO-ref to null
+		List<SumoEntry> sumoSegments = null;
+
+		// Define vehicle
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+
+		// Calculate MATSim-emissions
+		List<Map<Pollutant, Double>> link_pollutant2grams = calculateMATSIMEmissions(config, vehHbefaInfo, cycleLinkAttributes);
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
+
+		// Print out the results as csvv
+		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff/highwayOverestimation/";
+		String diff_name = "diff_WLTP_" + fuel + "130_output.csv";
+		writeDiffFile(path + diff_name, comparison);
+
 	}
 
 	// ----- Helper definitions -----
