@@ -968,14 +968,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			trafficSituation = SATURATED;
 		}
 		if (trafficSpeeds.containsKey(STOPANDGO) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO)) {
-			if (averageSpeed_kmh - trafficSpeeds.get(FREEFLOW) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+			if (Math.abs(averageSpeed_kmh - trafficSpeeds.get(FREEFLOW)) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
 				trafficSituation = STOPANDGO;
 			}
 		}
 		/*FIXME The following lines should be added to account for the HBEFA 4.1's additional traffic situation,
 		   but it currently causes a test failure (jwj, Nov'20) */
 		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
-			if (averageSpeed_kmh - trafficSpeeds.get(FREEFLOW) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+			if (Math.abs(averageSpeed_kmh - trafficSpeeds.get(FREEFLOW)) > 1e-6) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
 				trafficSituation = STOPANDGO_HEAVY;
 			}
 		}
