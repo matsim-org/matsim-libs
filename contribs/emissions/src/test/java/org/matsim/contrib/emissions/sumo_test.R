@@ -819,8 +819,8 @@
   CADC.high.mean_vel <- mean(CADC$vel[2076:3143])
 
   print(glue("WLTP, St.dev. : {WLTP.st_dev}; Mean vel: {WLTP.mean_vel}; Mean acc: {WLTP.mean_acc}"))
-  print(glue("CADC, St.dev.: {CADC.st_dev}; Mean vel: {CADC.mean_vel}; Mean acc: {WLTP.mean_acc};"))
-  # print(glue("WLTP_inv, St.dev. : {WLTP_inv.st_dev}; Mean vel: {WLTP_inv.mean_vel}; Mean acc: {WLTP.mean_acc}"))
+  print(glue("CADC, St.dev.: {CADC.st_dev}; Mean vel: {CADC.mean_vel}; Mean acc: {CADC.mean_acc};"))
+  print(glue("WLTP_inv, St.dev. : {WLTP_inv.st_dev}; Mean vel: {WLTP_inv.mean_vel}; Mean acc: {WLTP_inv.mean_acc}"))
 
   print(glue("WLTP: Low mean vel: {WLTP.low.mean_vel}; Medium mean vel: {WLTP.medium.mean_vel}; High mean vel: {WLTP.high.mean_vel}; Extra high mean vel: {WLTP.extra_high.mean_vel}"))
   print(glue("CADC: Low mean vel: {CADC.low.mean_vel}; Medium mean acc: --.--------------; High mean vel: {CADC.medium.mean_vel}; Extra high mean vel: {CADC.high.mean_vel}"))
@@ -1059,7 +1059,7 @@
 {
   wltp <- read_delim(glue("{sumo_path}/sumo_input.csv"), col_names=c("time", "vel", "acc"), col_types=cols(time=col_integer(), vel=col_double(), acc=col_double()))
 
-  scales <- c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
+  scales <- c(1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
 
   for (s in scales) {
     wltp_scaled <- wltp %>%
@@ -1087,17 +1087,18 @@
   fuel <- "petrol"
 
   # Define scales
-  scales <- c(1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
+  scales <- c(1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5)
   input_dir <- "/Users/aleksander/Documents/VSP/PHEMTest/scaled"
 
   # Create empty lists to store results
   avg_vel_list <- list()
   avg_acc_list <- list()
-  emissions_list <- list()
+  emissions_list_sumo <- list()
+  emissions_list_matsim <- list()
 
   for (s in scales) {
     # Build file path
-    file_path <- file.path(input_dir, paste0("sumo_petrol_", s, "_output.csv"))
+    file_path <- file.path(input_dir, paste0(glue("sumo_{fuel}_", s, "_output.csv")))
 
     # Read the file
     sumo_output <- read_delim(
@@ -1122,20 +1123,40 @@
     avg_vel_list[[as.character(s)]] <- mean(sumo_output$velocity)
     avg_acc_list[[as.character(s)]] <- mean(sumo_output$acceleration[sumo_output$acceleration > 0])
 
-    emissions_list[[as.character(s)]] <- sumo_output %>%
+    emissions_list_sumo[[as.character(s)]] <- sumo_output %>%
       pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
       group_by(component) %>%
       summarize(value = sum(value)/1000) %>%
-      mutate(avg_acc = avg_acc_list[[as.character(s)]], avg_vel = avg_vel_list[[as.character(s)]], scale = s, )
+      mutate(avg_acc = avg_acc_list[[as.character(s)]], avg_vel = avg_vel_list[[as.character(s)]], scale = s, model="SUMO")
+
+    # Compute the sum for MATSim values
+    r <- read_matsim(glue("/Users/aleksander/Documents/VSP/PHEMTest/scaled/diff_{fuel}_{s}.csv"), "")
+
+    emissions_list_matsim[[as.character(s)]] <- r[[1]] %>%
+      group_by(component) %>%
+      summarize(value = sum(value)) %>%
+      mutate(avg_acc = avg_acc_list[[as.character(s)]], avg_vel = avg_vel_list[[as.character(s)]], scale = s, model="MATSim")
   }
 
-  emissions_all <- bind_rows(emissions_list)
+  emissions_sumo <- bind_rows(emissions_list_sumo)
+  emissions_matsim <- bind_rows(emissions_list_matsim)
+  emissions_all <- bind_rows(emissions_sumo, emissions_matsim) %>%
+    mutate(length = scale * 14.664, gPkm = value/length)
 
-  # Compute the sum for MATSim values
-  r <- read_matsim(glue("{diff_path}/WLTP/diff_{fuel}_output_fixedIntervalLength_60.csv"), "")
-  emissions_matsim <- r[[1]] %>%
-    group_by(component) %>%
-    summarize(value = sum(value))
+  ggplot(data=emissions_all) +
+    geom_line(aes(x = avg_acc, y = gPkm, color=model)) +
+    facet_wrap(~component, scale="free") +
+    theme(text = element_text(size=18)) +
+    ggtitle(glue("Absolute emissions of scaled WLTP-cycle for {fuel} cars")) +
+
+    geom_vline(xintercept=0.4215515) +
+    geom_text(aes(x=0.4215515, label="WLTP\n", y = 0), angle=90) +
+
+    geom_vline(xintercept=0.5371735, color="blue") +
+    geom_text(aes(x=0.5371735, label="CADC\n", y = 0), color="blue", angle=90) +
+
+    geom_vline(xintercept=0.4400303, color="red") +
+    geom_text(aes(x=0.4400303, label="\nWLTP-inv.", y = 0), color="red", angle=90)
 }
 
 # ==== Plot CADCs ====
