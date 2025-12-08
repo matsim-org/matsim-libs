@@ -898,6 +898,38 @@ public class PHEMTest {
 			);
 	}
 
+	@ParameterizedTest
+	@EnumSource(Fuel.class)
+	void
+
+	sinusCyclesExpTest(Fuel fuel) throws IOException {
+
+		// Create config
+		Config config = configureTest(EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate);
+
+		Path cyclePath = Paths.get("/Users/aleksander/Documents/VSP/PHEMTest/style/combined_cycle.csv");
+
+		List<CycleLinkAttributes> cycleLinkAttributes = configureLinks(cyclePath, LinkCutSetting.fixedIntervalLength.setAttr(10));
+
+		// Read in the SUMO-outputs
+		// output-files for SUMO come from sumo emissionsDrivingCycle: https://sumo.dlr.de/docs/Tools/Emissions.html
+		List<SumoEntry> sumoSegments = null;
+
+		// Define vehicle
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+
+		// Calculate MATSim-emissions
+		List<Map<Pollutant, Double>> link_pollutant2grams = calculateMATSIMEmissions(config, vehHbefaInfo, cycleLinkAttributes);
+
+		// Prepare data for comparison (and print out a csv for debugging)
+		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
+
+		// Print out the results as csv
+		String path = "/Users/aleksander/Documents/VSP/PHEMTest/style/";
+		String diff_name = "combined_matsim_" + fuel + "_output.csv";
+		writeDiffFile(path + diff_name, comparison);
+	}
+
 
 	@ParameterizedTest
 	@MethodSource("scaledWLTPExpProvider")

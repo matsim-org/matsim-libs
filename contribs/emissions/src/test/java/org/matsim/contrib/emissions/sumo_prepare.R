@@ -485,3 +485,49 @@ hbefa_path <- "/Users/aleksander/Documents/VSP/PHEMTest/hbefa"
 
 
 }
+
+# MATSim Driving Style Analysis # TODO Outdated, remove eventually
+{
+  fuel <- "petrol"
+  selected_component <- "NOx"
+  velocity_low <- 0
+  velocity_high <- 130
+  acceleration_low <- -4
+  acceleration_high <- 4
+
+  HBEFA <- read_csv2("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv") %>%
+    filter(VehCat == "pass. car") %>%
+    filter(Technology == ifelse(fuel == "petrol", "petrol (4S)", "diesel")) %>%
+    filter(endsWith(EmConcept, "Euro-4")) %>%
+    filter(startsWith(TrafficSit, "URB/Local/50/Freeflow")) %>%
+    filter(Component == selected_component)
+
+  sumo_output <- read_delim(glue("{sumo_path}/sumo_{fuel}_output_heatmap.csv"),
+                            delim = ";",
+                            col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                            col_types = cols(
+                              time = col_integer(),
+                              velocity = col_double(),
+                              acceleration = col_double(),
+                              slope = col_double(),
+                              CO = col_double(),
+                              CO2 = col_double(),
+                              HC = col_double(),
+                              PMx = col_double(),
+                              NOx = col_double(),
+                              fuel = col_double(),
+                              electricity = col_double())) %>%
+    pivot_longer(cols = c("CO", "CO2", "HC", "PMx", "NOx"), names_to = "component", values_to="value") %>%
+    filter(component == selected_component, velocity_low < velocity & velocity < velocity_high & acceleration_low < acceleration & acceleration < acceleration_high) %>%
+    mutate(model = "SUMO_0", value=value/1000)
+
+  ggplot() +
+    geom_tile(data=sumo_output, aes(x = velocity, y = acceleration, fill = value)) +
+    labs(fill = "Emission", title = glue("Simulation Heatmap for {selected_component}")) +
+    #scale_fill_viridis_c(trans="log") +
+    scale_fill_viridis_c() +
+    scale_color_viridis_c() +
+    geom_contour(data = sumo_output, aes(x = velocity, y = acceleration, z = value), breaks = (HBEFA$EFA[[1]]), color = "black", linewidth = 1) +
+    theme_minimal()
+
+}
