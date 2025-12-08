@@ -1324,3 +1324,56 @@
   compute_emission_difference(glue("/Users/aleksander/Documents/VSP/PHEMTest/diff/WLTP/diff_WLTP_{fuel}_output_useFirstDuplicate_fixedIntervalLength_60.csv"),
                               glue("/Users/aleksander/Documents/VSP/PHEMTest/sumo/sumo_{fuel}_output_pl5.csv"))
 }
+
+# ==== Test, 2-avg-acc VS. diff-acc
+{
+  sumo_2_avg <- read_delim(glue("{sumo_path}/sumo_petrol_output_pl5.csv"),
+                           delim = ";",
+                           col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                           col_types = cols(
+                             time = col_integer(),
+                             velocity = col_double(),
+                             acceleration = col_double(),
+                             slope = col_double(),
+                             CO = col_double(),
+                             CO2 = col_double(),
+                             HC = col_double(),
+                             PMx = col_double(),
+                             NOx = col_double(),
+                             fuel = col_double(),
+                             electricity = col_double())) %>%
+    group_by() %>%
+    summarize(CO = sum(CO), CO2 = sum(CO2), HC = sum(HC), NOx = sum(NOx), PMx = sum(PMx)) %>%
+    mutate(model="2_avg")
+
+  sumo_diff <- read_delim(glue("{sumo_path}/sumo_petrol_a_output_pl5.csv"),
+                           delim = ";",
+                           col_names = c("time", "velocity", "acceleration", "slope", "CO", "CO2", "HC", "PMx", "NOx", "fuel", "electricity"),
+                           col_types = cols(
+                             time = col_integer(),
+                             velocity = col_double(),
+                             acceleration = col_double(),
+                             slope = col_double(),
+                             CO = col_double(),
+                             CO2 = col_double(),
+                             HC = col_double(),
+                             PMx = col_double(),
+                             NOx = col_double(),
+                             fuel = col_double(),
+                             electricity = col_double())) %>%
+    group_by() %>%
+    summarize(CO = sum(CO), CO2 = sum(CO2), HC = sum(HC), NOx = sum(NOx), PMx = sum(PMx)) %>%
+    mutate(model="diff")
+
+  a <- merge(sumo_diff, sumo_2_avg, by=c()) %>%
+    mutate(CO.percent = CO.x/CO.y,
+           CO2.percent = CO2.x/CO2.y,
+           HC.percent = HC.x/HC.y,
+           NOx.percent = NOx.x/NOx.y,
+           PMx.percent = PMx.x/PMx.y) %>%
+    select(CO.percent,
+           CO2.percent,
+           HC.percent,
+           NOx.percent,
+           PMx.percent)
+}
