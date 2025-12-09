@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  */
 public class CommercialTrafficDashboard implements Dashboard {
 
-	private List<String> groupsOfCommercialSubpopulations = new ArrayList<>();
+	private final LinkedHashMap<String, List<String>> groupsOfCommercialSubpopulations = new LinkedHashMap<>();
 	private final String crs;
 	private String[] args;
 
@@ -42,11 +42,17 @@ public class CommercialTrafficDashboard implements Dashboard {
 	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
 	 */
 	public CommercialTrafficDashboard setGroupsOfSubpopulationsForCommercialAnalysis(String... groupsOfSubpopulations) {
-		String joined = String.join(";", groupsOfSubpopulations);
-		groupsOfCommercialSubpopulations = Arrays.stream(joined.split(";"))
-			.map(entry -> entry.split("=")[0])
-			.collect(Collectors.toList());
-		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", joined);
+		String groupsOfCommercialSubpopulationsString = String.join(";", groupsOfSubpopulations);
+		for (String part : groupsOfCommercialSubpopulationsString.split(";")) {
+			if (part.isBlank()) continue;
+			String[] kv = part.split("=", 2);
+			String groupName = kv[0].trim();
+			List<String> subpops = kv.length > 1 && !kv[1].isBlank()
+				? Arrays.stream(kv[1].split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())
+				: new ArrayList<>();
+			groupsOfCommercialSubpopulations.put(groupName, subpops);
+		}
+		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
 	}
 	/**
 	 * Set an argument that will be passed to the analysis script. See {@link CommercialAnalysis}.
@@ -61,7 +67,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 		header.title = "Commercial Traffic";
-		header.description = "Commercial Traffic related analyses.";
+		header.description = "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsOfCommercialSubpopulations +
+			"**.";
 
 		layout.row("General_first","General").el(PieChart.class, (viz, data) -> {
 				double sampleSize = data.config().getSampleSize();
@@ -121,7 +128,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
-				for (String group : groupsOfCommercialSubpopulations) {
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					Plotly.DataSet ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
 						.constant("source", "Simulated")
@@ -140,7 +147,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.title = "Trip distance distribution";
 				viz.colorRamp = ColorScheme.Viridis;
-				for (String group : groupsOfCommercialSubpopulations) {
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name(group).build(),
 						viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
 							.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
@@ -161,7 +168,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
-				for (String group : groupsOfCommercialSubpopulations) {
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					var ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
 						.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
@@ -189,7 +196,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
-				for (String group : groupsOfCommercialSubpopulations) {
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					var ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
 						.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
@@ -258,7 +265,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "commercialTraffic");
 			viz.showAllRows = true;
 		});
-		for (String group : groupsOfCommercialSubpopulations) {
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics of group: *" + group + "*";
 				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
@@ -273,14 +280,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
-				headerPopStats.addAll(groupsOfCommercialSubpopulations);
+				headerPopStats.addAll(groupsOfCommercialSubpopulations.keySet());
 				viz.show = headerPopStats;
 			})
 			.el(Plotly.class, (viz, data) -> {
 //				viz.layout.barmode = "group";
 			viz.title = "Mode usage by subpopulation";
 
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				Plotly.DataSet dsSub = viz.addDataset(
 					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", group));
 				viz.addTrace(
@@ -304,7 +311,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 			viz.colorRamp = ColorScheme.Viridis;
 			viz.interactive = Plotly.Interactive.dropdown;
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				Plotly.DataSet ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", group))
 					.pivot(List.of("dist"), "main_mode", "share")
 					.constant("source", "Sim");
@@ -342,7 +349,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
 
 				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name(group)
@@ -379,7 +386,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			);
 		});
 
-		for (String group : groupsOfCommercialSubpopulations) {
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-dist-violin", "Tours").	el(Plotly.class, (viz, data) -> {
 			viz.title = "Distance per vehicle type (km) Violin *" + group + "*";
 			viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
@@ -436,7 +443,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
 
 				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name(group)
@@ -473,7 +480,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			);
 		});
 
-		for (String group : groupsOfCommercialSubpopulations) {
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-duration-violin", "Tours").	el(Plotly.class, (viz, data) -> {
 				viz.title = "Duration per vehicle type (h) Violin *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
@@ -513,7 +520,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Origin-Destination of commercial trips";
 			viz.description = "The OD can be filtered according to defined groups of commercial subpopulations.";
 			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addAggregation(group, "Origin",group+"_start_X",group+"_start_Y","Destination",group+"_act_X",group+"_act_Y");
 
 			}
@@ -545,7 +552,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
 
 				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name(group)
@@ -582,7 +589,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			);
 		});
 
-		for (String group : groupsOfCommercialSubpopulations) {
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-Activities-violin", "Activities").	el(Plotly.class, (viz, data) -> {
 				viz.title = "Number of Jobs per vehicle type (h) Violin *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
@@ -640,7 +647,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
 
 				.constant("source", "Act");
-			for (String group : groupsOfCommercialSubpopulations) {
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name(group)
@@ -677,7 +684,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			);
 		});
 
-		for (String group : groupsOfCommercialSubpopulations) {
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-ActivityDurations-violin", "Activities").	el(Plotly.class, (viz, data) -> {
 				viz.title = "ActivityDurations per vehicle type (km) Violin *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
