@@ -3,8 +3,6 @@ package org.matsim.core.router;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,6 +49,19 @@ public class WalkAsNetworkModeTest {
 		PopulationUtils.comparePopulations(utils.getOutputDirectory() + "output_plans.xml.gz", utils.getInputDirectory() + "output_plans.xml.gz");
 	}
 
+	// !!! Not using @ParameterizedTest because otherwise the test fails on windows (java.io.UncheckedIOException: java.nio.file.FileSystemException:
+	// ...\test_accessEgressModeToLinkPlusTimeConstant\logfile.log: The process cannot access the file because it is being used by another process)
+	// not sure why this is the case, probably some issue with the test framework, paul dec'25
+	@Test
+	void test_accessEgressModeToLinkPlusTimeConstant_ok() {
+		test_accessEgressModeToLinkPlusTimeConstant(false);
+	}
+
+	@Test
+	void test_accessEgressModeToLinkPlusTimeConstant_fail() {
+		test_accessEgressModeToLinkPlusTimeConstant(true);
+	}
+
 	/**
 	 * This test runs a scenario with walk as network mode and accessEgressModeToLinkPlusTimeConstant. There are two persons:
 	 * - one with only car legs
@@ -61,8 +72,6 @@ public class WalkAsNetworkModeTest {
 	 * <p>
 	 * All non_network_walk legs have a constant travel time of 10s added.
 	 */
-	@ParameterizedTest
-	@ValueSource(booleans = {true, false})
 	void test_accessEgressModeToLinkPlusTimeConstant(boolean fail) {
 		Config c = getConfig(RoutingConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant);
 		Scenario s = getScenario(c);
@@ -85,6 +94,17 @@ public class WalkAsNetworkModeTest {
 		}
 	}
 
+	// Deliberately not using @ParameterizedTest. See above. 
+	@Test
+	void test_walkConstantTimeToLink_ok() {
+		test_walkConstantTimeToLink(false);
+	}
+
+	@Test
+	void test_walkConstantTimeToLink_fail() {
+		test_walkConstantTimeToLink(true);
+	}
+
 	/**
 	 * This test runs a scenario with walk as network mode and accessEgressModeToLinkPlusTimeConstant. There are two persons:
 	 * - one with only car legs
@@ -95,8 +115,6 @@ public class WalkAsNetworkModeTest {
 	 * <p>
 	 * All non_network_walk legs have a constant travel time of 10s.
 	 */
-	@ParameterizedTest
-	@ValueSource(booleans = {true, false})
 	void test_walkConstantTimeToLink(boolean fail) {
 		Config c = getConfig(RoutingConfigGroup.AccessEgressType.walkConstantTimeToLink);
 		Scenario s = getScenario(c);
