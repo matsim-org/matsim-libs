@@ -20,14 +20,14 @@
 
 package org.matsim.core.population.routes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
@@ -37,7 +37,8 @@ import org.matsim.vehicles.Vehicle;
 final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 
 	/*package*/ final static String ROUTE_TYPE = "links";
-	
+
+	// These Lists do NOT contain the start and end link even though they are present in the route in population xml v6. paul, dec'25.
 	private ArrayList<Id<Link>> route = new ArrayList<>();
 	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
@@ -46,15 +47,15 @@ final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 	LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
-	
+
 	LinkNetworkRouteImpl(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 		setLinkIds(startLinkId, linkIds, endLinkId);
 	}
-	
+
 	LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link>[] linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
-        Collections.addAll(this.route, linkIds);
+		Collections.addAll(this.route, linkIds);
 		this.route.trimToSize();
 	}
 
@@ -90,7 +91,7 @@ final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 		} else {
 			for (int i = 0, n = this.route.size(); (i < n) && (fromIndex < 0); i++) {
 				if (fromLinkId.equals(this.route.get(i))) {
-					fromIndex = i+1;
+					fromIndex = i + 1;
 				}
 			}
 			if (fromIndex < 0 && fromLinkId.equals(this.getEndLinkId())) {
@@ -106,7 +107,7 @@ final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 		} else {
 			for (int i = fromIndex, n = this.route.size(); (i < n) && (toIndex < 0); i++) {
 				if (fromLinkId.equals(this.route.get(i))) {
-					fromIndex = i+1; // in case of a loop, cut it short
+					fromIndex = i + 1; // in case of a loop, cut it short
 				}
 				if (toLinkId.equals(this.route.get(i))) {
 					toIndex = i;
@@ -167,14 +168,14 @@ final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 			desc.append(" ");
 			desc.append(linkId.toString());
 		}
-		// If the start links equals the end link additionally check if its is a round trip. 
+		// If the start links equals the end link additionally check if its is a round trip.
 		if (!this.getEndLinkId().equals(this.getStartLinkId()) || this.getLinkIds().size() > 0) {
 			desc.append(" ");
 			desc.append(this.getEndLinkId().toString());
 		}
 		return desc.toString();
 	}
-	
+
 	@Override
 	public void setRouteDescription(String routeDescription) {
 		List<Id<Link>> linkIds = NetworkUtils.getLinkIds(routeDescription);
@@ -190,17 +191,17 @@ final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 		}
 		this.setLinkIds(startLinkId, linkIds, endLinkId);
 	}
-	
+
 	@Override
 	public String getRouteType() {
 		return ROUTE_TYPE;
 	}
-	
+
 	@Override
 	public String toString() {
 		String str = super.toString();
-		str += " linkIds=" + this.getLinkIds() ;
-		str += " travelCost=" + this.getTravelCost() ;
-		return str ;
+		str += " linkIds=" + this.getLinkIds();
+		str += " travelCost=" + this.getTravelCost();
+		return str;
 	}
 }

@@ -48,13 +48,13 @@ public interface Route extends MatsimPopulationObject {
 	public void setEndLinkId(final Id<Link> linkId);
 
 	/**
-	 * @return a serialization of this routes state as a String. Used to write the route to files.
+	 * @return a serialization of this routes state as a String. Used to write the route to files. Does include start and end link.
 	 */
 	public String getRouteDescription();
-	
+
 	/**
 	 * Sets the state of the route based on it's description
-	 * 
+	 *
 	 * @param routeDescription
 	 */
 	public void setRouteDescription(final String routeDescription);
@@ -63,13 +63,14 @@ public interface Route extends MatsimPopulationObject {
 	 * @return an identifier describing the type of this route uniquely. Used when writing the route to files.
 	 */
 	public String getRouteType();
-	
-	/** make the clone method public, but do NOT extend Cloneable so that implementations can decide on their own if they support
+
+	/**
+	 * make the clone method public, but do NOT extend Cloneable so that implementations can decide on their own if they support
 	 * Cloneable or use some other way to make a copy..
 	 * <p></p>
 	 * Design comments:<ul>
 	 * <li>Do we really want this?  Martin ("Clean code") argues for the difference between data objects and behavioral objects.  Data objects should
-	 * only be accessed via the interface methods.  I think that "route" is a data object.  In consequence, "copy" and/or "deepCopy" should, in 
+	 * only be accessed via the interface methods.  I think that "route" is a data object.  In consequence, "copy" and/or "deepCopy" should, in
 	 * my view, be static methods. (The argument against this is, I guess, that one might want to add Route implementations that are not
 	 * part of the standard.  Yet given that we want to be able to read/write them in xml, I am not sure how far this carries.)  kai, jan'13
 	 * <li> In our particular situation, "clone" may be considered as a useful approach to our problem (first clone the plan or its elements,
