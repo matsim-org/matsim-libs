@@ -57,7 +57,7 @@ public class RailsimEngineMovingBlockTest {
 		}
 
 		TrainManager trains = new TrainManager();
-		RailResourceManager res = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(), trains);
+		RailResourceManager res = new RailResourceManagerImpl(eventsManager, config, net, new NoDeadlockAvoidance(net), trains);
 		MaxSpeedProfile speed = new MaxSpeedProfile();
 		TrainRouter router = new TrainRouter(net, res);
 		TrainTimeDistanceHandler ttd = createTrainTimeDistanceHandler();

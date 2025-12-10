@@ -1,10 +1,15 @@
 package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
+
+import java.util.Objects;
 
 public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBicycleLinkScore {
 
@@ -13,14 +18,22 @@ public final class AdditionalBicycleLinkScoreDefaultImpl implements AdditionalBi
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_pct_m;
+	private final Vehicles vehicles;
+
 	@Inject AdditionalBicycleLinkScoreDefaultImpl( Scenario scenario ) {
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), BicycleConfigGroup.class );
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
 		this.marginalUtilityOfGradient_pct_m = bicycleConfigGroup.getMarginalUtilityOfGradient_pct_m();
-
+		this.vehicles = scenario.getVehicles();
 	}
-	@Override public double computeLinkBasedScore( Link link ){
+	@Override public double computeLinkBasedScore( Link link, Id<Vehicle> vehicleId, String bicycleMode ){
+
+//		if we do not check for the correct bicycleMode here, every network mode is scored with bicycleScores! -sm0825
+		if (!Objects.equals(vehicles.getVehicles().get(vehicleId).getType().getNetworkMode(), bicycleMode)) {
+			return Double.NaN;
+		}
+
 		String surface = BicycleUtils.getSurface(link);
 		String type = NetworkUtils.getType( link );
 		String cyclewaytype = BicycleUtils.getCyclewaytype( link );

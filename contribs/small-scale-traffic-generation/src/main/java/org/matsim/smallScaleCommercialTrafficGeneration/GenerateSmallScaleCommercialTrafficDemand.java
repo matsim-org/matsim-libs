@@ -291,8 +291,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
-					solveSeparatedVRPs(scenario);
 				}
+				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
+				solveSeparatedVRPs(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
@@ -439,6 +440,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
 			}
+			else
+				CarriersUtils.setJspritIterations(carrier, jspritIterations);
 		});
 		int carrierSteps = 30;
 		for (int i = 0; i < allCarriers.size(); i++) {
@@ -757,7 +760,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 								Id.create(possibleVehicleType, VehicleType.class)))
 								vehicleTypes.add(possibleVehicleType);
 						}
-
+						if (vehicleTypes.isEmpty())
+							throw new RuntimeException("The possible vehicle types found for purpose " + purpose + ", modeORvehType "
+								+ modeORvehType + ", smallScaleCommercialTrafficType " + smallScaleCommercialTrafficType +" do not exist in the given vehicle types file. PLease check your input file.");
 						String selectedStartCategory = getSelectedStartCategory(startZone, odMatrixEntry);
 
 						// Generate carrierName

@@ -259,8 +259,10 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 
 		//assertThat(result).allTrainsArrived(); this fails, some don't arrive...
 		assertThat(result).hasNumberOfTrains(210);
+
 		// check the number of events... we could see if something changes significantly in the future
-		Assertions.assertEquals(2505837, result.getEvents().size(), 1000);
+
+		Assertions.assertEquals(2_680_063, result.getEvents().size(), 1000);
 	}
 
 	@Test
@@ -397,7 +399,7 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		assertThat(result)
 			.allTrainsArrived()
 			.trainHasLastArrival("train1", 29505.0)
-			.trainHasLastArrival("train2", 29443.0);
+			.trainHasLastArrival("train2", 29335.0);
 	}
 
 	@Test
@@ -692,7 +694,8 @@ public class RailsimIntegrationTest extends AbstractIntegrationTest {
 		SimulationResult result = runSimulation(new File(utils.getPackageInputDirectory(), "scenarioMicroMesoConstructionSiteLsGe"));
 
 		assertThat(result).hasNumberOfTrains(71).allTrainsArrived();
-		Assertions.assertEquals(32888, result.getEvents().size(), 10);
+
+		Assertions.assertEquals(33030, result.getEvents().size(), 10);
 	}
 
 

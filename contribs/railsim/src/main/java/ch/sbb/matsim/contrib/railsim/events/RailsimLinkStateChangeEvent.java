@@ -37,16 +37,27 @@ public final class RailsimLinkStateChangeEvent extends Event implements HasLinkI
 	public static final String EVENT_TYPE = "railsimLinkStateChangeEvent";
 
 	public static final String ATTRIBUTE_STATE = "state";
+	public static final String ATTRIBUTE_DLA = "dla";
 
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 	private final ResourceState state;
 
-	public RailsimLinkStateChangeEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, ResourceState state) {
+	/**
+	 * Indicates that the deadlock avoidance has and internal reservation for this link.
+	 */
+	private final boolean dla;
+
+	public RailsimLinkStateChangeEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, ResourceState state, boolean dla) {
 		super(time);
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 		this.state = state;
+		this.dla = dla;
+	}
+
+	public RailsimLinkStateChangeEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, ResourceState state) {
+		this(time, linkId, vehicleId, state, false);
 	}
 
 	@Override
@@ -68,12 +79,19 @@ public final class RailsimLinkStateChangeEvent extends Event implements HasLinkI
 		return state;
 	}
 
+	public Object getDLA() {
+		return dla;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attr.put(ATTRIBUTE_STATE, this.state.toString());
+		if (this.dla)
+			attr.put(ATTRIBUTE_DLA, String.valueOf(true));
+
 		return attr;
 	}
 }
