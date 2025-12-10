@@ -36,7 +36,7 @@ public final class PoolExecutor implements LPExecutor {
 	@Inject
 	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
 		this.serializer = serializer;
-		this.executor = Executors.newWorkStealingPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
+		this.executor = Executors.newFixedThreadPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
 	}
 
 	/**
