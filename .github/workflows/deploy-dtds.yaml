@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: rsync dtds
-        uses: burnett01/rsync-deployments@7.0.2
+        uses: burnett01/rsync-deployments@v8
         with:
           switches: -avz
           path: matsim/src/main/resources/dtd/

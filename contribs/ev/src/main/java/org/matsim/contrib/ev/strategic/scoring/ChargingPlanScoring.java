@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -216,6 +217,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 		finalizeSoc(simStepTime);
 		finalizeDetours(simStepTime);
+		finalizeCosts(simStepTime);
 
 		eventsManager.removeHandler(this);
 		tracker.finish();
@@ -340,7 +342,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 							addScoreForPerson(person.getId(), parameters.getBelowMinimumEndSoc());
 							trackScoreForPerson(now, person.getId(), "minimum_end_soc",
 									parameters.getBelowMinimumEndSoc(),
-									null);
+									entry.current / entry.total);
 						}
 					}
 				}
@@ -417,7 +419,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 	// COST scoring
 
-	private record ChargingStartState(double time, double charge) {
+	private record ChargingStartState(double time, double charge, Id<Charger> chargerId) {
 	}
 
 	private final IdMap<Vehicle, ChargingStartState> chargingStartStates = new IdMap<>(Vehicle.class);
@@ -433,26 +435,38 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	}
 
 	private void handleStartCharging(ChargingStartEvent event) {
-		chargingStartStates.put(event.getVehicleId(), new ChargingStartState(event.getTime(), event.getCharge()));
+		chargingStartStates.put(event.getVehicleId(), new ChargingStartState(event.getTime(), event.getCharge(), event.getChargerId()));
 	}
 
 	private void handleFinishCharging(ChargingEndEvent event) {
-		ChargingStartState start = chargingStartStates.remove(event.getVehicleId());
+		handleFinishCharging(event.getVehicleId(), event.getTime(), event.getCharge());
+	}
 
-		double duration = event.getTime() - start.time;
-		double energy = event.getCharge() - start.charge;
+	private void handleFinishCharging(Id<Vehicle> vehicleId, double endTime, double endCharge) {
+		ChargingStartState start = chargingStartStates.remove(vehicleId);
 
-		Id<Person> personId = getPerson(event.getVehicleId());
+		if (start != null) {
+			double duration = endTime - start.time;
+			double energy = endCharge - start.charge;
 
-		if (personId != null) {
-			double cost = costCalculator.calculateChargingCost(personId, event.getChargerId(), start.time, duration,
-					energy);
-			addScoreForVehicle(event.getVehicleId(), cost * parameters.getCost());
-			trackScoreForVehicle(event.getTime(), event.getVehicleId(), "cost", cost * parameters.getCost(), cost);
+			Id<Person> personId = getPerson(vehicleId);
 
-			if (cost != 0.0) {
-				moneyEvents.add(new MoneyRecord(personId, event.getChargerId(), cost));
+			if (personId != null) {
+				double cost = costCalculator.calculateChargingCost(personId, start.chargerId, start.time, duration,
+						energy);
+				addScoreForVehicle(vehicleId, cost * parameters.getCost());
+				trackScoreForVehicle(endTime, vehicleId, "cost", cost * parameters.getCost(), cost);
+
+				if (cost != 0.0) {
+					moneyEvents.add(new MoneyRecord(personId, start.chargerId, cost));
+				}
 			}
+		}
+	}
+
+	private void finalizeCosts(double time) {
+		for (Id<Vehicle> vehicleId : new ArrayList<>(chargingStartStates.keySet())) {
+			handleFinishCharging(vehicleId, time, energy.get(vehicleId).current);
 		}
 	}
 
@@ -477,6 +491,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		Double score = chargerTypeConstants.get(chargerType);
 
 		if (score != null) {
+			addScoreForVehicle(event.getVehicleId(), score);
 			trackScoreForVehicle(event.getTime(), event.getVehicleId(), "charger_type", score, score);
 		}
 	}
@@ -497,25 +512,17 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		for (Person person : activePersons) {
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
 
-			AtomicDouble plannedTotalTravelTime = new AtomicDouble(0.0);
-			AtomicDouble plannedTotalTravelDistance = new AtomicDouble(0.0);
+			AtomicDouble travelTimeOffset = new AtomicDouble(0.0);
+			AtomicDouble travelDistanceOffset = new AtomicDouble(0.0);
 
 			for (Leg leg : TripStructureUtils.getLegs(person.getSelectedPlan())) {
-				// Here, we determine the planned travel time.
-				// Later, we track the actual travel time by listening to events on links.
-				// This means, we can not compare access and egress legs.
-				// (otherwise we would include all legs with _routing_Mode.equals(chargingMode)
-				// in the following filter)
-				// tschlenther, march '24
-				// TODO: include detour of access and egress in ChargingPlanScoring !?
-				if (!leg.getMode().equals(chargingMode))
-					continue;
-
-				plannedTotalTravelTime.addAndGet(this.timeInterpretation.decideOnLegTravelTime(leg).seconds());
-				plannedTotalTravelDistance.addAndGet(-leg.getRoute().getDistance());
+				if (leg.getMode().equals(chargingMode)) {
+					travelTimeOffset.addAndGet(-this.timeInterpretation.decideOnLegTravelTime(leg).seconds());
+					travelDistanceOffset.addAndGet(-leg.getRoute().getDistance());
+				}
 			}
 
-			detours.put(vehicleId, new DetourPair(plannedTotalTravelTime, plannedTotalTravelDistance));
+			detours.put(vehicleId, new DetourPair(travelTimeOffset, travelDistanceOffset));
 		}
 	}
 
@@ -528,24 +535,28 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Double enterTime = linkEnterTimes.remove(event.getVehicleId());
-
-		if (enterTime != null) {
-			DetourPair pair = detours.get(event.getVehicleId());
-			pair.travelTime.addAndGet(event.getTime() - enterTime);
-			pair.travelDistance.addAndGet(network.getLinks().get(event.getLinkId()).getLength());
-		}
+		processLinkMovement(event.getTime(), event.getVehicleId(), event.getLinkId());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		linkEnterTimes.remove(event.getVehicleId());
+		processLinkMovement(event.getTime(), event.getVehicleId(), event.getLinkId());
+	}
+
+	private void processLinkMovement(double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
+		Double enterTime = linkEnterTimes.remove(vehicleId);
+
+		if (enterTime != null) {
+			DetourPair pair = detours.get(vehicleId);
+			pair.travelTime.addAndGet(time - enterTime);
+			pair.travelDistance.addAndGet(network.getLinks().get(linkId).getLength());
+		}
 	}
 
 	private void finalizeDetours(double now) {
 		for (var entry : detours.entrySet()) {
 			double detourTravelTime_min = Math.max(0.0, entry.getValue().travelTime().get()) / 60.0;
-			double detourTravelDistance_km = Math.max(0.0, entry.getValue().travelTime().get()) * 1e-3;
+			double detourTravelDistance_km = Math.max(0.0, entry.getValue().travelDistance().get()) * 1e-3;
 
 			if (detourTravelTime_min * parameters.getDetourTime_min() != 0.0) {
 				addScoreForVehicle(entry.getKey(), detourTravelTime_min * parameters.getDetourTime_min());
