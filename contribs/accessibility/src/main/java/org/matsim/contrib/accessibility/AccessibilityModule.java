@@ -20,20 +20,16 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -97,7 +93,7 @@ public final class AccessibilityModule extends AbstractModule {
 	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry. The facilities are aggregated to
 	 * the measurement points in downstream code.
 	 */
-	public void addAdditionalFacilityData(ActivityFacilities facilities) { // TDO cleanu up this method
+	public void addAdditionalFacilityData(ActivityFacilities facilities) {
 		if (facilities.getName() == null || facilities.getName().equals("")) {
 			throw new RuntimeException("Cannot add unnamed facility containers here. A key is required to identify them.") ;
 		}
