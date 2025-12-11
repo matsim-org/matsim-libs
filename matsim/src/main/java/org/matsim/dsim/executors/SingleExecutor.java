@@ -57,12 +57,21 @@ public final class SingleExecutor implements LPExecutor {
 
 	@Override
 	public void doSimStep(double time) {
+
+		// the following iterates over all tasks twice. This is necessary,
+		// as beforeExecution notifies the tasks that they need to finish
+		// their previous phase (For example, the last timestep). In the case
+		// of SimProcesses, the message queueus for polling and receiving are
+		// switched, which does not work if we have both steps in one loop.
 		for (SimTask task : tasks) {
 			task.setTime(time);
 			if (task.needsExecution()) {
 				task.beforeExecution();
-				task.run();
 			}
+		}
+
+		for (SimTask task : tasks) {
+			task.run();
 		}
 	}
 
