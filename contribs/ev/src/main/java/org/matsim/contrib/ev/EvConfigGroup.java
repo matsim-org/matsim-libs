@@ -118,7 +118,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     @Parameter
     @Comment("Interval (in seconds) at which detailed vehicle socs are sampled")
-    private int writeVehicleSocFrequency = 0;
+    private int writeVehicleSocFrequency = 600;
 
     @Parameter
     @Comment("Interval at which detailed charging activities are written")

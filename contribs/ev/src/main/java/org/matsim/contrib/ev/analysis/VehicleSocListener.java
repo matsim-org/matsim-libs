@@ -176,7 +176,8 @@ public class VehicleSocListener implements EnergyChargedEventHandler,
     public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
         double time = e.getSimulationTime();
 
-        if (((int) time) % trackingInterval == 0) {
+        if (trackingInterval > 0 && ((int) time) % trackingInterval == 0) {
+            // trackingInterval = 0 is a valid option if we only want to have start and end
             writeTimestep(time);
         }
     }
