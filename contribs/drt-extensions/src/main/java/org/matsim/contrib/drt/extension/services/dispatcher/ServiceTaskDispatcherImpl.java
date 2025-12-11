@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.extension.services.services.tracker.ServiceExecuti
 import org.matsim.contrib.drt.extension.services.services.triggers.ServiceExecutionTrigger;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilityFinder;
+import org.matsim.contrib.drt.extension.services.tasks.DrtServiceTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -115,7 +116,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			for (ServiceExecutionTrigger serviceExecutionTrigger : serviceExecutionTracker.getTriggers(drtServiceParams)) {
 				if (serviceExecutionTrigger.requiresService(dvrpVehicle, timeStep)) {
 					LOG.debug("{} scheduled service {} for vehicle {} at {}.", serviceExecutionTrigger.getName(), drtServiceParams.getServiceName(), dvrpVehicle.getId(), timeStep);
-					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle), drtServiceParams, stackable));
+					servicesToBeScheduled.add(new ServiceScheduleEntry(dvrpVehicle, findServiceFacility(dvrpVehicle, timeStep), drtServiceParams, stackable));
 				}
 			}
 		}
@@ -138,7 +139,7 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 		}
 	}
 
-	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle) {
+	private OperationFacility findServiceFacility(DvrpVehicle dvrpVehicle, double timeStep) {
 		final Schedule schedule = dvrpVehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		Link lastLink;
@@ -155,7 +156,13 @@ public class ServiceTaskDispatcherImpl implements ServiceTaskDispatcher {
 			lastLink = ((DrtStayTask) schedule.getTasks()
 				.get(schedule.getTaskCount() - 1)).getLink();
 		}
-		return operationFacilityFinder.findFacility(lastLink.getCoord()).orElseThrow();
+		Optional<OperationFacilityFinder.FacilityWithPath> facility = operationFacilityFinder.findFacility(
+				lastLink, dvrpVehicle, Set.of());
+		if(facility.isPresent()) {
+			return facility.get().operationFacility();
+		} else {
+			throw new RuntimeException("Could not find operation facility for vehicle " + dvrpVehicle.getId());
+		}
 	}
 
 }

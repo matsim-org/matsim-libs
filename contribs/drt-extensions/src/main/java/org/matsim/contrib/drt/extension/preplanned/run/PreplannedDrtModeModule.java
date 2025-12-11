@@ -24,6 +24,8 @@ import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeRoutingModule;
 import org.matsim.contrib.drt.stops.DefaultStopTimeCalculator;
+import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
+import org.matsim.contrib.drt.stops.StaticPassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
@@ -77,6 +79,10 @@ public final class PreplannedDrtModeModule extends AbstractDvrpModeModule {
 				+ " Remove the rebalancing params from the drt config");
 
 		install(new DrtModeRoutingModule(drtCfg));
+
+		bindModal(PassengerStopDurationProvider.class).toProvider(modalProvider(getter -> {
+			return StaticPassengerStopDurationProvider.of(drtCfg.getStopDuration(), 0.0);
+		}));
 
 		drtCfg.getDrtFareParams()
 				.ifPresent(params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));

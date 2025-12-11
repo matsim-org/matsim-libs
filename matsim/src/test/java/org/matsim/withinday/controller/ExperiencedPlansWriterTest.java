@@ -63,7 +63,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.io.File;
 import java.util.*;
 
@@ -112,8 +112,8 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 			@Override
 			public void install() {
 				install(new WithinDayModule());
-				addControlerListenerBinding().to(WriterInitializer.class);
-				addControlerListenerBinding().to(ExecutedPlansServiceImpl.class);
+				addControllerListenerBinding().to(WriterInitializer.class);
+				addControllerListenerBinding().to(ExecutedPlansServiceImpl.class);
 				// only for debugging
 				addEventHandlerBinding().toInstance(new EventsPrinter());
 			}

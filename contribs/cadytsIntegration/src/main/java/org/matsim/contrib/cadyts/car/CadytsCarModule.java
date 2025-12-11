@@ -12,9 +12,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 public class CadytsCarModule extends AbstractModule {
 	static final String CALIBRATION="calibration";
@@ -41,7 +41,7 @@ public class CadytsCarModule extends AbstractModule {
 		// I think.  kai, jan'16
 
 		bind(CadytsContext.class).in( Singleton.class );
-		addControlerListenerBinding().to(CadytsContext.class);
+		addControllerListenerBinding().to(CadytsContext.class);
 	}
 
 	private static class CalibrationCountsProvider implements Provider<Counts<Link>> {

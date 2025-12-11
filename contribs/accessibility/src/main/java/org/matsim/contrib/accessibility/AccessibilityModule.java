@@ -35,7 +35,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -47,7 +47,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.*;
 
 /**
@@ -65,7 +65,7 @@ public final class AccessibilityModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+		addControllerListenerBinding().toProvider(new Provider<ControllerListener>() {
 			// yy not sure if this truly needs to be a provider.  kai, dec'16
 
 			@Inject private Config config ;
@@ -82,7 +82,7 @@ public final class AccessibilityModule extends AbstractModule {
 			@Inject TripRouter tripRouter ;
 
 			@Override
-			public ControlerListener get() {
+			public ControllerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 				final BoundingBox boundingBox;

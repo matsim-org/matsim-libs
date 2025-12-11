@@ -18,15 +18,10 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.drt.schedule.DrtStopTask;
+import com.google.common.collect.ImmutableList;
+import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
 import org.matsim.contrib.drt.schedule.DrtCapacityChangeTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
@@ -35,17 +30,23 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.*;
 
 /**
  * @author michalm
  */
 public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
-	private final DvrpLoadType loadType;
 
-	public VehicleDataEntryFactoryImpl(DvrpLoadType loadType) {
+	private final DvrpLoadType loadType;
+	private final StopWaypointFactory stopWaypointFactory;
+
+	public VehicleDataEntryFactoryImpl(DvrpLoadType loadType, StopWaypointFactory stopWaypointFactory) {
 		this.loadType = loadType;
-	}
+        this.stopWaypointFactory = stopWaypointFactory;
+    }
 
 	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
 		Schedule schedule = vehicle.getSchedule();
@@ -94,23 +95,22 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			}
 		}
 
-		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
+		StopWaypoint[] stops = new StopWaypoint[stopTasks.size()];
 		DvrpLoad outgoingOccupancy = loadType.getEmptyLoad();
 
 		for (int i = stops.length - 1; i >= 0; i--) {
-			if(stopTasks.get(i) instanceof DrtCapacityChangeTask capacityChangeTask) {
-				assert outgoingOccupancy.isEmpty();
-				outgoingOccupancy = loadType.getEmptyLoad();
-				stops[i] = new Waypoint.Stop(capacityChangeTask, loadType);
-			} else {
-				Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy, loadType);
-				outgoingOccupancy = outgoingOccupancy.subtract(s.getOccupancyChange());
-			}
+				StopWaypoint s = stops[i] = stopWaypointFactory.createStopWaypoint(stopTasks.get(i), outgoingOccupancy);
+				outgoingOccupancy = s.getOutgoingOccupancy().subtract(s.getOccupancyChange());
 		}
 
-		Waypoint.Stop startStop = startTask != null && STOP.isBaseTypeOf(startTask)
-				? startTask instanceof DrtCapacityChangeTask capacityChangeTask ? new Waypoint.Stop(capacityChangeTask, loadType) : new Waypoint.Stop((DrtStopTask) startTask, loadType.getEmptyLoad(), loadType)
-				: null;
+		StopWaypoint startStop = null;
+		if(startTask != null && STOP.isBaseTypeOf(startTask)) {
+			if(startTask instanceof DrtCapacityChangeTask capacityChangeTask) {
+				startStop = stopWaypointFactory.createStopWaypoint(capacityChangeTask, loadType.getEmptyLoad());
+			} else {
+				startStop = stopWaypointFactory.createStopWaypoint((DrtStopTask) startTask, outgoingOccupancy);
+			}
+		}
 
 		var slackTimes = computeSlackTimes(vehicle, currentTime, stops, startStop, precedingStayTimes);
 
@@ -118,25 +118,45 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 				ImmutableList.copyOf(stops), slackTimes, precedingStayTimes, currentTime);
 	}
 
-	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, Waypoint.Stop[] stops, Waypoint.Stop start, List<Double> precedingStayTimes) {
+	static double[] computeSlackTimes(DvrpVehicle vehicle, double now, StopWaypoint[] stops, StopWaypoint start,
+									  List<Double> precedingStayTimes) {
 		double[] slackTimes = new double[stops.length + 2];
 
 		//vehicle
 		double slackTime = calcVehicleSlackTime(vehicle, now);
 		slackTimes[stops.length + 1] = slackTime;
 
+		List<AcceptedDrtRequest> onboard = new ArrayList<>();
+
 		//stops
 		for (int i = stops.length - 1; i >= 0; i--) {
-			var stop = stops[i];
-			slackTime = Math.min(stop.latestArrivalTime - stop.task.getBeginTime(), slackTime);
-			slackTime = Math.min(stop.latestDepartureTime - stop.task.getEndTime(), slackTime);
+
+			StopWaypoint stop = stops[i];
+
+			onboard.addAll(stop.getTask().getDropoffRequests().values());
+
+			slackTime = Math.min(stop.getLatestArrivalTime() - stop.getTask().getBeginTime(), slackTime);
+			slackTime = Math.min(stop.getLatestDepartureTime() - stop.getTask().getEndTime(), slackTime);
+
+			for (AcceptedDrtRequest req : onboard) {
+				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
+						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
+				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
+						-> new IllegalStateException("Accepted request should have a (planned) dropoff time at this point."));
+				double currentRideDuration = plannedDropoffTime - plannedPickupTime;
+				double currentRideSlack = Math.max(0, req.getMaxRideDuration() - currentRideDuration);
+				slackTime = Math.min(slackTime, currentRideSlack);
+			}
+
 			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
 			slackTimes[i + 1] = slackTime;
+
+			onboard.removeAll(stop.getTask().getPickupRequests().values());
 		}
 
 		// start
 		slackTimes[0] = start == null ? slackTime :
-			Math.min(start.latestDepartureTime - start.task.getEndTime(), slackTime);
+			Math.min(start.getLatestDepartureTime() - start.getTask().getEndTime(), slackTime);
 
 		return slackTimes;
 	}

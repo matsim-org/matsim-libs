@@ -18,14 +18,18 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
+import org.matsim.contrib.common.zones.ZoneSystemParams;
+import org.matsim.contrib.common.zones.ZoneSystemUtils;
+import org.matsim.contrib.common.zones.systems.geom_free_zones.GeometryFreeZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.GISFileZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.h3.H3GridZoneSystemParams;
+import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
 import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-
-import com.google.common.base.Preconditions;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -43,6 +47,19 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 			+ " Must be positive. Default is 1800 s. Expects an Integer Value")
 	@Positive
 	private int interval = 1800;// [s]
+
+	@Parameter
+	@Comment("Specifies the minimum duration (seconds) a vehicle needs to be idle in order to be available for relocation.")
+	@PositiveOrZero
+	private double rebalancingTimeout = 0;
+
+	@Parameter
+	@Comment("Specifies the _remaining_ duration (seconds) a vehicle needs to be idle before the next task in order to be rebalanced. " +
+			"This can be used to avoid rebalancing vehicles within smaller time gaps, e.g. before a prebooked stop. " +
+			"This only applies to idle times that are followed by additional tasks (i.e., inter-task gaps). " +
+			"Idle times at the end of the schedule are not affected by this threshold. Default is 3600 [s].")
+	@PositiveOrZero
+	private double rebalancingMinIdleGap = 3600;
 
 	@Parameter
 	@Comment(
@@ -63,6 +80,16 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 	@NotNull
 	private RebalancingStrategyParams rebalancingStrategyParams;
 
+	public enum TargetLinkSelection {random, mostCentral}
+
+	@Parameter("zoneTargetLinkSelection")
+	@Comment("Defines how the target link of a zone is determined (e.g. for rebalancing)."
+			+ " Possible values are [random,mostCentral]. Default behavior is mostCentral, where all vehicles are sent to the same link.")
+	@NotNull
+	private TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
+
+	private ZoneSystemParams zoneSystemParams;
+
 	public RebalancingParams() {
 		super(SET_NAME);
 		initSingletonParameterSets();
@@ -82,14 +109,16 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 		addDefinition(CustomRebalancingStrategyParams.SET_NAME, CustomRebalancingStrategyParams::new,
 			() -> (ConfigGroup)rebalancingStrategyParams,
 			params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+
+		// rebalancing zones configuration
+		ZoneSystemUtils.registerDefaultZoneSystems(this::addDefinition,  //
+			(ZoneSystemParams params) -> zoneSystemParams = params, // 
+			() -> zoneSystemParams);
 	}
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-
-		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
-				"minServiceTime must be greater than maxTimeBeforeIdle");
 	}
 
 	public RebalancingStrategyParams getRebalancingStrategyParams() {
@@ -121,5 +150,33 @@ public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurab
 
 	public void setMaxTimeBeforeIdle(@PositiveOrZero double maxTimeBeforeIdle) {
 		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
+	}
+
+	public @NotNull TargetLinkSelection getTargetLinkSelection() {
+		return targetLinkSelection;
+	}
+
+	public void setTargetLinkSelection(@NotNull TargetLinkSelection targetLinkSelection) {
+		this.targetLinkSelection = targetLinkSelection;
+	}
+
+	public double getRebalancingTimeout() {
+		return rebalancingTimeout;
+	}
+
+	public void setRebalancingTimeout(double rebalancingTimeout) {
+		this.rebalancingTimeout = rebalancingTimeout;
+	}
+
+	public double getRebalancingMinIdleGap() {
+		return rebalancingMinIdleGap;
+	}
+
+	public void setRebalancingMinIdleGap(double rebalancingMinIdleGap) {
+		this.rebalancingMinIdleGap = rebalancingMinIdleGap;
+	}
+
+	public ZoneSystemParams getZoneSystemParams() {
+		return zoneSystemParams;
 	}
 }

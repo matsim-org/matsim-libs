@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.zone.skims;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.IntStream;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.zones.Zone;
@@ -33,12 +26,14 @@ import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.contrib.zone.skims.SparseMatrix.NodeAndTime;
 import org.matsim.contrib.zone.skims.SparseMatrix.SparseRow;
 import org.matsim.core.router.speedy.LeastCostPathTree;
-import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.speedy.SpeedyGraphBuilder;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.OptionalTime;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Based on NetworkSkimMatrices from sbb-matsim-extensions
@@ -60,7 +55,7 @@ public final class TravelTimeMatrices {
 	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime, Matrix travelTimeMatrix,
 		LeastCostPathTree lcpTree) {
 		Node fromNode = centralNodes.get(fromZone);
-		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null);
+		lcpTree.calculate(fromNode, departureTime, null, null);
 
 		for (Zone toZone : centralNodes.keySet()) {
 			Node toNode = centralNodes.get(toZone);
@@ -90,7 +85,7 @@ public final class TravelTimeMatrices {
 
 	private static void computeForDepartureNode(Node fromNode, Collection<? extends Node> nodes, double departureTime, SparseMatrix sparseMatrix,
 		LeastCostPathTree lcpTree, double maxDistance, double maxTravelTime) {
-		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null,
+		lcpTree.calculate(fromNode, departureTime, null, null,
 			(nodeIndex, arrivalTime, travelCost, distance, departTime) -> distance >= maxDistance && arrivalTime >= departTime + maxTravelTime);
 
 		List<NodeAndTime> neighborNodes = new ArrayList<>();

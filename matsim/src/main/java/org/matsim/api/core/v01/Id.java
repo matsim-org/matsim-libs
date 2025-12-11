@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,31 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		cacheIndex.clear();
 	}
 
+	/**
+	 * Retrieve all Ids of a given type.
+	 */
+	public static String[] getAllIds(Class<?> type) {
+		if (!cacheIndex.containsKey(type)) {
+			return new String[0];
+		}
+		return cacheIndex.get(type).stream()
+			.map(Id::toString)
+			.toArray(String[]::new);
+	}
+
+	/**
+	 * Check if the given value matches the Ids of the given type.
+	 * @throws RuntimeException if the Ids do not match
+	 */
+	public static void check(Class<?> type, String[] value) {
+		List<Id<?>> ids = cacheIndex.getOrDefault(type, List.of());
+		for (int i = 0; i < ids.size(); i++) {
+			if (!ids.get(i).toString().equals(value[i])) {
+				throw new RuntimeException("Id %s (idx: %d) mismatch: %s != %s".formatted(type, i, ids.get(i), value[i]));
+			}
+		}
+	}
+
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
 	}
@@ -97,7 +123,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 					// (2) use cacheIndex.compute() instead of get() and put() ==> less readable code...
 					List<Id<?>> mapIndex = mapId.isEmpty() ? new ArrayList<>(1000) : cacheIndex.get(type);
 					int index = mapIndex.size();
-					id = new IdImpl<T>(key, index);
+					id = new IdImpl<T>(key, index, type);
 					mapIndex.add(id);
 					cacheIndex.put(type, mapIndex);
 					mapId.put(key, id);
@@ -108,6 +134,11 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 
 	public abstract int index();
+
+	/**
+	 * Returns the class type of the object this Id is representing.
+	 */
+	public abstract Class<T> classType();
 
 	public static <T> Id<T> get(int index, final Class<T> type) {
 		List<Id<?>> mapIndex = cacheIndex.get(type);
@@ -159,15 +190,22 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 
 		private final String id;
 		private final int index;
+		private final Class<T> clazz;
 
-		/*package*/ IdImpl(final String id, final int index) {
+		/*package*/ IdImpl(final String id, final int index, final Class<T> clazz) {
 			this.id = id;
 			this.index = index;
+			this.clazz = clazz;
 		}
 
 		@Override
 		public int index() {
 			return this.index;
+		}
+
+		@Override
+		public Class<T> classType() {
+			return this.clazz;
 		}
 
 		@Override
@@ -199,6 +237,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Person> createPersonId( final String str ) {
 		return create( str, Person.class ) ;
 	}
+
 	public static Id<Link> createLinkId( final long key ) {
 		return create( key, Link.class ) ;
 	}
@@ -208,6 +247,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Link> createLinkId( final String str ) {
 		return create( str, Link.class ) ;
 	}
+
 	public static Id<Node> createNodeId( final long key ) {
 		return create( key, Node.class ) ;
 	}
@@ -217,6 +257,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Node> createNodeId( final String str ) {
 		return create( str, Node.class ) ;
 	}
+
 	public static Id<Vehicle> createVehicleId( final long key ) {
 		return create( key, Vehicle.class ) ;
 	}
@@ -225,6 +266,14 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 	public static Id<Vehicle> createVehicleId( final String str ) {
 		return create( str, Vehicle.class ) ;
+	}
+
+	public static Id<VehicleType> createVehicleTypeId( final long key ) { return create( key, VehicleType.class ); }
+	public static Id<VehicleType> createVehicleTypeId( final Id<?> id ) {
+		return create( id, VehicleType.class ) ;
+	}
+	public static Id<VehicleType> createVehicleTypeId( final String str ) {
+		return create( str, VehicleType.class ) ;
 	}
 
 }

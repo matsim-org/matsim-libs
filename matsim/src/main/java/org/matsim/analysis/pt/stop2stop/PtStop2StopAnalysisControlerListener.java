@@ -27,14 +27,14 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 /**
- * ControlerListener that executes PtStop2StopAnalysis in the last iteration
+ * ControllerListener that executes PtStop2StopAnalysis in the last iteration
  *
  * @author vsp-gleich
  */
-public class PtStop2StopAnalysisControlerListener implements IterationStartsListener, IterationEndsListener {
+class PtStop2StopAnalysisControlerListener implements IterationStartsListener, IterationEndsListener {
 
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy controlerIO;

@@ -51,7 +51,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	public static final String DRAW_TRANSIT_FACILITIES = "drawTransitFacilities";
 	public static final String DRAW_TRANSIT_FACILITY_IDS = "drawTransitFacilityIds";
 	public static final String DRAW_NON_MOVING_ITEMS = "drawNonMovingItems";
-	
+
 
 	private  float agentSize = 120.f;
 	private  String middleMouseFunc = "Pan";
@@ -81,7 +81,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 
 	/**
 	 * this is here so that the entry can be communicated from the network (which seems to be known only by the
-	 * otfvis server) to the otfvis client.  I am not sure if this is really a hack; might also just make this 
+	 * otfvis server) to the otfvis client.  I am not sure if this is really a hack; might also just make this
 	 * configurable in the sense that it tries to find a useful value either from network or from config or from
 	 * the saved config.  this is, however, not implemented.  kai, jan'11
 	 */
@@ -91,7 +91,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 
 	private String mapLayer = "";
 
-	private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
+	private final List<ZoomEntry> zooms = new ArrayList<>();
 
 	private boolean scaleQuadTreeRect;
 
@@ -104,18 +104,18 @@ public class OTFVisConfigGroup extends ConfigGroup {
     private ColoringScheme coloring = ColoringScheme.standard ;
 
 	// ---
-	
+
 	private static final String LINK_WIDTH_IS_PROPORTIONAL_TO="linkwidthIsProportionalTo" ;
-	
+
 	public static final String NUMBER_OF_LANES = "numberOfLanes" ;
 	public static final String CAPACITY = "capacity" ;
 
 	private static final String MAP_OVERLAY_MODE = "mapOverlayMode";
 	private static final String MAP_BASE_URL = "mapBaseURL";
 	private static final String MAP_LAYER = "mapLayer";
-	
+
 	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
-	
+
 	public OTFVisConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -191,22 +191,22 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		// this is needed since config file parsing uses it.
 		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
 		if ( "null".equalsIgnoreCase( value ) ) return;
-		
+
 		if (AGENT_SIZE.equals(key)) {
 			this.agentSize = Float.parseFloat(value);
-		} 
+		}
 		else if (MIDDLE_MOUSE_FUNC.equals(key)) {
 			this.middleMouseFunc = value;
-		} 
+		}
 		else if (LEFT_MOUSE_FUNC.equals(key)) {
 			this.leftMouseFunc = value;
-		} 
+		}
 		else if ( COLORING.equalsIgnoreCase(key) ) {
 			this.setColoringScheme( ColoringScheme.valueOf(value) ) ;
-		}  
+		}
 		else if ( LINK_WIDTH_IS_PROPORTIONAL_TO.equalsIgnoreCase(key) ) {
 			this.setLinkWidthIsProportionalTo( value ) ;
-		}  
+		}
 		else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
 		}
@@ -242,12 +242,12 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	@Override
 	public final TreeMap<String, String> getParams() {
 		// this is needed for everything since the config dump is based on this.
-		
-		TreeMap<String, String> map = new TreeMap<String, String>();
+
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put(AGENT_SIZE, Float.toString(this.getAgentSize()));
-		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
-		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
-		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
+		map.put(LEFT_MOUSE_FUNC, this.leftMouseFunc);
+		map.put(MIDDLE_MOUSE_FUNC, this.middleMouseFunc);
+		map.put(RIGHT_MOUSE_FUNC, this.rightMouseFunc);
 		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents()));
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, this.getLinkWidthIsProportionalTo());
 		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
@@ -268,19 +268,19 @@ public class OTFVisConfigGroup extends ConfigGroup {
 				+ " rather ungracefully, or displays no agents at all.");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'.");
-		
+
 		StringBuilder allowedColorings = new StringBuilder();
 		for (ColoringScheme scheme : ColoringScheme.values()) {
 			allowedColorings.append(' ');
 			allowedColorings.append(scheme.toString());
 		}
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2012) allowed values:" + allowedColorings);
-		
+
 		map.put(MAP_OVERLAY_MODE, "Render everything on top of map tiles. Default: From tiles.openstreetmap.org");
 		map.put(MAP_BASE_URL, "URL to get WMS tiles from. For a local GeoServer instance, use http://localhost:8080/geoserver/wms?service=WMS&");
 		map.put(MAP_LAYER, "The WMS layer to display. For GeoServer and a layer called clipped in workspace mz, use mz:clipped");
-		
-		
+
+
 		map.put(DRAW_NON_MOVING_ITEMS, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 				"May affect all non-moving items.") ;
 		return map ;
@@ -341,7 +341,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	public String getQueryType() {
 		return this.queryType;
 	}
-	
+
 	public OTFVisConfigGroup setQueryType( final String queryType ) {
 		setModified() ;
 		this.queryType = queryType;
@@ -475,7 +475,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	public boolean isDrawTransitFacilityIds() {
 		return this.drawTransitFacilityIds;
 	}
-	
+
 	public boolean isScaleQuadTreeRect() {
 		return this.scaleQuadTreeRect;
 	}
@@ -529,7 +529,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		this.mapOverlayMode = mapOverlayMode;
 		return this;
 	}
-	
+
 	public OTFVisConfigGroup setMapBaseUrl(String mapBaseURL) {
 		this.mapBaseURL = mapBaseURL;
 		return this;

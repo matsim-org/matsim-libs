@@ -43,9 +43,9 @@ public class ControlerEventsTestListener implements
   private final List<IterationEndsEvent> endIterationEvents = new Vector<IterationEndsEvent>();
 	private int number;
 
-	private ControlerEventsTest testClass;
+	private ControllerEventsTest testClass;
 
-	public ControlerEventsTestListener(int i, ControlerEventsTest test) {
+	public ControlerEventsTestListener(int i, ControllerEventsTest test) {
 		this.number = i;
 		this.testClass = test;
 	}

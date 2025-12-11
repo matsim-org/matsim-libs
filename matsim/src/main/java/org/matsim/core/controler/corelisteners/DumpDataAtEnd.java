@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 
-public interface DumpDataAtEnd extends ControlerListener {
+public interface DumpDataAtEnd extends ControllerListener {
 }

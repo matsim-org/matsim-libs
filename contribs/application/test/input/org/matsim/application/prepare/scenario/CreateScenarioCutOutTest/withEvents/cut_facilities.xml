@@ -80,25 +80,13 @@
 		<activity type="work">
 		</activity>
 	</facility>
-	<facility id="21" x="2500.0" y="0.0">
+	<facility id="23" x="4500.0" y="0.0">
 		<activity type="home">
 		</activity>
 		<activity type="work">
 		</activity>
 	</facility>
-	<facility id="24" x="5500.0" y="0.0">
-		<activity type="home">
-		</activity>
-		<activity type="work">
-		</activity>
-	</facility>
-	<facility id="26" x="7500.0" y="0.0">
-		<activity type="home">
-		</activity>
-		<activity type="work">
-		</activity>
-	</facility>
-	<facility id="27" x="8500.0" y="0.0">
+	<facility id="25" x="6500.0" y="0.0">
 		<activity type="home">
 		</activity>
 		<activity type="work">
@@ -223,12 +211,6 @@
 		</activity>
 	</facility>
 	<facility id="7" x="0.0" y="6500.0">
-		<activity type="home">
-		</activity>
-		<activity type="work">
-		</activity>
-	</facility>
-	<facility id="8" x="0.0" y="7500.0">
 		<activity type="home">
 		</activity>
 		<activity type="work">

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.events.*;
@@ -134,6 +135,11 @@ public final class EventsManagerImpl implements EventsManager {
 	public void addHandler (final EventHandler handler) {
 		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
+		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
+			log.info("=== Logging of event-handlers skipped ===");
+			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
+				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+		}
 		log.debug("adding Event-Handler: " + test.getName());
 		do {
 			for (Class<?> theInterface : test.getInterfaces()) {
@@ -282,6 +288,9 @@ public final class EventsManagerImpl implements EventsManager {
 			return true;
 		} else if (klass == PersonLeavesVehicleEvent.class) {
 			((PersonLeavesVehicleEventHandler)handler).handleEvent((PersonLeavesVehicleEvent)ev);
+			return true;
+		} else if (klass == PersonContinuesInVehicleEvent.class) {
+			((PersonContinuesInVehicleEventHandler) handler).handleEvent((PersonContinuesInVehicleEvent) ev);
 			return true;
 		} else if (klass == VehicleDepartsAtFacilityEvent.class) {
 			((VehicleDepartsAtFacilityEventHandler) handler).handleEvent((VehicleDepartsAtFacilityEvent) ev);

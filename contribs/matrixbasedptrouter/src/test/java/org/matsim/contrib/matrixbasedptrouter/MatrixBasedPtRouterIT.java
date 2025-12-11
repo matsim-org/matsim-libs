@@ -41,6 +41,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.NetworkWriter;
@@ -106,11 +107,8 @@ public class MatrixBasedPtRouterIT {
 		config.plans().setInputFile(path+"plans.xml");
 
 		//add home and work activity to plansCalcScoreConfigGroup
-		config.scoring().addParam("activityType_0", "home");
-		config.scoring().addParam("activityTypicalDuration_0", "43200");
-		config.scoring().addParam("activityType_1", "work");
-		config.scoring().addParam("activityTypicalDuration_1", "28800");
-
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("home").setTypicalDuration(43200));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("work").setTypicalDuration(28800));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);

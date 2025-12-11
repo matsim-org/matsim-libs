@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,7 +83,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.pConfig.getGexfInterval() > 0) {
-            String gexfOutputDir = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
+            String gexfOutputDir = event.getServices().getControllerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
 			try {
 				new File(gexfOutputDir).mkdir();
 			} catch (Exception e) {
