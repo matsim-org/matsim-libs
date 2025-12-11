@@ -13,7 +13,6 @@ public final class MapPlot extends Viz {
 	private final Map<String, String> datasets = new HashMap<>();
 	public double[] center;
 	public Double zoom;
-
 	public Display display = new Display();
 	public Double minValue;
 	public Double maxValue;
@@ -79,6 +78,7 @@ public final class MapPlot extends Viz {
 
 		@JsonProperty(required = true)
 		public String normalize;
+
 		@JsonProperty(required = true)
 		public String join;
 

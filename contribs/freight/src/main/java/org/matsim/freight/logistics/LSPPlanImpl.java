@@ -67,9 +67,8 @@ public class LSPPlanImpl implements LSPPlan {
   }
 
   @Override
-  public LSPPlan addShipmentPlan(LspShipmentPlan lspShipmentPlan) {
+  public void addShipmentPlan(LspShipmentPlan lspShipmentPlan) {
     this.lspShipmentPlans.add(lspShipmentPlan);
-    return null;
   }
 
   @Override

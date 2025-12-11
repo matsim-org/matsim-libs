@@ -228,8 +228,8 @@ public class ReceiverChessboardScenario {
                 LOG.warn("Multiple time windows set. Only the first is used");
             }
 
-            CarrierShipment shipment = shpBuilder.setDeliveryServiceTime(order.getServiceDuration())
-                    .setDeliveryTimeWindow(receiverPlan.getTimeWindows().get(0))
+            CarrierShipment shipment = shpBuilder.setDeliveryDuration(order.getServiceDuration())
+                    .setDeliveryStartingTimeWindow(receiverPlan.getTimeWindows().get(0))
                     .build();
             carriers.getCarriers().get(receiverOrder.getCarrierId()).getShipments().put(shipment.getId(), shipment);
         }

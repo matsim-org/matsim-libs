@@ -22,13 +22,10 @@ package org.matsim.core.network.algorithms.intersectionSimplifier;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -41,70 +38,70 @@ import org.matsim.core.utils.io.IOUtils;
 
 
 /**
- * <par>This class implements the density-based clustering approach as published
- * by Zhou <i>et al</i> (2004).</par>
+ * <par>This class implements the density-and-join-based clustering approach
+ * as published by Zhou <i>et al</i> (2004).</par>
  * <ul>
- * 		<i>``The basic idea of DJ-DigicoreCluster is as follows. For each point, calculate its
- * 		<b>neighborhood</b>: the neighborhood consists of points within distance
- * 		<b>Eps</b>, under condition that there are at least <b>MinPts</b> of them. If no
- * 		such neighborhood is found, the point is labeled noise; otherwise, the points are
- * 		created as a new DigicoreCluster if no neighbor is in an existing DigicoreCluster, or joined with
- * 		an existing DigicoreCluster if any neighbour is in an existing DigicoreCluster.''</i>
+ * 		<i>``The basic idea of DJ-Cluster is as follows. For each point,
+ * 		calculate its <b>neighborhood</b>: the neighborhood consists of points
+ * 		within distance <b>Eps</b>, under condition that there are at least
+ * 		<b>MinPts</b> of them. If no such neighborhood is found, the point is
+ * 		labeled noise; otherwise, the points are created as a new cluster if no
+ * 		neighbor is in an existing cluster, or joined with an existing cluster
+ * 		if any neighbour is in an existing cluster.''</i>
  * </ul>
  * <h4>Reference</h4>
- * Zhou, C., Frankowski, D., Ludford, P.m Shekar, S. and Terveen, L. (2004). Discovering
- * personal gazeteers: An interactive clustering approach. <i> Proceedings of the 12th annual
- * ACM International workshop on Geographic Information Systems</i>, p. 266-273. Washington, DC.
- * <h4></h4>
+ * Zhou, C., Frankowski, D., Ludford, P.m Shekar, S. and Terveen, L. (2004).
+ * Discovering personal gazeteers: An interactive clustering approach.
+ * <i>Proceedings of the 12th annual ACM International workshop on Geographic
+ * Information Systems</i>, p. 266-273. Washington, DC.
+ * DOI: <a href="https://doi.org/10.1145/1032222.1032261">10.1145/1032222.1032261</a>.
+ *
  * @author jwjoubert
  */
 public class DensityCluster {
-	private List<Node> inputPoints;
-	private Map<Id<Coord>, ClusterActivity> lostPoints = new TreeMap<Id<Coord>, ClusterActivity>();
+	private final List<Node> inputPoints;
+	private final Map<Id<Coord>, ClusterActivity> lostPoints = new TreeMap<>();
 	private QuadTree<ClusterActivity> quadTree;
-	private List<Cluster> clusterList;
+	private final List<Cluster> clusterList;
 	private final static Logger log = LogManager.getLogger(DensityCluster.class);
 	private String delimiter = ",";
 	private final boolean silent;
+	private final String[] csvHeader = new String[]{"clusterId", "lon", "lat", "numberOfActivities"};
 
 	/**
 	 * Creates a new instance of the density-based cluster with an empty list
 	 * of clusters.
-	 * @param radius the radius of the search circle within which other activity points
-	 * 			are searched.
-	 * @param minimumPoints the minimum number of points considered to constitute an
-	 * 			independent {@link Cluster}.
-	 * @param pointsToCluster
 	 */
-	public DensityCluster(List<Node> nodesToCluster, boolean silent){
+	public DensityCluster(List<Node> nodesToCluster, boolean silent) {
 		this.inputPoints = nodesToCluster;
 
 		/*TODO Remove later. */
 		int nullCounter = 0;
-		for(Node node : inputPoints){
-			if(node == null || node.getCoord() == null){
+		for (Node node : inputPoints) {
+			if (node == null || node.getCoord() == null) {
 				nullCounter++;
 			}
 		}
-		if(nullCounter > 0){
+		if (nullCounter > 0) {
 			log.warn("In DJCluster: of the " + inputPoints.size() + " points, " + nullCounter + " were null.");
 		}
 
-		this.clusterList = new ArrayList<Cluster>();
+		this.clusterList = new ArrayList<>();
 		this.silent = silent;
 	}
 
 
 	/**
-	 * Building an <code>ArrayList</code> of <code>DigicoreCluster</code>s. The DJ-Clustering
-	 * procedure of Zhou <i>et al</i> (2004) is followed. If there are no points to cluster, a
-	 * warning message is logged, and the procedure bypassed.
+	 * Building a <code>List</code> of <code>DensityCluster</code>s. The
+	 * DJ-Clustering procedure of Zhou <i>et al</i> (2004) is followed. If
+	 * there are no points to cluster, a warning message is logged, and the
+	 * procedure bypassed.
 	 */
-	public void clusterInput(double radius, int minimumPoints){
-		if(this.inputPoints.size() == 0){
+	public void clusterInput(double radius, int minimumPoints) {
+		if (this.inputPoints.isEmpty()) {
 			log.warn("DJCluster.clusterInput() called, but no points to cluster.");
-		} else{
-			if(!silent){
+		} else {
+			if (!silent) {
 				log.info("Clustering input points. This may take a while.");
 			}
 			int clusterIndex = 0;
@@ -123,9 +120,9 @@ public class DensityCluster {
 			for (Node node : this.inputPoints) {
 				Coord c = node.getCoord();
 				/* TODO Remove if no NullPointerExceptions are thrown. */
-				if(c == null){
+				if (c == null) {
 					log.warn("Coord is null. Number of points in list: " + inputPoints.size());
-				} else{
+				} else {
 					xMin = Math.min(xMin, c.getX());
 					yMin = Math.min(yMin, c.getY());
 					xMax = Math.max(xMax, c.getX());
@@ -135,14 +132,14 @@ public class DensityCluster {
 			/*
 			 * Build a new QuadTree, and place each point in the QuadTree as a ClusterActivity.
 			 * The geographic coordinates of each point is used as the keys in the QuadTree.
-			 * Initially all ClusterPoints will have a NULL reference to its DigicoreCluster. An
+			 * Initially all ClusterPoints will have a NULL reference to its cluster. An
 			 * ArrayList of Points is also kept as iterator for unclustered points.
 			 */
-			if(!silent){
+			if (!silent) {
 				log.info("Place points in QuadTree.");
 			}
-			quadTree = new QuadTree<ClusterActivity>(xMin-1, yMin-1, xMax+1, yMax+1);
-			List<ClusterActivity> listOfPoints = new ArrayList<ClusterActivity>();
+			quadTree = new QuadTree<>(xMin - 1, yMin - 1, xMax + 1, yMax + 1);
+			List<ClusterActivity> listOfPoints = new ArrayList<>();
 			for (int i = 0; i < this.inputPoints.size(); i++) {
 				double x = inputPoints.get(i).getCoord().getX();
 				double y = inputPoints.get(i).getCoord().getY();
@@ -150,28 +147,31 @@ public class DensityCluster {
 				quadTree.put(x, y, cp);
 				listOfPoints.add(cp);
 			}
-			if(!silent){
+			if (!silent) {
 				log.info("Done placing activities.");
 			}
 
+			/* We specifically do not use the standard MATSim counter class
+			 * because we want to retain the option to run this clustering in
+			 * parallel and, consequently, silently without log messages. */
 			int pointCounter = 0;
-			while(pointCounter < listOfPoints.size()){
+			while (pointCounter < listOfPoints.size()) {
 				// Get next point.
 				ClusterActivity p = listOfPoints.get(pointCounter);
 
-				if(p.getCluster() == null){
+				if (p.getCluster() == null) {
 					// Compute the density-based neighbourhood, N(p), of the point p
 					Collection<ClusterActivity> neighbourhood = quadTree.getDisk(p.getCoord().getX(), p.getCoord().getY(), radius);
-					List<ClusterActivity> uN = new ArrayList<ClusterActivity>(neighbourhood.size());
-					List<ClusterActivity> cN = new ArrayList<ClusterActivity>(neighbourhood.size());
+					List<ClusterActivity> uN = new ArrayList<>(neighbourhood.size());
+					List<ClusterActivity> cN = new ArrayList<>(neighbourhood.size());
 					for (ClusterActivity cp : neighbourhood) {
-						if(cp.getCluster() == null){
+						if (cp.getCluster() == null) {
 							uN.add(cp);
-						} else{
+						} else {
 							cN.add(cp);
 						}
 					}
-					if(neighbourhood.size() < minimumPoints){
+					if (neighbourhood.size() < minimumPoints) {
 						/* Point is considered to be noise.
 						 * FIXME Not quite true... it may be incorporated into
 						 * another cluster later! (JWJ - Mar '14)
@@ -179,36 +179,30 @@ public class DensityCluster {
 
 						lostPoints.put(p.getId(), p);
 						uPointCounter++;
-					}else if(cN.size() > 0){
+					} else if (!cN.isEmpty()) {
 						/*
-						 * Merge all the clusters. Use the DigicoreCluster with the smallest clusterId
-						 * value as the remaining DigicoreCluster.
+						 * Merge all the clusters. Use the DensityCluster with the smallest clusterId
+						 * value as the remaining DensityCluster.
 						 */
-						List<Cluster> localClusters = new ArrayList<Cluster>();
-						Cluster smallestCluster = cN.get(0).getCluster();
-						for(int i = 1; i < cN.size(); i++){
-							if(Integer.parseInt(cN.get(i).getCluster().getId().toString()) <
-									Integer.parseInt(smallestCluster.getId().toString()) ){
+						List<Cluster> localClusters = new ArrayList<>();
+						Cluster smallestCluster = cN.getFirst().getCluster();
+						for (int i = 1; i < cN.size(); i++) {
+							if (Integer.parseInt(cN.get(i).getCluster().getId().toString()) <
+								Integer.parseInt(smallestCluster.getId().toString())) {
 								smallestCluster = cN.get(i).getCluster();
 							}
-							if(!localClusters.contains(cN.get(i).getCluster())){
+							if (!localClusters.contains(cN.get(i).getCluster())) {
 								localClusters.add(cN.get(i).getCluster());
 							}
 						}
 						for (Cluster DigicoreCluster : localClusters) {
-							if(!DigicoreCluster.equals(smallestCluster)){
+							if (!DigicoreCluster.equals(smallestCluster)) {
 								List<ClusterActivity> thisClusterList = DigicoreCluster.getPoints();
-								for(int j = 0; j < thisClusterList.size(); j++){
-									// Change the DigicoreCluster reference of the ClusterActivity.
-									thisClusterList.get(j).setCluster(smallestCluster);
-									// Add the ClusterActivity to the new DigicoreCluster.
-									smallestCluster.getPoints().add(thisClusterList.get(j));
-									// Remove the ClusterActivity from old DigicoreCluster.
-									/*
-									 * 20091009 - I've commented this out... this seems
-									 * both dangerous and unnecessary.
-									 */
-//								DigicoreCluster.getPoints().remove(thisClusterList.get(j));
+								for (ClusterActivity clusterActivity : thisClusterList) {
+									// Change the cluster reference of the ClusterActivity.
+									clusterActivity.setCluster(smallestCluster);
+									// Add the ClusterActivity to the new cluster.
+									smallestCluster.getPoints().add(clusterActivity);
 								}
 							}
 						}
@@ -218,13 +212,13 @@ public class DensityCluster {
 							smallestCluster.getPoints().add(cp);
 							cp.setCluster(smallestCluster);
 							cPointCounter++;
-							if(lostPoints.containsKey(cp.getId())){
+							if (lostPoints.containsKey(cp.getId())) {
 								lostPoints.remove(cp.getId());
 								uPointCounter--;
 							}
 						}
-					} else{
-						// Create new DigicoreCluster and add all the points.
+					} else {
+						// Create a new cluster and add all the points.
 						Cluster newCluster = new Cluster(Id.create(clusterIndex, Cluster.class));
 						clusterIndex++;
 
@@ -232,7 +226,7 @@ public class DensityCluster {
 							cp.setCluster(newCluster);
 							newCluster.getPoints().add(cp);
 							cPointCounter++;
-							if(lostPoints.containsKey(cp.getId())){
+							if (lostPoints.containsKey(cp.getId())) {
 								lostPoints.remove(cp.getId());
 								uPointCounter--;
 							}
@@ -241,24 +235,24 @@ public class DensityCluster {
 				}
 				pointCounter++;
 				// Report progress
-				if(!silent){
-					if(pointCounter == pointMultiplier){
+				if (!silent) {
+					if (pointCounter == pointMultiplier) {
 						log.info("   Points clustered: " + pointCounter);
-						pointMultiplier = (int) Math.max(pointCounter, pointMultiplier)*2;
+						pointMultiplier *= 4;
 					}
 				}
 			}
 
 
-			if(!silent){
+			if (!silent) {
 				log.info("   Points clustered: " + pointCounter + " (Done)");
 				int sum = cPointCounter + uPointCounter;
 				log.info("Sum should add up: " + cPointCounter + " (clustered) + "
-						+ uPointCounter + " (unclustered) = " + sum);
+					+ uPointCounter + " (unclustered) = " + sum);
 
 				/* Code added for Joubert & Meintjes paper (2014). */
 				log.info("Unclustered points: ");
-				for(ClusterActivity ca : lostPoints.values()){
+				for (ClusterActivity ca : lostPoints.values()) {
 					log.info(String.format("   %.6f,%.6f", ca.getCoord().getX(), ca.getCoord().getY()));
 				}
 				log.info("New way of unclustered points:");
@@ -266,17 +260,17 @@ public class DensityCluster {
 			}
 
 			/*
-			 * Build the DigicoreCluster list. Once built, I rename the clusterId field so as to
-			 * start at '0', and increment accordingly. This allows me to directly use
+			 * Build the cluster list. Once built, rename the clusterId field so as to
+			 * start at '0', and increment accordingly. This allows to directly use
 			 * the clusterId field as 'row' and 'column' reference in the 2D matrices
 			 * when determining adjacency in Social Network Analysis.
 			 */
-			if(!silent){
-				log.info("Building the DigicoreCluster list (2 steps)");
+			if (!silent) {
+				log.info("Building the cluster list (2 steps)");
 			}
-			Map<Cluster, List<ClusterActivity>> clusterMap = new HashMap<Cluster, List<ClusterActivity>>();
+			Map<Cluster, List<ClusterActivity>> clusterMap = new HashMap<>();
 
-			if(!silent){
+			if (!silent) {
 				log.info("Step 1 of 2:");
 				log.info("Number of ClusterPoints to process: " + listOfPoints.size());
 			}
@@ -284,29 +278,26 @@ public class DensityCluster {
 			int cpMultiplier = 1;
 			for (ClusterActivity ca : listOfPoints) {
 				Cluster theCluster = ca.getCluster();
-				if(theCluster != null){
-					// Removed 7/12/2011 (JWJ): Seems unnecessary computation.
-//				theCluster.setCenterOfGravity();
-
-					if(!clusterMap.containsKey(theCluster)){
-						List<ClusterActivity> newList = new ArrayList<ClusterActivity>();
+				if (theCluster != null) {
+					if (!clusterMap.containsKey(theCluster)) {
+						List<ClusterActivity> newList = new ArrayList<>();
 						clusterMap.put(theCluster, newList);
 					}
 					clusterMap.get(theCluster).add(ca);
 				}
 
-				if(!silent){
-					if(++cpCounter == cpMultiplier){
-						log.info("   ClusterPoints processed: " + cpCounter + " (" + String.format("%3.2f", ((double)cpCounter/(double)listOfPoints.size())*100) + "%)");
+				if (!silent) {
+					if (++cpCounter == cpMultiplier) {
+						log.info("   ClusterPoints processed: " + cpCounter + " (" + String.format("%3.2f", ((double) cpCounter / (double) listOfPoints.size()) * 100) + "%)");
 						cpMultiplier *= 2;
 					}
 				}
 			}
-			if(!silent){
+			if (!silent) {
 				log.info("   ClusterPoints processed: " + cpCounter + " (Done)");
 			}
 
-			if(!silent){
+			if (!silent) {
 				log.info("Step 2 of 2:");
 				log.info("Number of clusters to process: " + clusterMap.keySet().size());
 			}
@@ -316,25 +307,25 @@ public class DensityCluster {
 			for (Map.Entry<Cluster, List<ClusterActivity>> e : clusterMap.entrySet()) {
 				Cluster digicoreCluster = e.getKey();
 				List<ClusterActivity> listOfClusterPoints = e.getValue();
-				if(listOfClusterPoints.size() >= minimumPoints){
+				if (listOfClusterPoints.size() >= minimumPoints) {
 					digicoreCluster.setClusterId(Id.create(clusterNumber++, Cluster.class));
 					clusterNumber++;
 					digicoreCluster.setCenterOfGravity();
 					clusterList.add(digicoreCluster);
-				} else if(!silent){
+				} else if (!silent) {
 					log.warn(" ... why do we HAVE a cluster with too few points?...");
 				}
 
-				if(!silent){
-					if(++clusterCounter == clusterMultiplier){
-						log.info("   Clusters processed: " + clusterCounter + " (" + String.format("%3.2f",	((double)clusterCounter / (double)clusterMap.keySet().size())*100) + "%)");
+				if (!silent) {
+					if (++clusterCounter == clusterMultiplier) {
+						log.info("   Clusters processed: " + clusterCounter + " (" + String.format("%3.2f", ((double) clusterCounter / (double) clusterMap.keySet().size()) * 100) + "%)");
 						clusterMultiplier *= 2;
 					}
 				}
 			}
-			if(!silent){
+			if (!silent) {
 				log.info("   Clusters processed: " + clusterCounter + " (Done)");
-				log.info("DigicoreCluster list built.");
+				log.info("DensityCluster list built.");
 			}
 		}
 
@@ -343,58 +334,54 @@ public class DensityCluster {
 
 
 	/**
-	 * For each DigicoreCluster, this method writes out the DigicoreCluster id, the DigicoreCluster's center of
-	 * gravity (as a longitude and latitude value), and the order of the DigicoreCluster, i.e.
-	 * the number of activity points from the input data associated with the DigicoreCluster.
-	 * Output is a comma-separated flat file, by default, but the delimiter can be set
-	 * using the class method <code>setDelimiter(String string)</code>.
+	 * For each DensityCluster, this method writes out the cluster id, the
+	 * cluster's center of gravity (as a longitude and latitude value), and
+	 * the order of the cluster, i.e. the number of activity points from the
+	 * input data associated with the cluster. The output is a comma-separated
+	 * flat file, by default, but the delimiter can be set using the class
+	 * method {@link #setDelimiter(String)}.
 	 * <h5>File format:</h5>
 	 * <ul><code>
-	 * 		ClusterId,Long,Lat,NumberOfActivities<br>
+	 * 		clusterId,lon,lat,numberOfActivities<br>
 	 * 		0,28.7654,35.4576,12<br>
 	 * 		1,28.0114,31.3421,5<br>
 	 * 		...
 	 * </code></ul>
 	 *
-	 * @param filename the absolute file path to where the DigicoreCluster information is written.
+	 * @param filename the absolute file path to where the cluster information is written.
 	 */
-	public void writeClustersToFile(String filename){
+	public void writeClustersToFile(String filename) {
 
 		int clusterCount = 0;
 		int clusterMultiplier = 1;
 		int totalClusters = clusterList.size();
-		if(!silent){
+		if (!silent) {
 			log.info("Writing a total of " + totalClusters + " to file.");
 		}
 
-			try (BufferedWriter output = IOUtils.getBufferedWriter(filename)) {
-				output.write("ClusterId,Long,Lat,NumberOfActivities");
-				output.write("\n");
-
-				for (Cluster c : clusterList) {
-					c.setCenterOfGravity();
-					Coord center = c.getCenterOfGravity();
-					output.write(c.getId().toString());
-					output.write(delimiter);
-					output.write(String.valueOf(center.getX()));
-					output.write(delimiter);
-					output.write(String.valueOf(center.getY()));
-					output.write(delimiter);
-					output.write(String.valueOf(c.getPoints().size()));
-					output.write("\n");
-
-					clusterCount++;
-					// Report progress
-					if(!silent){
-						if(clusterCount == clusterMultiplier){
-							log.info("   Clusters written: " + clusterCount);
-							clusterMultiplier *= 2;
-						}
+		try (BufferedWriter output = IOUtils.getBufferedWriter(filename);
+			 CSVPrinter printer = new CSVPrinter(output, CSVFormat.Builder.create().setHeader(csvHeader).setDelimiter(delimiter).build())) {
+			for (Cluster c : clusterList) {
+				c.setCenterOfGravity();
+				Coord center = c.getCenterOfGravity();
+				printer.printRecord(
+					c.getId(),
+					String.format(Locale.US, "%.6f", center.getX()),
+					String.format(Locale.US, "%.6f", center.getY()),
+					c.getPoints().size()
+				);
+				clusterCount++;
+				// Report progress
+				if (!silent) {
+					if (clusterCount == clusterMultiplier) {
+						log.info("   Clusters written: " + clusterCount);
+						clusterMultiplier *= 2;
 					}
 				}
-				if(!silent){
-					log.info("   Clusters written: " + clusterCount + " (Done)" );
-				}
+			}
+			if (!silent) {
+				log.info("   Clusters written: " + clusterCount + " (Done)");
+			}
 		} catch (IOException e) {
 			log.error("Could not write cluster to file.", e);
 		}
@@ -414,7 +401,8 @@ public class DensityCluster {
 		this.delimiter = delimiter;
 	}
 
-	public Map<Id<Coord>,ClusterActivity> getLostPoints(){
+	@SuppressWarnings("unused")
+	public Map<Id<Coord>, ClusterActivity> getLostPoints() {
 		return this.lostPoints;
 	}
 

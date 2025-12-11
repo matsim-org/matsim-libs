@@ -557,7 +557,9 @@ final class RailsimEngine implements Steppable {
 
 		// Time needs to be rounded to current sim step
 		double stopTime = state.pt.handleTransitStop(state.nextStop, Math.ceil(time));
-		state.nextStop = state.pt.getNextTransitStop();
+		// If stop time > 0, train has not yet departed
+		if (stopTime <= 0)
+			state.nextStop = state.pt.getNextTransitStop();
 
 		return stopTime;
 	}

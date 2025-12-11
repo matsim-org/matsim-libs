@@ -26,19 +26,23 @@ import jakarta.validation.constraints.Positive;
 public final class FifoTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String SET_NAME = "FifoTaxiOptimizer";
 
-	/**
-	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
-	 */
 	@Parameter
 	@Comment(REOPTIMIZATION_TIME_STEP_EXP)
 	@Positive
-	public int reoptimizationTimeStep = 1;
+	private int reoptimizationTimeStep = 1;
 
 	public FifoTaxiOptimizerParams() {
 		super(SET_NAME, true, true);
 	}
 
+	/**
+	 * {@value #REOPTIMIZATION_TIME_STEP_EXP}
+	 */
 	public int getReoptimizationTimeStep() {
 		return reoptimizationTimeStep;
+	}
+
+	public void setReoptimizationTimeStep(@Positive int reoptimizationTimeStep) {
+		this.reoptimizationTimeStep = reoptimizationTimeStep;
 	}
 }

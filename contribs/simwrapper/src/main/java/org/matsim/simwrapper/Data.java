@@ -3,8 +3,13 @@ package org.matsim.simwrapper;
 import org.apache.commons.io.FilenameUtils;
 import org.matsim.application.CommandRunner;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.utils.io.IOUtils;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.UncheckedIOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -18,6 +23,10 @@ import java.util.Map;
  */
 public final class Data {
 
+	/**
+	 * Context of the loaded configuration.
+	 */
+	private final URL configPath;
 	/**
 	 * Configured Simwrapper config.
 	 */
@@ -39,23 +48,29 @@ public final class Data {
 	private final Map<Class<? extends MATSimAppCommand>, String[]> globalArgs = new LinkedHashMap<>();
 
 	/**
+	 * Cache for resolved resources.
+	 */
+	private final Map<String, URL> resolveCache = new LinkedHashMap<>();
+
+	/**
 	 * The output directory.
 	 */
 	private Path path;
 	private CommandRunner currentContext;
 	private SimWrapperConfigGroup.ContextParams context;
 
-	Data(SimWrapperConfigGroup config) {
+	Data(URL contex, SimWrapperConfigGroup config) {
+		this.configPath = contex;
 		// path needed, but not available yet
 		this.config = config;
 		this.runners = new LinkedHashMap<>();
 		this.resources = new LinkedHashMap<>();
-
 		this.currentContext = runners.computeIfAbsent("", CommandRunner::new);
 		this.context = config.get("");
 	}
 
 	private Data(Data other, String context) {
+		this.configPath = other.configPath;
 		this.config = other.config;
 		this.runners = other.runners;
 		this.resources = other.resources;
@@ -89,8 +104,26 @@ public final class Data {
 	 * Set shp file for specific command, otherwise default shp will be used.
 	 */
 	public Data shp(Class<? extends MATSimAppCommand> command, String path) {
-		currentContext.setShp(command, path);
-		return this;
+
+		URL resolved = resolve(path);
+		if (resolved == null)
+			throw new IllegalArgumentException("Resource '" + path + "' not found!");
+
+		// Use absolute path if a file was resolved
+		try {
+			URI uri = resolved.toURI();
+			if (uri.getScheme().equals("file")) {
+				path = new File(uri).getAbsolutePath();
+			} else {
+				path = uri.toString();
+			}
+
+			currentContext.setShp(command, path);
+			return this;
+
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -154,13 +187,66 @@ public final class Data {
 	 */
 	public String resource(String name) {
 
-		URL resource = this.getClass().getResource(name);
+		String path = resolveResource(name, true);
 
+		// Handle shape files separately, copy additional files that are known to belong to shp files
+		if (name.endsWith(".shp")) {
+			resolveResource(name.replace(".shp", ".cpg"), false);
+			resolveResource(name.replace(".shp", ".dbf"), false);
+			resolveResource(name.replace(".shp", ".qix"), false);
+			resolveResource(name.replace(".shp", ".qmd"), false);
+			resolveResource(name.replace(".shp", ".prj"), false);
+			resolveResource(name.replace(".shp", ".shx"), false);
+		}
+
+		return path;
+	}
+
+	private URL resolve(String name) {
+		if (resolveCache.containsKey(name))
+			return resolveCache.get(name);
+
+		URL resource = null;
+		try {
+			resource = IOUtils.resolveFileOrResource(name);
+		} catch (UncheckedIOException e) {
+			// Nothing to do
+		}
+
+		// Try to prefix / automatically
 		if (resource == null) {
-			// Try to prefix / automatically
 			resource = this.getClass().getResource("/" + name);
-			if (resource == null)
+		}
+
+		// Load configs relative to the config file
+		if (resource == null) {
+			resource = ConfigGroup.getInputFileURL(configPath, name);
+		}
+
+		// If a file is expected, immediately check if it exists
+		if (resource != null && resource.getProtocol().equals("file")) {
+
+			try {
+				File f = new File(resource.toURI());
+				if (!f.exists())
+					resource = null;
+
+			} catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		resolveCache.put(name, resource);
+		return resource;
+	}
+
+	private String resolveResource(String name, boolean required) {
+		URL resource = resolve(name);
+		if (resource == null) {
+			if (required)
 				throw new IllegalArgumentException("Resource '" + name + "' not found!");
+			else
+				return null;
 		}
 
 		String baseName = FilenameUtils.getName(resource.getPath());

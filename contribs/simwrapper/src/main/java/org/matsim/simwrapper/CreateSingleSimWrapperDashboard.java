@@ -33,6 +33,7 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 
 @CommandLine.Command(
@@ -50,30 +51,18 @@ import java.util.List;
 final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateSingleSimWrapperDashboard.class);
-
+	@CommandLine.Mixin
+	private final ShpOptions shp = new ShpOptions();
 	@CommandLine.Option(names = "--type", required = true, description = "Provide the dashboard type to be generated. See DashboardType enum within this class.")
 	private DashboardType dashboardType;
-
 	@CommandLine.Parameters(arity = "1..*", description = "Path to run output directories for which the dashboards is to be generated.")
 	private List<Path> inputPaths;
 
-	@CommandLine.Mixin
-	private final ShpOptions shp = new ShpOptions();
-
-	enum DashboardType{
-		noise,
-		emissions,
-		traffic,
-		overview,
-		stuckAgent,
-		populationAttribute,
-		ODTrip,
-		trip,
-		publicTransit,
-		accessibility
+	private CreateSingleSimWrapperDashboard() {
 	}
 
-	private CreateSingleSimWrapperDashboard(){
+	public static void main(String[] args) {
+		new CreateSingleSimWrapperDashboard().execute(args);
 	}
 
 	@Override
@@ -88,13 +77,13 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 
 			SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
-			if (shp.isDefined()){
+			if (shp.isDefined()) {
 				//not sure if this is the best way to go, might be that the shape file would be automatically read by providing the --shp command line option
-				simwrapperCfg.defaultParams().shp = shp.getShapeFile().toString();
+				simwrapperCfg.defaultParams().setShp(shp.getShapeFile());
 			}
 
 			//skip default dashboards
-			simwrapperCfg.defaultDashboards = SimWrapperConfigGroup.Mode.disabled;
+			simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 
 			//add dashboard
 			switch (dashboardType) {
@@ -129,6 +118,12 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 				case accessibility -> {
 //					sw.addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), null, null));
 					throw new RuntimeException("Not yet implemented");
+				case impactAnalysis -> {
+					HashSet<String> modes = new HashSet<>();
+					modes.add("car");
+					modes.add("freight");
+
+					sw.addDashboard(new ImpactAnalysisDashboard(modes));
 				}
 				default -> throw new IllegalArgumentException("unkown dashboard type: " + dashboardType);
 			}
@@ -146,8 +141,18 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 		return 0;
 	}
 
-	public static void main(String[] args) {
-		new CreateSingleSimWrapperDashboard().execute(args);
+	enum DashboardType {
+		noise,
+		emissions,
+		traffic,
+		overview,
+		stuckAgent,
+		populationAttribute,
+		ODTrip,
+		trip,
+		publicTransit,
+		impactAnalysis,
+    accessibility
 	}
 
 }

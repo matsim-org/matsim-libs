@@ -55,7 +55,7 @@ public final class SimWrapper {
 	private SimWrapper(org.matsim.core.config.Config config) {
 		this.matsimConfig = config;
 		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
-		this.data = new Data(configGroup);
+		this.data = new Data(config.getContext(), configGroup);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public final class SimWrapper {
 
 		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
+		int i = 1;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
@@ -188,6 +188,12 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+		run(dir, null);
+	}
+	/**
+	 * Run the pipeline, and pass a different config file. This functionality is only available via {@link SimWrapperRunner}.
+	 */
+	void run(Path dir, String configPath) {
 
 		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
 			try {
@@ -205,12 +211,15 @@ public final class SimWrapper {
 
 			SimWrapperConfigGroup.ContextParams ctx = configGroup.get(runner.getName());
 
-			runner.setSampleSize(configGroup.sampleSize);
+			runner.setSampleSize(configGroup.getSampleSize());
 
-			if (ctx.shp != null) {
+			if (configPath != null)
+				runner.setConfigPath(configPath);
+
+			if (ctx.getShp() != null) {
 
 				try {
-					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
+					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.getShp()).toURI();
 
 					if (path.getScheme().equals("file"))
 						runner.setShp(new File(path).getAbsoluteFile().toString());

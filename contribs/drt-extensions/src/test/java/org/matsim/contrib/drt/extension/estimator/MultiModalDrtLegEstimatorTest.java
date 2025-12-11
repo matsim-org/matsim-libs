@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.application.MATSimApplication;
 import org.matsim.contrib.drt.estimator.DrtEstimatorModule;
+import org.matsim.contrib.drt.estimator.DrtEstimatorParams;
 import org.matsim.contrib.drt.estimator.impl.ExampleDrtEstimator;
 import org.matsim.contrib.drt.extension.DrtTestScenario;
 import org.matsim.contrib.drt.extension.modechoice.MultiModalDrtLegEstimator;
@@ -50,8 +51,8 @@ public class MultiModalDrtLegEstimatorTest {
 			public void install() {
 
 				for (DrtConfigGroup el : drtConfig.getModalElements()) {
-					install(new DrtEstimatorModule(el.mode, el, el.getDrtEstimatorParams().get()));
-					DrtEstimatorModule.bindEstimator(binder(), el.mode).toInstance(new ExampleDrtEstimator(1.05, 300));
+					install(new DrtEstimatorModule(el.getMode(), el, el.getDrtEstimatorParams().get()));
+					DrtEstimatorModule.bindEstimator(binder(), el.getMode()).toInstance(new ExampleDrtEstimator(1.05, 300));
 				}
 			}
 		});
@@ -71,6 +72,9 @@ public class MultiModalDrtLegEstimatorTest {
 
 		config.replanning().clearStrategySettings();
 		strategies.forEach(s -> config.replanning().addStrategySettings(s));
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = (MultiModeDrtConfigGroup) config.getModules().get(MultiModeDrtConfigGroup.GROUP_NAME);
+		multiModeDrtConfigGroup.getModalElements().forEach(drtConfigGroup -> drtConfigGroup.addParameterSet(new DrtEstimatorParams()));
 	}
 
 	@BeforeEach

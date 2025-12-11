@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -116,11 +117,9 @@ public class ApplicationUtils {
 	/**
 	 * Apply run configuration in yaml format.
 	 */
-	public static void applyConfigUpdate(Config config, Path yaml) {
+	public static void applyConfigUpdate(Config config, URL yaml) {
 
-		if (!Files.exists(yaml)) {
-			throw new IllegalArgumentException("Given config yaml does not exist: " + yaml);
-		}
+		Objects.requireNonNull(yaml, "URL or path is null. Most likely the file does not exist.");
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory()
 			.enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
@@ -128,7 +127,7 @@ public class ApplicationUtils {
 		ConfigAliases aliases = new ConfigAliases();
 		Deque<String> emptyStack = new ArrayDeque<>();
 
-		try (BufferedReader reader = Files.newBufferedReader(yaml)) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(yaml)) {
 
 			JsonNode node = mapper.readTree(reader);
 
@@ -149,7 +148,22 @@ public class ApplicationUtils {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
 
+	/**
+	 * Apply run configuration in yaml format.
+	 */
+	public static void applyConfigUpdate(Config config, Path yaml) {
+
+		if (!Files.exists(yaml)) {
+			throw new IllegalArgumentException("Given config yaml does not exist: " + yaml);
+		}
+
+		try {
+			applyConfigUpdate(config, yaml.toUri().toURL());
+		} catch (MalformedURLException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**

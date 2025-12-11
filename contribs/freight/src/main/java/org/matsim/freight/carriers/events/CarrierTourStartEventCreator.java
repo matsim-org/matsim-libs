@@ -68,9 +68,9 @@ import org.matsim.vehicles.Vehicle;
 	/**
 	 * Creating the FreightTourStartsEvent
 	 *
-	 * @param personId
-	 * @param carrier
-	 * @param scheduledTour
+	 * @param personId id of the driver (person)
+	 * @param carrier the carrier
+	 * @param scheduledTour the scheduledTour
 	 * @return CarrierTourStartEvent
 	 */
 	private CarrierTourStartEvent createFreightTourStartsEvent(Id<Person> personId, Carrier carrier, ScheduledTour scheduledTour) {

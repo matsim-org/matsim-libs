@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.common.zones.Zone;
 import org.matsim.contrib.common.zones.ZoneSystem;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +46,7 @@ import java.util.function.ToDoubleFunction;
  * @author jbischoff
  * @author michalm
  */
-public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler {
+public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler, IterationEndsListener {
 	private static final Logger logger = LogManager.getLogger(PreviousIterationDrtDemandEstimator.class);
 
 	private final ZoneSystem zonalSystem;
@@ -54,30 +56,24 @@ public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEst
 	private Map<Integer, Map<Zone, MutableInt>> previousIterationDepartures = new HashMap<>();
 
 	public PreviousIterationDrtDemandEstimator(ZoneSystem zonalSystem, DrtConfigGroup drtCfg,
-			int demandEstimationPeriod) {
+											   int demandEstimationPeriod) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		timeBinSize = demandEstimationPeriod;
 	}
 
 	@Override
-	public void reset(int iteration) {
-		previousIterationDepartures = currentIterationDepartures;
-		currentIterationDepartures = new HashMap<>();
-	}
-
-	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(mode)) {
 			zonalSystem.getZoneForLinkId(event.getLinkId()).ifPresentOrElse(
-                    zone -> {
-                        int timeBin = getBinForTime(event.getTime());
-                        currentIterationDepartures.computeIfAbsent(timeBin, v -> new HashMap<>())
-                            .computeIfAbsent(zone, z -> new MutableInt())
-                            .increment();
-                    },
-				//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
-				() -> logger.warn("No zone found for linkId " + event.getLinkId().toString())
+					zone -> {
+						int timeBin = getBinForTime(event.getTime());
+						currentIterationDepartures.computeIfAbsent(timeBin, v -> new HashMap<>())
+								.computeIfAbsent(zone, z -> new MutableInt())
+								.increment();
+					},
+					//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
+					() -> logger.warn("No zone found for linkId " + event.getLinkId().toString())
 			);
 		}
 	}
@@ -94,5 +90,11 @@ public final class PreviousIterationDrtDemandEstimator implements ZonalDemandEst
 
 	private int getBinForTime(double time) {
 		return (int)(time / timeBinSize);
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		previousIterationDepartures = currentIterationDepartures;
+		currentIterationDepartures = new HashMap<>();
 	}
 }

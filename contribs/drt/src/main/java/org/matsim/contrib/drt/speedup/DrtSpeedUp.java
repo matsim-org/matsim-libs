@@ -54,13 +54,13 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	public static boolean isTeleportDrtUsers(DrtSpeedUpParams drtSpeedUpParams, ControllerConfigGroup controlerConfig,
 			int iteration) {
 		int lastIteration = controlerConfig.getLastIteration();
-		if (iteration < drtSpeedUpParams.fractionOfIterationsSwitchOn * lastIteration
-				|| iteration >= drtSpeedUpParams.fractionOfIterationsSwitchOff * lastIteration) {
+		if (iteration < drtSpeedUpParams.getFractionOfIterationsSwitchOn() * lastIteration
+				|| iteration >= drtSpeedUpParams.getFractionOfIterationsSwitchOff() * lastIteration) {
 			return false; // full drt simulation
 		}
 
 		//full drt simulation only with a defined interval
-		return iteration % drtSpeedUpParams.intervalDetailedIteration != 0;
+		return iteration % drtSpeedUpParams.getIntervalDetailedIteration() != 0;
 	}
 
 	private final String mode;
@@ -88,8 +88,8 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		this.fleetSpecification = fleetSpecification;
 		this.drtEventSequenceCollector = drtEventSequenceCollector;
 
-		currentAvgWaitingTime = drtSpeedUpParams.initialWaitingTime;
-		currentAvgInVehicleBeelineSpeed = drtSpeedUpParams.initialInVehicleBeelineSpeed;
+		currentAvgWaitingTime = drtSpeedUpParams.getInitialWaitingTime();
+		currentAvgInVehicleBeelineSpeed = drtSpeedUpParams.getInitialInVehicleBeelineSpeed();
 	}
 
 	public DrtTeleportedRouteCalculator createTeleportedRouteCalculator() {
@@ -125,7 +125,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
 		boolean teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
-		if (iteration < drtSpeedUpParams.firstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams) {
+		if (iteration < drtSpeedUpParams.getFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams()) {
 			String type = teleportDrtUsers ? "teleported" : "simulated";
 			log.info("Number of {} {} trips: {}", type, mode, completedTripCount());
 		} else {
@@ -216,8 +216,8 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 		int count = (int)meanWaitTime.getN();
 		return new SimulatedTripStats(count,
-				count == 0 ? drtSpeedUpParams.initialInVehicleBeelineSpeed : meanInVehicleBeelineSpeed.getResult(),
-				count == 0 ? drtSpeedUpParams.initialWaitingTime : meanWaitTime.getResult());
+				count == 0 ? drtSpeedUpParams.getInitialInVehicleBeelineSpeed() : meanInVehicleBeelineSpeed.getResult(),
+				count == 0 ? drtSpeedUpParams.getInitialWaitingTime() : meanWaitTime.getResult());
 	}
 
 	static double computeMovingAverage(int movingAverageSize, List<Double> values) {

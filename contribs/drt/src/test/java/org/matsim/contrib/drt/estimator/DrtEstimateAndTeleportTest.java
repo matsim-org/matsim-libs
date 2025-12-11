@@ -38,13 +38,14 @@ public class DrtEstimateAndTeleportTest {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfig,
 			new OTFVisConfigGroup());
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtConfigGroup.simulationType = DrtConfigGroup.SimulationType.estimateAndTeleport;
+		drtConfigGroup.setSimulationType(DrtConfigGroup.SimulationType.estimateAndTeleport);
+		drtConfigGroup.addParameterSet(new DrtEstimatorParams());
 
 		Controler controler = DrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.mode).toInstance(
+				DrtEstimatorModule.bindEstimator(binder(), drtConfigGroup.getMode()).toInstance(
 					new DirectTripBasedDrtEstimator.Builder()
 						.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
 						.setWaitingTimeDistributionGenerator(new NormalDistributionGenerator(1, 0.4))

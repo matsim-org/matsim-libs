@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author Michal Maciejewski (michalm)
  */
-final class ElectricVehicleSpecificationDefaultImpl implements ElectricVehicleSpecification {
+public final class ElectricVehicleSpecificationDefaultImpl implements ElectricVehicleSpecification {
 
 	private final Vehicle matsimVehicle;
 

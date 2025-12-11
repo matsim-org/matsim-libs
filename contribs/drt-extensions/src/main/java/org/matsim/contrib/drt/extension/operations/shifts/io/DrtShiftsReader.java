@@ -25,14 +25,18 @@ public class DrtShiftsReader extends MatsimXmlParser {
     private final static String BREAK_NAME = "break";
 
     public static final String ID = "id";
+
     public static final String START_TIME = "start";
     public static final String END_TIME = "end";
+
     public static final String OPERATION_FACILITY_ID = "operationFacilityId";
     public static final String DESIGNATED_VEHICLE_ID = "designatedVehicleId";
 
     public static final String EARLIEST_BREAK_START_TIME = "earliestStart";
     public static final String LATEST_BREAK_END_TIME = "latestEnd";
     public static final String BREAK_DURATION = "duration";
+
+    public static final String TYPE = "type";
 
     private static final Logger log = LogManager.getLogger( DrtShiftsReader.class ) ;
 
@@ -62,6 +66,10 @@ public class DrtShiftsReader extends MatsimXmlParser {
                 String designatedVehicleId = atts.getValue(DESIGNATED_VEHICLE_ID);
                 if(designatedVehicleId != null) {
                     builder.designatedVehicle(Id.create(designatedVehicleId, DvrpVehicle.class));
+                }
+                String type = atts.getValue(TYPE);
+                if(type != null) {
+                    builder.type(type);
                 }
                 currentBuilder = builder;
                 break;

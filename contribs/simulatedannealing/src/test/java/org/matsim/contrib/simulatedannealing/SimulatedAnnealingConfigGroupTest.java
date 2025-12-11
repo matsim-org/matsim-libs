@@ -10,7 +10,6 @@ package org.matsim.contrib.simulatedannealing;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,9 +33,9 @@ public class SimulatedAnnealingConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 
 		SimulatedAnnealingConfigGroup simAnCfg = new SimulatedAnnealingConfigGroup();
-		simAnCfg.initialTemperature = 42;
-		simAnCfg.alpha = 42;
-		simAnCfg.coolingSchedule = TemperatureFunction.DefaultFunctions.exponentialAdditive;
+		simAnCfg.setInitialTemperature(42);
+		simAnCfg.setAlpha(42);
+		simAnCfg.setCoolingSchedule(TemperatureFunction.DefaultFunctions.exponentialAdditive);
 
 		config.addModule(simAnCfg);
 		return config;
@@ -58,9 +57,9 @@ public class SimulatedAnnealingConfigGroupTest {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, configFile.toString());
 		SimulatedAnnealingConfigGroup loadedCfg = ConfigUtils.addOrGetModule(config, SimulatedAnnealingConfigGroup.class);
-		Assertions.assertEquals(42., loadedCfg.alpha, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(42., loadedCfg.initialTemperature, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.coolingSchedule);
+		Assertions.assertEquals(42., loadedCfg.getAlpha(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(42., loadedCfg.getInitialTemperature(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(TemperatureFunction.DefaultFunctions.exponentialAdditive, loadedCfg.getCoolingSchedule());
 	}
 
 

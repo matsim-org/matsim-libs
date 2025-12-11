@@ -28,7 +28,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * The carrier vehicle type.
  * <p>
- * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus physical and
+ * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus, physical and
  * non-physical attributes are used. This is likely to be changed in the future.
  *
  * @author sschroeder
@@ -71,7 +71,7 @@ public class CarrierVehicleType {
 		/**
 		 * Sets fixed costs of vehicle.
 		 *
-		 * <p>By default it is 0.
+		 * <p>By default, it is 0.
 		 * @param fix 	fixed costs
 		 * @return 		this builder
 		 */
@@ -83,7 +83,7 @@ public class CarrierVehicleType {
 		/**
 		 * Sets costs per distance-unit.
 		 *
-		 * <p>By default it is 1.
+		 * <p>By default, it is 1.
 		 *
 		 * @param perDistanceUnit 	costs per distance-unit
 		 * @return 					this builder
@@ -96,7 +96,7 @@ public class CarrierVehicleType {
 		/**
 		 * Sets costs per time-unit.
 		 *
-		 * <p>By default it is 0.
+		 * <p>By default, it is 0.
 		 *
 		 * @param perTimeUnit 	costs per time-unit
 		 * @return 				this builder

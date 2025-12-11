@@ -52,7 +52,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @param -- {@value #LSPS_FILE_DESC}
+     * @param lspsFile {@value #LSPS_FILE_DESC}
      */
     @StringSetter(LSPS_FILE)
     public void setLspsFile(String lspsFile) {
@@ -62,7 +62,7 @@ public class FreightLogisticsConfigGroup extends ReflectiveConfigGroup {
 
 
     //---
-    // Commenting this out, because in a frist step I think it is better/ more streight forward to have the VRP logic in the carriers as an attribute.
+    // Commenting this out, because in a frist step I think it is better/ more straight forward to have the VRP logic in the carriers as an attribute.
     // please see {@link CarrierSchedulerUtils#setVrpLogic(carrier, VRPLogic)} and {@link CarrierSchedulerUtils#getVrpLogic(carrier)}
     //---
 

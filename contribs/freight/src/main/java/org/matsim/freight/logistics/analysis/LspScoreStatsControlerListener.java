@@ -116,9 +116,6 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.minIteration = this.controllerConfigGroup.getFirstIteration();
-		//		int maxIter = controlerConfigGroup.getLastIteration();
-		//		int iterations = maxIter - this.minIteration;
-		//		if (iterations > 5000) iterations = 5000; // limit the history size
 		for ( ScoreItem item : ScoreItem.values() ) {
 			this.scoreHistory.put( item, new TreeMap<>() ) ;
 			this.perLsp.forEach((s, data) -> data.hist.put(item, new TreeMap<>()));
@@ -154,10 +151,10 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 		}
 
 
-		log.info("-- avg. score of the executed plan of each agent: " + (info.sumExecutedScores / info.nofExecutedScores));
-		log.info("-- avg. score of the worst plan of each agent: " + (info.sumScoreWorst / info.nofScoreWorst));
-		log.info("-- avg. of the avg. plan score per agent: " + (info.sumAvgScores / info.nofAvgScores));
-		log.info("-- avg. score of the best plan of each agent: " + (info.sumScoreBest / info.nofScoreBest));
+		log.info("-- avg. score of the executed plan of each agent: {}", info.sumExecutedScores / info.nofExecutedScores);
+		log.info("-- avg. score of the worst plan of each agent: {}", info.sumScoreWorst / info.nofScoreWorst);
+		log.info("-- avg. of the avg. plan score per agent: {}", info.sumAvgScores / info.nofAvgScores);
+		log.info("-- avg. score of the best plan of each agent: {}", info.sumScoreBest / info.nofScoreBest);
 
 		try {
 			info.write(event.getIteration(), this.out, this.delimiter);
@@ -166,7 +163,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException while writing score stats", e);
 		}
 
 //		int index = event.getIteration() - this.minIteration;
@@ -188,7 +185,7 @@ public class LspScoreStatsControlerListener implements StartupListener, Iteratio
 	}
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
+	public void notifyShutdown(final ShutdownEvent controlerShutdownEvent) {
 		try {
 			this.out.close();
 			for (ScoreHist data : this.perLsp.values()) {

@@ -14,9 +14,13 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	private final Id<DrtShift> id;
 	private final double start;
 	private final double end;
+
 	private final DrtShiftBreakSpecification shiftBreak;
+
 	private final Id<OperationFacility> operationFacilityId;
 	private final Id<DvrpVehicle> designatedVehicleId;
+
+	private final String type;
 
 	private DrtShiftSpecificationImpl(Builder builder) {
 		this.id = builder.id;
@@ -25,6 +29,7 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		this.shiftBreak = builder.shiftBreak;
 		this.operationFacilityId = builder.operationFacilityId;
 		this.designatedVehicleId = builder.designatedVehicleId;
+		this.type = builder.type;
 	}
 
 	@Override
@@ -53,6 +58,11 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 	}
 
 	@Override
+	public Optional<String> getShiftType() {
+		return Optional.ofNullable(type);
+	}
+
+	@Override
 	public Id<DrtShift> getId() {
 		return id;
 	}
@@ -68,16 +78,22 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		builder.end = copy.getEndTime();
 		builder.shiftBreak = copy.getBreak().orElse(null);
 		builder.operationFacilityId = copy.getOperationFacilityId().orElse(null);
+		builder.type = copy.type;
 		return builder;
 	}
 
 	public static final class Builder {
 		private Id<DrtShift> id;
+
 		private double start;
 		private double end;
+
 		private DrtShiftBreakSpecification shiftBreak;
+
 		private Id<OperationFacility> operationFacilityId;
-		public Id<DvrpVehicle> designatedVehicleId;
+		private Id<DvrpVehicle> designatedVehicleId;
+
+		private String type;
 
 		private Builder() {
 		}
@@ -108,6 +124,11 @@ public class DrtShiftSpecificationImpl implements DrtShiftSpecification {
 		}
 		public Builder designatedVehicle(Id<DvrpVehicle> designatedVehicleId) {
 			this.designatedVehicleId = designatedVehicleId;
+			return this;
+		}
+
+		public Builder type(String type) {
+			this.type = type;
 			return this;
 		}
 

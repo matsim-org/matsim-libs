@@ -44,6 +44,7 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.controller.CarrierControllerUtils;
@@ -80,15 +81,14 @@ public class CollectionLSPReplanningTest {
 	@BeforeEach
 	public void initialize() {
 
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 
 		var freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 		Network network = scenario.getNetwork();
 
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -180,25 +180,10 @@ public class CollectionLSPReplanningTest {
 		collectionLSP.scheduleLogisticChains();
 
 
-//		ShipmentAssigner maybeTodayAssigner = new MaybeTodayAssigner();
-//		maybeTodayAssigner.setLSP(collectionLSP);
-//		final GenericPlanStrategy<LSPPlan, LSP> strategy = new TomorrowShipmentAssignerStrategyFactory(maybeTodayAssigner).createStrategy();
-//
-//		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManagerImpl<>();
-//		strategyManager.addStrategy(strategy, null, 1);
-//
-//		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(strategyManager);
-//
-//
-//		collectionLSP.setReplanner(replanner);
-
-
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(collectionLSP)));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(collectionLSP));
 
 		Controller controller = ControllerUtils.createController(scenario);
-
 		controller.addOverridingModule(new LSPModule() );
-
 		controller.addOverridingModule(new AbstractModule(){
 			@Override public void install(){
 				bind( LSPStrategyManager.class ).toProvider(() -> {
