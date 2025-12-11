@@ -193,8 +193,6 @@ import org.matsim.freight.carriers.*;
 						bw1.write(delimiter + score);
 						bw1.write(delimiter + jspritScore);
 						bw1.write(delimiter + tours);
-
-						bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
 						bw1.write(delimiter + jobsType);
 						bw1.write(delimiter + numberOfPlannedJobs);
 						bw1.write(delimiter + numberOfHandledJobs);
