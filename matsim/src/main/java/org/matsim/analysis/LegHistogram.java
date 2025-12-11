@@ -24,12 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -46,14 +46,15 @@ import java.util.TreeMap;
 
 /**
  * @author mrieser
- *
+ * <p>
  * Counts the number of persons departed, arrived or got stuck per time bin
  * based on events.
- *
+ * <p>
  * The chart plotting was moved to its own class.
  * This class could be moved to trafficmonitoring.
  *
  */
+@DistributedEventHandler(async = true)
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
 	public static final int DEFAULT_END_TIME = 30 * 3600;
@@ -69,14 +70,14 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	LegHistogram(Population population, Config config) {
 		super();
 		this.binSize = DEFAULT_BIN_SIZE;
-		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME) ) / this.binSize + 1;
+		this.nofBins = ((int) config.qsim().getEndTime().orElse(DEFAULT_END_TIME)) / this.binSize + 1;
 		reset(0);
 		if (population == null) {
 			this.personIds = null;
 		} else {
 			this.personIds = population.getPersons().keySet();
 		}
-		}
+	}
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
@@ -91,7 +92,8 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		reset(0);
 	}
 
-	/** Creates a new LegHistogram with the specified binSize and a default number of bins, such
+	/**
+	 * Creates a new LegHistogram with the specified binSize and a default number of bins, such
 	 * that 30 hours are analyzed.
 	 *
 	 * @param binSize The size of a time bin in seconds.
@@ -161,11 +163,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		stream.print("\n");
 		int allEnRoute = 0;
 		int[] modeEnRoute = new int[this.data.size()];
-				DataFrame allModesData = getAllModesData();
-				for (int i = 0; i < allModesData.countsDep.length; i++) {
+		DataFrame allModesData = getAllModesData();
+		for (int i = 0; i < allModesData.countsDep.length; i++) {
 			// data about all modes
 			allEnRoute = allEnRoute + allModesData.countsDep[i] - allModesData.countsArr[i] - allModesData.countsStuck[i];
-			stream.print(Time.writeTime(i*this.binSize) + "\t" + i*this.binSize);
+			stream.print(Time.writeTime(i * this.binSize) + "\t" + i * this.binSize);
 			stream.print("\t" + allModesData.countsDep[i] + "\t" + allModesData.countsArr[i] + "\t" + allModesData.countsStuck[i] + "\t" + allEnRoute);
 
 			// data about single modes
@@ -181,7 +183,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-		/**
+	/**
 	 * @return number of departures per time-bin, for all legs
 	 */
 	public int[] getDepartures() {
@@ -252,13 +254,13 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	DataFrame getAllModesData() {
 		DataFrame result = new DataFrame(this.binSize, this.nofBins + 1);
 		for (DataFrame byMode : this.data.values()) {
-			for (int i=0;i<result.countsDep.length;++i) {
+			for (int i = 0; i < result.countsDep.length; ++i) {
 				result.countsDep[i] += byMode.countsDep[i];
 			}
-			for (int i=0;i<result.countsArr.length;++i) {
+			for (int i = 0; i < result.countsArr.length; ++i) {
 				result.countsArr[i] += byMode.countsArr[i];
 			}
-			for (int i=0;i<result.countsStuck.length;++i) {
+			for (int i = 0; i < result.countsStuck.length; ++i) {
 				result.countsStuck[i] += byMode.countsStuck[i];
 			}
 		}
@@ -266,20 +268,13 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	private int getBinIndex(final double time) {
-		int bin = (int)(time / this.binSize);
-		if (bin >= this.nofBins) {
-			return this.nofBins;
-		}
-		return bin;
+		int bin = (int) (time / this.binSize);
+		return Math.min(bin, this.nofBins);
 	}
 
 	DataFrame getDataForMode(final String legMode) {
-		DataFrame dataFrame = this.data.get(legMode);
-		if (dataFrame == null) {
-			dataFrame = new DataFrame(this.binSize, this.nofBins + 1); // +1 for all times out of our range
-			this.data.put(legMode, dataFrame);
-		}
-		return dataFrame;
+		// +1 for all times out of our range
+		return this.data.computeIfAbsent(legMode, _ -> new DataFrame(this.binSize, this.nofBins + 1));
 	}
 
 	static class DataFrame {

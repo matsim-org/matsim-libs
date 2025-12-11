@@ -51,9 +51,9 @@ public class EvAnalysisModule extends AbstractModule {
     @Provides
     @Singleton
     VehicleTrajectoryListener provideVehicleTrajectoryListener(EventsManager eventsManager, Network network,
-            ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy,
+            ElectricFleetSpecification electricFleet, ChargingInfrastructureSpecification infrastructure, OutputDirectoryHierarchy outputHierarchy,
             EvConfigGroup evConfig) {
-        return new VehicleTrajectoryListener(eventsManager, network, electricFleet, outputHierarchy,
+        return new VehicleTrajectoryListener(eventsManager, network, electricFleet, infrastructure, outputHierarchy,
                 evConfig.getWriteVehicleTrajectoriesInterval(), getConfig().controller().getCompressionType());
     }
 

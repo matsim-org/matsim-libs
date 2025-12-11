@@ -359,17 +359,21 @@ public class CarriersUtils {
 		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = carries.values().stream()
 			.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
 			.collect(Collectors.toMap(CarrierVehicle::getId, cv -> cv, (a, b) -> a, HashMap::new));
-		//Create Rp Scheme from code.
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createRoadPricingSchemeImpl();
 
-		/* Configure roadpricing scheme. */
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createRoadPricingSchemeImpl();
+		List <String> usedModesByCarriers = carrierVehicles.values().stream()
+			.map(cv -> cv.getType().getNetworkMode())
+			.distinct()
+			.toList();
+
 		RoadPricingUtils.setName(scheme, "PricingForVRP");
 		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
 		RoadPricingUtils.setDescription(scheme, "Adds a toll for all vehicles on a link that are not networkMode on this link.");
-		Set<String> networkModes = NetworkUtils.getModes(scenario.getNetwork());
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if (link.getAllowedModes().size() < networkModes.size()) {
-				RoadPricingUtils.addLink(scheme, link.getId());
+			for (String mode : usedModesByCarriers) {
+				if (!link.getAllowedModes().contains(mode)) {
+					RoadPricingUtils.addLink(scheme, link.getId());
+				}
 			}
 		}
 
