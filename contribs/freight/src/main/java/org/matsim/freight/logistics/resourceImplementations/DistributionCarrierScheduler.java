@@ -78,7 +78,7 @@ import org.matsim.vehicles.VehicleType;
 			this.carrier = this.resource.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
-			this.carrier.getPlans().clear();
+			CarriersUtils.clearCarrierPlans(this.carrier);
 		}
 	}
 
