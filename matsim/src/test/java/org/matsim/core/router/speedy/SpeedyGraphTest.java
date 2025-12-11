@@ -80,9 +80,9 @@ public class SpeedyGraphTest {
 
         li.reset(f.node6.getId().index());
         Assertions.assertTrue(li.next());
-        assertLink(li, f.link65);
-        Assertions.assertTrue(li.next());
         assertLink(li, f.link62);
+        Assertions.assertTrue(li.next());
+        assertLink(li, f.link65);
         Assertions.assertFalse(li.next());
         Assertions.assertFalse(li.next());
 

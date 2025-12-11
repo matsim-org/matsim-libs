@@ -9,6 +9,10 @@ import org.matsim.core.replanning.ReplanningContext;
  * Interface for choosing a strategy for each person, each iteration.
  */
 public interface StrategyChooser<T extends BasicPlan, I extends HasPlansAndId<? extends BasicPlan, I>> {
+
+	default void beforeReplanning(ReplanningContext replanningContext) {
+	}
+
 	GenericPlanStrategy<T, I> chooseStrategy(HasPlansAndId<T, I> person, final String subpopulation, ReplanningContext replanningContext, Weights<T,I> weights);
 
 

@@ -99,7 +99,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 			throw new IllegalArgumentException("Unsupported");
 		}
 
-		if (params.socCheckTimeStep % params.getReoptimizationTimeStep() != 0) {
+		if (params.getSocCheckTimeStep() % params.getReoptimizationTimeStep() != 0) {
 			throw new RuntimeException("charge-scheduling must be followed up by req-scheduling");
 		}
 
@@ -111,7 +111,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
+		if (isNewDecisionEpoch(e, params.getSocCheckTimeStep())) {
 			if (chargingTaskRemovalEnabled) {
 				unscheduleAwaitingRequestsAndCharging();
 			} else {
@@ -199,7 +199,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 	private boolean isChargingSchedulable(EvDvrpVehicle eTaxi, TaxiScheduleInquiry scheduleInquiry,
 			double maxDepartureTime) {
 		Battery b = eTaxi.getElectricVehicle().getBattery();
-		boolean undercharged = b.getCharge() < params.minSoc * b.getCapacity();
+		boolean undercharged = b.getCharge() < params.getMinSoc() * b.getCapacity();
 		if (!undercharged || !scheduledForCharging.containsKey(eTaxi.getId())) {
 			return false;// not needed or already planned
 		}

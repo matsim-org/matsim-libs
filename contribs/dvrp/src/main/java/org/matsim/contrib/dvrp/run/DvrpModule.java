@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.io.File;
+import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.zones.ZoneSystem;
@@ -94,11 +94,11 @@ public final class DvrpModule extends AbstractModule {
 				ZoneSystem zoneSystem = ZoneSystemUtils.createZoneSystem(getConfig().getContext(), network,
 					matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 				
-				if (params.cachePath == null) {
+				if (params.getCachePath() == null) {
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize());
 				} else {
-					File cachePath = new File(ConfigGroup.getInputFileURL(getConfig().getContext(), params.cachePath).getPath());
+					URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), params.getCachePath());
 					return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, params, numberOfThreads,
 						qSimConfigGroup.getTimeStepSize(), cachePath);
 				}

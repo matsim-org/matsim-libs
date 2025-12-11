@@ -21,6 +21,8 @@
 
 package org.matsim.freight.carriers.usecases.chessboard;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -37,6 +39,8 @@ import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 public class RunChessboardIT {
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	private static final Logger log = LogManager.getLogger(RunChessboardIT.class);
 
 	@Test
 	void runChessboard() {
@@ -64,7 +68,7 @@ public class RunChessboardIT {
 				Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
 			}
 		} catch (Exception ee ) {
-			ee.printStackTrace();
+			log.error("Exception while running example", ee);
 			Assertions.fail("something went wrong");
 		}
 

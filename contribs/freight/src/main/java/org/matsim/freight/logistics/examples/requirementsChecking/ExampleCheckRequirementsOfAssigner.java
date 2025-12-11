@@ -54,6 +54,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -70,8 +71,6 @@ class ExampleCheckRequirementsOfAssigner {
 
   private static LSP createLSPWithProperties(Scenario scenario) {
 
-    final Network network = scenario.getNetwork();
-
     // Create red LogisticsSolution which has the corresponding info
     final Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
     final Id<VehicleType> collectionVehTypeId = Id.create("RedCarrierVehicleType", VehicleType.class);
@@ -85,8 +84,7 @@ class ExampleCheckRequirementsOfAssigner {
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
-    CarrierVehicle redVehicle =
-        CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionVehType);
+    CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities redCapabilities =
         CarrierCapabilities.Builder.newInstance()
@@ -96,8 +94,7 @@ class ExampleCheckRequirementsOfAssigner {
     Carrier redCarrier = CarriersUtils.createCarrier(redCarrierId);
     redCarrier.setCarrierCapabilities(redCapabilities);
 
-    LSPResource redResource =
-        ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
+    LSPResource redResource = ResourceImplementationUtils.CollectionCarrierResourceBuilder.newInstance(redCarrier)
             .setCollectionScheduler(
                 ResourceImplementationUtils.createDefaultCollectionCarrierScheduler(scenario))
             .setLocationLinkId(collectionLinkId)
@@ -226,7 +223,7 @@ class ExampleCheckRequirementsOfAssigner {
     config.addCoreModules();
     Scenario scenario = ScenarioUtils.createScenario(config);
     new MatsimNetworkReader(scenario.getNetwork())
-        .readFile("scenarios/2regions/2regions-network.xml");
+        .readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
     Network network = scenario.getNetwork();
 
     // Create LSP and lspShipments

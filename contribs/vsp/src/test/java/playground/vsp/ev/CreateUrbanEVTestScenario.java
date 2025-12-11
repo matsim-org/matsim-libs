@@ -20,9 +20,13 @@
 
 package playground.vsp.ev;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
+import org.matsim.contrib.ev.EvConfigGroup.InitialSocBehavior;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -34,9 +38,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 class CreateUrbanEVTestScenario {
 	static Scenario createTestScenario(){
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
-		evConfigGroup.timeProfiles = true;
-		evConfigGroup.chargersFile = "chargers.xml";
-		evConfigGroup.transferFinalSoCToNextIteration = true;
+		evConfigGroup.setAnalysisOutputs(Set.of(EvAnalysisOutput.TimeProfiles));
+		evConfigGroup.setChargersFile("chargers.xml");
+		evConfigGroup.setInitialSocBehavior(InitialSocBehavior.UpdateAfterIteration);
 
 		//prepare config
 		Config config = ConfigUtils.loadConfig("test/input/playground/vsp/ev/chessboard-config.xml", evConfigGroup);

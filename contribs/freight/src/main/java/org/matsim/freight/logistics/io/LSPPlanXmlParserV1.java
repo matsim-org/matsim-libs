@@ -53,7 +53,9 @@ import org.xml.sax.Attributes;
  */
 class LSPPlanXmlParserV1 extends MatsimXmlParser {
 
-  public static final Logger logger = LogManager.getLogger(LSPPlanXmlParserV1.class);
+  @SuppressWarnings("unused")
+  public static final Logger log = LogManager.getLogger(LSPPlanXmlParserV1.class);
+
   private final LSPs lsPs;
   private final Carriers carriers;
   private final Map<String, String> elementIdResourceIdMap = new LinkedHashMap<>();
@@ -261,28 +263,28 @@ class LSPPlanXmlParserV1 extends MatsimXmlParser {
         LspShipmentPlanElement planElement = null;
 
         switch (type) {
-          case "LOAD" -> {
+			case LOAD -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
-          case "TRANSPORT" -> {
+          case TRANSPORT -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
-          case "UNLOAD" -> {
+          case UNLOAD -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));
             planElementBuilder.setResourceId(Id.create(resourceId, LSPResource.class));
             planElement = planElementBuilder.build();
           }
-          case "HANDLE" -> {
+          case HANDLING -> {
             var planElementBuilder = LspShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
             planElementBuilder.setStartTime(parseTimeToDouble(startTime));
             planElementBuilder.setEndTime(parseTimeToDouble(endTime));

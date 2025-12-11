@@ -32,8 +32,8 @@ public class RunDrtWithServicesScenarioIT {
 
 		{
 			DrtServiceParams clean = new DrtServiceParams("clean");
-			clean.executionLimit = 1;
-			clean.duration = 900;
+			clean.setExecutionLimit(1);
+			clean.setDuration(900);
 			var condition1 = new TimeOfDayReachedTriggerParam();
 			condition1.executionTime = 53205;
 			clean.addParameterSet(condition1);
@@ -42,8 +42,8 @@ public class RunDrtWithServicesScenarioIT {
 
 		{
 			DrtServiceParams deepClean = new DrtServiceParams("deep clean");
-			deepClean.executionLimit = 1;
-			deepClean.duration = 1800;
+			deepClean.setExecutionLimit(1);
+			deepClean.setDuration(1800);
 			var condition1 = new TimeOfDayReachedTriggerParam();
 			condition1.executionTime = 53205;
 			deepClean.addParameterSet(condition1);

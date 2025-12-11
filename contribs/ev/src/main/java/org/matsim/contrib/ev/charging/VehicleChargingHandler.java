@@ -86,11 +86,14 @@ public class VehicleChargingHandler
 	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 	private final EvConfigGroup evCfg;
 
+	private final ChargingStrategy.Factory strategyFactory;
+
 	@Inject
-	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evConfigGroup) {
+	VehicleChargingHandler(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, EvConfigGroup evConfigGroup, ChargingStrategy.Factory strategyFactory) {
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.electricFleet = electricFleet;
 		this.evCfg = evConfigGroup;
+		this.strategyFactory = strategyFactory;
 		chargersAtLinks = ChargingInfrastructureUtils.getChargersAtLinks(chargingInfrastructure );
 	}
 
@@ -112,7 +115,7 @@ public class VehicleChargingHandler
 							.filter(ch -> ev.getChargerTypes().contains(ch.getChargerType()))
 							.findAny()
 							.get();
-					c.getLogic().addVehicle(ev, event.getTime());
+					c.getLogic().addVehicle(ev, strategyFactory.createStrategy(c.getSpecification(), ev), event.getTime());
 					vehiclesAtChargers.put(evId, c.getId());
 				}
 			}
@@ -204,7 +207,7 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(QuitQueueAtChargerEvent event) {
-		if (evCfg.enforceChargingInteractionDuration){
+		if (evCfg.isEnforceChargingInteractionDuration()){
 			//this could actually happen when combining with edrt/etaxi/evrp
 			throw new RuntimeException("should currently not happen, as this event is only triggered in case the agent quits the charger queue without charging afterwards, " +
 				" and this should not happen with fixed charging activity duration.\n" +

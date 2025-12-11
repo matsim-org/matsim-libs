@@ -19,16 +19,20 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
+import org.matsim.contrib.dvrp.load.IntegerLoad;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-
-import java.util.*;
 
 /**
  * @author michalm
@@ -43,6 +47,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 
 	private final Link fromLink;
 	private final Link toLink;
+	private final DvrpLoad load;
 
 	public OneTaxiRequest(Id<Request> id, Collection<Id<Person>> passengerIds, String mode, Link fromLink, Link toLink,
 						  double departureTime, double submissionTime) {
@@ -53,6 +58,7 @@ public final class OneTaxiRequest implements PassengerRequest {
 		this.mode = mode;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
+		this.load = IntegerLoad.fromValue(passengerIds.size());
 	}
 
 	@Override
@@ -91,13 +97,13 @@ public final class OneTaxiRequest implements PassengerRequest {
 	}
 
 	@Override
-	public int getPassengerCount() {
-		return passengerIds.size();
+	public DvrpLoad getLoad() {
+		return this.load;
 	}
 
 	public static final class OneTaxiRequestCreator implements PassengerRequestCreator {
 		@Override
-		public OneTaxiRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, Route route, Link fromLink,
+		public OneTaxiRequest createRequest(Id<Request> id, List<Id<Person>> passengerIds, List<Route> routes, Link fromLink,
 				Link toLink, double departureTime, double submissionTime) {
 			return new OneTaxiRequest(id, passengerIds, TransportMode.taxi, fromLink, toLink, departureTime,
 					submissionTime);

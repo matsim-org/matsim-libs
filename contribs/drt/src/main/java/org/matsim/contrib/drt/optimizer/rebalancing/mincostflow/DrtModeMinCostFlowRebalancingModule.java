@@ -58,16 +58,16 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(ZoneSystem.class), getter.getModal(Fleet.class),
 								getter.getModal(ZonalRelocationCalculator.class), params))).asEagerSingleton();
 
-				switch (strategyParams.rebalancingTargetCalculatorType) {
+				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case EstimatedDemand:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> new DemandEstimatorAsTargetCalculator(
-								getter.getModal(ZonalDemandEstimator.class), strategyParams.demandEstimationPeriod))).asEagerSingleton();
+								getter.getModal(ZonalDemandEstimator.class), strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 						break;
 
 					case EqualRebalancableVehicleDistribution:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
 								getter.getModal(ZonalDemandEstimator.class),
-								getter.getModal(ZoneSystem.class), strategyParams.demandEstimationPeriod))).asEagerSingleton();
+								getter.getModal(ZoneSystem.class), strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 						break;
 
 					case EqualVehicleDensity:
@@ -85,7 +85,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 					default:
 						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
-								+ strategyParams.zonalDemandEstimatorType);
+								+ strategyParams.getZonalDemandEstimatorType());
 				}
 
 				bindModal(ZonalRelocationCalculator.class).toProvider(modalProvider(
@@ -94,13 +94,14 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		switch (strategyParams.zonalDemandEstimatorType) {
+		switch (strategyParams.getZonalDemandEstimatorType()) {
 			case PreviousIterationDemand:
 				bindModal(PreviousIterationDrtDemandEstimator.class).toProvider(modalProvider(
 						getter -> new PreviousIterationDrtDemandEstimator(getter.getModal(ZoneSystem.class), drtCfg,
-								strategyParams.demandEstimationPeriod))).asEagerSingleton();
+								strategyParams.getDemandEstimationPeriod()))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
+				addControlerListenerBinding().to(modalKey(PreviousIterationDrtDemandEstimator.class));
 				break;
 
 			case None:
@@ -108,7 +109,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 			default:
 				throw new IllegalArgumentException(
-						"Unsupported zonalDemandEstimatorType=" + strategyParams.zonalDemandEstimatorType);
+						"Unsupported zonalDemandEstimatorType=" + strategyParams.getZonalDemandEstimatorType());
 		}
 	}
 }

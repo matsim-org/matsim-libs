@@ -28,30 +28,64 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 
 public final class QNetsimEngineModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "NetsimEngine";
-	
+
+	/**
+	 * The {@link QNetsimEngineModule} fills the following interfaces with bindings:<ul>
+	 *         <li>{@link QNetsimEngineI}</li>
+	 *         <li>{@link QNetworkFactory}</li>
+	 *         <li> (Q){@link NetworkModeDepartureHandler} </li>
+	 * </ul>
+	 */
 	@Override
 	protected void configureQSim() {
+		// === QNetsimEngine:
+
 		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in( Singleton.class );
-		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in( Singleton.class );
-		// in the two lines above, I changed "asEagerSingleton" to "in( Singleton.class )", since forcing construction early often leads to problems.  kai, jun'23
+		// (given the "overriding" architecture, this is a default binding which may be overridden later)
+
+		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
+		// (this will register the MobsimEngine functionality.  necessary since QNetsimEngineI is a MobsimEngine, which needs to be registered.)
+
+		// === QNetworkFactory:
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
-			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
 			bind( DefaultQNetworkFactory.class ).in( Singleton.class );
-			// (need this here because QLanesNetworkFactory uses it as a delegate.  maybe some other design would be better?  kai, jun'23)
+			// (provide this as a delegate to QLanesNetworkFactory)
+			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ).in( Singleton.class ) ;
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ).in( Singleton.class) ;
 		}
-		// I added in(Singleton.class) above.  Might cause problems with parallel implementations?  kai, jun'23
 
-		// defining this here so we do not have to hedge against null:
+		// === LinkSpeedCalculator(s):
+
 		Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class );
+		// (initialize this here so we do not have to hedge against "null".)
 
-		// specialized link speed calculators can be set via the syntax
-//			Multibinder.newSetBinder( this.binder(), LinkSpeedCalculator.class ).addBinding().to...
-		// yyyy maybe move as generalized syntax to AbstractQSimModule
+//		addLinkSpeedCalculatorBinding().to(...);
 
-		addQSimComponentBinding( COMPONENT_NAME ).to( VehicularDepartureHandler.class );
-		addQSimComponentBinding( COMPONENT_NAME ).to( QNetsimEngineI.class );
+		// === departure handler:
+		bind( NetworkModeDepartureHandler.class ).to(NetworkModeDepartureHandlerDefaultImpl.class ).in( Singleton.class );
+		// (given the "overriding" architecture, this is a default binding which may be overridden later)
+
+		addQSimComponentBinding( COMPONENT_NAME ).to( NetworkModeDepartureHandler.class );
+		// (this will register the DepartureHandler functionality.  Necessary since departureHandlers need to be registered.  It will,
+		// however, use whatever is bound to the interface, and not necessarily the above binding.)
+
+		// kai, jan'25:
+
+		// I am currently thinking that the NetworkModeDepartureHandler as a separate interface is not needed.  It used to be hardwired into
+		// the QNetsimEngine, but that is no longer the case.  Technically, it just does something like
+		// qNetsimEngine.getNetsimNetwork.getNetsimLink.letVehicleDepart, so as long as all those classes have the necessary functionality, it
+		// does not have to be tightly integrated.
+
+		// The question, in more general terms, is if we need to put things, which are registered as QSimComponents, also behind interfaces.
+
+		// on the other hand, it may be a bit more natural (compared to the controler-related injection architecture) to replace the binding of
+		// the interface and rather not touch the QSimComponents if one does not have to.
+
+		// The QSimComponent thing is really not much more than a multibinder, except that one can remove things before everything is plugged
+		// together.  In other places, we say something like addTravelTimeBinding()( modeString ).to( ...Impl.class ).  So there we are NOT putting
+		// an interface in between.
+
 	}
 }

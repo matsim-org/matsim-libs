@@ -48,19 +48,19 @@ public class DrtServiceParams extends ReflectiveConfigGroup {
 
 	@NotNull
 	@Parameter
-	public String name;
+	private String name;
 
 	@NotNull
 	@Positive
 	@Parameter
-	public double duration;
+	private double duration;
 
 	@Positive
 	@Parameter
-	public int executionLimit = Integer.MAX_VALUE;
+	private int executionLimit = Integer.MAX_VALUE;
 
 	@Parameter
-	public boolean enableTaskStacking = false;
+	private boolean enableTaskStacking = false;
 
 	public DrtServiceParams() {
 		this(null);
@@ -69,7 +69,7 @@ public class DrtServiceParams extends ReflectiveConfigGroup {
 	public DrtServiceParams(String name)
 	{
 		super(SET_TYPE);
-		this.name = name;
+		this.setName(name);
 	}
 
 	@Override
@@ -89,5 +89,40 @@ public class DrtServiceParams extends ReflectiveConfigGroup {
 		} else {
 			throw new IllegalStateException("Unsupported ConfigGroup "+ configGroup.getName());
 		}
+	}
+
+	public @NotNull String getServiceName() {
+		return name;
+	}
+
+	public void setName(@NotNull String name) {
+		this.name = name;
+	}
+
+	@NotNull
+	@Positive
+	public double getDuration() {
+		return duration;
+	}
+
+	public void setDuration(@NotNull @Positive double duration) {
+		this.duration = duration;
+	}
+
+	@Positive
+	public int getExecutionLimit() {
+		return executionLimit;
+	}
+
+	public void setExecutionLimit(@Positive int executionLimit) {
+		this.executionLimit = executionLimit;
+	}
+
+	public boolean isEnableTaskStacking() {
+		return enableTaskStacking;
+	}
+
+	public void setEnableTaskStacking(boolean enableTaskStacking) {
+		this.enableTaskStacking = enableTaskStacking;
 	}
 }

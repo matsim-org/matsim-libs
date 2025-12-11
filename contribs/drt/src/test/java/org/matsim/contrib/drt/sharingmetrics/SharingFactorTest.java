@@ -42,7 +42,7 @@ public class SharingFactorTest {
 			var requestId = Id.create(0, Request.class);
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0, null, null));
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId, personId1, vehicleId));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId, personId1, vehicleId));
 			events.flush();
@@ -62,8 +62,8 @@ public class SharingFactorTest {
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId1));
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId2));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0));
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0, null, null));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0, null, null));
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerPickedUpEvent(300.0, mode, requestId2, personId2, vehicleId));
@@ -91,8 +91,8 @@ public class SharingFactorTest {
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId1));
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId2));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0));
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0, null, null));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0, null, null));
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerPickedUpEvent(200.0, mode, requestId2, personId2, vehicleId));
 			events.processEvent(new PassengerDroppedOffEvent(300.0, mode, requestId1, personId1, vehicleId));
@@ -121,8 +121,8 @@ public class SharingFactorTest {
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId1));
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId2));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0));
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0, null, null));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0, null, null));
 
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerPickedUpEvent(200.0, mode, requestId2, personId2, vehicleId));
@@ -152,8 +152,8 @@ public class SharingFactorTest {
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId1));
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId2));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0));
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1), null, null, 0, 0, 0, 0, 0, 0, null, null));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId2, List.of(personId2), null, null, 0, 0, 0, 0, 0, 0, null, null));
 
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId2, personId2, vehicleId));
@@ -182,7 +182,7 @@ public class SharingFactorTest {
 			var requestId1 = Id.create(0, Request.class);
 			Assertions.assertNull(sharingFactorTracker.getPoolingRates().get(requestId1));
 
-			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1, personId2), null, null, 0, 0, 0, 0, 0, 0));
+			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId1, List.of(personId1, personId2), null, null, 0, 0, 0, 0, 0, 0, null, null));
 
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId1, vehicleId));
 			events.processEvent(new PassengerPickedUpEvent(100.0, mode, requestId1, personId2, vehicleId));

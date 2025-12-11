@@ -46,6 +46,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 
   private final Tour tour;
   private final CarrierService carrierService;
+  @SuppressWarnings({"FieldCanBeLocal", "unused"}) //Todo: Keep it currently. Functionality for Shipments needs to be implemented
   private final CarrierShipment carrierShipment;
   private final LogisticChainElement logisticChainElement;
   private final LSPCarrierResource resource;

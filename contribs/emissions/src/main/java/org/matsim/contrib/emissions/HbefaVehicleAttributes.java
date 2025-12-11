@@ -29,10 +29,10 @@ final class HbefaVehicleAttributes {
 	private String hbefaTechnology = "average";
 	private String hbefaSizeClass = "average";
 	private String hbefaEmConcept = "average";
-	
+
 	public HbefaVehicleAttributes(){
 	}
-	
+
 	private static final String TECHNOLOGY_CMT="Normally something like |diesel| or |petrol|." ;
 	/**
 	 * @return {@value #TECHNOLOGY_CMT}
@@ -44,10 +44,10 @@ final class HbefaVehicleAttributes {
 	 * @param hbefaTechnology - {@value #TECHNOLOGY_CMT}
 	 */
 	public void setHbefaTechnology(String hbefaTechnology) {
-		this.hbefaTechnology = hbefaTechnology;		
+		this.hbefaTechnology = hbefaTechnology;
 	}
-	
-	
+
+
 	private static final String SIZE_CLASS_CMT="Normally something like |<1,4L| or |>=2L|." ;
 	/**
 	 * @return {@value #SIZE_CLASS_CMT}
@@ -100,9 +100,9 @@ final class HbefaVehicleAttributes {
 	@Override
 	public String toString() {
 		return
-				hbefaTechnology + "; "
-						+ hbefaSizeClass + "; "
-						+ hbefaEmConcept;
+				"hbefaTechnology: " + hbefaTechnology + "; " +
+				"hbefasizeClass: " + hbefaSizeClass + "; " +
+					"hbefaEmConcept: " + hbefaEmConcept;
 	}
 
 	public boolean isDetailed() {

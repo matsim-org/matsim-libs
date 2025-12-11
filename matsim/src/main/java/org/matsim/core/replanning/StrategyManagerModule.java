@@ -27,27 +27,19 @@ import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import org.matsim.api.core.v01.Scenario;
+import jakarta.inject.Provider;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.choosers.StrategyChooser;
 import org.matsim.core.replanning.choosers.WeightedStrategyChooser;
 import org.matsim.core.replanning.conflicts.ConflictModule;
-import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 public class StrategyManagerModule extends AbstractModule {
 	@Override
 	public void install() {
-		int externalCounter = 0;
-
 		install(new DefaultPlanStrategiesModule());
 		// (does commands of type "bind(PlanStrategy.class).annotatedWith(Names.named(strategyName))", i.e.
 		// plan strategies can be looked up under their names (*))
@@ -62,11 +54,7 @@ public class StrategyManagerModule extends AbstractModule {
 
 		for (ReplanningConfigGroup.StrategySettings settings : getConfig().replanning().getStrategySettings()) {
 			String name = settings.getStrategyName() ;
-			if (name.equals("ExternalModule")) {
-				// plan strategy is some external executable:
-				externalCounter++;
-				planStrategyMapBinder.addBinding(settings).toProvider(new ExternalModuleProvider(externalCounter, settings.getExePath()));
-			} else if (name.contains(".")) {
+			if (name.contains(".")) {
 				// plan strategy is in Java, but it is found via the class loader:
 				if (name.startsWith("org.matsim.core")
 						    // && !name.startsWith("org.matsim.contrib.")
@@ -93,34 +81,7 @@ public class StrategyManagerModule extends AbstractModule {
 				// (settings is the key ... ok.  The Key.get(...) returns the PlanStrategy that was registered under its name at (*) above.)
 			}
 		}
-		
+
 		install(new ConflictModule());
-	}
-
-	/**
-	 * If plan strategy comes from some external executable.  E.g. some external router that is not in Java.
-	 */
-	private static class ExternalModuleProvider implements Provider<PlanStrategy> {
-
-		@Inject
-		private OutputDirectoryHierarchy controlerIO;
-
-		@Inject
-		private Scenario scenario;
-
-		private int externalCounter;
-		private String exePath;
-
-		public ExternalModuleProvider(int externalCounter, String exePath) {
-			this.externalCounter = externalCounter;
-			this.exePath = exePath;
-		}
-
-		@Override
-		public PlanStrategy get() {
-			PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
-			builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario));
-			return builder.build();
-		}
 	}
 }

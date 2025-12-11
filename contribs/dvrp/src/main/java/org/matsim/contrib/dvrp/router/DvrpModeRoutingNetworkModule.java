@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.io.File;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
@@ -51,6 +51,7 @@ import com.google.inject.name.Names;
  */
 public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	private final boolean useModeFilteredSubnetwork;
+	private final String modalCachePath;
 
 	@Inject
 	private DvrpConfigGroup dvrpConfigGroup;
@@ -61,9 +62,14 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	@Inject
 	private QSimConfigGroup qSimConfigGroup;
 
-	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
+	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork, String modalCachePath) {
 		super(mode);
 		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+		this.modalCachePath = modalCachePath;
+	}
+
+	public DvrpModeRoutingNetworkModule(String mode, boolean useModeFilteredSubnetwork) {
+		this(mode, useModeFilteredSubnetwork, null);
 	}
 
 	@Override
@@ -90,11 +96,11 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 							matrixParams.getZoneSystemParams(), getConfig().global().getCoordinateSystem(), zone -> true);
 						
 						
-						if (matrixParams.cachePath == null) {
+						if (modalCachePath == null) {
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrix(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize());
 						} else {
-							File cachePath = new File(ConfigGroup.getInputFileURL(getConfig().getContext(), matrixParams.cachePath).getPath());
+							URL cachePath = ConfigGroup.getInputFileURL(getConfig().getContext(), modalCachePath);
 							return FreeSpeedTravelTimeMatrix.createFreeSpeedMatrixFromCache(network, zoneSystem, matrixParams, globalConfigGroup.getNumberOfThreads(),
 								qSimConfigGroup.getTimeStepSize(), cachePath);
 						}
@@ -110,7 +116,7 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 	}
 
 	public static void checkUseModeFilteredSubnetworkAllowed(Config config, String mode) {
-		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).networkModes;
+		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).getNetworkModes();
 		Preconditions.checkArgument(dvrpNetworkModes.isEmpty() || dvrpNetworkModes.contains(mode),
 				"DvrpConfigGroup.networkModes must either be empty or contain DVRP mode: %s when 'useModeFilteredSubnetwork' is enabled for this mode",
 				mode);
