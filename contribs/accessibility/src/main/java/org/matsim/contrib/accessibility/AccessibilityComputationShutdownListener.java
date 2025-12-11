@@ -175,9 +175,6 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 					compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);
 				}
 
-				if (!mode.equals(Modes4Accessibility.pt.toString())) {
-					break;
-				}
 			}
 			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 				zoneDataExchangeInterface.finish();
