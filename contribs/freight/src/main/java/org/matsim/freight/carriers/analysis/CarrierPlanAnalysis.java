@@ -180,13 +180,13 @@ import org.matsim.freight.carriers.*;
 
 						CarrierPlan plan = carrier.getSelectedPlan();
 
-						double score = Double.NaN;
-						double jspritScore = Double.NaN;
+						Double score = null;
+						Double jspritScore = null;
 						int tours = 0;
 
 						if (plan instanceof CarrierPlan p) {
-							score = (p.getScore() instanceof Double s) ? s : Double.NaN;
-							jspritScore = (p.getJspritScore() instanceof Double js) ? js : Double.NaN;
+							score = (p.getScore() instanceof Double s) ? s : null;
+							jspritScore = (p.getJspritScore() instanceof Double js) ? js : null;
 							tours = (p.getScheduledTours() != null) ? p.getScheduledTours().size() : 0;
 						}
 
