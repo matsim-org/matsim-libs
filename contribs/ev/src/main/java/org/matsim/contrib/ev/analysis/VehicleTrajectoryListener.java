@@ -48,9 +48,9 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
         ChargingEndEventHandler,
         IterationStartsListener,
         IterationEndsListener, ShutdownListener {
-    static public final String OUTPUT_FILE = "ev_trajectories.csv";
+    static public final String OUTPUT_FILE = "ev_vehicle_trajectories.csv";
 
-    private final String fileEnding;
+    private final CompressionType compressionType;
     private final EventsManager eventsManager;
     private final OutputDirectoryHierarchy outputHierarchy;
 
@@ -68,7 +68,7 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
             ElectricFleetSpecification electricFleet, ChargingInfrastructureSpecification infrastructure,
             OutputDirectoryHierarchy outputHierarchy, int interval,
             CompressionType compressionType) {
-        this.fileEnding = compressionType.fileEnding;
+        this.compressionType = compressionType;
         this.eventsManager = eventsManager;
         this.network = network;
         this.electricFleet = electricFleet;
@@ -89,7 +89,7 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
             }
 
             String outputPath = outputHierarchy.getIterationFilename(event.getIteration(),
-                    OUTPUT_FILE + this.fileEnding);
+                    OUTPUT_FILE, compressionType);
 
             writer = IOUtils.getBufferedWriter(outputPath);
 
@@ -128,8 +128,8 @@ public class VehicleTrajectoryListener implements LinkLeaveEventHandler,
     @Override
     public void notifyShutdown(ShutdownEvent event) {
         File iterationPath = new File(
-                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE + this.fileEnding));
-        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE + this.fileEnding));
+                outputHierarchy.getIterationFilename(event.getIteration(), OUTPUT_FILE, compressionType));
+        File outputPath = new File(outputHierarchy.getOutputFilename(OUTPUT_FILE, compressionType));
 
         try {
             Files.copy(iterationPath, outputPath);

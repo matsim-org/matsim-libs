@@ -113,6 +113,18 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
     private int writeVehicleTrajectoriesInterval = 0;
 
     @Parameter
+    @Comment("Interval (iterations) at which detailed vehicle socs are written")
+    private int writeVehicleSocInterval = 0;
+
+    @Parameter
+    @Comment("Interval (in seconds) at which detailed vehicle socs are sampled")
+    private int writeVehicleSocFrequency = 600;
+
+    @Parameter
+    @Comment("Interval at which detailed charging activities are written")
+    private int writeChargingActivitiesInterval = 0;
+
+    @Parameter
     @Comment("Interval at which zonal energy demand information is written")
     private int writeZonalEnergyDemandInterval = 0;
 
@@ -199,6 +211,30 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     public void setWriteVehicleTrajectoriesInterval(int value) {
         this.writeVehicleTrajectoriesInterval = value;
+    }
+
+    public int getWriteChargingActivitiesInterval() {
+        return writeChargingActivitiesInterval;
+    }
+
+    public void setWriteChargingActivitiesInterval(int value) {
+        this.writeChargingActivitiesInterval = value;
+    }
+
+    public int getWriteVehicleSocInterval() {
+        return writeVehicleSocInterval;
+    }
+
+    public void setWriteVehicleSocInterval(int value) {
+        this.writeVehicleSocInterval = value;
+    }
+
+    public int getWriteVehicleSocFrequency() {
+        return writeVehicleSocFrequency;
+    }
+
+    public void setWriteVehicleSocFrequency(int value) {
+        this.writeVehicleSocFrequency = value;
     }
 
     public int getWriteZonalEnergyDemandInterval() {
