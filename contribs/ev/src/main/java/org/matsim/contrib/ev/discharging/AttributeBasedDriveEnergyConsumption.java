@@ -9,7 +9,7 @@ import org.matsim.vehicles.VehicleType;
 import com.google.common.base.Preconditions;
 
 public class AttributeBasedDriveEnergyConsumption implements DriveEnergyConsumption {
-    static public final String ATTRIBUTE = "energyConsumption_Wh_km";
+    static public final String ATTRIBUTE = "driveEnergyConsumption_Wh_km";
 
     private final double consumption_Wh_km;
 

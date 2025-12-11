@@ -10,7 +10,7 @@ import org.matsim.vehicles.VehicleType;
 import com.google.common.base.Preconditions;
 
 public class AttributeBasedAuxEnergyConsumption implements AuxEnergyConsumption {
-    static public final String ATTRIBUTE = "energyConsumption_kW";
+    static public final String ATTRIBUTE = "auxEnergyConsumption_kW";
 
     private final double consumption_kW;
 
