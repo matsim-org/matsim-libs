@@ -146,6 +146,13 @@ public class CarriersUtils {
 		return null;
 	}
 
+	/** Clears all plans of a carrier and sets the selected plan to null.
+	 * @param carrier	this carrier
+	 */
+	public static void clearCarrierPlans(Carrier carrier) {
+		carrier.getPlans().clear();
+		carrier.setSelectedPlan(null);
+	}
 
 	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
 		List<ScheduledTour> tours = new ArrayList<>();
@@ -258,7 +265,7 @@ public class CarriersUtils {
 		// This also selects the carriers for which a new solution should be created
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			switch (carriersSolutionType) {
-				case solveForAllCarriersAndOverrideExistingPlans -> carrier.clearPlans();
+				case solveForAllCarriersAndOverrideExistingPlans -> clearCarrierPlans(carrier);
 				case solveOnlyForCarrierWithoutPlans -> {
 					if (!carrier.getPlans().isEmpty()) {
 						continue;
