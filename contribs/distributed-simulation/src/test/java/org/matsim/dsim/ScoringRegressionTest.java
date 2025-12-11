@@ -1,0 +1,146 @@
+package org.matsim.dsim;
+
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ScoringConfigGroup;import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
+
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.EnumSet;import java.util.List;import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ScoringRegressionTest {
+
+	@RegisterExtension
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void allTeleported() {
+
+		var config = loadConfig("equil", utils.getOutputDirectory(), "config_plans1.xml");
+		config.qsim().setMainModes(Collections.emptyList());
+		config.dsim().setNetworkModes(Set.of());
+
+		var scenario = loadScenarioAndresetRoutes(config);
+		var controler = new Controler(scenario);
+
+		controler.run();
+
+		var person = getSinglePerson(scenario);
+		assertEquals(-39239.973501685585, person.getSelectedPlan().getScore(), 0.1);
+	}
+
+	@Test
+	public void mainModeOnNetwork() {
+
+		var config = loadConfig("equil", utils.getOutputDirectory(), "config_plans1.xml");
+		var scenario = loadScenarioAndresetRoutes(config);
+		var controler = new Controler(scenario);
+		controler.run();
+
+		var person = getSinglePerson(scenario);
+		assertEquals(-39240.03597080516, person.getSelectedPlan().getScore(), 0.1);
+	}
+
+	@Test
+	public void ptTrip() {
+
+		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
+		var scenario = ScenarioUtils.loadScenario(config);
+		var controler = new Controler(scenario);
+		controler.run();
+
+		var person = getSinglePerson(scenario);
+		assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
+	}
+
+	@Test
+	public void kelheim() {
+		var scenarioUrl = ExamplesUtils.getTestScenarioURL("kelheim");
+		Path configPath = getConfigPath(scenarioUrl, "config.xml");
+		var config = ConfigUtils.loadConfig(configPath.toString());
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controller().setLastIteration(0);
+		config.controller().setWritePlansInterval(1);
+		config.controller().setMobsim("dsim");
+		Activities.addScoringParams(config);
+
+		var scenario = ScenarioUtils.loadScenario(config);
+		// Need to prepare network for freight
+		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight));
+
+		var controler = new Controler(scenario);
+		controler.run();
+
+		var comparisonPopulation = PopulationUtils.readPopulation(utils.getInputDirectory() + "expected_experienced_plans.xml.gz");
+		for (var person : scenario.getPopulation().getPersons().values()) {
+			var ep = comparisonPopulation.getPersons().get(person.getId());
+			assertEquals(ep.getSelectedPlan().getScore(), person.getSelectedPlan().getScore(), 1.);
+		}
+	}
+
+	private static @NonNull Config loadConfig(String scenarioName, String outputDir, String... configFile) {
+		var scenarioUrl = ExamplesUtils.getTestScenarioURL(scenarioName);
+		Path configPath = getConfigPath(scenarioUrl, configFile);
+
+		var config = ConfigUtils.loadConfig(configPath.toString());
+		config.controller().setLastIteration(0);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(outputDir);
+		config.controller().setMobsim("dsim");
+		config.controller().getSnapshotFormat().clear();
+
+		var walkModeParam = new ScoringConfigGroup.ModeParams("walk")
+			.setConstant(0)
+			.setMarginalUtilityOfDistance(-1);
+		config.scoring().addModeParams(walkModeParam);
+		return config;
+	}
+
+	private static @NonNull Path getConfigPath(URL scenarioUrl, String... configFile) {
+
+		assert configFile.length < 2 : "Only one config file is supported";
+
+		var fileName = configFile.length == 0 ? "config.xml" : configFile[0];
+		try {
+			return Paths.get(scenarioUrl.toURI()).resolve(fileName);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static @NonNull Scenario loadScenarioAndresetRoutes(Config config) {
+		var scenario = ScenarioUtils.loadScenario(config);
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			PopulationUtils.resetRoutes(person.getSelectedPlan());
+		}
+		return scenario;
+	}
+
+	private static @NonNull Person getSinglePerson(Scenario scenario) {
+		var size = scenario.getPopulation().getPersons().size();
+		assertEquals(1, size, "Expected scenario with one Person, but has: " + size);
+		return scenario.getPopulation().getPersons().values().iterator().next();
+	}
+}
