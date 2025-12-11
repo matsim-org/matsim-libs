@@ -15,9 +15,7 @@ public final class AggregationObject {
 	private BasicLocation nearestBasicLocation;
 
 	private double sum = 0. ;
-	private double logOfSum;
 	private double cnt = 0. ;
-	private boolean cacheIsValid = false;
 
 
 	// not used anywhere, dz, jul'17
@@ -44,7 +42,6 @@ public final class AggregationObject {
 		this.objectIdList.add( objectID );
 		this.sum += value;
 		this.cnt ++ ; // could be generalized into a weight.  kai, mar'14
-		this.cacheIsValid = false;
 	}
 
 	public BasicLocation getNearestBasicLocation(){
@@ -69,13 +66,6 @@ public final class AggregationObject {
 
 	public double getSum(){
 		return this.sum;
-	}
-	public double getLogOfSum(){
-		if(!cacheIsValid){
-			this.logOfSum = Math.log(this.sum);
-			this.cacheIsValid = true;
-		}
-		return this.logOfSum;
 	}
 
 

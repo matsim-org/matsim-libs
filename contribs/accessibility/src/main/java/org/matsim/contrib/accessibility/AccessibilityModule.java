@@ -117,8 +117,7 @@ public final class AccessibilityModule extends AbstractModule {
 	private class AccessibilityControlerListenerProvider implements Provider<ControlerListener> {
 		// yy not sure if this truly needs to be a provider.  kai, dec'16
 
-		@Inject
-		private Config config ;
+		@Inject private Config config ;
 		@Inject private Network network ;
 		@Inject private Scenario scenario;
 
@@ -129,14 +128,11 @@ public final class AccessibilityModule extends AbstractModule {
 		@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
 		@Inject private Map<String, TravelTime> travelTimes ;
 
-		@Inject
-		TripRouter tripRouter;
+		@Inject TripRouter tripRouter;
 
-		@Inject
-		Map<String, DvrpRoutingModule.AccessEgressFacilityFinder> map;
+		@Inject Map<String, DvrpRoutingModule.AccessEgressFacilityFinder> map;
 
-		@Inject
-		Optional<DrtEstimator> drtEstimator;
+		@Inject Optional<DrtEstimator> drtEstimator;
 
 		@Override
 		public ControlerListener get() {
@@ -181,20 +177,6 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				LOG.info("Using measuring points from facilities object.");
 
-			} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromPopulation) {
-				boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
-				measuringPoints = new ActivityFacilitiesImpl();
-				for (Person person : scenario.getPopulation().getPersons().values()) {
-					double homeX = (Double) person.getAttributes().getAttribute("homeX");
-					double homeY = (Double) person.getAttributes().getAttribute("homeY");
-					ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(
-						Id.create(person.getId().toString(), ActivityFacility.class),
-						new Coord(homeX, homeY),
-						null
-					);
-
-					measuringPoints.addActivityFacility(facility);
-				}
 			} else { // This covers also the "fromNetwork" case
 				LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 				LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");

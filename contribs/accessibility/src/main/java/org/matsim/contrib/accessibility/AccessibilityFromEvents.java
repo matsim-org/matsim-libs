@@ -5,8 +5,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -27,10 +25,6 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.DirectTripBasedDrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.distribution.NormalDistributionGenerator;
-import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
-import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
 
 import java.util.*;
 

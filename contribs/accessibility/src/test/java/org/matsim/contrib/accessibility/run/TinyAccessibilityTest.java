@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
-import org.matsim.contrib.drt.estimator.impl.DirectTripDistanceBasedDrtEstimator;
+import org.matsim.contrib.drt.estimator.impl.DirectTripBasedDrtEstimator;
 import org.matsim.contrib.drt.estimator.impl.distribution.NoDistribution;
 import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDurationEstimator;
 import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
@@ -234,7 +234,7 @@ public class TinyAccessibilityTest {
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
 
 
-		DrtEstimator drtEstimator = new DirectTripDistanceBasedDrtEstimator.Builder()
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
 			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
 			.setWaitingTimeDistributionGenerator(new NoDistribution())
 			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
@@ -304,7 +304,7 @@ public class TinyAccessibilityTest {
 
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , congestedFileName );
 
-		DrtEstimator drtEstimator = new DirectTripDistanceBasedDrtEstimator.Builder()
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
 			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(300))
 			.setWaitingTimeDistributionGenerator(new NoDistribution())
 			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))

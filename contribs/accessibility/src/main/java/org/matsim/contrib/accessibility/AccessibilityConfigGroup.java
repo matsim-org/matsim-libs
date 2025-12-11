@@ -79,7 +79,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private String shapeFileCellBasedAccessibility;
 
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation";
-	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromBoundingBoxHexagons, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject, fromPopulation}
+	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromBoundingBoxHexagons, fromShapeFile, fromFacilitiesFile, fromFacilitiesObject}
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 

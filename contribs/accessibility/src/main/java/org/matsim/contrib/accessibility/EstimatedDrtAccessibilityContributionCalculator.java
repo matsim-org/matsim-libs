@@ -53,7 +53,6 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
-//	@Inject
 	private DrtEstimator drtEstimator;
 
 
@@ -158,11 +157,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			DrtEstimator.Estimate estimate = drtEstimator.estimate(drtRoute, OptionalTime.defined(departureTime));
 			double waitTime_s = estimate.waitingTime();
 			double rideTime_s = estimate.rideTime();
-			// old version, hardcoded
-//			{
-//				double waitTime_s = 103.34;
-//				double rideTime_s = 47.84 + 0.1087 * directRideDistance_m;
-//			}
+
 			double totalTime_h = (waitTime_s + rideTime_s) / 3600;
 			double utilityDrtTime = betaDrtTT_h * totalTime_h;
 			double utilityDrtDistance = betaDrtDist_m * directRideDistance_m; // Todo: this doesn't include the detours. Only time does.
@@ -181,15 +176,13 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			// ASC
 			double utilityDrtConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(TransportMode.drt, scoringConfigGroup);
 
-//			double utilityEgress = Math.log(sumExpVjkWalk) / scoringConfigGroup.getBrainExpBeta();
-
 
 			double drtUtility =
-				utilityAccess +
-				utilityDrtTime +
-				utilityDrtDistance +
+					utilityAccess +
+					utilityDrtTime +
+					utilityDrtDistance +
 					utilityEgress +
-				utilityDrtConstant;
+					utilityDrtConstant;
 
 
 

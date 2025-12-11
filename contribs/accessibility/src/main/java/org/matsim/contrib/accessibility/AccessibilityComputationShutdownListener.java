@@ -97,12 +97,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		if (event.isUnexpected()) {
 			return;
 		}
-//	// consider refactoring the rest of this class into the method process and  call this from the simwrapper (see kelheim emissions dashboard)
 
-//		process();
-//	}
-//
-//	public void process() {
 		LOG.info("Initializing accessibility computation...");
 		accessibilityAggregator = new AccessibilityAggregator();
 		addFacilityDataExchangeListener(accessibilityAggregator);
@@ -113,36 +108,13 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		}
 
 		LOG.info("Start computing accessibilities.");
-//		for (double timeOfDay : acg.getTimeOfDay()) {
 		computeAccessibilities(acg.getTimeOfDay(), opportunities);
-//		}
 		LOG.info("Finished computing accessibilities.");
 
 		writeCSVFile(outputDirectory);
 		writePoiFile(outputDirectory);
 		writeConfigUsedForAccessibilityComputation(outputDirectory, config);
 
-	}
-
-	private void writePoiFile(String outputDirectory) {
-		LOG.info("Start writing POI output to " + outputDirectory + ".");
-
-		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
-
-		// Write header
-//		writer.writeField(Labels.ID);
-		writer.writeField(Labels.X_COORDINATE);
-		writer.writeField(Labels.Y_COORDINATE);
-		writer.writeNewLine();
-
-		opportunities.getFacilities().values().forEach(facility -> {
-			writer.writeField(facility.getCoord().getX());
-			writer.writeField(facility.getCoord().getY());
-			writer.writeNewLine();
-		});
-
-		writer.close() ;
-		LOG.info("Finished writing POI output to " + outputDirectory + ".");
 	}
 
 
@@ -254,6 +226,27 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 				}
 			}
 		}
+	}
+
+	private void writePoiFile(String outputDirectory) {
+		LOG.info("Start writing POI output to " + outputDirectory + ".");
+
+		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
+
+		// Write header
+//		writer.writeField(Labels.ID);
+		writer.writeField(Labels.X_COORDINATE);
+		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeNewLine();
+
+		opportunities.getFacilities().values().forEach(facility -> {
+			writer.writeField(facility.getCoord().getX());
+			writer.writeField(facility.getCoord().getY());
+			writer.writeNewLine();
+		});
+
+		writer.close() ;
+		LOG.info("Finished writing POI output to " + outputDirectory + ".");
 	}
 
 	private void writeConfigUsedForAccessibilityComputation(String adaptedOutputDirectory, Config config) {
