@@ -113,7 +113,7 @@ public class InsertionCostCalculatorTest {
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(120, 150, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
 
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[1];
@@ -187,12 +187,12 @@ public class InsertionCostCalculatorTest {
 
 		DrtStopTask existingPickupTask = new DefaultDrtStopTask(120, 150, link("scheduledPU"));
 		DrtRequest scheduledRequest = DrtRequest.newBuilder().fromLink(link("scheduledFrom")).toLink(link("scheduledTo")).build();
-		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest);
+		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest, 60);
 		existingPickupTask.addPickupRequest(acceptedScheduledRequest);
 
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(200, 230, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
 		StopWaypoint[] stops = new StopWaypoint[2];
