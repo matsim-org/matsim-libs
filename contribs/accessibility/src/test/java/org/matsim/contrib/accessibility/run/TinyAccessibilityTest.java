@@ -24,14 +24,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.google.inject.multibindings.MapBinder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.image.test.ImageComparator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +48,6 @@ import org.matsim.contrib.drt.estimator.impl.trip_estimation.ConstantRideDuratio
 import org.matsim.contrib.drt.estimator.impl.waiting_time_estimation.ConstantWaitingTimeEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -147,8 +140,6 @@ public class TinyAccessibilityTest {
 				}
 			}
 		}
-
-
 	}
 
 
@@ -284,7 +275,6 @@ public class TinyAccessibilityTest {
 		Assertions.assertEquals(congestedModeToAccessMap.get(Modes4Accessibility.freespeed.name()),uncongestedModeToAccessMap.get(Modes4Accessibility.freespeed.name()),MatsimTestUtils.EPSILON);
 		// Since car accessibility is affected by congestion, the accessibilities should NOT be equal
 		Assertions.assertTrue(congestedModeToAccessMap.get(Modes4Accessibility.car.name()) < uncongestedModeToAccessMap.get(Modes4Accessibility.car.name()));
-
 		// Since drt accessibility is affected by congestion, the accessibilities should NOT be equal
 		Assertions.assertTrue(congestedModeToAccessMap.get(Modes4Accessibility.estimatedDrt.name()) < uncongestedModeToAccessMap.get(Modes4Accessibility.estimatedDrt.name()));
 
@@ -310,8 +300,8 @@ public class TinyAccessibilityTest {
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.operationalScheme = DrtConfigGroup.OperationalScheme.stopbased;
-		drtConfigGroup.transitStopFile = stopsInputFileName;
+		drtConfigGroup 	 .setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
+		drtConfigGroup.setTransitStopFile( stopsInputFileName);
 
 		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
 
