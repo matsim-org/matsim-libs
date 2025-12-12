@@ -115,9 +115,6 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 				case publicTransit -> {
 					sw.addDashboard(new PublicTransitDashboard());
 				}
-				case accessibility -> {
-//					sw.addDashboard(new AccessibilityDashboard(config.global().getCoordinateSystem(), null, null));
-					throw new RuntimeException("Not yet implemented");
 				case impactAnalysis -> {
 					HashSet<String> modes = new HashSet<>();
 					modes.add("car");
@@ -151,8 +148,7 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 		ODTrip,
 		trip,
 		publicTransit,
-		impactAnalysis,
-    accessibility
+		impactAnalysis
 	}
 
 }

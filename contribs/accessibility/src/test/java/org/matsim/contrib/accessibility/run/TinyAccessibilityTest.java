@@ -300,7 +300,7 @@ public class TinyAccessibilityTest {
 		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup 	 .setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drtConfigGroup.setTransitStopFile( stopsInputFileName);
 
 		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
