@@ -58,6 +58,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 	private final double legInclusionProbability;
 	private final double reservationProbability;
 	private final double retentionProbability;
+	private final double updateChargerProbability;
 
 	public RandomChargingPlanInnovator(ChargerProvider chargerProvider, ChargingSlotFinder candidateFinder,
 			TimeInterpretation timeInterpretation, StrategicChargingConfigGroup config, Parameters parameters,
@@ -75,6 +76,7 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		this.legInclusionProbability = parameters.getLegInclusionProbability();
 		this.reservationProbability = parameters.getReservationProbability();
 		this.retentionProbability = parameters.getRetentionProbability();
+		this.updateChargerProbability = parameters.getUpdateChargerProbability();
 		this.candidateFinder = candidateFinder;
 		this.random = MatsimRandom.getLocalInstance();
 		this.selectorFactory = selectorFactory;
@@ -111,6 +113,15 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 						if (random.nextDouble() <= retentionProbability) {
 							ChargerSpecification charger = infrastructure.getChargerSpecifications()
 									.get(activity.getChargerId());
+
+							if (random.nextDouble() <= updateChargerProbability) {
+								boolean withReservation = StrategicChargingReservationEngine
+										.getReservationSlack(person) != null
+										&& random.nextDouble() < reservationProbability;
+
+								charger = helper.selectCharger(candidate, chargerProvider, chargerSelector,
+										withReservation);
+							}
 
 							if (charger != null && chargerAccess.hasAccess(person, charger)) {
 								helper.push(candidate, charger, activity.isReserved());
@@ -155,6 +166,16 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 						if (random.nextDouble() <= retentionProbability) {
 							ChargerSpecification charger = infrastructure.getChargerSpecifications()
 									.get(activity.getChargerId());
+
+							if (random.nextDouble() <= updateChargerProbability) {
+								boolean withReservation = StrategicChargingReservationEngine
+										.getReservationSlack(person) != null
+										&& random.nextDouble() < reservationProbability;
+
+								charger = helper.selectCharger(candidate, activity.getDuration(), chargerProvider,
+										chargerSelector,
+										withReservation);
+							}
 
 							if (charger != null && chargerAccess.hasAccess(person, charger)) {
 								helper.push(candidate, activity.getDuration(), charger, activity.isReserved());
@@ -207,6 +228,9 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 		@Parameter
 		private double retentionProbability = 0.0;
 
+		@Parameter
+		private double updateChargerProbability = 0.0;
+
 		public double getActivityInclusionProbability() {
 			return activityInclusionProbability;
 		}
@@ -237,6 +261,14 @@ public class RandomChargingPlanInnovator implements ChargingPlanInnovator {
 
 		public void setRetentionProbability(double val) {
 			retentionProbability = val;
+		}
+
+		public double getUpdateChargerProbability() {
+			return updateChargerProbability;
+		}
+
+		public void setUpdateChargerProbability(double val) {
+			updateChargerProbability = val;
 		}
 	}
 }
