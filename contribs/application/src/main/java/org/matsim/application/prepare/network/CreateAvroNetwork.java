@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 public class CreateAvroNetwork implements MATSimAppCommand {
 
 	private static final Set<String> FIELD_RESERVED = Set.of("name", "type", "doc", "default", "aliases");
-
 	@CommandLine.Mixin
 	private InputOptions input = InputOptions.ofCommand(CreateAvroNetwork.class);
 	@CommandLine.Mixin

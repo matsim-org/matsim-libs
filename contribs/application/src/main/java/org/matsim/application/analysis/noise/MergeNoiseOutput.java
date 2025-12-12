@@ -120,14 +120,14 @@ final class MergeNoiseOutput {
 	private void mergeLinkData(String pathParameter, String label) throws IOException {
 		log.info("Merging emissions data for label {}", label);
 		Object2DoubleMap<String> mergedData = new Object2DoubleOpenHashMap<>();
-		Table csvOutputMerged = Table.create(TextColumn.create("Link Id"), DoubleColumn.create("value"));
+		Table csvOutputMerged = Table.create(StringColumn.create("Link Id"), DoubleColumn.create("value"));
 
 		for (double time = minTime; time <= maxTime; time += 3600.) {
 			String path = pathParameter + label + "_" + this.round(time, 1) + ".csv";
 
 			// Read the file
 			Table table = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(path))
-				.columnTypesPartial(Map.of("Link Id", ColumnType.TEXT,
+				.columnTypesPartial(Map.of("Link Id", ColumnType.STRING,
 					"Noise Emission " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS), ColumnType.DOUBLE))
 				.sample(false)
 				.separator(CsvOptions.detectDelimiter(path)).build());
