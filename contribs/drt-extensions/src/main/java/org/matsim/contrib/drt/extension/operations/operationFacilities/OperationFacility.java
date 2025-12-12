@@ -27,4 +27,8 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
     OperationFacilityType getType();
 
     Set<Id<DvrpVehicle>> getRegisteredVehicles();
+
+    static Id<OperationFacility> id(String id) {
+        return Id.create(id, OperationFacility.class);
+    }
 }
