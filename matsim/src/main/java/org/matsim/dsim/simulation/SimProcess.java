@@ -304,4 +304,8 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	public void run() {
 		// This method is not called
 	}
+
+	public int getPartitionIndex() {
+		return partition.getIndex();
+	}
 }
