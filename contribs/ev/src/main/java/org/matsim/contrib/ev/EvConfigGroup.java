@@ -26,6 +26,8 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.contrib.common.zones.ZoneSystemParams;
 import org.matsim.contrib.common.zones.ZoneSystemUtils;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.ev.discharging.AttributeBasedAuxEnergyConsumption;
+import org.matsim.contrib.ev.discharging.AttributeBasedDriveEnergyConsumption;
 import org.matsim.core.config.Config;
 
 import jakarta.annotation.Nullable;
@@ -141,6 +143,24 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
             + "in iteration X+1 for each EV.")
     public InitialSocBehavior initialSocBehavior = InitialSocBehavior.Keep;
 
+    public enum DriveEnergyConsumption {
+        OhdeSlaski, AttributeBased, None
+    }
+
+    @Parameter
+    @Comment("Determines how to obtain the drive energy consumption of the vehicles. OhdeSlaski is a generic model, AttributedBased requires your vehicles or vehicle types to have the " + AttributeBasedDriveEnergyConsumption.ATTRIBUTE + " attribute defined")
+    private DriveEnergyConsumption driveEnergyConsumption = DriveEnergyConsumption.OhdeSlaski;
+
+    public enum AuxEnergyConsumption {
+        OhdeSlaski, AttributeBased, None
+    }
+
+    @Parameter
+    @Comment("Determines how to obtain the aux energy consumption of the vehicles. OhdeSlaski is a generic model, AttributedBased requires your vehicles or vehicle types to have the " + AttributeBasedAuxEnergyConsumption.ATTRIBUTE + " attribute defined")
+    private AuxEnergyConsumption auxEnergyConsumption = AuxEnergyConsumption.OhdeSlaski;
+
+    
+
     public int getChargeTimeStep() {
         return chargeTimeStep;
     }
@@ -251,5 +271,21 @@ public final class EvConfigGroup extends ReflectiveConfigGroupWithConfigurablePa
 
     public void setWriteChargersInterval(int value) {
         this.writeChargersInterval = value;
+    }
+
+    public DriveEnergyConsumption getDriveEnergyConsumption() {
+        return driveEnergyConsumption;
+    }
+
+    public void setDriveEnergyConsumption(DriveEnergyConsumption value) {
+        this.driveEnergyConsumption = value;
+    }
+
+    public AuxEnergyConsumption getAuxEnergyConsumption() {
+        return auxEnergyConsumption;
+    }
+
+    public void setAuxEnergyConsumption(AuxEnergyConsumption value) {
+        this.auxEnergyConsumption = value;
     }
 }
