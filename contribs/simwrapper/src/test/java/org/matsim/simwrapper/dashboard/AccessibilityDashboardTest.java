@@ -59,13 +59,13 @@ public class AccessibilityDashboardTest {
 
 		//simwrapper
 		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.sampleSize = 0.001;
-		group.defaultParams().mapCenter = "11.891000, 48.911000";
+		group.setSampleSize(0.001);
+		group.defaultParams().setMapCenter("11.891000, 48.911000");
 
 		//drt
 		//we have 2 operators ('av' + 'drt'), configure one of them to be areaBased (the other remains stopBased)
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-		DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().stream().filter(x -> x.mode.equals("drt")).findFirst().get();
+		DrtConfigGroup drtConfigGroup = multiModeDrtConfigGroup.getModalElements().stream().filter(x -> x.getMode().equals(TransportMode.drt)).findFirst().get();
 		config.removeModule(MultiModeDrtConfigGroup.GROUP_NAME);
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup2 = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		multiModeDrtConfigGroup2.addParameterSet(drtConfigGroup);

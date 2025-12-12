@@ -112,7 +112,7 @@ public class AccessibilityDashboard implements Dashboard {
 
 		viz.projection = this.coordinateSystem;
 		viz.center = data.context().getCenter();
-		viz.zoom = data.context().mapZoomLevel;
+		viz.zoom = data.context().getMapZoomLevel();
 		viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
 		viz.valueColumn = columnName;
 		viz.height = 12.;
