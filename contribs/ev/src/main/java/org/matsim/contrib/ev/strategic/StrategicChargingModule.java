@@ -16,6 +16,7 @@ import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.access.SubscriptionRegistry;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
 import org.matsim.contrib.ev.strategic.analysis.ChargingPlanScoringListener;
+import org.matsim.contrib.ev.strategic.analysis.PersonSocWriter;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostModule;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
@@ -44,6 +45,7 @@ import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.analysis.WithinDayChargingAnalysisHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.util.TravelTime;
@@ -140,6 +142,8 @@ public class StrategicChargingModule extends AbstractModule {
 
 		install(new ChargerReservationModule(
 				chargingConfig.getOnlineSearchStrategy().equals(AlternativeSearchStrategy.ReservationBased)));
+
+		addControllerListenerBinding().to(PersonSocWriter.class);
 	}
 
 	@Provides
@@ -288,5 +292,12 @@ public class StrategicChargingModule extends AbstractModule {
 		EnergyHelper.Factory energyFactory = new EnergyHelper.Factory(timeInterpretation, travelTime, network,
 				driveFactory, chargingFactory, vehicles, fleet, config.getCarMode());
 		return new MinimalCostChargerSelector.Factory(costCalculator, energyFactory);
+	}
+
+	@Provides
+	@Singleton
+	PersonSocWriter providPersonSocWriter(Population population, OutputDirectoryHierarchy outputDirectoryHierarchy,
+			ControllerConfigGroup controllerConfig) {
+		return new PersonSocWriter(population, outputDirectoryHierarchy, controllerConfig.getCompressionType());
 	}
 }

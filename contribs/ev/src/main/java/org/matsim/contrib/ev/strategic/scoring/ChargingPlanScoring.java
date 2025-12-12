@@ -78,6 +78,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		MobsimEngine {
 	static public final String MINIMUM_SOC_PERSON_ATTRIBUTE = "sevc:minimumSoc";
 	static public final String MINIMUM_END_SOC_PERSON_ATTRIBUTE = "sevc:minimumEndSoc";
+	static public final String TARGET_SOC_PERSON_ATTRIBUTE = "sevc:targetSoc";
 
 	static public final String MONEY_EVENT_PURPOSE = "strategic charging";
 
@@ -348,6 +349,28 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 				}
 			}
 		}
+
+		if (parameters.getTargetSoc() != 0.0) {
+			for (Person person : activePersons) {
+				Double targetSoc = getTargetSoc(person);
+
+				if (targetSoc != null) {
+					Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, chargingMode);
+
+					if (energy.containsKey(vehicleId)) {
+						EnergyEntry entry = energy.get(vehicleId);
+
+						double delta = Math.abs(entry.current / entry.total - targetSoc);
+						if (delta > 0.0) {
+							addScoreForPerson(person.getId(), delta * parameters.getTargetSoc());
+							trackScoreForPerson(now, person.getId(), "target_soc",
+									delta * parameters.getTargetSoc(),
+									delta);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// CHARGING PROCESS: handle failed attempts
@@ -435,7 +458,8 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	}
 
 	private void handleStartCharging(ChargingStartEvent event) {
-		chargingStartStates.put(event.getVehicleId(), new ChargingStartState(event.getTime(), event.getCharge(), event.getChargerId()));
+		chargingStartStates.put(event.getVehicleId(),
+				new ChargingStartState(event.getTime(), event.getCharge(), event.getChargerId()));
 	}
 
 	private void handleFinishCharging(ChargingEndEvent event) {
@@ -629,5 +653,19 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 	 */
 	static public Double getMinimumEndSoc(Person person) {
 		return (Double) person.getAttributes().getAttribute(MINIMUM_END_SOC_PERSON_ATTRIBUTE);
+	}
+
+	/**
+	 * Sets the target SoC at the end of the day.
+	 */
+	static public void setTargetSoc(Person person, double targetSoc) {
+		person.getAttributes().putAttribute(TARGET_SOC_PERSON_ATTRIBUTE, targetSoc);
+	}
+
+	/**
+	 * Returns the target SoC at the end of the day.
+	 */
+	static public Double getTargetSoc(Person person) {
+		return (Double) person.getAttributes().getAttribute(TARGET_SOC_PERSON_ATTRIBUTE);
 	}
 }

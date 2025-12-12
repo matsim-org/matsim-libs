@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
+
+import picocli.CommandLine.Command;
 
 /**
  * This parameter set represents the weights that are used in charging plan
@@ -60,6 +63,10 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("applied every time an agent planned to do a reservation but it was unsuccessful")
 	private double failedReservation = -100.0;
+
+	@Parameter
+	@Comment("applied to the absolute delta between the end-of-day soc and the per-person target soc")
+	private double targetSoc = 0.0;
 
 	public double getCost() {
 		return cost;
@@ -139,6 +146,14 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 
 	public void setFailedReservation(double failedReservation) {
 		this.failedReservation = failedReservation;
+	}
+
+	public double getTargetSoc() {
+		return targetSoc;
+	}
+
+	public void setTargetSoc(double targetSoc) {
+		this.targetSoc = targetSoc;
 	}
 
 	static public class ChargerTypeParams extends ReflectiveConfigGroup {
