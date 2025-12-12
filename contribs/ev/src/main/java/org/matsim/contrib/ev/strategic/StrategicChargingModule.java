@@ -212,11 +212,12 @@ public class StrategicChargingModule extends AbstractModule {
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
 			TimeInterpretation timeInterpretation, ChargerSelector.Factory selectorFactory,
-			ChargerReservability chargerReservability) {
+			ChargerReservability chargerReservability, ChargingInfrastructureSpecification infrastructure,
+			ChargerAccess chargerAccess) {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
 				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory,
-				chargerReservability);
+				chargerReservability, infrastructure, chargerAccess);
 	}
 
 	@Provides
