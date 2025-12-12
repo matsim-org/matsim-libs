@@ -170,7 +170,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		eventsManager.addHandler(this);
 	}
 
-	private void addScoreForPerson(Id<Person> personId, double score) {
+	public void addScoreForPerson(Id<Person> personId, double score) {
 		if (score != 0.0) {
 			AtomicDouble item = scores.get(personId);
 
@@ -186,7 +186,7 @@ public class ChargingPlanScoring implements IterationStartsListener, ScoringList
 		}
 	}
 
-	private void addScoreForVehicle(Id<Vehicle> vehicleId, double score) {
+	public void addScoreForVehicle(Id<Vehicle> vehicleId, double score) {
 		Id<Person> personId = getPerson(vehicleId);
 
 		if (personId != null) {
