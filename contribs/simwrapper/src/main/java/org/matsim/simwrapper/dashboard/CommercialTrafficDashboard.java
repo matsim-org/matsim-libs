@@ -205,51 +205,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 						ds
 					);
 			});
-//		layout.row("trips_third", "Trips").el(Plotly.class, (viz, data) -> {
-//
-//				viz.title = "Trip distance distribution by mode";
-//				viz.description = "Distribution within each distance group.";
-//
-//
-//				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-//					.xAxis(Axis.builder().title("Distance group").build())
-//					.yAxis(Axis.builder().title("Share").build())
-//					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-//					.build();
-//
-//				Plotly.DataSet sim = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv"))
-//					.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
-//					.constant("source", "Sim");
-//
-//				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-//					sim.mapping()
-//						.name("main_mode")
-//						.x("dist_group")
-//						.y("share")
-//				);
-//			})
-//			.el(Plotly.class, (viz, data) -> {
-//
-//				viz.title = "Trip distance distribution by subpopulation";
-//				viz.description = "Distribution within each distance group.";
-//
-//				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-//					.xAxis(Axis.builder().title("Distance group").build())
-//					.yAxis(Axis.builder().title("Share").build())
-//					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-//					.build();
-//
-//				Plotly.DataSet sim = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv"))
-//					.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
-//					.constant("source", "Sim");
-//
-//				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-//					sim.mapping()
-//						.name("subpopulation")
-//						.x("dist_group")
-//						.y("share")
-//				);
-//			});
+
 		layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of group: *commercialTraffic*";
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
