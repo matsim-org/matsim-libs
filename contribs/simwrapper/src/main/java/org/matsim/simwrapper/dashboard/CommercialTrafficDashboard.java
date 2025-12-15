@@ -148,10 +148,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name(group).build(),
 						viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
-							.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
+							.aggregate(List.of("dist_group"), "share_"+group, Plotly.AggrFunc.SUM)
 							.mapping()
 							.x("dist_group")
-							.y("share")
+							.y("share_"+group)
 					);
 				}
 			})
@@ -164,16 +164,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 
-				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
-				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
-						.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+						.aggregate(List.of("dist_group", "main_mode"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
 						.x("dist_group")
-						.y("share");
+						.y("share_commercialTraffic");
 
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
@@ -181,10 +179,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 							.name("$dataset.main_mode")
 							.build(), ds
 					);
-				}
 			})
 			.el(Plotly.class, (viz, data) -> {
-
 				viz.title = "Trip distance distribution by subpopulation";
 				viz.colorRamp = ColorScheme.Viridis;
 
@@ -192,16 +188,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK).xAxis(Axis.builder().categoryOrder(Axis.CategoryOrder.TRACE).build())
 					.build();
 
-				viz.mergeDatasets = true;
 				viz.multiIndex = Map.of("dist_group", "source");
-				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
-						.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+						.aggregate(List.of("dist_group", "subpopulation"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
 						.x("dist_group")
-						.y("share");
+						.y("share_commercialTraffic");
 
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
@@ -210,7 +204,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 							.build(),
 						ds
 					);
-				}
 			});
 //		layout.row("trips_third", "Trips").el(Plotly.class, (viz, data) -> {
 //
