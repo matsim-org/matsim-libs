@@ -326,6 +326,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
+	 * @deprecated use {@link MATSimApplication#start(Class, String...)} instead
+	 */
+	@Deprecated
+	public static void run(Class<? extends MATSimApplication> clazz, String... args) {
+		start(clazz, args);
+	}
+
+	/**
 	 * Start the application class and terminates when done.
 	 * This should never be used in tests and only in main methods.
 	 */
@@ -368,6 +376,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		int code = cli.execute(args);
 		System.exit(code);
+	}
+
+	/**
+	 * @deprecated use {@link MATSimApplication#startWithDefaults(Class, String[], String...)} instead
+	 */
+	@Deprecated
+	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+		startWithDefaults(clazz, args, defaultArgs);
 	}
 
 	/**
