@@ -2,6 +2,7 @@ package org.matsim.contrib.perceivedsafety;
 
 import com.google.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
@@ -41,36 +42,40 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static org.matsim.contrib.perceivedsafety.PerceivedSafetyAndBicycleContribTest.Setup.*;
 import static org.matsim.contrib.perceivedsafety.PerceivedSafetyScoringTest.createAndAddTestPopulation;
 
 public class PerceivedSafetyAndBicycleContribTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static final Id<Person> PERSON_ID = Id.createPersonId("testPerson");
-	private static final String BASIC = "matsimBasic";
-	private static final String BICYCLE = "matsimBasicAndBicycleContrib";
-	private static final String BICYCLE_AND_PSAFE = "matsimBicycleContribAndPerceivedSafetyContrib";
+	private Id<Person> personId;
+
+	@BeforeEach
+	void setup() {
+//		somehow this needs to be set here. If PERSON_ID is a final Id<Person>, the seconds test fails?!
+		personId = Id.createPersonId("testPerson");
+	}
 
 	@Test
 	void testAndCompareDisutilityAndRouting() {
-		Map<String, Set<Id<Link>>> actualLinksUsed = new HashMap<>();
+		Map<Setup, Set<Id<Link>>> actualLinksUsed = new HashMap<>();
 		actualLinksUsed.put(BASIC, null);
 		actualLinksUsed.put(BICYCLE, null);
 		actualLinksUsed.put(BICYCLE_AND_PSAFE, null);
 
-		Map<String, Set<Id<Link>>> expectedLinksUsed = new HashMap<>();
+		Map<Setup, Set<Id<Link>>> expectedLinksUsed = new HashMap<>();
 		expectedLinksUsed.put(BASIC, Set.of(Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20")));
 		expectedLinksUsed.put(BICYCLE, Set.of(Id.createLinkId("2"), Id.createLinkId("11"), Id.createLinkId("20")));
 		expectedLinksUsed.put(BICYCLE_AND_PSAFE, Set.of(Id.createLinkId("3"), Id.createLinkId("12"), Id.createLinkId("20")));
 
-		for (Map.Entry<String, Set<Id<Link>>> e : actualLinksUsed.entrySet()) {
-			String setup = e.getKey();
+		for (Map.Entry<Setup, Set<Id<Link>>> e : actualLinksUsed.entrySet()) {
+			Setup setup = e.getKey();
 
 			URL context = ExamplesUtils.getTestScenarioURL("equil");
 			Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
 
-			Path outputPath = Paths.get(utils.getOutputDirectory()).resolve(setup);
+			Path outputPath = Paths.get(utils.getOutputDirectory()).resolve(setup.toString());
 
 //########################################################################### prepare config #######################################################################
 //			general config settings
@@ -225,7 +230,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 			actualLinksUsed.put(setup, handler.enteredLinks);
 		}
 
-		for (Map.Entry<String, Set<Id<Link>>> e : actualLinksUsed.entrySet()) {
+		for (Map.Entry<Setup, Set<Id<Link>>> e : actualLinksUsed.entrySet()) {
 			Assertions.assertEquals(expectedLinksUsed.get(e.getKey()).size(), e.getValue().size());
 
 			for (Id<Link> id : e.getValue()) {
@@ -241,7 +246,7 @@ public class PerceivedSafetyAndBicycleContribTest {
 
 	@Test
 	void testAndComparePerceivedSafetyScoringWithAndWithoutBicycleContrib() {
-		Map<String, Double> actualLegScores = new HashMap<>();
+		Map<Setup, Double> actualLegScores = new HashMap<>();
 		actualLegScores.put(BASIC, null);
 		actualLegScores.put(BICYCLE, null);
 		actualLegScores.put(BICYCLE_AND_PSAFE, null);
@@ -267,18 +272,18 @@ public class PerceivedSafetyAndBicycleContribTest {
 //		= -3.12680924632864; for second link (random double of 0.9194079489827879 is different to first link (see above) because the computeLinkBasedScore is called from different method (probably).
 //		RESULTING IN A FINAL SCORE WITH BIKE CONTRIB + PERCEIVED SAFETY CONTRIB
 //		= -11.200466754540857
-		Map<String, Double> expectedLegScores = new HashMap<>();
+		Map<Setup, Double> expectedLegScores = new HashMap<>();
 		expectedLegScores.put(BASIC, 0.);
 		expectedLegScores.put(BICYCLE, -4.8);
 		expectedLegScores.put(BICYCLE_AND_PSAFE, -11.200466754540857);
 
-		for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
-			String setup = e.getKey();
+		for (Map.Entry<Setup, Double> e : actualLegScores.entrySet()) {
+			Setup setup = e.getKey();
 
 			URL context = ExamplesUtils.getTestScenarioURL("equil");
 			Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(context, "config.xml"));
 
-			Path outputPath = Paths.get(utils.getOutputDirectory()).resolve(setup);
+			Path outputPath = Paths.get(utils.getOutputDirectory()).resolve(setup.toString());
 
 //########################################################################### prepare config #######################################################################
 //			general config settings
@@ -414,10 +419,10 @@ public class PerceivedSafetyAndBicycleContribTest {
 			Population experiencedPlans = PopulationUtils.readPopulation(experiencedPlansPath);
 
 //            score of plan should only consist of leg scores as all act types are set to "dont score"
-			actualLegScores.put(setup, experiencedPlans.getPersons().get(PERSON_ID).getSelectedPlan().getScore());
+			actualLegScores.put(setup, experiencedPlans.getPersons().get(personId).getSelectedPlan().getScore());
 		}
 
-		for (Map.Entry<String, Double> e : actualLegScores.entrySet()) {
+		for (Map.Entry<Setup, Double> e : actualLegScores.entrySet()) {
 			Assertions.assertEquals(expectedLegScores.get(e.getKey()), e.getValue());
 		}
 
@@ -473,5 +478,9 @@ public class PerceivedSafetyAndBicycleContribTest {
 					bind(QNetworkFactory.class).toInstance(factory);}
 			});
 		}
+	}
+
+	enum Setup {
+		BASIC, BICYCLE, BICYCLE_AND_PSAFE
 	}
 }
