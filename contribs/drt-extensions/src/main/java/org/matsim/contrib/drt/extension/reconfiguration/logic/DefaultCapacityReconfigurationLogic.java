@@ -129,7 +129,7 @@ public class DefaultCapacityReconfigurationLogic
 				maxServiceEndTime = vehicleSpecification.getServiceEndTime();
 			}
 			for (int slotIndex = timeToSlotIndex(
-					vehicleSpecification.getServiceBeginTime()); slotIndex < timeToSlotIndex(
+					vehicleSpecification.getServiceBeginTime()); slotIndex <= timeToSlotIndex(
 							vehicleSpecification.getServiceEndTime()); slotIndex++) {
 				this.vehiclesActivePerTimeSlot.computeIfAbsent(slotIndex, key -> new ArrayList<>())
 						.add(vehicleSpecification.getId());
