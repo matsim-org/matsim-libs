@@ -321,4 +321,33 @@ public class StrategicChargingTest {
         assertEquals(1, scenario.tracker().chargingStartEvents.size());
         assertEquals("personB", scenario.tracker().chargingStartEvents.getLast().getVehicleId().toString());
     }
+
+    @Test
+    public void testActivityRetention() {
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(5) //
+                .addWorkCharger(8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                .addPerson("person", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+
+        // always innovate
+        config.setSelectionProbability(0.0);
+
+        // frequent
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setRetentionProbability(0.9);
+
+        Controler controller = scenario.controller();
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
+    }
 }
