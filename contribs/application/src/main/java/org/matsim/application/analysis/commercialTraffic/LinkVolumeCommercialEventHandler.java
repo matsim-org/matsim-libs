@@ -31,7 +31,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 	private final Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> travelDistancesPerMode = new Object2DoubleOpenHashMap<>();
-	private final Object2DoubleOpenHashMap<String> travelDistancesPerType = new Object2DoubleOpenHashMap<>();
+	private final Object2DoubleOpenHashMap<String> travelDistancesPerGroup = new Object2DoubleOpenHashMap<>();
 	private final Object2DoubleOpenHashMap<String> travelDistancesPerSubpopulation = new Object2DoubleOpenHashMap<>();
 	private final HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = new HashMap<>();
 	private final HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle_inInvestigationArea = new HashMap<>();
@@ -82,7 +82,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 	public void reset(int iteration) {
 		this.linkVolumesPerMode.clear();
 		this.travelDistancesPerMode.clear();
-		this.travelDistancesPerType.clear();
+		this.travelDistancesPerGroup.clear();
 		this.travelDistancesPerSubpopulation.clear();
 		this.travelDistancesPerVehicle.clear();
 		this.travelDistancesPerVehicle_inInvestigationArea.clear();
@@ -211,6 +211,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 			currentTrip_Distance_perPerson_inInvestigationArea.mergeDouble(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
 			travelDistancesPerType.mergeDouble(group, link.getLength(), Double::sum);
 			travelDistancesPerSubpopulation.mergeDouble(groupOfRelevantVehicles.get(event.getVehicleId()), link.getLength(), Double::sum);
+			travelDistancesPerGroup.mergeDouble(group, link.getLength(), Double::sum);
 			travelDistancesPerMode.mergeDouble(mode, link.getLength(), Double::sum);
 			travelDistancesPerVehicle_inInvestigationArea.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
 		}
@@ -243,8 +244,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 	public Object2DoubleOpenHashMap<String> getTravelDistancesPerSubpopulation () {
 		return travelDistancesPerSubpopulation;
 	}
-	public Object2DoubleOpenHashMap<String> getTravelDistancesPerType() {
-		return travelDistancesPerType;
+	public Object2DoubleOpenHashMap<String> getTravelDistancesPerGroup() {
+		return travelDistancesPerGroup;
 	}
 	public HashMap<String, Object2DoubleOpenHashMap<String>> getTravelDistancesPerVehicle() {
 		return travelDistancesPerVehicle;

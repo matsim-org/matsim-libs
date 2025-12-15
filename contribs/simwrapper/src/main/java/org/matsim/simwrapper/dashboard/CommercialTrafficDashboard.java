@@ -90,7 +90,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 			})
 			.el(PieChart.class, (viz, data) -> {
-				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perType.csv", args);
+				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perGroup.csv", args);
 				viz.title = "Travel Distance Shares by model type";
 				viz.useLastRow = true;
 				viz.description = "at final iteration";

@@ -50,7 +50,7 @@ import static org.matsim.application.ApplicationUtils.globFile;
 		"commercialTraffic_travelDistancesShares.csv",
 		"commercialTraffic_travelDistancesShares_perMode.csv",
 		"commercialTraffic_travelDistancesShares_perSubpopulation.csv",
-		"commercialTraffic_travelDistancesShares_perType.csv",
+		"commercialTraffic_travelDistancesShares_perGroup.csv",
 		"commercialTraffic_tourAnalysis.csv",
 		"commercialTraffic_relations.csv",
 		"commercialTraffic_activities.csv"
@@ -501,9 +501,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		String newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perMode.csv");
 		Object2DoubleOpenHashMap<String> travelDistancesPerMode = linkDemandEventHandler.getTravelDistancesPerMode();
 		writeDistanceFiles(travelDistancesPerMode, newFileName);
-		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perType.csv");
-		Object2DoubleOpenHashMap<String> travelDistancesPerType = linkDemandEventHandler.getTravelDistancesPerType();
-		writeDistanceFiles(travelDistancesPerType, newFileName);
+		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perGroup.csv");
+		Object2DoubleOpenHashMap<String> travelDistancesPerGroup = linkDemandEventHandler.getTravelDistancesPerGroup();
+		writeDistanceFiles(travelDistancesPerGroup, newFileName);
 		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perSubpopulation.csv");
 		Object2DoubleOpenHashMap<String> travelDistancesPerSubpopulation = linkDemandEventHandler.getTravelDistancesPerSubpopulation();
 		writeDistanceFiles(travelDistancesPerSubpopulation, newFileName);
