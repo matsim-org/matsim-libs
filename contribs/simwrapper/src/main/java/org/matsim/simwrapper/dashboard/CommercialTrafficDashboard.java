@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -67,8 +68,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 	@Override
 	public void configure(Header header, Layout layout) {
 		header.title = "Commercial Traffic";
-		header.description = "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsOfCommercialSubpopulations +
-			"**.";
+		header.description = getDescription();
 
 		layout.row("General_first","General").el(PieChart.class, (viz, data) -> {
 				double sampleSize = data.config().getSampleSize();
@@ -717,5 +717,24 @@ public class CommercialTrafficDashboard implements Dashboard {
 				);
 			});
 		}
+	}
+
+	private @NonNull String getDescription() {
+		if (groupsOfCommercialSubpopulations.isEmpty()) {
+			return "No groups of commercial subpopulations have been defined for the analysis. " + "Please define at least one group of commercial subpopulations to see commercial traffic statistics.";
+		}
+
+		boolean allGroupsHaveSizeOne = groupsOfCommercialSubpopulations.values().stream().allMatch(v -> v.size() == 1);
+
+		if (allGroupsHaveSizeOne) {
+			String groups = String.join(", ", groupsOfCommercialSubpopulations.keySet());
+
+			return "General information about modal share and trip distributions of the selected subpopulations of the commercial agents: **" + groups + "**.";
+		}
+
+		String groupsWithSubpops = groupsOfCommercialSubpopulations.entrySet().stream().map(
+			e -> e.getKey() + " (" + String.join(", ", e.getValue()) + ")").collect(Collectors.joining("; "));
+
+		return "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsWithSubpops + "**.";
 	}
 }
