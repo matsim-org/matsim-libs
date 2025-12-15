@@ -209,9 +209,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 		currentTrip_Distance_perPerson.merge(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
 		if (isInInvestigationArea || geometryInvestigationArea == null) {
 			currentTrip_Distance_perPerson_inInvestigationArea.mergeDouble(vehicleIdToPersonId.get(event.getVehicleId()), link.getLength(), Double::sum);
-			travelDistancesPerType.mergeDouble(group, link.getLength(), Double::sum);
-			travelDistancesPerSubpopulation.mergeDouble(groupOfRelevantVehicles.get(event.getVehicleId()), link.getLength(), Double::sum);
 			travelDistancesPerGroup.mergeDouble(group, link.getLength(), Double::sum);
+			travelDistancesPerSubpopulation.mergeDouble(PopulationUtils.getSubpopulation(scenario.getPopulation().getPersons().get(vehicleIdToPersonId.get(event.getVehicleId()))), link.getLength(), Double::sum);
 			travelDistancesPerMode.mergeDouble(mode, link.getLength(), Double::sum);
 			travelDistancesPerVehicle_inInvestigationArea.computeIfAbsent(vehicleType, (k) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), link.getLength(), Double::sum);
 		}
