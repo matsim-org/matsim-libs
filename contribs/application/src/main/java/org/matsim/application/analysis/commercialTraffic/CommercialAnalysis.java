@@ -138,7 +138,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		createLinkVolumeAnalysis(scenario, linkDemandOutputFile, linkDemandEventHandler);
 		createRelationsAnalysis(relationsOutputFile, linkDemandEventHandler);
 		createAnalysisPerVehicle(travelDistancesPerVehicleOutputFile, linkDemandEventHandler);
-		createActivityAnalysis(scenario, commercialActivitiesOutputFile, linkDemandEventHandler);
+		createActivityAnalysis(scenario, commercialActivitiesOutputFile);
 
 		log.info("Done");
 		log.info("All outputs of commercial analysis written to {}", output.getPath());
@@ -146,8 +146,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void createActivityAnalysis(Scenario scenario, Path commercialActivitiesOutputFile,
-										LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createActivityAnalysis(Scenario scenario, Path commercialActivitiesOutputFile) {
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(commercialActivitiesOutputFile), CSVFormat.DEFAULT)) {
 			HashMap<String, List<Double>> activityDurationsPerGroup = new HashMap<>();
 			printer.print("personId");
