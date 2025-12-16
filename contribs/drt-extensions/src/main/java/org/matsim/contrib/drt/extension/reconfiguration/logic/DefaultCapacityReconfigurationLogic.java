@@ -256,6 +256,7 @@ public class DefaultCapacityReconfigurationLogic
 							}
 							DvrpLoad currentVehicleCapacity = currentCapacities.get(vehicleId);
 							if (delta.getOrDefault(currentVehicleCapacity, 0) < 0) {
+								//if delta is negative, we have too many vehicles, i.e. vehicles to spare for other capacities
 								if (minTransferableVehicleCapacityChanges < 0 || capacityChangesPerVehicle
 										.get(vehicleId) < minTransferableVehicleCapacityChanges) {
 									minTransferableVehicleCapacityChanges = capacityChangesPerVehicle.get(vehicleId);
