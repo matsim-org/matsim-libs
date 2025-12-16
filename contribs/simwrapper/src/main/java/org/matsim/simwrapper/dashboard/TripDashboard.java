@@ -3,6 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.utils.io.IOUtils;
@@ -163,6 +164,28 @@ public class TripDashboard implements Dashboard {
 		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", joined);
 	}
 
+	/** Adds the description depending on if groups are set or not.
+	 * @return description string
+	 */
+	private @NonNull String getDescription() {
+		if (groupsOfPersonSubpopulations.isEmpty()) {
+			return "General information about modal share and trip distributions.";
+		}
+
+		boolean allGroupsHaveSizeOne = groupsOfPersonSubpopulations.values().stream().allMatch(v -> v.size() == 1);
+
+		if (allGroupsHaveSizeOne) {
+			String groups = String.join(", ", groupsOfPersonSubpopulations.keySet());
+
+			return "General information about modal share and trip distributions of the selected subpopulations of the person agents: **" + groups + "**.";
+		}
+
+		String groupsWithSubpops = groupsOfPersonSubpopulations.entrySet().stream().map(
+			e -> e.getKey() + " (" + String.join(", ", e.getValue()) + ")").collect(Collectors.joining("; "));
+
+		return "General information about modal share and trip distributions of the selected groups and related subpopulations of the person agents: **" + groupsWithSubpops + "**.";
+	}
+
 	@Override
 	public void configure(Header header, Layout layout) {
 
@@ -171,12 +194,11 @@ public class TripDashboard implements Dashboard {
 			columnForModeShare = "share_total";
 			groupsOfPersonSubpopulations.put("total", new ArrayList<>());
 			header.title = "Trips";
-			header.description = "General information about modal share and trip distributions.";
+			header.description = getDescription();
 		} else {
 			columnForModeShare = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			header.title = "Trips (Persons)";
-			header.description = "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsOfPersonSubpopulations +
-				"**.";
+			header.description = getDescription();
 			if (groupsOfPersonSubpopulations.size() > 1)
 				groupsOfPersonSubpopulations.putFirst("total", new ArrayList<>());
 		}

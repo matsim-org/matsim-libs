@@ -667,7 +667,9 @@ public class CommercialTrafficDashboard implements Dashboard {
 			});
 		}
 	}
-
+	/** Adds the description depending on if groups are set or not.
+	 * @return description string
+	 */
 	private @NonNull String getDescription() {
 		if (groupsOfCommercialSubpopulations.isEmpty()) {
 			return "No groups of commercial subpopulations have been defined for the analysis. " + "Please define at least one group of commercial subpopulations to see commercial traffic statistics.";
@@ -684,6 +686,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 		String groupsWithSubpops = groupsOfCommercialSubpopulations.entrySet().stream().map(
 			e -> e.getKey() + " (" + String.join(", ", e.getValue()) + ")").collect(Collectors.joining("; "));
 
-		return "General information about modal share and trip distributions of the selected groups and related subpopulations of the persons: **" + groupsWithSubpops + "**.";
+		return "General information about modal share and trip distributions of the selected groups and related subpopulations of the commercial agents: **" + groupsWithSubpops + "**.";
 	}
 }
