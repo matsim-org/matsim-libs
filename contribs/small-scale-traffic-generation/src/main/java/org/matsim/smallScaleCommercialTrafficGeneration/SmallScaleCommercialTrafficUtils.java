@@ -189,6 +189,10 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null){
+				log.warn("Carrier {} has no selected plan. Therefore, no population plans are created for this carrier.", carrier.getId());
+				continue;
+			}
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 
 				Plan plan = popFactory.createPlan();
