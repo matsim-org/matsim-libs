@@ -12,6 +12,9 @@ import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.scoring.ScoringDataCollector;
+import org.matsim.dsim.scoring.VehicleArrivingOnPartitionEvent;
+import org.matsim.dsim.scoring.VehicleLeavingPartitionEvent;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
@@ -25,6 +28,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
+	private final ScoringDataCollector sdc;
 	//private final Set<String> modes;
 
 	private InternalInterface internalInterface;
@@ -35,9 +39,8 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,
-								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks, ParkedVehicles parkedVehicles,
-								Wait2Link wait2Link, EventsManager em) {
+	public NetworkTrafficEngine(AgentSourcesContainer asc, SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
+								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em, ScoringDataCollector sdc) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
@@ -45,32 +48,37 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		this.activeLinks = activeLinks;
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
-		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
-		//this.modes = new HashSet<>(dsimConfig.getNetworkModes());
+		this.sdc = sdc;
 	}
 
 	@Override
 	public void onPrepareSim() {
 		for (SimLink link : simNetwork.getLinks().values()) {
 
-			// Split out links don't have queue and buffer and have no leave handler
-			if (link instanceof SimLink.SplitOutLink)
-				continue;
+			// Split out links put vehicles into the messaging. Before they do so, we intercept and
+			// propagate an event.
+			if (link instanceof SimLink.SplitOutLink sol) {
+				sol.addLeaveHandler( (vehicle, link1, now) -> {
+					var toPart = ((SimLink.SplitOutLink)link1).getToPart();
+					this.sdc.vehicleLeavesPartition(vehicle, toPart);
+					return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
+				});
+			} else {
+				// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
+				// also give it a low priority, to make sure that this handler is called last if more handlers
+				// are active
+				link.addLeaveHandler(new SimLink.OnLeaveQueue() {
+					@Override
+					public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+						return handleVehicleIsFinished(vehicle, link, now);
+					}
 
-			// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
-			// also give it a low priority, to make sure that this handler is called last if more handlers
-			// are active
-			link.addLeaveHandler(new SimLink.OnLeaveQueue() {
-				@Override
-				public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-					return handleVehicleIsFinished(vehicle, link, now);
-				}
-
-				@Override
-				public double getPriority() {
-					return -10.;
-				}
-			});
+					@Override
+					public double getPriority() {
+						return -10.;
+					}
+				});
+			}
 		}
 	}
 
@@ -87,6 +95,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
 		DistributedMobsimVehicle vehicle = asc.vehicleFromContainer(vehicleContainer);
+		em.processEvent(new VehicleArrivingOnPartitionEvent(now, vehicle));
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);

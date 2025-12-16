@@ -29,6 +29,9 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
+import org.matsim.dsim.scoring.PersonArrivingOnPartitionEvent;
+import org.matsim.dsim.scoring.ScoringDataCollector;
+import org.matsim.dsim.scoring.VehicleArrivingOnPartitionEvent;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -52,6 +55,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
+	private final ScoringDataCollector scoringDataCollector;
 	/**
 	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
 	 * This map does not contain the full set of agents in the simulation.
@@ -59,13 +63,14 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
 
 	@Inject
-	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, EventsManager em) {
+	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, EventsManager em, ScoringDataCollector scoringDataCollector) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.messaging = messaging;
 		this.asc = asc;
 		this.em = em;
 		this.currentTime = new MobsimTimer();
+		this.scoringDataCollector = scoringDataCollector;
 	}
 
 	/**
@@ -140,11 +145,32 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	@Override
 	public void process(SimStepMessage msg) {
 
-		assert msg.simstep() <= currentTime.getTimeOfDay() : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.simstep(), currentTime.getTimeOfDay());
+		var now = getSimTimer().getTimeOfDay();
+
+		assert msg.simstep() <= now : "Message time (%.2f) does not match current time (%.2f)".formatted(msg.simstep(), currentTime.getTimeOfDay());
+
+//		for (Teleportation teleportation : msg.teleportations()) {
+//			var exitTime = teleportation.exitTime();
+//			if (exitTime < now) {
+//				throw new IllegalStateException("Teleportation message was received too late. Exit time is supposed to be" +
+//					exitTime + " but simulation time is already at: " + now + ". This might happen, if partitions " +
+//					"diverge in simulation time. We don't really have a solution to this problem yet. However, this" +
+//					" error might be an indicator, that the speed of the teleported leg is too fast.");
+//			}
+//			DistributedMobsimAgent agent = asc.agentFromMessage(teleportation.type(), teleportation.agent());
+//			em.processEvent(new PersonArrivingOnPartitionEvent(now, agent, exitTime));
+//		}
+//
+//		for (var vehicleContainer : msg.vehicles()) {
+//			var vehicle = asc.vehicleFromContainer(vehicleContainer);
+//			em.processEvent(new VehicleArrivingOnPartitionEvent(now, vehicle));
+//		}
+
 
 		for (DistributedMobsimEngine engine : engines) {
-			engine.process(msg, currentTime.getTimeOfDay());
+			engine.process(msg, now);
 		}
+        scoringDataCollector.process(msg);
 	}
 
 	@Override
@@ -229,6 +255,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
+		scoringDataCollector.registerAgent(agent);
 		arrangeNextAgentState(agent);
 	}
 

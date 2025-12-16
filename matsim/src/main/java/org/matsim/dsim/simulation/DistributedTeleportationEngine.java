@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
@@ -12,6 +13,9 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.dsim.scoring.PersonArrivingOnPartitionEvent;
+import org.matsim.dsim.scoring.PersonLeavingPartitionEvent;
+import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 import java.util.Collection;
@@ -25,6 +29,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final SimStepMessaging simStepMessaging;
 	private final AgentSourcesContainer asc;
+	private final ScoringDataCollector sdc;
+	private final NetworkPartitioning partitioning;
 
 	private InternalInterface internalInterface;
 
@@ -34,10 +40,13 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc) {
+	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc,
+								   ScoringDataCollector sdc, NetworkPartitioning partitioning) {
 		this.simStepMessaging = simStepMessaging;
 		this.em = em;
 		this.asc = asc;
+		this.sdc = sdc;
+		this.partitioning = partitioning;
 	}
 
 	@Override
@@ -65,6 +74,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		if (simStepMessaging.isLocal(person.getDestinationLinkId())) {
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
+			var toPart = partitioning.getPartition(person.getDestinationLinkId());
+			sdc.teleportedPersonLeavesPartition(person.getId(), toPart);
 			simStepMessaging.collectTeleportation(person, exitTime);
 		}
 
@@ -84,6 +95,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 			DistributedMobsimAgent agent = asc.agentFromMessage(teleportation.type(), teleportation.agent());
 			personsTeleporting.add(new TeleportationEntry(agent, exitTime));
+			em.processEvent(new PersonArrivingOnPartitionEvent(now, agent, exitTime));
 		}
 	}
 

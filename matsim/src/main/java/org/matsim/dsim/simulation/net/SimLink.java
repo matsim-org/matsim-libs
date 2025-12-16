@@ -277,6 +277,7 @@ public interface SimLink {
 		private final SimpleStorageCapacity storageCapacity;
 		private final FlowCapacity inflowCapacity;
 		private final Consumer<SimLink> activateLink;
+		private OnLeaveQueue onLeaveHandler;
 
 		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink) {
 			id = link.getId();
@@ -334,6 +335,7 @@ public interface SimLink {
 		@Override
 		public boolean doSimStep(SimStepMessaging messaging, double now) {
 			for (var vehicle : q) {
+				onLeaveHandler.apply(vehicle, this, now);
 				messaging.collectVehicle(vehicle);
 			}
 			q.clear();
@@ -344,7 +346,7 @@ public interface SimLink {
 
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
-			throw new RuntimeException("Split out links don't handle vehicles leaving");
+			this.onLeaveHandler = onLeaveQueue;
 		}
 
 		public void applyCapacityUpdate(double released, double consumed) {

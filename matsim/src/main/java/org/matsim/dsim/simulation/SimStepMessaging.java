@@ -63,6 +63,11 @@ public class SimStepMessaging {
 			.addVehicleContainer(AgentSourcesContainer.vehicleToContainer(simVehicle));
 	}
 
+	public void collectBackPack(BackPack backPack, int toPart) {
+		msgs.computeIfAbsent(toPart, _ -> SimStepMessage.builder())
+			.addBackPack(backPack);
+	}
+
 	public void sendMessages(double now) {
 
 		var it = msgs.int2ObjectEntrySet().iterator();

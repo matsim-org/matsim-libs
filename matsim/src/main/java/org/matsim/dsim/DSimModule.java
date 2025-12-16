@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.pt.TransitEngineModule;
+import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.DSimComponentsModule;
 import org.matsim.dsim.simulation.SimProvider;
 import org.matsim.dsim.simulation.net.NetworkTrafficModule;

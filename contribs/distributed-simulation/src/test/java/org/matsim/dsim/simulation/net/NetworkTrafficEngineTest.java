@@ -30,6 +30,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.TestUtils;
+import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.dsim.simulation.SimpleVehicle;
@@ -58,9 +59,10 @@ class NetworkTrafficEngineTest {
 		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
 		var config = new DSimConfigGroup();
 		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);
+		var sdc = new ScoringDataCollector(mock(SimStepMessaging.class), NetworkPartition.SINGLE_INSTANCE, eventsManager);
 
-		var engine = new NetworkTrafficEngine(scenario, mock(AgentSourcesContainer.class), simNetwork,
-			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager);
+		var engine = new NetworkTrafficEngine(mock(AgentSourcesContainer.class), simNetwork,
+			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager, sdc);
 
 		var timer = mock(MobsimTimer.class);
 

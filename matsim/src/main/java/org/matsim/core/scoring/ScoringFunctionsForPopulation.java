@@ -24,6 +24,8 @@ import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.*;
@@ -64,6 +66,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 @DistributedEventHandler(async = true)
 final class ScoringFunctionsForPopulation implements BasicEventHandler {
 
+	private static final Logger log = LogManager.getLogger(ScoringFunctionsForPopulation.class);
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 
@@ -124,7 +127,7 @@ final class ScoringFunctionsForPopulation implements BasicEventHandler {
 	@Override
 	public void handleEvent(Event o) {
 
-		System.out.println(o.toString());
+	//	log.info(o.toString());
 		// this is for the stuff that is directly based on events. note that this passes on _all_ person events, even those which are
 		// aggregated into legs and activities. for the time being, not all PersonEvents may "implement HasPersonId". link enter/leave events
 		// are NOT passed on, for performance reasons. kai/dominik, dec'12
