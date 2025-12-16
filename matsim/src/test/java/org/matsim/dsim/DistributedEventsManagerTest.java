@@ -93,14 +93,41 @@ class DistributedEventsManagerTest {
 		// call partition 0 and then 1. Thus, the ordering is changed, other than with the NodeTestHandler above.
 		manager.setContext(1);
 		manager.processEvent(new TestEvent(1., "second"));
-		assertEquals(2, nodeHandler.expectedTypes.size());
+		assertEquals(2, nodeHandler.expectedData.size());
 		manager.setContext(0);
 		manager.processEvent(new TestEvent(1., "first"));
-		assertEquals(2, nodeHandler.expectedTypes.size());
+		assertEquals(2, nodeHandler.expectedData.size());
 
 		executor.runEventHandler();
 
-		assertEquals(0, nodeHandler.expectedTypes.size());
+		assertEquals(0, nodeHandler.expectedData.size());
+	}
+
+	@Test
+	public void nodeConcurrentHandlerDirect() {
+		MessageBroker broker = mock(MessageBroker.class);
+		var provider = new SerializationProvider();
+		LPExecutor executor = new SingleExecutor(provider);
+		var computeNode = ComputeNode.builder()
+			.rank(0)
+			.parts(IntList.of(0, 1))
+			.build();
+
+		var nodeHandler = new NodeConcurrentDirectTestHandler(new ArrayList<>(List.of("first", "second")));
+		var manager = new DistributedEventsManager(broker, computeNode, executor, provider);
+		manager.addHandler(nodeHandler);
+
+		// submit event from process 1 first and from 0 second. Other than the NodeConcurrent test above, the order
+		// should not change, as the handler should be called directly.
+		manager.setContext(1);
+		manager.processEvent(new TestEvent(1., "first"));
+		assertEquals(1, nodeHandler.expectedData.size());
+		manager.setContext(0);
+		manager.processEvent(new TestEvent(1., "second"));
+		assertEquals(0, nodeHandler.expectedData.size());
+
+		executor.runEventHandler();
+		assertEquals(0, nodeHandler.expectedData.size());
 	}
 
 	@Test
@@ -160,10 +187,10 @@ class DistributedEventsManagerTest {
 	}
 
 	/**
-	 * @param expectedTypes = new ArrayList<>(List.of("partition-0", "partition-1"));
+	 * @param expectedData = new ArrayList<>(List.of("partition-0", "partition-1"));
 	 */
 	@DistributedEventHandler(value = DistributedMode.NODE_CONCURRENT)
-	private record NodeConcurrentTestHandler(List<String> expectedTypes) implements TestEvent.Handler {
+	private record NodeConcurrentTestHandler(List<String> expectedData) implements TestEvent.Handler {
 
 		@Override
 		public void handleEvent(TestEvent event) {
@@ -172,7 +199,24 @@ class DistributedEventsManagerTest {
 		}
 
 		synchronized String removeExpected() {
-			return expectedTypes.removeFirst();
+			return expectedData.removeFirst();
+		}
+	}
+
+	/**
+	 * @param expectedData = new ArrayList<>(List.of("partition-0", "partition-1"));
+	 */
+	@DistributedEventHandler(value = DistributedMode.NODE_CONCURRENT, processing = ProcessingMode.DIRECT)
+	private record NodeConcurrentDirectTestHandler(List<String> expectedData) implements TestEvent.Handler {
+
+		@Override
+		public void handleEvent(TestEvent event) {
+			var expectedType = removeExpected();
+			assertEquals(expectedType, event.data);
+		}
+
+		synchronized String removeExpected() {
+			return expectedData.removeFirst();
 		}
 	}
 

@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
@@ -101,22 +100,22 @@ public final class DistributedEventsManager implements EventsManager {
 		return ann == null || ann.value() == DistributedMode.GLOBAL;
 	}
 
-	@Override
-	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
-		return addInternal(provider.get(), provider);
-	}
-
-	@Override
-	public void addHandler(EventHandler handler) {
-
-		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		if (partition != null && partition.value() == DistributedMode.PARTITION) {
-			throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
-				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
-		}
-
-		addInternal(handler, null);
-	}
+//	@Override
+//	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
+//		return addInternal(provider.get(), provider);
+//	}
+//
+//	@Override
+//	public void addHandler(EventHandler handler) {
+//
+//		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
+//		if (partition != null && partition.value() == DistributedMode.PARTITION) {
+//			throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
+//				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
+//		}
+//
+//		addInternal(handler, null);
+//	}
 
 	public void addHandler(EventHandler handler, int part) {
 		var partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
@@ -126,100 +125,109 @@ public final class DistributedEventsManager implements EventsManager {
 		}
 	}
 
-//	private <T extends EventHandler> T addGlobalHandler(T handler, String name) {
-//		log.warn("Registering global event handler {}", name);
-//		Integer part = computeNode.getParts().getFirst();
-//		EventHandlerTask task = executor.register(handler, this, part, 1, null);
-//		addTask(task, part);
-//		handlers.add(handler);
-//	}
+	@Override
+	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
+		var handler = provider.get();
+		var distMode = getDistributedMode(handler);
 
-	private <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
-
-		String name = handler.getName();
-
-		List<T> handlers = new ArrayList<>();
-
-		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
-
-		if (partition != null && partition.value() == DistributedMode.NODE) {
-			log.info("Registering event handler {} for node {}", name, computeNode.getRank());
-			Integer part = computeNode.getParts().getFirst();
-			EventHandlerTask task = executor.register(handler, this, part, 1, null);
-			addTask(task, part);
-			handlers.add(handler);
-
-		} else if (partition != null && (partition.value() == DistributedMode.PARTITION || partition.value() == DistributedMode.NODE_CONCURRENT)) {
-			log.info("Registering event handler {} for each partition", name);
-
-			AtomicInteger partitionCounter = new AtomicInteger();
-			for (int part : computeNode.getParts()) {
-				EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
-
-				addTask(task, part);
-				handlers.add(handler);
-
-				if (partition.value() == DistributedMode.PARTITION) {
-					T next = provider.get();
-					if (handler == next)
-						throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
-
-					handler = next;
-				}
-			}
-		} else if (computeNode.getRank() == 0) {
-			log.warn("Registering global event handler {}", name);
-			Integer part = computeNode.getParts().getFirst();
-			EventHandlerTask task = executor.register(handler, this, part, 1, null);
-			addTask(task, part);
-			handlers.add(handler);
+		if (distMode == DistributedMode.PARTITION) {
+			return addPartitionHandler(handler, provider);
+		} else {
+			addHandler(handler);
+			return List.of(handler);
 		}
-
-		return handlers;
 	}
 
-	//private void addOneTask()
+	private <T extends EventHandler> List<T> addPartitionHandler(T firstHandler, Provider<T> provider) {
 
-	private void addTask(EventHandlerTask task, int part) {
+		// set up stuff to create multiple handlers
+		var partitionCounter = new AtomicInteger();
+		var result = new ArrayList<T>();
 
+		// keep a reference to the last handler added, to ensure each partition receives a distinct handler instance
+		T handler = null;
+
+		// add as many handlers as there are partitions
+		for (int part : computeNode.getParts()) {
+			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
+			if (handler == nextHandler) {
+				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
+			}
+			handler = nextHandler;
+			addAsPartitionSingleton(handler, part, partitionCounter);
+			result.add(handler);
+		}
+
+		return result;
+	}
+
+	private DistributedMode getDistributedMode(EventHandler handler) {
+		var annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return annotation == null ? DistributedMode.GLOBAL : annotation.value();
+	}
+
+	@Override
+	public void addHandler(EventHandler handler) {
+
+		var distMode = getDistributedMode(handler);
+		switch (distMode) {
+			case GLOBAL -> {
+				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
+			}
+			case NODE -> addAsNodeSingleton(handler);
+			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
+			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
+				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
+		}
+	}
+
+	public <T extends EventHandler> void addAsNodeSingleton(T handler) {
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+	}
+
+	public <T extends EventHandler> void addAsConcurrentNodeSingleton(T handler) {
+		AtomicInteger partitionCounter = new AtomicInteger();
+		for (int part : computeNode.getParts()) {
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+			addTaskForSinglePart(task, part);
+		}
+	}
+
+	public <T extends EventHandler> void addAsPartitionSingleton(T handler, int part, AtomicInteger partitionCounter) {
+		EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+		addTaskForSinglePart(task, part);
+	}
+
+	private void addTaskForEachPart(EventHandlerTask task, int handlerPartition) {
+		broker.register(task, handlerPartition);
+		for (var part : computeNode.getParts()) {
+			addTaskForPart(task, part);
+		}
+		tasks.add(task);
+		task.setBroker(broker);
+	}
+
+	private void addTaskForSinglePart(EventHandlerTask task, int part) {
 		broker.register(task, part);
+		addTaskForPart(task, part);
+		tasks.add(task);
+		task.setBroker(broker);
+	}
 
-		for (int type : task.getSupportedMessages()) {
-
+	private void addTaskForPart(EventHandlerTask task, int part) {
+		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
 				continue;
 			}
-
-			EventSource source = task.getEventSource(type);
-			if (!task.isDirect() && source == EventSource.GLOBAL) {
-				globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
-				remoteSyncStep = Double.min(remoteSyncStep, task.getHandler().getProcessInterval());
-			}
-			// otherwise the task is local and is not added to any queue.
-
-			// Store handler as listener for all partitions
-			if (source == EventSource.GLOBAL || source == EventSource.NODE) {
-				for (Integer p : computeNode.getParts()) {
-					long address = MessageBroker.address(p, type);
-					if (task.isDirect())
-						directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
-					else
-						byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
-				}
-			} else {
-
-				long address = MessageBroker.address(part, type);
-				if (task.isDirect())
-					directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
-				else
-					byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
-
-			}
+			long address = MessageBroker.address(part, type);
+			if (task.isDirect())
+				directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
+			else
+				byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
 		}
-
-		task.setBroker(broker);
-		tasks.add(task);
 	}
 
 	/**
