@@ -37,8 +37,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 		args = new String[0];
 	}
 
-	/** Set the groups of supopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
-	 * Different groups are separated by ';' and subpopulations within a group by ','.
+	/** Set the groups of subpopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
+	 * Different groups are separated by ';' and subpopulations within a group by ','. The delimiter between group name and subpopulations is '='.
 	 * See {@link CommercialAnalysis}.
 	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
 	 */
@@ -48,10 +48,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 			if (part.isBlank()) continue;
 			String[] kv = part.split("=", 2);
 			String groupName = kv[0].trim();
-			List<String> subpops = kv.length > 1 && !kv[1].isBlank()
+			List<String> subpopulations = kv.length > 1 && !kv[1].isBlank()
 				? Arrays.stream(kv[1].split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())
 				: new ArrayList<>();
-			groupsOfCommercialSubpopulations.put(groupName, subpops);
+			groupsOfCommercialSubpopulations.put(groupName, subpopulations);
 		}
 		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
 	}
