@@ -20,8 +20,10 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.load.DvrpLoad;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
@@ -40,7 +42,9 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	/**
 	 * @return the amount of people/goods that can be served/transported at the same time
 	 */
-	int getCapacity();
+	DvrpLoad getCapacity();
+
+	void setCapacity(DvrpLoad capacity);
 
 	/**
 	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
@@ -65,4 +69,8 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 
 
 	DvrpVehicleSpecification getSpecification();
+
+	static Id<DvrpVehicle> id(String id) {
+		return Id.create(id, DvrpVehicle.class);
+	}
 }

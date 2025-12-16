@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.optimizer.insertion.extensive;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -37,10 +36,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.testcases.fakes.FakeLink;
 import org.matsim.testcases.fakes.FakeNode;
 import org.mockito.ArgumentMatchers;
@@ -57,12 +59,22 @@ public class MultiInsertionDetourPathCalculatorTest {
 	private final Link dropoffLink = link("dropoff");
 	private final Link afterDropoffLink = link("after_dropoff");
 
+	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
+
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.earliestDepartureTime(100)
+			.constraints(
+					new DrtRouteConstraints(
+							400,
+							Double.POSITIVE_INFINITY,
+							100,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final OneToManyPathSearch pathSearch = mock(OneToManyPathSearch.class);
@@ -84,7 +96,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -105,7 +117,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Waypoint.Dropoff.class));
 		var dropoff = insertionPoint(waypoint(pickupLink, Waypoint.Pickup.class),
 				waypoint(dropoffLink, Waypoint.End.class));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);
@@ -128,7 +140,7 @@ public class MultiInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff);
+		var insertion = new InsertionGenerator.Insertion(null, pickup, dropoff, loadType.fromInt(1));
 
 		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
 		var insertionWithDetourData = detourData.createInsertionDetourData(insertion);

@@ -20,16 +20,18 @@
 package org.matsim.contrib.dvrp.optimizer;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 
 /**
  * Minimal functionality of dvrp optimizers in the dvrp contrib. <br>
  * </br>
  * More specific functionality (such as request modification & cancellation, or vehicle tracking) should be offered by
  * subinterfaces.
- * 
+ *
  * @author michalm
  * @author (of documentation) nagel
  */
+@NodeSingleton
 public interface VrpOptimizer {
 	/**
 	 * This is called by the framework every time a request is submitted so that the optimizer is notified of it.

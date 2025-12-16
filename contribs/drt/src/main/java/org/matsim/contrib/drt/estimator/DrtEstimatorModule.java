@@ -49,13 +49,13 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 			.addBinding(DvrpModes.mode(getMode()))
 			.to(modalKey(DrtEstimator.class));
 
-		addControlerListenerBinding().to(modalKey(DrtEstimator.class));
+		addControllerListenerBinding().to(modalKey(DrtEstimator.class));
 
 		bindModal(DrtEstimatorParams.class).toInstance(params);
 
 		// Analyze quality of estimates, this is only useful if an online estimator is used
 		// TODO: updating estimation as in drt speed up is not fully implemented yet
-		if (drtCfg.simulationType == DrtConfigGroup.SimulationType.fullSimulation) {
+		if (drtCfg.getSimulationType() == DrtConfigGroup.SimulationType.fullSimulation) {
 			bindModal(DrtEstimateAnalyzer.class)
 				.toProvider(
 					modalProvider(getter -> new DrtEstimateAnalyzer(getter.getModal(DrtEstimator.class),
@@ -63,7 +63,7 @@ public class DrtEstimatorModule extends AbstractDvrpModeModule {
 				)
 				.in(Singleton.class);
 
-			addControlerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
+			addControllerListenerBinding().to(modalKey(DrtEstimateAnalyzer.class));
 		}
 	}
 }

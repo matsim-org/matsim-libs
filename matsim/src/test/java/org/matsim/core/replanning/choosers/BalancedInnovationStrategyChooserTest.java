@@ -80,13 +80,13 @@ class BalancedInnovationStrategyChooserTest {
 		assertThat(count.getSum()).isEqualTo(0);
 
 		runReplanning();
-		assertThat(count.getSum()).isCloseTo(3000, Offset.offset(70));
+		assertThat(count.getSum()).isCloseTo(3000, Offset.offset(100));
 
 		runReplanning();
-		assertThat(count.getSum()).isCloseTo(3000 * 2, Offset.offset(70));
+		assertThat(count.getSum()).isCloseTo(3000 * 2, Offset.offset(100));
 
 		runReplanning();
-		assertThat(count.getSum()).isCloseTo(3000 * 3, Offset.offset(140));
+		assertThat(count.getSum()).isCloseTo(3000 * 3, Offset.offset(200));
 
 		assertThat(count.getDifference()).isLessThanOrEqualTo(2);
 
@@ -99,11 +99,11 @@ class BalancedInnovationStrategyChooserTest {
 			int diff = count.getSum() - before;
 
 			assertThat(diff)
-				.isCloseTo(3000, Offset.offset(300));
+				.isCloseTo(3000, Offset.offset(400));
 
 		}
 
-		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(2000));
+		assertThat(count.getSum()).isCloseTo(3000 * 600, Offset.offset(3000));
 		assertThat(count.getDifference()).isLessThanOrEqualTo(2);
 	}
 

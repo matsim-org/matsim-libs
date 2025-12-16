@@ -12,17 +12,11 @@ import java.util.List;
 public interface UnhandledServicesSolution {
 
 	/**
-	 * @param scenario Scenario to search for carriers with unhandled jobs
-	 * @return List with the found carriers
-	 */
-	List<Carrier> createListOfCarrierWithUnhandledJobs(Scenario scenario);
-
-	/**
 	 *
 	 * Checks and recalculates plans of carriers, which did not serve all services.
 	 * This step may take a few minutes.
-	 * @param scenario Scenario to handle the carriers for. Needed to execute {@link org.matsim.freight.carriers.CarriersUtils#runJsprit(Scenario)} and {@link UnhandledServicesSolution#createListOfCarrierWithUnhandledJobs(Scenario)}
-	 * @param nonCompleteSolvedCarriers List of carriers, that are not solved. Can be obtained by {@link UnhandledServicesSolution#createListOfCarrierWithUnhandledJobs(Scenario)}
+	 * @param scenario Scenario to handle the carriers for.
+	 * @param nonCompleteSolvedCarriers List of carriers, that are not solved.
 	 */
 	void tryToSolveAllCarriersCompletely(Scenario scenario, List<Carrier> nonCompleteSolvedCarriers);
 

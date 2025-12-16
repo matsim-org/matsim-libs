@@ -29,4 +29,10 @@ public interface DrtShift extends Identifiable<DrtShift>, Comparable<DrtShift> {
 	Optional<DrtShiftBreak> getBreak();
 
 	Optional<Id<DvrpVehicle>> getDesignatedVehicleId();
+
+	Optional<String> getShiftType();
+
+	static Id<DrtShift> id(String id) {
+		return Id.create(id, DrtShift.class);
+	}
 }

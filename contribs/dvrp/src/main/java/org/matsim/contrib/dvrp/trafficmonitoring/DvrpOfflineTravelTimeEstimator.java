@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
@@ -51,6 +52,7 @@ import com.google.inject.name.Named;
  *
  * @author michalm
  */
+@NodeSingleton
 public class DvrpOfflineTravelTimeEstimator
 		implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener, AfterMobsimListener {
 	private final TravelTime observedTT;
@@ -72,7 +74,7 @@ public class DvrpOfflineTravelTimeEstimator
 										  @Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
 										  TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
 										  OutputDirectoryHierarchy outputDirectoryHierarchy, GlobalConfigGroup globalConfig) {
-		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.travelTimeEstimationAlpha,
+		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig), dvrpConfig.getTravelTimeEstimationAlpha(),
 				outputDirectoryHierarchy, globalConfig.getDefaultDelimiter());
 	}
 

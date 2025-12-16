@@ -50,6 +50,7 @@ import org.matsim.freight.carriers.controller.CarrierControllerUtils;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.controller.CarrierStrategyManager;
 import org.matsim.freight.logistics.*;
+import org.matsim.freight.logistics.examples.MyLSPScorer;
 import org.matsim.freight.logistics.resourceImplementations.ResourceImplementationUtils;
 import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
@@ -65,7 +66,7 @@ public class WorstPlanSelectorTest {
 	private static final VehicleType VEH_TYPE_EXPENSIVE = createVehType("expensive", 100., 0.01, 0.01);
 
 	private static VehicleType createVehType(String vehicleTypeId, double fix, double perDistanceUnit, double perTimeUnit) {
-		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeId, VehicleType.class), TransportMode.car);
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.createVehicleTypeId(vehicleTypeId), TransportMode.car);
 		vehicleType.getCapacity().setOther(50);
 		vehicleType.getCostInformation().setCostsPerMeter(perDistanceUnit);
 		vehicleType.getCostInformation().setCostsPerSecond(perTimeUnit);
@@ -87,7 +88,7 @@ public class WorstPlanSelectorTest {
 			link.setCapacity(1000);
 		}
 
-		LSPUtils.addLSPs(scenario, new LSPs(Collections.singletonList(createLSP(scenario))));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
 		return scenario;
 	}
@@ -183,7 +184,7 @@ public class WorstPlanSelectorTest {
 		lsp.addPlan(lspPlan_twoChains);
 
 		for (LspShipment shipment : createInitialLSPShipments(network)) {
-			lsp.assignShipmentToLSP(shipment);
+			lsp.assignShipmentToLspPlan(shipment);
 		}
 
 		lsp.scheduleLogisticChains();

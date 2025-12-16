@@ -26,7 +26,7 @@ import org.matsim.contrib.common.util.ReflectiveConfigGroupWithConfigurableParam
 import org.matsim.core.config.Config;
 
 /**
- * @author steffenaxer
+ * @author nkuehnel
  */
 public class DrtSpatialRequestFleetFilterParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 
@@ -40,39 +40,92 @@ public class DrtSpatialRequestFleetFilterParams extends ReflectiveConfigGroupWit
 	@Positive
 	@Comment("Expansion factor for the iterative expansion of search radius until max expansion or the" +
 			"minimum number of candidates is reached. Must be positive.")
-	public double expansionFactor = 2;
+	private double expansionFactor = 2;
 
 	@Parameter
 	@PositiveOrZero
 	@Comment("Minimum expansion in map units (meters in most projections).")
-	public double minExpansion = 1000;
+	private double minExpansion = 1000;
 
 	@Parameter
 	@PositiveOrZero
 	@Comment("Maximum expansion in map units (meters in most projections).")
-	public double maxExpansion = 5000;
+	private double maxExpansion = 5000;
 
 	@Parameter
 	@Comment("Returns the unfiltered fleet if the filter did not keep enough candidates.")
-	public boolean returnAllIfEmpty = true;
+	private boolean returnAllIfEmpty = true;
 
 	@Parameter
 	@Positive
 	@Comment("Minimum number of vehicle candidates the filter has to find.")
-	public int minCandidates = 1;
+	private int minCandidates = 1;
 
 	@Parameter
 	@PositiveOrZero
 	@Comment("Update interval of the periodically built spatial search tree of vehicle positions.")
-	public double updateInterval = 5 * 600;
+	private double updateInterval = 5 * 60;
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		Verify.verify(expansionFactor > 0, "Expansion factor must be greater than zero");
-		Verify.verify(minExpansion <= maxExpansion, "Max expansion must not be smaller than minimum expansion");
-		Verify.verify(minExpansion >= 0, "Expansion must be greater than zero");
-		Verify.verify(minCandidates > 0, "Minimum number of candidates must be positive");
-		Verify.verify(updateInterval >= 0, "Update interval must not be negative");
+		Verify.verify(getExpansionFactor() > 0, "Expansion factor must be greater than zero");
+		Verify.verify(getMinExpansion() <= getMaxExpansion(), "Max expansion must not be smaller than minimum expansion");
+		Verify.verify(getMinExpansion() >= 0, "Expansion must be greater than zero");
+		Verify.verify(getMinCandidates() > 0, "Minimum number of candidates must be positive");
+		Verify.verify(getUpdateInterval() >= 0, "Update interval must not be negative");
+	}
+
+	@Positive
+	public double getExpansionFactor() {
+		return expansionFactor;
+	}
+
+	public void setExpansionFactor(@Positive double expansionFactor) {
+		this.expansionFactor = expansionFactor;
+	}
+
+	@PositiveOrZero
+	public double getMinExpansion() {
+		return minExpansion;
+	}
+
+	public void setMinExpansion(@PositiveOrZero double minExpansion) {
+		this.minExpansion = minExpansion;
+	}
+
+	@PositiveOrZero
+	public double getMaxExpansion() {
+		return maxExpansion;
+	}
+
+	public void setMaxExpansion(@PositiveOrZero double maxExpansion) {
+		this.maxExpansion = maxExpansion;
+	}
+
+	public boolean isReturnAllIfEmpty() {
+		return returnAllIfEmpty;
+	}
+
+	public void setReturnAllIfEmpty(boolean returnAllIfEmpty) {
+		this.returnAllIfEmpty = returnAllIfEmpty;
+	}
+
+	@Positive
+	public int getMinCandidates() {
+		return minCandidates;
+	}
+
+	public void setMinCandidates(@Positive int minCandidates) {
+		this.minCandidates = minCandidates;
+	}
+
+	@PositiveOrZero
+	public double getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(@PositiveOrZero double updateInterval) {
+		this.updateInterval = updateInterval;
 	}
 }

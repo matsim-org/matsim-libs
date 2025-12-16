@@ -2,7 +2,7 @@ package org.matsim.modechoice;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 

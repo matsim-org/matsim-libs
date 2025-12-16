@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Transit viewer for pt schedules.
  */
-public class TransitViewer extends Viz {
+public class TransitViewer extends VizMap<TransitViewer> {
 
 	@JsonProperty(required = true)
 	public String network;
@@ -16,7 +16,7 @@ public class TransitViewer extends Viz {
 	public String transitSchedule;
 
 	@JsonProperty
-	public String ptStop2stopFile;
+	public String demand;
 
 	public List<CustomRouteType> customRouteTypes;
 

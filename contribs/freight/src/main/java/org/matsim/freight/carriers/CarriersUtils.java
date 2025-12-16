@@ -31,7 +31,10 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.management.InvalidAttributeValueException;
+
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,8 +42,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.freight.carriers.analysis.CarriersAnalysis;
+import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
 import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.freight.carriers.jsprit.NetworkRouter;
@@ -138,6 +146,13 @@ public class CarriersUtils {
 		return null;
 	}
 
+	/** Clears all plans of a carrier and sets the selected plan to null.
+	 * @param carrier	this carrier
+	 */
+	public static void clearCarrierPlans(Carrier carrier) {
+		carrier.getPlans().clear();
+		carrier.setSelectedPlan(null);
+	}
 
 	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
 		List<ScheduledTour> tours = new ArrayList<>();
@@ -147,7 +162,7 @@ public class CarriersUtils {
 			Tour tour = sTour.getTour().duplicate();
 			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
 		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
+		CarrierPlan copiedPlan = new CarrierPlan(tours);
 		double initialScoreOfCopiedPlan = plan2copy.getScore();
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		return copiedPlan;
@@ -174,7 +189,7 @@ public class CarriersUtils {
 	public static int getJspritIterations(Carrier carrier) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute(JSPRIT_ITERATIONS);
 		if (result == null) {
-			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritIterations does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		} else {
 			return result;
@@ -214,13 +229,35 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight").runCarrierAnalysis(
+			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(
-			scenario.getNetwork(), getCarrierVehicleTypes(scenario).getVehicleTypes().values()).build();
+		// Create the NetBasedCosts based on the network and the vehicle types
+		//Consider tolls if a RoadPricingScheme is available in the scenario.
+		RoadPricingScheme roadPricingScheme = null;
+		try {
+			roadPricingScheme = RoadPricingUtils.getRoadPricingScheme(scenario);
+		} catch (Exception e) {
+			log.debug("Was not able to get a RoadPricingScheme from scenario. Tolls cannot be considered.", e);
+		}
+
+		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
+				.setRoadPricingScheme(roadPricingScheme)
+				.build();
+
 
 		Carriers carriers = getCarriers(scenario);
+
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
+		if (result == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
+		}
 
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
@@ -228,7 +265,7 @@ public class CarriersUtils {
 		// This also selects the carriers for which a new solution should be created
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			switch (carriersSolutionType) {
-				case solveForAllCarriersAndOverrideExistingPlans -> carrier.clearPlans();
+				case solveForAllCarriersAndOverrideExistingPlans -> clearCarrierPlans(carrier);
 				case solveOnlyForCarrierWithoutPlans -> {
 					if (!carrier.getPlans().isEmpty()) {
 						continue;
@@ -241,33 +278,54 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
+
+
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
-		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carriers.getCarriers().size(), nThreads);
+		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
-		ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads);
+		List<Future<?>> futures;
+		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
+			futures = new ArrayList<>();
+			List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+				.toList();
 
-		List<Future<?>> futures = new ArrayList<>();
-		List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-			.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
-			.toList();
-
-		for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
-			JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
-				startedVRPCounter, carriers.getCarriers().size());
-			log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
-			futures.add(executor.submit(task));
+			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
+				JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
+					startedVRPCounter, carriers.getCarriers().size());
+				log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
+				futures.add(executor.submit(task));
+			}
 		}
 
 		for (Future<?> future : futures) {
 			future.get();
 		}
+
+
+		//Check if the inputs of the carrier(s) are consistent before starting the planning
+		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
+		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
+			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
+			log.error("Carrier consistency check failed! There are carriers with unhandled jobs or other inconsistencies. " +
+				"Please check the log for details.");
+		}
+
+
 	}
 
 	/**
 	 * Checks if the selected plan handles all jobs of a carrier.
-	 * The check is done only by counting the number of activities in the selected plan and compare them with the number of services or shipments of the carrier.
+	 * The check is done only by counting the number of activities in the selected plan and comparing them with the number of services or shipments of the carrier.
+	 * <p
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it checks only one specific carrier.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
+	 *
 	 * @param carrier the carrier
 	 */
 	public static boolean allJobsHandledBySelectedPlan(Carrier carrier) {
@@ -294,6 +352,91 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Adds a roadPricing scheme (RoadPricingSchemeUsingTollFactor) to the scenario that adds a toll for all vehicles on a link that are not networkMode on this link.
+	 * This is needed to ensure that VRP solutions consider the network modes defined on links.
+	 *
+	 * @param scenario scenario to which the roadPricing scheme is added
+	 */
+	public static void addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(Scenario scenario) {
+
+		Map<Id<Carrier>, Carrier> carries = CarriersUtils.getCarriers(scenario).getCarriers();
+		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = carries.values().stream()
+			.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
+			.collect(Collectors.toMap(CarrierVehicle::getId, cv -> cv, (a, b) -> a, HashMap::new));
+
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createRoadPricingSchemeImpl();
+		List <String> usedModesByCarriers = carrierVehicles.values().stream()
+			.map(cv -> cv.getType().getNetworkMode())
+			.distinct()
+			.toList();
+
+		RoadPricingUtils.setName(scheme, "PricingForVRP");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Adds a toll for all vehicles on a link that are not networkMode on this link.");
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			for (String mode : usedModesByCarriers) {
+				if (!link.getAllowedModes().contains(mode)) {
+					RoadPricingUtils.addLink(scheme, link.getId());
+				}
+			}
+		}
+
+		RoadPricingUtils.createAndAddGeneralCost(scheme,
+			Time.parseTime("00:00:00"),
+			Time.parseTime("72:00:00"),
+			1000); // high value to ensure that by solving a VRP a vehicle which is tolled avoids tolled links (e.g. forbitten zones or restrictions for specific trucks
+
+		TollFactor tollFactor =
+			(personId, vehicleId, linkId, time) -> {
+				if (!scheme.getTolledLinkIds().contains(linkId))
+					return 0;
+				var veh = carrierVehicles.get(vehicleId);
+				if (veh == null) {
+					return 0;
+				}
+				var vehType = veh.getType();
+				Link link = scenario.getNetwork().getLinks().get(linkId);
+				if (!link.getAllowedModes().contains(vehType.getNetworkMode())) {
+					return 1;
+				} else {
+					return 0;
+				} // no toll for allowed vehicles
+			};
+		RoadPricingUtils.addRoadPricingScheme(scenario, new RoadPricingSchemeUsingTollFactor(scheme, tollFactor));
+	}
+
+	/**
+	 * Creates a list of carriers with unhandled jobs.
+	 * <p></p>
+	 * IMO (kmt, jun'25) this method does something very similar to {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)}.
+	 * As @rewertvsp stated it has a slightly different focus, because it returns a list of carriers with unhandled jobs instead of a boolean.
+	 * Nevertheless, IMO it should be decided, where to locate the method (to avoid some duplications) ->
+	 * i) Here and call from the {@link CarrierConsistencyCheckers#checkAfterResults(Carriers, Level)} or
+	 * ii) move it as public method into {@link CarrierConsistencyCheckers}.
+	 *
+	 * @param carriers the carriers
+	 * @return list of carriers with unhandled jobs
+	 */
+	public static List<Carrier> createListOfCarrierWithUnhandledJobs(Carriers carriers) {
+		List<Carrier> carriersWithUnhandledJobs = new LinkedList<>();
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			if (!allJobsHandledBySelectedPlan(carrier))
+				carriersWithUnhandledJobs.add(carrier);
+		}
+		return carriersWithUnhandledJobs;
+	}
+
+	/**
+	 * Checks if a carrier has jobs (services or shipments).
+	 *
+	 * @param carrier the carrier
+	 * @return true if a carrier has jobs (services or shipments)
+	 */
+	public static boolean hasJobs(Carrier carrier) {
+		return !carrier.getServices().isEmpty() || !carrier.getShipments().isEmpty();
 	}
 
 	/**
@@ -335,10 +478,14 @@ public class CarriersUtils {
 		return addOrGetCarriers(scenario);
 	}
 
+	/**
+	 * Will return the {@link Carriers} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the Carrier should be added.
+	 * @return the Carriers container
+	 */
 	public static Carriers addOrGetCarriers(Scenario scenario) {
-		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controller is started, it is better to fail if the carriers are not found.
-		// kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement(CARRIERS);
 		if (carriers == null) {
 			carriers = new Carriers();
@@ -357,7 +504,14 @@ public class CarriersUtils {
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
-	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * If it does not exist, it will be created.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from or added.
+	 * @return the CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getOrAddCarrierVehicleTypes(Scenario scenario) {
 		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 		if (types == null) {
 			types = new CarrierVehicleTypes();
@@ -367,6 +521,27 @@ public class CarriersUtils {
 	}
 
 	/**
+	 * Will return the {@link CarrierVehicleTypes} container of the scenario.
+	 * Please note, that this has changed in feb'25:
+	 * If the container does not exist, it will throw an exception instead of creating it.
+	 * For creating it, please use {@link #getOrAddCarrierVehicleTypes(Scenario)}.
+	 *
+	 * @param scenario The scenario where the CarrierVehicleTypes should be taken from .
+	 * @return the (existing) CarrierVehicleTypes container
+	 */
+	public static CarrierVehicleTypes getCarrierVehicleTypes(Scenario scenario) {
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
+		// not found. (Similar to getOrCreateCarriers and getCarriers.) kmt, feb'25
+		if (scenario.getScenarioElement(CARRIER_VEHICLE_TYPES) == null) {
+			throw new RuntimeException("cannot retrieve carrierVehicleTypes from scenario; typical ways to resolve that problem are to call " +
+				"CarrierControlerUtils.getOrCreateCarriers(...) or CarrierControlerUtils.loadCarriersAccordingToFreightConfig(...) early enough\n");
+		}
+		return (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
+	}
+
+
+
+	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
 	 *
 	 * @param scenario the scenario
@@ -374,13 +549,23 @@ public class CarriersUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
-		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersVehicleTypesFile()));
+		//Load VehicleTypes
 
-		Carriers carriers = addOrGetCarriers(scenario); // also registers with scenario
-		new CarrierPlanXmlReader(carriers, vehTypes).readURL(
-			IOUtils.extendUrl(scenario.getConfig().getContext(), freightCarriersConfigGroup.getCarriersFile()));
+		String carriersVehicleTypesFile = freightCarriersConfigGroup.getCarriersVehicleTypesFile();
+		if (carriersVehicleTypesFile == null ||carriersVehicleTypesFile.isEmpty()) {
+			throw new IllegalArgumentException("CarriersVehicleTypes file path should not be null or empty");
+		}
+		new CarrierVehicleTypeReader(getOrAddCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersVehicleTypesFile));
+
+		//Load Carriers
+		String carriersFile = freightCarriersConfigGroup.getCarriersFile();
+		if (carriersFile == null ||carriersFile.isEmpty()) {
+			throw new IllegalArgumentException("Carriers file path should not be null or empty");
+		}
+		// also registers with scenario
+		new CarrierPlanXmlReader(addOrGetCarriers(scenario), getOrAddCarrierVehicleTypes(scenario)).readURL(
+			IOUtils.extendUrl(scenario.getConfig().getContext(), carriersFile));
 	}
 
 	/**
@@ -431,13 +616,13 @@ public class CarriersUtils {
 			CarrierShipment carrierShipment = CarrierShipment.Builder
 				.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class),
 					depotServiceIsDeliveredFrom.get(carrierService.getId()), carrierService.getServiceLinkId(),
-					carrierService.getDemand())
+					carrierService.getCapacityDemand())
 				.setDeliveryDuration(carrierService.getServiceDuration())
 				// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 				// have now time for that. Maybe change it later, kmt sep18
-				.setDeliveryStartsTimeWindow(carrierService.getServiceStartTimeWindow())
+				.setDeliveryStartingTimeWindow(carrierService.getServiceStaringTimeWindow())
 				// Limited to end of delivery timeWindow (pickup later than the latest delivery is not useful).
-				.setPickupStartsTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))
+				.setPickupStartingTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStaringTimeWindow().getEnd()))
 				.build();
 			addShipment(carrierWS, carrierShipment);
 		}
@@ -665,7 +850,7 @@ public class CarriersUtils {
 		try {
 			return (double) carrier.getAttributes().getAttribute(ATTR_JSPRIT_Time);
 		} catch (Exception e) {
-			log.error("Requested attribute jspritComputationTime does not exists. Will return " + Integer.MIN_VALUE);
+			log.error("Requested attribute jspritComputationTime does not exists for carrier {}. Will return {}.", carrier.getId(), Integer.MIN_VALUE);
 			return Integer.MIN_VALUE;
 		}
 	}
@@ -780,7 +965,7 @@ public class CarriersUtils {
 
 			log.info("tour planning for carrier {} took {} seconds.", carrier.getId(), (System.currentTimeMillis() - start) / 1000);
 
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
 
 			log.info("routing plan for carrier {}", carrier.getId());

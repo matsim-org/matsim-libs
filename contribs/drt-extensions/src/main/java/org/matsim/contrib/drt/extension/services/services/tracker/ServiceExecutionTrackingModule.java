@@ -31,7 +31,7 @@ public class ServiceExecutionTrackingModule extends AbstractDvrpModeModule {
 	DrtConfigGroup drtConfigGroup;
 
 	public ServiceExecutionTrackingModule(DrtConfigGroup drtConfigGroup) {
-		super(drtConfigGroup.mode);
+		super(drtConfigGroup.getMode());
 		this.drtConfigGroup = drtConfigGroup;
 	}
 
@@ -45,6 +45,6 @@ public class ServiceExecutionTrackingModule extends AbstractDvrpModeModule {
 		))).asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(ServiceExecutionTrackers.class));
-		addControlerListenerBinding().to(modalKey(ServiceExecutionTrackers.class));
+		addControllerListenerBinding().to(modalKey(ServiceExecutionTrackers.class));
 	}
 }

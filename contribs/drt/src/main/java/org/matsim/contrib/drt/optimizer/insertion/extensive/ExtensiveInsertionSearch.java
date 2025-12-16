@@ -1,3 +1,4 @@
+
 /*
  * *********************************************************************** *
  * project: org.matsim.*
@@ -26,7 +27,6 @@ import java.util.Optional;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.drt.stops.StopTimeCalculator;
 
 /**
@@ -39,8 +39,8 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 	private final BestInsertionFinder bestInsertionFinder;
 
 	public ExtensiveInsertionSearch(ExtensiveInsertionProvider insertionProvider,
-			MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
-			StopTimeCalculator stopTimeCalculator) {
+									MultiInsertionDetourPathCalculator detourPathCalculator, InsertionCostCalculator insertionCostCalculator,
+									StopTimeCalculator stopTimeCalculator) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
 		this.detourTimeCalculator = new InsertionDetourTimeCalculator(stopTimeCalculator, null);
@@ -49,7 +49,7 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 
 	@Override
 	public Optional<InsertionWithDetourData> findBestInsertion(DrtRequest drtRequest,
-			Collection<VehicleEntry> vehicleEntries) {
+															   Collection<VehicleEntry> vehicleEntries) {
 		var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
 		if (insertions.isEmpty()) {
 			return Optional.empty();
@@ -59,7 +59,7 @@ final class ExtensiveInsertionSearch implements DrtInsertionSearch {
 		return bestInsertionFinder.findBestInsertion(drtRequest, insertions.stream().map(i -> {
 			var insertionDetourData = pathData.createInsertionDetourData(i);
 			return new InsertionWithDetourData(i, insertionDetourData,
-					detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
+				detourTimeCalculator.calculateDetourTimeInfo(i, insertionDetourData, drtRequest));
 		}));
 	}
 }

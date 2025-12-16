@@ -1,0 +1,10 @@
+component_management:
+  individual_components:
+    - component_id: core
+      name: core
+      paths:
+        - matsim/**
+    - component_id: contribs
+      name: contribs
+      paths:
+        - contribs/**

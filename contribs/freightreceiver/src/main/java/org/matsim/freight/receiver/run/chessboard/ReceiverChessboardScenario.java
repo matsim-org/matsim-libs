@@ -229,7 +229,7 @@ public class ReceiverChessboardScenario {
             }
 
             CarrierShipment shipment = shpBuilder.setDeliveryDuration(order.getServiceDuration())
-                    .setDeliveryStartsTimeWindow(receiverPlan.getTimeWindows().get(0))
+                    .setDeliveryStartingTimeWindow(receiverPlan.getTimeWindows().get(0))
                     .build();
             carriers.getCarriers().get(receiverOrder.getCarrierId()).getShipments().put(shipment.getId(), shipment);
         }

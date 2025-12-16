@@ -37,6 +37,7 @@ import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.events.CarrierServiceEndEvent;
@@ -201,15 +202,14 @@ import org.matsim.vehicles.VehicleUtils;
 
     // assign the lspShipments to the LSP
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     // schedule the LSP with the lspShipments and according to the scheduler of the Resource
     lsp.scheduleLogisticChains();
 
     // Prepare LSPModule and add the LSP
-    LSPs lsps = new LSPs(Collections.singletonList(lsp));
-    LSPUtils.addLSPs(scenario, lsps);
+	  LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(lsp));
     return scenario;
   }
 
@@ -217,7 +217,7 @@ import org.matsim.vehicles.VehicleUtils;
     // Set up required MATSim classes
     Config config = ConfigUtils.createConfig();
 
-    config.network().setInputFile("scenarios/2regions/2regions-network.xml");
+    config.network().setInputFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 
     config.controller().setLastIteration(0);
     config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

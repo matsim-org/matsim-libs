@@ -210,7 +210,7 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 					Link lastLink = this.sc.getNetwork().getLinks().get(lastAct.getLinkId());
 					Link currentLink = this.sc.getNetwork().getLinks().get(act.getLinkId());
 
-					Path path = this.routingAlgo.calcLeastCostPath(lastLink.getToNode(), currentLink.getFromNode(), 0.0, null, null);
+					Path path = this.routingAlgo.calcLeastCostPath(lastLink, currentLink, 0.0, null, null);
 					this.storeLinks(currentMode, path.links);
 					lastAct = act;
 				}

@@ -19,14 +19,17 @@
  */
 package org.matsim.contrib.drt.extension.services.tasks;
 
-import com.google.common.base.Verify;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.common.util.reservation.ReservationManager;
 import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacility;
 import org.matsim.contrib.drt.extension.operations.shifts.schedule.OperationalStop;
 import org.matsim.contrib.drt.extension.services.schedule.DrtService;
 import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.DefaultStayTask;
+import org.matsim.contrib.evrp.ChargingTask;
+
+import java.util.Optional;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 
@@ -36,21 +39,15 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 public class DrtServiceTask extends DefaultStayTask implements OperationalStop {
 
 	public static final DrtTaskType TYPE = new DrtTaskType("SERVICE", STAY);
-	OperationFacility operationFacility;
+	Id<OperationFacility> facilityId;
 	Id<DrtService> drtServiceId;
 	final double intendedDuration;
 
-	public DrtServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility operationFacility) {
+	public DrtServiceTask(Id<DrtService> drtServiceId, double beginTime, double endTime, Link link, OperationFacility facility) {
 		super(TYPE,beginTime, endTime, link);
-		this.operationFacility = operationFacility;
+		this.facilityId = facility.getId();
 		this.drtServiceId = drtServiceId;
 		this.intendedDuration = endTime-beginTime;
-		Verify.verify(link.getId().equals(operationFacility.getLinkId()));
-	}
-
-	@Override
-	public OperationFacility getFacility() {
-		return operationFacility;
 	}
 
 	public Id<DrtService> getDrtServiceId() {
@@ -59,6 +56,26 @@ public class DrtServiceTask extends DefaultStayTask implements OperationalStop {
 
 	public double getIntendedDuration() {
 		return intendedDuration;
+	}
+
+	@Override
+	public Id<OperationFacility> getFacilityId() {
+		return facilityId;
+	}
+
+	@Override
+	public Optional<Id<ReservationManager.Reservation>> getReservationId() {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<ChargingTask> getChargingTask() {
+		return Optional.empty();
+	}
+
+	@Override
+	public boolean addCharging(ChargingTask chargingTask) {
+		return false;
 	}
 }
 

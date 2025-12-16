@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -45,20 +48,38 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
  * @author mrieser / SBB
  */
 public final class RaptorUtils {
-
+    private static final Logger log = LogManager.getLogger( RaptorUtils.class );
+	public static final String TOTAL_ROUTE_COST_ATTR_NAME = "totalRouteCost";
 
     private RaptorUtils() {
     }
 
     public static RaptorStaticConfig createStaticConfig(Config config) {
-        RoutingConfigGroup pcrConfig = config.routing();
+        RoutingConfigGroup routingConfig = config.routing();
         SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 
         RaptorStaticConfig staticConfig = new RaptorStaticConfig();
 
 		staticConfig.setBeelineWalkConnectionDistance(config.transitRouter().getMaxBeelineWalkConnectionDistance());
-		RoutingConfigGroup.TeleportedModeParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk );
-		staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
+//		RoutingConfigGroup.TeleportedModeParams walk = routingConfig.getModeRoutingParams().get(TransportMode.walk );
+
+        // the code below also exists in TransitRouterConfig.  kai, mar'25
+        RoutingConfigGroup.TeleportedModeParams params = routingConfig.getTeleportedModeParams().get( TransportMode.transit_walk );
+        if ( params==null ) {
+            params = routingConfig.getTeleportedModeParams().get( TransportMode.non_network_walk );
+        }
+        if ( params==null ) {
+            params = routingConfig.getTeleportedModeParams().get( TransportMode.walk) ;
+        }
+        if ( params==null ) {
+            log.error( "teleported mode params do not exist for " + TransportMode.transit_walk + ", " + TransportMode.non_network_walk + ", nor "
+                               + TransportMode.walk + ".  At least one of them needs to be defined for TransitRouterConfig.  Aborting ...");
+            // yyyy I do not know which of this is conceptually the correct one.  It should _not_ be walk since that may be routed on the network, see TransitRouterConfig.  kai, mar'25
+        }
+        Gbl.assertNotNull( params );
+        RoutingConfigGroup.TeleportedModeParams walk = params;
+
+        staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
 		staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
 		staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
 		staticConfig.setIntermodalLegOnlyHandling(srrConfig.getIntermodalLegOnlyHandling());
@@ -130,6 +151,7 @@ public final class RaptorUtils {
                             leg.setDepartureTime(lastArrivalTime);
                         }
                         lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
+						leg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                     }
                     else {
                     	Activity act = (Activity) pe;
@@ -140,14 +162,12 @@ public final class RaptorUtils {
                 // a pt leg
                 Leg ptLeg = PopulationUtils.createLeg(part.mode);
                 ptLeg.setDepartureTime(part.depTime);
-                ptLeg.setTravelTime(part.arrivalTime - part.depTime);
-                DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop);
-                ptRoute.setBoardingTime(part.boardingTime);
-                ptRoute.setTravelTime(part.arrivalTime - part.depTime);
-                ptRoute.setDistance(part.distance);
-                ptLeg.setRoute(ptRoute);
-                legs.add(ptLeg);
-                lastArrivalTime = part.arrivalTime;
+                ptLeg.setTravelTime(part.getChainedArrivalTime() - part.depTime);
+
+                ptLeg.setRoute(convertRoutePart(part));
+				ptLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
+				legs.add(ptLeg);
+                lastArrivalTime = part.getChainedArrivalTime();
                 firstPtLegProcessed = true;
                 if (previousTransferWalkleg != null) {
                     //adds the margin only to legs in between pt legs
@@ -168,6 +188,7 @@ public final class RaptorUtils {
                 walkRoute.setTravelTime(travelTime);
                 walkRoute.setDistance(part.distance);
                 walkLeg.setRoute(walkRoute);
+				walkLeg.getAttributes().putAttribute(TOTAL_ROUTE_COST_ATTR_NAME, route.getTotalCosts());
                 legs.add(walkLeg);
                 lastArrivalTime = part.arrivalTime;
                 if (firstPtLegProcessed) {
@@ -178,4 +199,23 @@ public final class RaptorUtils {
 
         return legs;
     }
+
+
+	/**
+	 * Create passenger routes recursively.
+	 */
+	private static DefaultTransitPassengerRoute convertRoutePart(RaptorRoute.RoutePart part) {
+
+		if (part == null)
+			return null;
+
+		DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop, convertRoutePart(part.chainedPart));
+		ptRoute.setBoardingTime(part.boardingTime);
+		ptRoute.setTravelTime(part.getChainedArrivalTime() - part.depTime);
+		ptRoute.setDistance(part.getChainedDistance());
+		// End link is always set to the last destination
+		ptRoute.setEndLinkId(part.getChainedEgressStop().getLinkId());
+
+		return ptRoute;
+	}
 }

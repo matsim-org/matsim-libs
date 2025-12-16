@@ -9,8 +9,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * Provider for {@link SimplePlanSelectionStrategy}.
@@ -29,15 +29,12 @@ public class SelectBestKPlanModesStrategyProvider implements Provider<PlanStrate
 	@Inject
 	private Provider<GeneratorContext> generator;
 
-	@Inject
-	private Provider<PlanSelector> selector;
-
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SimplePlanSelectionStrategy(globalConfigGroup, generator, selector));
+		builder.addStrategyModule(new SimplePlanSelectionStrategy(globalConfigGroup, generator));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 
 		return builder.build();

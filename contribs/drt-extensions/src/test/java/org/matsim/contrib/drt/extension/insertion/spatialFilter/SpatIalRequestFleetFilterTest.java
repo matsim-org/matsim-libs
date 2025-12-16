@@ -1,6 +1,13 @@
 package org.matsim.contrib.drt.extension.insertion.spatialFilter;
 
-import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -10,22 +17,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DefaultDrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
-import org.matsim.contrib.dvrp.fleet.*;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
+import org.matsim.contrib.dvrp.fleet.Fleets;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegersLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author nkuehnel / MOIA
@@ -40,7 +50,54 @@ public class SpatIalRequestFleetFilterTest {
     @RegisterExtension
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
+    private static final IntegersLoadType loadType = new IntegersLoadType("passengers");
+
+	@Test
+	void testConcurrentFiltering() throws InterruptedException {
+		Link link = prepareNetworkAndLink();
+		MobsimTimer timer = new MobsimTimer(1);
+		timer.setTime(0);
+
+		Fleet fleet = getFleet(link);
+		var vehicleEntry = getVehicleEntry(link, fleet);
+		Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries = Map.of(V_1_ID, vehicleEntry);
+
+		DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
+
+		DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
+		params.setUpdateInterval(0.1); // very frequent updates
+		params.setExpansionFactor(2);
+		params.setMinExpansion(1);
+		params.setMaxExpansion(10);
+		params.setReturnAllIfEmpty(true);
+
+		SpatialRequestFleetFilter filter = new SpatialRequestFleetFilter(fleet, params);
+
+		int threadCount = 10;
+		int iterationsPerThread = 100;
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		CountDownLatch latch = new CountDownLatch(threadCount);
+
+		for (int i = 0; i < threadCount; i++) {
+			executor.submit(() -> {
+				try {
+					for (int j = 0; j < iterationsPerThread; j++) {
+						timer.setTime(j * 0.1); // simulate time progression
+						Collection<VehicleEntry> result = filter.filter(dummyRequest, vehicleEntries, timer.getTimeOfDay());
+						Assertions.assertThat(result).isNotNull();
+					}
+				} finally {
+					latch.countDown();
+				}
+			});
+		}
+
+		latch.await();
+		executor.shutdown();
+	}
+
+
+	@Test
     void test() {
 
         Link link = prepareNetworkAndLink();
@@ -54,14 +111,14 @@ public class SpatIalRequestFleetFilterTest {
         DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
 
         DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
-        params.updateInterval = 1;
-        params.expansionFactor = 2;
+        params.setUpdateInterval(1);
+        params.setExpansionFactor(2);
 
         // mimic no finding of candidates by setting min higher by max (prevented by config consistency check in regular setup)
-        params.minExpansion = 1;
-        params.maxExpansion = 0;
-        params.returnAllIfEmpty = false;
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        params.setMinExpansion(1);
+        params.setMaxExpansion(0);
+        params.setReturnAllIfEmpty(false);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isEmpty();
     }
@@ -81,12 +138,12 @@ public class SpatIalRequestFleetFilterTest {
         DrtRequest dummyRequest = request("r1", link, link, 0., 0, 0, 0);
 
         DrtSpatialRequestFleetFilterParams params = new DrtSpatialRequestFleetFilterParams();
-        params.updateInterval = 1;
-        params.expansionFactor = 2;
-        params.minExpansion = 1;
-        params.maxExpansion = 0;
-        params.returnAllIfEmpty = true;
-        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, timer, params);
+        params.setUpdateInterval(1);
+        params.setExpansionFactor(2);
+        params.setMinExpansion(1);
+        params.setMaxExpansion(0);
+        params.setReturnAllIfEmpty(true);
+        SpatialRequestFleetFilter spatialRequestFleetFilter = new SpatialRequestFleetFilter(fleet, params);
         Collection<VehicleEntry> filtered = spatialRequestFleetFilter.filter(dummyRequest, Map.of(V_1_ID, vehicleEntry), 0);
         Assertions.assertThat(filtered).isNotEmpty();
     }
@@ -138,27 +195,31 @@ public class SpatIalRequestFleetFilterTest {
         return DrtRequest.newBuilder()
                 .id(Id.create(id, Request.class))
                 .passengerIds(List.of(Id.createPersonId(id)))
+                .earliestDepartureTime(submissionTime)
+                .constraints(
+                        new DrtRouteConstraints(
+                                latestArrivalTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                latestStartTime - earliestStartTime,
+                                Double.POSITIVE_INFINITY,
+                                0.,
+                                false
+                        )
+                )
                 .submissionTime(submissionTime)
-                .latestArrivalTime(latestArrivalTime)
-                .latestStartTime(latestStartTime)
-                .earliestStartTime(earliestStartTime)
                 .fromLink(fromLink)
                 .toLink(toLink)
                 .mode("drt")
                 .build();
     }
 
-    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, Waypoint.Stop... stops) {
+    private VehicleEntry entry(DvrpVehicle vehicle, Waypoint.Start start, StopWaypoint... stops) {
         List<Double> precedingStayTimes = Collections.nCopies(stops.length, 0.0);
         return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops), null, precedingStayTimes, 0);
     }
 
     private Waypoint.Start start(Task task, double time, Link link, int occupancy) {
-        return new Waypoint.Start(task, link, time, occupancy);
-    }
-
-    private Waypoint.Stop stop(DefaultDrtStopTask stopTask, int outgoingOccupancy) {
-        return new Waypoint.Stop(stopTask, outgoingOccupancy);
+        return new Waypoint.Start(task, link, time, loadType.fromArray(occupancy));
     }
 
 }

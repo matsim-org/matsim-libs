@@ -10,8 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
-import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -227,13 +226,13 @@ public class DrtPoolingParameterTest {
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements().forEach(x -> {
-			DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-					(DefaultDrtOptimizationConstraintsSet) x.addOrGetDrtOptimizationConstraintsParams()
-							.addOrGetDefaultDrtOptimizationConstraintsSet();
-			defaultConstraintsSet.maxWaitTime = maxWaitTime;
-			defaultConstraintsSet.maxTravelTimeAlpha = maxTravelTimeAlpha;
-			defaultConstraintsSet.maxTravelTimeBeta = maxTravelTimeBeta;
-			x.stopDuration = 1.;
+			DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                    x.addOrGetDrtOptimizationConstraintsParams()
+                            .addOrGetDefaultDrtOptimizationConstraintsSet();
+			defaultConstraintsSet.setMaxWaitTime(maxWaitTime);
+			defaultConstraintsSet.setMaxTravelTimeAlpha(maxTravelTimeAlpha);
+			defaultConstraintsSet.setMaxTravelTimeBeta(maxTravelTimeBeta);
+			x.setStopDuration(1.);
 		});
 
 		Controler controler = DrtControlerCreator.createControler(config, false);

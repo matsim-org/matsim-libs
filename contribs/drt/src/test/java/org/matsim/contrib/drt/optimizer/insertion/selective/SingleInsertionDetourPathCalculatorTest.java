@@ -39,9 +39,11 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint.Dropoff;
 import org.matsim.contrib.drt.optimizer.Waypoint.End;
 import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -61,13 +63,22 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final Link beforeDropoffLink = link("before_dropoff");
 	private final Link dropoffLink = link("dropoff");
 	private final Link afterDropoffLink = link("after_dropoff");
+	private final IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.earliestDepartureTime(100)
+			.constraints(
+					new DrtRouteConstraints(
+							400,
+							Double.POSITIVE_INFINITY,
+							100,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
@@ -88,7 +99,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink));
 		var dropoff = insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, integerLoadType.fromInt(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
@@ -107,7 +118,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 		//use specific class of waypoint to allow for detecting the special case
 		var pickup = insertionPoint(waypoint(beforePickupLink), waypoint(dropoffLink, Dropoff.class));
 		var dropoff = insertionPoint(waypoint(pickupLink, Pickup.class), waypoint(dropoffLink, End.class));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, integerLoadType.fromInt(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
@@ -123,7 +134,7 @@ public class SingleInsertionDetourPathCalculatorTest {
 	void calculatePaths_noDetours() {
 		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
 		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
-		var insertion = new Insertion(null, pickup, dropoff);
+		var insertion = new Insertion(null, pickup, dropoff, integerLoadType.fromInt(1));
 
 		var insertionWithDetourData = detourPathCalculator.calculatePaths(request, insertion);
 
@@ -134,10 +145,8 @@ public class SingleInsertionDetourPathCalculatorTest {
 	}
 
 	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
-		var fromNode = fromLink.getToNode();
-		var toNode = toLink.getFromNode();
-		var path = new Path(List.of(fromNode, toNode), List.of(), pathTravelTime, pathTravelTime + 1000);
-		when(pathCalculator.calcLeastCostPath(eq(fromNode), eq(toNode), eq(startTimeArg + FIRST_LINK_TT), isNull(),
+		var path = new Path(List.of(fromLink.getToNode(), toLink.getFromNode()), List.of(), pathTravelTime, pathTravelTime + 1000);
+		when(pathCalculator.calcLeastCostPath(eq(fromLink), eq(toLink), eq(startTimeArg + FIRST_LINK_TT), isNull(),
 				isNull())).thenReturn(path);
 		return path;
 	}

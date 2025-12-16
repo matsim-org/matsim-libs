@@ -116,11 +116,11 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance( Id.create( id, CarrierShipment.class ),
 					  Id.create( from, Link.class ), Id.create( to, Link.class ), size );
 				if( startPickup == null ){
-					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartsTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) ).setDeliveryStartingTimeWindow(
 						  TimeWindow.newInstance( 0.0, Integer.MAX_VALUE ) );
 				} else{
-					shipmentBuilder.setPickupStartsTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
-						setDeliveryStartsTimeWindow(
+					shipmentBuilder.setPickupStartingTimeWindow( TimeWindow.newInstance( getDouble( startPickup ), getDouble( endPickup ) ) ).
+						setDeliveryStartingTimeWindow(
 																										   TimeWindow.newInstance(
 																											     getDouble(
 																													 startDelivery ),
@@ -152,7 +152,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 					typeId = "default";
 				}
 
-				VehicleType vehicleType = carrierVehicleTypes.getVehicleTypes().get( Id.create( typeId, VehicleType.class ) );
+				VehicleType vehicleType = carrierVehicleTypes.getVehicleTypes().get( Id.createVehicleTypeId(typeId) );
 				if ( vehicleType==null ) {
 					throw new RuntimeException( "VehicleTypeId=" + typeId + " is missing" );
 				}
@@ -268,9 +268,12 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 		}
 		if (name.equals("plan")) {
-			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
+			CarrierPlan currentPlan = new CarrierPlan(scheduledTours );
 			currentPlan.setScore(currentScore );
-			currentCarrier.getPlans().add( currentPlan );
+			//The following is done instead of currentCarrier.addPlan(currentPlan), because addPlan() sets the selected plan, if now plan is already selected.
+			//In this version here it seems to be ok, to have also plans without any decision if they are selected or not.
+			currentCarrier.getPlans().add(currentPlan); // Just add the plan without making it the selected one.
+			currentPlan.setCarrier(currentCarrier); // This is necessary for the bidirectional reference.
 			if(this.selected){
 				currentCarrier.setSelectedPlan( currentPlan );
 			}

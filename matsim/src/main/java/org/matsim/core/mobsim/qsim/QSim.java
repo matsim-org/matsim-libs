@@ -37,11 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -62,7 +58,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
@@ -95,7 +91,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements Netsim {
 
 	final private static Logger log = LogManager.getLogger(QSim.class);
 
@@ -105,7 +101,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
-	//	private static final int INFO_PERIOD = 10;
 
 	private final EventsManager events;
 
@@ -154,7 +149,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		}
 
 		@Override
-		public QSim getMobsim() {
+		public Netsim getMobsim() {
 			return QSim.this;
 		}
 
@@ -173,18 +168,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 			return null;
 		}
 
-//		@Override
-//		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-//		public void rescheduleActivityEnd(MobsimAgent agent) {
-//			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
-//			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
-//			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence,
-//			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
-//			QSim.this.activityEngine.rescheduleActivityEnd(agent);
-//		}
-
-		@Override
-		public final List<DepartureHandler> getDepartureHandlers() {
+		@Override public final List<DepartureHandler> getDepartureHandlers() {
 			return departureHandlers ;
 		}
 	};
@@ -192,7 +176,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 	private final Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
 	private final Injector childInjector;
-//	private QVehicleFactory qVehicleFactory;
 
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
@@ -223,7 +206,6 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		this.simTimer = new MobsimTimer( sc.getConfig().qsim().getTimeStepSize());
 
 		this.childInjector = childInjector ;
-//		this.qVehicleFactory = qVehicleFactory;
 	}
 
 	// ============================================================================================================================
@@ -316,6 +298,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 //	}
 
 	private static int wrnCnt2 = 0;
+	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (this.netEngine != null) {
 			this.netEngine.addParkedVehicle(veh, startLinkId);
@@ -343,6 +326,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		// yy one might want to check if the types/vehicles here are the same as in previous iterations. kai/kai, jan'20
 	}
 
+	@Override
 	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
@@ -441,6 +425,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		return doContinue;
 	}
 
+	@Override
 	public void insertAgentIntoMobsim(final MobsimAgent agent) {
 		if (this.agents.containsKey(agent.getId())) {
 			throw new RuntimeException("Agent with same Id (" + agent.getId().toString() + ") already in mobsim; aborting ... ") ;
@@ -448,7 +433,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
 		if ( agent instanceof HasPerson ){
-			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			final Population allpersons = PopulationUtils.getOrCreateAllPersons( scenario );
 			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
 				allpersons.addPerson( ((HasPerson) agent).getPerson() );
 			}
@@ -564,7 +549,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 					.getTime()) / 1000;
 			double diffsim = time - this.simTimer.getSimStartTime();
 			log.info("SIMULATION (NEW QSim) AT " + Time.writeTime(time)
-					+ " : #Veh=" + this.agentCounter.getLiving() + " lost="
+					+ " : #active agents=" + this.agentCounter.getLiving() + " lost="
 					+ this.agentCounter.getLost() + " simT=" + diffsim
 					+ "s realT=" + (diffreal) + "s; (s/r): "
 					+ (diffsim / (diffreal + Double.MIN_VALUE)));
@@ -716,6 +701,7 @@ public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 		};
 	}
 
+	@Override
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}

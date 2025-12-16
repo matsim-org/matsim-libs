@@ -22,7 +22,7 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PopulationUtils;
@@ -62,8 +62,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager) {
-        controlerListenerManager.addControlerListener(new AfterMobsimListener() {
+    EventsToActivities(ControllerListenerManager controllerListenerManager) {
+        controllerListenerManager.addControllerListener(new AfterMobsimListener() {
             @Override
             public void notifyAfterMobsim(AfterMobsimEvent event) {
                 finish();
@@ -81,8 +81,9 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
+		PersonExperiencedActivity personExperiencedActivity = new PersonExperiencedActivity(event.getPersonId(), activity);
         for (ActivityHandler activityHandler : this.activityHandlers) {
-            activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
+            activityHandler.handleActivity(personExperiencedActivity);
         }
     }
 
@@ -107,8 +108,9 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 
     public void finish() {
         this.activities.forEach((id, activity) -> {
+			PersonExperiencedActivity personExperiencedActivity = new PersonExperiencedActivity(id, activity);
             for (ActivityHandler activityHandler : this.activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
+                activityHandler.handleActivity(personExperiencedActivity);
             }
         });
     }

@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.AcceptedDrtRequest;
@@ -31,15 +32,12 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.load.IntegerLoadType;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.network.NetworkUtils;
@@ -600,6 +598,7 @@ public class ComplexUnschedulerTest {
 		private final DvrpVehicleLookup lookup;
 
 		private int requestIndex = 0;
+		private final IntegerLoadType integerLoadType = new IntegerLoadType("passengers");
 
 		Fixture() {
 			this.network = createNetwork();
@@ -625,17 +624,18 @@ public class ComplexUnschedulerTest {
 			Mockito.when(this.lookup.lookupVehicle(Mockito.any())).thenReturn(vehicle);
 
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.stopDuration = 30.0;
-			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWaitTime = 600.0;
+			drtConfig.setStopDuration(30.0);
+			drtConfig.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWaitTime(600.0);
 
-			this.entryFactory = new VehicleDataEntryFactoryImpl();
+			this.entryFactory = new VehicleDataEntryFactoryImpl(integerLoadType, new StopWaypointFactoryImpl(integerLoadType, false));
 
-			this.timingUpdater = Mockito.mock(ScheduleTimingUpdater.class);
+			this.timingUpdater = Mockito.mock(ScheduleTimingUpdaterImpl.class);
 		}
 
 		AcceptedDrtRequest createRequest() {
 			AcceptedDrtRequest request = Mockito.mock(AcceptedDrtRequest.class);
 			Mockito.when(request.getId()).thenReturn(Id.create("req_" + requestIndex++, Request.class));
+			Mockito.when(request.getLoad()).thenReturn(integerLoadType.getEmptyLoad());
 			return request;
 		}
 

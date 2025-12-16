@@ -22,9 +22,14 @@ package org.matsim.contrib.drt.extension.edrt.run;
 
 import java.net.URL;
 
+import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.drt.extension.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactory;
+import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
+import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -64,8 +69,8 @@ public class RunEDrtScenario {
 			controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 				@Override
 				public void install() {
-					bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-							new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+					bindModal(EDrtVehicleDataEntryFactory.class).toProvider(
+							new EDrtVehicleDataEntryFactoryProvider(getMode(), MIN_RELATIVE_SOC));
 				}
 			});
 		}
@@ -78,14 +83,14 @@ public class RunEDrtScenario {
 				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 
 				for (DrtConfigGroup drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-					bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtCfg.mode))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
+					bind(Key.get(ChargingStrategy.Factory.class, DvrpModes.mode(drtCfg.getMode()))).toInstance(new ChargeUpToMaxSocStrategy.Factory(MAX_RELATIVE_SOC));
 				}
 			}
 		});
-		
+
 		return controler;
 	}
-	
+
 	public static void run(Config config, boolean otfvis) {
 		createControler(config, otfvis).run();
 	}

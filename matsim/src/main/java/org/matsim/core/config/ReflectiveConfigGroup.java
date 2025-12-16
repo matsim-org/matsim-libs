@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -305,7 +305,7 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	public void handleAddUnknownParam(final String paramName, final String value) {
 		Preconditions.checkArgument(this.storeUnknownParameters, "Module %s of type %s doesn't accept unknown parameters."
 				+ " Parameter %s is not part of the valid parameters: %s", getName(), getClass().getName(), paramName,
-			this.setters.keySet());
+			this.registeredParams);
 
 		log.warn(
 			"Unknown parameter {} for group {}. Here are the valid parameter names: {}. Only the string value will be remembered.",
@@ -519,12 +519,17 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup implements Matsi
 	private String toString(Object result) {
 		if (result == null) {
 			return null;
-		} else if (result instanceof Set<?> || result instanceof List<?>) {
-			//we only support Set<String> and List<String>, therefore we can safely cast to Collection<String>
-			var collection = ((Collection<String>)result);
-			Preconditions.checkArgument(collection.stream().noneMatch(String::isBlank),
-					"Collection %s contains blank elements. Only non-blank elements are supported.", collection);
-			return String.join(", ", collection);
+		} else if (result instanceof Set<?>) {
+			Set<String> set = ((Set<String>) result);
+			Preconditions.checkArgument(set.stream().noneMatch(String::isBlank),
+					"Set %s contains blank elements. Only non-blank elements are supported.", set);
+			// we sort the set to have a deterministic output
+			return set.stream().sorted().collect(Collectors.joining(", "));
+		} else if (result instanceof List<?>) {
+			List<String> list = ((List<String>) result);
+			Preconditions.checkArgument(list.stream().noneMatch(String::isBlank),
+					"List %s contains blank elements. Only non-blank elements are supported.", list);
+			return String.join(", ", list);
 		} else {
 			return result + "";
 		}

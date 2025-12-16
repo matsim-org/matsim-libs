@@ -90,7 +90,7 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 
 		router = new SpeedyALTFactory().createPathCalculator(network, travelDisutility, travelTime);
-		stopDuration = drtCfg.stopDuration;
+		stopDuration = drtCfg.getStopDuration();
 
 		initSchedules(fleet);
 	}
@@ -182,11 +182,11 @@ public class PreplannedDrtOptimizer implements DrtOptimizer {
 				if (nextStop.pickup) {
 					var request = Preconditions.checkNotNull(openRequests.get(nextStop.preplannedRequest.key),
 							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+					stopTask.addPickupRequest(AcceptedDrtRequest.createFromOriginalRequest(request, 60));
 				} else {
 					var request = Preconditions.checkNotNull(openRequests.remove(nextStop.preplannedRequest.key),
 							"Request (%s) has not been yet submitted", nextStop.preplannedRequest);
-					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request));
+					stopTask.addDropoffRequest(AcceptedDrtRequest.createFromOriginalRequest(request, 60));
 				}
 				schedule.addTask(stopTask);
 			}

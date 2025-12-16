@@ -17,7 +17,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControllerListenerManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.TripRouter;
@@ -31,7 +32,6 @@ import org.matsim.modechoice.estimators.*;
 import org.matsim.modechoice.pruning.CandidatePruner;
 import org.matsim.testcases.MatsimTestUtils;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
@@ -58,7 +58,7 @@ public class TopKMinMaxTest {
 	private TripRouter router;
 
 	@Mock
-	private ControlerListenerManager cl;
+	private ControllerListenerManager cl;
 
 	@Mock
 	private EventsManager em;
@@ -180,31 +180,29 @@ public class TopKMinMaxTest {
 		protected void configure() {
 
 			PopulationFactory f = PopulationUtils.getFactory();
-
+			bind(Config.class).toInstance(config);
 			bind(EventsManager.class).toInstance(em);
-			bind(ControlerListenerManager.class).toInstance(cl);
+			bind(ControllerListenerManager.class).toInstance(cl);
+			bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(config));
 
 			bind(TimeInterpretation.class).toInstance(TimeInterpretation.create(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration, PlansConfigGroup.TripDurationHandling.shiftActivityEndTimes, 0));
 
-			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then(new Answer<List<PlanElement>>() {
-				@Override
-				public List<PlanElement> answer(InvocationOnMock invocationOnMock) throws Throwable {
+			when(router.calcRoute(any(), any(), any(), anyDouble(), any(), any())).then((Answer<List<PlanElement>>) invocationOnMock -> {
 
-					Leg walk = f.createLeg(TransportMode.walk);
-					Leg car = f.createLeg(TransportMode.car);
+                Leg walk = f.createLeg(TransportMode.walk);
+                Leg car = f.createLeg(TransportMode.car);
 
-					walk.setTravelTime(1);
-					car.setTravelTime(10);
+                walk.setTravelTime(1);
+                car.setTravelTime(10);
 
-					if (invocationOnMock.getArgument(0).equals(TransportMode.car))
-						return List.of(walk, car);
-					else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
-						walk.setTravelTime(100);
-						return List.of(walk);
-					} else
-						throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
-				}
-			});
+                if (invocationOnMock.getArgument(0).equals(TransportMode.car))
+                    return List.of(walk, car);
+                else if (invocationOnMock.getArgument(0).equals(TransportMode.walk)) {
+                    walk.setTravelTime(100);
+                    return List.of(walk);
+                } else
+                    throw new Exception("Unknown main mode:" + invocationOnMock.getArgument(0));
+            });
 
 			bind(EstimateRouter.class).toInstance(new EstimateRouter(router,
 					FacilitiesUtils.createActivityFacilities(),
@@ -264,7 +262,7 @@ public class TopKMinMaxTest {
 		}
 
 		@Override
-		public double estimate(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
+		public double estimatePlan(EstimatorContext context, String mode, String[] modes, PlanModel plan, ModeAvailability option) {
 
 			double est = 0;
 			for (String m : modes) {

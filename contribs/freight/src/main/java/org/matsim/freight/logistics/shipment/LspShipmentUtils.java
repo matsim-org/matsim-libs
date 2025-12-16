@@ -145,6 +145,8 @@ public final class LspShipmentUtils {
 
   //-----------------------------
   // LoggedShipment<..> builders
+  // Consider changing this Logged<...> ShipmentPlanElement to MATSim's experienced plans.
+  //This would be closer to MATSim and makes clear that this is what happened in the simulation. kmt/kn jan'25
   //-----------------------------
 
   @SuppressWarnings("ClassEscapesDefinedScope")
@@ -369,7 +371,7 @@ public final class LspShipmentUtils {
     }
 
     public LspShipmentPlanElement build() {
-      return new LoggedLspShipmentHandle(this);
+      return new LoggedLspShipmentHandling(this);
     }
   }
 
@@ -383,6 +385,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentLoadBuilder() {}
 
@@ -397,6 +400,8 @@ public final class LspShipmentUtils {
     public void setEndTime(double endTime) {
       this.endTime = endTime;
     }
+
+	public void setLinkId(Id<Link> linkId) {this.linkId = linkId;}
 
     public void setLogisticChainElement(LogisticChainElement element) {
       this.element = element;
@@ -476,6 +481,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentUnloadBuilder() {}
 
@@ -499,6 +505,10 @@ public final class LspShipmentUtils {
       this.resourceId = resourceId;
     }
 
+	public void setLinkId(Id<Link> linkId) {
+		  this.linkId = linkId;
+	  }
+
     public ScheduledLspShipmentUnload build() {
       return new ScheduledLspShipmentUnload(this);
     }
@@ -510,6 +520,7 @@ public final class LspShipmentUtils {
     double endTime;
     LogisticChainElement element;
     Id<LSPResource> resourceId;
+	Id<Link> linkId;
 
     private ScheduledShipmentHandleBuilder() {}
 
@@ -533,8 +544,12 @@ public final class LspShipmentUtils {
       this.resourceId = resourceId;
     }
 
-    public ScheduledLspShipmentHandle build() {
-      return new ScheduledLspShipmentHandle(this);
+	public void setLinkId(Id<Link> linkId) {
+		  this.linkId = linkId;
+	  }
+
+    public ScheduledLspShipmentHandling build() {
+      return new ScheduledLspShipmentHandling(this);
     }
   }
 

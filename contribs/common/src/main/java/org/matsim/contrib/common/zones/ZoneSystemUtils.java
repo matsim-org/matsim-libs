@@ -1,15 +1,37 @@
 package org.matsim.contrib.common.zones;
 
-import com.google.common.base.Preconditions;
-import one.util.streamex.EntryStream;
-import one.util.streamex.StreamEx;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+
+import java.io.File;
+import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.geotools.api.feature.Property;
 import org.geotools.api.feature.simple.SimpleFeature;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygonal;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdCollectors;
 import org.matsim.api.core.v01.IdMap;
@@ -33,18 +55,12 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.GeoFileReader;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import com.google.common.base.Preconditions;
 
-import static java.util.stream.Collectors.*;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import one.util.streamex.EntryStream;
+import one.util.streamex.StreamEx;
 
 /**
  * @author nkuehnel / MOIA
@@ -70,20 +86,20 @@ public final class ZoneSystemUtils {
 
 		final ZoneSystem zoneSystem = switch (zoneSystemParams.getName()) {
 			case GISFileZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+				Preconditions.checkNotNull(((GISFileZoneSystemParams) zoneSystemParams).getZonesShapeFile());
 				Preconditions.checkNotNull(context);
-				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).zonesShapeFile);
+				URL url = ConfigGroup.getInputFileURL(context, ((GISFileZoneSystemParams) zoneSystemParams).getZonesShapeFile());
 				Collection<SimpleFeature> features = GeoFileReader.getAllFeatures(url);
 				yield ZoneSystemUtils.createFromFeatures(network, features, zoneFilter);
 			}
 			case SquareGridZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).cellSize);
-                yield new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).cellSize, zoneFilter);
+				Preconditions.checkNotNull(((SquareGridZoneSystemParams) zoneSystemParams).getCellSize());
+                yield new SquareGridZoneSystem(network, ((SquareGridZoneSystemParams) zoneSystemParams).getCellSize(), zoneFilter);
 			}
 			case H3GridZoneSystemParams.SET_NAME -> {
-				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).h3Resolution);
+				Preconditions.checkNotNull(((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution());
 				Preconditions.checkNotNull(crs);
-				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).h3Resolution, network, zoneFilter);
+				yield new H3ZoneSystem(crs, ((H3GridZoneSystemParams) zoneSystemParams).getH3Resolution(), network, zoneFilter);
 			}
 			case GeometryFreeZoneSystemParams.SET_NAME -> new GeometryFreeZoneSystem(network);
 			default -> throw new IllegalStateException("Unexpected value: " + zoneSystemParams.getName());
@@ -218,5 +234,46 @@ public final class ZoneSystemUtils {
 			zonesByDistance.put(currentZone.getId(), sortedZones);
 		}
 		return zonesByDistance;
+	}
+
+	public static <T extends BasicLocation> Predicate<Zone> createPredicateByLocations(Stream<T> features) {
+		GeometryFactory geometryFactory = new GeometryFactory();
+
+		Set<Point> points = features.map(BasicLocation::getCoord).map(coord -> {
+			return geometryFactory.createPoint(new Coordinate(coord.getX(), coord.getY()));
+		}).collect(Collectors.toSet());
+
+		return zone -> {
+			for (Point point : points) {
+				if (zone.getPreparedGeometry().covers(point)) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+	}
+
+	public static void registerDefaultZoneSystems(AddZoneSystemDefinition delegate, Consumer<ZoneSystemParams> setter, Supplier<ZoneSystemParams> getter) {
+		delegate.addDefinition(SquareGridZoneSystemParams.SET_NAME, SquareGridZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((SquareGridZoneSystemParams)params));
+
+		delegate.addDefinition(GISFileZoneSystemParams.SET_NAME, GISFileZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((GISFileZoneSystemParams)params));
+
+		delegate.addDefinition(H3GridZoneSystemParams.SET_NAME, H3GridZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((H3GridZoneSystemParams)params));
+
+		delegate.addDefinition(GeometryFreeZoneSystemParams.SET_NAME, GeometryFreeZoneSystemParams::new,
+				() -> getter.get(),
+				params -> setter.accept((GeometryFreeZoneSystemParams)params));
+	}
+
+	static public interface AddZoneSystemDefinition {
+		<T extends ConfigGroup> void addDefinition(String type, Supplier<T> creator, Supplier<ConfigGroup> getter,
+				Consumer<ConfigGroup> setter);
 	}
 }

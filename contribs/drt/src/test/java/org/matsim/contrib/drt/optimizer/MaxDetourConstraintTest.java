@@ -3,7 +3,7 @@ package org.matsim.contrib.drt.optimizer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
-import org.matsim.contrib.drt.optimizer.constraints.DefaultDrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -37,20 +37,20 @@ public class MaxDetourConstraintTest {
 		DrtConfigGroup drtConfigGroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Max wait time
-		DefaultDrtOptimizationConstraintsSet defaultConstraintsSet =
-				(DefaultDrtOptimizationConstraintsSet) drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-						.addOrGetDefaultDrtOptimizationConstraintsSet();
-		defaultConstraintsSet.maxWaitTime = 300;
+		DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
+                drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+                        .addOrGetDefaultDrtOptimizationConstraintsSet();
+		defaultConstraintsSet.setMaxWaitTime(300);
 
 		// Turn on the max detour constraint
-		defaultConstraintsSet.maxDetourAlpha = 1.5;
-		defaultConstraintsSet.maxDetourBeta = 300;
-		defaultConstraintsSet.maxAllowedPickupDelay = 180;
-		defaultConstraintsSet.maxAbsoluteDetour = 1200;
+		defaultConstraintsSet.setMaxDetourAlpha(1.5);
+		defaultConstraintsSet.setMaxDetourBeta(300);
+		defaultConstraintsSet.setMaxAllowedPickupDelay(180);
+		defaultConstraintsSet.setMaxAbsoluteDetour(1200);
 
 		// Make the max total travel time constraints very loose (i.e., make it not active)
-		defaultConstraintsSet.maxTravelTimeAlpha = 10;
-		defaultConstraintsSet.maxTravelTimeBeta = 7200;
+		defaultConstraintsSet.setMaxTravelTimeAlpha(10);
+		defaultConstraintsSet.setMaxTravelTimeBeta(7200);
 
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

@@ -42,8 +42,8 @@ public class TrafficCountsDashboardTest {
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
 
 		SimWrapperConfigGroup.ContextParams contextParams = simWrapperConfigGroup.defaultParams();
-		contextParams.mapCenter = "12,48.95";
-		contextParams.mapZoomLevel = 9.0;
+		contextParams.setMapCenter("12,48.95");
+		contextParams.setMapZoomLevel(9.0);
 
 		SimWrapper sw = SimWrapper.create(config)
 			.addDashboard(new TrafficCountsDashboard()

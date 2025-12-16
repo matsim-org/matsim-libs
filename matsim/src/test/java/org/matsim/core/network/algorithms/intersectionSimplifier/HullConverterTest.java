@@ -29,10 +29,6 @@ import org.locationtech.jts.geom.Polygon;
 
 public class HullConverterTest {
 
-	public void testConvert() {
-
-	}
-
 	/**
 	 * 	   4           3
 	 *   (5,0)-------(5,5)
@@ -46,11 +42,11 @@ public class HullConverterTest {
 	@Test
 	void testConvertString(){
 		/* Must pass a Geometry. */
-		Object o = new Integer(0);
+		Object o = 0;
 		HullConverter hc = new HullConverter();
 		String s = hc.convertToString(o);
 		Assertions.assertTrue(s.isEmpty(), "Should receive empty string");
-		
+
 		/* Check String. */
 		GeometryFactory gf = new GeometryFactory();
 		Coordinate[] ca = new Coordinate[5];
@@ -59,13 +55,13 @@ public class HullConverterTest {
 		ca[2] = new Coordinate(5.0, 5.0);
 		ca[3] = new Coordinate(0.0, 5.0);
 		ca[4] = ca[0];
-		
+
 		/* Point */
 		Point point = gf.createPoint(ca[0]);
 		s = hc.convertToString(point);
 		String pointString = "(0.0;0.0)";
 		Assertions.assertTrue(pointString.equalsIgnoreCase(s), "Wrong string for point.");
-		
+
 		/* Line */
 		Coordinate[] ca2 = new Coordinate[2];
 		ca2[0] = ca[0];
@@ -74,11 +70,11 @@ public class HullConverterTest {
 		s = hc.convertToString(line);
 		String lineString = "(0.0;0.0),(5.0;0.0)";
 		Assertions.assertTrue(lineString.equalsIgnoreCase(s), "Wrong string for line.");
-		
+
 		/* Polygon */
 		Polygon polygon = gf.createPolygon(ca);
 		s = hc.convertToString(polygon);
-		String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)"; 
+		String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)";
 		Assertions.assertTrue(polygonString.equalsIgnoreCase(s), "Wrong string for polygon.");
 	}
 
@@ -101,22 +97,22 @@ public class HullConverterTest {
 		ca[2] = new Coordinate(5.0, 5.0);
 		ca[3] = new Coordinate(0.0, 5.0);
 		ca[4] = ca[0];
-		
+
 		/* Point */
 		Point point = gf.createPoint(ca[0]);
 		Assertions.assertEquals(point, hc.convert(hc.convertToString(point)), "Wrong point.");
-		
+
 		/* Line */
 		Coordinate[] ca2 = new Coordinate[2];
 		ca2[0] = ca[0];
 		ca2[1] = ca[1];
 		LineString line = gf.createLineString(ca2);
 		Assertions.assertEquals(line, hc.convert(hc.convertToString(line)), "Wrong line.");
-		
+
 		/* Polygon */
 		Polygon polygon = gf.createPolygon(ca);
 		Assertions.assertEquals(polygon, hc.convert(hc.convertToString(polygon)), "Wrong polygon.");
 	}
-	
+
 
 }

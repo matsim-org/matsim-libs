@@ -11,7 +11,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -23,8 +23,8 @@ import org.matsim.contrib.simulatedannealing.perturbation.ChainedPerturbatorFact
 import org.matsim.contrib.simulatedannealing.perturbation.PerturbatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author nkuehnel / MOIA
@@ -63,7 +63,7 @@ public class SimulatedAnnealingIT {
 					@Override
 					public SimulatedAnnealing<VolumeEstimator> get() {
 						return new SimulatedAnnealing<>(costCalculator, new DefaultAnnealingAcceptor<>(simAnCfg),
-								perturbatorFactory, new VolumeEstimator(0), simAnCfg.coolingSchedule, simAnCfg);
+								perturbatorFactory, new VolumeEstimator(0), simAnCfg.getCoolingSchedule(), simAnCfg);
 					}
 				}).asEagerSingleton();
 
@@ -81,15 +81,15 @@ public class SimulatedAnnealingIT {
 								.add((iteration, temperature) -> current -> {
 									return new VolumeEstimator(current.estimation + MatsimRandom.getRandom().nextInt(10) - 5);
 								}, 1)
-								.initialTemperature(simAnCfg.initialTemperature)
+								.initialTemperature(simAnCfg.getInitialTemperature())
 								.maxPerturbations(3)
 								.minPerturbations(1)
 								.build()
 				);
 
-				addControlerListenerBinding().to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {}).asEagerSingleton();
+				addControllerListenerBinding().to(new TypeLiteral<SimulatedAnnealing<VolumeEstimator>>() {}).asEagerSingleton();
 
-				addControlerListenerBinding().toProvider(new Provider<>() {
+				addControllerListenerBinding().toProvider(new Provider<>() {
 
 					@Inject
 					MatsimServices matsimServices;
@@ -98,7 +98,7 @@ public class SimulatedAnnealingIT {
 					SimulatedAnnealing<VolumeEstimator> simulatedAnnealing;
 
 					@Override
-					public ControlerListener get() {
+					public ControllerListener get() {
 						return new SimulatedAnnealingAnalysis<>(getConfig(), matsimServices, simulatedAnnealing);
 					}
 				});

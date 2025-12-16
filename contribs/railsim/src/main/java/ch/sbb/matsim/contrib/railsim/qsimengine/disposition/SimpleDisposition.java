@@ -25,10 +25,11 @@ import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import ch.sbb.matsim.contrib.railsim.qsimengine.RailsimCalc;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.router.TrainRouter;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Simple disposition without deadlock avoidance.
@@ -36,6 +37,7 @@ import java.util.List;
 public class SimpleDisposition implements TrainDisposition {
 
 	private final RailResourceManager resources;
+	private final SpeedProfile speedProfile;
 	private final TrainRouter router;
 
 	/**
@@ -48,8 +50,9 @@ public class SimpleDisposition implements TrainDisposition {
 	}
 
 	@Inject
-	public SimpleDisposition(RailResourceManager resources, TrainRouter router) {
+	public SimpleDisposition(RailResourceManager resources, SpeedProfile speedProfile, TrainRouter router) {
 		this.resources = resources;
+		this.speedProfile = speedProfile;
 		this.router = router;
 	}
 
@@ -111,10 +114,24 @@ public class SimpleDisposition implements TrainDisposition {
 			}
 		}
 
-		return new DispositionResponse(reserveDist, stop ? 0 : Double.POSITIVE_INFINITY, null);
+		double approvedSpeed;
+		if (stop) {
+			approvedSpeed = 0;
+		} else {
+			PlannedArrival nextArrival = speedProfile.getNextArrival(time, position);
+			approvedSpeed = speedProfile.getTargetSpeed(time, position, nextArrival);
+		}
+
+		return new DispositionResponse(reserveDist, approvedSpeed, null);
 	}
 
 	private Detour checkDetour(double time, List<RailLink> segment, TrainPosition position) {
+
+		// No detour is calculated if a train is already on a link with the current transit stop
+		if (segment.size() == 1 && Objects.equals(position.getHeadLink(), segment.getFirst().getLinkId())
+			&& position.isStop(position.getHeadLink())) {
+			return null;
+		}
 
 		if (position.getPt() != null && considerReRouting(segment, resources.getLink(position.getHeadLink()))) {
 

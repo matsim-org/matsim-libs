@@ -55,5 +55,5 @@ public interface LSPPlan extends BasicPlan, KnowsLSP {
 
   String getType();
 
-  void setType(final String type);
+  LSPPlan setType(final String type);
 }

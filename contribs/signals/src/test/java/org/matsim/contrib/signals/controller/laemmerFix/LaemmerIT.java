@@ -562,7 +562,7 @@ public class LaemmerIT {
 				@Override
 				public void install() {
 					this.addEventHandlerBinding().toInstance(signalAnalyzer);
-					this.addControlerListenerBinding().toInstance(signalAnalyzer);
+					this.addControllerListenerBinding().toInstance(signalAnalyzer);
 				}
 			});
 			// add general analysis tools

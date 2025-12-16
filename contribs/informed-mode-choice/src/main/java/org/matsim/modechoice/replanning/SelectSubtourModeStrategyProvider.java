@@ -11,8 +11,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * Provider for {@link SelectSubtourModeStrategy}.
@@ -31,15 +31,13 @@ public class SelectSubtourModeStrategyProvider implements Provider<PlanStrategy>
 	private Provider<GeneratorContext> generator;
 	@Inject
 	private Config config;
-	@Inject
-	private Scenario scenario;
 
 	@Override
 	public PlanStrategy get() {
 
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 
-		builder.addStrategyModule(new SelectSubtourModeStrategy(config, scenario, generator));
+		builder.addStrategyModule(new SelectSubtourModeStrategy(config, generator));
 
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup, timeInterpretation));
 

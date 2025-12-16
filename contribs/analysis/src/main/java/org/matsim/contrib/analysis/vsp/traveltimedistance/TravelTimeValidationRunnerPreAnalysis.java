@@ -143,7 +143,7 @@ public class TravelTimeValidationRunnerPreAnalysis {
                     continue;
                 }
                 double simulatedTravelTime = router.calcLeastCostPath
-                        (fromLink.getToNode(), toLink.getToNode(), 0, null, null).travelTime;
+                        (fromLink, toLink, 0, null, null).travelTime;
                 tsvWriter.printRecord(Integer.toString(counter), tripType, Double.toString(fromCorrd.getX()),
                         Double.toString(fromCorrd.getY()), Double.toString(toCoord.getX()),
                         Double.toString(toCoord.getY()), Double.toString(simulatedTravelTime),

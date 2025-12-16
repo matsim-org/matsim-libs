@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.extension.edrt.schedule.EDrtChargingTask;
+import org.matsim.contrib.drt.extension.operations.operationFacilities.OperationFacilities;
 import org.matsim.contrib.drt.extension.services.events.DrtServiceEndedEvent;
 import org.matsim.contrib.drt.extension.services.events.DrtServiceScheduledEvent;
 import org.matsim.contrib.drt.extension.services.events.DrtServiceStartedEvent;
@@ -57,9 +58,12 @@ import java.util.*;
  * @author steffenaxer
  */
 public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
+
 	private static final Logger LOG = LogManager.getLogger(ServiceTaskSchedulerImpl.class);
+
 	private final StackableTasks stackableTasks;
 	private final DrtConfigGroup drtConfigGroup;
+
 	private final Network network;
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
@@ -92,14 +96,14 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 	}
 
 	@Override
-	public void scheduleServiceTask(DvrpVehicle vehicle, OperationFacility serviceFacility, DrtServiceParams drtServiceParams, boolean enableTaskStacking) {
-		double duration = drtServiceParams.duration;
+	public void scheduleServiceTask(DvrpVehicle vehicle, OperationFacility facility, DrtServiceParams drtServiceParams, boolean enableTaskStacking) {
+		double duration = drtServiceParams.getDuration();
 
 		final Schedule schedule = vehicle.getSchedule();
 
 		final Task currentTask = schedule.getCurrentTask();
 
-		Link toLink = network.getLinks().get(serviceFacility.getLinkId());
+		Link toLink = network.getLinks().get(facility.getLinkId());
 
 		if (currentTask instanceof DriveTask
 			&& currentTask.getTaskType().equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)
@@ -109,7 +113,7 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 
 			VrpPathWithTravelData path;
 			if (start != null) {
-				toLink = network.getLinks().get(serviceFacility.getLinkId());
+				toLink = network.getLinks().get(toLink.getId());
 				path = VrpPaths.calcAndCreatePath(start.link, toLink, start.time, router, travelTime);
 				((OnlineDriveTaskTracker) currentTask.getTaskTracker()).divertPath(path);
 
@@ -129,7 +133,7 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 			double startTime = path.getArrivalTime();
 			double endTime = startTime + duration;
 
-			addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, serviceFacility);
+			addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, facility);
 
 		}
 		// Append new task to existing charging task
@@ -137,30 +141,30 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 			Schedules.getLastTask(schedule) != currentTask &&
 			!(Schedules.getNextTask(schedule) instanceof DrtServiceTask)) {
 
-			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.name, enableTaskStacking);
+			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.getServiceName(), enableTaskStacking);
 			schedule.removeLastTask(); //Remove stay
 			double startTime = currentTask.getEndTime();
 			double endTime = startTime + compensatedDuration;
-			addServiceTask(vehicle, drtServiceParams, startTime, endTime, chargingTask.getLink(), serviceFacility);
+			addServiceTask(vehicle, drtServiceParams, startTime, endTime, chargingTask.getLink(), facility);
 		}
 		// Append new task to existing service task
 		else if (currentTask instanceof EDrtChargingTask chargingTask &&
 			Schedules.getLastTask(schedule) != currentTask &&
 			(Schedules.getNextTask(schedule) instanceof DrtServiceTask)) {
 
-			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.name, enableTaskStacking);
+			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.getServiceName(), enableTaskStacking);
 			schedule.removeLastTask(); //Remove stay
 
 			//Append to end
 			double startTime = Schedules.getLastTask(schedule).getEndTime();
 			double endTime = startTime + compensatedDuration;
-			addServiceTask(vehicle, drtServiceParams, startTime, endTime, chargingTask.getLink(), serviceFacility);
+			addServiceTask(vehicle, drtServiceParams, startTime, endTime, chargingTask.getLink(), facility);
 		} else {
-			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.name, enableTaskStacking);
+			double compensatedDuration = compensateDuration(currentTask, duration, drtServiceParams.getServiceName(), enableTaskStacking);
 			final Task task = schedule.getTasks().get(schedule.getTaskCount() - 1);
 			final Link lastLink = ((StayTask) task).getLink();
 
-			if (lastLink.getId() != serviceFacility.getLinkId()) {
+			if (lastLink.getId() != toLink.getId()) {
 				double departureTime = task.getBeginTime();
 
 				if (schedule.getCurrentTask() == task) {
@@ -184,7 +188,7 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 					double startTime = path.getArrivalTime();
 					double endTime = startTime + compensatedDuration;
 
-					addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, serviceFacility);
+					addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, facility);
 				}
 			} else {
 				double startTime;
@@ -198,14 +202,12 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 				}
 				double endTime = startTime + compensatedDuration;
 
-				addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, serviceFacility);
+				addServiceTask(vehicle, drtServiceParams, startTime, endTime, toLink, facility);
 			}
 		}
 	}
 
-	private void addServiceTask(DvrpVehicle vehicle, DrtServiceParams drtServiceParams, double startTime, double endTime, Link link, OperationFacility operationFacility) {
-
-		Verify.verify(link.getId().equals(operationFacility.getLinkId()));
+	private void addServiceTask(DvrpVehicle vehicle, DrtServiceParams drtServiceParams, double startTime, double endTime, Link link, OperationFacility facility) {
 
 		if (startTime > vehicle.getServiceEndTime() || endTime > vehicle.getServiceEndTime()) {
 			// Do not schedule behind service time
@@ -215,9 +217,9 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 		Schedule schedule = vehicle.getSchedule();
 		// append DrtServiceTask
 		Id<DrtService> drtServiceId = Id.create(UUID.randomUUID().toString(), DrtService.class);
-		schedule.addTask(taskFactory.createServiceTask(drtServiceId, startTime, endTime, link, operationFacility));
-		this.eventsManager.processEvent(new DrtServiceScheduledEvent(drtServiceId, mobsimTimer.getTimeOfDay(), startTime, endTime, drtConfigGroup.mode, drtServiceParams.name, vehicle.getId(), link.getId(), operationFacility.getId()));
-		this.scheduledServices.computeIfAbsent(vehicle.getId(), k -> new HashMap<>()).put(drtServiceId, new DrtService(drtServiceId, startTime, endTime, drtServiceParams.name, link.getId(), operationFacility.getId()));
+		schedule.addTask(taskFactory.createServiceTask(drtServiceId, startTime, endTime, link, facility));
+		this.eventsManager.processEvent(new DrtServiceScheduledEvent(drtServiceId, mobsimTimer.getTimeOfDay(), startTime, endTime, drtConfigGroup.getMode(), drtServiceParams.getServiceName(), vehicle.getId(), link.getId(), facility.getId()));
+		this.scheduledServices.computeIfAbsent(vehicle.getId(), k -> new HashMap<>()).put(drtServiceId, new DrtService(drtServiceId, startTime, endTime, drtServiceParams.getServiceName(), link.getId(), facility.getId()));
 
 		// append DrtStayTask
 		schedule.addTask(taskFactory.createStayTask(vehicle, endTime, Math.max(vehicle.getServiceEndTime(), endTime), link));
@@ -239,7 +241,7 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 		Verify.verify(drtService != null);
 		drtService.start();
 		this.startedServices.computeIfAbsent(dvrpVehicleId, k -> new HashMap<>()).put(drtService.drtServiceId, drtService);
-		this.eventsManager.processEvent(new DrtServiceStartedEvent(drtService.drtServiceId, mobsimTimer.getTimeOfDay(), drtConfigGroup.mode, drtService.serviceType, dvrpVehicleId, drtService.linkId, drtService.operationFacilityId));
+		this.eventsManager.processEvent(new DrtServiceStartedEvent(drtService.drtServiceId, mobsimTimer.getTimeOfDay(), drtConfigGroup.getMode(), drtService.serviceType, dvrpVehicleId, drtService.linkId, drtService.operationFacilityId));
 	}
 
 	@Override
@@ -247,7 +249,7 @@ public class ServiceTaskSchedulerImpl implements ServiceTaskScheduler {
 		DrtService drtService = this.startedServices.get(dvrpVehicleId).remove(drtServiceId);
 		Verify.verify(drtService != null);
 		drtService.end();
-		this.eventsManager.processEvent(new DrtServiceEndedEvent(drtService.drtServiceId, mobsimTimer.getTimeOfDay(), drtConfigGroup.mode, drtService.serviceType, dvrpVehicleId, drtService.linkId, drtService.operationFacilityId));
+		this.eventsManager.processEvent(new DrtServiceEndedEvent(drtService.drtServiceId, mobsimTimer.getTimeOfDay(), drtConfigGroup.getMode(), drtService.serviceType, dvrpVehicleId, drtService.linkId, drtService.operationFacilityId));
 	}
 
 	double compensateDuration(Task currentTask, double requestedDuration, String serviceName, boolean enableTaskStacking) {

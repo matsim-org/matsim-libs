@@ -117,13 +117,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				Id<Link> to = Id.create(toLocation, Link.class);
 				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 				String capDemandString = atts.getValue("capacityDemand");
-				if (capDemandString != null) serviceBuilder.setDemand(getInt(capDemandString));
+				if (capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
 				String startString = atts.getValue("earliestStart");
 				double start = parseTimeToDouble(startString);
 				double end;
 				String endString = atts.getValue("latestEnd");
 				end = parseTimeToDouble(endString);
-				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
+				serviceBuilder.setServiceStartingTimeWindow(TimeWindow.newInstance(start, end));
 				String serviceTimeString = atts.getValue("serviceDuration");
 				if (serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 				currentService = serviceBuilder.build();
@@ -157,9 +157,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
 				if (startPickup != null && endPickup != null)
-					shipmentBuilder.setPickupStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+					shipmentBuilder.setPickupStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
 				if (startDelivery != null && endDelivery != null)
-					shipmentBuilder.setDeliveryStartsTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+					shipmentBuilder.setDeliveryStartingTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
 				if (pickupServiceTime != null)
 					shipmentBuilder.setPickupDuration(parseTimeToDouble(pickupServiceTime));
 				if (deliveryServiceTime != null)
@@ -202,7 +202,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 				String typeId = atts.getValue("typeId");
 				if (typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.create(typeId, VehicleType.class));
+				VehicleType vehicleType = this.carrierVehicleTypes.getVehicleTypes().get(Id.createVehicleTypeId(typeId));
 				if (vehicleType == null) {
 					throw new RuntimeException("vehicleTypeId=" + typeId + " is missing.");
 				}
@@ -324,9 +324,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				currentCarrier = null;
 			}
 			case "plan" -> {
-				CarrierPlan currentPlan = new CarrierPlan(currentCarrier, scheduledTours);
+				CarrierPlan currentPlan = new CarrierPlan(scheduledTours);
 				currentPlan.setScore(currentScore);
-				currentCarrier.getPlans().add(currentPlan);
+				currentCarrier.addPlan(currentPlan);
 				if (this.selected) {
 					currentCarrier.setSelectedPlan(currentPlan);
 				}

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -54,8 +55,6 @@ import org.matsim.vehicles.VehicleUtils;
 
   private static LSP createInitialLSP(Scenario scenario) {
 
-    Network network = scenario.getNetwork();
-
     // The Carrier for collection is created
     Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
     Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -68,8 +67,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
     Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-    CarrierVehicle carrierVehicle =
-        CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionVehType);
+    CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId, collectionVehType);
 
     CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
     capabilitiesBuilder.addVehicle(carrierVehicle);
@@ -336,7 +334,7 @@ import org.matsim.vehicles.VehicleUtils;
     config.addCoreModules();
     Scenario scenario = ScenarioUtils.createScenario(config);
     new MatsimNetworkReader(scenario.getNetwork())
-        .readFile("scenarios/2regions/2regions-network.xml");
+        .readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
 
     // Create LSP and shipments
     LSP lsp = createInitialLSP(scenario);
@@ -344,7 +342,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // assign the shipments to the LSP
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     // schedule the LSP with the shipments and according to the scheduler of the Resource

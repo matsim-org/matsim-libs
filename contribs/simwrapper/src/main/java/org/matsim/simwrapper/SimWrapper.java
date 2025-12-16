@@ -55,7 +55,7 @@ public final class SimWrapper {
 	private SimWrapper(org.matsim.core.config.Config config) {
 		this.matsimConfig = config;
 		this.configGroup = ConfigUtils.addOrGetModule(matsimConfig, SimWrapperConfigGroup.class);
-		this.data = new Data(configGroup);
+		this.data = new Data(config.getContext(), configGroup);
 	}
 
 	/**
@@ -77,6 +77,10 @@ public final class SimWrapper {
 	 */
 	public static LinkedBindingBuilder<Dashboard> addDashboardBinding(Binder binder) {
 		return Multibinder.newSetBinder(binder, Dashboard.class).addBinding();
+	}
+
+	public static LinkedBindingBuilder<DashboardProvider> addDashboardProviderBinding(Binder binder) {
+		return Multibinder.newSetBinder(binder, DashboardProvider.class).addBinding();
 	}
 
 	/**
@@ -116,6 +120,20 @@ public final class SimWrapper {
 		return dashboards.stream().anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
 	}
 
+	public void replaceDashboard(Dashboard oldDashboard, Dashboard newDashboard) {
+		replaceDashboard(oldDashboard, newDashboard, "");
+	}
+
+	public void replaceDashboard(Dashboard oldDashboard, Dashboard newDashboard, String context) {
+		if (hasDashboard(oldDashboard.getClass(), context)) {
+			log.info("Replacing dashboard {} with context {} by dashboard {}", oldDashboard, context, newDashboard);
+			dashboards.remove(oldDashboard);
+			dashboards.add(newDashboard);
+		} else {
+			log.info("Dashboard {} with context {} not found in list of dashboards. Not replacing anything.", oldDashboard, context);
+		}
+	}
+
 	/**
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
 	 */
@@ -125,7 +143,8 @@ public final class SimWrapper {
 
 	/**
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
-	 * @param dir target directory
+	 *
+	 * @param dir    target directory
 	 * @param append if true, existing dashboards will not be overwritten
 	 */
 	public void generate(Path dir, boolean append) throws IOException {
@@ -155,7 +174,7 @@ public final class SimWrapper {
 
 		dashboards.sort(Comparator.comparingDouble(Dashboard::priority).reversed());
 
-		int i = 0;
+		int i = 1;
 		for (Dashboard d : dashboards) {
 
 			YAML yaml = new YAML();
@@ -188,6 +207,13 @@ public final class SimWrapper {
 	 * Run data pipeline to create the necessary data for the dashboards.
 	 */
 	public void run(Path dir) {
+		run(dir, null);
+	}
+
+	/**
+	 * Run the pipeline, and pass a different config file. This functionality is only available via {@link SimWrapperRunner}.
+	 */
+	void run(Path dir, String configPath) {
 
 		for (Map.Entry<Path, URL> e : data.getResources().entrySet()) {
 			try {
@@ -207,10 +233,13 @@ public final class SimWrapper {
 
 			runner.setSampleSize(matsimConfig.global().getScaling());
 
-			if (ctx.shp != null) {
+			if (configPath != null)
+				runner.setConfigPath(configPath);
+
+			if (ctx.getShp() != null) {
 
 				try {
-					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.shp).toURI();
+					URI path = ConfigGroup.getInputFileURL(matsimConfig.getContext(), ctx.getShp()).toURI();
 
 					if (path.getScheme().equals("file"))
 						runner.setShp(new File(path).getAbsoluteFile().toString());

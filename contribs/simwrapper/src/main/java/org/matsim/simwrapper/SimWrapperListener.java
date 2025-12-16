@@ -3,6 +3,7 @@ package org.matsim.simwrapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -30,19 +31,21 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 	private final SimWrapper simWrapper;
 	private final Set<Dashboard> bindings;
 	private final Config config;
+	private final Set<DashboardProvider> providers;
 
 	@Inject
-	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config) {
+	public SimWrapperListener(SimWrapper simWrapper, Set<Dashboard> bindings, Config config, Set<DashboardProvider> providers) {
 		this.simWrapper = simWrapper;
 		this.bindings = bindings;
 		this.config = config;
+		this.providers = providers;
 	}
 
 	/**
 	 * Create a new listener with no default bindings.
 	 */
 	public SimWrapperListener(SimWrapper simWrapper, Config config) {
-		this(simWrapper, Collections.emptySet(), config);
+		this(simWrapper, Collections.emptySet(), config, Collections.emptySet());
 	}
 
 	@Override
@@ -52,7 +55,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		generate(Path.of(event.getServices().getControlerIO().getOutputPath()));
+		generate(Path.of(event.getServices().getControllerIO().getOutputPath()));
 	}
 
 
@@ -60,7 +63,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		SimWrapperConfigGroup config = simWrapper.getConfigGroup();
 
 		// Load provider from packages
-		for (String pack : config.packages) {
+		for (String pack : config.getPackages()) {
 
 			log.info("Scanning package {}", pack);
 
@@ -75,45 +78,30 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 			}
 		}
 
+		// Load dashboards from SPI dashboards
+		ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
+		List<DashboardProvider> p = new ArrayList<>();
+
+		for (DashboardProvider dashboardProvider : loader) {
+			// Skip default providers if disabled
+			if (config.getDefaultDashboards() == SimWrapperConfigGroup.Mode.disabled && dashboardProvider.isDefault()) {
+				continue;
+			}
+			p.add(dashboardProvider);
+		}
+
+		addFromProvider(config, p);
+
 		// Lambda provider which uses dashboards from bindings
 		addFromProvider(config, List.of((c, sw) -> new ArrayList<>(bindings)));
 
-		// Dashboard provider services
-		if (config.defaultDashboards != SimWrapperConfigGroup.Mode.disabled) {
-			ServiceLoader<DashboardProvider> loader = ServiceLoader.load(DashboardProvider.class);
-			addFromProvider(config, loader);
-		}
+		// Load providers from bindings
+		addFromProvider(config, providers);
 
 		try {
 			simWrapper.generate(output);
 		} catch (IOException e) {
 			log.error("Could not create SimWrapper dashboard.");
-		}
-	}
-
-	private void addFromProvider(SimWrapperConfigGroup config, Iterable<DashboardProvider> providers) {
-
-		List<DashboardProvider> list = StreamSupport.stream(providers.spliterator(), false)
-			.sorted(Comparator.comparingDouble(DashboardProvider::priority).reversed())
-			.toList();
-
-		for (DashboardProvider provider : list) {
-			log.info("Creating dashboards for {}", provider);
-
-			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
-
-				if (config.exclude.contains(d.getClass().getSimpleName()) || config.exclude.contains(d.getClass().getName()))
-					continue;
-
-				if (!config.include.isEmpty() && (!config.include.contains(d.getClass().getSimpleName()) && !config.include.contains(d.getClass().getName())))
-					continue;
-
-				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {
-					log.info("Adding dashboard {}", d);
-					simWrapper.addDashboard(d);
-				} else
-					log.warn("Skipping dashboard {} with context {}, because it is already present", d, d.context());
-			}
 		}
 	}
 
@@ -134,20 +122,50 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 		return result;
 	}
 
+	private void addFromProvider(SimWrapperConfigGroup config, Iterable<DashboardProvider> providers) {
+
+		List<DashboardProvider> list = StreamSupport.stream(providers.spliterator(), false)
+			.sorted(Comparator.comparingDouble(DashboardProvider::priority).reversed())
+			.toList();
+
+		for (DashboardProvider provider : list) {
+			log.info("Creating dashboards for {}", provider);
+
+			for (Dashboard d : provider.getDashboards(this.config, this.simWrapper)) {
+
+				if (config.getExclude().contains(d.getClass().getSimpleName()) || config.getExclude().contains(d.getClass().getName()))
+					continue;
+
+				if (!config.getInclude().isEmpty() && (!config.getInclude().contains(d.getClass().getSimpleName()) && !config.getInclude().contains(d.getClass().getName())))
+					continue;
+
+				if (!simWrapper.hasDashboard(d.getClass(), d.context()) || d instanceof Dashboard.Customizable) {
+					log.info("Adding dashboard {}", d);
+					simWrapper.addDashboard(d);
+				} else
+					log.warn("Skipping dashboard {} with context {}, because it is already present", d, d.context());
+			}
+		}
+	}
+
 	/**
 	 * This needs to run after all the other MATSim listeners. Currently, this is the case, but unclear if that is ensured somewhere.
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		simWrapper.run(Path.of(event.getServices().getControlerIO().getOutputPath()));
+		simWrapper.run(Path.of(event.getServices().getControllerIO().getOutputPath()));
 	}
 
 	/**
 	 * Run dashboard creation and execution. This method is useful when used outside MATSim.
 	 */
 	public void run(Path output) throws IOException {
+		run(output, null);
+	}
+
+	void run(Path output, @Nullable String configPath) throws IOException {
 		generate(output);
-		simWrapper.run(output);
+		simWrapper.run(output, configPath);
 	}
 
 }

@@ -6,7 +6,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.matsim.modechoice.PlanCandidate;
 import org.matsim.modechoice.PlanModel;
 
@@ -19,14 +19,11 @@ import java.util.Random;
 public class SimplePlanSelectionStrategy extends AbstractMultithreadedModule {
 
 	private final Provider<GeneratorContext> generator;
-	private final Provider<PlanSelector> selector;
 
 	public SimplePlanSelectionStrategy(GlobalConfigGroup globalConfigGroup,
-									   Provider<GeneratorContext> generator,
-									   Provider<PlanSelector> selector) {
+									   Provider<GeneratorContext> generator) {
 		super(globalConfigGroup);
 		this.generator = generator;
-		this.selector = selector;
 	}
 
 	@Override
@@ -47,7 +44,7 @@ public class SimplePlanSelectionStrategy extends AbstractMultithreadedModule {
 		@Override
 		public void run(Plan plan) {
 
-			PlanModel planModel = PlanModel.newInstance(plan);
+			PlanModel planModel = ctx.service.getPlanModel(plan);
 			List<PlanCandidate> candidates = ctx.generator.generate(planModel);
 
 			if (ctx.pruner != null) {

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.logistics.*;
@@ -98,8 +99,7 @@ import org.matsim.vehicles.VehicleUtils;
     // The initial plan of the lsp is generated and the assigner and the solution from above are
     // added
     LSPPlan collectionPlan = LSPUtils.createLSPPlan();
-    InitialShipmentAssigner assigner =
-        ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
+    InitialShipmentAssigner assigner = ResourceImplementationUtils.createSingleLogisticChainShipmentAssigner();
     collectionPlan.setInitialShipmentAssigner(assigner);
     collectionPlan.addLogisticChain(collectionSolution);
 
@@ -158,7 +158,7 @@ import org.matsim.vehicles.VehicleUtils;
     config.addCoreModules();
     Scenario scenario = ScenarioUtils.createScenario(config);
     new MatsimNetworkReader(scenario.getNetwork())
-        .readFile("scenarios/2regions/2regions-network.xml");
+        .readFile(ExamplesUtils.getTestScenarioURL("logistics-2regions") + "2regions-network.xml");
     Network network = scenario.getNetwork();
 
     // Create LSP and lspShipments
@@ -167,7 +167,7 @@ import org.matsim.vehicles.VehicleUtils;
 
     // assign the lspShipments to the LSP
     for (LspShipment lspShipment : lspShipments) {
-      lsp.assignShipmentToLSP(lspShipment);
+      lsp.assignShipmentToLspPlan(lspShipment);
     }
 
     // schedule the LSP with the lspShipments and according to the scheduler of the Resource
