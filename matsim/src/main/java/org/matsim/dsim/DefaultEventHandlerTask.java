@@ -5,6 +5,8 @@ import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.MessageComparator;
+import org.matsim.api.core.v01.events.handler.BlockingMode;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.EventMessagingPattern;
@@ -60,7 +62,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
 								   DistributedEventsManager manager, SerializationProvider serializer,
 								   @Nullable AtomicInteger counter) {
-		super(handler, manager, partition, DistributedEventsManager.supportsAsync(handler));
+		super(handler, manager, partition, supportsAsync(handler));
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
 		this.pattern = buildConsumers(serializer);
@@ -147,5 +149,13 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 		}
 
 		storeRuntime(t);
+	}
+
+	/**
+	 * Whether the handler supports async execution.
+	 */
+	public static boolean supportsAsync(EventHandler handler) {
+		DistributedEventHandler annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return annotation != null && !annotation.blocking().equals(BlockingMode.SIM_STEP);
 	}
 }

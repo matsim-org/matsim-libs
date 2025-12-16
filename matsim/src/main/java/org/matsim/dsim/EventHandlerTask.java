@@ -9,10 +9,7 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
-import org.matsim.api.core.v01.events.handler.AggregatingEventHandler;
-import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
-import org.matsim.api.core.v01.events.handler.DistributedMode;
-import org.matsim.api.core.v01.events.handler.EventsFrom;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.AggregateFromAll;
@@ -137,7 +134,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	boolean isDirect() {
 		DistributedEventHandler handler = this.handler.getClass().getAnnotation(DistributedEventHandler.class);
 		String d = System.getenv("DISABLE_DIRECT_EVENTS");
-		return handler != null && handler.directProcessing() && !Objects.equals(d, "1");
+		return handler != null && handler.processing().equals(ProcessingMode.DIRECT) && !Objects.equals(d, "1");
 	}
 
 	Consumer<Message> getConsumer(int type) {
@@ -148,8 +145,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
 
 		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		boolean node = distributed != null && distributed.value() == DistributedMode.NODE_SINGLETON;
-		boolean partition = distributed != null && (distributed.value() == DistributedMode.PARTITION_SINGLETON || distributed.value() == DistributedMode.PARTITION);
+		boolean node = distributed != null && distributed.value() == DistributedMode.NODE;
+		boolean partition = distributed != null && (distributed.value() == DistributedMode.NODE_CONCURRENT || distributed.value() == DistributedMode.PARTITION);
 
 		for (Class<?> ifType : handler.getClass().getInterfaces()) {
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
@@ -190,7 +187,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				"Please explicitly implement needed EventHandler").formatted(handler.getClass().getName()));
 		}
 
-		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE_SINGLETON || distributed.value() == DistributedMode.PARTITION_SINGLETON);
+		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE || distributed.value() == DistributedMode.NODE_CONCURRENT);
 
 		// Singleton handlers on one jvm don't need to communicate
 		if (singleton && !manager.getComputeNode().isDistributed()) {

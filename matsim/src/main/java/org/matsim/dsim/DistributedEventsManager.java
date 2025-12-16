@@ -94,14 +94,6 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
-	 * Whether the handler supports async execution.
-	 */
-	public static boolean supportsAsync(EventHandler handler) {
-		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return ann != null && ann.async();
-	}
-
-	/**
 	 * Whether this is a global event handler.
 	 */
 	public static boolean isGlobal(EventHandler handler) {
@@ -126,6 +118,22 @@ public final class DistributedEventsManager implements EventsManager {
 		addInternal(handler, null);
 	}
 
+	public void addHandler(EventHandler handler, int part) {
+		var partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		if (partition == null || partition.value() != DistributedMode.PARTITION) {
+			throw new IllegalArgumentException("Adding event handler for specific partition requires the event to be annotated with" +
+				" '@DistributedEventHandler(value = DistributedMode.PARTITION)'");
+		}
+	}
+
+//	private <T extends EventHandler> T addGlobalHandler(T handler, String name) {
+//		log.warn("Registering global event handler {}", name);
+//		Integer part = computeNode.getParts().getFirst();
+//		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+//		addTask(task, part);
+//		handlers.add(handler);
+//	}
+
 	private <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
 
 		String name = handler.getName();
@@ -134,14 +142,14 @@ public final class DistributedEventsManager implements EventsManager {
 
 		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
 
-		if (partition != null && partition.value() == DistributedMode.NODE_SINGLETON) {
+		if (partition != null && partition.value() == DistributedMode.NODE) {
 			log.info("Registering event handler {} for node {}", name, computeNode.getRank());
 			Integer part = computeNode.getParts().getFirst();
 			EventHandlerTask task = executor.register(handler, this, part, 1, null);
 			addTask(task, part);
 			handlers.add(handler);
 
-		} else if (partition != null && (partition.value() == DistributedMode.PARTITION || partition.value() == DistributedMode.PARTITION_SINGLETON)) {
+		} else if (partition != null && (partition.value() == DistributedMode.PARTITION || partition.value() == DistributedMode.NODE_CONCURRENT)) {
 			log.info("Registering event handler {} for each partition", name);
 
 			AtomicInteger partitionCounter = new AtomicInteger();
@@ -169,6 +177,8 @@ public final class DistributedEventsManager implements EventsManager {
 
 		return handlers;
 	}
+
+	//private void addOneTask()
 
 	private void addTask(EventHandlerTask task, int part) {
 
