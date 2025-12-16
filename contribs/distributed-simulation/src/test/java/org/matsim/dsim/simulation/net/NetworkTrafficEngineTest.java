@@ -59,7 +59,7 @@ class NetworkTrafficEngineTest {
 		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
 		var config = new DSimConfigGroup();
 		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);
-		var sdc = new ScoringDataCollector(mock(SimStepMessaging.class), NetworkPartition.SINGLE_INSTANCE, eventsManager);
+		var sdc = new ScoringDataCollector(mock(SimStepMessaging.class), scenario.getNetwork());
 
 		var engine = new NetworkTrafficEngine(mock(AgentSourcesContainer.class), simNetwork,
 			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager, sdc);

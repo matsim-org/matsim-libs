@@ -56,7 +56,7 @@ class DistributedTeleportationEngineTest {
 		var messaging = mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(true);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(ScoringDataCollector.class), mock(NetworkPartitioning.class));
+			mock(ScoringDataCollector.class));
 		var internalInterface = mock(InternalInterface.class);
 		engine.setInternalInterface(internalInterface);
 
@@ -88,7 +88,7 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(true);
 		var internalInterface = mock(InternalInterface.class);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(ScoringDataCollector.class), mock(NetworkPartitioning.class));
+			mock(ScoringDataCollector.class));
 		engine.setInternalInterface(internalInterface);
 
 		engine.handleDeparture(10, agent1, agent1.getCurrentLinkId());
@@ -113,7 +113,7 @@ class DistributedTeleportationEngineTest {
 		var messaging = Mockito.mock(SimStepMessaging.class);
 		when(messaging.isLocal(any())).thenReturn(false);
 		var engine = new DistributedTeleportationEngine(em, messaging, mock(AgentSourcesContainer.class),
-			mock(ScoringDataCollector.class), mock(NetworkPartitioning.class));
+			mock(ScoringDataCollector.class));
 
 		engine.handleDeparture(11, agent, agent.getCurrentLinkId());
 		verify(messaging).collectTeleportation(eq(agent), eq(11 + 42.));
@@ -128,7 +128,7 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(true);
 		var asc = mock(AgentSourcesContainer.class);
 		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(ScoringDataCollector.class), mock(NetworkPartitioning.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(ScoringDataCollector.class));
 
 		engine.setInternalInterface(mock(InternalInterface.class));
 
@@ -158,7 +158,7 @@ class DistributedTeleportationEngineTest {
 		when(messaging.isLocal(any())).thenReturn(true);
 		var asc = mock(AgentSourcesContainer.class);
 		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
-		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(ScoringDataCollector.class), mock(NetworkPartitioning.class));
+		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(ScoringDataCollector.class));
 		var message = SimStepMessage.builder()
 			.addTeleportation(new Teleportation(
 				agent.getClass(), agent.toMessage(), 42

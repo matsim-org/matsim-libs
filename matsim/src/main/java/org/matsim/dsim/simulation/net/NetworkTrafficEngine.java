@@ -2,19 +2,14 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.dsim.scoring.ScoringDataCollector;
-import org.matsim.dsim.scoring.VehicleArrivingOnPartitionEvent;
-import org.matsim.dsim.scoring.VehicleLeavingPartitionEvent;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
@@ -59,8 +54,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 			// propagate an event.
 			if (link instanceof SimLink.SplitOutLink sol) {
 				sol.addLeaveHandler( (vehicle, link1, now) -> {
-					var toPart = ((SimLink.SplitOutLink)link1).getToPart();
-					this.sdc.vehicleLeavesPartition(vehicle, toPart);
+					this.sdc.vehicleLeavesPartition(vehicle);
 					return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 				});
 			} else {
@@ -95,7 +89,6 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private void processVehicleMessage(VehicleContainer vehicleContainer, double now) {
 		DistributedMobsimVehicle vehicle = asc.vehicleFromContainer(vehicleContainer);
-		em.processEvent(new VehicleArrivingOnPartitionEvent(now, vehicle));
 
 		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
 		SimLink link = simNetwork.getLinks().get(linkId);

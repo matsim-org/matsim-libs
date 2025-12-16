@@ -8,10 +8,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartition;
+import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.BackPack;
+import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -23,13 +26,12 @@ public class ScoringDataCollector {
 	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 	private final IdMap<Person, BackPack> backPacks = new IdMap<>(Person.class);
 	private final SimStepMessaging simStepMessaging;
-	private final NetworkPartition partition;
+	private final NetworkPartitioning partitioning;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, NetworkPartition partition, EventsManager em) {
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network) {
 		this.simStepMessaging = simStepMessaging;
-		this.partition = partition;
-		//em.addHandler(() -> this);
+		this.partitioning = network.getPartitioning();
 	}
 
 	public void registerAgent(MobsimAgent agent) {
@@ -39,27 +41,30 @@ public class ScoringDataCollector {
 
 	public void process(SimStepMessage msg) {
 		for (var backpack : msg.backPacks()) {
-			log.info("Processing backpack for person {} at {} on partition: {}", backpack.personId(), msg.simstep(), partition.getIndex());
+			log.info("Processing backpack for person {} at {}", backpack.personId(), msg.simstep());
 			this.backPacks.put(backpack.personId(), backpack);
 		}
 	}
 
-	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle, int toPart) {
+	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
 		var driverId = vehicle.getDriver().getId();
-		personLeavingPartition(driverId, toPart);
+		var targetPart = partitioning.getPartition(vehicle.getCurrentLinkId());
+		personLeavingPartition(driverId, targetPart);
 
 		for (var passenger : vehicle.getPassengers()) {
-			personLeavingPartition(passenger.getId(), toPart);
+			personLeavingPartition(passenger.getId(), targetPart);
 		}
 	}
 
-	public void teleportedPersonLeavesPartition(Id<Person> personId, int toPart) {
-		personLeavingPartition(personId, toPart);
+	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {
+
+		var targetPart = partitioning.getPartition(agent.getDestinationLinkId());
+		personLeavingPartition(agent.getId(), targetPart);
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
 		var backPack = backPacks.remove(id);
-		log.info("Person {} leaving partition {}, sending backpack at", id, partition.getIndex());
+		log.info("Person {} leaving partition sending backpack at", id);
 		simStepMessaging.collectBackPack(backPack, toPart);
 	}
 }
