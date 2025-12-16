@@ -53,7 +53,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 			// Split out links put vehicles into the messaging. Before they do so, we intercept and
 			// propagate an event.
 			if (link instanceof SimLink.SplitOutLink sol) {
-				sol.addLeaveHandler( (vehicle, link1, now) -> {
+				sol.addLeaveHandler((vehicle, _, _) -> {
 					this.sdc.vehicleLeavesPartition(vehicle);
 					return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 				});

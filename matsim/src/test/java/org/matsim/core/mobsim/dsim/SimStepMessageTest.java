@@ -33,10 +33,10 @@ class SimStepMessageTest {
         assertEquals(1, msg.vehicles().size());
         assertEquals(1, msg.backPacks().size());
 
-        assertSame(cu, msg.capUpdates().get(0));
-        assertSame(tp, msg.teleportations().get(0));
-        assertSame(vc, msg.vehicles().get(0));
-        assertSame(bp, msg.backPacks().get(0));
+		assertSame(cu, msg.capUpdates().getFirst());
+		assertSame(tp, msg.teleportations().getFirst());
+		assertSame(vc, msg.vehicles().getFirst());
+		assertSame(bp, msg.backPacks().getFirst());
     }
 
     @Test
