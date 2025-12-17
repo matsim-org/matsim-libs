@@ -3,13 +3,9 @@ package org.matsim.application.prepare.scenario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.*;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
@@ -43,6 +39,7 @@ import picocli.CommandLine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Cuts out a part of the Population and Network which is relevant inside the specified shape of the shapefile.<br><br>
@@ -101,6 +98,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--events", description = "Input events used for travel time calculation. NOTE: Making a cutout without the events file will make the scenario inaccurate!", required = false)
 	private String eventPath;
 
+	@CommandLine.Option(names = "--vehicles", description = "Path to vehicle types.", required = false)
+	private String vehiclePath;
+
 	@CommandLine.Option(names = "--buffer", description = "Buffer around zones in meter", defaultValue = "5000")
 	private double buffer;
 
@@ -119,6 +119,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-change-events-interval", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "900", required = false)
 	private double changeEventsInterval;
 
+	// TODO Rename to interval
 	@CommandLine.Option(names = "--network-change-events-maxTime", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "86400", required = false)
 	private int changeEventsMaxTime;
 
@@ -131,11 +132,12 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept. No change events will be generated for these.", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
 
+	// TODO Replace by enum
 	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
 	private boolean checkBeeline;
 
-	@CommandLine.Option(names = "--keep-capacities", description = "Keep the capacities of all links, even outside the shp file", defaultValue = "false")
-	private boolean keepCapacities;
+	@CommandLine.Option(names = "--capacity-setting", description = "Defines in capacity should be corrected or not", defaultValue = "absoluteCapacityCorrection")
+	private CapacitySetting capacitySetting;
 
 	@CommandLine.Mixin
 	private CrsOptions crs;
@@ -146,6 +148,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	// External classes
 	private final GeometryFactory geoFactory = new GeometryFactory();
 	private TravelTimeCalculator tt;
+	private CutoutVolumeCalculator cv;
 
 	// Variables used for processing
 	/**
@@ -224,27 +227,15 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		if (facilityPath != null) {
 			config.facilities().setInputFile(facilityPath);
 		}
+		if (vehiclePath != null) {
+			config.vehicles().setVehiclesFile(vehiclePath);
+		}
 		scenario = ScenarioUtils.loadScenario(config);
 
 		geom = shp.getGeometry(crs.getInputCRS()).buffer(buffer);
 
 		for (String mode : modes)
 			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(scenario.getNetwork(), mode));
-
-		if (eventPath != null) {
-			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
-			builder.setTimeslice(changeEventsInterval);
-			builder.setMaxTime(changeEventsMaxTime);
-
-			EventsManager manager = EventsUtils.createEventsManager();
-
-			tt = builder.build();
-			manager.addHandler(tt);
-
-			manager.initProcessing();
-			EventsUtils.readEvents(manager, eventPath);
-			manager.finishProcessing();
-		}
 
 		// Cut out the network: Filter for links inside the shapefile
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -324,6 +315,26 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		if (eventPath != null) {
+			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(scenario.getNetwork());
+			builder.setTimeslice(changeEventsInterval);
+			builder.setMaxTime(changeEventsMaxTime);
+
+			EventsManager manager = EventsUtils.createEventsManager();
+
+			tt = builder.build();
+			manager.addHandler(tt);
+
+			cv = new CutoutVolumeCalculator(
+				scenario,
+				changeEventsInterval,
+				scenario.getPopulation().getPersons().values().stream().map(Identifiable::getId).collect(Collectors.toSet())
+			);
+			manager.addHandler(cv);
+
+			manager.initProcessing();
+			EventsUtils.readEvents(manager, eventPath);
+			manager.finishProcessing();
+
 			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
 			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
@@ -479,15 +490,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			if (link.getAllowedModes().equals(keepModes))
 				continue;
 
-
-			// Setting capacity outside shapefile (and buffer) to a very large value, not max value, as this causes problem in the qsim
-			if (!keepCapacities) {
-				link.setCapacity(1_000_000);
-				// Increase the number of lanes which increases the storage capacity
-				link.setNumberOfLanes(10_000);
-			}
-
 			Double prevSpeed = null;
+			Double prevCapacity = null;
 
 			// Do this for the whole simulation run
 			for (double time = 0; time < changeEventsMaxTime; time += timeFrameLength) {
@@ -495,24 +499,33 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				// Setting freespeed to the link average
 				double freespeed = link.getLength() / tt.getLinkTravelTimes().getLinkTravelTime(link, time, null, null);
 
+				// Subtracting volume from link capacity
+				double capacity = link.getCapacity() - (cv.getTotalLinkVolume(link.getId(), time) - cv.getCutoutLinkVolume(link.getId(), time));
+
 				// avoid that link speed is higher than the free speed of the link
 				if (freespeed >= link.getFreespeed()) {
 					freespeed = link.getFreespeed();
 				}
 
 				// Skip if the speed is the same as the previous speed
-				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6) {
+				if (prevSpeed != null && Math.abs(freespeed - prevSpeed) < 1e-6 &&
+					prevCapacity != null && Math.abs(capacity - prevCapacity) < 1e-6) {
 					continue;
 				}
 
 
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
+
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
+				if(capacitySetting == CapacitySetting.absoluteCapacityCorrection)
+					event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, capacity));
+				
 				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
 
 				prevSpeed = freespeed;
+				prevCapacity = capacity;
 			}
 		}
 
@@ -623,4 +636,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	}
 
 
+	private enum CapacitySetting {
+		keepOriginalCapacity,
+		absoluteCapacityCorrection
+	}
 }
