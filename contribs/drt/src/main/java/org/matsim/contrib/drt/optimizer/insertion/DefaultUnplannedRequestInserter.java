@@ -128,31 +128,30 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			retryOrReject(req, now, NO_INSERTION_FOUND_CAUSE);
 		} else {
 			InsertionWithDetourData insertion = best.get();
+			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 
-			double dropoffDuration =
-				insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime -
-				insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime;
+			double pickupDuration = stopDurationProvider.calcPickupDuration(vehicle, req);
+			double dropoffDuration = stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 			// accept offered drt ride
 			var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
 					insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
 					insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
-					dropoffDuration);
+					pickupDuration, dropoffDuration);
 
 			if(acceptedRequest.isPresent()) {
-				var vehicle = insertion.insertion.vehicleEntry.vehicle;
 				var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
 				double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();
 				expectedPickupTime = Math.max(expectedPickupTime, acceptedRequest.get().getEarliestStartTime());
-				expectedPickupTime += stopDurationProvider.calcPickupDuration(vehicle, req);
+				expectedPickupTime += pickupDuration;
 
 				// if the stop task ends earlier, it means that it was decided that the stop duration
 				// is shorter, which can happen if a request is merged with an existing stop
 				expectedPickupTime = Math.min(expectedPickupTime, pickupDropoffTaskPair.pickupTask.getEndTime());
 
 				double expectedDropoffTime = pickupDropoffTaskPair.dropoffTask.getBeginTime();
-				expectedDropoffTime += stopDurationProvider.calcDropoffDuration(vehicle, req);
+				expectedDropoffTime += dropoffDuration;
 
 				VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
 				if (newVehicleEntry != null) {

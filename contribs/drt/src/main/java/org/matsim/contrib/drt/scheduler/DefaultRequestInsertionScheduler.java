@@ -250,8 +250,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				stopTask = stops.get(pickupIdx - 1).getTask(); // future stop task
 			}
 
-			boolean canMergePickup = stopTask != null && !(stopTask instanceof CapacityChangeTask) && request.getFromLink() == stopTask.getLink()
-				&& stopTask.getEndTime() >= request.getEarliestStartTime();
+boolean canMergePickup = stopTask != null && !(stopTask instanceof CapacityChangeTask) && request.getFromLink() == stopTask.getLink()
+					&& stopTask.calcLatestDepartureTime() >= request.getEarliestStartTime();
 
 			if (canMergePickup) { // no detour; no new stop task
 				// add pickup request to stop task

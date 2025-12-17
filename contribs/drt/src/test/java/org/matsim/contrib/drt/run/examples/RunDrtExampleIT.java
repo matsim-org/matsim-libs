@@ -505,6 +505,7 @@ public class RunDrtExampleIT {
 				PassengerStopDurationProvider stopDurationProvider = StaticPassengerStopDurationProvider.of(60.0, 5.0);
 				StopTimeCalculator stopTimeCalculator = new CumulativeStopTimeCalculator(stopDurationProvider);
 				stopTimeCalculator = new MinimumStopDurationAdapter(stopTimeCalculator, 60.0);
+				bindModal(PassengerStopDurationProvider.class).toInstance(stopDurationProvider);
 				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
 			}
 		});
@@ -560,9 +561,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.04)
 				.rejections(14)
-				.waitAverage(236.87)
-				.inVehicleTravelTimeMean(389.63)
-				.totalTravelTimeMean(626.51)
+				.waitAverage(235.18)
+				.inVehicleTravelTimeMean(390.26)
+				.totalTravelTimeMean(625.45)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -617,9 +618,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.19)
 				.rejections(77)
-				.waitAverage(202.33)
+				.waitAverage(202.3)
 				.inVehicleTravelTimeMean(375.53)
-				.totalTravelTimeMean(577.86)
+				.totalTravelTimeMean(577.83)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -828,11 +829,13 @@ public class RunDrtExampleIT {
 		private final Random random = new Random(123);
 
 		@Override
-		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
+		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request,
+														   double departureTime, double arrivalTime,
+														   double pickupDuration, double dropoffDuration) {
 			if (random.nextBoolean()) {
 				return Optional.empty();
 			} else {
-				return delegate.acceptDrtOffer(request, departureTime, arrivalTime, dropoffDuration);
+				return delegate.acceptDrtOffer(request, departureTime, arrivalTime, 0, dropoffDuration);
 			}
 		}
 	}
