@@ -2,9 +2,12 @@ package org.matsim.application.prepare.scenario;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -12,8 +15,10 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -88,6 +93,49 @@ public class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnte
 		linkId2timeslice2volume.computeIfAbsent(linkId, k -> new Int2ObjectOpenHashMap<>());
 		linkId2timeslice2volume.get(linkId).computeIfAbsent(timeslice, k -> new CutoutVolume());
 		return linkId2timeslice2volume.get(linkId).get(timeslice).cutoutVolume;
+	}
+
+	// TODO Remove for final commit, this is just for testing/validating
+	/// Prints out random links with different types
+	public void printSample(String path) throws IOException {
+		/*
+		4556354 -> highway, secondary
+		-4553259 -> highway, tertiary
+		-28225794 -> highway, residential
+		4764111 -> highway, motorway
+		-1103167081 -> highway, unclassified
+		 */
+
+		Set<Id<Link>> selectedIds = HashSet.newHashSet(5);
+		selectedIds.add(Id.createLinkId("4556354"));
+		selectedIds.add(Id.createLinkId("-4553259"));
+		selectedIds.add(Id.createLinkId("-28225794"));
+		selectedIds.add(Id.createLinkId("4764111"));
+		selectedIds.add(Id.createLinkId("-1103167081"));
+
+		List<Id<Link>> links = scenario.getNetwork().getLinks().values().stream().filter(l -> selectedIds.contains(l.getId())).map(Identifiable::getId).toList();
+
+		// Save the results in a file
+		CSVPrinter writer = new CSVPrinter(
+			IOUtils.getBufferedWriter(path),
+			CSVFormat.DEFAULT);
+		writer.printRecord(
+			"linkId",
+			"time",
+			"cutoutVolume",
+			"totalVolume"
+		);
+
+		for(double t = 0; t < 86400; t += Math.round(changeEventsInterval)) {
+			for (Id<Link> l : links) {
+				writer.printRecord(
+					l, t, getCutoutLinkVolume(l, t), getTotalLinkVolume(l, t)
+				);
+			}
+		}
+
+		writer.flush();
+		writer.close();
 	}
 
 	@Override

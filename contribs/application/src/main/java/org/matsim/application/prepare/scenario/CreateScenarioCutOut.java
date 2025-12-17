@@ -341,6 +341,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		NetworkUtils.writeNetwork(scenario.getNetwork(), outputNetwork);
 
+		// TODO Remove, it is for testing only
+		cv.printSample("/Users/aleksander/Documents/VSP/Cutout/gartenfeld/out/sample.csv");
+
 		return 0;
 	}
 
@@ -519,7 +522,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
 				if(capacitySetting == CapacitySetting.absoluteCapacityCorrection)
 					event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, capacity));
-				
+
 				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
 				event.addLink(link);
 				events.add(event);
