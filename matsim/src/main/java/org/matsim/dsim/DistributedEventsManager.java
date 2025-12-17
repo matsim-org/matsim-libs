@@ -93,35 +93,35 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
-	 * Whether this is a global event handler.
+	 * Adds one handler for a specific partition. The calling code hast to make sure that each partition has one handler.
+	 * This is, for now, not part of the {@link EventsManager} interface, as this is specific for this implementation.
+	 *
+	 * @param handler the event handler
+	 * @param part    partition index this event handler can be called from
 	 */
-	public static boolean isGlobal(EventHandler handler) {
-		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return ann == null || ann.value() == DistributedMode.GLOBAL;
-	}
-
-//	@Override
-//	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
-//		return addInternal(provider.get(), provider);
-//	}
-//
-//	@Override
-//	public void addHandler(EventHandler handler) {
-//
-//		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
-//		if (partition != null && partition.value() == DistributedMode.PARTITION) {
-//			throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
-//				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
-//		}
-//
-//		addInternal(handler, null);
-//	}
-
 	public void addHandler(EventHandler handler, int part) {
 		var partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		if (partition == null || partition.value() != DistributedMode.PARTITION) {
 			throw new IllegalArgumentException("Adding event handler for specific partition requires the event to be annotated with" +
 				" '@DistributedEventHandler(value = DistributedMode.PARTITION)'");
+		}
+
+		EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
+		addTaskForSinglePart(task, part);
+	}
+
+	@Override
+	public void addHandler(EventHandler handler) {
+
+		var distMode = getDistributedMode(handler);
+		switch (distMode) {
+			case GLOBAL -> {
+				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
+			}
+			case NODE -> addAsNodeSingleton(handler);
+			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
+			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
+				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
 		}
 	}
 
@@ -135,6 +135,25 @@ public final class DistributedEventsManager implements EventsManager {
 		} else {
 			addHandler(handler);
 			return List.of(handler);
+		}
+	}
+
+	private DistributedMode getDistributedMode(EventHandler handler) {
+		var annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return annotation == null ? DistributedMode.GLOBAL : annotation.value();
+	}
+
+	public void addAsNodeSingleton(EventHandler handler) {
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+	}
+
+	public void addAsConcurrentNodeSingleton(EventHandler handler) {
+		AtomicInteger partitionCounter = new AtomicInteger();
+		for (int part : computeNode.getParts()) {
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+			addTaskForSinglePart(task, part);
 		}
 	}
 
@@ -154,50 +173,12 @@ public final class DistributedEventsManager implements EventsManager {
 				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
-			addAsPartitionSingleton(handler, part, partitionCounter);
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+			addTaskForSinglePart(task, part);
 			result.add(handler);
 		}
 
 		return result;
-	}
-
-	private DistributedMode getDistributedMode(EventHandler handler) {
-		var annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return annotation == null ? DistributedMode.GLOBAL : annotation.value();
-	}
-
-	@Override
-	public void addHandler(EventHandler handler) {
-
-		var distMode = getDistributedMode(handler);
-		switch (distMode) {
-			case GLOBAL -> {
-				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
-			}
-			case NODE -> addAsNodeSingleton(handler);
-			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
-			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
-				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
-		}
-	}
-
-	public <T extends EventHandler> void addAsNodeSingleton(T handler) {
-		var part = computeNode.getParts().getInt(0);
-		EventHandlerTask task = executor.register(handler, this, part, 1, null);
-		addTaskForEachPart(task, part);
-	}
-
-	public <T extends EventHandler> void addAsConcurrentNodeSingleton(T handler) {
-		AtomicInteger partitionCounter = new AtomicInteger();
-		for (int part : computeNode.getParts()) {
-			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
-			addTaskForSinglePart(task, part);
-		}
-	}
-
-	public <T extends EventHandler> void addAsPartitionSingleton(T handler, int part, AtomicInteger partitionCounter) {
-		EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
-		addTaskForSinglePart(task, part);
 	}
 
 	private void addTaskForEachPart(EventHandlerTask task, int handlerPartition) {

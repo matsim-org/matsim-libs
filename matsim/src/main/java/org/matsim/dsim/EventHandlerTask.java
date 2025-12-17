@@ -285,14 +285,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final void process(Message msg) {
 
-		Consumer<Message> consumer = consumers.get(msg.getType());
+		var consumer = consumers.get(msg.getType());
 		if (consumer == null) {
-			Consumer<Message> any = consumers.get(Event.ANY_TYPE);
-			if (any != null) {
-				any.accept(msg);
-				return;
-			}
-
+			consumer = consumers.get(Event.ANY_TYPE);
+		}
+		if (consumer == null) {
 			throw new IllegalArgumentException("No processor found for message: " + msg);
 		}
 

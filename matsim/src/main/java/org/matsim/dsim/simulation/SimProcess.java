@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.qsim.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.dsim.DistributedEventsManager;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
 import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
@@ -69,6 +70,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		this.em = em;
 		this.currentTime = new MobsimTimer();
 		this.scoringDataCollector = scoringDataCollector;
+
+		// Wire up the scoring data collector as single partition events handler.
+		DistributedEventsManager dem = (DistributedEventsManager) em;
+		dem.addHandler(scoringDataCollector, partition.getIndex());
 	}
 
 	/**
@@ -168,7 +173,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		for (DistributedMobsimEngine engine : engines) {
 			engine.process(msg, now);
 		}
-        scoringDataCollector.process(msg);
+		scoringDataCollector.process(msg);
 	}
 
 	@Override

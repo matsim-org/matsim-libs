@@ -49,6 +49,30 @@ class DistributedEventsManagerTest {
 	}
 
 	@Test
+	public void globalHandlerNotHeadNode() {
+		MessageBroker broker = mock(MessageBroker.class);
+		var provider = new SerializationProvider();
+		LPExecutor executor = new SingleExecutor(provider);
+		var computeNode = ComputeNode.builder()
+			.rank(1)
+			.parts(IntList.of(0, 1))
+			.build();
+
+		var globalHandler = new GlobalTestHandler();
+		var manager = new DistributedEventsManager(broker, computeNode, executor, provider);
+		manager.addHandler(globalHandler);
+
+		manager.setContext(0);
+		manager.processEvent(new TestEvent(1., "test"));
+		manager.setContext(1);
+		manager.processEvent(new TestEvent(1., "test"));
+
+		// events are queued on the handler task and are only processed after the executor runs the event handler task
+		executor.runEventHandler();
+		assertEquals(0, globalHandler.counter.get());
+	}
+
+	@Test
 	public void nodeHandler() {
 		MessageBroker broker = mock(MessageBroker.class);
 		var provider = new SerializationProvider();
@@ -159,6 +183,32 @@ class DistributedEventsManagerTest {
 				assertEquals(0, handlerI.counter.get());
 			}
 		}
+	}
+
+	@Test
+	public void partitionHandlerParticularPart() {
+
+		MessageBroker broker = mock(MessageBroker.class);
+		var serializationProvider = new SerializationProvider();
+		LPExecutor executor = new SingleExecutor(serializationProvider);
+		var computeNode = ComputeNode.builder()
+			.rank(0)
+			.parts(IntList.of(0, 1))
+			.build();
+
+		var handler = new PartitionHandler();
+		var manager = new DistributedEventsManager(broker, computeNode, executor, serializationProvider);
+		manager.addHandler(handler, 0);
+
+		var emittingPartition = 1;
+		manager.setContext(emittingPartition);
+		manager.processEvent(new TestEvent(1., "first"));
+		assertEquals(0, handler.counter.get());
+
+		emittingPartition = 0;
+		manager.setContext(emittingPartition);
+		manager.processEvent(new TestEvent(1., "second"));
+		assertEquals(1, handler.counter.get());
 	}
 
 	@DistributedEventHandler(value = DistributedMode.GLOBAL)

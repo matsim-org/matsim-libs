@@ -6,9 +6,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
+import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.BackPack;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
@@ -17,9 +21,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.dsim.simulation.SimStepMessaging;
 
-public class ScoringDataCollector {
+@DistributedEventHandler(value = DistributedMode.PARTITION)
+public class ScoringDataCollector implements BasicEventHandler {
 
 	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
+
 	private final IdMap<Person, BackPack> backPacks = new IdMap<>(Person.class);
 	private final SimStepMessaging simStepMessaging;
 	private final NetworkPartitioning partitioning;
@@ -60,7 +66,12 @@ public class ScoringDataCollector {
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
 		var backPack = backPacks.remove(id);
-		log.info("Person {} leaving partition sending backpack at", id);
+		log.info("Person {} leaving partition sending backpack to {}", id, toPart);
 		simStepMessaging.collectBackPack(backPack, toPart);
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		log.info("Received event {}", event);
 	}
 }
