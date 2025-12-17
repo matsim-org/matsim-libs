@@ -27,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateScenarioCutOutTest {
 
+	// TODO The test has to be updated
+
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -154,6 +156,53 @@ class CreateScenarioCutOutTest {
 		Assertions.assertSame(PopulationComparison.Result.equal, PopulationComparison.compare(referenceScenario.getPopulation(), outputScenario.getPopulation()), "Population was not cut properly!");
 		Assertions.assertTrue(outputScenario.getActivityFacilities().getFacilities().size() <= referenceScenario.getActivityFacilities().getFacilities().size());
 		Assertions.assertTrue(outputScenario.getActivityFacilities().getFacilities().keySet().stream().allMatch(id -> referenceScenario.getActivityFacilities().getFacilities().containsKey(id)));
+	}
+
+	// TODO Temporary test for technical testing, remove later or replace by unit tests
+
+	/*
+	--population
+	"https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_plans.xml.gz"
+	--network
+	"https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_network.xml.gz"
+	--events
+	"https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_events.xml.gz"
+	--facilities
+	"https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_facilities.xml.gz"
+	--buffer
+	"0"
+	--shp
+	"/Users/aleksander/Documents/VSP/Cutout/gartenfeld/gartenfeld-shape-v5.5.shp"
+	--shp-crs
+	"EPSG:31468"
+	--input-crs
+	"EPSG:31468"
+	--output-network
+	"/Users/aleksander/Documents/VSP/Cutout/gartenfeld/out/network.xml"
+	--output-population
+	"/Users/aleksander/Documents/VSP/Cutout/gartenfeld/out/plans.xml"
+	--output-network-change-events
+	"/Users/aleksander/Documents/VSP/Cutout/gartenfeld/out/change_events.xml"
+	--output-facilities
+	"/Users/aleksander/Documents/VSP/Cutout/gartenfeld/out/facilities.xml"
+	 */
+
+	// TODO Has some dependency problem
+	@Test
+	void temporaryTestBerlinV5_5() {
+		new CreateScenarioCutOut().execute(
+			"--population", "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_plans.xml.gz",
+			"--network", "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_network.xml.gz",
+			"--events", "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_events.xml.gz",
+			"--facilities", "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-1pct/output-berlin-v5.5-1pct/berlin-v5.5.3-1pct.output_facilities.xml.gz",
+			"--buffer", "0",
+			"--shp", "/Users/aleksander/Documents/VSP/Cutout/gartenfeld/gartenfeld-shape-v5.5.shp",
+			"--output-network", utils.getOutputDirectory() + "cut_network.xml",
+			"--output-population", utils.getOutputDirectory() + "cut_population.xml",
+			"--output-network-change-events", utils.getOutputDirectory() + "cut_change_events.xml",
+			"--input-crs", "EPSG:31468",
+			"--target-crs", "EPSG:31468"
+		);
 	}
 
 	/**

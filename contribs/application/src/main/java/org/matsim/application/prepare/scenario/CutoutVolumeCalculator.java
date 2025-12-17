@@ -96,22 +96,22 @@ public class CutoutVolumeCalculator implements LinkLeaveEventHandler, PersonEnte
 	}
 
 	// TODO Remove for final commit, this is just for testing/validating
-	/// Prints out random links with different types
 	public void printSample(String path) throws IOException {
 		/*
-		4556354 -> highway, secondary
-		-4553259 -> highway, tertiary
-		-28225794 -> highway, residential
-		4764111 -> highway, motorway
-		-1103167081 -> highway, unclassified
+		v5.5
+		105854 -> motorway
+		99575 -> secondary
+		111193 -> tertiary
+		72549 -> residential
+		69754 -> unclassified
 		 */
 
 		Set<Id<Link>> selectedIds = HashSet.newHashSet(5);
-		selectedIds.add(Id.createLinkId("4556354"));
-		selectedIds.add(Id.createLinkId("-4553259"));
-		selectedIds.add(Id.createLinkId("-28225794"));
-		selectedIds.add(Id.createLinkId("4764111"));
-		selectedIds.add(Id.createLinkId("-1103167081"));
+		selectedIds.add(Id.createLinkId("105854"));
+		selectedIds.add(Id.createLinkId("99575"));
+		selectedIds.add(Id.createLinkId("111193"));
+		selectedIds.add(Id.createLinkId("72549"));
+		selectedIds.add(Id.createLinkId("69754"));
 
 		List<Id<Link>> links = scenario.getNetwork().getLinks().values().stream().filter(l -> selectedIds.contains(l.getId())).map(Identifiable::getId).toList();
 
