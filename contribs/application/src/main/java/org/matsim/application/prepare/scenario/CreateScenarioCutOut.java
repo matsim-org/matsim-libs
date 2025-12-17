@@ -186,14 +186,9 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private Scenario scenario;
 
 	/**
-	 * Shapefile as a {@link Geometry}.
-	 */
-	private Geometry geom;
-
-	/**
 	 * Shapefile+buffer as a {@link Geometry}.
 	 */
-	private Geometry geomBuffer;
+	private Geometry geom;
 
 	private int emptyNetworkWarnings = 0;
 	private int noActCoordsWarnings = 0;
@@ -231,8 +226,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 
-		geom = shp.getGeometry(crs.getInputCRS());
-		geomBuffer = geom.buffer(buffer);
+		geom = shp.getGeometry(crs.getInputCRS()).buffer(buffer);
 
 		for (String mode : modes)
 			mode2modeOnlyNetwork.putIfAbsent(mode, filterNetwork(scenario.getNetwork(), mode));
@@ -478,7 +472,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 
 			// Don't generate events for links thar are in the shapefile + buffer
-			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
+			if (geom.contains(MGC.coord2Point(link.getCoord())))
 				continue;
 
 			// Don't generate events for these fixed modes.
