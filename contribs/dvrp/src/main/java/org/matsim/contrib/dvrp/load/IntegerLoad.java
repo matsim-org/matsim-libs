@@ -7,7 +7,7 @@ package org.matsim.contrib.dvrp.load;
 public class IntegerLoad implements DvrpLoad {
 	private final int value;
 
-	IntegerLoad(int value) {
+	protected IntegerLoad(int value) {
 		this.value = value;
 	}
 

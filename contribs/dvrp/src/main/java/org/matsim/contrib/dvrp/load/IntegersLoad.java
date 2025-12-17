@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 public class IntegersLoad implements DvrpLoad {
     private final int[] values;
 
-    IntegersLoad(int[] values) {
+    protected IntegersLoad(int[] values) {
         this.values = values;
     }
 

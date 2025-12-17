@@ -11,7 +11,7 @@ We describe below the steps to follow to implement two example tests. If you wan
 Let's say the goal is to simulate a service where some vehicles can serve persons and the others can serve goods, both being able to be represented with an integer. The steps below can be followed to achieve that:
 1. Define two extensions of `IntegerLoadType`: `PersonsLoadType` and `GoodsLoadType` that both build `IntegerLoad` instances with the given type.
 2. (a) If the vehicles come from a dvrp fleet file: Define an implementation of `DvrpLoadFromFleet` that sets the vehicle's capacity to persons or goods according to its ID. (b) If the vehicles come from a vehicles file: You can add the attributes `dvrp:capacityType` and `dvrp:capacityValue` in the vehicles or factor in different vehicle types.
-3. (a) Define an implementation of `DvrpLoadFromDrtPassengers` the determines whether a request is a persons or a goods one. (b) Alternatively, modify your plans.xml to add the person attribute `dvrp:loadType` with the name of the appropriate load type.
+3. (a) Define an implementation of `DvrpLoadFromDrtPassengers` that determines whether a request is a persons or a goods one. (b) Alternatively (if you use one multidimensional load type like `IntegersLoadType`), you can modify your plans.xml to add the person attribute `dvrp:loadType` with the name of the appropriate load type.
 4. Bind a DvrpLoadSerializer that is aware of the two `DvrpLoadType`s that are used in the simulation, the `DefaultDvrpLoadSerializer` can be built by passing them to the constructor.
 
 ### Simulating a fleet with changing heterogeneous capacities and its related demand
