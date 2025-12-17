@@ -119,8 +119,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--network-change-events-interval", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "900", required = false)
 	private double changeEventsInterval;
 
-	// TODO Rename to interval
-	@CommandLine.Option(names = "--network-change-events-maxTime", description = "Interval of NetworkChangesToBeApplied. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "86400", required = false)
+	@CommandLine.Option(names = "--network-change-events-maxTime", description = "End time of simulation day. Unit is seconds. Will be ignored if --output-network-change-events is undefined", defaultValue = "86400", required = false)
 	private int changeEventsMaxTime;
 
 	@CommandLine.Option(names = "--network-modes", description = "Modes to consider when cutting network", defaultValue = "car,bike", split = ",")
@@ -132,9 +131,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	@CommandLine.Option(names = "--keep-modes", description = "Network modes of links that are always kept. No change events will be generated for these.", defaultValue = TransportMode.pt, split = ",")
 	private Set<String> keepModes;
 
-	// TODO Replace by enum
 	@CommandLine.Option(names = "--check-beeline", description = "Additional check if agents might cross the zone using a direct beeline.")
-	private boolean checkBeeline;
+	private SelectAgentSetting selectAgentSetting;
 
 	@CommandLine.Option(names = "--capacity-setting", description = "Defines in capacity should be corrected or not", defaultValue = "absoluteCapacityCorrection")
 	private CapacitySetting capacitySetting;
@@ -574,7 +572,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 			Coord destinationCoord = getActivityCoord(trip.getDestinationActivity());
 
 			// also keep persons traveling through or close to area (beeline)
-			if (checkBeeline && originCoord != null && destinationCoord != null) {
+			if (selectAgentSetting == SelectAgentSetting.routeAndBeelineSelection && originCoord != null && destinationCoord != null) {
 				LineString line = geoFactory.createLineString(new Coordinate[]{
 					MGC.coord2Coordinate(originCoord),
 					MGC.coord2Coordinate(destinationCoord)
@@ -642,5 +640,10 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	private enum CapacitySetting {
 		keepOriginalCapacity,
 		absoluteCapacityCorrection
+	}
+
+	private enum SelectAgentSetting {
+		onlyRouteSelection,
+		routeAndBeelineSelection
 	}
 }
