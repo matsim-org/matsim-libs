@@ -71,4 +71,10 @@ public interface DvrpLoad extends Comparable<DvrpLoad> {
 	 */
 	Number getElement(int i);
 
+	/**
+	 * This method produces a copy of the given DvrpLoad instance. It is mainly used when creating requests,
+	 * in order to ensure that loads from a group request are added up correctly, ending with a DvrpLoad instance of the correct implementation.
+	 * @return a copy of the DvrpLoad instance with the same value
+	 */
+	DvrpLoad copy();
 }

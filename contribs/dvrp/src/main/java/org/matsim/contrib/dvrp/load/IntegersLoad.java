@@ -1,6 +1,7 @@
 package org.matsim.contrib.dvrp.load;
 
 import com.google.common.base.Preconditions;
+import java.util.Arrays;
 
 /**
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
@@ -125,4 +126,10 @@ public class IntegersLoad implements DvrpLoad {
 
         throw new IllegalStateException("Passed load is not an IntegersLoad");
     }
+
+	@Override
+	public IntegersLoad copy() {
+		return new IntegersLoad(Arrays.copyOf(values, values.length));
+	}
+
 }

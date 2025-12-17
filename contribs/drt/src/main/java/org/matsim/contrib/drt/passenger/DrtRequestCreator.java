@@ -45,13 +45,11 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final DvrpLoadType dvrpLoadType;
-	private final DvrpLoad emptyLoad;
 
 	public DrtRequestCreator(String mode, EventsManager eventsManager, DvrpLoadType dvrpLoadType) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.dvrpLoadType = dvrpLoadType;
-		this.emptyLoad = dvrpLoadType.getEmptyLoad();
 	}
 
 	@Override
@@ -65,7 +63,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 
         double lateDiversionThreshold = 0;
 		boolean allowRejection = true;
-		DvrpLoad load = emptyLoad;
+		DvrpLoad load = null;
 
 		Preconditions.checkArgument(!passengerIds.isEmpty());
 		for (Route route : routes) {
@@ -77,7 +75,9 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 			maxRideDuration = Math.min(maxRideDuration, constraints.maxRideDuration());
             maxPickupDelay = Math.min(maxPickupDelay, constraints.maxPickupDelay());
             lateDiversionThreshold = Math.max(lateDiversionThreshold, constraints.lateDiversionThreshold());
-            load = load.add(drtRoute.getLoad(dvrpLoadType));
+			//the DvrpLoadType needs to be able to deserialize the load from the route description
+			//and the load needs to be addable to first load of all routes, i.e. the DvrpLoad implementations of all routes need to be compatible
+            load = (load == null) ? drtRoute.getLoad(dvrpLoadType).copy() : load.add(drtRoute.getLoad(dvrpLoadType));
 			allowRejection = allowRejection && constraints.allowRejection();
 		}
 

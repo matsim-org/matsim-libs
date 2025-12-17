@@ -79,4 +79,9 @@ public class IntegerLoad implements DvrpLoad {
 	static public IntegerLoad fromValue(int value) {
 		return new IntegerLoad(value);
 	}
+
+	@Override
+	public IntegerLoad copy() {
+		return new IntegerLoad(this.value);
+	}
 }
