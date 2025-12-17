@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.dsim.MessageBroker;
+import org.matsim.dsim.scoring.BackPack;
 
 /**
  * Bridge between simulation and Message broker. Have this behind an interface, so that

@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.dsim;
 
 
 import org.matsim.api.core.v01.Message;
+import org.matsim.dsim.scoring.BackPack;
 
 import java.util.ArrayList;
 import java.util.List;
