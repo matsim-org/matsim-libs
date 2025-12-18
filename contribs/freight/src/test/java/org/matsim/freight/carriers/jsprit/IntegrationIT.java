@@ -27,8 +27,16 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,6 +47,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
@@ -49,7 +58,7 @@ public class IntegrationIT {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	void testJsprit() throws ExecutionException, InterruptedException {
+	void testJsprit() throws ExecutionException, InterruptedException, IOException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
 		final String vehicleTypeFilename = Path.of(utils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString();
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
@@ -94,6 +103,54 @@ public class IntegrationIT {
 				.build();
 			CarriersUtils.addService(carrier, newService);
 			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
+		}
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "freight");
+
+		Assertions.assertTrue(Files.exists(out.resolve("VRP_Solution_Stats.csv")));
+		Assertions.assertTrue(Files.exists(out.resolve("VRP_Solution_Stats_perCarrier.csv")));
+		Assertions.assertTrue(Files.exists(out.resolve("VRP_Solution_Stats.png")));
+
+		try (BufferedReader reader = IOUtils.getBufferedReader(out.resolve("VRP_Solution_Stats.csv").toString())) {
+			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
+				.setSkipHeaderRecord(true).get().parse(reader);
+			Assertions.assertEquals(21, parse.getRecords().size());
+			int count = 0;
+			double lastBestScore = Double.MAX_VALUE;
+			for (CSVRecord record : parse) {
+				int numberOfIterations = Integer.parseInt(record.get("jsprit_iteration"));
+				int numberOfRunCarrier = Integer.parseInt(record.get("runCarrier"));
+				double bestScoreOfThisIteration = Double.parseDouble(record.get("sumJspritScores"));
+				Assertions.assertTrue(bestScoreOfThisIteration <= lastBestScore);
+
+				if (bestScoreOfThisIteration<lastBestScore)
+					lastBestScore = bestScoreOfThisIteration;
+
+				Assertions.assertEquals(count, numberOfIterations, "The number of iterations is not as expected");
+				Assertions.assertEquals(2, numberOfRunCarrier);
+				count++;
+			}
+		}
+		try (BufferedReader reader = IOUtils.getBufferedReader(out.resolve("VRP_Solution_Stats_perCarrier.csv").toString())) {
+			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
+				.setSkipHeaderRecord(true).get().parse(reader);
+			Assertions.assertEquals(42, parse.getRecords().size());
+			int count = 0;
+			for (CSVRecord record : parse) {
+				int iteration = Integer.parseInt(record.get("iteration"));
+				Double scoreThisSolution = Double.parseDouble(record.get("costsOfThisSolution"));
+				Double scoreBest = Double.parseDouble(record.get("bestSolutionCost"));
+				String strategy = record.get("strategyOfThisIteration");
+				Assertions.assertNotNull(scoreBest);
+				Assertions.assertNotNull(scoreThisSolution);
+				Assertions.assertNotNull(strategy);
+				if (iteration == 0)
+					Assertions.assertEquals("initialSolution", strategy);
+				Assertions.assertTrue(scoreBest<=scoreThisSolution);
+				int numberOfRunCarrier = Integer.parseInt(record.get("runCarrier"));
+				Assertions.assertEquals(count, iteration, "The number of iterations is not as expected");
+				Assertions.assertEquals(2, numberOfRunCarrier);
+				count++;
+			}
 		}
 	}
 
