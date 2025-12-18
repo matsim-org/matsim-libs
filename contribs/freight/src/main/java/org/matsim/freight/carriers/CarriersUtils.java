@@ -76,8 +76,6 @@ public class CarriersUtils {
 	private static final String delimiter = "\t";
 
 	private static final Object CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER = new Object();
-	private static final ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> SELECTED_SERIES =
-		new ConcurrentHashMap<>();
 
 	/**
 	 * Enum to decide for which carriers a new solution should be created.
@@ -293,6 +291,7 @@ public class CarriersUtils {
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
+		BestJspritSolutionCollector bestJspritSolutionCollector = new BestJspritSolutionCollector();
 		List<Future<?>> futures;
 		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
 			futures = new ArrayList<>();
@@ -302,7 +301,7 @@ public class CarriersUtils {
 
 			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
 				JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
-					startedVRPCounter, carriers.getCarriers().size(), jspritAnalysisPerCarrierCSVPath);
+					startedVRPCounter, carriers.getCarriers().size(), jspritAnalysisPerCarrierCSVPath, bestJspritSolutionCollector);
 				log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
 				futures.add(executor.submit(task));
 			}
@@ -312,7 +311,7 @@ public class CarriersUtils {
 			future.get();
 		}
 		writeCarriers(carriers, scenario.getConfig().controller().getOutputDirectory() + "/jsprit_output_carriers.xml.gz");
-		writeAggregatedResultsForAllRunVRPs(aggegatedJspritAnalysisCSVPath);
+		writeAggregatedResultsForAllRunVRPs(carriers, aggegatedJspritAnalysisCSVPath, bestJspritSolutionCollector.snapshot());
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
 		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
@@ -322,18 +321,21 @@ public class CarriersUtils {
 		}
 	}
 
-	/** Writes the aggregated results for all run VRPs to a csv file and creates a related graphic.
+	/**
+	 * Writes the aggregated results for all run VRPs to a csv file and creates a related graphic.
+	 *
+	 * @param carriers 					 the carriers
 	 * @param aggegatedJspritAnalysisCSVPath path of the output csv file
+	 * @param bestJspritSolutionCollector    the selected series of all solved VRPs
 	 */
-	public static void writeAggregatedResultsForAllRunVRPs(Path aggegatedJspritAnalysisCSVPath) {
-		JspritIterationHistogram histogram = new JspritIterationHistogram(
-			SELECTED_SERIES,
-			"VRP aggregated statistics"
-		);
+	public static void writeAggregatedResultsForAllRunVRPs(Carriers carriers, Path aggegatedJspritAnalysisCSVPath,
+														   Map<Id<Carrier>, NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
+		JspritIterationHistogram histogram = new JspritIterationHistogram(carriers, bestJspritSolutionCollector, "VRP aggregated statistics");
 
 		histogram.writeAggregatedCsv(aggegatedJspritAnalysisCSVPath, delimiter);
 		histogram.writeGraphic(aggegatedJspritAnalysisCSVPath);
 	}
+
 
 	/**
 	 * Initializes the jsprit analysis CSV per carrier by creating the file and writing the header.
@@ -953,6 +955,21 @@ public class CarriersUtils {
 		writeCarriers(getCarriers(scenario), pathFile);
 	}
 
+	/**
+	 * Snapshot collector for the best jsprit solutions found during the VRP solving per carrier.
+	 */
+	static final class BestJspritSolutionCollector {
+		private final ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> map = new ConcurrentHashMap<>();
+
+		void put(Id<Carrier> carrierId, NavigableMap<Integer, Double> series) {
+			map.put(carrierId, new TreeMap<>(series)); // defensive copy
+		}
+
+		ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> snapshot() {
+			return map;
+		}
+	}
+
 	static class JspritCarrierTask implements Runnable {
 		private final int priority;
 		private final Carrier carrier;
@@ -961,9 +978,11 @@ public class CarriersUtils {
 		private final AtomicInteger startedVRPCounter;
 		private final int taskCount;
 		private final Path iterationAnalysisPerCarrierPath;
+		private final BestJspritSolutionCollector bestJspritSolutionCollector;
 
 		public JspritCarrierTask(int priority, Carrier carrier, Scenario scenario, NetworkBasedTransportCosts netBasedCosts,
-								 AtomicInteger startedVRPCounter, int taskCount, Path iterationAnalysisPerCarrierPath) {
+								 AtomicInteger startedVRPCounter, int taskCount, Path iterationAnalysisPerCarrierPath,
+								 BestJspritSolutionCollector bestJspritSolutionCollector) {
 			this.priority = priority;
 			this.carrier = carrier;
 			this.scenario = scenario;
@@ -971,6 +990,7 @@ public class CarriersUtils {
 			this.startedVRPCounter = startedVRPCounter;
 			this.taskCount = taskCount;
 			this.iterationAnalysisPerCarrierPath = iterationAnalysisPerCarrierPath;
+			this.bestJspritSolutionCollector = bestJspritSolutionCollector;
 		}
 
 		public int getPriority() {
@@ -1046,7 +1066,7 @@ public class CarriersUtils {
 
 					LinkedHashMap <Integer, JspritStrategyAnalyzer.IterationResult> jspritResultsPerIteration = analyzer.getIterationSolutionCosts();
 					NavigableMap<Integer, Double> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
-					SELECTED_SERIES.put(carrier.getId(), new TreeMap<>(foundNewBestSolutions));
+					bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
 
 					for (var entry : jspritResultsPerIteration.entrySet()) {
 						Integer iteration = entry.getKey();

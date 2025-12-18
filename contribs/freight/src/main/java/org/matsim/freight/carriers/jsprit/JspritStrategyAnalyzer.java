@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-public class JspritStrategyAnalyzer implements StrategySelectedListener, AlgorithmEndsListener, IterationEndsListener, IterationStartsListener, AlgorithmStartsListener {
+public class JspritStrategyAnalyzer implements StrategySelectedListener, IterationEndsListener, IterationStartsListener, AlgorithmStartsListener {
 
 	private static final Logger log = LogManager.getLogger(JspritStrategyAnalyzer.class);
 	private int iterationsCounter;
@@ -60,13 +60,6 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Algorit
 	}
 
 	@Override
-	public void informAlgorithmEnds(VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
-		// fill in the value of the last iteration if no new best solution was found in the last iteration
-		if (!foundNewBestSolutions.containsKey(iterationsCounter))
-			foundNewBestSolutions.put(iterationsCounter, foundNewBestSolutions.lastEntry().getValue());
-	}
-
-	@Override
 	public void informIterationEnds(int i, VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
 		if (i != iterationsCounter) {
 			log.error("Inconsistent iteration number: {} vs {}", i, iterationsCounter);
@@ -76,7 +69,7 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Algorit
 			if (sol.getCost() < best)
 				best = sol.getCost();
 		}
-		if (i == 1 || foundNewBestSolutions.lastEntry().getValue() > best) {
+		if (foundNewBestSolutions.lastEntry().getValue() > best) {
 			log.info("Carrier {}: New best solution found in iteration {}: {}", carrier.getId(), i, best);
 			foundNewBestSolutions.put(i, best);
 		}

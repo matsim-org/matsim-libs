@@ -15,6 +15,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
+import org.matsim.freight.carriers.Carriers;
+import org.matsim.freight.carriers.CarriersUtils;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -33,32 +35,33 @@ public class JspritIterationHistogram {
 	private final String title;
 
 	/**
-	 * @param selectedSeries Map: CarrierId -> (Iteration -> selectedCost)
+	 * @param carriers 				the carriers
+	 * @param bestJspritSolutionCollector Map: CarrierId -> (Iteration -> selectedCost)
 	 */
-	public JspritIterationHistogram(Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> selectedSeries,
+	public JspritIterationHistogram(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector,
 									String title) {
 		this.title = title;
-		aggregate(selectedSeries);
+		aggregate(carriers, bestJspritSolutionCollector);
 	}
 
 	/**
 	 * Analyze and aggregate the selected cost series of all carriers.
 	 *
-	 * @param selectedSeries results of all solved VRPs
+	 * @param carriers 					the carriers
+	 * @param bestJspritSolutionCollector results of all solved VRPs
 	 */
-	private void aggregate(Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> selectedSeries) {
+	private void aggregate(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
 		// get global max iterations for jsprit
-		int globalMaxIteration = selectedSeries.values().stream()
-			.filter(m -> !m.isEmpty())
-			.mapToInt(SortedMap::lastKey)
+		int globalMaxIteration = carriers.getCarriers().values().stream()
+			.mapToInt(CarriersUtils::getJspritIterations)
 			.max()
 			.orElse(0);
-
 		for (int iter = 0; iter <= globalMaxIteration; iter++) {
 			double sum = 0.0;
 			int runCount = 0;
 
-			for (NavigableMap<Integer, Double> series : selectedSeries.values()) {
+			for (Id<Carrier> carrierId : bestJspritSolutionCollector.keySet()) {
+				NavigableMap<Integer, Double> series = bestJspritSolutionCollector.get(carrierId);
 				if (series.isEmpty()) continue;
 
 				Map.Entry<Integer, Double> floor = series.floorEntry(iter);
@@ -66,7 +69,7 @@ public class JspritIterationHistogram {
 				sum += floor.getValue();
 
 				// count carriers that are still running at iteration iter
-				if (series.ceilingKey(iter) != null) {
+				if (CarriersUtils.getJspritIterations(carriers.getCarriers().get(carrierId)) <= iter) {
 					runCount++;
 				}
 			}
