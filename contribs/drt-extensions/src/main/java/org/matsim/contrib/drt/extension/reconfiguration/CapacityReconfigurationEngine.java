@@ -37,7 +37,7 @@ import com.google.common.base.Verify;
  * changes to be inserted in the vehicles' schedules and perform the insertion.
  * The desired capacity changes determined by the logic might be scheduled with
  * a later time if the vehicle cannot be there on time.
- * 
+ *
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  */
 public class CapacityReconfigurationEngine implements MobsimEngine {
@@ -113,7 +113,7 @@ public class CapacityReconfigurationEngine implements MobsimEngine {
 						capacityChangeItem.time(), link);
 			}
 
-			// Then we insert a capacity change with a duration of one minute
+			// Then we insert a capacity change with duration = this.reconfigurationDuration
 			Task capacityChangeTask = new DefaultDrtCapacityChangeTask(capacityChangeBeginTime,
 					capacityChangeBeginTime + this.reconfigurationDuration, link, capacityChangeItem.capacity());
 
