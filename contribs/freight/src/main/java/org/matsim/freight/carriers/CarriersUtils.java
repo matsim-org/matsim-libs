@@ -311,7 +311,7 @@ public class CarriersUtils {
 		for (Future<?> future : futures) {
 			future.get();
 		}
-
+		writeCarriers(carriers, scenario.getConfig().controller().getOutputDirectory() + "/jsprit_output_carriers.xml.gz");
 		writeAggregatedResultsForAllRunVRPs(aggegatedJspritAnalysisCSVPath);
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
