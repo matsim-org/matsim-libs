@@ -259,9 +259,7 @@ public class CarriersUtils {
 				.setRoadPricingScheme(roadPricingScheme)
 				.build();
 
-
 		Carriers carriers = getCarriers(scenario);
-
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
@@ -290,8 +288,6 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
-
-
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
@@ -301,7 +297,7 @@ public class CarriersUtils {
 		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
 			futures = new ArrayList<>();
 			List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+				.sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
 				.toList();
 
 			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
@@ -592,8 +588,6 @@ public class CarriersUtils {
 		}
 		return (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 	}
-
-
 
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
