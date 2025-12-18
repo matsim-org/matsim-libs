@@ -1073,7 +1073,8 @@ public class CarriersUtils {
 						double selectedStrategyCost = entry.getValue().cost();
 						String strategyOfThisIteration = entry.getValue().strategyId();
 						double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
-						Double bestSoFar = foundNewBestSolutions.floorEntry(iteration).getValue();
+						var floor = foundNewBestSolutions.floorEntry(iteration);
+						double bestSoFar = (floor != null) ? floor.getValue() : Double.NaN;
 
 						writer.write(carrier.getId().toString());
 						writer.write(delimiter + iteration);
