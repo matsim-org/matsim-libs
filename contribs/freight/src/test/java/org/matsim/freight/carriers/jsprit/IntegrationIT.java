@@ -56,7 +56,7 @@ public class IntegrationIT {
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setRandomSeed(4177);
-
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
@@ -105,6 +105,7 @@ public class IntegrationIT {
 
 		Config config = ConfigUtils.createConfig();
 		config.global().setRandomSeed(4177);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
 
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
