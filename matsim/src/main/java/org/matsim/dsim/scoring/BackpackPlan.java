@@ -17,8 +17,10 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import static org.matsim.core.scoring.EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME;
 import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
@@ -28,7 +30,8 @@ public class BackpackPlan {
 
 	private static final Logger log = LogManager.getLogger(BackpackPlan.class);
 	private final Plan experiencedPlan = PopulationUtils.createPlan();
-	private final Network network;
+//	private final Network network;
+//	private final TransitSchedule transitSchedule;
 
 	private Activity currentActivity;
 	private PendingLeg currentLeg;
@@ -39,8 +42,15 @@ public class BackpackPlan {
 		return experiencedPlan;
 	}
 
-	public BackpackPlan(Network network) {
-		this.network = network;
+	public BackpackPlan() {
+//		this.network = network;
+//		this.transitSchedule = transitSchedule;
+	}
+
+	void startPtPart(Id<TransitLine> line, Id<TransitRoute> route) {
+		if (currentPtLeg == null)
+			currentPtLeg = new PendingPtLeg();
+		currentPtLeg.startPart(line, route);
 	}
 
 	void handleEvent(ActivityStartEvent e) {
@@ -71,7 +81,11 @@ public class BackpackPlan {
 		currentLeg.addLink(e.getLinkId());
 	}
 
-	void handleEvent(PersonArrivalEvent e) {
+	/**
+	 * This takes the arrival event as well as the network and the transit schedule. This has the advantage that the object does not store these
+	 * objects as the backpack plan is passed around when agents switch from one to another partition.
+	 */
+	void handleEvent(PersonArrivalEvent e, Network network, TransitSchedule transitSchedule) {
 
 		// TODO this lacks pt
 
@@ -79,7 +93,7 @@ public class BackpackPlan {
 
 		currentLeg.arrivalTime(e.getTime());
 
-		var route = finishRoute(e);
+		var route = finishRoute(e, network, transitSchedule);
 		var leg = PopulationUtils.createLeg(currentLeg.legMode());
 		leg.setDepartureTime(currentLeg.departureTime());
 		leg.setRoutingMode(currentLeg.routingMode());
@@ -97,8 +111,31 @@ public class BackpackPlan {
 		currentPtLeg = null;
 	}
 
-	private Route finishRoute(PersonArrivalEvent pae) {
+	private Route finishRoute(PersonArrivalEvent pae, Network network, TransitSchedule transitSchedule) {
 
+		if (currentPtLeg != null) {
+
+			// chained routes are implemented as a linked list of transit routes. We have collected a plain list
+			// of those transit routes. Iterate through this list backwards, create pt routes and place them into
+			// the previous one.
+			DefaultTransitPassengerRoute ptRoute = null;
+
+			while (!currentPtLeg.getPtParts().isEmpty()) {
+				var part = currentPtLeg.getPtParts().removeLast();
+
+				var start = transitSchedule.getFacilities().get(part.getStartFacility());
+				var end = transitSchedule.getFacilities().get(part.getEndFacility());
+				var transitLine = transitSchedule.getTransitLines().get(part.getLine());
+				var transitRoute = transitLine.getRoutes().get(part.getRoute());
+				ptRoute = new DefaultTransitPassengerRoute(start, transitLine, transitRoute, end, ptRoute);
+			}
+			assert ptRoute != null;
+
+			ptRoute.setBoardingTime(currentVehicleLeg.enterVehicleTime());
+			ptRoute.setTravelTime(currentLeg.travelTime());
+			ptRoute.setDistance(RouteUtils.calcDistance(ptRoute, transitSchedule, network));
+			return ptRoute;
+		}
 		// The original code handles a special case, where a person enters and leaves a vehicle, but the vehicle does not
 		// enter and leave traffic. In that case the code generates a generic route instead of a network route.
 		// the code below creates a network route in that case but with the same attributes regarding distance (0.0) and
@@ -123,10 +160,6 @@ public class BackpackPlan {
 
 	void handleEvent(TeleportationArrivalEvent e) {
 		currentLeg.travelDistance(e.getDistance());
-	}
-
-	void handleEvent(PersonEntersVehicleEvent e, Id<TransitLine> line, Id<TransitRoute> route) {
-		currentPtLeg = new PendingPtLeg(route, line);
 	}
 
 	void handleEvent(PersonEntersVehicleEvent e) {

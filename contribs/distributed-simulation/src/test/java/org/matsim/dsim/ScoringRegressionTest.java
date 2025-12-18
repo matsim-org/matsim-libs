@@ -110,6 +110,8 @@ public class ScoringRegressionTest {
 		config.controller().setMobsim("dsim");
 		config.controller().getSnapshotFormat().clear();
 
+		config.dsim().setThreads(2);
+
 		var walkModeParam = new ScoringConfigGroup.ModeParams("walk")
 			.setConstant(0)
 			.setMarginalUtilityOfDistance(-1);

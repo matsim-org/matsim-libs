@@ -4,16 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Person;
@@ -58,10 +49,11 @@ class NetworkTrafficEngineTest {
 		var parkedVehicles = new MassConservingParking();
 		var simNetwork = new SimNetwork(scenario.getNetwork(), scenario.getConfig(), NetworkPartition.SINGLE_INSTANCE, activeLinks, activeNodes);
 		var config = new DSimConfigGroup();
+		var asc = mock(AgentSourcesContainer.class);
 		var networkDepartureHandler = new NetworkTrafficDepartureHandler(simNetwork, config, parkedVehicles, wait2link, eventsManager);
-		var sdc = new ScoringDataCollector(mock(SimStepMessaging.class), scenario.getNetwork());
+		var sdc = new ScoringDataCollector(mock(SimStepMessaging.class), scenario.getNetwork(), scenario.getTransitSchedule(), asc);
 
-		var engine = new NetworkTrafficEngine(mock(AgentSourcesContainer.class), simNetwork,
+		var engine = new NetworkTrafficEngine(asc, simNetwork,
 			activeNodes, activeLinks, parkedVehicles, wait2link, eventsManager, sdc);
 
 		var timer = mock(MobsimTimer.class);

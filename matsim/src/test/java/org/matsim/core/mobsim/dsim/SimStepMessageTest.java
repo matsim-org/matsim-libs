@@ -18,7 +18,7 @@ class SimStepMessageTest {
 		CapacityUpdate cu = new CapacityUpdate(null, 1.0, 2.0);
 		Teleportation tp = new Teleportation(null, null, 42.0);
 		VehicleContainer vc = new VehicleContainer(null, null, null, List.of());
-		BackPack bp = new BackPack(null, null);
+		BackPack bp = new BackPack(null);
 
 		b.addCapacityUpdate(cu)
 			.addTeleportation(tp)
@@ -48,7 +48,7 @@ class SimStepMessageTest {
 		CapacityUpdate cu = new CapacityUpdate(null, 1.0, 2.0);
 		Teleportation tp = new Teleportation(null, null, 7.0);
 		VehicleContainer vc = new VehicleContainer(null, null, null, List.of());
-		BackPack bp = new BackPack(null, null);
+		BackPack bp = new BackPack(null);
 
 		b.addCapacityUpdate(cu)
 			.addTeleportation(tp)

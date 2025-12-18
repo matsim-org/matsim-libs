@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
@@ -44,11 +43,11 @@ public class BackPack {
 		return backpackPlan;
 	}
 
-	public BackPack(Id<Person> personId, Network network) {
+	public BackPack(Id<Person> personId) {
 		this.personId = personId;
 		this.events = new ArrayList<>();
 		this.plan = PopulationUtils.createPlan();
-		backpackPlan = new BackpackPlan(network);
+		backpackPlan = new BackpackPlan();
 	}
 
 	void addSpecialScoringEvent(Event e) {
