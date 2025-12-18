@@ -188,7 +188,7 @@ public class JspritIterationHistogram {
 				writer.write(String.join(delimiter, "jsprit_iteration", "runCarrier", "sumJspritScores"));
 				writer.newLine();
 
-				for (int iter = 0; iter <= sumSelectedCost.size(); iter++) {
+				for (int iter = 0; iter < sumSelectedCost.size(); iter++) {
 					writer.write(iter + delimiter + runCarrierCount.get(iter) + delimiter + sumSelectedCost.get(iter));
 					writer.newLine();
 				}
