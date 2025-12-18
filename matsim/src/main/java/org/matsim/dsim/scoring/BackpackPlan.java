@@ -17,6 +17,8 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import static org.matsim.core.scoring.EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME;
 import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
@@ -123,6 +125,10 @@ public class BackpackPlan {
 		currentLeg.travelDistance(e.getDistance());
 	}
 
+	void handleEvent(PersonEntersVehicleEvent e, Id<TransitLine> line, Id<TransitRoute> route) {
+		currentPtLeg = new PendingPtLeg(route, line);
+	}
+
 	void handleEvent(PersonEntersVehicleEvent e) {
 		if (currentVehicleLeg != null) throw new IllegalStateException("Agent already performs vehicle leg");
 		currentVehicleLeg = new PendingVehicleLeg(e.getTime(), e.getVehicleId(), currentLeg);
@@ -140,8 +146,8 @@ public class BackpackPlan {
 	}
 
 	void handleEvent(VehicleDepartsAtFacilityEvent e) {
-		if (currentPtLeg == null) {
-			currentPtLeg = new PendingPtLeg(e.getFacilityId());
+		if (currentPtLeg != null && !currentPtLeg.hasStartFacility()) {
+			currentPtLeg.startFacility(e.getFacilityId());
 		}
 	}
 

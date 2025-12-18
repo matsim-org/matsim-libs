@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesPtEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -161,7 +160,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
 		boolean handled = vehicle.addPassenger(passenger);
 		if (handled) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
@@ -183,16 +182,6 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
 			passenger.setVehicle(null);
-			if (vehicle.getDriver() instanceof AbstractTransitDriverAgent td) {
-				var stop = td.getNextTransitStop();
-				assert stop != null;
-				var line = td.getTransitLine();
-				var route = td.getTransitRoute();
-				eventsManager.processEvent(new PersonLeavesPtEvent(time, passenger.getId(), vehicle.getId(), stop.getId(), line.getId(), route.getId()));
-			} else {
-				throw new RuntimeException("Expecting driver of transit vehicles to be transit drivers.");
-			}
-			
 			eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
@@ -208,7 +197,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+	public void handlePassengerRelocating(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
 
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {

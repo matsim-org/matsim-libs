@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
@@ -128,7 +127,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
 		boolean entered = vehicle.addPassenger(passenger);
 		if (entered) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
@@ -142,7 +141,7 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	@Override
-	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+	public void handlePassengerRelocating(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
 
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
