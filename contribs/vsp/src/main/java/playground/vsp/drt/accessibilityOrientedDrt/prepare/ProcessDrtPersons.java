@@ -15,8 +15,8 @@ import java.util.Random;
 public class ProcessDrtPersons {
 	public static void main(String[] args) {
 		// the frequency of premium passengers
-		double premiumRatio = 0.01;
-		Population drtPlans = PopulationUtils.readPopulation("/Users/luchengqi/Documents/MATSimScenarios/Berlin/accessibility-drt-study/v6.4/drt-plans-0.5pct-processed.xml.gz");
+		double premiumRatio = 0.2;
+		Population drtPlans = PopulationUtils.readPopulation("/Users/luchengqi/Documents/MATSimScenarios/Dresden/drt-study/plans/drt-plans-raw.xml.gz");
 		Random rand = new Random(1);
 		for (Person drtPerson : drtPlans.getPersons().values()) {
 			// default case: normal
@@ -41,6 +41,6 @@ public class ProcessDrtPersons {
 			}
 
 		}
-		new PopulationWriter(drtPlans).write("/Users/luchengqi/Documents/MATSimScenarios/Berlin/accessibility-drt-study/v6.4/drt-plans-0.5pct-heterogeneous-with-"+ premiumRatio +"-premium.xml.gz");
+		new PopulationWriter(drtPlans).write("/Users/luchengqi/Documents/MATSimScenarios/Dresden/drt-study/plans/drt-plans-heterogeneous-with-"+ premiumRatio +"-premium.xml.gz");
 	}
 }

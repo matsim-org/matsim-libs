@@ -82,6 +82,8 @@ public class RunHeterogeneousDrt implements MATSimAppCommand {
 		int fleetInterval = fleetSizing.get(2);
 
 		Config configForGettingData = ConfigUtils.loadConfig(configPath, new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
+		String tempConfigPath = Path.of(configPath).getParent().toString() + "/temp_config_" + System.currentTimeMillis()/1000 + ".xml";
+		ConfigUtils.writeConfig(configForGettingData, tempConfigPath);
 
 		// Reading person attributes
 		Population inputPlans = PopulationUtils.readPopulation(Path.of(configPath).getParent().toString() + "/" + configForGettingData.plans().getInputFile());
@@ -108,7 +110,7 @@ public class RunHeterogeneousDrt implements MATSimAppCommand {
 		for (int fleetSize = fleetFrom; fleetSize <= fleetMax; fleetSize += fleetInterval) {
 			String fleetSizeFolder = outputRootDirectory + "/" + fleetSize + "-veh";
 
-			Config config = ConfigUtils.loadConfig(configPath, new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
+			Config config = ConfigUtils.loadConfig(tempConfigPath, new MultiModeDrtConfigGroup(), new DvrpConfigGroup());
 			config.controller().setOutputDirectory(fleetSizeFolder);
 
 			// Currently we only focus on single DRT mode
@@ -149,6 +151,10 @@ public class RunHeterogeneousDrt implements MATSimAppCommand {
 				break;
 			}
 		}
+
+		// remove temp config at the end
+		Files.delete(Path.of(tempConfigPath));
+
 		return 0;
 	}
 
