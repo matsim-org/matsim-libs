@@ -8,10 +8,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;import org.matsim.core.controler.Controler;
+import org.matsim.core.config.groups.ScoringConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -22,7 +21,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.EnumSet;import java.util.List;import java.util.Set;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -105,7 +104,7 @@ public class ScoringRegressionTest {
 		Path configPath = getConfigPath(scenarioUrl, configFile);
 
 		var config = ConfigUtils.loadConfig(configPath.toString());
-		config.controller().setLastIteration(0);
+		config.controller().setLastIteration(2);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(outputDir);
 		config.controller().setMobsim("dsim");

@@ -37,6 +37,14 @@ public class PendingVehicleLeg {
 		return relativePositionOnLastArrivalLink;
 	}
 
+	Id<Vehicle> vehicleId() {
+		return vehicleId;
+	}
+
+	double enterVehicleTime() {
+		return enterVehicleTime;
+	}
+
 	void addLink(Id<Link> id) {
 		basicLeg.addLink(id);
 	}

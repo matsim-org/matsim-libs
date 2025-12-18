@@ -13,7 +13,10 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
@@ -120,7 +123,10 @@ public class ScoringDataCollector implements BasicEventHandler {
 		} else if (e instanceof PersonLeavesVehicleEvent plve) {
 			var personId = plve.getPersonId();
 			var backpack = backpackByPerson.get(personId);
+
 			backpack.setCurrentVehicle(null);
+			backpack.backpackPlan().handleEvent(plve);
+
 			var backpacksInVehicle = backpackByVehicle.get(plve.getVehicleId());
 			backpacksInVehicle.remove(backpack);
 			if (backpacksInVehicle.isEmpty()) {
@@ -165,6 +171,19 @@ public class ScoringDataCollector implements BasicEventHandler {
 			var backpackInVehicle = backpackByVehicle.get(vlte.getVehicleId());
 			for (var backpack : backpackInVehicle) {
 				backpack.backpackPlan().handleEvent(vlte);
+			}
+		} else if (e instanceof AgentWaitingForPtEvent awfpte) {
+			var backpack = backpackByPerson.get(awfpte.getPersonId());
+			backpack.backpackPlan().handleEvent(awfpte);
+		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
+			var backpacksInVehicle = backpackByVehicle.get(vaafe.getVehicleId());
+			for (var backpack : backpacksInVehicle) {
+				backpack.backpackPlan().handleEvent(vaafe);
+			}
+		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
+			var backpacksInVehicle = backpackByVehicle.get(vdafe.getVehicleId());
+			for (var backpack : backpacksInVehicle) {
+				backpack.backpackPlan().handleEvent(vdafe);
 			}
 		}
 	}

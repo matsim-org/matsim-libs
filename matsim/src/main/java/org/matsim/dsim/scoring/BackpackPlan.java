@@ -1,5 +1,7 @@
 package org.matsim.dsim.scoring;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -8,20 +10,32 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacility;
 
+import static org.matsim.core.scoring.EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME;
+import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
+
 
 public class BackpackPlan {
 
+	private static final Logger log = LogManager.getLogger(BackpackPlan.class);
 	private final Plan experiencedPlan = PopulationUtils.createPlan();
 	private final Network network;
 
 	private Activity currentActivity;
 	private PendingLeg currentLeg;
 	private PendingVehicleLeg currentVehicleLeg;
+	private PendingPtLeg currentPtLeg;
+
+	Plan experiencedPlan() {
+		return experiencedPlan;
+	}
 
 	public BackpackPlan(Network network) {
 		this.network = network;
@@ -55,10 +69,6 @@ public class BackpackPlan {
 		currentLeg.addLink(e.getLinkId());
 	}
 
-	void handleEvent(TeleportationArrivalEvent e) {
-		currentLeg.travelDistance(e.getDistance());
-	}
-
 	void handleEvent(PersonArrivalEvent e) {
 
 		// TODO this lacks pt
@@ -73,19 +83,31 @@ public class BackpackPlan {
 		leg.setRoutingMode(currentLeg.routingMode());
 		leg.setTravelTime(currentLeg.travelTime());
 		leg.setRoute(route);
+
+		if (currentVehicleLeg != null) {
+			leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, currentVehicleLeg.enterVehicleTime());
+			leg.getAttributes().putAttribute(VEHICLE_ID_ATTRIBUTE_NAME, currentVehicleLeg.vehicleId());
+		}
+
 		experiencedPlan.addLeg(leg);
 		currentLeg = null;
 		currentVehicleLeg = null;
+		currentPtLeg = null;
 	}
 
 	private Route finishRoute(PersonArrivalEvent pae) {
 
+		// The original code handles a special case, where a person enters and leaves a vehicle, but the vehicle does not
+		// enter and leave traffic. In that case the code generates a generic route instead of a network route.
+		// the code below creates a network route in that case but with the same attributes regarding distance (0.0) and
+		// travel time. Let's see whether this breaks things somewhere else.
 		if (currentVehicleLeg != null) {
 			var route = currentVehicleLeg.route();
-			route.setTravelTime(currentLeg.travelTime());
 			var travelledDistance = RouteUtils.calcDistance(
-				route, currentVehicleLeg.relativePositionOnArrivalLink(), currentVehicleLeg.relativePositionOnArrivalLink(), network);
+				route, currentVehicleLeg.relativePositionOnDepartureLink(), currentVehicleLeg.relativePositionOnArrivalLink(), network);
 			route.setDistance(travelledDistance);
+			route.setTravelTime(currentLeg.travelTime());
+			route.setVehicleId(currentVehicleLeg.vehicleId());
 			return route;
 		} else {
 			// this was a teleported leg with a generic route. Add the arrival link
@@ -97,9 +119,30 @@ public class BackpackPlan {
 		}
 	}
 
+	void handleEvent(TeleportationArrivalEvent e) {
+		currentLeg.travelDistance(e.getDistance());
+	}
+
 	void handleEvent(PersonEntersVehicleEvent e) {
 		if (currentVehicleLeg != null) throw new IllegalStateException("Agent already performs vehicle leg");
 		currentVehicleLeg = new PendingVehicleLeg(e.getTime(), e.getVehicleId(), currentLeg);
+	}
+
+	void handleEvent(PersonLeavesVehicleEvent e) {
+		log.info("break");
+	}
+
+	void handleEvent(VehicleArrivesAtFacilityEvent e) {
+		if (currentPtLeg != null) {
+			currentPtLeg.endFacility(e.getFacilityId());
+			//throw new IllegalStateException("Vehicle arrives at facility events should only be passed if the person has started a pt leg");
+		}
+	}
+
+	void handleEvent(VehicleDepartsAtFacilityEvent e) {
+		if (currentPtLeg == null) {
+			currentPtLeg = new PendingPtLeg(e.getFacilityId());
+		}
 	}
 
 	void handleEvent(VehicleEntersTrafficEvent e) {
@@ -115,6 +158,10 @@ public class BackpackPlan {
 
 	void handleEvent(LinkEnterEvent e) {
 		currentVehicleLeg.addLink(e.getLinkId());
+	}
+
+	void handleEvent(AgentWaitingForPtEvent e) {
+		log.info("waiting for pt");
 	}
 
 	void finish() {

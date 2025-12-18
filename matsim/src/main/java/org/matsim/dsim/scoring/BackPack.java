@@ -21,6 +21,7 @@ public class BackPack {
 	private final Plan plan;
 	private final BackpackPlan backpackPlan;
 
+	// this can probably be done from the backpackplan
 	private Id<Vehicle> currentVehicle;
 
 	public Id<Person> personId() {
