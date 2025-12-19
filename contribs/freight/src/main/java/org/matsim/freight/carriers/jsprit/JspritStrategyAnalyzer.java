@@ -3,8 +3,11 @@ package org.matsim.freight.carriers.jsprit;
 import com.graphhopper.jsprit.core.algorithm.SearchStrategy;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.listener.*;
+import com.graphhopper.jsprit.core.algorithm.ruin.listener.RuinListener;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.job.Job;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.freight.carriers.Carrier;
@@ -14,16 +17,19 @@ import java.util.LinkedHashMap;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-public class JspritStrategyAnalyzer implements StrategySelectedListener, IterationEndsListener, IterationStartsListener, AlgorithmStartsListener {
+public class JspritStrategyAnalyzer implements StrategySelectedListener, IterationEndsListener, IterationStartsListener, AlgorithmStartsListener, RuinListener {
 
 	private static final Logger log = LogManager.getLogger(JspritStrategyAnalyzer.class);
 	private int iterationsCounter;
-	private final LinkedHashMap <Integer, IterationResult> iterationSolutionCosts;
+	private final LinkedHashMap<Integer, IterationResult> iterationSolutionCosts;
 	private final NavigableMap<Integer, Double> foundNewBestSolutions;
 
 	private double iterationStartTime;
 	private double algorithmStartTime;
+	private int removedJobsWhileRuin;
+	private int routesAfterRuin;
 	private final Carrier carrier;
+
 	public JspritStrategyAnalyzer(Carrier carrier) {
 		this.carrier = carrier;
 		iterationSolutionCosts = new LinkedHashMap<>();
@@ -31,7 +37,24 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 
 	}
 
-	public record IterationResult(double cost, String strategyId, double iterationComputationTimeInSeconds) {}
+	public record IterationResult(double costsOfThisIteration, String strategyId, double iterationComputationTimeInSeconds,
+								  int numberOfRoutesOfThisIterationSolution, int removedJobsWhileRuin,
+								  int routesAfterRuin) {
+	}
+
+	@Override
+	public void ruinStarts(Collection<VehicleRoute> routes) {
+	}
+
+	@Override
+	public void ruinEnds(Collection<VehicleRoute> routes, Collection<Job> unassignedJobs) {
+		removedJobsWhileRuin = unassignedJobs.size();
+		routesAfterRuin = routes.size();
+	}
+
+	@Override
+	public void removed(Job job, VehicleRoute fromRoute) {
+	}
 
 	@Override
 	public void informIterationStarts(int i, VehicleRoutingProblem problem, Collection<VehicleRoutingProblemSolution> solutions) {
@@ -40,7 +63,8 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 		if (i == 1) {
 			double initialSolutionComputationTime = (System.currentTimeMillis() - algorithmStartTime) / 1000.0;
 			double initialSolutionCosts = solutions.iterator().next().getCost();
-			iterationSolutionCosts.put(0, new IterationResult(initialSolutionCosts, "initialSolution", initialSolutionComputationTime));
+			iterationSolutionCosts.put(0, new IterationResult(initialSolutionCosts, "initialSolution", initialSolutionComputationTime,
+				solutions.iterator().next().getRoutes().size(), 0, 0));
 			iterationStartTime = System.currentTimeMillis();
 			foundNewBestSolutions.put(0, initialSolutionCosts);
 		}
@@ -56,7 +80,9 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 	public void informSelectedStrategy(SearchStrategy.DiscoveredSolution discoveredSolution, VehicleRoutingProblem vehicleRoutingProblem,
 									   Collection<VehicleRoutingProblemSolution> vehicleRoutingProblemSolutions) {
 		double iterationComputationTime = (System.currentTimeMillis() - iterationStartTime) / 1000.0;
-		iterationSolutionCosts.put(iterationsCounter, new IterationResult(discoveredSolution.getSolution().getCost(), discoveredSolution.getStrategyId(), iterationComputationTime));
+		iterationSolutionCosts.put(iterationsCounter,
+			new IterationResult(discoveredSolution.getSolution().getCost(), discoveredSolution.getStrategyId(), iterationComputationTime,
+				discoveredSolution.getSolution().getRoutes().size(), removedJobsWhileRuin, routesAfterRuin));
 	}
 
 	@Override
@@ -70,12 +96,11 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 				best = sol.getCost();
 		}
 		if (foundNewBestSolutions.lastEntry().getValue() > best) {
-			log.info("Carrier {}: New best solution found in iteration {}: {}", carrier.getId(), i, best);
 			foundNewBestSolutions.put(i, best);
 		}
 	}
 
-	public LinkedHashMap <Integer, IterationResult> getIterationSolutionCosts() {
+	public LinkedHashMap<Integer, IterationResult> getIterationSolutionCosts() {
 		return iterationSolutionCosts;
 	}
 

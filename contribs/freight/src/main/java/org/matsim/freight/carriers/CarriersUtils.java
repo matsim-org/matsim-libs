@@ -353,10 +353,13 @@ public class CarriersUtils {
 				// write header
 				writer.write(String.join(delimiter,"carrierId",
 					"jsprit_iteration",
-					"costsOfThisSolution",
 					"currentBestSolutionCost",
+					"costsOfThisSolution",
 					"strategyOfThisIteration",
-					"iterationComputationTimeInSeconds"));
+					"iterationComputationTimeInSeconds",
+					"numberOfRoutesOfThisIterationSolution",
+					"removedJobsWhileRuin",
+					"routesAfterRuin"));
 
 				writer.newLine();
 			}
@@ -1018,7 +1021,7 @@ public class CarriersUtils {
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			JspritStrategyAnalyzer iterationsAnalyzer = new JspritStrategyAnalyzer(carrier);
 			algorithm.getAlgorithmListeners().addListener(iterationsAnalyzer, VehicleRoutingAlgorithmListeners.Priority.HIGH);
-
+			algorithm.getSearchStrategyManager().addSearchStrategyModuleListener(iterationsAnalyzer);
 			int jspritIterations = getJspritIterations(carrier);
 			try {
 				if (jspritIterations > 0) {
@@ -1067,22 +1070,28 @@ public class CarriersUtils {
 					bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
 
 					for (var entry : jspritResultsPerIteration.entrySet()) {
-						Integer iteration = entry.getKey();
-						double selectedStrategyCost = entry.getValue().cost();
+						Integer jspritIteration = entry.getKey();
+						double selectedStrategyCost = entry.getValue().costsOfThisIteration();
 						String strategyOfThisIteration = entry.getValue().strategyId();
 						double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
-						var floor = foundNewBestSolutions.floorEntry(iteration);
+						var floor = foundNewBestSolutions.floorEntry(jspritIteration);
 						double bestSoFar = (floor != null) ? floor.getValue() : Double.NaN;
+						int numberOfRoutesOfThisIterationSolution = entry.getValue().numberOfRoutesOfThisIterationSolution();
+						int removedJobsWhileRuin = entry.getValue().removedJobsWhileRuin();
+						int routesAfterRuin = entry.getValue().routesAfterRuin();
 
 						writer.write(carrier.getId().toString());
-						writer.write(delimiter + iteration);
-						writer.write(delimiter + selectedStrategyCost);
+						writer.write(delimiter + jspritIteration);
 						writer.write(delimiter + bestSoFar);
+						writer.write(delimiter + selectedStrategyCost);
 						writer.write(delimiter + strategyOfThisIteration);
 						if (iterationComputationTimeInSeconds >= 1)
 							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSS));
 						else
 							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSSDOTSS));
+						writer.write(delimiter + numberOfRoutesOfThisIterationSolution);
+						writer.write(delimiter + removedJobsWhileRuin);
+						writer.write(delimiter + routesAfterRuin);
 						writer.newLine();
 					}
 
