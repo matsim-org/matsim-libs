@@ -1,7 +1,5 @@
 package org.matsim.dsim.scoring;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -10,7 +8,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -21,6 +18,7 @@ import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
 
 import static org.matsim.core.scoring.EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME;
 import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
@@ -28,10 +26,7 @@ import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
 
 public class BackpackPlan {
 
-	private static final Logger log = LogManager.getLogger(BackpackPlan.class);
 	private final Plan experiencedPlan = PopulationUtils.createPlan();
-//	private final Network network;
-//	private final TransitSchedule transitSchedule;
 
 	private Activity currentActivity;
 	private PendingLeg currentLeg;
@@ -42,15 +37,18 @@ public class BackpackPlan {
 		return experiencedPlan;
 	}
 
-	public BackpackPlan() {
-//		this.network = network;
-//		this.transitSchedule = transitSchedule;
+	Id<Vehicle> currentVehicle() {
+		return currentVehicleLeg.vehicleId();
 	}
 
 	void startPtPart(Id<TransitLine> line, Id<TransitRoute> route) {
 		if (currentPtLeg == null)
 			currentPtLeg = new PendingPtLeg();
 		currentPtLeg.startPart(line, route);
+	}
+
+	void handleEvent(PersonContinuesInVehicleEvent e) {
+		currentVehicleLeg.vehicleId(e.getVehicleId());
 	}
 
 	void handleEvent(ActivityStartEvent e) {
@@ -120,10 +118,6 @@ public class BackpackPlan {
 		currentVehicleLeg = new PendingVehicleLeg(e.getTime(), e.getVehicleId(), currentLeg);
 	}
 
-	void handleEvent(PersonLeavesVehicleEvent e) {
-		log.info("break");
-	}
-
 	void handleEvent(VehicleArrivesAtFacilityEvent e) {
 		if (currentPtLeg != null) {
 			currentPtLeg.endFacility(e.getFacilityId());
@@ -149,10 +143,6 @@ public class BackpackPlan {
 
 	void handleEvent(LinkEnterEvent e) {
 		currentVehicleLeg.addLink(e.getLinkId());
-	}
-
-	void handleEvent(AgentWaitingForPtEvent e) {
-		log.info("waiting for pt");
 	}
 
 	void finish() {

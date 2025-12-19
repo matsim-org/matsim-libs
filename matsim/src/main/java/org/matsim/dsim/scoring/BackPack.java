@@ -6,8 +6,6 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -17,26 +15,18 @@ public class BackPack {
 
 	private final Id<Person> personId;
 	private final Collection<Event> events;
-	private final Plan plan;
 	private final BackpackPlan backpackPlan;
-
-	// this can probably be done from the backpackplan
-	private Id<Vehicle> currentVehicle;
 
 	public Id<Person> personId() {
 		return personId;
 	}
 
 	public Id<Vehicle> currentVehicle() {
-		return currentVehicle;
-	}
-
-	public void setCurrentVehicle(Id<Vehicle> currentVehicle) {
-		this.currentVehicle = currentVehicle;
+		return backpackPlan.currentVehicle();
 	}
 
 	public boolean isInVehicle() {
-		return currentVehicle != null;
+		return backpackPlan.currentVehicle() != null;
 	}
 
 	public BackpackPlan backpackPlan() {
@@ -46,7 +36,6 @@ public class BackPack {
 	public BackPack(Id<Person> personId) {
 		this.personId = personId;
 		this.events = new ArrayList<>();
-		this.plan = PopulationUtils.createPlan();
 		backpackPlan = new BackpackPlan();
 	}
 
@@ -66,5 +55,4 @@ public class BackPack {
 	public static boolean isRelevantForScoring(Event e) {
 		return e instanceof PersonMoneyEvent || e instanceof PersonScoreEvent || e instanceof PersonStuckEvent;
 	}
-
 }

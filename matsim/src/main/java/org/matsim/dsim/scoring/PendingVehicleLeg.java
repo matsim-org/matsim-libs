@@ -9,9 +9,9 @@ import org.matsim.vehicles.Vehicle;
 public class PendingVehicleLeg {
 
 	private final double enterVehicleTime;
-	private final Id<Vehicle> vehicleId;
 	private final PendingLeg basicLeg;
 
+	private Id<Vehicle> vehicleId;
 	private double relativePositionOnDepartureLink;
 	private double relativePositionOnLastArrivalLink;
 
@@ -35,6 +35,10 @@ public class PendingVehicleLeg {
 
 	double relativePositionOnArrivalLink() {
 		return relativePositionOnLastArrivalLink;
+	}
+
+	void vehicleId(Id<Vehicle> vehicleId) {
+		this.vehicleId = vehicleId;
 	}
 
 	Id<Vehicle> vehicleId() {

@@ -204,7 +204,6 @@ class BackpackPlanTest {
 		backpackPlan.handleEvent(new LinkEnterEvent(11.0, transitVehiceId, middleLink.getId()));
 		backpackPlan.handleEvent(new LinkEnterEvent(25.0, transitVehiceId, egressLinkId));
 		backpackPlan.handleEvent(new VehicleArrivesAtFacilityEvent(50, transitVehiceId, egressFacilityId, 0.0));
-		backpackPlan.handleEvent(new PersonLeavesVehicleEvent(50.0, passengerId, transitVehiceId));
 		backpackPlan.handleEvent(new PersonArrivalEvent(50.0, passengerId, egressLinkId, "pt"), scenario.getNetwork(), scenario.getTransitSchedule());
 		backpackPlan.finish();
 

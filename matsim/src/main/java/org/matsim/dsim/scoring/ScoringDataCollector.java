@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -31,7 +30,10 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Event handler to collect data relevant for scoring. Each partition in a DSim has one event handler.
@@ -77,6 +79,12 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 	public void process(SimStepMessage msg) {
 
+		// we tap into the vehicle messages to get the state of the transit vehicle. In particular, we need to connect the driver id
+		// with the line and route information. This information is needed to recreate TransitPassengerRoutes.
+		// It is a little dirty to do this, as the vehicle messages are kinda private to the NetworkTrafficEngine and we are creating
+		// transit vehicles and drivers from the message in two places.
+		// The alternative would have been to introduce new events for passengers entering and leaving pt and we decided not to do this
+		// janek, marcel Dec' 2025
 		for (VehicleContainer vehicle : msg.vehicles()) {
 			var veh = asc.vehicleFromContainer(vehicle);
 			if (veh instanceof TransitVehicle) {
@@ -103,7 +111,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 		var driverId = vehicle.getDriver().getId();
 		var targetPart = partitioning.getPartition(vehicle.getCurrentLinkId());
 
-		// we don't want to send data for transit drivers, but we want to remove them from our bookeeping
+		// we don't want to send data for transit drivers, but we want to remove them from our bookkeeping
 		if (transitDrivers.contains(driverId)) {
 			transitInformation.remove(driverId);
 		} else {
@@ -113,12 +121,9 @@ public class ScoringDataCollector implements BasicEventHandler {
 		for (var passenger : vehicle.getPassengers()) {
 			personLeavingPartition(passenger.getId(), targetPart);
 		}
-
-		transitInformation.remove(vehicle.getId());
 	}
 
 	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {
-
 		var targetPart = partitioning.getPartition(agent.getDestinationLinkId());
 		personLeavingPartition(agent.getId(), targetPart);
 	}
@@ -148,7 +153,6 @@ public class ScoringDataCollector implements BasicEventHandler {
 		log.info("Received event {}", e);
 
 		// short circuit on transit drivers and pass on special scoring events
-
 		if (e instanceof HasPersonId hpi) {
 			if (transitDrivers.contains(hpi.getPersonId())) {
 				return;
@@ -167,13 +171,12 @@ public class ScoringDataCollector implements BasicEventHandler {
 			var backpack = backpackByPerson.get(pcive.getPersonId());
 			backpacksInVehicle.remove(backpack);
 			backpackByVehicle.computeIfAbsent(pcive.getVehicleId(), _ -> new HashSet<>()).add(backpack);
-			backpack.setCurrentVehicle(pcive.getVehicleId());
 			var transitInfo = transitInformation.get(pcive.getVehicleId());
 			backpack.backpackPlan().startPtPart(transitInfo.line(), transitInfo.route());
+			backpack.backpackPlan().handleEvent(pcive);
 
 		} else if (e instanceof PersonEntersVehicleEvent peve) {
 			var backpack = backpackByPerson.get(peve.getPersonId());
-			backpack.setCurrentVehicle(peve.getVehicleId());
 
 			backpackByVehicle
 				.computeIfAbsent(peve.getVehicleId(), _ -> new HashSet<>())
@@ -188,30 +191,47 @@ public class ScoringDataCollector implements BasicEventHandler {
 		} else if (e instanceof PersonLeavesVehicleEvent plve) {
 			var personId = plve.getPersonId();
 			var backpack = backpackByPerson.get(personId);
-
-			backpack.setCurrentVehicle(null);
-			backpack.backpackPlan().handleEvent(plve);
-
 			var backpacksInVehicle = backpackByVehicle.get(plve.getVehicleId());
 			backpacksInVehicle.remove(backpack);
 			if (backpacksInVehicle.isEmpty()) {
 				backpackByVehicle.remove(plve.getVehicleId());
 			}
 		} else if (e instanceof LinkEnterEvent lee) {
-			var backpacksInVehicle = backpackByVehicle.computeIfAbsent(lee.getVehicleId(), _ -> new HashSet<>());
-			for (var backpack : backpacksInVehicle) {
-				backpack.backpackPlan().handleEvent(lee);
+			var backpacksInVehicle = backpackByVehicle.get(lee.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(lee);
+				}
 			}
-		}
-
-//		else if (e instanceof LinkLeaveEvent lle) {
-//			if (backpackByVehicle.containsKey(lle.getVehicleId())) {
-//				for (var backpack : backpackByVehicle.get(lle.getVehicleId())) {
-//					// TODO update backpack with link information
-//				}
-//			}
-//		}
-		else if (e instanceof ActivityStartEvent ase) {
+		} else if (e instanceof VehicleEntersTrafficEvent vete) {
+			var backpacksInVehicle = backpackByVehicle.get(vete.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(vete);
+				}
+			}
+		} else if (e instanceof VehicleLeavesTrafficEvent vlte) {
+			var backpacksInVehicle = backpackByVehicle.get(vlte.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(vlte);
+				}
+			}
+		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
+			var backpacksInVehicle = backpackByVehicle.get(vaafe.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(vaafe);
+				}
+			}
+		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
+			var backpacksInVehicle = backpackByVehicle.get(vdafe.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(vdafe);
+				}
+			}
+		} else if (e instanceof ActivityStartEvent ase) {
 			var backpack = backpackByPerson.get(ase.getPersonId());
 			backpack.backpackPlan().handleEvent(ase);
 		} else if (e instanceof ActivityEndEvent aee) {
@@ -226,37 +246,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 		} else if (e instanceof TeleportationArrivalEvent tae) {
 			var backpack = backpackByPerson.get(tae.getPersonId());
 			backpack.backpackPlan().handleEvent(tae);
-		} else if (e instanceof VehicleEntersTrafficEvent vete) {
-			var backpackInVehicle = backpackByVehicle.get(vete.getVehicleId());
-			for (var backpack : backpackInVehicle) {
-				backpack.backpackPlan().handleEvent(vete);
-			}
-		} else if (e instanceof VehicleLeavesTrafficEvent vlte) {
-			var backpackInVehicle = backpackByVehicle.get(vlte.getVehicleId());
-			for (var backpack : backpackInVehicle) {
-				backpack.backpackPlan().handleEvent(vlte);
-			}
-		} else if (e instanceof AgentWaitingForPtEvent awfpte) {
-			var backpack = backpackByPerson.get(awfpte.getPersonId());
-			backpack.backpackPlan().handleEvent(awfpte);
-		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
-			var backpacksInVehicle = backpackByVehicle.computeIfAbsent(vaafe.getVehicleId(), _ -> new HashSet<>());
-			for (var backpack : backpacksInVehicle) {
-				backpack.backpackPlan().handleEvent(vaafe);
-			}
-		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
-			var backpacksInVehicle = backpackByVehicle.computeIfAbsent(vdafe.getVehicleId(), _ -> new HashSet<>());
-			for (var backpack : backpacksInVehicle) {
-				backpack.backpackPlan().handleEvent(vdafe);
-			}
 		}
-	}
-
-	private Optional<BackPack> getBackPack(Event e) {
-		if (e instanceof HasPersonId hpid) {
-			return Optional.ofNullable(backpackByPerson.get(hpid.getPersonId()));
-		}
-		return Optional.empty();
 	}
 
 	private record TransitInformation(Id<TransitRoute> route, Id<TransitLine> line) {
