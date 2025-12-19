@@ -23,13 +23,13 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegsTest;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BackpackPlanTest {
 
@@ -152,15 +152,19 @@ class BackpackPlanTest {
 		Node node1 = networkFactory.createNode(Id.createNodeId("node1"), new Coord(0.0, 0.0));
 		Node node2 = networkFactory.createNode(Id.createNodeId("node2"), new Coord(0.0, 100.0));
 		Node node3 = networkFactory.createNode(Id.createNodeId("node3"), new Coord(0.0, 200.0));
+		Node node4 = networkFactory.createNode(Id.createNodeId("node4"), new Coord(0.0, 400.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
+		network.addNode(node4);
 
 		Id<Link> accessLinkId = Id.createLinkId("accessLink");
 		Link accessLink = networkFactory.createLink(accessLinkId, node1, node2);
 		network.addLink(accessLink);
+		Link middleLink = networkFactory.createLink(Id.createLinkId("middleLink"), node2, node3);
+		network.addLink(middleLink);
 		Id<Link> egressLinkId = Id.createLinkId("egressLink");
-		Link egressLink = networkFactory.createLink(egressLinkId, node1, node2);
+		Link egressLink = networkFactory.createLink(egressLinkId, node3, node4);
 		network.addLink(egressLink);
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
@@ -180,8 +184,8 @@ class BackpackPlanTest {
 		schedule.addTransitLine(transitLine);
 
 		Id<TransitRoute> transitRouteId = Id.create("testRouteId", TransitRoute.class);
-		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(accessLinkId, Collections.emptyList(), egressLinkId);
-		TransitRoute transitRoute = scheduleFactory.createTransitRoute(transitRouteId, networkRoute, Collections.emptyList(), "bus");
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(accessLinkId, List.of(middleLink.getId()), egressLinkId);
+		TransitRoute transitRoute = scheduleFactory.createTransitRoute(transitRouteId, networkRoute, List.of(), "bus");
 		transitLine.addRoute(transitRoute);
 
 		Id<Departure> departureId = Id.create("departureId", Departure.class);
@@ -191,27 +195,31 @@ class BackpackPlanTest {
 		var backpackPlan = new BackpackPlan();
 
 		Id<Vehicle> transitVehiceId = Id.createVehicleId("transitVehicle");
-
 		Id<Person> passengerId = Id.createPersonId("passenger");
 
-		backpackPlan.handleEvent(new PersonDepartureEvent(10.0, passengerId, accessLinkId, "pt", "pt"));
+		backpackPlan.handleEvent(new PersonDepartureEvent(11.0, passengerId, accessLinkId, "pt", "pt"));
 		backpackPlan.startPtPart(transitLineId, transitRouteId);
-		backpackPlan.handleEvent(new PersonEntersVehicleEvent(10.0, passengerId, transitVehiceId));
-		backpackPlan.handleEvent(new VehicleDepartsAtFacilityEvent(10., transitVehiceId, accessFacilityId, 0.0));
-		backpackPlan.handleEvent(new LinkEnterEvent(10.0, transitVehiceId, egressLinkId));
+		backpackPlan.handleEvent(new PersonEntersVehicleEvent(11.0, passengerId, transitVehiceId));
+		backpackPlan.handleEvent(new VehicleDepartsAtFacilityEvent(11., transitVehiceId, accessFacilityId, 0.0));
+		backpackPlan.handleEvent(new LinkEnterEvent(11.0, transitVehiceId, middleLink.getId()));
+		backpackPlan.handleEvent(new LinkEnterEvent(25.0, transitVehiceId, egressLinkId));
 		backpackPlan.handleEvent(new VehicleArrivesAtFacilityEvent(50, transitVehiceId, egressFacilityId, 0.0));
 		backpackPlan.handleEvent(new PersonLeavesVehicleEvent(50.0, passengerId, transitVehiceId));
 		backpackPlan.handleEvent(new PersonArrivalEvent(50.0, passengerId, egressLinkId, "pt"), scenario.getNetwork(), scenario.getTransitSchedule());
 		backpackPlan.finish();
 
-		// TODO add assertions
-
-//		Assertions.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-3);
-//		Assertions.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-3);
-//		Assertions.assertTrue(lh.handledLeg.getLeg().getRoute() instanceof TransitPassengerRoute);
-//
-//		TransitPassengerRoute route = (TransitPassengerRoute) lh.handledLeg.getLeg().getRoute();
-//		Assertions.assertEquals(100.0, route.getBoardingTime().seconds(), 1e-3);
+		assertSingleLeg(backpackPlan.experiencedPlan(), 11., 39., 300, "pt", "pt");
+		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();
+		assertInstanceOf(TransitPassengerRoute.class, leg.getRoute());
+		var route = (TransitPassengerRoute) leg.getRoute();
+		assertEquals(transitRouteId, route.getRouteId());
+		assertEquals(transitLineId, route.getLineId());
+		assertNull(route.getChainedRoute());
+		assertEquals(11., route.getBoardingTime().seconds(), 1e-9);
+		assertEquals(accessFacilityId, route.getAccessStopId());
+		assertEquals(egressFacilityId, route.getEgressStopId());
+		assertEquals(accessLinkId, route.getStartLinkId());
+		assertEquals(egressLinkId, route.getEndLinkId());
 	}
 
 	private static void assertSingleLeg(Plan experiencedPlan, double departureTime, double travelTime, double distance, String legMode, String routingMode) {

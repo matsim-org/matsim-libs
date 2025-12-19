@@ -111,53 +111,6 @@ public class BackpackPlan {
 		currentPtLeg = null;
 	}
 
-	private Route finishRoute(PersonArrivalEvent pae, Network network, TransitSchedule transitSchedule) {
-
-		if (currentPtLeg != null) {
-
-			// chained routes are implemented as a linked list of transit routes. We have collected a plain list
-			// of those transit routes. Iterate through this list backwards, create pt routes and place them into
-			// the previous one.
-			DefaultTransitPassengerRoute ptRoute = null;
-
-			while (!currentPtLeg.getPtParts().isEmpty()) {
-				var part = currentPtLeg.getPtParts().removeLast();
-
-				var start = transitSchedule.getFacilities().get(part.getStartFacility());
-				var end = transitSchedule.getFacilities().get(part.getEndFacility());
-				var transitLine = transitSchedule.getTransitLines().get(part.getLine());
-				var transitRoute = transitLine.getRoutes().get(part.getRoute());
-				ptRoute = new DefaultTransitPassengerRoute(start, transitLine, transitRoute, end, ptRoute);
-			}
-			assert ptRoute != null;
-
-			ptRoute.setBoardingTime(currentVehicleLeg.enterVehicleTime());
-			ptRoute.setTravelTime(currentLeg.travelTime());
-			ptRoute.setDistance(RouteUtils.calcDistance(ptRoute, transitSchedule, network));
-			return ptRoute;
-		}
-		// The original code handles a special case, where a person enters and leaves a vehicle, but the vehicle does not
-		// enter and leave traffic. In that case the code generates a generic route instead of a network route.
-		// the code below creates a network route in that case but with the same attributes regarding distance (0.0) and
-		// travel time. Let's see whether this breaks things somewhere else.
-		if (currentVehicleLeg != null) {
-			var route = currentVehicleLeg.route();
-			var travelledDistance = RouteUtils.calcDistance(
-				route, currentVehicleLeg.relativePositionOnDepartureLink(), currentVehicleLeg.relativePositionOnArrivalLink(), network);
-			route.setDistance(travelledDistance);
-			route.setTravelTime(currentLeg.travelTime());
-			route.setVehicleId(currentVehicleLeg.vehicleId());
-			return route;
-		} else {
-			// this was a teleported leg with a generic route. Add the arrival link
-			currentLeg.addLink(pae.getLinkId());
-			var route = currentLeg.route();
-			route.setDistance(currentLeg.travelDistance());
-			route.setTravelTime(currentLeg.travelTime());
-			return route;
-		}
-	}
-
 	void handleEvent(TeleportationArrivalEvent e) {
 		currentLeg.travelDistance(e.getDistance());
 	}
@@ -174,7 +127,6 @@ public class BackpackPlan {
 	void handleEvent(VehicleArrivesAtFacilityEvent e) {
 		if (currentPtLeg != null) {
 			currentPtLeg.endFacility(e.getFacilityId());
-			//throw new IllegalStateException("Vehicle arrives at facility events should only be passed if the person has started a pt leg");
 		}
 	}
 
@@ -206,6 +158,63 @@ public class BackpackPlan {
 	void finish() {
 		// overnight activities don't have an activity end event
 		if (currentActivity != null) experiencedPlan.addActivity(currentActivity);
+	}
+
+	private Route finishRoute(PersonArrivalEvent pae, Network network, TransitSchedule transitSchedule) {
+
+		if (currentPtLeg != null) {
+			return createTransitRoute(network, transitSchedule);
+		} else if (currentVehicleLeg != null) {
+			return createNetworkRoute(network);
+		} else {
+			// this was a teleported leg with a generic route. Add the arrival link
+			currentLeg.addLink(pae.getLinkId());
+			return createGenericRoute();
+		}
+	}
+
+	private Route createGenericRoute() {
+		var route = currentLeg.route();
+		route.setDistance(currentLeg.travelDistance());
+		route.setTravelTime(currentLeg.travelTime());
+		return route;
+	}
+
+	private Route createNetworkRoute(Network network) {
+		// The original code handles a special case, where a person enters and leaves a vehicle, but the vehicle does not
+		// enter and leave traffic. In that case the code generates a generic route instead of a network route.
+		// the code below creates a network route in that case but with the same attributes regarding distance (0.0) and
+		// travel time. Let's see whether this breaks things somewhere else.
+		var route = currentVehicleLeg.route();
+		var travelledDistance = RouteUtils.calcDistance(
+			route, currentVehicleLeg.relativePositionOnDepartureLink(), currentVehicleLeg.relativePositionOnArrivalLink(), network);
+		route.setDistance(travelledDistance);
+		route.setTravelTime(currentLeg.travelTime());
+		route.setVehicleId(currentVehicleLeg.vehicleId());
+		return route;
+	}
+
+	private Route createTransitRoute(Network network, TransitSchedule transitSchedule) {
+		// chained routes are implemented as a linked list of transit routes. We have collected a plain list
+		// of those transit routes. Iterate through this list backwards, create pt routes and place them into
+		// the previous one.
+		DefaultTransitPassengerRoute ptRoute = null;
+
+		while (!currentPtLeg.getPtParts().isEmpty()) {
+			var part = currentPtLeg.getPtParts().removeLast();
+
+			var start = transitSchedule.getFacilities().get(part.getStartFacility());
+			var end = transitSchedule.getFacilities().get(part.getEndFacility());
+			var transitLine = transitSchedule.getTransitLines().get(part.getLine());
+			var transitRoute = transitLine.getRoutes().get(part.getRoute());
+			ptRoute = new DefaultTransitPassengerRoute(start, transitLine, transitRoute, end, ptRoute);
+		}
+		assert ptRoute != null;
+
+		ptRoute.setBoardingTime(currentVehicleLeg.enterVehicleTime());
+		ptRoute.setTravelTime(currentLeg.travelTime());
+		ptRoute.setDistance(RouteUtils.calcDistance(ptRoute, transitSchedule, network));
+		return ptRoute;
 	}
 
 	private static Activity createActivity(String type, Id<Link> linkId, Id<ActivityFacility> facilityId, Coord coord) {
