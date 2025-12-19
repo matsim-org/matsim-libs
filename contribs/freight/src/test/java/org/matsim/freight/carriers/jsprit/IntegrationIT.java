@@ -45,10 +45,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.freight.carriers.controller.CarrierModule;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -66,6 +70,8 @@ public class IntegrationIT {
 		Config config = ConfigUtils.createConfig();
 		config.global().setRandomSeed(4177);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setLastIteration(0);
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setCarriersFile(carrierFilename);
 		freightCarriersConfigGroup.setCarriersVehicleTypesFile(vehicleTypeFilename);
@@ -76,7 +82,9 @@ public class IntegrationIT {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
-
+		Controller controller = ControllerUtils.createController(scenario);
+		controller.addOverridingModule(new CarrierModule());
+		controller.getInjector();
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			CarriersUtils.setJspritIterations(carrier, 1);
 		}
@@ -149,6 +157,7 @@ public class IntegrationIT {
 			}
 			Assertions.assertEquals(42, count); // this should be 42, because the two carrier have 20 iterations + initial solution each
 		}
+		controller.run();
 	}
 
 	@Test
