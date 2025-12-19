@@ -19,13 +19,14 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.scoring;
+package org.matsim.core.scoring;
 
 
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Person;
 
-interface NewScoreAssigner {
+// Such a weird interface and very tightly coupled to the concrete ScoringFunctionsForPopulation
+public interface NewScoreAssigner {
 
-	void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population);
 
+	void assignNewScore(int iteration, ScoringFunction scoringFunction, Person person);
 }

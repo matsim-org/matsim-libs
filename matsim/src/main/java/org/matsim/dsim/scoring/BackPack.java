@@ -59,6 +59,10 @@ public class BackPack {
 		}
 	}
 
+	public Collection<Event> specialScoringEvents() {
+		return events;
+	}
+
 	public static boolean isRelevantForScoring(Event e) {
 		return e instanceof PersonMoneyEvent || e instanceof PersonScoreEvent || e instanceof PersonStuckEvent;
 	}

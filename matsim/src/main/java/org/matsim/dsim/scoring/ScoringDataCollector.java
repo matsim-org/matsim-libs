@@ -58,14 +58,16 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private final Network network;
 	private final TransitSchedule transitSchedule;
 	private final AgentSourcesContainer asc;
+	private final EndOfDayScoring eods;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc) {
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods) {
 		this.simStepMessaging = simStepMessaging;
 		this.partitioning = network.getPartitioning();
 		this.network = network;
 		this.transitSchedule = transitSchedule;
 		this.asc = asc;
+		this.eods = eods;
 	}
 
 	public void registerAgent(MobsimAgent agent) {
@@ -119,6 +121,12 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 		var targetPart = partitioning.getPartition(agent.getDestinationLinkId());
 		personLeavingPartition(agent.getId(), targetPart);
+	}
+
+	public void finishPerson(DistributedMobsimAgent agent) {
+		var backpack = backpackByPerson.remove(agent.getId());
+		backpack.backpackPlan().finish();
+		eods.score(backpack);
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
