@@ -69,7 +69,7 @@ public class JspritIterationHistogram {
 				sum += floor.getValue();
 
 				// count carriers that are still running at iteration iter
-				if (CarriersUtils.getJspritIterations(carriers.getCarriers().get(carrierId)) <= iter) {
+				if (CarriersUtils.getJspritIterations(carriers.getCarriers().get(carrierId)) >= iter) {
 					runCount++;
 				}
 			}
