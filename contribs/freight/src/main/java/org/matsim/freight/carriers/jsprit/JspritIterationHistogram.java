@@ -35,7 +35,7 @@ public class JspritIterationHistogram {
 	private final String title;
 
 	/**
-	 * @param carriers 				the carriers
+	 * @param carriers                    the carriers
 	 * @param bestJspritSolutionCollector Map: CarrierId -> (Iteration -> selectedCost)
 	 */
 	public JspritIterationHistogram(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector,
@@ -47,7 +47,7 @@ public class JspritIterationHistogram {
 	/**
 	 * Analyze and aggregate the selected cost series of all carriers.
 	 *
-	 * @param carriers 					the carriers
+	 * @param carriers                    the carriers
 	 * @param bestJspritSolutionCollector results of all solved VRPs
 	 */
 	private void aggregate(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
@@ -96,7 +96,8 @@ public class JspritIterationHistogram {
 				runSeries.add(iter, run);
 			}
 		}
-
+		int maxValue = sumSelectedCost.values().stream().max(Double::compareTo).orElse(0.0).intValue();
+		int minorValue = sumSelectedCost.values().stream().min(Double::compareTo).orElse(0.0).intValue();
 		XYSeriesCollection costDataset = new XYSeriesCollection();
 		costDataset.addSeries(sumSelectedSeries);
 
@@ -135,7 +136,7 @@ public class JspritIterationHistogram {
 		NumberAxis costAxis = (NumberAxis) plot.getRangeAxis();
 		costAxis.setLabelFont(axisLabelFont);
 		costAxis.setTickLabelFont(tickFont);
-
+		costAxis.setRange(minorValue * 0.8, maxValue * 1.2);
 		// second axis for running carriers
 		NumberAxis carrierAxis = new NumberAxis("Running carriers");
 		plot.setRangeAxis(1, carrierAxis);
