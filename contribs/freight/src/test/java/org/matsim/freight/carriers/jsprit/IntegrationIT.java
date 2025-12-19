@@ -90,6 +90,9 @@ public class IntegrationIT {
 		}
 
 		CarriersUtils.runJsprit(scenario);
+
+		controller.run();
+
 		double scoreWithRunJsprit = 0;
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
@@ -157,7 +160,6 @@ public class IntegrationIT {
 			}
 			Assertions.assertEquals(42, count); // this should be 42, because the two carrier have 20 iterations + initial solution each
 		}
-		controller.run();
 	}
 
 	@Test
