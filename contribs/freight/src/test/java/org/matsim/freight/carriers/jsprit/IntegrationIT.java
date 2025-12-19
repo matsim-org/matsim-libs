@@ -113,7 +113,6 @@ public class IntegrationIT {
 		try (BufferedReader reader = IOUtils.getBufferedReader(out.resolve("VRP_Solution_Stats.csv").toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 				.setSkipHeaderRecord(true).get().parse(reader);
-			Assertions.assertEquals(21, parse.getRecords().size());
 			int count = 0;
 			double lastBestScore = Double.MAX_VALUE;
 			for (CSVRecord record : parse) {
@@ -129,11 +128,11 @@ public class IntegrationIT {
 				Assertions.assertEquals(2, numberOfRunCarrier);
 				count++;
 			}
+			Assertions.assertEquals(21, count); // this should be 21, because the carrier have 20 iterations + initial solution
 		}
 		try (BufferedReader reader = IOUtils.getBufferedReader(out.resolve("VRP_Solution_Stats_perCarrier.csv").toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 				.setSkipHeaderRecord(true).get().parse(reader);
-			Assertions.assertEquals(42, parse.getRecords().size());
 			int count = 0;
 			for (CSVRecord record : parse) {
 				int iteration = Integer.parseInt(record.get("jsprit_iteration"));
@@ -146,11 +145,9 @@ public class IntegrationIT {
 				if (iteration == 0)
 					Assertions.assertEquals("initialSolution", strategy);
 				Assertions.assertTrue(scoreBest<=scoreThisSolution);
-				int numberOfRunCarrier = Integer.parseInt(record.get("runCarrier"));
-				Assertions.assertEquals(count, iteration, "The number of iterations is not as expected");
-				Assertions.assertEquals(2, numberOfRunCarrier);
 				count++;
 			}
+			Assertions.assertEquals(42, count); // this should be 42, because the two carrier have 20 iterations + initial solution each
 		}
 	}
 
