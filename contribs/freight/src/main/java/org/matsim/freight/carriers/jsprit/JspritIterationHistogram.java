@@ -102,7 +102,7 @@ public class JspritIterationHistogram {
 
 		JFreeChart chart = ChartFactory.createXYLineChart(
 			title,
-			"Iteration",
+			"Jsprit Iteration",
 			"Sum selected cost",
 			costDataset,
 			PlotOrientation.VERTICAL,

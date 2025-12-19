@@ -136,9 +136,9 @@ public class IntegrationIT {
 			Assertions.assertEquals(42, parse.getRecords().size());
 			int count = 0;
 			for (CSVRecord record : parse) {
-				int iteration = Integer.parseInt(record.get("iteration"));
+				int iteration = Integer.parseInt(record.get("jsprit_iteration"));
 				Double scoreThisSolution = Double.parseDouble(record.get("costsOfThisSolution"));
-				Double scoreBest = Double.parseDouble(record.get("bestSolutionCost"));
+				Double scoreBest = Double.parseDouble(record.get("currentBestSolutionCost"));
 				String strategy = record.get("strategyOfThisIteration");
 				Assertions.assertNotNull(scoreBest);
 				Assertions.assertNotNull(scoreThisSolution);

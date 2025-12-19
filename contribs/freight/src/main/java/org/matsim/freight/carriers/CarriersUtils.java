@@ -346,19 +346,17 @@ public class CarriersUtils {
 
 	private static void initJspritAnalysisPerCarrierCsv(Path jspritAnalysisPerCarrierCSVPath) {
 		try {
-			// Verzeichnis sicherstellen
 			Files.createDirectories(jspritAnalysisPerCarrierCSVPath.getParent());
 
-			// Datei neu anlegen (alte Version ggf. überschreiben)
 			try (BufferedWriter writer = IOUtils.getBufferedWriter(jspritAnalysisPerCarrierCSVPath.toString())) {
 
-				// Header schreiben
+				// write header
 				writer.write(String.join(delimiter,"carrierId",
-					"iteration",
+					"jsprit_iteration",
 					"costsOfThisSolution",
-					"bestSolutionCost",
+					"currentBestSolutionCost",
 					"strategyOfThisIteration",
-					"computationTimeSeconds"));
+					"iterationComputationTimeInSeconds"));
 
 				writer.newLine();
 			}
