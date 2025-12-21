@@ -241,9 +241,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener, Shut
 					"waitTime",//
 					"arrivalTime",//
 					"inVehicleRideTime",//
-					"unsharedRideTime",//
-					"sharedRideDistance",//
-					"unsharedRideDistance",//
+					"directRideTime",//
+					"inVehicleDistance",//
+					"directRideDistance",//
 					"fareForLeg", //
 					"earliestDepartureTime",
 					"latestDepartureTime", //
