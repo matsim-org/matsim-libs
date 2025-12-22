@@ -490,10 +490,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		runJsprit(controller, useDistanceConstraint);
 		if (runMatSim)
 			controller.run();
-		else
-			log.warn(
-					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersWithPlans.xml");
 	}
 
 	/**
