@@ -310,6 +310,7 @@ public class RunDrtExampleIT {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
 				new OTFVisConfigGroup());
 
+		// !!! IMPORTANT: use the plans with a late request
 		config.plans().setInputFile("plans_only_drt_1.0_with_late_request.xml.gz");
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
