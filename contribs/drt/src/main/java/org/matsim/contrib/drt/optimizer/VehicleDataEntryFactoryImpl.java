@@ -68,6 +68,8 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			};
 
 			nextTaskIdx = startTask.getTaskIdx() + 1;
+		} else if (schedule.getStatus() == ScheduleStatus.COMPLETED) { 
+			return null; // not available for dispatching anymore
 		} else { // PLANNED
 			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
 			startTask = null;
