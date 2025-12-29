@@ -17,11 +17,12 @@ import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
-import tech.tablesaw.columns.Column;
 import tech.tablesaw.io.csv.CsvWriteOptions;
 
 import java.util.*;
 
+import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUSE_h;
+import static org.matsim.application.analysis.population.AddVttsEtcToActivities.getMUTTS_h;
 import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.formatTable;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 
@@ -40,7 +41,8 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 //			, DoubleColumn.create( HeadersKN.MUTTS_H )
 			, DoubleColumn.create( TTIME)
 			, DoubleColumn.create( ASCS)
-			, DoubleColumn.create( ADDTL_TRAV_SCORE )
+			, DoubleColumn.create( U_TRAV_DIRECT )
+			, DoubleColumn.create( U_LINESWITCHES )
 			, StringColumn.create( MODE )
 			, StringColumn.create( ACT_AT_END)
 								  );
@@ -76,13 +78,13 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 				table.stringColumn( MODE ).append( AgentWiseComparisonKNUtils.shortenModeString( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
 				table.stringColumn( ACT_AT_END ).append( trip.getDestinationActivity().getType() );
 				if ( isBaseTable ){
-					Double mutts_h = AgentWiseComparisonKNUtils.getMUTTS_h( trip.getDestinationActivity() );
+					Double mutts_h = getMUTTS_h( trip.getDestinationActivity() );
 					if( mutts_h != null ){
 						table.doubleColumn( MUTTS_H ).append( mutts_h );
 					} else{
 						throw new RuntimeException( "find default value" );
 					}
-					Double musl_h = AgentWiseComparisonKNUtils.getMUSL_h( trip.getDestinationActivity() );
+					Double musl_h = getMUSE_h( trip.getDestinationActivity() );
 					if( musl_h != null ){
 						table.doubleColumn( MUSL_h ).append( musl_h );
 					} else{
@@ -132,7 +134,10 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 				}
 				table.doubleColumn( TTIME ).append( tripTtime/3600. );
 				table.doubleColumn( ASCS ).append( sumAscs );
-				table.doubleColumn( ADDTL_TRAV_SCORE ).append( addtlTravelScore );
+//				table.doubleColumn( ADDTL_TRAV_SCORE ).append( addtlTravelScore );
+				if ( true ) {
+					throw new RuntimeException("the above has no longer been adapted to further changes");
+				}
 			}
 
 			// money:
@@ -206,16 +211,18 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 		joinedTable.addColumns( AgentWiseComparisonKNUtils.deltaColumn( joinedTable, TTIME ) );
 		{
 			// The effect of the direct marginal utl of travelling (beta_trav) is already included in the (dis)utl computation of the corresponding legs.  Here we only need the effect on the activity times, thus MUSL:
-			final DoubleColumn newColumn = joinedTable.doubleColumn( deltaOf( TTIME ) ).multiply( joinedTable.doubleColumn(
-				MUSL_h ) ).multiply( -1 ).setName( deltaOf(  WEIGHTED_TTIME ) );
-			joinedTable.addColumns( newColumn );
+//			final DoubleColumn newColumn = joinedTable.doubleColumn( deltaOf( TTIME ) ).multiply( joinedTable.doubleColumn( MUSL_h ) ).multiply( -1 ).setName( deltaOf(  WEIGHTED_TTIME ) );
+//			joinedTable.addColumns( newColumn );
 		}
 		joinedTable.addColumns( AgentWiseComparisonKNUtils.deltaColumn( joinedTable, MONEY ) );
 //		{
 //			final DoubleColumn newColumn = joinedTable.doubleColumn( deltaOf( MONEY ) ).multiply( joinedTable.doubleColumn( UTL_OF_MONEY ) ).setName( deltaOf( WEIGHTED_MONEY) );
 //			joinedTable.addColumns( newColumn );
 //		}
-		joinedTable.addColumns( AgentWiseComparisonKNUtils.deltaColumn( joinedTable, ADDTL_TRAV_SCORE ) );
+//		joinedTable.addColumns( AgentWiseComparisonKNUtils.deltaColumn( joinedTable, ADDTL_TRAV_SCORE ) );
+		if ( true ) {
+			throw new RuntimeException("the above has no longer been adapted to further changes");
+		}
 
 
 		Table deltaTable = Table.create( joinedTable.column( PERSON_ID), joinedTable.column( TRIP_IDX )
@@ -230,28 +237,36 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 			, joinedTable.column( ASCS )
 			//
 			, AgentWiseComparisonKNUtils.deltaColumn( joinedTable, SCORE )
-			, joinedTable.column( deltaOf( WEIGHTED_TTIME ) )
+//			, joinedTable.column( deltaOf( WEIGHTED_TTIME ) )
 //			, joinedTable.column( deltaOf( WEIGHTED_MONEY ) )
 			, AgentWiseComparisonKNUtils.deltaColumn( joinedTable, ASCS )
-			, joinedTable.column( deltaOf( ADDTL_TRAV_SCORE ) )
+//			, joinedTable.column( deltaOf( ADDTL_TRAV_SCORE ) )
 			//
 			, joinedTable.column( MODE )
 			, joinedTable.column( keyTwoOf( MODE ) )
 			, joinedTable.column( ACT_AT_END )
 									   );
+		if ( true ) {
+			throw new RuntimeException("the above has no longer been adapted to further changes");
+		}
+
 
 		deltaTable.write().usingOptions( CsvWriteOptions.builder( "deltaTable.tsv" ).separator( '\t' ).build() );
 
 		log.warn("###");
 		log.warn(
 			"D_SCORE_MEAN=" + deltaTable.doubleColumn( deltaOf( SCORE ) ).mean()
-				+"; d_w_ttime_mean=" + deltaTable.doubleColumn( deltaOf( WEIGHTED_TTIME ) ).mean()
+//				+"; d_w_ttime_mean=" + deltaTable.doubleColumn( deltaOf( WEIGHTED_TTIME ) ).mean()
 //				+ "; d_w_money=" + deltaTable.where( deltaTable.numberColumn( TRIP_IDX ).isEqualTo( 0 ) ).doubleColumn( deltaOf( WEIGHTED_MONEY) ).mean()
 //				+ "; d_w_money=" + deltaTable.where( deltaTable.numberColumn( TRIP_IDX ).isEqualTo( 0 ) ).doubleColumn( deltaOf( WEIGHTED_MONEY) ).mean()
 				+ "; d_ascs=" + deltaTable.doubleColumn( deltaOf( ASCS ) ).mean()
-				+ "; d_addtlTScore=" + deltaTable.doubleColumn( deltaOf( ADDTL_TRAV_SCORE ) ).mean()
+//				+ "; d_addtlTScore=" + deltaTable.doubleColumn( deltaOf( ADDTL_TRAV_SCORE ) ).mean()
 				+ "; d_ttime_mean=" + deltaTable.doubleColumn( deltaOf( TTIME) ).mean() / 3600 * 6
 				);
+		if ( true ) {
+			throw new RuntimeException("the above has no longer been adapted to further changes");
+		}
+
 		log.warn("###");
 
 		Table sortedTable = deltaTable.sortOn( deltaOf( SCORE), TRIP_IDX );

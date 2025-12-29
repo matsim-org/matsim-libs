@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -40,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import static java.lang.Math.exp;
 import static tech.tablesaw.aggregate.AggregateFunctions.*;
 
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
@@ -141,15 +143,32 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 
 		// The following is a really complicated way to do a join.  Maybe first convert to tablesaw and then do this?
 		for( Person person : population.getPersons().values() ){
-			final List<Activity> activities = TripStructureUtils.getActivities( person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
+			final List<Activity> activities = TripStructureUtils.getActivities( person.getSelectedPlan(),
+				TripStructureUtils.StageActivityHandling.ExcludeStageActivities );
 			List<VTTSHandler.TripData> tripDataList = tripDataMap.get( person.getId() );
-			for ( int ii=1; ii<activities.size(); ii++ ) {
+			double sumMuse = 0.;
+			double cntMuse = 0.;
+			for( int ii = 1 ; ii < activities.size() ; ii++ ){
 				Activity activity = activities.get( ii );
-				VTTSHandler.TripData tripData = tripDataList.get( ii-1 );  // activity # 1 belongs to trip # 0!
+				VTTSHandler.TripData tripData = tripDataList.get( ii - 1 );  // activity # 1 belongs to trip # 0!
 				setVTTS_h( activity, tripData.VTTSh );
 				setMUTTS_h( activity, tripData.mUTTSh );
-				setMUSL_h( activity, tripData.musl_h );
+				setMUSE_h( activity, tripData.musl_h );
 				setActScore( activity, tripData.actScore );
+				if( tripData.musl_h > 0. && tripData.musl_h < 6 * exp( 1. ) ){
+					// There are acts that start long after their end time, and in consequence immediately end again.  If they start
+					// earlier, they will also just end earlier, but Ihab's calculation gives them a meaningful MUSE.  This is then
+					// in the linear regime, and in consequence beta_perf * e - beta_trav(mode).
+					// yyyy For the time being we assume that beta_perf=6 and beta_trav(mode) = 0.
+					sumMuse += tripData.musl_h;
+					cntMuse++;
+				}
+				if ( cntMuse >0 ) {
+					setMUSE_h( person.getSelectedPlan(), sumMuse / cntMuse );
+				} else {
+					setMUSE_h( person.getSelectedPlan(), 6);
+					// yyyy I don't like this.  Maybe set nothing and compensate later? kai, dec'25
+				}
 			}
 		}
 
@@ -225,12 +244,23 @@ public class AddVttsEtcToActivities implements MATSimAppCommand {
 		return (Double) activity.getAttributes().getAttribute( VTTS_H );
 	}
 
-	private static final String MUSL_h = "marginal_utility_of_starting_later_h";
-	public static void setMUSL_h( Activity activity, double musl_h ){
-		activity.getAttributes().putAttribute( MUSL_h, musl_h );
+	private static final String MUSE_H = "marginal_utility_of_starting_earlier_h";
+	public static void setMUSE_h( Activity activity, double muse_h ){
+		activity.getAttributes().putAttribute( MUSE_H, muse_h );
 	}
-	public static Double getMUSL_h( Activity activity ) {
-		return (Double) activity.getAttributes().getAttribute( MUSL_h );
+	public static Double getMUSE_h( Activity activity ) {
+		Double muse = (Double) activity.getAttributes().getAttribute( MUSE_H );
+		if ( muse!=null ){
+			return muse;
+		} else {
+			return (Double) activity.getAttributes().getAttribute( "marginal_utility_of_starting_later_h" );
+		}
+	}
+	public static void setMUSE_h( Plan plan, double muse_h ) {
+		plan.getAttributes().putAttribute( MUSE_H, muse_h );
+	}
+	public static Double getMUSE_h( Plan plan ) {
+		return (Double) plan.getAttributes().getAttribute( MUSE_H );
 	}
 
 	public static void setActScore( Activity activity, double score ) {

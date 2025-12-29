@@ -1,17 +1,21 @@
 package org.matsim.application.analysis.population;
 
+import org.apache.commons.numbers.gamma.RegularizedGamma;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+
+import static org.matsim.application.ApplicationUtils.globFile;
 
 @CommandLine.Command(name = "run-vtts-analysis", description = "")
 public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
@@ -20,8 +24,8 @@ public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
 	@CommandLine.Option(names = "--path", description = "Path to output folder", required = true)
 	private Path path;
 
-	@CommandLine.Option(names = "--runId", description = "Run id (i.e. prefixes of files)")
-	private String runId;
+//	@CommandLine.Option(names = "--runId", description = "Run id (i.e. prefixes of files)")
+//	private String runId;
 
 //	@CommandLine.Option(names = "--prefix", description = "Prefix for filtered events output file, optional." )
 //	private String prefix;
@@ -35,10 +39,16 @@ public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
 
 	@Override
 	public Integer call() throws Exception {
-		String runPrefix = Objects.nonNull(runId ) ? runId + "." : "";
 
-		Path outputPopPath = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz");
+//		Path outputPopPath = path.resolve( runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz");
+		Path outputPopPath = globFile( path, "*output_" + Controler.DefaultFiles.population.getFilename() + ".gz" );
+
+		// extracting the runPrefix from the outputPopPath:
+		String tmp = outputPopPath.toString().replace( ".output_" + Controler.DefaultFiles.population.getFilename() + ".gz", "" );
+		String runPrefix = Objects.nonNull(tmp ) ? tmp + "." : "";
+
 		Path expPlansPath =  path.resolve( runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+//		Path expPlansPath = globFile( path, Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 
 		Path postprocExpPlansPath = path.resolve( runPrefix + "postproc_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 
@@ -55,6 +65,7 @@ public class AddPersonAttribsToExperiencedPlans implements MATSimAppCommand {
 				// end we never know.  kai, oct'25
 			}
 		}
+
 
 		PopulationUtils.writePopulation( experiencedPlans, postprocExpPlansPath.toString() );
 

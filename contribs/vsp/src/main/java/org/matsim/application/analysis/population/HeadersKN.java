@@ -3,8 +3,15 @@ package org.matsim.application.analysis.population;
 // These are "excel" column headers so we use: (1) no spaces; (2) underscores instead of camel case.
 class HeadersKN{
 	public static final String ACTS_SCORE = "acts_score";
-	public static final String COMPUTED_SCORE_ERROR = "computed_score_error";
+	public static final String IX_DIFF_REMAINING = "ixDiffRem";
+	public static final String IX_DIFF_SWITCHING = "ixDiffSwi";
 	public static final String MONEY_SCORE = "money_score";
+	public static final String ANALYSIS_POPULATION = "analysis_population";
+	public static final String W1_TTIME_DIFF_REM = "wUniTtimeDiffRem";
+
+	public static final String W2_TTIME_DIFF_REM = "wHetTtimeDiffRem";
+	public static final String W2_TTIME_DIFF_SWI = "wHetTtimeDiffSwi";
+	public static final String W1_TTIME_DIFF_SWI = "wUniTtimeDiffSwi";
 
 	public static final String personId = "personId";
 	public static final String tripIdx = "tripIdx";
@@ -12,18 +19,20 @@ class HeadersKN{
 	public static final String vttsh = "VTTS_[Eu/h]";
 	public static final String muttsh = "mUTTS_[u/h]";
 	public static final String activity = "activity";
-	public static final String activityDuration = "act_dur";
-	public static final String typicalDuration = "typ_dur";
+	public static final String activityDuration = "actDur";
+	public static final String typicalDuration = "typDur";
 	public static final String mUoM = "mUoM";
 	public static final String muslh = "mUSL_[u/h]";
 
 	public static final String ACT_SEQ = "actSeq";
 	public static final String MODE_SEQ = "modeSeq";
-	public static final String ADDTL_TRAV_SCORE = "addtlTravScore";
-	public static final String MUTTS_H = "mUTTS[h]";
+//	public static final String ADDTL_TRAV_SCORE = "addtlTravScore";
+	public static final String U_TRAV_DIRECT = "UTravDir";
+	public static final String U_LINESWITCHES = "U_iX";
+	public static final String MUTTS_H = "mUTTS[/1h]";
 	public static final String TRIP_IDX = "tripNr";
 //	public static final String WEIGHTED_MONEY = "w_money[u]";
-	public static final String WEIGHTED_TTIME = "w_ttime[u]";
+//	public static final String WEIGHTED_TTIME = "w_ttime[u]";
 	public static final String MODE ="modeSeq";
 	public static final String PERSON_ID = "personId";
 	public static final String INCOME = "income";

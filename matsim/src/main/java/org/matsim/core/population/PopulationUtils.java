@@ -912,6 +912,14 @@ public final class PopulationUtils {
 
 	// --- static copy methods:
 
+	public static void copyFromTo( final Person in, final Person out ) {
+		AttributesUtils.copyAttributesFromTo( in, out );
+		for( Plan inPlan : in.getPlans() ){
+			Plan outPlan = getFactory().createPlan();
+			copyFromTo( inPlan, outPlan );
+		}
+	}
+
 	/**
 	 * loads a copy of an existing plan, but keeps the person reference
 	 *

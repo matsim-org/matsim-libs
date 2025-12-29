@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author mrieser
