@@ -1,13 +1,11 @@
 package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
-import org.matsim.application.analysis.accessibility.PreparePois;
+//import org.matsim.application.analysis.accessibility.PreparePois;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
-import scala.util.parsing.combinator.testing.Str;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,15 +47,15 @@ public class AccessibilityDashboard implements Dashboard {
 
 
 
-			layout.row("pois-" + poi).el(MapPlot.class, ((viz, data) -> {
-				viz.title = "POIs: " + poi;
-				viz.description = "Shows points of interest of type " + poi;
-				viz.setShape(data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi));
-				viz.display.fill.fixedColors = new String[]{"#f28e2c"};
+//			layout.row("pois-" + poi).el(MapPlot.class, ((viz, data) -> {
+//				viz.title = "POIs: " + poi;
+//				viz.description = "Shows points of interest of type " + poi;
+//				viz.setShape(data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi));
+//				viz.display.fill.fixedColors = new String[]{"#f28e2c"};
+//
+//			}));
 
-			}));
-
-			layout.tab(poi).add("pois-" + poi);
+//			layout.tab(poi).add("pois-" + poi);
 
 			for (Iterator<Modes4Accessibility> iterator = modes.iterator(); iterator.hasNext(); ) {
 				Modes4Accessibility modeLeft = iterator.next();
@@ -107,7 +105,7 @@ public class AccessibilityDashboard implements Dashboard {
 		viz.description = "yellow: high accessibility; purple: low accessibility";
 		viz.setColorRamp(ColorScheme.Viridis);
 		viz.cellSize = 500;
-		viz.opacity = 0.75;
+		viz.opacity = 1.0;
 		viz.maxHeight = 0;
 
 		viz.projection = this.coordinateSystem;
