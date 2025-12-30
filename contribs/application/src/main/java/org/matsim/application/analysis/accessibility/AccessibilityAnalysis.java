@@ -20,8 +20,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.contrib.accessibility.AccessibilityModule.CONFIG_FILENAME_ACCESSIBILITY;
-
 
 @CommandLine.Command(
 	name = "accessibility", description = "Accessibility analysis.",

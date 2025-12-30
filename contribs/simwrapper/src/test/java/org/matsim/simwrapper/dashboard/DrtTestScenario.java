@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -28,7 +29,6 @@ import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import javax.annotation.Nullable;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;

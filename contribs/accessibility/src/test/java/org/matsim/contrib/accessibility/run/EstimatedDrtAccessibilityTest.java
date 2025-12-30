@@ -22,7 +22,6 @@ package org.matsim.contrib.accessibility.run;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,9 +47,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -78,7 +75,8 @@ public class EstimatedDrtAccessibilityTest {
 
 	private static final Logger LOG = LogManager.getLogger(EstimatedDrtAccessibilityTest.class);
 
-	@RegisterExtension private static MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private static MatsimTestUtils utils = new MatsimTestUtils();
 	public static double gapBtwnNodes = 1000.;
 	public double carSpeed;
 

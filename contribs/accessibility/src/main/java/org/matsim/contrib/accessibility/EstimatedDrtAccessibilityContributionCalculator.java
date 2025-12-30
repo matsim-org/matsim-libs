@@ -25,6 +25,12 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesImpl;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +60,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 	private DvrpRoutingModule.AccessEgressFacilityFinder stopFinder;
 
 	private DrtEstimator drtEstimator;
-
+	private Person dummyPerson;
 
 
 	EstimatedDrtAccessibilityContributionCalculator(String mode, Scenario scenario, DvrpRoutingModule.AccessEgressFacilityFinder stopFinder, TripRouter tripRouter, DrtEstimator drtEstimator) {
@@ -66,6 +72,15 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		this.tripRouter = tripRouter;
 		this.stopFinder = stopFinder;
 		this.drtEstimator = drtEstimator;
+
+		dummyPerson = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("dummy"));
+		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
+		scenario.getVehicles().addVehicleType(vehicleType);
+		Id<Vehicle> dummyVehicleId = Id.createVehicleId("dummy-veh");
+		Vehicle vehicle = VehicleUtils.createVehicle(dummyVehicleId,vehicleType);
+		scenario.getVehicles().addVehicle(vehicle);
+
+		VehicleUtils.insertVehicleIdsIntoPersonAttributes(dummyPerson, Map.of(TransportMode.car, dummyVehicleId));
 
 		// drt params
 		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
@@ -134,7 +149,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 		double accessDist_m = accessLeg.getRoute().getDistance();
 		double utilityAccess = accessTime_h * betaWalkTT_h + accessDist_m * betaWalkDist_m;
 
-		Person dummyPerson = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("dummy"));
+		Attributes routingAttributes = new AttributesImpl();
 
 		// now we iterate through drt stops, each of which has a set of opportunities connected to it (those which are closest to that stop)
 		// we calculate sum of utilities to travel from the origin drt stop to all drt stops that have at least one opportunity close to it
@@ -144,7 +159,7 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 			Facility nearestStopEgress = ((ClosestAccessEgressFacilityFinder) stopFinder).findClosestStop(opportunity);
 			// UTILITY OF DRT LEG
 
-			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, dummyPerson, null);
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.car, nearestStopAccess, nearestStopEgress, departureTime, dummyPerson, routingAttributes);
 			Leg mainLeg = extractLeg(planElements, TransportMode.car);
 			double directRideDistance_m = mainLeg.getRoute().getDistance();
 

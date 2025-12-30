@@ -71,16 +71,6 @@
 			<artifactId>analysis</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.matsim.contrib</groupId>-->
-<!--			<artifactId>dvrp</artifactId>-->
-<!--			<version>13.0-SNAPSHOT</version>-->
-<!--		</dependency>-->
-		<!-- This dependency is required to be able to push to the GeoServer -->
-		<dependency>
-			<groupId>org.geotools.jdbc</groupId>
-			<artifactId>gt-jdbc-postgis</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
@@ -109,11 +99,11 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<scope>test</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.junit.jupiter</groupId>-->
+<!--			<artifactId>junit-jupiter-api</artifactId>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

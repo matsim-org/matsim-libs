@@ -242,7 +242,9 @@ public class TinyAccessibilityTest {
 
 		// ---
 
-		final Scenario scenario = createTestScenario(config);
+		final Scenario scenarioUncongested = createTestScenario(config);
+		final Scenario scenarioCongested = createTestScenario(config);
+
 
 		// ---
 
@@ -253,14 +255,14 @@ public class TinyAccessibilityTest {
 			.setRideDurationDistributionGenerator(new NoDistribution())
 			.build();
 
-		AccessibilityFromEvents.Builder builderUncongested = new AccessibilityFromEvents.Builder( scenario , emptyEventsFileName );
+		AccessibilityFromEvents.Builder builderUncongested = new AccessibilityFromEvents.Builder( scenarioUncongested , emptyEventsFileName );
 		ResultsComparator dataListenerUncongested = new ResultsComparator();
 		builderUncongested.addDataListener(dataListenerUncongested);
 		builderUncongested.addDrtEstimator(drtEstimator);
 		builderUncongested.build().run() ;
 		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMapUncongested = dataListenerUncongested.accessibilitiesMap;
 
-		AccessibilityFromEvents.Builder builderCongested = new AccessibilityFromEvents.Builder(scenario, congestedEventsFileName);
+		AccessibilityFromEvents.Builder builderCongested = new AccessibilityFromEvents.Builder(scenarioCongested, congestedEventsFileName);
 		ResultsComparator dataListenerCongested = new ResultsComparator();
 		builderCongested.addDataListener(dataListenerCongested);
 		builderCongested.addDrtEstimator(drtEstimator);

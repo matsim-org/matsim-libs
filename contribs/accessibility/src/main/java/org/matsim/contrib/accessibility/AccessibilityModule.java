@@ -20,6 +20,8 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -56,6 +58,8 @@ import java.util.*;
  * @author dziemke
  */
 public final class AccessibilityModule extends AbstractModule {
+	public static final String CONFIG_FILENAME_ACCESSIBILITY = "configUsedForAccessibilityComputation.xml";
+
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
