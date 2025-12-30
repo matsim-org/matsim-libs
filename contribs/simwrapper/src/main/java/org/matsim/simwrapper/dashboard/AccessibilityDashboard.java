@@ -2,6 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
 //import org.matsim.application.analysis.accessibility.PreparePois;
+import org.matsim.application.analysis.accessibility.PreparePois;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
@@ -46,17 +47,6 @@ public class AccessibilityDashboard implements Dashboard {
 		for (String poi : pois) {
 
 
-
-//			layout.row("pois-" + poi).el(MapPlot.class, ((viz, data) -> {
-//				viz.title = "POIs: " + poi;
-//				viz.description = "Shows points of interest of type " + poi;
-//				viz.setShape(data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi));
-//				viz.display.fill.fixedColors = new String[]{"#f28e2c"};
-//
-//			}));
-
-//			layout.tab(poi).add("pois-" + poi);
-
 			for (Iterator<Modes4Accessibility> iterator = modes.iterator(); iterator.hasNext(); ) {
 				Modes4Accessibility modeLeft = iterator.next();
 				layout.row(modeLeft.name() + "-" + poi)
@@ -75,28 +65,7 @@ public class AccessibilityDashboard implements Dashboard {
 
 				layout.tab(poi).add(modeLeft.name() + "-" + poi);
 			}
-
-//			if(equity) {
-//				layout.row("scatter-" + poi).el(Scatter.class, (viz, data) -> {
-//					viz.title = "PT Accessibility Vs. Income: " + poi;
-//					viz.description = "... " + poi;
-//
-//					viz.dataset = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
-//					viz.x = "income";
-//					viz.y = "pt_accessibility";
-//					viz.xAxisName = "Income";
-//					viz.yAxisName = "PT Accessibility";
-//
-//				});
-//				layout.tab(poi).add("scatter-" + poi);
-//
-//
-//			}
-
-
-
 		}
-
 	}
 
 	private void accessibilityDataGridMap(String modeName, String columnName, String poi, GridMap viz, Data data) {
@@ -114,6 +83,14 @@ public class AccessibilityDashboard implements Dashboard {
 		viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
 		viz.valueColumn = columnName;
 		viz.height = 12.;
-//		viz.width = 0.5;
+
+		// add poi in background
+		String poiFilename = data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi);
+		BackgroundLayer poiBackgroundLayer = new BackgroundLayer(poiFilename);
+		poiBackgroundLayer.setOnTop(true);
+		poiBackgroundLayer.setBorderWidth(10);
+		poiBackgroundLayer.setBorderColor("red");
+
+		viz.addBackgroundLayer("poi",poiBackgroundLayer);
 	}
 }
