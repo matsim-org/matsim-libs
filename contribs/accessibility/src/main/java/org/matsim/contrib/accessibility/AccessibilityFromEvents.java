@@ -142,7 +142,7 @@ public final class AccessibilityFromEvents{
 					for( DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements() ){
 						install( new DrtModeModule( drtCfg ) );
 						installQSimModule( new DrtModeQSimModule( drtCfg ) );
-						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = Double.MAX_VALUE;
+						drtCfg.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(Double.MAX_VALUE);
 //						install( new DrtModeAnalysisModule( drtCfg ) );
 
 

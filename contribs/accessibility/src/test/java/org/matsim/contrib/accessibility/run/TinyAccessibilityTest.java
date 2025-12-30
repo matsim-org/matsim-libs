@@ -305,8 +305,8 @@ public class TinyAccessibilityTest {
 		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drtConfigGroup.setTransitStopFile( stopsInputFileName);
 
-		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().maxWalkDistance = 200;
-
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(200);
+		
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
