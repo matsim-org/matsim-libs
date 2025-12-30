@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class XYTime extends Viz {
+public class XYTime extends VizMap<XYTime> {
 
 	/**
 	 * The filepath containing the data.
@@ -21,6 +21,11 @@ public class XYTime extends Viz {
 	 */
 	@JsonProperty(required = false)
 	public Double radius;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
 
 	/**
 	 * The name of the color ramp.

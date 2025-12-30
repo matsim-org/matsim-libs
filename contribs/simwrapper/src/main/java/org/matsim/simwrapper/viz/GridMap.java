@@ -8,7 +8,15 @@ import java.util.Map;
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class GridMap extends Viz {
+public class GridMap extends VizMap<GridMap> {
+
+	/**
+	 * Defines the time selector types
+	 */
+	public enum TimeSelector {
+		discrete,
+		slider
+	}
 
 	/**
 	 * The unit of the values.
@@ -27,6 +35,11 @@ public class GridMap extends Viz {
 	 */
 	@JsonProperty(required = false)
 	public double[] center;
+
+	/**
+	 * Set to true for this map to have independent center/zoom/motion
+	 */
+	public Boolean mapIsIndependent;
 
 	/**
 	 * The filepath containing the data.
@@ -87,6 +100,13 @@ public class GridMap extends Viz {
 		colorRamp = new HashMap<>(Map.of("ramp", ramp));
 		return this;
 	}
+
+	/**
+	 * Defines which type of time selector to use.
+	 * Possible values are `discrete` and `slider`.
+	 */
+	@JsonProperty(required = false)
+	public TimeSelector timeSelector;
 
 	/**
 	 * Sets the full color ramps settings.

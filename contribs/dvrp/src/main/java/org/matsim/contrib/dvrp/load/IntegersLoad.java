@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class IntegersLoad implements DvrpLoad {
+public final class IntegersLoad implements DvrpLoad {
     private final int[] values;
 
     IntegersLoad(int[] values) {
@@ -66,6 +66,26 @@ public class IntegersLoad implements DvrpLoad {
     public Number getElement(int i) {
         Preconditions.checkArgument(i >= 0 && i < values.length);
         return values[i];
+    }
+
+    @Override
+    public int compareTo(DvrpLoad other) {
+        if (other instanceof IntegersLoad otherLoad) {
+            if (values.length != otherLoad.values.length) {
+                return Integer.compare(values.length, otherLoad.values.length);
+            }
+
+            int result = 0;
+
+            for (int i = 0; i < values.length; i++) {
+                result = Integer.compare(values[i], otherLoad.values[i]);
+                if (result != 0) break;
+            }
+
+            return result;
+        }
+
+        throw new IllegalStateException();
     }
 
     @Override

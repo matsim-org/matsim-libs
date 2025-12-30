@@ -71,7 +71,7 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
     this.locationLinkId = builder.getLocationLinkId();
     this.transshipmentHubScheduler = builder.getTransshipmentHubScheduler();
     transshipmentHubScheduler.setTranshipmentHub(this);
-    TransshipmentHubTourEndEventHandler eventHandler = new TransshipmentHubTourEndEventHandler(this, scenario);
+    TransshipmentHubEventHandler eventHandler = new TransshipmentHubEventHandler(this, scenario);
     transshipmentHubScheduler.setTransshipmentHubTourEndEventHandler(eventHandler);
     this.clientElements = builder.getClientElements();
   }
@@ -93,7 +93,7 @@ public class TransshipmentHubResource extends LSPDataObject<LSPResource> impleme
 
   @Override
   public void schedule(int bufferTime, LSPPlan lspPlan) {
-    transshipmentHubScheduler.scheduleShipments(lspPlan, this, bufferTime);
+    transshipmentHubScheduler.scheduleLspShipments(lspPlan, this, bufferTime);
   }
 
   public double getCapacityNeedFixed() {

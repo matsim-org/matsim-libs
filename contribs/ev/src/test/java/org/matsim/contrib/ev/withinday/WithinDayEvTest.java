@@ -8,6 +8,9 @@ import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.reservation.ChargerReservability;
 import org.matsim.contrib.ev.reservation.ChargerReservationModule;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder;
 import org.matsim.contrib.ev.strategic.utils.TestScenarioBuilder.TestScenario;
@@ -496,7 +499,7 @@ public class WithinDayEvTest {
 
 		// check charger interaction
 		assertEquals(1, scenario.tracker().chargingStartEvents.size());
-		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().chargingEndEvents.size());
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 
@@ -887,6 +890,12 @@ public class WithinDayEvTest {
 				/**/.addActivity("home", 0, 0) //
 				.build();
 
+		ChargingInfrastructureSpecification infrastructure = (ChargingInfrastructureSpecification) scenario.scenario()
+				.getScenarioElement("infrastructure");
+		for (ChargerSpecification charger : infrastructure.getChargerSpecifications().values()) {
+			ChargerReservability.setReservable(charger, true);
+		}
+
 		Controler controller = scenario.controller();
 		controller.addOverridingModule(new ChargerReservationModule());
 
@@ -1101,7 +1110,7 @@ public class WithinDayEvTest {
 
 		// check charger interaction
 		assertEquals(1, scenario.tracker().chargingStartEvents.size());
-		assertEquals(1, scenario.tracker().chargingEndEvents.size());
+		assertEquals(0, scenario.tracker().chargingEndEvents.size());
 		assertEquals(0, scenario.tracker().queuedAtChargerEvents.size());
 		assertEquals(0, scenario.tracker().quitQueueAtChargerEvents.size());
 

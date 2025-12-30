@@ -20,8 +20,6 @@
 package org.matsim.contrib.accessibility;
 
 import com.google.inject.Inject;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.OptionalBinder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
@@ -39,7 +37,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -51,19 +49,18 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import java.util.*;
 
 /**
  * @author dziemke
  */
 public final class AccessibilityModule extends AbstractModule {
-	public static final String CONFIG_FILENAME_ACCESSIBILITY = "configUsedForAccessibilityComputation.xml";
 	private static final Logger LOG = LogManager.getLogger(AccessibilityModule.class);
 
-	private final List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
+	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ;
 	private ActivityFacilities measuringPoints;
-	private final Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
+	private Map<String, ActivityFacilities> additionalFacs = new TreeMap<>() ;
 	private String activityType;
 	private boolean pushing2Geoserver = false;
 	private boolean createQGisOutput = false;
@@ -74,7 +71,7 @@ public final class AccessibilityModule extends AbstractModule {
 		OptionalBinder.newOptionalBinder(binder(), DrtEstimator.class);
 
 		MapBinder.newMapBinder(binder(), String.class, DvrpRoutingModule.AccessEgressFacilityFinder.class);
-		addControlerListenerBinding().toProvider(new AccessibilityControlerListenerProvider());
+		addControllerListenerBinding().toProvider(new AccessibilityControllerListenerProvider());
 	}
 
 	public final void setPushing2Geoserver(boolean pushing2Geoserver) {
@@ -110,7 +107,7 @@ public final class AccessibilityModule extends AbstractModule {
 		this.activityType = activityType ;
 	}
 
-	private class AccessibilityControlerListenerProvider implements Provider<ControlerListener> {
+	private class AccessibilityControllerListenerProvider implements Provider<ControllerListener> {
 		// yy not sure if this truly needs to be a provider.  kai, dec'16
 
 		@Inject private Config config ;
@@ -131,7 +128,7 @@ public final class AccessibilityModule extends AbstractModule {
 		@Inject Optional<DrtEstimator> drtEstimator;
 
 		@Override
-		public ControlerListener get() {
+			public ControllerListener get() {
 			AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 			ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 			final BoundingBox boundingBox;

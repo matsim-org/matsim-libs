@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.groups;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -29,8 +31,6 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +52,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 	// measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
 	/* package */ final static String REMOVE_STUCK_VEHICLES_STRING =
-			"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
+		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
@@ -66,14 +66,17 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 	/* package */ final static String STUCK_TIME_STRING =
-			"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
+		"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
 	private static final String FILTER_SNAPSHOTS = "filterSnapshots";
 	private static final String LINK_DYNAMICS = "linkDynamics";
+	private static final String PERSON_INITIALIZED_EVENTS = "personInitializedEvents";
 	private InflowCapacitySetting inflowCapacitySetting = InflowCapacitySetting.INFLOW_FROM_FDIAG;
 
 	public enum StarttimeInterpretation {maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime}
 
 	public enum EndtimeInterpretation {minOfEndtimeAndMobsimFinished, onlyUseEndtime}
+
+	public enum PersonInitializedEventsSetting {none, singleActAgentsOnly, all}
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
@@ -160,6 +163,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle;
 	private Collection<String> seepModes = Collections.singletonList(TransportMode.bike);
 	// ---
+	private PersonInitializedEventsSetting personInitializedEventsSetting = PersonInitializedEventsSetting.none;
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -173,8 +177,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 			map.put(SNAPSHOT_STYLE, "snapshotStyle. One of: " + options);
 		}
 		map.put(NUMBER_OF_THREADS, "Number of threads used for the QSim.  "
-				+ "Note that this setting is independent from the \"global\" threads setting.  "
-				+ "In contrast to earlier versions, the non-parallel special version is no longer there.");
+			+ "Note that this setting is independent from the \"global\" threads setting.  "
+			+ "In contrast to earlier versions, the non-parallel special version is no longer there.");
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING);
 		map.put(STUCK_TIME, STUCK_TIME_STRING);
 		map.put(NOTIFY_ABOUT_STUCK_VEHICLES, NOTIFY_ABOUT_STUCK_VEHICLES_STRING);
@@ -198,13 +202,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 				options.append(behav).append(' ');
 			}
 			map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
-					"One of: " + options);
+				"One of: " + options);
 		}
 		map.put(MAIN_MODE, "[comma-separated list] Defines which modes are congested modes. Technically, these are the modes that " +
-				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
-				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
+			"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
+			"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES,
-				INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT);
+			INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT);
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values. This is used only for visualisation.");
 		{
@@ -216,8 +220,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		}
 		map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
 		map.put(FAST_CAPACITY_UPDATE, "If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, "
-				+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer. "
-				+ "Default is true.");
+			+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer. "
+			+ "Default is true.");
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		{
 			StringBuilder stb = new StringBuilder();
@@ -225,7 +229,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 				stb.append(" ").append(src.toString());
 			}
 			map.put(VEHICLES_SOURCE, "If vehicles should all be the same default vehicle, or come from the vehicles file, "
-					+ "or something else.  Possible values: " + stb);
+				+ "or something else.  Possible values: " + stb);
 		}
 		map.put(SEEP_MODE, "If link dynamics is set as " + LinkDynamics.SeepageQ + ", set a seep mode. Default is bike.");
 		map.put(IS_SEEP_MODE_STORAGE_FREE, "If link dynamics is set as " + LinkDynamics.SeepageQ + ", set to true if seep mode do not consumes any space on the link. Default is false.");
@@ -233,7 +237,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(FILTER_SNAPSHOTS, "If set to " + FilterSnapshots.withLinkAttributes + " snapshots will only be generated for links which include " + SnapshotWritersModule.GENERATE_SNAPSHOT_FOR_LINK_KEY + " as attribute key. Default is no filtering.");
 //		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
 //				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
-
+		{
+			StringBuilder options = new StringBuilder(60);
+			for (PersonInitializedEventsSetting ii : PersonInitializedEventsSetting.values()) {
+				options.append(ii).append(' ');
+			}
+			map.put(PERSON_INITIALIZED_EVENTS, "Which agents should throw a PersonInitializedEvent on creation. Options: " + options);
+		}
 		return map;
 	}
 
@@ -253,6 +263,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		 * theresa, jun'20
 		 */
 	}
+
 	private NodeTransition nodeTransitionLogic = NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode;
 
 	// ---
@@ -447,7 +458,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	/**
 	 * This determines the traffic dynamics of a link. The default is 'queue', but the recommended setting is kinematic waves.
-	 *
+	 * <p>
 	 * DEPRECATION NOTE: 'withHoles' is deprecated, use 'kinematicWaves' instead, as that uses 'withHoles' and adds an inflow capacity on top.
 	 */
 	public enum TrafficDynamics {
@@ -469,11 +480,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 * diagram, assuming the flow capacity in the link attributes to be correct. DEPRECATED: In practice the other setting is used most often! Use\
 	 * INFLOW_FROM_FDIAG instead.</li>
 	 */
-	public enum InflowCapacitySetting {INFLOW_FROM_FDIAG,
+	public enum InflowCapacitySetting {
+		INFLOW_FROM_FDIAG,
 		@Deprecated
 		NR_OF_LANES_FROM_FDIAG,
 		@Deprecated
-		MAX_CAP_FOR_ONE_LANE}
+		MAX_CAP_FOR_ONE_LANE
+	}
 
 	@StringSetter(TRAFFIC_DYNAMICS)
 	public void setTrafficDynamics(final TrafficDynamics str) {
@@ -492,8 +505,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
-		if ( numberOfThreads < 1 ) {
-			throw new IllegalArgumentException( "Number of threads must be strictly positive, got "+numberOfThreads );
+		if (numberOfThreads < 1) {
+			throw new IllegalArgumentException("Number of threads must be strictly positive, got " + numberOfThreads);
 		}
 		this.numberOfThreads = numberOfThreads;
 	}
@@ -511,6 +524,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(SIM_ENDTIME_INTERPRETATION)
 	public EndtimeInterpretation getSimEndtimeInterpretation() {
 		return simEndtimeInterpretation;
+	}
+
+	@StringSetter(PERSON_INITIALIZED_EVENTS)
+	public void setPersonInitializedEventsSetting(PersonInitializedEventsSetting setting) {
+		this.personInitializedEventsSetting = setting;
+	}
+
+	@StringGetter(PERSON_INITIALIZED_EVENTS)
+	public PersonInitializedEventsSetting getPersonInitializedEventsSetting() {
+		return personInitializedEventsSetting;
 	}
 
 	@StringSetter(SIM_ENDTIME_INTERPRETATION)
@@ -535,10 +558,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public Collection<String> getMainModes() {
 		return mainModes;
 	}
+
 	// ---
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT =
-			"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false";
+		"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: true";
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = true;
 	// (yyyyyy switch this default to true; false has really weird consequences sometimes (vehicles waiting for hours in driveway;
 	// and this is not included into decongestion approach. kai/ihab, aug'18)
@@ -576,12 +600,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(LINK_DYNAMICS)
 	public LinkDynamics getLinkDynamics() {
-		return this.linkDynamics ;
+		return this.linkDynamics;
 	}
 
 	@StringSetter(LINK_DYNAMICS)
 	public void setLinkDynamics(LinkDynamics linkDynamics) {
-		this.linkDynamics = linkDynamics ;
+		this.linkDynamics = linkDynamics;
 	}
 
 	@StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
@@ -594,19 +618,20 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.usePersonIdForMissingVehicleId = value;
 	}
 
-	@StringSetter( VEHICLES_SOURCE)
-	public final void setVehiclesSource( VehiclesSource source ) {
+	@StringSetter(VEHICLES_SOURCE)
+	public final void setVehiclesSource(VehiclesSource source) {
 		// yyyy This setting triggers behavior in PrepareForSim, the result of which is also used by the router.  A better place for this switch might be in the vehicles config group. kai, may'21
 		testForLocked();
-		this.vehiclesSource = source ;
-	}
-	@StringGetter( VEHICLES_SOURCE )
-	public final VehiclesSource getVehiclesSource() {
-		// yyyy This setting triggers behavior in PrepareForSim, the result of which is also used by the router.  A better place for this switch might be in the vehicles config group. kai, may'21
-		return this.vehiclesSource ;
+		this.vehiclesSource = source;
 	}
 
-	private static final String USE_LANES="useLanes" ;
+	@StringGetter(VEHICLES_SOURCE)
+	public final VehiclesSource getVehiclesSource() {
+		// yyyy This setting triggers behavior in PrepareForSim, the result of which is also used by the router.  A better place for this switch might be in the vehicles config group. kai, may'21
+		return this.vehiclesSource;
+	}
+
+	private static final String USE_LANES = "useLanes";
 	private boolean useLanes = false;
 
 	@StringGetter(USE_LANES)
@@ -638,44 +663,66 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public Collection<String> getSeepModes() {
 		return seepModes;
 	}
+
 	public void setSeepModes(Collection<String> seepModes) {
 		this.seepModes = seepModes;
 	}
+
 	// ---
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
 		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isSeepModeStorageFree;
 	}
+
 	@StringSetter(IS_SEEP_MODE_STORAGE_FREE)
 	public void setSeepModeStorageFree(boolean isSeepModeStorageFree) {
 		this.isSeepModeStorageFree = isSeepModeStorageFree;
 	}
+
 	// ---
 	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
 	private boolean isRestrictingSeepage = true;
+
 	@StringGetter(IS_RESTRICTING_SEEPAGE)
 	public boolean isRestrictingSeepage() {
 		// yyyyyy replace boolean by something more expressive.  kai, aug'18
 		return isRestrictingSeepage;
 	}
+
 	@StringSetter(IS_RESTRICTING_SEEPAGE)
 	public void setRestrictingSeepage(boolean isRestrictingSeepage) {
 		this.isRestrictingSeepage = isRestrictingSeepage;
 	}
+
 	// ---
-	private boolean usingTravelTimeCheckInTeleportation = false ;
+	private boolean usingTravelTimeCheckInTeleportation = false;
+
 	public boolean isUsingTravelTimeCheckInTeleportation() {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
-		return this.usingTravelTimeCheckInTeleportation ;
+		return this.usingTravelTimeCheckInTeleportation;
 	}
-	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
+
+	public boolean setUsingTravelTimeCheckInTeleportation(boolean val) {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
-		return this.usingTravelTimeCheckInTeleportation = val ;
+		return this.usingTravelTimeCheckInTeleportation = val;
+	}
+
+	public static final String DELAY_INSTANT_TELEPORTATION_ARRIVALS = "delayInstantTeleportationArrivals";
+	public boolean delayInstantTeleportationArrivals = true;
+
+	@StringGetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
+	public boolean getDelayInstantTeleportationArrivals() {
+		return this.delayInstantTeleportationArrivals;
+	}
+
+	@StringSetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
+	public void setDelayInstantTeleportationArrivals(boolean val) {
+		this.delayInstantTeleportationArrivals = val;
 	}
 
 	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING = //
-			"Flow capacity easing is activated for vehicles of size equal or smaller than the specified threshold. "
+		"Flow capacity easing is activated for vehicles of size equal or smaller than the specified threshold. "
 			+ "Introduced to minimise the chances of buses being severely delayed in downsampled scenarios";
 
 

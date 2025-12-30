@@ -1,6 +1,6 @@
 package org.matsim.contrib.drt.extension.insertion.constraints;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.matsim.contrib.drt.extension.insertion.DrtInsertionConstraint;
 import org.matsim.contrib.drt.extension.insertion.distances.DistanceApproximator;
@@ -15,7 +15,7 @@ import org.matsim.contrib.dvrp.load.DvrpLoadType;
 
 public class VehicleRangeConstraint implements DrtInsertionConstraint {
 	private final InsertionDistanceCalculator insertionCalculator;
-	
+
 	private final VehicleRangeSupplier rangeSupplier;
 	private final DistanceCalculator distanceCalculator;
 	private final DistanceApproximator distanceApproximator;

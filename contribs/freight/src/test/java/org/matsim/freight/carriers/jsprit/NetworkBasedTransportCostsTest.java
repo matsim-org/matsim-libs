@@ -123,14 +123,14 @@ public class NetworkBasedTransportCostsTest {
 		String NETWORK_FILENAME = utils.getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 
-		VehicleType vehType1 = VehicleUtils.getFactory().createVehicleType(Id.create(TYPE_1, VehicleType.class ));
+		VehicleType vehType1 = VehicleUtils.getFactory().createVehicleType(Id.createVehicleTypeId(TYPE_1));
 
 		CostInformation costInformation1 = vehType1.getCostInformation() ;
 		costInformation1.setFixedCost( 0.0 );
 		costInformation1.setCostsPerMeter( 2.0 );
 		costInformation1.setCostsPerSecond( 0.0 );
 
-		VehicleType vehType2 = VehicleUtils.getFactory().createVehicleType(Id.create(TYPE_2, VehicleType.class ));
+		VehicleType vehType2 = VehicleUtils.getFactory().createVehicleType(Id.createVehicleTypeId(TYPE_2));
 
 		CostInformation costInformation = vehType2.getCostInformation() ;
 		costInformation.setFixedCost( 0.0 );
@@ -256,7 +256,7 @@ public class NetworkBasedTransportCostsTest {
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		final Vehicle vehicle1;
 		{
-			VehicleType vehType1 = vf.createVehicleType( Id.create( TYPE_1, VehicleType.class ) );
+			VehicleType vehType1 = vf.createVehicleType( Id.createVehicleTypeId(TYPE_1) );
 				vehType1.getCostInformation().setFixedCost(10.0);
 				vehType1.getCostInformation().setCostsPerSecond(0.0);
 				vehType1.getCostInformation().setCostsPerMeter(2.0);
@@ -268,7 +268,7 @@ public class NetworkBasedTransportCostsTest {
 
 		final Vehicle vehicle2;
 		{
-			VehicleType vehType2 = vf.createVehicleType(Id.create(TYPE_2, VehicleType.class));
+			VehicleType vehType2 = vf.createVehicleType(Id.createVehicleTypeId(TYPE_2));
 				vehType2.getCostInformation().setFixedCost(20.0);
 				vehType2.getCostInformation().setCostsPerSecond(0.0);
 				vehType2.getCostInformation().setCostsPerMeter(4.0);

@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.Waypoint.Dropoff;
 import org.matsim.contrib.drt.optimizer.Waypoint.End;
 import org.matsim.contrib.drt.optimizer.Waypoint.Pickup;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -67,9 +68,17 @@ public class SingleInsertionDetourPathCalculatorTest {
 	private final DrtRequest request = DrtRequest.newBuilder()
 			.fromLink(pickupLink)
 			.toLink(dropoffLink)
-			.earliestStartTime(100)
-			.latestStartTime(200)
-			.latestArrivalTime(500)
+			.earliestDepartureTime(100)
+			.constraints(
+					new DrtRouteConstraints(
+							400,
+							Double.POSITIVE_INFINITY,
+							100,
+							Double.POSITIVE_INFINITY,
+							0.,
+							false
+					)
+			)
 			.build();
 
 	private final LeastCostPathCalculator pathCalculator = mock(LeastCostPathCalculator.class);
@@ -136,10 +145,8 @@ public class SingleInsertionDetourPathCalculatorTest {
 	}
 
 	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
-		var fromNode = fromLink.getToNode();
-		var toNode = toLink.getFromNode();
-		var path = new Path(List.of(fromNode, toNode), List.of(), pathTravelTime, pathTravelTime + 1000);
-		when(pathCalculator.calcLeastCostPath(eq(fromNode), eq(toNode), eq(startTimeArg + FIRST_LINK_TT), isNull(),
+		var path = new Path(List.of(fromLink.getToNode(), toLink.getFromNode()), List.of(), pathTravelTime, pathTravelTime + 1000);
+		when(pathCalculator.calcLeastCostPath(eq(fromLink), eq(toLink), eq(startTimeArg + FIRST_LINK_TT), isNull(),
 				isNull())).thenReturn(path);
 		return path;
 	}

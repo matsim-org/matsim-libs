@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.inject.*;
+import com.google.inject.*;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
@@ -120,18 +120,18 @@ public class LinkToLinkRouting
         );
 
         // see NetworkRoutingProvider for some notes
-        if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
-            if (mode.equals(TransportMode.walk)) {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);
-            } else {
-                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
-                        filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation, multimodalLinkChooser);
-            }
+		if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
+			if (mode.equals(TransportMode.walk)) {
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+					filteredNetwork, invertedNetwork, null,null, timeInterpretation, multimodalLinkChooser);
+			} else {
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+					filteredNetwork, invertedNetwork, walkRouter, walkRouter, timeInterpretation, multimodalLinkChooser);
+			}
 
-        } else {
-            // pure inverted router
-            return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
-        }
+		} else {
+			// pure inverted router
+			return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
+		}
     }
 }

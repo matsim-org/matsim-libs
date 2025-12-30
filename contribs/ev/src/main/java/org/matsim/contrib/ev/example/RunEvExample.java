@@ -24,6 +24,7 @@ package org.matsim.contrib.ev.example;/*
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEvExample {
-	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
+	static public final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
 	private static final Logger log = LogManager.getLogger(RunEvExample.class);
 
 	public static void main(String[] args) throws IOException {
@@ -54,7 +55,7 @@ public class RunEvExample {
 				args = new String[] {DEFAULT_CONFIG_FILE};
 			} else {
 				log.info("Starting simulation run with the example config file from GitHub repository");
-				args = new String[] {"https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+				args = new String[] {"https://raw.githubusercontent.com/matsim-org/matsim/main/contribs/ev/"
 						+ DEFAULT_CONFIG_FILE};
 			}
 		}
@@ -62,9 +63,19 @@ public class RunEvExample {
 	}
 
 	public void run( String[] args ) {
+		run(args, config -> {});	
+	}
+
+	public void run( String[] args, Consumer<Config> configurator ) {
+		run(args, configurator, scenario -> {}, controller -> {});	
+	}
+
+	public void run( String[] args, Consumer<Config> configurator, Consumer<Scenario> scenarioConfigurator, Consumer<Controler> controllerConfigurator) {
 		Config config = ConfigUtils.loadConfig(args, new EvConfigGroup());
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		configurator.accept(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenarioConfigurator.accept(scenario);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
@@ -78,6 +89,7 @@ public class RunEvExample {
 				// kai, dec'22
 			}
 		} );
+		controllerConfigurator.accept(controler);
 
 		controler.run();
 	}

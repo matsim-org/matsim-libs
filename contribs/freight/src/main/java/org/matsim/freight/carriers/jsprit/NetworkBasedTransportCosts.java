@@ -28,6 +28,9 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +45,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.freight.carriers.CarrierVehicle;
+import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 import org.matsim.vehicles.VehicleType;
@@ -84,6 +88,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
+	private static final Logger log = LogManager.getLogger(NetworkBasedTransportCosts.class);
+
 	public interface InternalLeastCostPathCalculatorListener {
 
 		void startCalculation(long routerId);
@@ -119,7 +125,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 		private org.matsim.vehicles.VehicleType makeType(String typeId, double maxVelocity) {
 			org.matsim.vehicles.VehicleType vehicleTypeImpl = VehicleUtils
-					.createVehicleType(Id.create(typeId, VehicleType.class));
+					.createVehicleType(Id.createVehicleTypeId(typeId));
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}
@@ -435,8 +441,12 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		}
 
 		public Builder setRoadPricingScheme( RoadPricingScheme roadPricingScheme) {
-			withToll = true;
-			this.roadPricingScheme = roadPricingScheme;
+			if (roadPricingScheme != null) {
+				withToll = true;
+				this.roadPricingScheme = roadPricingScheme;
+			} else {
+				log.debug("RoadPricingScheme is null. Tolls cannot be considered.");
+			}
 			return this;
 		}
 
@@ -574,7 +584,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,
@@ -657,7 +667,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 		} else {
 			informStartCalc();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,
@@ -720,7 +730,7 @@ public class NetworkBasedTransportCosts implements VRPTransportCosts {
 			travelDistance = fromLink.getLength();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
-			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null,
+			Path path = router.calcLeastCostPath(fromLink, toLink, departureTime, null,
 					matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime + path.travelTime,

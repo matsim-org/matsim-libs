@@ -31,4 +31,9 @@ public class DrtDashboardProvider implements DashboardProvider {
 
 		return result;
 	}
+
+	@Override
+	public boolean isDefault() {
+		return true;
+	}
 }

@@ -70,7 +70,7 @@ public class DefaultUnplannedRequestInserterTest {
 	private static final String mode = "DRT_MODE";
 
 	private final DrtRequest request1 = request("r1", "from1", "to1");
-	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1);
+	private final AcceptedDrtRequest acceptedDrtRequest1 = AcceptedDrtRequest.createFromOriginalRequest(request1, 60);
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
 
@@ -156,8 +156,8 @@ public class DefaultUnplannedRequestInserterTest {
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval - 1)).isEmpty();
 		assertThat(retryQueue.getRequestsToRetryNow(now + retryInterval)).usingRecursiveFieldByFieldElementComparator()
 				.containsExactly(DrtRequest.newBuilder(request1)
-						.latestStartTime(request1.getLatestStartTime() + retryInterval)
-						.latestArrivalTime(request1.getLatestArrivalTime() + retryInterval)
+						.earliestDepartureTime(request1.getEarliestStartTime())
+						.constraints(request1.getConstraints())
 						.build());
 
 		//ensure rejection event is NOT emitted
@@ -290,8 +290,8 @@ public class DefaultUnplannedRequestInserterTest {
 	private DefaultUnplannedRequestInserter newInserter(Fleet fleet, double now,
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch insertionSearch, RequestInsertionScheduler insertionScheduler) {
-		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, insertionSearch, new DefaultOfferAcceptor(),
+		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, () -> insertionScheduler,
+				vehicleEntryFactory, insertionRetryQueue, () -> insertionSearch, new DefaultOfferAcceptor(),
 				forkJoinPoolExtension.forkJoinPool, StaticPassengerStopDurationProvider.of(10.0, 0.0),
 				RequestFleetFilter.none);
 	}

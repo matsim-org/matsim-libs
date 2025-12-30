@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.network.turnRestrictions.TurnRestrictionsContext;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -11,6 +12,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -19,7 +21,7 @@ import java.util.NoSuchElementException;
  * <p>
  * In some limited tests, this resulted in a speed-up of at least a factor 2.5 compared to MATSim's default LeastCostPathTree.
  * <p>
- * The implementation does not allocate any memory in the {@link #calculate(int, double, Person, Vehicle)} method. All required memory is pre-allocated in the constructor. This makes the
+ * The implementation does not allocate any memory in the {@link #calculate(Link, double, Person, Vehicle)} method. All required memory is pre-allocated in the constructor. This makes the
  * implementation NOT thread-safe.
  *
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
@@ -51,11 +53,38 @@ public class LeastCostPathTree {
         this.inLI = graph.getInLinkIterator();
     }
 
-    public void calculate(int startNode, double startTime, Person person, Vehicle vehicle) {
-        this.calculate(startNode, startTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
+    /**
+     * Please use the link based methods to also account for turn restrictions.
+     */
+    @Deprecated
+    public void calculate(Node startNode, double startTime, Person person, Vehicle vehicle) {
+        this.calculateImpl(startNode.getId().index(), startTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
     }
 
-    public void calculate(int startNode, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
+    /**
+     * Please use the link based methods to also account for turn restrictions.
+     */
+    @Deprecated
+    public void calculate(Node startNode, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
+        this.calculateImpl(startNode.getId().index(), startTime, person, vehicle, stopCriterion);
+    }
+
+    public void calculate(Link startLink, double startTime, Person person, Vehicle vehicle) {
+        this.calculate(startLink, startTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
+    }
+
+    public void calculate(Link startLink, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
+        int startNode = startLink.getToNode().getId().index();
+        if(graph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext context = graph.getTurnRestrictions().get();
+            if(context.replacedLinks.containsKey(startLink.getId())) {
+                startNode = context.replacedLinks.get(startLink.getId()).toColoredNode.index();
+            }
+        }
+        calculateImpl(startNode, startTime, person, vehicle, stopCriterion);
+    }
+
+    private void calculateImpl(int startNode, double startTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
         Arrays.fill(this.data, Double.POSITIVE_INFINITY);
         Arrays.fill(this.comingFrom, -1);
         Arrays.fill(this.fromLink, -1);
@@ -72,7 +101,7 @@ public class LeastCostPathTree {
             double currCost = getCost(nodeIdx);
             double currDistance = getDistance(nodeIdx);
 
-            if (stopCriterion.stop(nodeIdx, currTime, currCost, currDistance, startTime)) {
+            if (stopCriterion.stop( graph.getNode(nodeIdx).getId().index(), currTime, currCost, currDistance, startTime)) {
                 break;
             }
 
@@ -103,7 +132,7 @@ public class LeastCostPathTree {
             }
         }
 
-        if (graph.hasTurnRestrictions()) {
+        if (graph.getTurnRestrictions().isPresent()) {
             consolidateColoredNodes();
         }
 
@@ -120,19 +149,47 @@ public class LeastCostPathTree {
         }
     }
 
-    public void calculateBackwards(int arrivalNode, double arrivalTime, Person person, Vehicle vehicle) {
-        this.calculate(arrivalNode, arrivalTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
+
+    public void calculateBackwards(Link arrivalLink, double arrivalTime, Person person, Vehicle vehicle) {
+        this.calculateBackwards(arrivalLink, arrivalTime, person, vehicle, (node, arrTime, cost, distance, depTime) -> false);
     }
 
-    public void calculateBackwards(int arrivalNode, double arrivalTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
+    public void calculateBackwards(Link arrivalLink, double arrivalTime, Person person, Vehicle vehicle, StopCriterion stopCriterion) {
+
         Arrays.fill(this.data, Double.POSITIVE_INFINITY);
         Arrays.fill(this.comingFrom, -1);
         Arrays.fill(this.fromLink, -1);
 
-        setData(arrivalNode, 0, arrivalTime, 0);
-
         this.pq.clear();
+
+        int arrivalNode = arrivalLink.getFromNode().getId().index();
+        setData(arrivalNode, 0, arrivalTime, 0);
         this.pq.insert(arrivalNode);
+
+        if(graph.getTurnRestrictions().isPresent()) {
+            TurnRestrictionsContext turnRestrictionsContext = graph.getTurnRestrictions().get();
+            // it might be that the "real" node is not accessible in the colored graph, but only its colored
+            // copies. Loop over all in links and add their colored to nodes to the queue. nkuehnel, May 2025
+            for (Link inLink : arrivalLink.getFromNode().getInLinks().values()) {
+                TurnRestrictionsContext.ColoredLink replacedLink = turnRestrictionsContext.replacedLinks
+                        .get(inLink.getId());
+                if (replacedLink != null && replacedLink.toColoredNode != null) {
+                    int coloredArrivalNode = replacedLink.toColoredNode.index();
+                    setData(coloredArrivalNode, 0, arrivalTime, 0);
+                    this.pq.insert(coloredArrivalNode);
+                }
+                List<TurnRestrictionsContext.ColoredLink> coloredLinks = turnRestrictionsContext.coloredLinksPerLinkMap.get(inLink.getId());
+                if (coloredLinks != null) {
+                    for (TurnRestrictionsContext.ColoredLink coloredLink : coloredLinks) {
+                        if (coloredLink.toColoredNode != null) {
+                            int coloredArrivalNode = coloredLink.toColoredNode.index();
+                            setData(coloredArrivalNode, 0, arrivalTime, 0);
+                            this.pq.insert(coloredArrivalNode);
+                        }
+                    }
+                }
+            }
+        }
 
         while (!this.pq.isEmpty()) {
             final int nodeIdx = this.pq.poll();
@@ -141,7 +198,7 @@ public class LeastCostPathTree {
             double currCost = getCost(nodeIdx);
             double currDistance = getDistance(nodeIdx);
 
-            if (stopCriterion.stop(nodeIdx, arrivalTime, currCost, currDistance, currTime)) {
+            if (stopCriterion.stop( graph.getNode(nodeIdx).getId().index(), arrivalTime, currCost, currDistance, currTime)) {
                 break;
             }
 
@@ -172,7 +229,7 @@ public class LeastCostPathTree {
             }
         }
 
-        if (graph.hasTurnRestrictions()) {
+        if (graph.getTurnRestrictions().isPresent()) {
             consolidateColoredNodes();
         }
 

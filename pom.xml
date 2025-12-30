@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim</groupId>
     <artifactId>matsim-all</artifactId>
     <packaging>pom</packaging>
-    <version>2025.0-SNAPSHOT</version>
+    <version>2026.0-SNAPSHOT</version>
     <name>MATSim-All</name>
     <modules>
         <module>matsim</module>
@@ -27,24 +26,27 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
-        <argLine></argLine>
+        <maven.compiler.release>25</maven.compiler.release>
+        <argLine />
 
-        <log4j.version>2.24.2</log4j.version>
-        <geotools.version>31.3</geotools.version>
+        <log4j.version>2.25.3</log4j.version>
+        <geotools.version>34.1</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.17.2</jackson.version>
-        <jogl.version>2.5.0</jogl.version>
-		<junit.version>5.10.3</junit.version>
+        <jackson.version>2.20.1</jackson.version>
+		<fury.version>0.10.3</fury.version>
+        <jogl.version>2.6.0</jogl.version>
+		<junit.version>6.0.1</junit.version>
+		<fastutil.version>8.5.18</fastutil.version>
     </properties>
 
     <scm>
         <url>https://github.com/matsim-org/matsim</url>
         <connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
         <developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
-    </scm>
+      <tag>MATSim 2025 (Spring)</tag>
+  </scm>
 
     <repositories>
         <repository>
@@ -99,92 +101,105 @@
 
     <!-- Some commonly used dependencies with fixed versions, please try to avoid replicating the versions in other poms -->
     <dependencyManagement>
-        <dependencies>
+			<dependencies>
+				<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jakarta.annotation</groupId>
+				<artifactId>jakarta.annotation-api</artifactId>
+				<version>3.0.0</version>
+			</dependency>
+            <dependency>
+                <groupId>net.sf.trove4j</groupId>
+                <artifactId>trove4j</artifactId>
+                <version>3.0.3</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.3.0-jre</version>
+                <version>33.5.0-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.17.0</version>
+                <version>3.20.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
                 <version>3.6.1</version>
             </dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-rng-simple</artifactId>
+				<version>1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-statistics-distribution</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>1.14.1</version>
+			</dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.27.1</version>
+                <version>1.28.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.2</version>
+                <version>1.3.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.17.1</version>
+                <version>1.20.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
-                <version>1.12.0</version>
+                <version>1.15.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.16.1</version>
+                <version>2.21.0</version>
             </dependency>
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
-                <version>5.9</version>
+                <version>5.12.0</version>
             </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
-                <artifactId>gt-main</artifactId>
+                <artifactId>gt-bom</artifactId>
                 <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-referencing</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-shapefile</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-hsql</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-epsg-extension</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-api</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
-            <dependency>
-                <groupId>org.geotools.jdbc</groupId>
-                <artifactId>gt-jdbc-postgis</artifactId>
-                <version>${geotools.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.locationtech.jts</groupId>
                 <artifactId>jts-core</artifactId>
                 <version>${jts.version}</version>
             </dependency>
+			<!-- Command line parser -->
+			<dependency>
+				<groupId>info.picocli</groupId>
+				<artifactId>picocli</artifactId>
+				<version>4.7.7</version>
+			</dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
@@ -197,7 +212,7 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-bom</artifactId>
-                <version>4.0.5</version>
+                <version>4.0.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -205,19 +220,19 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.33.0</version>
+                <version>2.45.0</version>
             </dependency>
 
             <dependency>
                 <groupId>com.google.re2j</groupId>
                 <artifactId>re2j</artifactId>
-                <version>1.7</version>
+                <version>1.8</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>7.0.0</version>
+                <version>7.1.1</version>
             </dependency>
 
             <dependency>
@@ -234,6 +249,18 @@
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter</artifactId>
 				<version>${junit.version}</version>
 				<scope>test</scope>
@@ -242,7 +269,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.16</version>
+                <version>2.0.17</version>
             </dependency>
 
             <dependency>
@@ -293,41 +320,40 @@
                 <version>${jogl.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>3.45.0</version>
-            </dependency>
-
 			<dependency>
 				<groupId>javax.measure</groupId>
 				<artifactId>unit-api</artifactId>
-				<version>2.1.3</version>
+				<version>2.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>it.unimi.dsi</groupId>
 				<artifactId>fastutil</artifactId>
-				<version>8.5.15</version>
+				<version>${fastutil.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>it.unimi.dsi</groupId>
+				<artifactId>fastutil-core</artifactId>
+				<version>${fastutil.version}</version>
 			</dependency>
 
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.26.3</version>
+                <version>3.27.6</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.13.0</version>
+                <version>5.21.0</version>
                 <scope>test</scope>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>5.12.0</version>
+				<version>5.21.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -340,26 +366,44 @@
 			<dependency>
 				<groupId>tech.tablesaw</groupId>
 				<artifactId>tablesaw-core</artifactId>
-				<version>0.43.1</version>
+				<version>0.44.4</version>
 			</dependency>
 
 			<dependency>
 				<groupId>tech.tablesaw</groupId>
 				<artifactId>tablesaw-jsplot</artifactId>
-				<version>0.43.1</version>
+				<version>0.44.4</version>
 			</dependency>
 
 			<dependency>
 			    <groupId>com.google.j2objc</groupId>
 			    <artifactId>j2objc-annotations</artifactId>
-			    <version>3.0.0</version>
+			    <version>3.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.15.1</version>
+				<version>1.18.3</version>
 				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.github.classgraph</groupId>
+				<artifactId>classgraph</artifactId>
+				<version>4.8.184</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.fury</groupId>
+				<artifactId>fury-core</artifactId>
+				<version>${fury.version}</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.fury</groupId>
+				<artifactId>fury-format</artifactId>
+				<version>${fury.version}</version>
+				<optional>true</optional>
 			</dependency>
 
 		</dependencies>
@@ -370,16 +414,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.14.1</version>
 				<configuration>
-					<source>21</source>
-					<target>21</target>
+					<source>25</source>
+					<target>25</target>
 				</configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -390,8 +434,8 @@
                 </executions>
                 <configuration>
                     <rules>
-                        <requireUpperBoundDeps/>
-                        <banDuplicatePomDependencyVersions/>
+                        <requireUpperBoundDeps />
+                        <banDuplicatePomDependencyVersions />
 						<requireReleaseDeps>
 							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 							<excludes>
@@ -420,37 +464,37 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.3</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.10.0</version>
+                    <version>3.12.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -507,7 +551,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.12</version>
+                        <version>0.8.14</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>

@@ -79,6 +79,10 @@ public final class SimWrapper {
 		return Multibinder.newSetBinder(binder, Dashboard.class).addBinding();
 	}
 
+	public static LinkedBindingBuilder<DashboardProvider> addDashboardProviderBinding(Binder binder) {
+		return Multibinder.newSetBinder(binder, DashboardProvider.class).addBinding();
+	}
+
 	/**
 	 * Return the {@link Data} instance for managing.
 	 */
@@ -116,6 +120,20 @@ public final class SimWrapper {
 		return dashboards.stream().anyMatch(o -> d.isAssignableFrom(o.getClass()) && Objects.equals(o.context(), context));
 	}
 
+	public void replaceDashboard(Dashboard oldDashboard, Dashboard newDashboard) {
+		replaceDashboard(oldDashboard, newDashboard, "");
+	}
+
+	public void replaceDashboard(Dashboard oldDashboard, Dashboard newDashboard, String context) {
+		if (hasDashboard(oldDashboard.getClass(), context)) {
+			log.info("Replacing dashboard {} with context {} by dashboard {}", oldDashboard, context, newDashboard);
+			dashboards.remove(oldDashboard);
+			dashboards.add(newDashboard);
+		} else {
+			log.info("Dashboard {} with context {} not found in list of dashboards. Not replacing anything.", oldDashboard, context);
+		}
+	}
+
 	/**
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
 	 */
@@ -125,7 +143,8 @@ public final class SimWrapper {
 
 	/**
 	 * Generate the dashboards specification and writes .yaml files to {@code dir}.
-	 * @param dir target directory
+	 *
+	 * @param dir    target directory
 	 * @param append if true, existing dashboards will not be overwritten
 	 */
 	public void generate(Path dir, boolean append) throws IOException {
@@ -190,6 +209,7 @@ public final class SimWrapper {
 	public void run(Path dir) {
 		run(dir, null);
 	}
+
 	/**
 	 * Run the pipeline, and pass a different config file. This functionality is only available via {@link SimWrapperRunner}.
 	 */

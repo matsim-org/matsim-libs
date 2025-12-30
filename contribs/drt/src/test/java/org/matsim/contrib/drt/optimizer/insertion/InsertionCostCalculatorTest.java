@@ -26,9 +26,12 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import org.matsim.contrib.drt.optimizer.StopWaypointImpl;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSet;
+import org.matsim.contrib.drt.optimizer.constraints.DrtRouteConstraints;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DropoffDetourInfo;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.PickupDetourInfo;
@@ -49,33 +52,52 @@ import com.google.common.collect.ImmutableList;
 public class InsertionCostCalculatorTest {
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
-	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
+
+		private final DrtRequest drtRequest = DrtRequest.newBuilder()
+			.fromLink(fromLink)
+			.toLink(toLink)
+			.earliestDepartureTime(0)
+			.constraints(new DrtRouteConstraints(
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					Double.POSITIVE_INFINITY,
+					0,
+					true
+					)
+			)
+			.build();
 
 	private final IntegerLoadType loadType = new IntegerLoadType("passengers");
 
 	@Test
 	void testCalculate() {
-		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.<Waypoint.Stop>builder().build(), null);
+
+		StopWaypoint[] stops = new StopWaypoint[1];
+		DrtStopTask existingStopTask = new DefaultDrtStopTask(0, 60, link("a"));
+		stops[0] = new StopWaypointImpl(existingStopTask, loadType.fromInt(1), loadType, false);
+
+		VehicleEntry entry = entry(new double[] { 20, 20, 50 }, ImmutableList.copyOf(stops), null);
 		var insertion = insertion(entry, 0, 1);
 
 		//feasible solution
 		final DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 11), new DropoffDetourInfo(0, 22)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 11), new DropoffDetourInfo(0, 0, 22)),
 				11 + 22, drtRequest, drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//feasible solution - longest possible pickup and dropoff time losses
 		final DrtConfigGroup drtConfigGroup1 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 30)),
 				20 + 30, drtRequest, drtConfigGroup1.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - time constraints at stop 0
 		final DrtConfigGroup drtConfigGroup2 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 21), new DropoffDetourInfo(0, 29)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 21), new DropoffDetourInfo(0, 0, 29)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup2.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 
 		//infeasible solution - vehicle time constraints
 		final DrtConfigGroup drtConfigGroup3 = new DrtConfigGroup();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 20), new DropoffDetourInfo(0, 31)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(0, 0, 20), new DropoffDetourInfo(0, 0, 31)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtConfigGroup3.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet());
 	}
 
@@ -91,11 +113,11 @@ public class InsertionCostCalculatorTest {
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(120, 150, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
 
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
-		Waypoint.Stop[] stops = new Waypoint.Stop[1];
-		stops[0] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
+		StopWaypoint[] stops = new StopWaypoint[1];
+		stops[0] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType, false);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 300}, ImmutableList.copyOf(stops), start);
 		var insertion = insertion(entry, 0, 1);
@@ -105,40 +127,54 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(180)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								300,
+								Double.POSITIVE_INFINITY,
+								120,
+								Double.POSITIVE_INFINITY,
+								180.,
+								true
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		DrtOptimizationConstraintsSet drtOptimizationConstraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, drtOptimizationConstraintsSet);
 
 		// new insertion before dropoff of boarded passenger, inside of threshold but no additional delay - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 0), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(120, 120, 0), new DropoffDetourInfo(300, 300, 30)),
 				30, drtRequest, drtOptimizationConstraintsSet);
 
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(120)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								300,
+								Double.POSITIVE_INFINITY,
+								120,
+								Double.POSITIVE_INFINITY,
+								120.,
+								false
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger, but outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest2, drtOptimizationConstraintsSet);
 
 
 		// new insertion after dropoff of boarded passenger - feasible solution
 		insertion = insertion(entry, 1, 1);
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 30), new DropoffDetourInfo(300, 30)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 30), new DropoffDetourInfo(300, 300, 30)),
 				60, drtRequest, drtOptimizationConstraintsSet);
 	}
 
@@ -151,17 +187,17 @@ public class InsertionCostCalculatorTest {
 
 		DrtStopTask existingPickupTask = new DefaultDrtStopTask(120, 150, link("scheduledPU"));
 		DrtRequest scheduledRequest = DrtRequest.newBuilder().fromLink(link("scheduledFrom")).toLink(link("scheduledTo")).build();
-		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest);
+		AcceptedDrtRequest acceptedScheduledRequest = AcceptedDrtRequest.createFromOriginalRequest(scheduledRequest, 60);
 		existingPickupTask.addPickupRequest(acceptedScheduledRequest);
 
 		DrtStopTask existingDropoffTask = new DefaultDrtStopTask(200, 230, link("boardedDO"));
 		DrtRequest boardedRequest = DrtRequest.newBuilder().fromLink(link("boardedFrom")).toLink(link("boardedTo")).build();
-		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest);
+		AcceptedDrtRequest existingRequest = AcceptedDrtRequest.createFromOriginalRequest(boardedRequest, 60);
 		existingDropoffTask.addDropoffRequest(existingRequest);
 
-		Waypoint.Stop[] stops = new Waypoint.Stop[2];
-		stops[0] = new Waypoint.Stop(existingPickupTask, loadType.fromInt(2), loadType);
-		stops[1] = new Waypoint.Stop(existingDropoffTask, loadType.fromInt(1), loadType);
+		StopWaypoint[] stops = new StopWaypoint[2];
+		stops[0] = new StopWaypointImpl(existingPickupTask, loadType.fromInt(2), loadType, false);
+		stops[1] = new StopWaypointImpl(existingDropoffTask, loadType.fromInt(1), loadType, false);
 
 		VehicleEntry entry = entry(new double[] {60, 60, 60, 300}, ImmutableList.copyOf(stops), start);
 
@@ -172,42 +208,56 @@ public class InsertionCostCalculatorTest {
 		DrtRequest drtRequest = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(300)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								300,
+								Double.POSITIVE_INFINITY,
+								120,
+								Double.POSITIVE_INFINITY,
+								300.,
+								true
+						)
+				)
 				.build();
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 
 		// new insertion before dropoff of boarded passenger within threshold - infeasible solution
 		DrtOptimizationConstraintsSet constraintsSet = drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet();
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				INFEASIBLE_SOLUTION_COST, drtRequest, constraintsSet);
 
 		DrtRequest drtRequest2 = builder
 				.fromLink(fromLink)
 				.toLink(toLink)
-				.latestStartTime(120)
-				.latestArrivalTime(300)
-				.maxRideDuration(Double.MAX_VALUE)
-				.lateDiversionThreshold(200)
+				.earliestDepartureTime(Double.POSITIVE_INFINITY)
+				.constraints(
+						new DrtRouteConstraints(
+								300,
+								Double.POSITIVE_INFINITY,
+								120,
+								Double.POSITIVE_INFINITY,
+								200.,
+								true
+						)
+				)
 				.build();
 
 		// new insertion before dropoff of boarded passenger outside of threshold - feasible solution
-		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60), new DropoffDetourInfo(300, 60)),
+		assertCalculate(insertion, new DetourTimeInfo(new PickupDetourInfo(60, 60, 60), new DropoffDetourInfo(300, 300, 60)),
 				120, drtRequest2, constraintsSet);
 	}
 
 	private void assertCalculate(Insertion insertion, DetourTimeInfo detourTimeInfo, double expectedCost, DrtRequest drtRequest, DrtOptimizationConstraintsSet constraintsSet) {
 		var insertionCostCalculator = new DefaultInsertionCostCalculator(
-				new CostCalculationStrategy.RejectSoftConstraintViolations(), constraintsSet);
+				new CostCalculationStrategy.DefaultCostCalculationStrategy(), constraintsSet);
 		var insertionWithDetourData = new InsertionWithDetourData(insertion, null, detourTimeInfo);
 		assertThat(insertionCostCalculator.calculate(drtRequest, insertionWithDetourData.insertion,
 				insertionWithDetourData.detourTimeInfo)).isEqualTo(expectedCost);
 	}
 
-	private VehicleEntry entry(double[] slackTimes, ImmutableList<Waypoint.Stop> stops, Waypoint.Start start) {
+	private VehicleEntry entry(double[] slackTimes, ImmutableList<StopWaypoint> stops, Waypoint.Start start) {
 		return new VehicleEntry(null, start, stops, slackTimes, stops.stream().map(s -> 0.).toList(), 0);
 	}
 
