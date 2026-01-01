@@ -63,55 +63,67 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
-
-/**
- * A small test that enables to easily compare results with hand-computed results.
+/*
+ * A small test to test the functionality of the EstimatedDrtContributionCalculator.java
+ * We are comparing calculators outputs to hand-computed results. We will test the following:
+ * - The required output files are created --> runFromEvents, part e
+ * - Calculation of walk is correct --> runFromEvents, part a
+ * - Calculation of DRT accessibility is correct --> runFromEvents, part b & c
+ * - Agent will fall back to walk if walk provides higher accessibility --> runFromEvents, part d
+ * - Agent will fall back to walk if origin and destination stops of the DRT trip are identical
+ * - The wait time and detour factors are included in DRT calculation --> testDetourFactorsAndWaitTimeAndDistanceCosts
+ * - The distance costs are included in DRT calculation --> testDetourFactorsAndWaitTimeAndDistanceCosts
+ *
+ *
+ * Following Network will be used
+ * (0)-----!----------!-----(1)-----!----------!-----(2)-----!----------!-----(3)-----!--------x--!-----(4)
+ * (#) denotes nodes - distance between each node is 1000m (each "-" denotes 50m)
+ * ! denotes location of DRT stops
+ * x denotes our opportunity
  *
  * @author jakobrehmann
  */
+
 public class EstimatedDrtAccessibilityTest {
 
 	private static final Logger LOG = LogManager.getLogger(EstimatedDrtAccessibilityTest.class);
 
 	@RegisterExtension
-	private static MatsimTestUtils utils = new MatsimTestUtils();
+	private static final MatsimTestUtils utils = new MatsimTestUtils();
 	public static double gapBtwnNodes = 1000.;
-	public double carSpeed;
+	public double carSpeed = 50/3.6;
 
 
 	String emptyEventsFileName;
 
 	String congestedEventsFileName;
-	public int drtWaitTime;
-	// Opportunity is at x = 2600m. We multiply distance by beeline factor (1.3).
+
+	// Set Parameters
+	public int drtWaitTime = 300;
 	public int positionOfOpportunity = 2600;
 
 	@BeforeEach
-	void prepare(){
+	void prepare() {
 		emptyEventsFileName = utils.getClassInputDirectory() + "output_events.xml.gz";
 		congestedEventsFileName = utils.getClassInputDirectory() + "output_events_congested.xml.gz";
 
 	}
+
 	/**
-	 * Tests offline accessibility, based on events file. In this case, the events file is empty.
+	 * Tests walk and drt calculations; also tests that walk is used if walk provides higher accessibility. Finally, tests that output files are generated.
 	 */
 	@Test
 	void runFromEvents() {
 
 
-		// Set Parameters
-		drtWaitTime = 300;
-		carSpeed = 50 / 3.6;
-
 		// Create Network
-		Network network = createLineNetwork(carSpeed);
+		Network network = createLineNetwork();
 
 		// Create  & Update Config
 		final Config config = createTestConfig();
 
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setBoundingBoxBottom(-250).setBoundingBoxTop(250).setBoundingBoxLeft(0).setBoundingBoxRight(4000);
 		acg.setTileSize_m(500);
@@ -123,7 +135,6 @@ public class EstimatedDrtAccessibilityTest {
 		acg.setUseParallelization(false);
 
 		addDrtParamsToConfig(config, network);
-
 
 
 		// Create  Scenario
@@ -139,12 +150,12 @@ public class EstimatedDrtAccessibilityTest {
 			.build();
 
 		// Run Accessibility Analysis
-		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , emptyEventsFileName );
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
 		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
 		builder.addDataListener(dataListener);
 		builder.addDrtEstimator(drtEstimator);
 
-		builder.build().run() ;
+		builder.build().run();
 
 
 		// ------------
@@ -158,27 +169,23 @@ public class EstimatedDrtAccessibilityTest {
 		Double walkSpeed = config.routing().getTeleportedModeSpeeds().get("walk");
 		for (Map.Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> tupleMapEntry : accessibilitiesMap.entrySet()) {
 			double dist = Math.abs(positionOfOpportunity - tupleMapEntry.getKey().getFirst().getCoord().getX()) * walkBeelineFactor;
-			// time converted into hours
-			double time = dist / walkSpeed / 3600;
-			// accessibility for walk is just time x -12
-			double accessibilityShould = time * (config.scoring().getModes().get("walk").getMarginalUtilityOfTraveling() - config.scoring().getPerforming_utils_hr());
+			// time converted into hours x -12
+			double accessibilityShould = dist / walkSpeed / 3600 * -12;
 			// we compare this "hand-calculated" value with the result from the accessibility analysis
 			double accessibilityActual = tupleMapEntry.getValue().get(Modes4Accessibility.teleportedWalk.name());
 			Assertions.assertEquals(accessibilityShould, accessibilityActual, MatsimTestUtils.EPSILON, "Unexpected accessibility for walk at " + tupleMapEntry.getKey().getFirst().getCoord().getX());
 		}
 
 
-		// @ Measuring point (250,0) we expect following:
+		// B) Test that agent walks backwards (away from opportunity) to reach closest DRT stop. And check that a direct walk would be worse than DRT in this case.
+		// @ Measuring point (250,0):
 		// Access Walk: we expect agent to walk 250 to closest DRT stop (back to node 0)
 		// DRT trip is 3000m @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
 		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
-
-
-
 		{
 			int x = 250;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
-			double accessWalkUtility = 	250 * walkBeelineFactor / walkSpeed / 3600 * -12;;
+			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
 			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
 			double drtTripUtility = (Math.round(3000 / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * -12;
 			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
@@ -187,10 +194,10 @@ public class EstimatedDrtAccessibilityTest {
 			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
 			double walkUtilityActual = accMap.get(Modes4Accessibility.teleportedWalk.name());
 			Assertions.assertEquals(drtUtilityShould, drtUtilityActual, MatsimTestUtils.EPSILON);
-			Assertions.assertTrue(drtUtilityActual > walkUtilityActual );
+			Assertions.assertTrue(drtUtilityActual > walkUtilityActual);
 		}
-
-		// @ Measuring point (750,0) we expect following:
+		// C) Test that agent walks forwards (towards opportunity) to reach closest DRT stop. And check that a direct walk would be worse than DRT in this case.
+		// @ Measuring point (750,0): we expect agent to walk forwards to reach closest DRT stop
 		// Access Walk: we expect agent to walk 250 to closest DRT stop (forward to node 1)
 		// DRT trip is 2000m @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
 		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
@@ -206,34 +213,18 @@ public class EstimatedDrtAccessibilityTest {
 			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
 			double walkUtilityActual = accMap.get(Modes4Accessibility.teleportedWalk.name());
 			Assertions.assertEquals(drtUtilityShould, drtUtilityActual, MatsimTestUtils.EPSILON);
-			Assertions.assertTrue(drtUtilityActual > walkUtilityActual );
+			Assertions.assertTrue(drtUtilityActual > walkUtilityActual);
 		}
 
-		// @ Measuring point (1250,0) we expect following:
-		// Access Walk: we expect agent to walk 250 to closest DRT stop (backward to node 1)
-		// DRT trip is 2000m @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
-		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
-		{
-			int x = 1250;
-			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
-			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
-			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
-			double drtTripUtility = (Math.round(2000 / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * -12;
-			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+		// D) Test situation where agent falls back to walk because walk is better
+		// @ Measuring point (2250,0): we expect agent to directly walk to the destination
+		// Access Walk: we expect agent to walk 250 to closest DRT stop (forward to backward to node 2)
+		// DRT trip is 1000m @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
+		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s
+		// Since direct walk accessibility is higher than DRT accessibility (only 350m direct walk), walk will be chosen
 
-			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
-			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
-			double walkUtilityActual = accMap.get(Modes4Accessibility.teleportedWalk.name());
-			Assertions.assertEquals(drtUtilityShould, drtUtilityActual, MatsimTestUtils.EPSILON);
-			Assertions.assertTrue(drtUtilityActual > walkUtilityActual );
-		}
-
-		// @ Measuring point (1750,0) we expect following:
-		// Access Walk: we expect agent to walk 250 to closest DRT stop (backward to node 1)
-		// DRT trip is 1000 @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
-		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
 		{
-			int x = 1750;
+			int x = 2250;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
 			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
 			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
@@ -241,10 +232,202 @@ public class EstimatedDrtAccessibilityTest {
 			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
 
 			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
+			// I do not have to recalculate walk by hand, since we checked the calculation in part a of this test.
+			double walkUtilityShould = accMap.get(Modes4Accessibility.teleportedWalk.name());
+			Assertions.assertTrue(walkUtilityShould > drtUtilityShould);
+
+			// Since walk is better, walk is chosen:
 			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
 			double walkUtilityActual = accMap.get(Modes4Accessibility.teleportedWalk.name());
-			Assertions.assertTrue(drtUtilityShould < walkUtilityActual );
 			Assertions.assertEquals(walkUtilityActual, drtUtilityActual, MatsimTestUtils.EPSILON);
+
+		}
+
+		// E) Test that output files are created:
+		Path pathToFolder = Path.of(utils.getOutputDirectory() + "analysis/accessibility/null/");
+
+		Assertions.assertTrue(Files.exists(pathToFolder), "Expected output folder was not created: " + pathToFolder);
+		Assertions.assertTrue(Files.exists(pathToFolder.resolve("accessibilities.csv")), "Expected output file accessibilities.csv was not created in" + pathToFolder);
+		Assertions.assertTrue(Files.exists(pathToFolder.resolve("pois.csv")), "Expected output file pois.csv was not created in" + pathToFolder);
+		Assertions.assertTrue(Files.exists(pathToFolder.resolve("configUsedForAccessibilityComputation.xml")), "Expected output file configUsedForAccessibilityComputation.xml was not created in" + pathToFolder);
+
+	}
+
+	/**
+	 * Tests that EstimatedDrtContributionCalculator is sensitive to detour factors (both intercept and slope), waiting time, and distance
+	 * based disutility.
+	 */
+	@Test
+	void testDetourFactorsAndWaitTimeAndDistanceCosts() {
+
+		// Create Network
+		Network network = createLineNetwork();
+
+		// Create  & Update Config
+		final Config config = createTestConfig();
+
+
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(-250).
+			setBoundingBoxTop(250).
+			setBoundingBoxLeft(0).
+			setBoundingBoxRight(4000);
+
+		acg.setTileSize_m(500);
+
+		for(Modes4Accessibility mode :Modes4Accessibility.values()) {
+			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt));
+		}
+
+		acg.setUseParallelization(false);
+
+		addDrtParamsToConfig(config, network);
+
+		config.scoring().getModes().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
+
+
+		// Create  Scenario
+		final Scenario scenario = createTestScenario(config, network);
+
+		// Set up DRT estimator
+
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(drtWaitTime))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1.5, 30))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+		// Run Accessibility Analysis
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
+		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
+		builder.addDataListener(dataListener);
+		builder.addDrtEstimator(drtEstimator);
+
+		builder.build().run();
+
+
+		// ------------
+		// Check results
+		// ------------
+
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMap = dataListener.getAccessibilitiesMap();
+		Double walkBeelineFactor = config.routing().getBeelineDistanceFactors().get("walk");
+		Double walkSpeed = config.routing().getTeleportedModeSpeeds().get("walk");
+
+		// Test that wait time and detour factors are included in DRT Accessibility calculation.
+		// @ Measuring point (250,0):
+		// Access Walk: we expect agent to walk 250 to closest DRT stop (back to node 0)
+		// DRT trip is (3000m @ 2.7m/s) * 1.5 for detour factor alpha+ 30 second for detour factor beta  + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
+		// Distance based disutility is 3000m x -.001 utils/m. (Note: for distance disutility we do not include detours)
+		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
+		{
+			int x = 250;
+			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
+			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
+			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
+			double drtTripTimeUtility = (Math.round(3000 / carSpeed * 100.) * 1.5 / 100. + 30 + drtWaitTime) / 3600 * -12;
+			double drtTripDistanceUtility = 3000 * -.001;
+			double drtTripUtility = drtTripTimeUtility + drtTripDistanceUtility;
+			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+
+			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
+			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
+			Assertions.assertEquals(drtUtilityShould, drtUtilityActual, MatsimTestUtils.EPSILON);
+		}
+
+	}
+
+	/**
+	 * Tests that EstimatedDrtContributionCalculator is sensitive to detour factors (both intercept and slope), waiting time, and distance
+	 * based disutility. We test this by setting the ASC to postive 10. Thus, the DRT trip is guaranteed to provide a higher accessibilty.
+	 * And then we examine a measuring point that shares the same DRT stop as the opportunity, to check that we fallback to walk.
+	 */
+	@Test
+	void testFallbackWalkIfDrtStopsSame() {
+
+		// Create Network
+		Network network = createLineNetwork();
+
+		// Create  & Update Config
+		final Config config = createTestConfig();
+
+
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(-250).
+			setBoundingBoxTop(250).
+			setBoundingBoxLeft(0).
+			setBoundingBoxRight(4000);
+
+		acg.setTileSize_m(500);
+
+		for(Modes4Accessibility mode :Modes4Accessibility.values()) {
+			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt) || mode.equals(Modes4Accessibility.teleportedWalk));
+
+		}
+
+		acg.setUseParallelization(false);
+
+		addDrtParamsToConfig(config, network);
+
+		config.scoring().getModes().get(TransportMode.drt).setConstant(10);
+
+
+		// Create  Scenario
+		final Scenario scenario = createTestScenario(config, network);
+
+		// Set up DRT estimator
+
+		DrtEstimator drtEstimator = new DirectTripBasedDrtEstimator.Builder()
+			.setWaitingTimeEstimator(new ConstantWaitingTimeEstimator(drtWaitTime))
+			.setWaitingTimeDistributionGenerator(new NoDistribution())
+			.setRideDurationEstimator(new ConstantRideDurationEstimator(1, 0))
+			.setRideDurationDistributionGenerator(new NoDistribution())
+			.build();
+
+		// Run Accessibility Analysis
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
+		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
+		builder.addDataListener(dataListener);
+		builder.addDrtEstimator(drtEstimator);
+
+		builder.build().run();
+
+
+		// ------------
+		// Check results
+		// ------------
+
+		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMap = dataListener.getAccessibilitiesMap();
+		Double walkBeelineFactor = config.routing().getBeelineDistanceFactors().get("walk");
+		Double walkSpeed = config.routing().getTeleportedModeSpeeds().get("walk");
+
+		// Test that walk is chosen, even though accessibilty with DRT is better.
+		// @ Measuring point (3250,0):
+		// Access Walk: we expect agent to walk 250 to closest DRT stop (back to node 0)
+		// DRT trip is (3000m @ 2.7m/s) * 1.5 for detour factor alpha+ 30 second for detour factor beta  + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
+		// Distance based disutility is 3000m x -.001 utils/m. (Note: for distance disutility we do not include detours)
+		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
+		{
+			int x = 3250;
+			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
+			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
+			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
+			double drtTripUtility = 10 + (Math.round(0 / carSpeed * 100.) / 100.  + drtWaitTime) / 3600 * -12;
+			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+
+			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
+			double walkShould = (250+400)*walkBeelineFactor / walkSpeed / 3600 * -12;
+			// DRT should provide higher accessibility because of the +10 bonus
+			Assertions.assertTrue(walkShould < drtUtilityShould);
+
+			// Regardless, because the pickup stop and dropoff stop are the same, walk will be used
+			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
+			Assertions.assertEquals(walkShould, drtUtilityActual, MatsimTestUtils.EPSILON);
 		}
 
 	}
@@ -280,6 +463,8 @@ public class EstimatedDrtAccessibilityTest {
 
 
 
+
+
 	private void createDrtStopsFile(String stopsInputFileName, Network network) throws IOException {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TransitScheduleFactory tf = dummyScenario.getTransitSchedule().getFactory();
@@ -287,19 +472,11 @@ public class EstimatedDrtAccessibilityTest {
 
 		for (Node node : network.getNodes().values()) {
 
-//			if(node.getId().toString().contains("-")) continue;
-
 			int nodeId = Integer.parseInt(node.getId().toString());
 
 			TransitStopFacility stop = tf.createTransitStopFacility(Id.create(nodeId, TransitStopFacility.class),node.getCoord(), false);
 
 			stop.setLinkId(Id.create(nodeId, Link.class));
-//
-//			Link link = network.getLinks().get(Id.createLinkId(nodeId + "-" + (nodeId + 1)));
-//			if(link == null) {
-//				link = network.getLinks().get(Id.createLinkId((nodeId - 1) + "-" + nodeId));
-//			}
-//			stop.setLinkId(link.getId());
 			dummyScenario.getTransitSchedule().addStopFacility(stop);
 		}
 
@@ -343,12 +520,11 @@ public class EstimatedDrtAccessibilityTest {
 	 * @return the created test network
 	 *
 	 */
-	public Network createLineNetwork(double carSpeed) {
+	public Network createLineNetwork() {
 		/*
-		 * (0)----------(1)----------(2)----------(3)------x----(4)
-		 * each "-" denotes 1000m
+		 * (0)----------(1)----------(2)----------(3)----------(4)
+		 * each "-" denotes 100m
 		 */
-		double freespeed = carSpeed;
 		double capacity = 500.;
 		double numLanes = 1.;
 
@@ -366,14 +542,14 @@ public class EstimatedDrtAccessibilityTest {
 		for (int i = 0; i < 5; i++) {
 			Node node = NetworkUtils.createAndAddNode(network, Id.createNodeId(i), new Coord(i * gapBtwnNodes, 0));
 
-			Link tinyLink = NetworkUtils.createAndAddLink(network, Id.createLinkId(i), node, node, 0, freespeed, capacity, numLanes);
+			Link tinyLink = NetworkUtils.createAndAddLink(network, Id.createLinkId(i), node, node, 0, carSpeed, capacity, numLanes);
 			tinyLink.setAllowedModes(modes);
 
 			if(prevNode != null) {
 
-				Link linkForward = NetworkUtils.createAndAddLink(network, Id.createLinkId(prevNode.getId().toString() + "-" + i), prevNode, node, 1000., freespeed, capacity, numLanes);
+				Link linkForward = NetworkUtils.createAndAddLink(network, Id.createLinkId(prevNode.getId().toString() + "-" + i), prevNode, node, 1000., carSpeed, capacity, numLanes);
 				linkForward.setAllowedModes(modes);
-				Link linkBackward = NetworkUtils.createAndAddLink(network, Id.createLinkId(i + "-" + prevNode.getId().toString()), node, prevNode, 1000., freespeed, capacity, numLanes);
+				Link linkBackward = NetworkUtils.createAndAddLink(network, Id.createLinkId(i + "-" + prevNode.getId().toString()), node, prevNode, 1000., carSpeed, capacity, numLanes);
 				linkBackward.setAllowedModes(modes);
 			}
 
@@ -409,42 +585,4 @@ public class EstimatedDrtAccessibilityTest {
 		}
 	}
 
-//	void createCongestedEventsFile(String congestedFileName, double congestionTime){
-//		final Config config = createTestConfig();
-//		config.controller().setLastIteration(1);
-//		config.replanning().addStrategySettings(new ReplanningConfigGroup.StrategySettings().setStrategyName("ChangeExpBeta").setWeight(1.));
-//		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("dummy").setTypicalDuration(60));
-//
-//
-//		final Scenario scenario = createTestScenario(config,);
-//
-//		// ---
-//
-//		Random rnd = new Random();
-//		PopulationFactory pf = scenario.getPopulation().getFactory();
-//		for (int i = 0; i < 1000; i++) {
-//			Person person = pf.createPerson(Id.createPersonId(i));
-//			Plan plan = pf.createPlan();
-//			Activity home = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
-//			home.setEndTime(congestionTime);
-//			Leg leg = pf.createLeg(TransportMode.car);
-//			Activity work = pf.createActivityFromCoord("dummy", new Coord(rnd.nextInt(200), rnd.nextInt(200)));
-//			plan.addActivity(home);
-//			plan.addLeg(leg);
-//			plan.addActivity(work);
-//			person.addPlan(plan);
-//			scenario.getPopulation().addPerson(person);
-//		}
-//
-//
-//		Controler controler = new Controler(scenario);
-//		controler.run();
-//
-//		try {
-//			Files.copy(Path.of(utils.getOutputDirectory() + "output_events.xml.gz"),Path.of(congestedFileName), StandardCopyOption.REPLACE_EXISTING);
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
-//
-//	}
 }
