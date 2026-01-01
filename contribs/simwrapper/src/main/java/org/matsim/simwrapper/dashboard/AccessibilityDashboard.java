@@ -85,7 +85,7 @@ public class AccessibilityDashboard implements Dashboard {
 		viz.height = 12.;
 
 		// add poi in background
-		String poiFilename = data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi);
+		String poiFilename = data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi, "--input-crs", coordinateSystem);
 		BackgroundLayer poiBackgroundLayer = new BackgroundLayer(poiFilename);
 		poiBackgroundLayer.setOnTop(true);
 		poiBackgroundLayer.setBorderWidth(10);

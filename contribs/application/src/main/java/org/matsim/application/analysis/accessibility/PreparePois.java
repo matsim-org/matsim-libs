@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.core.utils.gis.GeoFileWriter;
@@ -48,6 +49,10 @@ public class PreparePois implements MATSimAppCommand {
 	private final OutputOptions output = OutputOptions.ofCommand(PreparePois.class);
 	public SimpleFeatureBuilder builder;
 
+	@CommandLine.Mixin
+	private final CrsOptions crs = new CrsOptions();
+
+
 
 	public static void main(String[] args) {
 		new PreparePois().execute(args);
@@ -58,9 +63,7 @@ public class PreparePois implements MATSimAppCommand {
 
 
 		// set up coordinate reference systems and transformations
-		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:25832", true);
-//		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true); // WGS84
-//		MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, true);
+		CoordinateReferenceSystem sourceCRS = CRS.decode(crs.getInputCRS(), true);
 
 		// set up shape file builder
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
@@ -70,8 +73,6 @@ public class PreparePois implements MATSimAppCommand {
 		typeBuilder.add("ID",String.class);
 		typeBuilder.add("type",String.class);
 		builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-
-
 
 
 		Set<String> activityOptions = null;
@@ -125,7 +126,6 @@ public class PreparePois implements MATSimAppCommand {
 					GeometryFactory geometryFactory = new GeometryFactory();
 					Point p = geometryFactory.createPoint(new Coordinate(table.doubleColumn("xcoord").get(row), table.doubleColumn("ycoord").get(row)));
 
-//					Point wgs84Point = (Point) JTS.transform(p, transform);
 					features.add(builder.buildFeature(null, p, String.valueOf(row), activityOption));
 
 				}
