@@ -259,4 +259,55 @@ public class InsertionDetourTimeCalculatorTest {
 	private double timeBetween(Waypoint from, Waypoint to) {
 		return to.getArrivalTime() - from.getDepartureTime();
 	}
+
+	@Test
+	void calculateRemainingPickupTimeLossAtDropoff_withPrecedingStayTimes() {
+		// Test that preceding stay times between pickup and dropoff correctly reduce the pickup time loss
+		// This is a regression test for the bug where the loop started at pickup.index + 1 instead of pickup.index
+		Waypoint.Start start = start(null, 5, link("start"));
+		StopWaypoint stop0 = stop(50, link("stop0")); // Prebooked stop with stay time before it
+		StopWaypoint stop1 = stop(150, link("stop1")); // Another prebooked stop
+
+		// Create entry with non-zero preceding stay times
+		// 30s stay before stop0, 20s stay before stop1
+		List<Double> precedingStayTimes = List.of(30.0, 20.0);
+		VehicleEntry entry = new VehicleEntry(null, start, ImmutableList.of(stop0, stop1), null, precedingStayTimes, 0);
+
+		var detour = detourData(10., 30., 40., 50.);
+		var insertion = insertion(entry, 0, 1, detour);
+
+		var detourTimeCalculator = new InsertionDetourTimeCalculator(new DefaultStopTimeCalculator(STOP_DURATION), null);
+		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion.insertion, insertion.detourData, drtRequest);
+
+		// Calculate expected values
+		// IMPORTANT: replacedDriveTT already accounts for preceding stay time in its calculation!
+		// replacedDriveTT = (stop0.beginTime - start.departureTime) - precedingStayTime(0) = (50 - 5) - 30 = 15
+		double departureTime = start.getDepartureTime() + detour.detourToPickup.getTravelTime() + STOP_DURATION;
+		// departureTime = 5 + 10 + 10 = 25
+
+		double replacedDriveAtPickup = (stop0.getArrivalTime() - start.getDepartureTime()) - precedingStayTimes.getFirst();
+		// replacedDriveAtPickup = (50 - 5) - 30 = 15
+		double pickupTimeLoss = detour.detourToPickup.getTravelTime()
+				+ STOP_DURATION
+				+ detour.detourFromPickup.getTravelTime() - replacedDriveAtPickup;
+		// pickupTimeLoss = 10 + 10 + 30 - 15 = 35
+
+		// The key part: remaining pickup time loss should be reduced by the stay time at index 0 (30.0)
+		double remainingPickupTimeLoss = Math.max(pickupTimeLoss - precedingStayTimes.get(0), 0.0);
+		// remainingPickupTimeLoss = max(35 - 30, 0) = 5
+		double arrivalTime = stop0.getDepartureTime() + remainingPickupTimeLoss + detour.detourToDropoff.getTravelTime();
+		// arrivalTime = 60 + 5 + 40 = 105
+
+		double replacedDriveAtDropoff = (stop1.getArrivalTime() - stop0.getDepartureTime()) - precedingStayTimes.get(1);
+		// replacedDriveAtDropoff = (150 - 60) - 20 = 70
+		double dropoffTimeLoss = detour.detourToDropoff.getTravelTime()
+				+ STOP_DURATION
+				+ detour.detourFromDropoff.getTravelTime() - replacedDriveAtDropoff;
+		// dropoffTimeLoss = 40 + 10 + 50 - 70 = 30
+
+		assertThat(detourTimeInfo).usingRecursiveComparison()
+				.isEqualTo(new DetourTimeInfo(
+						new PickupDetourInfo(departureTime, departureTime, pickupTimeLoss),
+						new DropoffDetourInfo(arrivalTime, arrivalTime, dropoffTimeLoss)));
+	}
 }

@@ -3,6 +3,7 @@ package ch.sbb.matsim.contrib.railsim.qsimengine.deadlocks;
 import ch.sbb.matsim.contrib.railsim.qsimengine.TrainPosition;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailLink;
 import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResource;
+import ch.sbb.matsim.contrib.railsim.qsimengine.resources.RailResourceManager;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
@@ -18,7 +19,7 @@ public interface DeadlockAvoidance {
 	/**
 	 * Let the strategy known about the resources that are available.
 	 */
-	default void initResources(Map<Id<RailResource>, RailResource> resources) {
+	default void initResources(RailResourceManager rrm) {
 	}
 
 
@@ -27,6 +28,11 @@ public interface DeadlockAvoidance {
 	 * @return true if the link can be reserved, false otherwise.
 	 */
 	boolean checkLink(double time, RailLink link, TrainPosition position);
+
+	/**
+	 * Return whether any train holds a reservation for this resource. Links not under consideration should return false.
+	 */
+	boolean isReserved(RailResource resource);
 
 	/**
 	 * Check if reserving these links may produce a deadlock. All links will be reserved together.

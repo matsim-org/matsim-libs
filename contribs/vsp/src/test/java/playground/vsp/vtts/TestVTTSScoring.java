@@ -1,7 +1,6 @@
 package playground.vsp.vtts;
 
 import com.google.inject.Singleton;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -11,7 +10,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.application.analysis.population.VTTSHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -22,6 +20,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.examples.ExamplesUtils;
+import playground.vsp.analysis.modules.VTTS.VTTSHandler;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,8 +67,8 @@ public class TestVTTSScoring {
 			@Override public void install(){
 				//this.addEventHandlerBinding().toInstance( new VTTSHandler( new String[]{"freight"} ) );
 				//this.addEventHandlerBinding().to( VTTSHandler.class ); // this would be better
-				bind( VTTSHandler.class ).in(Singleton.class );
-				addEventHandlerBinding().to( VTTSHandler.class );
+				bind(VTTSHandler.class).in(Singleton.class);
+				addEventHandlerBinding().to(VTTSHandler.class);
 			}
 		} );
 
@@ -78,18 +77,15 @@ public class TestVTTSScoring {
 		VTTSHandler vttsHandler = controler.getInjector().getInstance( VTTSHandler.class );
 
 		vttsHandler.computeFinalVTTS();
-//		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
+		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
 		/*
 		this is the average between the work activity which is exact the typical duration --> 6.001979820359793
 		and the home activity which is a lot longer then the typical duration --> 4.76729108633549
 		*/
 		//assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration"))).isEqualTo(5.3846354533476415);
 		// use isCloseTo with epsilon
-//		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration")))
-//			.isCloseTo(5.3846354533476415, Offset.offset(EPSILON));
-
-		Assertions.assertThat( false );
-		// need to repair the regression test
+		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration")))
+			.isCloseTo(5.3846354533476415, Offset.offset(EPSILON));
 
 
 		/*
@@ -98,10 +94,8 @@ public class TestVTTSScoring {
 		*/
 		//assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure"))).isEqualTo(6.44512607275729);
 
-//		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure")))
-//			.isCloseTo(6.44512607275729, Offset.offset(EPSILON));
-		org.junit.jupiter.api.Assertions.assertTrue( false );
-		// repair test
+		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure")))
+			.isCloseTo(6.44512607275729, Offset.offset(EPSILON));
 	}
 
 
@@ -140,8 +134,8 @@ public class TestVTTSScoring {
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				bind( VTTSHandler.class ).in(Singleton.class );
-				addEventHandlerBinding().to( VTTSHandler.class );
+				bind(VTTSHandler.class).in(Singleton.class);
+				addEventHandlerBinding().to(VTTSHandler.class);
 				bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class).asEagerSingleton();
 			}
 		} );
@@ -151,16 +145,15 @@ public class TestVTTSScoring {
 		VTTSHandler vttsHandler = controler.getInjector().getInstance( VTTSHandler.class );
 
 		vttsHandler.computeFinalVTTS();
-//		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
+		vttsHandler.printVTTS(controler.getConfig().controller().getOutputDirectory()+"vtts.csv");
 		/*
 		this is the average between the work activity which is exact the typical duration --> 6.001979820359793 /0.75 --> 8.002639760479724
 		and the home activity which is a lot longer then the typical duration --> 4.76729108633549 --> 4.76729108633549 /0.75 --> 6.356388115113987
 		the 0.75 is the person specific marginal utility of money
 		*/
 		//assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration"))).isEqualTo(7.179513937796855);
-//		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration")))
-//			.isCloseTo(7.179513937796855, Offset.offset(EPSILON));
-		org.junit.jupiter.api.Assertions.assertTrue( false, "repair test" );
+		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("perfectDuration")))
+			.isCloseTo(7.179513937796855, Offset.offset(EPSILON));
 
 		/*
 		this is the average between the work activity which is below the typical duration --> 8.811606029321695 / 1.5 --> 5.8744040195477965
@@ -168,9 +161,8 @@ public class TestVTTSScoring {
 		the 1.5 is the person specific marginal utility of money
 		*/
 		//assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure"))).isEqualTo(4.296750715171527);
-//		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure")))
-//			.isCloseTo(4.296750715171527, Offset.offset(EPSILON));
-		org.junit.jupiter.api.Assertions.assertTrue( false, "repair test" );
+		assertThat(vttsHandler.getAvgVTTSh(Id.createPersonId("timePressure")))
+			.isCloseTo(4.296750715171527, Offset.offset(EPSILON));
 	}
 
 

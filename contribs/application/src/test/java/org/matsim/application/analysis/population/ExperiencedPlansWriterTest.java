@@ -19,15 +19,14 @@ class ExperiencedPlansWriterTest{
 			"--threads", "1"
 		};
 
-		// yy the way the class under test is set up, it is not possible to have the output in a directory different from the
-		// input directory.  In consequence, the test output goes into the test input directory.  kai, nov'25
+		// yy the way ExperiencedPlansWriter is set up, it is not possible to have the output in a directory different from the input directory. kai, nov'25
 
 		ExperiencedPlansWriter.main( args );
 
 		String expected = utils.getInputDirectory() + "/test.reference_experienced_plans.xml.gz";
 		String actual = utils.getInputDirectory() + "/test.output_experienced_plans.xml.gz";
 		PopulationComparison.Result result = PopulationUtils.comparePopulations( expected, actual );
-		Assertions.assertSame( result, PopulationComparison.Result.equal );
+		Assertions.assertTrue( result== PopulationComparison.Result.equal );
 	}
 
 }

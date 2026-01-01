@@ -299,6 +299,40 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
+	void testRunDrtExampleWithLateRequest() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+				new OTFVisConfigGroup());
+
+		// !!! IMPORTANT: use the plans with a late request
+		config.plans().setInputFile("plans_only_drt_1.0_with_late_request.xml.gz");
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
+			// using exactly free-speed estimates
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);
+			drtCfg.addParameterSet(selectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+					.addOrGetDefaultDrtOptimizationConstraintsSet()
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+	}
+
+	@Test
 	void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -505,6 +539,7 @@ public class RunDrtExampleIT {
 				PassengerStopDurationProvider stopDurationProvider = StaticPassengerStopDurationProvider.of(60.0, 5.0);
 				StopTimeCalculator stopTimeCalculator = new CumulativeStopTimeCalculator(stopDurationProvider);
 				stopTimeCalculator = new MinimumStopDurationAdapter(stopTimeCalculator, 60.0);
+				bindModal(PassengerStopDurationProvider.class).toInstance(stopDurationProvider);
 				bindModal(StopTimeCalculator.class).toInstance(stopTimeCalculator);
 			}
 		});
@@ -560,9 +595,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.04)
 				.rejections(14)
-				.waitAverage(232.48)
-				.inVehicleTravelTimeMean(389.16)
-				.totalTravelTimeMean(621.63)
+				.waitAverage(235.18)
+				.inVehicleTravelTimeMean(390.26)
+				.totalTravelTimeMean(625.45)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -609,17 +644,17 @@ public class RunDrtExampleIT {
 
 		controller.run();
 
-		assertEquals(124, tracker.immediateScheduled);
+		assertEquals(122, tracker.immediateScheduled);
 		assertEquals(197, tracker.prebookedScheduled);
-		assertEquals(67, tracker.immediateRejected);
+		assertEquals(69, tracker.immediateRejected);
 		assertEquals(8, tracker.prebookedRejected);
 
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.19)
-				.rejections(75)
-				.waitAverage(208.48)
-				.inVehicleTravelTimeMean(367.07)
-				.totalTravelTimeMean(575.55)
+				.rejections(77)
+				.waitAverage(202.3)
+				.inVehicleTravelTimeMean(375.53)
+				.totalTravelTimeMean(577.83)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -828,11 +863,13 @@ public class RunDrtExampleIT {
 		private final Random random = new Random(123);
 
 		@Override
-		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request, double departureTime, double arrivalTime, double dropoffDuration) {
+		public Optional<AcceptedDrtRequest> acceptDrtOffer(DrtRequest request,
+														   double departureTime, double arrivalTime,
+														   double pickupDuration, double dropoffDuration) {
 			if (random.nextBoolean()) {
 				return Optional.empty();
 			} else {
-				return delegate.acceptDrtOffer(request, departureTime, arrivalTime, dropoffDuration);
+				return delegate.acceptDrtOffer(request, departureTime, arrivalTime, 0, dropoffDuration);
 			}
 		}
 	}

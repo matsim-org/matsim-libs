@@ -48,8 +48,6 @@ public final class PersonUtils {
 	private PersonUtils() {
 	} // do not instantiate
 
-	@Deprecated // use methods of interface Person
-	//yyy there is no such method in the Person interface.  paul, feb'25
 	public static Plan createAndAddPlan(Person person, final boolean selected) {
 		Plan p = PopulationUtils.createPlan(person);
 		person.addPlan(p);

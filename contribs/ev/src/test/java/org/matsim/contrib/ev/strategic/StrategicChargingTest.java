@@ -108,7 +108,7 @@ public class StrategicChargingTest {
         ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
                 .setLegInclusionProbability(1.0);
 
-        // motivate agent to charge enroute
+        // motivate agent to charge enroute (both on way there and back)
         config.setMaximumActivityChargingDuration(0.0);
         config.setMinimumEnrouteDriveTime(0.0);
 
@@ -119,19 +119,19 @@ public class StrategicChargingTest {
         Controler controller = scenario.controller();
         controller.run();
 
-        assertEquals(1, scenario.tracker().startChargingProcessEvents.size());
-        assertEquals(1, scenario.tracker().finishChargingProcessEvents.size());
+        assertEquals(2, scenario.tracker().startChargingProcessEvents.size());
+        assertEquals(2, scenario.tracker().finishChargingProcessEvents.size());
         assertEquals(0, scenario.tracker().abortCharingProcessEvents.size());
 
-        assertEquals(1, scenario.tracker().startChargingAttemptEvents.size());
+        assertEquals(2, scenario.tracker().startChargingAttemptEvents.size());
         assertEquals(0, scenario.tracker().updateChargingAttemptEvents.size());
-        assertEquals(1, scenario.tracker().finishChargingAttemptEvents.size());
+        assertEquals(2, scenario.tracker().finishChargingAttemptEvents.size());
         assertEquals(0, scenario.tracker().abortCharingAttemptEvents.size());
 
         assertTrue(scenario.tracker().startChargingAttemptEvents.getFirst().isEnroute());
 
-        assertEquals(1, scenario.tracker().chargingStartEvents.size());
-        assertEquals(1, scenario.tracker().chargingEndEvents.size());
+        assertEquals(2, scenario.tracker().chargingStartEvents.size());
+        assertEquals(2, scenario.tracker().chargingEndEvents.size());
     }
 
     @Test
@@ -320,5 +320,34 @@ public class StrategicChargingTest {
 
         assertEquals(1, scenario.tracker().chargingStartEvents.size());
         assertEquals("personB", scenario.tracker().chargingStartEvents.getLast().getVehicleId().toString());
+    }
+
+    @Test
+    public void testActivityRetention() {
+        TestScenario scenario = new TestScenarioBuilder(utils) //
+                .enableStrategicCharging(5) //
+                .addWorkCharger(8, 8, 1, 1.0, "default") //
+                .setElectricVehicleRange(10000.0) //
+                .addPerson("person", 0.5) // SoC goes to zero after leaving from work
+                .addActivity("home", 0, 0, 10.0 * 3600.0) //
+                .addActivity("work", 8, 8, 18.0 * 3600.0) //
+                .addActivity("home", 0, 0) //
+                .build();
+
+        StrategicChargingConfigGroup config = StrategicChargingConfigGroup.get(scenario.config());
+        config.setScoreTrackingInterval(1);
+        config.getScoringParameters().setZeroSoc(-1000.0); // incentivize agent to charge at work
+
+        // always innovate
+        config.setSelectionProbability(0.0);
+
+        // frequent
+        ((RandomChargingPlanInnovator.Parameters) config.getInnovationParameters())
+                .setRetentionProbability(0.9);
+
+        Controler controller = scenario.controller();
+        controller.run();
+
+        assertEquals(1, scenario.tracker().chargingStartEvents.size());
     }
 }

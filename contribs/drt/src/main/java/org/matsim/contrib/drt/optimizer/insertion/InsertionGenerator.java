@@ -195,11 +195,11 @@ public class InsertionGenerator {
 			// This is different than using allowed &= ... which causes the right hand expression to be always evaluated even if left variable is already false
 			allowed = allowed && occupancy.add(drtRequest.getLoad()).fitsIn(vehicleCapacity);
 
-			// (2) check if the request wants to depart after the departure time of the next
+			// (2) check if the request wants to depart after the latest departure time of the next
 			// stop. We can early on filter out the current insertion, because we will
 			// neither be able to insert our stop before the next stop nor merge the request
 			// into it.
-			allowed &= drtRequest.getEarliestStartTime() <= nextStop.getDepartureTime();
+			allowed &= drtRequest.getEarliestStartTime() <= nextStop.getLatestDepartureTime();
 
 			if (allowed) {
 				if (drtRequest.getFromLink() != nextStop.getTask().getLink()) {// next stop at different link
@@ -422,8 +422,11 @@ public class InsertionGenerator {
 		var dropoffDetourInfo = detourTimeCalculator.calcDropoffDetourInfo(insertion, toDropoffTT, fromDropoffTT,
 				pickupDetourInfo, request);
 
-		if (vehicleEntry.getSlackTime(dropoffIdx)
-				< pickupDetourInfo.pickupTimeLoss + dropoffDetourInfo.dropoffTimeLoss) {
+		// Calculate effective time loss at dropoff, accounting for stay time buffers
+		double effectiveDropoffTimeLoss = InsertionDetourTimeCalculator.calculateRemainingPickupTimeLossAtDropoff(
+				insertion, pickupDetourInfo) + dropoffDetourInfo.dropoffTimeLoss;
+
+		if (vehicleEntry.getSlackTime(dropoffIdx) < effectiveDropoffTimeLoss) {
 			return null; // skip this dropoff insertion
 		}
 
