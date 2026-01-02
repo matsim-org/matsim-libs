@@ -84,6 +84,8 @@ public class AccessibilityDashboard implements Dashboard {
 		viz.valueColumn = columnName;
 		viz.height = 12.;
 
+		viz.timeSelector = GridMap.TimeSelector.discrete;
+
 		// add poi in background
 		String poiFilename = data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi, "--input-crs", coordinateSystem);
 		BackgroundLayer poiBackgroundLayer = new BackgroundLayer(poiFilename);
