@@ -71,12 +71,20 @@ final class EstimatedDrtAccessibilityContributionCalculator implements Accessibi
 
 		// We need a dummy person, with a dummy vehicle, for the trip routers
 		this.dummyPerson = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("dummy"));
+
+		// Add default veh type, if doesn't yet exist
 		VehicleType vehicleType = VehicleUtils.createDefaultVehicleType();
-		scenario.getVehicles().addVehicleType(vehicleType);
+		if(!scenario.getVehicles().getVehicleTypes().containsKey(vehicleType.getId()))
+			scenario.getVehicles().addVehicleType(vehicleType);
+
+		// add dummy vehicle of default type
 		Id<Vehicle> dummyVehicleId = Id.createVehicleId("dummy-veh");
-		Vehicle vehicle = VehicleUtils.createVehicle(dummyVehicleId,vehicleType);
-		scenario.getVehicles().addVehicle(vehicle);
 		VehicleUtils.insertVehicleIdsIntoPersonAttributes(dummyPerson, Map.of(TransportMode.car, dummyVehicleId));
+
+		if (!scenario.getVehicles().getVehicles().containsKey(dummyVehicleId)) {
+			Vehicle vehicle = VehicleUtils.createVehicle(dummyVehicleId,vehicleType);
+			scenario.getVehicles().addVehicle(vehicle);
+		}
 
 		// drt params
 		this.betaDrtTT_h = scoringConfigGroup.getModes().get(TransportMode.drt).getMarginalUtilityOfTraveling() - scoringConfigGroup.getPerforming_utils_hr();
