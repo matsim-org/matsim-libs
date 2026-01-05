@@ -49,8 +49,8 @@ public class EndOfDayScoring implements IterationStartsListener {
 		var trips = TripStructureUtils.getTrips(experiencedPlan);
 		for (var trip : trips) {
 			// pass all elements except the last activity, as it will be included in the next trip as well
-			var tripElementsToPass = trip.getTripElements().subList(0, trip.getTripElements().size() - 2);
-			for (var e : tripElementsToPass) {
+			scoringFunction.handleActivity(trip.getOriginActivity());
+			for (var e : trip.getTripElements()) {
 				if (e instanceof Activity a) {
 					scoringFunction.handleActivity(a);
 				} else if (e instanceof Leg l) {

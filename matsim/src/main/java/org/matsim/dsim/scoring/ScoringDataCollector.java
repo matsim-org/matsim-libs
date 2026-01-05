@@ -58,18 +58,33 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private final SimStepMessaging simStepMessaging;
 	private final NetworkPartitioning partitioning;
 	private final Network network;
-	private final TransitSchedule transitSchedule;
+
 	private final AgentSourcesContainer asc;
 	private final EndOfDayScoring eods;
 
+	// transit schedule has to be optional, as not all scenarios have a transit schedule.
+	@Inject(optional = true)
+	private TransitSchedule transitSchedule;
+
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods) {
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods) {
 		this.simStepMessaging = simStepMessaging;
 		this.partitioning = network.getPartitioning();
 		this.network = network;
-		this.transitSchedule = transitSchedule;
 		this.asc = asc;
 		this.eods = eods;
+	}
+
+	/**
+	 * Constructor for testing, which includes all dependencies
+	 */
+	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods) {
+		this.simStepMessaging = simStepMessaging;
+		this.partitioning = network.getPartitioning();
+		this.network = network;
+		this.asc = asc;
+		this.eods = eods;
+		this.transitSchedule = transitSchedule;
 	}
 
 	public void registerAgent(MobsimAgent agent) {

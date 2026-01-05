@@ -1,6 +1,7 @@
 package org.matsim.dsim.simulation;
 
-import com.google.inject.*;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -12,6 +13,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
+import org.matsim.dsim.scoring.EndOfDayScoring;
 import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.net.DefaultWait2Link;
 import org.matsim.dsim.simulation.net.Wait2Link;
@@ -26,17 +28,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 		bind(SimStepMessaging.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
 		bind(ScoringDataCollector.class).in(Singleton.class);
-//		addMobsimScopeEventHandlerBinding().toProvider(new Provider<ScoringDataCollector>() {
-//
-//			@Inject
-//			private Injector injector;
-//
-//			@Override
-//			public ScoringDataCollector get() {
-//				return injector.getInstance(ScoringDataCollector.class);
-//			}
-//		});
-		//addMobsimScopeEventHandlerBinding().to(ScoringDataCollector.class);//.in(Singleton.class);
+		bind(EndOfDayScoring.class).in(Singleton.class);
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
 		addQSimComponentBinding(TeleportationModule.COMPONENT_NAME).to(DistributedTeleportationEngine.class);

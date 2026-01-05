@@ -193,6 +193,12 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	}
 
 	private void arrangeAgentActivity(final DistributedMobsimAgent agent) {
+
+		// the agent has reached its end of the plan. go score it.
+		// TODO: think about whether this makes sense. If we have Dynamic agents they could add more plan elements on the go.
+		if (agent instanceof PlanAgent pa && pa.getNextPlanElement() == null) {
+			scoringDataCollector.finishPerson(agent);
+		}
 		for (ActivityHandler activityHandler : activityHandlers) {
 			if (activityHandler.handleActivity(agent)) {
 				return;

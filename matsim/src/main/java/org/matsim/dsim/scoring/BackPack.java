@@ -26,7 +26,7 @@ public class BackPack {
 	}
 
 	public boolean isInVehicle() {
-		return backpackPlan.currentVehicle() != null;
+		return backpackPlan.isInVehicle();
 	}
 
 	public BackpackPlan backpackPlan() {

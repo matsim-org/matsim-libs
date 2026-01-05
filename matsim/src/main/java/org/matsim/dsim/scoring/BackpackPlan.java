@@ -41,6 +41,10 @@ public class BackpackPlan {
 		return currentVehicleLeg.vehicleId();
 	}
 
+	boolean isInVehicle() {
+		return currentVehicleLeg != null;
+	}
+
 	void startPtPart(Id<TransitLine> line, Id<TransitRoute> route) {
 		if (currentPtLeg == null)
 			currentPtLeg = new PendingPtLeg();
@@ -84,8 +88,6 @@ public class BackpackPlan {
 	 * objects as the backpack plan is passed around when agents switch from one to another partition.
 	 */
 	void handleEvent(PersonArrivalEvent e, Network network, TransitSchedule transitSchedule) {
-
-		// TODO this lacks pt
 
 		if (currentLeg == null) throw new IllegalStateException("Agent arrives but never started");
 
@@ -185,6 +187,10 @@ public class BackpackPlan {
 	}
 
 	private Route createTransitRoute(Network network, TransitSchedule transitSchedule) {
+
+		if (transitSchedule == null) {
+			throw new IllegalStateException("Agent travelled on transit route, but no transit schedule is present. This indicates an inconsistent simulation setup.");
+		}
 		// chained routes are implemented as a linked list of transit routes. We have collected a plain list
 		// of those transit routes. Iterate through this list backwards, create pt routes and place them into
 		// the previous one.
