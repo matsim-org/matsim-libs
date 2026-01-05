@@ -11,6 +11,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -25,8 +26,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ScoringDataCollectorTest {
@@ -99,6 +99,64 @@ class ScoringDataCollectorTest {
 		assertEquals(25., act2.getStartTime().seconds(), 1e-9);
 		assertEquals(OptionalTime.undefined(), act2.getEndTime());
 		assertEquals(OptionalTime.undefined(), act2.getMaximumDuration());
+	}
+
+	@Test
+	void testTeleportationBetweenPartitions() {
+		var person = Id.createPersonId("p1");
+		var link1 = Id.createLinkId("l1");
+		var link2 = Id.createLinkId("l2");
+		var distAggent = mock(DistributedMobsimAgent.class);
+		when(distAggent.getId()).thenReturn(person);
+
+		var messaging = mock(SimStepMessaging.class);
+		var network = NetworkUtils.createNetwork();
+		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
+		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1001, 0));
+		var node3 = network.getFactory().createNode(Id.createNodeId("n3"), new Coord(2002, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
+		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
+		var transitSchedule = mock(TransitSchedule.class);
+		var asc = mock(AgentSourcesContainer.class);
+		var eods = mock(EndOfDayScoring.class);
+
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods);
+
+		collector.registerAgent(distAggent);
+		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(1., person, link1, "walk", "walk"));
+
+		// the following simulates how a person leaves and enters a partition. The simulation calls the leave method, which passes a person's backpack
+		// to the messaging. Then the other partition passes the received message to its collector, which then receives the events for that agent.
+		collector.teleportedPersonLeavesPartition(distAggent);
+
+		// make sure the collector does not have the person anymore
+		try {
+			collector.finishPerson(distAggent);
+			fail("Person should have been removed from scoring collector");
+		} catch (NullPointerException _) {
+		}
+
+		// capture the backpack that was passed to messaging.
+		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		verify(messaging).collectBackPack(backPackCaptor.capture(), anyInt());
+		var backpack = backPackCaptor.getValue();
+
+		// create a message from the backpack and pass it back to the collector.
+		var msg = SimStepMessage.builder().addBackPack(backpack).build();
+		collector.process(msg);
+
+		// now, process the remaining events.
+		collector.handleEvent(new TeleportationArrivalEvent(25, person, 339, "walk"));
+		collector.handleEvent(new PersonArrivalEvent(25, person, link2, "walk"));
+		collector.handleEvent(new ActivityStartEvent(25, person, link2, null, "work", new Coord(1001, 0)));
+		collector.finishPerson(distAggent);
+
+		// make sure all plan elements are present. The other values should be the same as in the test above.
+		assertEquals(3, backpack.backpackPlan().experiencedPlan().getPlanElements().size());
 	}
 
 	@Test

@@ -24,9 +24,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Person;
 
-// Such a weird interface and very tightly coupled to the concrete ScoringFunctionsForPopulation
+@FunctionalInterface
 public interface NewScoreAssigner {
-
-
 	void assignNewScore(int iteration, ScoringFunction scoringFunction, Person person);
 }
