@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +23,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.ArrayMap;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -31,6 +34,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -59,6 +66,9 @@ public class PHEMTest {
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
+
+	// WGS83 -> SA_Lo29
+	private final static GeotoolsTransformation TRANSFORMATION = new GeotoolsTransformation("EPSG:4326", "SA_Lo29");
 
 	// ----- Helper methods -----
 
@@ -671,6 +681,60 @@ public class PHEMTest {
 		Assertions.assertTrue(testAverages[4]/refComparison.size()-1 <= refAverages[4]/refComparison.size()-1);
 	}
 
+	/// Returns id to the link from given pretoria network, that the GPS coordinates maps to.
+	private Id<Link> mapGpsToPretoriaNetworkLink(double gpsLat, double gpsLon, Network network){
+		Coord coordWGS84 = new Coord(gpsLon, gpsLat);
+		Coord coordLo29 = TRANSFORMATION.transform(coordWGS84);
+
+		// Flip XY
+//		coordLo29 = new Coord(-coordLo29.getX(), -coordLo29.getY());
+
+		return NetworkUtils.getNearestLinkExactly(network, coordLo29).getId();
+	}
+
+	/// Computes the diff time between the date and the referenceDate
+	private double getCycleTimeFromDate(String date, String referenceDate) {
+		try {
+			Instant d1 = Instant.parse(date);
+			Instant d2 = Instant.parse(referenceDate);
+			return Duration.between(d2, d1).toNanos() / 1_000_000_000.0;
+		} catch (Exception e1) {
+			try {
+				DateTimeFormatter formatter =
+					DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss.SSS Z");
+
+				ZonedDateTime d1 = ZonedDateTime.parse(date, formatter);
+				ZonedDateTime d2 = ZonedDateTime.parse(referenceDate, formatter);
+
+				return Duration.between(d2, d1).toNanos() / 1_000_000_000.0;
+			} catch (Exception e2) {
+				throw e2;
+			}
+		}
+	}
+
+	// TODO Remove for final commit, as this was just used once for data preparation
+	public static void main(String[] args) {
+		Network n = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
+		for(var link : n.getLinks().values()){
+			link.getAttributes().removeAttribute("CO");
+			link.getAttributes().removeAttribute("CO2_TOTAL");
+			link.getAttributes().removeAttribute("CO2_pems");
+			link.getAttributes().removeAttribute("CO2_rep");
+			link.getAttributes().removeAttribute("CO2e");
+			link.getAttributes().removeAttribute("CO_pems");
+			link.getAttributes().removeAttribute("NO2");
+			link.getAttributes().removeAttribute("NOx");
+			link.getAttributes().removeAttribute("NOx_pems");
+			link.getAttributes().removeAttribute("timeOut");
+		}
+
+		/*for(var node : n.getNodes().values()){
+			node.setCoord(new Coord(-node.getCoord().getX(), -node.getCoord().getY()));
+		}*/
+		NetworkUtils.writeNetwork(n, "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC.xml");
+	}
+
 	// ----- Main-test method -----
 
 	/// Start the main-test with the given settings
@@ -779,14 +843,22 @@ public class PHEMTest {
 	// ----- Additional/Experimental tests -----
 
 	@ParameterizedTest
-	@EnumSource(Fuel.class)
-	public void pretoriaInputsExpTest(Fuel fuel) throws IOException{
+	@EnumSource(PretoriaVehicle.class)
+	public void pretoriaInputsExpTest(PretoriaVehicle vehicle) throws IOException{
+//		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
+
 		// Prepare emission-config
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
+		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
+		ecg.setHandlesHighAverageSpeeds(true);
+//		ecg.setAverageWarmEmissionFactorsFile(SVN + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc");
+//		ecg.setAverageColdEmissionFactorsFile(SVN + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc");
+//		ecg.setDetailedWarmEmissionFactorsFile(SVN + "944637571c833ddcf1d0dfcccb59838509f397e6.enc");
+//		ecg.setDetailedColdEmissionFactorsFile(SVN + "54adsdas478ss457erhzj5415476dsrtzu.enc");
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
@@ -796,77 +868,182 @@ public class PHEMTest {
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define vehicle
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = configureVehicle(fuel);
+		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
+		vehicleAttributes.setHbefaTechnology(vehicle.hbefaTechnology);
+		vehicleAttributes.setHbefaEmConcept(vehicle.hbefaEmConcept);
+		vehicleAttributes.setHbefaSizeClass(vehicle.hbefaSizeClass);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
+			vehicle.hbefaVehicleCategory,
+			vehicleAttributes);
+
+		System.out.println(vehHbefaInfo);
+
+		// Read in the Pretoria network file with real emissions
+		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC.xml");
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager manager = EventsUtils.createEventsManager(config);
 
-		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
+		// Read in the csv with Pretoria GPS/PEMS data for C-route
+		List<PretoriaGPSEntry> pretoriaGPSEntries = new ArrayList<>();
 
-		// Sort the links by the timeOut attribute
-		List<Link> sortedLinks = pretoriaNetwork.getLinks().values().stream().sorted(Comparator.comparingDouble((Link l) -> (double) l.getAttributes().getAttribute("timeOut"))).collect(Collectors.toList());
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(",")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
 
-		// Compute the MATSim emissions for the Pretoria network
-		EmissionModule module = new EmissionModule(scenario, manager);
-		List<Tuple<Link, Map<Pollutant, Double>>> link_pollutant2grams = new ArrayList<>();
+		Path gps_path = switch (vehicle){
+			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
+			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
+		};
 
-		Link previous = null;
-		for (Link link : sortedLinks) {
-			if (previous != null){
-				double time = (double) link.getAttributes().getAttribute("timeOut") - (double) previous.getAttributes().getAttribute("timeOut");
+		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				pretoriaGPSEntries.add(new PretoriaGPSEntry(
+					record.get(0),
+					Integer.parseInt(record.get(1)),
+					Integer.parseInt(record.get(2)),
+					Integer.parseInt(record.get(3)),
+					Integer.parseInt(record.get(4)),
+					Boolean.parseBoolean(record.get(5)),
+					Double.parseDouble(record.get(6)),
+					Double.parseDouble(record.get(7)),
+					Double.parseDouble(record.get(8)),
+					Double.parseDouble(record.get(9)),
+					Double.parseDouble(record.get(14)),
 
-				link_pollutant2grams.add(
-					new Tuple<>(
-						link,
-						module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-							time,
-							(String) link.getAttributes().getAttribute("hbefa_road_type"),
-							link.getFreespeed(),
-							link.getLength(),
-							vehHbefaInfo)
-					)
-				);
+					Double.parseDouble(record.get(39)),
+					Double.parseDouble(record.get(38)),
+					Double.parseDouble(record.get(40))
+				));
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+
+		// Attach gps-information to the matsim links
+		String referenceDate = pretoriaGPSEntries.getFirst().date;
+		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
+		Map<Integer, Map<Id<Link>, Tuple<Double, Double>>> tripId2linkId2enterTimeAndLeaveTimes = new ArrayMap<>();
+		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
+
+		// TODO Check if ArrayMaps or HashMaps are faster here
+		int previousTripId = -1;
+		Id<Link> previousLinkId = null;
+		int i = 0;
+		for(var gpsEntry : pretoriaGPSEntries){
+			var tripId = gpsEntry.trip;
+			tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
+			tripId2linkId2enterTimeAndLeaveTimes.putIfAbsent(tripId, new HashMap<>());
+
+			var linkId = mapGpsToPretoriaNetworkLink(gpsEntry.gpsLat, gpsEntry.gpsLon, pretoriaNetwork);
+			tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
+			tripId2linkId2pretoriaGpsEntries.get(tripId).get(linkId).add(gpsEntry);
+
+			// Check if a new trip has started OR if vehicle arrived at new link
+			if(previousTripId != tripId || previousLinkId != linkId){
+				// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We simply skip these points.
+				if(tripId2linkId2enterTimeAndLeaveTimes.get(tripId).containsKey(linkId)) {
+					continue;
+				}
+
+				double currentTime = getCycleTimeFromDate(gpsEntry.date, referenceDate);
+
+				// Start new entry
+				tripId2linkId2enterTimeAndLeaveTimes.get(tripId).put(linkId, new Tuple<>(currentTime, Double.MAX_VALUE));
+
+				// Finish old entry (except when we started a new trip)
+				if (previousTripId == tripId) {
+					double enterTime = tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).get(previousLinkId).getFirst();
+					tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).put(previousLinkId, new Tuple<>(enterTime, currentTime));
+				}
 			}
 
-			previous = link;
+			previousTripId = tripId;
+			previousLinkId = linkId;
+			i++;
+		}
+
+		// Add last entry TODO Check if this works properly
+		double enterTime = tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).get(previousLinkId).getFirst();
+		tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).put(previousLinkId, new Tuple<>(enterTime, getCycleTimeFromDate(pretoriaGPSEntries.getLast().date, referenceDate)));
+
+		// Get the emission values (PEMS and MATSim)
+		EmissionModule module = new EmissionModule(scenario, manager);
+
+		for(var tripEntry : tripId2linkId2pretoriaGpsEntries.entrySet()){
+			var tripId = tripEntry.getKey();
+
+			for(var linkEntry : tripEntry.getValue().entrySet()){
+				var linkId = linkEntry.getKey();
+				var link = pretoriaNetwork.getLinks().get(linkId);
+
+				// Extract the PEMS information
+				double CO_pems = linkEntry.getValue().stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble();
+				double CO2_pems = linkEntry.getValue().stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble();
+				double NOx_pems = linkEntry.getValue().stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble();
+
+				// Compute the MATSim emissions
+				// TODO Add cold emissions
+
+				double time = tripId2linkId2enterTimeAndLeaveTimes.get(tripId).get(linkId).getSecond() - tripId2linkId2enterTimeAndLeaveTimes.get(tripId).get(linkId).getFirst();
+				assert time > 0;
+
+				var emissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+					time,
+					(String) link.getAttributes().getAttribute("hbefa_road_type"),
+					link.getFreespeed(),
+					link.getLength(),
+					vehHbefaInfo
+				);
+
+				double CO_matsim = emissionsMatsim.get(Pollutant.CO);
+				double CO2_matsim = emissionsMatsim.get(Pollutant.CO2_TOTAL);
+				double NOx_matsim = emissionsMatsim.get(Pollutant.NOx);
+
+				tripId2linkId2pollutant2emissions.putIfAbsent(tripId, new HashMap<>());
+				tripId2linkId2pollutant2emissions.get(tripId).putIfAbsent(linkId, new HashMap<>());
+
+				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.CO, new Tuple<>(CO_matsim, CO_pems));
+				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.CO2_TOTAL, new Tuple<>(CO2_matsim, CO2_pems));
+				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.NOx, new Tuple<>(NOx_matsim, NOx_pems));
+			}
 		}
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + fuel),
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
-			"CO_original",
-			"CO_HBEFA",
+			"tripId",
+			"linkId",
+			"CO_MATSim",
 			"CO_pems",
-			"CO2_original",
-			"CO2_HBEFA",
+			"CO2_MATSim",
 			"CO2_pems",
-			"NOx_original",
-			"NOx_HBEFA",
+			"NOx_MATSim",
 			"NOx_pems"
 		);
 
-		link_pollutant2grams.forEach(t -> {
-			try {
-				writer.printRecord(
-					t.getFirst().getAttributes().getAttribute("CO"),
-					t.getSecond().get(Pollutant.CO),
-					t.getFirst().getAttributes().getAttribute("CO_pems"),
-
-					t.getFirst().getAttributes().getAttribute("CO2_TOTAL"),
-					t.getSecond().get(Pollutant.CO2_TOTAL),
-					t.getFirst().getAttributes().getAttribute("CO2_pems"),
-
-					t.getFirst().getAttributes().getAttribute("NOx"),
-					t.getSecond().get(Pollutant.NOx),
-					t.getFirst().getAttributes().getAttribute("NOx_pems")
-				);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+		tripId2linkId2pollutant2emissions.forEach((tripId, linkMap) -> {
+			linkMap.forEach((linkId, pollutantMap) -> {
+				try {
+					writer.printRecord(
+						tripId,
+						linkId,
+						pollutantMap.get(Pollutant.CO).getFirst(),
+						pollutantMap.get(Pollutant.CO).getSecond(),
+						pollutantMap.get(Pollutant.CO2_TOTAL).getFirst(),
+						pollutantMap.get(Pollutant.CO2_TOTAL).getSecond(),
+						pollutantMap.get(Pollutant.NOx).getFirst(),
+						pollutantMap.get(Pollutant.NOx).getSecond()
+					);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			});
 		});
 
 		writer.flush();
@@ -998,6 +1175,8 @@ public class PHEMTest {
 
 	// ----- Helper definitions -----
 
+	private record PretoriaGPSEntry(String date, int trip, int driver, int route, int load, boolean coldStart, double gpsLat, double gpsLon, double gpsAlt, double gpsVel, double vehVel, double CO, double CO2, double NOx){};
+
 	private record DrivingCycleSecond(int second, double vel, double acc){}
 
 	/**
@@ -1111,6 +1290,31 @@ public class PHEMTest {
 		WLTP_derivated_acc,
 		WLTP_inverted_time,
 		CADC
+	}
+
+	public enum PretoriaVehicle{
+		/// Toyota Etios 1.5 (1496ccm, 66kW) Sprint hatchback light passenger vehicle with a Euro 6 classification (138g/km) (file: public-etios.csv).
+		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
+
+		// TODO Euro 5 or Euro 6? (contradicting information)
+		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
+		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR);
+
+		/* TODO Add, when detailed HBEFA table for HGV available
+		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
+		RRV("diesel", "PC D Euro-3", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);*/
+
+		final String hbefaTechnology;
+		final String hbefaEmConcept;
+		final String hbefaSizeClass;
+		final HbefaVehicleCategory hbefaVehicleCategory;
+
+		PretoriaVehicle(String hbefaTechnology, String hbefaEmConcept, String hbefaSizeClass, HbefaVehicleCategory hbefaVehicleCategory) {
+			this.hbefaTechnology = hbefaTechnology;
+			this.hbefaEmConcept = hbefaEmConcept;
+			this.hbefaSizeClass = hbefaSizeClass;
+			this.hbefaVehicleCategory = hbefaVehicleCategory;
+		}
 	}
 }
 
