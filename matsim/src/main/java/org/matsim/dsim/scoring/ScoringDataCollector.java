@@ -148,9 +148,12 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 	public void finishPerson(DistributedMobsimAgent agent) {
 		var backpack = backpackByPerson.remove(agent.getId());
-		backpack.backpackPlan().finish();
-		eods.score(backpack);
-		plansCollector.addExperiencedPlan(agent.getId(), backpack.backpackPlan().experiencedPlan());
+		// the netsim calls finish for each agent, but some are not scored, for example pt drivers.
+		if (backpack != null) {
+			backpack.backpackPlan().finish();
+			eods.score(backpack);
+			plansCollector.addExperiencedPlan(agent.getId(), backpack.backpackPlan().experiencedPlan());
+		}
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {

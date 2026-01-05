@@ -20,10 +20,6 @@
 
 package org.matsim.core.scoring.functions;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.apache.logging.log4j.LogManager;
@@ -37,23 +33,32 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
- * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
+ *
  * @author rashid_waraich
+ * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  */
-public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, SumScoringFunction.TripScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
 
-	private static final Logger log = LogManager.getLogger( CharyparNagelLegScoring.class ) ;
+	private static final Logger log = LogManager.getLogger(CharyparNagelLegScoring.class);
 
 	protected double score;
 
-	/** The parameters used for scoring */
+	/**
+	 * The parameters used for scoring
+	 */
 	protected final ScoringParameters params;
 	protected Network network;
 	private boolean nextEnterVehicleIsFirstOfTrip = true;
@@ -116,34 +121,34 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		}
 	}
 
-	private static int ccc=0 ;
+	private static int ccc = 0;
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
-			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk )
-					|| leg.getMode().equals(TransportMode.non_network_walk ) ) {
+			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk)
+				|| leg.getMode().equals(TransportMode.non_network_walk)) {
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);
-				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode()) ;
+				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode());
 			}
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
 		if (modeParams.marginalUtilityOfDistance_m != 0.0
-				|| modeParams.monetaryDistanceCostRate != 0.0) {
+			|| modeParams.monetaryDistanceCostRate != 0.0) {
 			Route route = leg.getRoute();
 			double dist = route.getDistance(); // distance in meters
-			if ( Double.isNaN(dist) ) {
-				if ( ccc<10 ) {
-					ccc++ ;
+			if (Double.isNaN(dist)) {
+				if (ccc < 10) {
+					ccc++;
 					LogManager.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
-							"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
-							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
-					if ( ccc==10 ) {
-						LogManager.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+						"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
+						"write distance into plan.  Needs to be fixed or these plans will die out.");
+					if (ccc == 10) {
+						LogManager.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED);
 					}
 				}
 			}
@@ -167,54 +172,63 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleEvent(Event event) {
-		if ( event instanceof ActivityEndEvent ) {
+		if (event instanceof ActivityEndEvent) {
 			// When there is a "real" activity, flags are reset:
-			if ( !PtConstants.TRANSIT_ACTIVITY_TYPE.equals( ((ActivityEndEvent)event).getActType()) ) {
-				this.nextEnterVehicleIsFirstOfTrip  = true ;
-				this.nextStartPtLegIsFirstOfTrip = true ;
+			if (!PtConstants.TRANSIT_ACTIVITY_TYPE.equals(((ActivityEndEvent) event).getActType())) {
+				this.nextEnterVehicleIsFirstOfTrip = true;
+				this.nextStartPtLegIsFirstOfTrip = true;
 			}
-			this.lastActivityEndTime = event.getTime() ;
+			this.lastActivityEndTime = event.getTime();
 		}
 
-		if ( event instanceof PersonEntersVehicleEvent && currentLegIsPtLeg ) {
-			if ( !this.nextEnterVehicleIsFirstOfTrip ) {
+		if (event instanceof PersonEntersVehicleEvent && currentLegIsPtLeg) {
+			if (!this.nextEnterVehicleIsFirstOfTrip) {
 				// all vehicle entering after the first triggers the disutility of line switch:
-				this.score += params.utilityOfLineSwitch ;
+				this.score += params.utilityOfLineSwitch;
 			}
-			this.nextEnterVehicleIsFirstOfTrip = false ;
+			this.nextEnterVehicleIsFirstOfTrip = false;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
-			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s) ;
+			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s);
 		}
 
-		if ( event instanceof PersonDepartureEvent ) {
-			String mode = ((PersonDepartureEvent)event).getLegMode();
+		if (event instanceof PersonDepartureEvent) {
+			String mode = ((PersonDepartureEvent) event).getLegMode();
 
 			this.currentLegIsPtLeg = this.ptModes.contains(mode);
-			if ( currentLegIsPtLeg ) {
-				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.modeParams.get(mode).constant ;
+			if (currentLegIsPtLeg) {
+				if (!this.nextStartPtLegIsFirstOfTrip) {
+					this.score -= params.modeParams.get(mode).constant;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}
-				this.nextStartPtLegIsFirstOfTrip = false ;
+				this.nextStartPtLegIsFirstOfTrip = false;
 			}
 		}
 	}
 
 	@Override
 	public void handleLeg(Leg leg) {
-		Gbl.assertIf( leg.getDepartureTime().isDefined() ) ;
-		Gbl.assertIf( leg.getTravelTime().isDefined() );
+		Gbl.assertIf(leg.getDepartureTime().isDefined());
+		Gbl.assertIf(leg.getTravelTime().isDefined());
 
 		double legScore = calcLegScore(
-				leg.getDepartureTime().seconds(), leg.getDepartureTime().seconds() + leg.getTravelTime()
-						.seconds(), leg);
-		if ( Double.isNaN( legScore )) {
-			log.error( "dpTime=" + leg.getDepartureTime().seconds()
-					+ "; ttime=" + leg.getTravelTime().seconds() + "; leg=" + leg ) ;
-			throw new RuntimeException("score is NaN") ;
+			leg.getDepartureTime().seconds(), leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), leg);
+		if (Double.isNaN(legScore)) {
+			log.error("dpTime=" + leg.getDepartureTime().seconds()
+				+ "; ttime=" + leg.getTravelTime().seconds() + "; leg=" + leg);
+			throw new RuntimeException("score is NaN");
 		}
 		this.score += legScore;
 		this.legScores.add(legScore);
+	}
+
+	@Override
+	public void handleTrip(TripStructureUtils.Trip trip) {
+		// we want to score each leg of the trip separately. As far as I can see, the code does the following things tailord to pt:
+		// 1. apply params.utilityOfLineSwitch if there is a line switch
+		// 2. score waiting time between departure and entering of transit vehicles. This is done by applying the difference between util waiting and util travelling
+		// 3. score asc if this is the first pt vehicle of the trip.
+		// then legs are scored the regular way using the calcLegScore method
 	}
 }

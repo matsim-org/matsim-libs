@@ -11,12 +11,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ExperiencedPlansService;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ExperiencedPlansCollector implements ExperiencedPlansService {
 
-	private final Map<Id<Person>, Plan> plans = new HashMap<>();
+	private final Map<Id<Person>, Plan> plans = new ConcurrentHashMap<>();
 
 	private final Config config;
 	private final Population population;
@@ -39,6 +39,9 @@ public class ExperiencedPlansCollector implements ExperiencedPlansService {
 		var tmpPop = PopulationUtils.createPopulation(config, network);
 		for (var entry : plans.entrySet()) {
 			var person = population.getFactory().createPerson(entry.getKey());
+			if (person == null) {
+				continue;
+			}
 			var origPerson = population.getPersons().get(entry.getKey());
 
 			for (var attrEntry : origPerson.getAttributes().getAsMap().entrySet()) {

@@ -30,6 +30,11 @@ public class EndOfDayScoring {
 	public void score(BackPack backPack) {
 
 		var person = population.getPersons().get(backPack.personId());
+
+		if (person == null) {
+			return;
+		}
+
 		var scoringFunction = scoringFunctionFactory.createNewScoringFunction(person);
 
 		// replay events relevant for scoring function first
@@ -59,8 +64,9 @@ public class EndOfDayScoring {
 			scoringFunction.handleTrip(trip);
 		}
 		// pass the last activity of the day to the scoring function, as we have excluded it above
-		var lastAct = (Activity) experiencedPlan.getPlanElements().getLast();
-		scoringFunction.handleActivity(lastAct);
+		if (!experiencedPlan.getPlanElements().isEmpty() && experiencedPlan.getPlanElements().getLast() instanceof Activity a) {
+			scoringFunction.handleActivity(a);
+		}
 
 		scoringFunction.finish();
 
