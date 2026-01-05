@@ -7,25 +7,24 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.simulation.IterationInformation;
 
-public class EndOfDayScoring implements IterationStartsListener {
+public class EndOfDayScoring {
 
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Population population;
 	private final NewScoreAssigner newScoreAssigner;
-
-	private int currentIteration = -1;
+	private final IterationInformation iterationInformation;
 
 	@Inject
-	public EndOfDayScoring(Population population, ScoringFunctionFactory scoringFunctionFactory, NewScoreAssigner newScoreAssigner) {
+	public EndOfDayScoring(Population population, ScoringFunctionFactory scoringFunctionFactory, NewScoreAssigner newScoreAssigner, IterationInformation iterationInformation) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.population = population;
 		this.newScoreAssigner = newScoreAssigner;
+		this.iterationInformation = iterationInformation;
 	}
 
 	public void score(BackPack backPack) {
@@ -69,11 +68,6 @@ public class EndOfDayScoring implements IterationStartsListener {
 		// we can do it this way, without synchronization, as an agent should only be
 		// present on one partition at a time. This makes the person data structures
 		// contained in the population independent of each other.
-		newScoreAssigner.assignNewScore(currentIteration, scoringFunction, person);
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		currentIteration = event.getIteration();
+		newScoreAssigner.assignNewScore(iterationInformation.iteration(), scoringFunction, person);
 	}
 }

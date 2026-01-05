@@ -13,8 +13,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.dsim.scoring.EndOfDayScoring;
-import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.net.DefaultWait2Link;
 import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.dsim.simulation.pt.DistributedPtEngine;
@@ -27,14 +25,19 @@ public class DSimComponentsModule extends AbstractQSimModule {
 
 		bind(SimStepMessaging.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
-		bind(ScoringDataCollector.class).in(Singleton.class);
-		bind(EndOfDayScoring.class).in(Singleton.class);
+//		bind(ScoringDataCollector.class).in(Singleton.class);
+//		bind(EndOfDayScoring.class).in(Singleton.class);
+//		// expose the iteration number to dsim components, as they cannot listen for iteration start events because they are
+//		// only instantiated after the event has been issued.
+//		bind(IterationInformation.class).toProvider(() -> new IterationInformation(getIterationNumber()));
+
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
 		addQSimComponentBinding(TeleportationModule.COMPONENT_NAME).to(DistributedTeleportationEngine.class);
 
 		bind(PopulationAgentSource.class).asEagerSingleton();
 		addQSimComponentBinding(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
+
 
 		if (getConfig().transit().isUseTransit()) {
 			bind(Wait2Link.class).to(DistributedPtEngine.class).in(Singleton.class);

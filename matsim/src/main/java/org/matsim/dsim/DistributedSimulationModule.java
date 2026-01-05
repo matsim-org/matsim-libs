@@ -14,6 +14,7 @@ import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
+import org.matsim.dsim.scoring.BackpackScoringModule;
 
 public class DistributedSimulationModule extends AbstractModule {
 
@@ -58,6 +59,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		Multibinder.newSetBinder(binder(), LPProvider.class);
 
 		install(new DSimModule());
+		install(new BackpackScoringModule());
 	}
 
 	/**

@@ -14,6 +14,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.dsim.simulation.IterationInformation;
 import org.matsim.facilities.ActivityFacility;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ class EndOfDayScoringTest {
 		NewScoreAssigner newScoreAssigner = (_, _, p) -> assertEquals(personId, p.getId());
 		var scoringFunction = new TestScoringFunction();
 		ScoringFunctionFactory sff = _ -> scoringFunction;
-		var eods = new EndOfDayScoring(population, sff, newScoreAssigner);
+		var eods = new EndOfDayScoring(population, sff, newScoreAssigner, new IterationInformation());
 		eods.score(backpack);
 
 		assertEquals(2, scoringFunction.activities.size());

@@ -53,8 +53,9 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
+		var eps = mock(ExperiencedPlansCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
@@ -122,8 +123,9 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
+		var eps = mock(ExperiencedPlansCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
@@ -199,7 +201,9 @@ class ScoringDataCollectorTest {
 		schedule.addTransitLine(transitLine);
 
 		var eods = mock(EndOfDayScoring.class);
-		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), eods);
+		var eps = mock(ExperiencedPlansCollector.class);
+
+		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), eods, eps);
 
 		collector.registerAgent(distAgent);
 
@@ -276,7 +280,9 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods);
+		var eps = mock(ExperiencedPlansCollector.class);
+
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., person, link1, null, "home", new Coord(0, 0)));
@@ -352,7 +358,9 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods);
+		var eps = mock(ExperiencedPlansCollector.class);
+
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
@@ -401,12 +409,12 @@ class ScoringDataCollectorTest {
 		var leg2 = (Leg) bp2.backpackPlan().experiencedPlan().getPlanElements().get(1);
 		assertEquals("ride", leg2.getMode());
 		assertEquals(15.0, leg2.getTravelTime().seconds());
-		assertEquals(link2, ((NetworkRoute) leg2.getRoute()).getEndLinkId());
+		assertEquals(link2, leg2.getRoute().getEndLinkId());
 
 		// Assertions for Person 1 (the driver who went the full distance)
 		var leg1 = (Leg) bp1.backpackPlan().experiencedPlan().getPlanElements().get(1);
 		assertEquals("car", leg1.getMode());
 		assertEquals(30.0, leg1.getTravelTime().seconds());
-		assertEquals(link3, ((NetworkRoute) leg1.getRoute()).getEndLinkId());
+		assertEquals(link3, leg1.getRoute().getEndLinkId());
 	}
 }

@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import java.util.HashMap;
 import java.util.Map;
 
-class NewScoreAssignerImpl implements NewScoreAssigner {
+public class NewScoreAssignerImpl implements NewScoreAssigner {
 
 	static private final Logger log = LogManager.getLogger(NewScoreAssignerImpl.class);
 

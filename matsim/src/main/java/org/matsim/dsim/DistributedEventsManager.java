@@ -93,7 +93,7 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
-	 * Adds one handler for a specific partition. The calling code hast to make sure that each partition has one handler.
+	 * Adds one handler for a specific partition. The calling code has to make sure that each partition has one handler.
 	 * This is, for now, not part of the {@link EventsManager} interface, as this is specific for this implementation.
 	 *
 	 * @param handler the event handler
