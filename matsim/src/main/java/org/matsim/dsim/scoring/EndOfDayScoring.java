@@ -63,9 +63,9 @@ public class EndOfDayScoring {
 			}
 			scoringFunction.handleTrip(trip);
 		}
-		// pass the last activity of the day to the scoring function, as we have excluded it above
-		if (!experiencedPlan.getPlanElements().isEmpty() && experiencedPlan.getPlanElements().getLast() instanceof Activity a) {
-			scoringFunction.handleActivity(a);
+		// pass the last activity of the last complete trip as we have excluded it before
+		if (!trips.isEmpty()) {
+			scoringFunction.handleActivity(trips.getLast().getDestinationActivity());
 		}
 
 		scoringFunction.finish();
