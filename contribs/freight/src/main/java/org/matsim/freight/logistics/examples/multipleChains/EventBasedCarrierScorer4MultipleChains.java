@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -50,7 +52,7 @@ import java.util.*;
  * <p>
  * I think the design of this class if fundamentally broken. Please reconcider if you want to use it. janek Jan' 26
  */
-class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
+class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory, IterationEndsListener {
 
 	// I think these are never used, as the code instantiating this class binds to an instance constructed with no constructor arguments...
 	@Inject
@@ -70,16 +72,17 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		// I don't understand why this factory saves the carrier id. My understanding is that it should create new scoring functions
 		// for each carrier it receives.
+		if (scoringFunctions.containsKey(carrier.getId())) {
+			var functions = scoringFunctions.get(carrier.getId());
+			var sf = new SumScoringFunction();
+			for (var f : functions) {
+				sf.addScoringFunction((SumScoringFunction.BasicScoring) f);
+			}
+			return sf;
+		}
+
 		this.carrierId = carrier.getId();
 		SumScoringFunction sf = new SumScoringFunction();
-
-		// assuming that an events handler is injected, we deregister old scoring functions from the event mechanism and
-		// then, futher below register the new ones per carrier id.
-		if (scoringFunctions.containsKey(carrier.getId())) {
-			for (var handler : scoringFunctions.get(carrier.getId())) {
-				eventsManager.removeHandler(handler);
-			}
-		}
 
 		var ebs = new EventBasedScoring();
 		var lbts = new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks);
@@ -103,6 +106,16 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 
 	void setTolledLinks(List<String> tolledLinks) {
 		this.tolledLinks = tolledLinks;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		for (var handlers : scoringFunctions.values()) {
+			for (var handler : handlers) {
+				eventsManager.removeHandler(handler);
+			}
+		}
+		scoringFunctions.clear();
 	}
 
 	/**

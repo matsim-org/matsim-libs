@@ -28,6 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.freight.carriers.Carrier;
@@ -43,7 +47,7 @@ import java.util.*;
  * @author mzilske, sschroeder
  *
  */
-public final class CarrierAgentTracker implements BasicEventHandler {
+public final class CarrierAgentTracker implements BasicEventHandler, IterationEndsListener, IterationStartsListener {
 	// not sure if this _should_ be public, but current LSP design makes this necessary.  kai, sep'20
 
 	// need to use this via injection, since LSP is using it from another package, and thus has to be public.  With injection, can at least
@@ -72,15 +76,10 @@ public final class CarrierAgentTracker implements BasicEventHandler {
 		this.reset(-1);
 	}
 
+
 	@Override
 	public void reset(int iteration) {
 		vehicle2DriverEventHandler.reset(iteration);
-		driverAgentMap.clear();
-		carrierAgents.clear();
-		for (Carrier carrier : this.carriers.getCarriers().values()) {
-			var sf = carrierScoringFunctionFactory.createScoringFunction(carrier);
-			carrierAgents.add(new CarrierAgent(carrier, carrierScoringFunctionFactory.createScoringFunction(carrier), events, carrierEventCreators));
-		}
 	}
 
 	/**
@@ -155,5 +154,19 @@ public final class CarrierAgentTracker implements BasicEventHandler {
 
 	public Carriers getCarriers() {
 		return carriers;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		driverAgentMap.clear();
+		carrierAgents.clear();
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		for (Carrier carrier : this.carriers.getCarriers().values()) {
+			var sf = carrierScoringFunctionFactory.createScoringFunction(carrier);
+			carrierAgents.add(new CarrierAgent(carrier, sf, events, carrierEventCreators));
+		}
 	}
 }

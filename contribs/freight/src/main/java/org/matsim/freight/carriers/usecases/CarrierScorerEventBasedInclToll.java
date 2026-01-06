@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -59,7 +61,7 @@ import java.util.Map;
  * @todo Can this be the new default scoring function for carriers?
  * Discuss with RE/KN and write tests around it.
  */
-public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory {
+public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory, IterationEndsListener {
 
 	private final Scenario scenario;
 	private final EventsManager em;
@@ -74,10 +76,11 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 
-		// it looks like functions are added at each iteration. remove the old ones from the event handling infrastructure before adding a new one
 		if (scoringFunctions.containsKey(carrier.getId())) {
-			var function = scoringFunctions.remove(carrier.getId());
-			em.removeHandler(function);
+			var function = scoringFunctions.get(carrier.getId());
+			var sf = new SumScoringFunction();
+			sf.addScoringFunction(function);
+			return sf;
 		}
 
 		SumScoringFunction sf = new SumScoringFunction();
@@ -86,6 +89,14 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 		sf.addScoringFunction(scorer);
 		em.addHandler(scorer);
 		return sf;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		for (var handler : scoringFunctions.values()) {
+			em.removeHandler(handler);
+		}
+		scoringFunctions.clear();
 	}
 
 
