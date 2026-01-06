@@ -47,7 +47,8 @@ public class CharyparNagelLegScoringTest {
 		route.setTravelTime(41);
 		route.setDistance(1009);
 		var scoringParams = createScoringParams("leg-mode");
-		var function = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, Set.of());
+		var legBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, Set.of());
+		var tripBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, Set.of());
 		var trips = TripStructureUtils.getTrips(person.getSelectedPlan());
 		assertEquals(1, trips.size());
 		var trip = trips.getFirst();
@@ -56,19 +57,24 @@ public class CharyparNagelLegScoringTest {
 		leg.setRoute(route);
 
 		var startAct = trip.getOriginActivity();
-		function.handleEvent(new ActivityEndEvent(
+		legBasedFunction.handleEvent(new ActivityEndEvent(
 			startAct.getEndTime().seconds(), person.getId(), startAct.getLinkId(), startAct.getFacilityId(),
 			startAct.getType(), startAct.getCoord()));
-		function.handleEvent(new PersonDepartureEvent(
+		legBasedFunction.handleEvent(new PersonDepartureEvent(
 			leg.getDepartureTime().seconds(), person.getId(), route.getStartLinkId(), leg.getMode(), leg.getRoutingMode()
 		));
-		function.handleLeg(leg);
-		function.finish();
+		legBasedFunction.handleLeg(leg);
+		legBasedFunction.finish();
+
+		tripBasedFunction.handleTrip(trip);
+		tripBasedFunction.finish();
 
 		var expectedScore = calcBaseScore(scoringParams, leg.getMode(), leg.getTravelTime().seconds(), route.getDistance())
 			+ calcDailyConstant(scoringParams, leg.getMode())
 			+ calcTripConstant(scoringParams, leg.getMode());
-		assertEquals(expectedScore, function.getScore());
+		assertEquals(expectedScore, legBasedFunction.getScore());
+
+		assertEquals(expectedScore, tripBasedFunction.getScore());
 	}
 
 	@Test
@@ -83,10 +89,12 @@ public class CharyparNagelLegScoringTest {
 		assertEquals(1, config.transit().getTransitModes().size());
 		var transitMode = config.transit().getTransitModes().iterator().next();
 		var scoringParams = createScoringParams(transitMode);
-		var function = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
+		var legBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
+		var tripBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
 		var person = getSinglePerson(scenario);
 
-		replayPlan(function, person);
+		replayPlanLegBased(legBasedFunction, person);
+		replayPlanTripBased(tripBasedFunction, person);
 
 		var expectedScore = TripStructureUtils.getLegs(person.getSelectedPlan()).stream()
 			.mapToDouble(l -> {
@@ -97,7 +105,8 @@ public class CharyparNagelLegScoringTest {
 			.sum() +
 			calcTripConstant(scoringParams, transitMode) +
 			calcDailyConstant(scoringParams, transitMode);
-		assertEquals(expectedScore, function.getScore(), 0.1);
+		assertEquals(expectedScore, legBasedFunction.getScore(), 0.1);
+		assertEquals(expectedScore, tripBasedFunction.getScore(), 0.1);
 	}
 
 	@Test
@@ -111,10 +120,12 @@ public class CharyparNagelLegScoringTest {
 		assertEquals(1, config.transit().getTransitModes().size());
 		var transitMode = config.transit().getTransitModes().iterator().next();
 		var scoringParams = createScoringParams(transitMode);
-		var function = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
+		var legBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
+		var tripBasedFunction = createScoringFunction(NetworkUtils.createNetwork(), scoringParams, config.transit().getTransitModes());
 		var person = getSinglePerson(scenario);
 
-		replayPlan(function, person);
+		replayPlanLegBased(legBasedFunction, person);
+		replayPlanTripBased(tripBasedFunction, person);
 
 		// the scoring puts one pt constant onto each trip
 		var expectedConstantPerTrip = TripStructureUtils.getTrips(person.getSelectedPlan()).stream()
@@ -139,10 +150,19 @@ public class CharyparNagelLegScoringTest {
 		var dailyScore = calcDailyConstant(scoringParams, transitMode);
 		System.out.println("dailyScore: " + dailyScore);
 		var expectedScore = dailyScore + expectedConstantPerTrip + expectedLegScore + expectedLineSwitch;
-		assertEquals(expectedScore, function.getScore(), 0.1);
+		assertEquals(expectedScore, legBasedFunction.getScore(), 0.1);
+		assertEquals(expectedScore, tripBasedFunction.getScore(), 0.1);
 	}
 
-	private static void replayPlan(CharyparNagelLegScoring function, Person person) {
+	private static void replayPlanTripBased(CharyparNagelLegScoring function, Person person) {
+		var trips = TripStructureUtils.getTrips(person.getSelectedPlan());
+		for (var trip : trips) {
+			function.handleTrip(trip);
+		}
+		function.finish();
+	}
+
+	private static void replayPlanLegBased(CharyparNagelLegScoring function, Person person) {
 		var lastArrivalTime = -1.;
 		for (var e : person.getSelectedPlan().getPlanElements()) {
 			if (e instanceof Activity a && (a.getEndTime().isDefined() || a.getMaximumDuration().isDefined())) {

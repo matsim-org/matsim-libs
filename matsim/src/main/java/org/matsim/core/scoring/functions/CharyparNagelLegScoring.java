@@ -37,10 +37,12 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -229,10 +231,91 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleTrip(TripStructureUtils.Trip trip) {
-		// we want to score each leg of the trip separately. As far as I can see, the code does the following things tailord to pt:
-		// 1. apply params.utilityOfLineSwitch if there is a line switch
-		// 2. score waiting time between departure and entering of transit vehicles. This is done by applying the difference between util waiting and util travelling
-		// 3. score asc if this is the first pt vehicle of the trip.
-		// then legs are scored the regular way using the calcLegScore method
+
+		var seenModesInTrip = new HashSet<String>();
+		var tripScore = 0.;
+		var ptLegsInTrip = new AtomicInteger();
+
+		for (var leg : trip.getLegsOnly()) {
+			var baseScore = calcBasicLegScore(leg);
+			var waitScore = calcWaitScore(leg);
+			// this adds the mode constant only once per trip. This is what the old code did for pt. For other modes this is a different behavior
+			// compared to the previous code. Yet we usually only have several walk legs per trip and the constant is usually 0. for this mode.
+			var tripConstant = calcTripConstant(leg, seenModesInTrip);
+			var dailyConstant = calcDailyConstant(leg, modesAlreadyConsideredForDailyConstants);
+			var lineSwitch = calcLineSwitch(leg, ptLegsInTrip);
+			var legScore = baseScore + waitScore + tripConstant + dailyConstant + lineSwitch;
+			legScores.add(legScore);
+			tripScore += legScore;
+		}
+		this.score += tripScore;
+	}
+
+	private double calcBasicLegScore(Leg leg) {
+		Gbl.assertIf(leg.getTravelTime().isDefined());
+		if (Double.isNaN(leg.getRoute().getDistance())) {
+			throw new RuntimeException("Distance is NaN which cannot be interpreted. A previous version of this code allowed NaN distances, but " +
+				" threw an exception at a later point. Therefore we abort here immediately");
+		}
+
+		var modeParams = params.modeParams.get(leg.getMode());
+		var utilTravelTime = leg.getTravelTime().seconds() * modeParams.marginalUtilityOfTraveling_s;
+		var utilDist = leg.getRoute().getDistance() * modeParams.marginalUtilityOfDistance_m;
+		var utilDistCosts = leg.getRoute().getDistance() * modeParams.monetaryDistanceCostRate * params.marginalUtilityOfMoney;
+
+		return utilTravelTime + utilDist + utilDistCosts;
+	}
+
+	private double calcWaitScore(Leg leg) {
+		if (leg.getRoute() instanceof TransitPassengerRoute tpr) {
+			var waitTime = tpr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
+			var waitUtil = params.marginalUtilityOfWaitingPt_s - params.modeParams.get(leg.getMode()).marginalUtilityOfTraveling_s;
+			return waitTime * waitUtil;
+		}
+		return 0.;
+	}
+
+	/**
+	 * Returns the constant for leg's mode if it is not contained in seen modes.
+	 */
+	private double calcTripConstant(Leg leg, Set<String> seenModes) {
+		if (seenModes.contains(leg.getMode())) {
+			return 0.;
+		}
+		seenModes.add(leg.getMode());
+		return params.modeParams.get(leg.getMode()).constant;
+	}
+
+	private double calcDailyConstant(Leg leg, Set<String> seenModes) {
+		if (seenModes.contains(leg.getMode())) {
+			return 0.;
+		}
+		seenModes.add(leg.getMode());
+		return params.modeParams.get(leg.getMode()).dailyUtilityConstant + params.modeParams.get(leg.getMode()).dailyMoneyConstant * params.marginalUtilityOfMoney;
+	}
+
+	/**
+	 *
+	 * @param ptLegsInTrip use AtomicInteger so that we can change the counter at the call site.
+	 */
+	private double calcLineSwitch(Leg leg, AtomicInteger ptLegsInTrip) {
+		if (ptModes.contains(leg.getMode())) {
+			if (ptLegsInTrip.incrementAndGet() > 1) {
+				return params.utilityOfLineSwitch;
+			}
+		}
+		return 0.;
+	}
+
+	private void warnDist() {
+		if (ccc < 10) {
+			ccc++;
+			log.warn("distance is NaN. Will make score of this plan NaN. Possible reason: Simulation does not report " +
+				"a distance for this trip. Possible reason for that: mode is teleported and router does not " +
+				"write distance into plan.  Needs to be fixed or these plans will die out.");
+			if (ccc == 10) {
+				log.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
 	}
 }
