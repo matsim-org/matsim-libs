@@ -21,15 +21,15 @@
 package org.matsim.freight.carriers.usecases;
 
 import com.google.inject.Inject;
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
@@ -41,27 +41,50 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * This is a scoring function for carriers that uses events to calculate the score.
  * This includes also tolls for vehicles driving on tolled links based on the person money event(s).
  * <p></p>
  * Currently, it includes: -
- *  - fixed costs (using CarrierTourEndEvent)
- *  - time-dependent costs (using FreightTourStart- and -EndEvent)
- *  - distance-dependent costs (using LinkEnterEvent)
- * 	- tolls (using PersonMoneyEvent)
+ * - fixed costs (using CarrierTourEndEvent)
+ * - time-dependent costs (using FreightTourStart- and -EndEvent)
+ * - distance-dependent costs (using LinkEnterEvent)
+ * - tolls (using PersonMoneyEvent)
  *
- * 	@todo 	Can this be the new default scoring function for carriers?
- * 	Discuss with RE/KN and write tests around it.
- *  @author Kai Martins-Turner (kturner)
+ * @author Kai Martins-Turner (kturner)
+ * @todo Can this be the new default scoring function for carriers?
+ * Discuss with RE/KN and write tests around it.
  */
 public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory {
 
-	@Inject private Scenario scenario;
+	private final Scenario scenario;
+	private final EventsManager em;
+
+	private final Map<Id<Carrier>, EventBasedScoring> scoringFunctions = new HashMap<>();
+
+	@Inject
+	public CarrierScorerEventBasedInclToll(Scenario scenario, EventsManager em) {
+		this.scenario = scenario;
+		this.em = em;
+	}
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
+
+		// it looks like functions are added at each iteration. remove the old ones from the event handling infrastructure before adding a new one
+		if (scoringFunctions.containsKey(carrier.getId())) {
+			var function = scoringFunctions.remove(carrier.getId());
+			em.removeHandler(function);
+		}
+
 		SumScoringFunction sf = new SumScoringFunction();
-		sf.addScoringFunction(new EventBasedScoring(scenario, carrier.getId()) );
+		var scorer = new EventBasedScoring(scenario, carrier.getId());
+		scoringFunctions.put(carrier.getId(), scorer);
+		sf.addScoringFunction(scorer);
+		em.addHandler(scorer);
 		return sf;
 	}
 
@@ -72,7 +95,7 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 	 * distance-dependent costs (using LinkEnterEvent)
 	 * tolls (using PersonMoneyEvent)
 	 */
-	private static class EventBasedScoring implements ArbitraryEventScoring {
+	private static class EventBasedScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
@@ -82,7 +105,7 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 		private double score;
 		private final Scenario scenario;
 
-		public EventBasedScoring(Scenario scenario, Id<Carrier> carrierId ) {
+		public EventBasedScoring(Scenario scenario, Id<Carrier> carrierId) {
 			super();
 			this.scenario = scenario;
 			this.carrierId = carrierId;
@@ -90,7 +113,8 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 		}
 
 		@Override
-		public void finish() {}
+		public void finish() {
+		}
 
 		@Override
 		public double getScore() {
@@ -108,7 +132,8 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 				case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
 				case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> d2v.handleEvent(vehicleEntersTrafficEvent);
 				case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> d2v.handleEvent(vehicleLeavesTrafficEvent);
-				default -> {}
+				default -> {
+				}
 			}
 		}
 

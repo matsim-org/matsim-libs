@@ -22,13 +22,15 @@
 package org.matsim.freight.logistics.examples.multipleChains;
 
 import com.google.inject.Inject;
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
@@ -41,161 +43,196 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.*;
+
 /**
  * @author Kai Martins-Turner (kturner)
+ * <p>
+ * I think the design of this class if fundamentally broken. Please reconcider if you want to use it. janek Jan' 26
  */
 class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory {
 
-  @Inject private Network network;
-  @Inject private Scenario scenario;
+	// I think these are never used, as the code instantiating this class binds to an instance constructed with no constructor arguments...
+	@Inject
+	private Network network;
+	@Inject
+	private Scenario scenario;
+	@Inject
+	private EventsManager eventsManager;
 
-  private Id<Carrier> carrierId;
+	private Id<Carrier> carrierId;
 
-  private double toll;
-  private List<String> tolledVehicleTypes = new ArrayList<>();
-  private List<String> tolledLinks = new ArrayList<>();
+	private double toll;
+	private List<String> tolledVehicleTypes = new ArrayList<>();
+	private List<String> tolledLinks = new ArrayList<>();
+	private final Map<Id<Carrier>, Collection<BasicEventHandler>> scoringFunctions = new HashMap<>();
 
-  public ScoringFunction createScoringFunction(Carrier carrier) {
-    this.carrierId = carrier.getId();
-    SumScoringFunction sf = new SumScoringFunction();
-    sf.addScoringFunction(new EventBasedScoring());
-    sf.addScoringFunction(new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks));
-    return sf;
-  }
+	public ScoringFunction createScoringFunction(Carrier carrier) {
+		// I don't understand why this factory saves the carrier id. My understanding is that it should create new scoring functions
+		// for each carrier it receives.
+		this.carrierId = carrier.getId();
+		SumScoringFunction sf = new SumScoringFunction();
 
-  void setToll(double toll) {
-    this.toll = toll;
-  }
+		// assuming that an events handler is injected, we deregister old scoring functions from the event mechanism and
+		// then, futher below register the new ones per carrier id.
+		if (scoringFunctions.containsKey(carrier.getId())) {
+			for (var handler : scoringFunctions.get(carrier.getId())) {
+				eventsManager.removeHandler(handler);
+			}
+		}
 
-  void setTolledVehicleTypes(List<String> tolledVehicleTypes) {
-    this.tolledVehicleTypes = tolledVehicleTypes;
-  }
+		var ebs = new EventBasedScoring();
+		var lbts = new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks);
+		var listeners = scoringFunctions.computeIfAbsent(carrier.getId(), k -> new ArrayList<>());
+		listeners.add(ebs);
+		listeners.add(lbts);
+		sf.addScoringFunction(ebs);
+		sf.addScoringFunction(lbts);
+		eventsManager.addHandler(ebs);
+		eventsManager.addHandler(lbts);
+		return sf;
+	}
 
-  void setTolledLinks(List<String> tolledLinks) {
-    this.tolledLinks = tolledLinks;
-  }
+	void setToll(double toll) {
+		this.toll = toll;
+	}
 
-  /**
-   * Calculate the carrier's score based on Events. Currently, it includes: - fixed costs (using
-   * CarrierTourEndEvent) - time-dependent costs (using FreightTourStart- and -EndEvent) -
-   * distance-dependent costs (using LinkEnterEvent)
-   */
-  private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
+	void setTolledVehicleTypes(List<String> tolledVehicleTypes) {
+		this.tolledVehicleTypes = tolledVehicleTypes;
+	}
 
-    final Logger log = LogManager.getLogger(EventBasedScoring.class);
-    private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
-    private double score;
+	void setTolledLinks(List<String> tolledLinks) {
+		this.tolledLinks = tolledLinks;
+	}
 
-    public EventBasedScoring() {
-      super();
-    }
+	/**
+	 * Calculate the carrier's score based on Events. Currently, it includes: - fixed costs (using
+	 * CarrierTourEndEvent) - time-dependent costs (using FreightTourStart- and -EndEvent) -
+	 * distance-dependent costs (using LinkEnterEvent)
+	 * <p>
+	 * With the current design, there is one factory for one scoring function, as the inner class is non static.
+	 * This is probably not what one wants to do.
+	 */
+	private class EventBasedScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
-    @Override
-    public void finish() {}
+		final Logger log = LogManager.getLogger(EventBasedScoring.class);
+		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
+		private double score;
 
-    @Override
-    public double getScore() {
-      return score;
-    }
+		public EventBasedScoring() {
+			super();
+		}
 
-    @Override
-    public void handleEvent(Event event) {
-      log.debug(event.toString());
-      switch (event) {
-        case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
-        case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
-        case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-        default -> {}
-      }
-    }
+		@Override
+		public void finish() {
+		}
 
-    private void handleEvent(CarrierTourStartEvent event) {
-      // Save time of freight tour start
-      tourStartTime.put(event.getTourId(), event.getTime());
-    }
+		@Override
+		public double getScore() {
+			return score;
+		}
 
-    // scores fix costs for vehicle usage and variable costs per time
-    private void handleEvent(CarrierTourEndEvent event) {
-      // Fix costs for vehicle usage
-      final VehicleType vehicleType =
-              (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
+		@Override
+		public void handleEvent(Event event) {
+			log.debug(event.toString());
+			switch (event) {
+				case CarrierTourStartEvent carrierTourStartEvent -> handleEvent(carrierTourStartEvent);
+				case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
+				case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+				default -> {
+				}
+			}
+		}
 
-      double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
+		private void handleEvent(CarrierTourStartEvent event) {
+			// Save time of freight tour start
+			tourStartTime.put(event.getTourId(), event.getTime());
+		}
 
-      log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
-      score = score - vehicleType.getCostInformation().getFixedCosts();
+		// scores fix costs for vehicle usage and variable costs per time
+		private void handleEvent(CarrierTourEndEvent event) {
+			// Fix costs for vehicle usage
+			final VehicleType vehicleType =
+				(VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
-      // variable costs per time
-      score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
-    }
+			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
-    // scores variable costs per distance
-    private void handleEvent(LinkEnterEvent event) {
-      final double distance = network.getLinks().get(event.getLinkId()).getLength();
-      final double costPerMeter =
-              (VehicleUtils.findVehicle(event.getVehicleId(), scenario))
-                      .getType()
-                      .getCostInformation()
-                      .getCostsPerMeter();
-      // variable costs per distance
-      score = score - (distance * costPerMeter);
-    }
-  }
+			log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
+			score = score - vehicleType.getCostInformation().getFixedCosts();
 
-  /**
-   * Calculate some toll for driving on a link This a lazy implementation of a cordon toll. A
-   * vehicle is only tolled once.
-   */
-  class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
+			// variable costs per time
+			score = score - (tourDuration * vehicleType.getCostInformation().getCostsPerSecond());
+		}
 
-    final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
+		// scores variable costs per distance
+		private void handleEvent(LinkEnterEvent event) {
+			final double distance = network.getLinks().get(event.getLinkId()).getLength();
+			final double costPerMeter =
+				(VehicleUtils.findVehicle(event.getVehicleId(), scenario))
+					.getType()
+					.getCostInformation()
+					.getCostsPerMeter();
+			// variable costs per distance
+			score = score - (distance * costPerMeter);
+		}
+	}
 
-    private final double toll;
-    private final List<String> vehicleTypesToBeTolled;
-      private double score;
-    private final List<String> tolledLinkList;
-    private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
+	/**
+	 * Calculate some toll for driving on a link This a lazy implementation of a cordon toll. A
+	 * vehicle is only tolled once.
+	 */
+	class LinkBasedTollScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
-    public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {
-      super();
-      this.vehicleTypesToBeTolled = vehicleTypeToBeTolled;
-      this.tolledLinkList = tolledLinkListBerlin;
-      this.toll = toll;
-    }
+		final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
 
-    @Override
-    public void finish() {}
+		private final double toll;
+		private final List<String> vehicleTypesToBeTolled;
+		private double score;
+		private final List<String> tolledLinkList;
+		private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
 
-    @Override
-    public double getScore() {
-      return score;
-    }
+		public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {
+			super();
+			this.vehicleTypesToBeTolled = vehicleTypeToBeTolled;
+			this.tolledLinkList = tolledLinkListBerlin;
+			this.toll = toll;
+		}
 
-    @Override
-    public void handleEvent(Event event) {
+		@Override
+		public void finish() {
+		}
 
-      switch (event) {
-        case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
-        case CarrierTourStartEvent carrierTourStartEvent -> v2c.handleEvent(carrierTourStartEvent);
-        case CarrierTourEndEvent carrierTourEndEvent -> v2c.handleEvent(carrierTourEndEvent);
-        default -> {}
-      }
+		@Override
+		public double getScore() {
+			return score;
+		}
 
-    }
+		@Override
+		public void handleEvent(Event event) {
 
-    private void handleEvent(LinkEnterEvent event) {
-      final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
+			switch (event) {
+				case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+				case CarrierTourStartEvent carrierTourStartEvent -> v2c.handleEvent(carrierTourStartEvent);
+				case CarrierTourEndEvent carrierTourEndEvent -> v2c.handleEvent(carrierTourEndEvent);
+				default -> {
+				}
+			}
 
-      Id<Vehicle> vehicleId = event.getVehicleId();
-      if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
-        if (tolledLinkList.contains(event.getLinkId().toString())) {
-          Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
-          if (carrierId.equals(carrierIdOfVehicle)) {
-            log.info("Tolling caused by event: {}, tollvalue {}", event, toll);
-            score = score - toll;
-          }
-        }
-      }
-    }
-  }
+		}
+
+		private void handleEvent(LinkEnterEvent event) {
+			final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
+
+			Id<Vehicle> vehicleId = event.getVehicleId();
+			if (vehicleTypesToBeTolled.contains(vehicleTypeId.toString())) {
+				if (tolledLinkList.contains(event.getLinkId().toString())) {
+					Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
+					if (carrierId.equals(carrierIdOfVehicle)) {
+						log.info("Tolling caused by event: {}, tollvalue {}", event, toll);
+						score = score - toll;
+					}
+				}
+			}
+		}
+	}
 }

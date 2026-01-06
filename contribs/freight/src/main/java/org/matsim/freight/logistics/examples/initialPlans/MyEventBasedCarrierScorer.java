@@ -22,7 +22,6 @@
 package org.matsim.freight.logistics.examples.initialPlans;
 
 import com.google.inject.Inject;
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,6 +29,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.freight.carriers.Carrier;
@@ -42,6 +43,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.*;
+
 /**
  * A carrier scoring function based on events.
  * Please note: The fixed costs are reduced, of service based carriers are driving severeal tours. (Workaround for service-based carriers)
@@ -52,16 +55,42 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
-	@Inject private Network network;
+	@Inject
+	private Network network;
 
-	@Inject private Scenario scenario;
+	@Inject
+	private Scenario scenario;
+
+	@Inject
+	private EventsManager eventsManager;
 
 	private double toll;
+
+	private final Map<Id<Carrier>, Collection<BasicEventHandler>> scoringFunctions = new HashMap<>();
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		SumScoringFunction sf = new SumScoringFunction();
 		sf.addScoringFunction(new EventBasedScoring());
 		sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("large50")));
+
+		// assuming that an events handler is injected, we deregister old scoring functions from the event mechanism and
+		// then, futher below register the new ones per carrier id.
+		if (scoringFunctions.containsKey(carrier.getId())) {
+			for (var handler : scoringFunctions.get(carrier.getId())) {
+				eventsManager.removeHandler(handler);
+			}
+		}
+
+		var ebs = new EventBasedScoring();
+		var lbts = new LinkBasedTollScoring(toll, List.of("large50"));
+		var listeners = scoringFunctions.computeIfAbsent(carrier.getId(), k -> new ArrayList<>());
+		listeners.add(ebs);
+		listeners.add(lbts);
+		sf.addScoringFunction(ebs);
+		sf.addScoringFunction(lbts);
+		eventsManager.addHandler(ebs);
+		eventsManager.addHandler(lbts);
+
 		return sf;
 	}
 
@@ -74,7 +103,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	 * CarrierTourEndEvent) - time-dependent costs (using FreightTourStart- and -EndEvent) -
 	 * distance-dependent costs (using LinkEnterEvent)
 	 */
-	private class EventBasedScoring implements SumScoringFunction.ArbitraryEventScoring {
+	private class EventBasedScoring implements BasicEventHandler, SumScoringFunction.BasicScoring {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Map<VehicleType, Double> vehicleType2TourDuration = new LinkedHashMap<>();
@@ -87,7 +116,8 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		}
 
 		@Override
-		public void finish() {}
+		public void finish() {
+		}
 
 		@Override
 		public double getScore() {
@@ -163,7 +193,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	 * Calculate some toll for driving on a link This a lazy implementation of a cordon toll. A
 	 * vehicle is only tolled once.
 	 */
-	class LinkBasedTollScoring implements SumScoringFunction.ArbitraryEventScoring {
+	class LinkBasedTollScoring implements BasicEventHandler, SumScoringFunction.BasicScoring {
 
 		final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
 
@@ -179,7 +209,8 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		}
 
 		@Override
-		public void finish() {}
+		public void finish() {
+		}
 
 		@Override
 		public double getScore() {
