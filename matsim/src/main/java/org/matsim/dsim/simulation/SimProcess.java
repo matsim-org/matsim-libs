@@ -253,7 +253,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		log.info("Registering agent {} on partition {}.", agent.getId(), partition.getIndex());
 		scoringDataCollector.registerAgent(agent);
 		arrangeNextAgentState(agent);
 	}

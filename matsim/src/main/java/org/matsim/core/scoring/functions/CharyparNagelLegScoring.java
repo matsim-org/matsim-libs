@@ -22,6 +22,7 @@ package org.matsim.core.scoring.functions;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripStructureUtils;
@@ -129,7 +130,7 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 				" threw an exception at a later point. Therefore we abort here immediately");
 		}
 
-		var modeParams = params.modeParams.get(leg.getMode());
+		var modeParams = getModeParams(leg);
 		var utilTravelTime = leg.getTravelTime().seconds() * modeParams.marginalUtilityOfTraveling_s;
 		var utilDist = leg.getRoute().getDistance() * modeParams.marginalUtilityOfDistance_m;
 		// use the extra marginal utility of money parameter, to allow for person individual utilities of money.
@@ -141,7 +142,7 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 	private double calcWaitScore(Leg leg) {
 		if (leg.getRoute() instanceof TransitPassengerRoute tpr) {
 			var waitTime = tpr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
-			var waitUtil = params.marginalUtilityOfWaitingPt_s - params.modeParams.get(leg.getMode()).marginalUtilityOfTraveling_s;
+			var waitUtil = params.marginalUtilityOfWaitingPt_s - getModeParams(leg).marginalUtilityOfTraveling_s;
 			return waitTime * waitUtil;
 		}
 		return 0.;
@@ -155,7 +156,7 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 			return 0.;
 		}
 		seenModes.add(leg.getMode());
-		return params.modeParams.get(leg.getMode()).constant;
+		return getModeParams(leg).constant;
 	}
 
 	private double calcDailyConstant(Leg leg, Set<String> seenModes) {
@@ -163,7 +164,8 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 			return 0.;
 		}
 		seenModes.add(leg.getMode());
-		return params.modeParams.get(leg.getMode()).dailyUtilityConstant + params.modeParams.get(leg.getMode()).dailyMoneyConstant * params.marginalUtilityOfMoney;
+		var modeParams = getModeParams(leg);
+		return modeParams.dailyUtilityConstant + modeParams.dailyMoneyConstant * params.marginalUtilityOfMoney;
 	}
 
 	/**
@@ -177,5 +179,17 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 			}
 		}
 		return 0.;
+	}
+
+	private ModeUtilityParameters getModeParams(Leg leg) {
+		return params.modeParams.computeIfAbsent(leg.getMode(), this::getFallbackModeParams);
+	}
+
+	private ModeUtilityParameters getFallbackModeParams(String mode) {
+		if (mode.equals(TransportMode.transit_walk) || mode.equals(TransportMode.non_network_walk)) {
+			return params.modeParams.get(TransportMode.walk);
+		}
+
+		throw new IllegalStateException("No scoring parameters definded for mode; " + mode);
 	}
 }

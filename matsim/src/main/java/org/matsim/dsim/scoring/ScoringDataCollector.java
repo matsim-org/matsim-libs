@@ -2,8 +2,6 @@ package org.matsim.dsim.scoring;
 
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
@@ -48,8 +46,6 @@ import java.util.Set;
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class ScoringDataCollector implements BasicEventHandler {
-
-	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 
 	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
@@ -115,7 +111,6 @@ public class ScoringDataCollector implements BasicEventHandler {
 			}
 		}
 		for (var backpack : msg.backPacks()) {
-			log.info("Processing backpack for person {} at {}", backpack.personId(), msg.simstep());
 			this.backpackByPerson.put(backpack.personId(), backpack);
 			if (backpack.isInVehicle()) {
 				this.backpackByVehicle
@@ -166,13 +161,11 @@ public class ScoringDataCollector implements BasicEventHandler {
 				backpackByVehicle.remove(backPack.currentVehicle());
 			}
 		}
-		log.info("Person {} leaving partition sending backpack to {}", id, toPart);
 		simStepMessaging.collectBackPack(backPack, toPart);
 	}
 
 	@Override
 	public void handleEvent(Event e) {
-		log.info("Received event {}", e);
 
 		// short circuit on transit drivers and pass on special scoring events
 		if (e instanceof HasPersonId hpi) {
