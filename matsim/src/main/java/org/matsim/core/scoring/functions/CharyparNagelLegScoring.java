@@ -109,34 +109,40 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 		var ptLegsInTrip = new AtomicInteger();
 
 		for (var leg : trip.getLegsOnly()) {
-			var baseScore = calcBasicLegScore(leg);
+			var timeScore = calcTravelTimeScore(leg);
+			var distScore = calcTravelDistScore(leg);
 			var waitScore = calcWaitScore(leg);
 			// this adds the mode constant only once per trip. This is what the old code did for pt. For other modes this is a different behavior
 			// compared to the previous code. Yet we usually only have several walk legs per trip and the constant is usually 0. for this mode.
 			var tripConstant = calcTripConstant(leg, seenModesInTrip);
 			var dailyConstant = calcDailyConstant(leg, modesAlreadyConsideredForDailyConstants);
 			var lineSwitch = calcLineSwitch(leg, ptLegsInTrip);
-			var legScore = baseScore + waitScore + tripConstant + dailyConstant + lineSwitch;
+			var legScore = timeScore + distScore + waitScore + tripConstant + dailyConstant + lineSwitch;
 			legScores.add(legScore);
 			tripScore += legScore;
 		}
 		this.score += tripScore;
 	}
 
-	private double calcBasicLegScore(Leg leg) {
+	private double calcTravelTimeScore(Leg leg) {
 		Gbl.assertIf(leg.getTravelTime().isDefined());
-		if (Double.isNaN(leg.getRoute().getDistance())) {
-			throw new RuntimeException("Distance is NaN which cannot be interpreted. A previous version of this code allowed NaN distances, but " +
-				" threw an exception at a later point. Therefore we abort here immediately");
-		}
-
 		var modeParams = getModeParams(leg);
-		var utilTravelTime = leg.getTravelTime().seconds() * modeParams.marginalUtilityOfTraveling_s;
-		var utilDist = leg.getRoute().getDistance() * modeParams.marginalUtilityOfDistance_m;
-		// use the extra marginal utility of money parameter, to allow for person individual utilities of money.
-		var utilDistCosts = leg.getRoute().getDistance() * modeParams.monetaryDistanceCostRate * this.marginalUtilityOfMoney;
+		return leg.getTravelTime().seconds() * modeParams.marginalUtilityOfTraveling_s;
+	}
 
-		return utilTravelTime + utilDist + utilDistCosts;
+	private double calcTravelDistScore(Leg leg) {
+		var modeParams = getModeParams(leg);
+		if (modeParams.marginalUtilityOfDistance_m != 0 || modeParams.monetaryDistanceCostRate != 0) {
+			if (Double.isNaN(leg.getRoute().getDistance())) {
+				throw new RuntimeException("Distance is NaN which cannot be interpreted. A previous version of this code allowed NaN distances, but " +
+					" threw an exception at a later point. Therefore we abort here immediately");
+			}
+			var utilDist = leg.getRoute().getDistance() * modeParams.marginalUtilityOfDistance_m;
+			// use the extra marginal utility of money parameter, to allow for person individual utilities of money.
+			var utilDistCosts = leg.getRoute().getDistance() * modeParams.monetaryDistanceCostRate * this.marginalUtilityOfMoney;
+			return utilDist + utilDistCosts;
+		}
+		return 0.;
 	}
 
 	private double calcWaitScore(Leg leg) {

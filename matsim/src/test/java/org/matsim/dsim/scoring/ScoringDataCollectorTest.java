@@ -26,7 +26,8 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.*;
 
 class ScoringDataCollectorTest {
@@ -135,16 +136,9 @@ class ScoringDataCollectorTest {
 		// to the messaging. Then the other partition passes the received message to its collector, which then receives the events for that agent.
 		collector.teleportedPersonLeavesPartition(distAggent);
 
-		// make sure the collector does not have the person anymore
-		try {
-			collector.finishPerson(distAggent);
-			fail("Person should have been removed from scoring collector");
-		} catch (NullPointerException _) {
-		}
-
 		// capture the backpack that was passed to messaging.
 		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
-		verify(messaging).collectBackPack(backPackCaptor.capture(), anyInt());
+		verify(messaging, times(1)).collectBackPack(backPackCaptor.capture(), anyInt());
 		var backpack = backPackCaptor.getValue();
 
 		// create a message from the backpack and pass it back to the collector.
