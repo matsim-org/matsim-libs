@@ -184,11 +184,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		if (event instanceof PersonEntersVehicleEvent && currentLegIsPtLeg) {
 			if (!this.nextEnterVehicleIsFirstOfTrip) {
 				// all vehicle entering after the first triggers the disutility of line switch:
+				log.info("line switch: " + params.utilityOfLineSwitch);
 				this.score += params.utilityOfLineSwitch;
 			}
 			this.nextEnterVehicleIsFirstOfTrip = false;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
-			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s);
+			var waitScore = (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s);
+			log.info("waitScore=" + waitScore);
+			this.score += waitScore;
 		}
 
 		if (event instanceof PersonDepartureEvent) {
@@ -219,6 +222,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 				+ "; ttime=" + leg.getTravelTime().seconds() + "; leg=" + leg);
 			throw new RuntimeException("score is NaN");
 		}
+		log.info("legScore=" + legScore);
 		this.score += legScore;
 		this.legScores.add(legScore);
 	}
