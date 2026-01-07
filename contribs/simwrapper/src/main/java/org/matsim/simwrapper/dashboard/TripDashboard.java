@@ -309,9 +309,15 @@ public class TripDashboard implements Dashboard {
 		});
 
 		layout.row("second" + rowSuffix, tabTitle).el(Table.class, (viz, data) -> {
-			viz.title = "Mode Statistics * " + "personTraffic" + " *";
+			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")){
+				viz.title = "Mode Statistics";
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "total", args);
+			}
+			else {
+				viz.title = "Mode Statistics * " + "personTraffic" + " *";
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "personTraffic", args);
+			}
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
-			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "personTraffic", args);
 			viz.showAllRows = true;
 		});
 		layout.row("second" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
