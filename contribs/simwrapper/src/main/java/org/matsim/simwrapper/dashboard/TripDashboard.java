@@ -171,19 +171,10 @@ public class TripDashboard implements Dashboard {
 		if (groupsOfPersonSubpopulations.isEmpty() || groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")) {
 			return "General information about modal share and trip distributions.";
 		}
-
-		boolean allGroupsHaveSizeOne = groupsOfPersonSubpopulations.values().stream().allMatch(v -> v.size() == 1);
-
-		if (allGroupsHaveSizeOne) {
-			String groups = String.join(", ", groupsOfPersonSubpopulations.keySet());
-
-			return "General information about modal share and trip distributions of the selected subpopulations of the person agents: **" + groups + "**.";
-		}
-
 		String groupsWithSubpops = groupsOfPersonSubpopulations.entrySet().stream().map(
 			e -> e.getKey() + " (" + String.join(", ", e.getValue()) + ")").collect(Collectors.joining("; "));
 
-		return "General information about modal share and trip distributions of the selected groups and related subpopulations of the person agents: **" + groupsWithSubpops + "**.";
+		return "General information about modal share and trip distributions of the selected groups and related subpopulations (shown in parentheses) of the person agents: **" + groupsWithSubpops + "**.";
 	}
 
 	@Override

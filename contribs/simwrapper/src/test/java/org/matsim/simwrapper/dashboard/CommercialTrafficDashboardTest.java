@@ -125,10 +125,10 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 		sw.addDashboard(
-			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("person=person").setGroupsOfSubpopulationsForCommercialAnalysis(
-				"commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroup=person").setGroupsOfSubpopulationsForCommercialAnalysis(
+				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
-			"commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 
