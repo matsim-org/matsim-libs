@@ -151,10 +151,17 @@ public final class CarrierAgentTracker implements BasicEventHandler, IterationEn
 		return carrierAgents;
 	}
 
-
-	public Carriers getCarriers() {
-		return carriers;
+	public void clearCarriers() {
+		carrierAgents.clear();
+		carriers.getCarriers().clear();
 	}
+
+	public void addCarrier(Carrier carrier) {
+		var sf = carrierScoringFunctionFactory.createScoringFunction(carrier);
+		carrierAgents.add(new CarrierAgent(carrier, sf, events, carrierEventCreators));
+		carriers.addCarrier(carrier);
+	}
+
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {

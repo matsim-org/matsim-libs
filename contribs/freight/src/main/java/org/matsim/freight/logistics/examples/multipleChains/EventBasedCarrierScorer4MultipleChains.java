@@ -62,8 +62,6 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 	@Inject
 	private EventsManager eventsManager;
 
-	private Id<Carrier> carrierId;
-
 	private double toll;
 	private List<String> tolledVehicleTypes = new ArrayList<>();
 	private List<String> tolledLinks = new ArrayList<>();
@@ -81,11 +79,10 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 			return sf;
 		}
 
-		this.carrierId = carrier.getId();
 		SumScoringFunction sf = new SumScoringFunction();
 
-		var ebs = new EventBasedScoring();
-		var lbts = new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks);
+		var ebs = new EventBasedScoring(carrier.getId(), network, scenario);
+		var lbts = new LinkBasedTollScoring(toll, tolledVehicleTypes, tolledLinks, carrier.getId(), scenario);
 		var listeners = scoringFunctions.computeIfAbsent(carrier.getId(), k -> new ArrayList<>());
 		listeners.add(ebs);
 		listeners.add(lbts);
@@ -126,14 +123,21 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 	 * With the current design, there is one factory for one scoring function, as the inner class is non static.
 	 * This is probably not what one wants to do.
 	 */
-	private class EventBasedScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
+	private static class EventBasedScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
+		private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
+		private final Id<Carrier> carrierId;
+		private final Network network;
+		private final Scenario scenario;
+
 		private double score;
 
-		public EventBasedScoring() {
-			super();
+		public EventBasedScoring(Id<Carrier> carrierId, Network network, Scenario scenario) {
+			this.carrierId = carrierId;
+			this.network = network;
+			this.scenario = scenario;
 		}
 
 		@Override
@@ -158,19 +162,25 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 		}
 
 		private void handleEvent(CarrierTourStartEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+
+			v2c.handleEvent(event);
 			// Save time of freight tour start
 			tourStartTime.put(event.getTourId(), event.getTime());
 		}
 
 		// scores fix costs for vehicle usage and variable costs per time
 		private void handleEvent(CarrierTourEndEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+
+			v2c.handleEvent(event);
 			// Fix costs for vehicle usage
 			final VehicleType vehicleType =
 				(VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
 			double tourDuration = event.getTime() - tourStartTime.get(event.getTourId());
 
-			log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
+			//log.info("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
 			score = score - vehicleType.getCostInformation().getFixedCosts();
 
 			// variable costs per time
@@ -179,6 +189,8 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 
 		// scores variable costs per distance
 		private void handleEvent(LinkEnterEvent event) {
+			if (!carrierId.equals(v2c.getCarrierOfVehicle(event.getVehicleId()))) return;
+
 			final double distance = network.getLinks().get(event.getLinkId()).getLength();
 			final double costPerMeter =
 				(VehicleUtils.findVehicle(event.getVehicleId(), scenario))
@@ -194,7 +206,7 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 	 * Calculate some toll for driving on a link This a lazy implementation of a cordon toll. A
 	 * vehicle is only tolled once.
 	 */
-	class LinkBasedTollScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
+	static class LinkBasedTollScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
 		final Logger log = LogManager.getLogger(LinkBasedTollScoring.class);
 
@@ -203,12 +215,15 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 		private double score;
 		private final List<String> tolledLinkList;
 		private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
+		private final Id<Carrier> carrierId;
+		private final Scenario scenario;
 
-		public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin) {
-			super();
+		public LinkBasedTollScoring(double toll, List<String> vehicleTypeToBeTolled, List<String> tolledLinkListBerlin, Id<Carrier> carrierId, Scenario scenario) {
 			this.vehicleTypesToBeTolled = vehicleTypeToBeTolled;
 			this.tolledLinkList = tolledLinkListBerlin;
 			this.toll = toll;
+			this.carrierId = carrierId;
+			this.scenario = scenario;
 		}
 
 		@Override
@@ -234,6 +249,8 @@ class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFa
 		}
 
 		private void handleEvent(LinkEnterEvent event) {
+			if (!carrierId.equals(v2c.getCarrierOfVehicle(event.getVehicleId()))) return;
+
 			final Id<VehicleType> vehicleTypeId = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getId();
 
 			Id<Vehicle> vehicleId = event.getVehicleId();

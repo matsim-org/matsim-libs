@@ -362,7 +362,10 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 			new AbstractModule() {
 				@Override
 				public void install() {
-					bind(CarrierScoringFunctionFactory.class).to(CarrierScorerEventBasedInclToll.class).in(Singleton.class);
+					// bind one instance of the factory and then bind that instance to the interface and the controller listener binding
+					bind(CarrierScorerEventBasedInclToll.class).in(Singleton.class);
+					bind(CarrierScoringFunctionFactory.class).to(CarrierScorerEventBasedInclToll.class);
+					addControllerListenerBinding().to(CarrierScorerEventBasedInclToll.class);
 					bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 					bind(CarrierStrategyManager.class)
 						.toProvider(

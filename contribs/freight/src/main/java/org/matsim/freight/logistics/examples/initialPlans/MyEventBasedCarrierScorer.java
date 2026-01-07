@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -38,6 +40,7 @@ import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
 import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
+import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
 import org.matsim.freight.logistics.examples.ExampleConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -53,7 +56,7 @@ import java.util.*;
  *
  * @author Kai Martins-Turner (kturner)
  */
-class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
+class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory, IterationEndsListener {
 
 	@Inject
 	private Network network;
@@ -69,20 +72,22 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 	private final Map<Id<Carrier>, Collection<BasicEventHandler>> scoringFunctions = new HashMap<>();
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
-		SumScoringFunction sf = new SumScoringFunction();
-		sf.addScoringFunction(new EventBasedScoring());
-		sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("large50")));
 
-		// assuming that an events handler is injected, we deregister old scoring functions from the event mechanism and
-		// then, futher below register the new ones per carrier id.
 		if (scoringFunctions.containsKey(carrier.getId())) {
-			for (var handler : scoringFunctions.get(carrier.getId())) {
-				eventsManager.removeHandler(handler);
+			var functions = scoringFunctions.get(carrier.getId());
+			var sf = new SumScoringFunction();
+			for (var function : functions) {
+				sf.addScoringFunction((SumScoringFunction.BasicScoring) function);
 			}
+			return sf;
 		}
 
-		var ebs = new EventBasedScoring();
-		var lbts = new LinkBasedTollScoring(toll, List.of("large50"));
+		SumScoringFunction sf = new SumScoringFunction();
+		sf.addScoringFunction(new EventBasedScoring(carrier.getId()));
+		sf.addScoringFunction(new LinkBasedTollScoring(toll, List.of("large50"), carrier.getId()));
+
+		var ebs = new EventBasedScoring(carrier.getId());
+		var lbts = new LinkBasedTollScoring(toll, List.of("large50"), carrier.getId());
 		var listeners = scoringFunctions.computeIfAbsent(carrier.getId(), k -> new ArrayList<>());
 		listeners.add(ebs);
 		listeners.add(lbts);
@@ -92,6 +97,16 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		eventsManager.addHandler(lbts);
 
 		return sf;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		for (var handlers : scoringFunctions.values()) {
+			for (var handler : handlers) {
+				eventsManager.removeHandler(handler);
+			}
+		}
+		scoringFunctions.clear();
 	}
 
 	void setToll(double toll) {
@@ -108,11 +123,15 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Map<VehicleType, Double> vehicleType2TourDuration = new LinkedHashMap<>();
 		private final Map<VehicleType, Integer> vehicleType2ScoredFixCosts = new LinkedHashMap<>();
+		private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
+		private final Id<Carrier> carrierId;
+
 		private double score;
 
-		public EventBasedScoring() {
-			super();
+
+		public EventBasedScoring(Id<Carrier> carrierId) {
+			this.carrierId = carrierId;
 		}
 
 		@Override
@@ -137,6 +156,8 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		}
 
 		private void handleEvent(CarrierTourStartEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+			v2c.handleEvent(event);
 			// Save time of freight tour start
 			tourStartTime.put(event.getTourId(), event.getTime());
 		}
@@ -146,6 +167,10 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		//maybe do it stepwise: if (carrierType=distributionCarrier): score each vehicle, else use current workaround
 		// Reason: distCarrier is the first, I am implementing the shipment-based approach.
 		private void handleEvent(CarrierTourEndEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+
+			v2c.handleEvent(event);
+
 			// Fix costs for vehicle usage
 			final VehicleType vehicleType =
 				(VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
@@ -182,6 +207,7 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		}
 
 		private void handleEvent(LinkEnterEvent event) {
+			if (!carrierId.equals(v2c.getCarrierOfVehicle(event.getVehicleId()))) return;
 			final double distance = network.getLinks().get(event.getLinkId()).getLength();
 			final double costPerMeter = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType().getCostInformation().getCostsPerMeter();
 			// variable costs per distance
@@ -200,12 +226,15 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 		private final double toll;
 		private final List<String> vehicleTypesToBeTolled;
 		private final List<Id<Vehicle>> tolledVehicles = new ArrayList<>();
+		private final Vehicle2CarrierEventHandler v2c = new Vehicle2CarrierEventHandler();
+		private final Id<Carrier> carrierId;
+
 		private double score;
 
-		public LinkBasedTollScoring(double toll, List<String> vehicleTypesToBeTolled) {
-			super();
+		public LinkBasedTollScoring(double toll, List<String> vehicleTypesToBeTolled, Id<Carrier> carrierId) {
 			this.toll = toll;
 			this.vehicleTypesToBeTolled = vehicleTypesToBeTolled;
+			this.carrierId = carrierId;
 		}
 
 		@Override
@@ -219,12 +248,29 @@ class MyEventBasedCarrierScorer implements CarrierScoringFunctionFactory {
 
 		@Override
 		public void handleEvent(Event event) {
-			if (event instanceof LinkEnterEvent linkEnterEvent) {
-				handleEvent(linkEnterEvent);
+
+			switch (event) {
+				case CarrierTourStartEvent freightTourStartEvent -> handleEvent(freightTourStartEvent);
+				case CarrierTourEndEvent freightTourEndEvent -> handleEvent(freightTourEndEvent);
+				case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
+				default -> {
+				}
 			}
 		}
 
+		private void handleEvent(CarrierTourStartEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+			v2c.handleEvent(event);
+		}
+
+		private void handleEvent(CarrierTourEndEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+			v2c.handleEvent(event);
+		}
+
 		private void handleEvent(LinkEnterEvent event) {
+			if (!carrierId.equals(v2c.getCarrierOfVehicle(event.getVehicleId()))) return;
+
 			List<String> tolledLinkList = ExampleConstants.TOLLED_LINK_LIST_GRID;
 
 			final Id<VehicleType> vehicleTypeId =
