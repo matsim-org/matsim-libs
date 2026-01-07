@@ -627,7 +627,7 @@ public class TripAnalysis implements MATSimAppCommand {
 				analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
 					beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
 			}
-			analyseAndWriteTripStatsPerGroup("personTraffic", nBySubpopulationGroup, travelTimeBySubpopulationGroup,
+			analyseAndWriteTripStatsPerGroup(ModelType.PERSON_TRAFFIC.id, nBySubpopulationGroup, travelTimeBySubpopulationGroup,
 				travelDistanceBySubpopulationGroup, beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, groupsOfSubpopulationsForPersonAnalysis.keySet());
 		}
 		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
@@ -635,7 +635,7 @@ public class TripAnalysis implements MATSimAppCommand {
 				analyseAndWriteTripStatsPerGroup(group, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
 					beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
 			}
-			analyseAndWriteTripStatsPerGroup("commercialTraffic", nBySubpopulationGroup, travelTimeBySubpopulationGroup,
+			analyseAndWriteTripStatsPerGroup(ModelType.COMMERCIAL_TRAFFIC.id, nBySubpopulationGroup, travelTimeBySubpopulationGroup,
 				travelDistanceBySubpopulationGroup, beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, groupsOfSubpopulationsForCommercialAnalysis.keySet());
 		}
 		analyseAndWriteTripStatsPerGroup("total", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
