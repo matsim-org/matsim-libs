@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.DistributedScoringListener;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
@@ -52,7 +51,8 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx.isDistributed()) {
 
 			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
-			addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
+			//TODO think about whether we still need something similar to consolidate experienced plans in the end
+			//addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
 
 		// Need to define the set binder, in case no other module uses it

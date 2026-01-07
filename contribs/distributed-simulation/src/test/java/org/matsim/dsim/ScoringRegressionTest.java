@@ -60,26 +60,15 @@ public class ScoringRegressionTest {
 
 	@Test
 	public void ptTrip() {
-		{
-			var config = loadConfig("pt-simple", utils.getOutputDirectory());
-			config.controller().setMobsim("qsim");
-			var scenario = ScenarioUtils.loadScenario(config);
-			var controler = new Controler(scenario);
-			controler.run();
 
-			var person = getSinglePerson(scenario);
-			assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
-		}
+		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
+		var scenario = ScenarioUtils.loadScenario(config);
+		var controler = new Controler(scenario);
+		controler.run();
 
-//		{
-//			var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
-//			var scenario = ScenarioUtils.loadScenario(config);
-//			var controler = new Controler(scenario);
-//			controler.run();
-//
-//			var person = getSinglePerson(scenario);
-//			assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
-//		}
+		var person = getSinglePerson(scenario);
+		assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
+
 	}
 
 	@Test

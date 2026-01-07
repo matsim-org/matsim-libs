@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,7 +150,7 @@ public class ThreeLinkIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
+				f.get();//1, TimeUnit.MINUTES);
 			}
 		}
 

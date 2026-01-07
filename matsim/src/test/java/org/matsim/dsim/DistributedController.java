@@ -18,7 +18,6 @@ import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControllerListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -132,7 +131,6 @@ public class DistributedController implements ControlerI {
 	private void addCoreControllers(ControllerListenerManager listenerManager, Injector injector) {
 
 		listenerManager.addControllerListener(injector.getInstance(DumpDataAtEnd.class));
-		listenerManager.addControllerListener(injector.getInstance(PlansScoring.class));
 		listenerManager.addControllerListener(injector.getInstance(PlansDumping.class));
 		listenerManager.addControllerListener(injector.getInstance(EventsHandling.class));
 

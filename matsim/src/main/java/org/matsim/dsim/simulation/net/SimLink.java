@@ -277,7 +277,7 @@ public interface SimLink {
 		private final SimpleStorageCapacity storageCapacity;
 		private final FlowCapacity inflowCapacity;
 		private final Consumer<SimLink> activateLink;
-		private OnLeaveQueue onLeaveHandler;
+		private OnLeaveQueue onLeaveHandler = (_, _, _) -> OnLeaveQueueInstruction.RemoveVehicle;
 
 		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink) {
 			id = link.getId();
