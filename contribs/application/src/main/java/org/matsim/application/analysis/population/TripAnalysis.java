@@ -941,19 +941,22 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 		for (String group : tripsPerPerson.keySet()) {
 			totalAvgTripsPerSubpopulation.put(group, tripsPerPerson.get(group).values().intStream().average().orElse(0d));
+			if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty() || !groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
 
-			Table table = Table.create("modal_share",	StringColumn.create("main_mode"),DoubleColumn.create("user"), StringColumn.create("group"));
-			for (String m : modeOrder) {
-				int n = usedModes.get(group).getInt(m);
-				if (n == 0) continue;
+				Table table = Table.create("modal_share", StringColumn.create("main_mode"), DoubleColumn.create("user"),
+					StringColumn.create("group"));
+				for (String m : modeOrder) {
+					int n = usedModes.get(group).getInt(m);
+					if (n == 0) continue;
 
-				double share = new BigDecimal(n / totalMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+					double share = new BigDecimal(n / totalMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).doubleValue();
 
-				table.stringColumn("main_mode").append(m);
-				table.doubleColumn("user").append(share);
-				table.stringColumn("group").append(group);
+					table.stringColumn("main_mode").append(m);
+					table.doubleColumn("user").append(share);
+					table.stringColumn("group").append(group);
+				}
+				table.write().csv(output.getPath("mode_users_%s.csv", group).toFile());
 			}
-			table.write().csv(output.getPath("mode_users_%s.csv", group).toFile());
 		}
 
 		Table table = Table.create("modal_share",	StringColumn.create("main_mode"),DoubleColumn.create("user"), StringColumn.create("group"));
@@ -971,12 +974,15 @@ public class TripAnalysis implements MATSimAppCommand {
 
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
-			printer.printRecord(
-				Stream.concat(
-					Stream.concat(Stream.of("Group"), tripsPerPerson.keySet().stream()),
-					Stream.of("total")
-				).toList()
-			);
+			if (groupsOfSubpopulationsForPersonAnalysis.isEmpty() && groupsOfSubpopulationsForCommercialAnalysis.isEmpty())
+				printer.printRecord("Group", "total");
+			else
+				printer.printRecord(
+					Stream.concat(
+						Stream.concat(Stream.of("Group"), tripsPerPerson.keySet().stream()),
+						Stream.of("total")
+					).toList()
+				);
 
 			List<String> recordPersons = new ArrayList<>();
 			List<String> recordMobilePersons = new ArrayList<>();
@@ -986,12 +992,16 @@ public class TripAnalysis implements MATSimAppCommand {
 			recordMobilePersons.add("Mobile persons [%]");
 			recordAvgTrips.add("Avg. trips");
 			recordAvgTripsMobile.add("Avg. trips per mobile persons");
-			for (String group : tripsPerPerson.keySet()) {
-				recordPersons.add(String.valueOf(tripsPerPerson.get(group).size()));
-				recordMobilePersons.add(new BigDecimal(100 * totalMobilePerSubpopulation.get(group) / tripsPerPerson.get(group).size()).setScale(2, RoundingMode.HALF_UP).toString());
-				recordAvgTrips.add(new BigDecimal(totalAvgTripsPerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
-				recordAvgTripsMobile.add(new BigDecimal(totalAvgTripsMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
-			}
+			if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty() || !groupsOfSubpopulationsForCommercialAnalysis.isEmpty())
+				for (String group : tripsPerPerson.keySet()) {
+					recordPersons.add(String.valueOf(tripsPerPerson.get(group).size()));
+					recordMobilePersons.add(
+						new BigDecimal(100 * totalMobilePerSubpopulation.get(group) / tripsPerPerson.get(group).size()).setScale(2,
+							RoundingMode.HALF_UP).toString());
+					recordAvgTrips.add(new BigDecimal(totalAvgTripsPerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
+					recordAvgTripsMobile.add(
+						new BigDecimal(totalAvgTripsMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).toString());
+				}
 			recordPersons.add(String.valueOf(tripsPerPerson.values().stream().mapToInt(Object2IntMap::size).sum()));
 			recordMobilePersons.add(new BigDecimal(100 * totalMobilePerSubpopulation.values().stream().mapToInt(Double::intValue).sum() / (double) tripsPerPerson.values().stream().mapToInt(Object2IntMap::size).sum()).setScale(2, RoundingMode.HALF_UP).toString());
 			recordAvgTrips.add(new BigDecimal(totalAvgTripsPerSubpopulation.values().stream().mapToDouble(Double::doubleValue).average().orElse(0d)).setScale(2, RoundingMode.HALF_UP).toString());
