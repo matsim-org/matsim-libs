@@ -168,7 +168,7 @@ public class TripDashboard implements Dashboard {
 	 * @return description string
 	 */
 	private @NonNull String getDescription() {
-		if (groupsOfPersonSubpopulations.isEmpty()) {
+		if (groupsOfPersonSubpopulations.isEmpty() || groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")) {
 			return "General information about modal share and trip distributions.";
 		}
 
