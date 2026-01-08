@@ -20,8 +20,6 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +59,7 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	@Test
-	void scoreSinglePtTrip() throws URISyntaxException, MalformedURLException {
+	void scoreSinglePtTrip() {
 
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
 		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
@@ -89,7 +87,7 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	@Test
-	void scoreMultiplePtTripsWithLineSwitch() throws URISyntaxException, MalformedURLException {
+	void scoreMultiplePtTripsWithLineSwitch() {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
 		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
 		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan-line-switch.xml.gz").toAbsolutePath();
