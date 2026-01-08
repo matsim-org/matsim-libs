@@ -148,8 +148,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.afterSim();
 		}
 
-		//em.removeHandler(scoringDataCollector);
-
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.dsim.scoring.ScoringDataCollector;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -165,5 +166,31 @@ class DistributedTeleportationEngineTest {
 			.build();
 
 		assertThrows(IllegalStateException.class, () -> engine.process(message, 100));
+	}
+
+	@Test
+	void cleanUpAfterSim() {
+
+		var expectedStuckTime = 43;
+		var em = mock(EventsManager.class);
+		var agent = createPerson("some", em);
+		var messaging = mock(SimStepMessaging.class);
+		when(messaging.isLocal(any())).thenReturn(true);
+		var asc = mock(AgentSourcesContainer.class);
+		when(asc.agentFromMessage(any(), any())).thenReturn(agent);
+		var engine = new DistributedTeleportationEngine(em, messaging, asc, mock(ScoringDataCollector.class));
+
+		engine.handleDeparture(10, agent, agent.getCurrentLinkId());
+		engine.doSimStep(expectedStuckTime);
+		engine.afterSim();
+
+		var captor = ArgumentCaptor.forClass(org.matsim.api.core.v01.events.PersonStuckEvent.class);
+		verify(em, times(1)).processEvent(captor.capture());
+		var event = captor.getValue();
+
+		assertEquals(expectedStuckTime, event.getTime(), 1e-6);
+		assertEquals(agent.getId(), event.getPersonId());
+		assertEquals(agent.getDestinationLinkId(), event.getLinkId());
+		assertEquals(agent.getMode(), event.getLegMode());
 	}
 }

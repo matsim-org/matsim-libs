@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -29,6 +30,8 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final ScoringDataCollector sdc;
 
 	private InternalInterface internalInterface;
+	// store the current time, so we can use it for after sim.
+	private double now;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -94,6 +97,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 
 		while (firstPersonReady(now)) {
 			TeleportationEntry entry = personsTeleporting.remove();
@@ -107,6 +111,15 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 			person.endLegAndComputeNextState(now);
 			internalInterface.arrangeNextAgentState(person);
 		}
+	}
+
+	@Override
+	public void afterSim() {
+		for (var entry : personsTeleporting) {
+			var person = entry.person();
+			em.processEvent(new PersonStuckEvent(now, person.getId(), person.getDestinationLinkId(), person.getMode()));
+		}
+		personsTeleporting.clear();
 	}
 
 	@Override
