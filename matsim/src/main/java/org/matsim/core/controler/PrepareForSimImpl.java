@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -225,10 +226,16 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 
 		for (ActivityFacility value : scenario.getActivityFacilities().getFacilities().values()) {
-			boolean linkExists = scenario.getNetwork().getLinks().get(value.getLinkId()) != null;
+			Id<Link> linkId = value.getLinkId();
+
+			if (linkId == null) {
+				continue;
+			}
+
+			boolean linkExists = scenario.getNetwork().getLinks().get(linkId) != null;
 
 			if (!linkExists) {
-				String errorMessage = "Facility " + value.getId() + " is assigned to non-existing link " + value.getLinkId();
+				String errorMessage = "Facility " + value.getId() + " is assigned to non-existing link " + linkId;
 				log.error("{}\n Probably, you removed links from the network but did not update the facilities accordingly. " +
 					"Run the org.matsim.application.prepare.facilities.CleanFacilities with rmLinkIds = true. If this is intended, set the routing config " +
 					"parameter 'networkRouteConsistencyCheck' to 'disable'.", errorMessage);
