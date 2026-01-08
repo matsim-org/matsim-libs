@@ -193,6 +193,7 @@ public final class LPTask implements SimTask {
 
 	@Override
 	public void cleanup() {
+		manager.setContext(partition);
 		lp.onCleanupSim();
 	}
 

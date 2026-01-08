@@ -2,12 +2,15 @@ package org.matsim.dsim.scoring;
 
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -47,6 +50,7 @@ import java.util.Set;
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class ScoringDataCollector implements BasicEventHandler {
 
+	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
 	private final Map<Id<Vehicle>, TransitInformation> transitInformation = new HashMap<>();
@@ -65,9 +69,14 @@ public class ScoringDataCollector implements BasicEventHandler {
 	@Inject(optional = true)
 	private TransitSchedule transitSchedule;
 
+
+	// TODO remove
+	private NetworkPartition networkPartition;
+
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods, ExperiencedPlansService eps) {
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods, ExperiencedPlansService eps, NetworkPartition partition) {
 		this(simStepMessaging, network, null, asc, eods, eps);
+		this.networkPartition = partition;
 	}
 
 	/**
@@ -88,6 +97,8 @@ public class ScoringDataCollector implements BasicEventHandler {
 	}
 
 	public void registerAgent(MobsimAgent agent) {
+		if (agent.getId().toString().equals("1099"))
+			log.info("#{} Registering agent {} for scoring", networkPartition.getIndex(), agent.getId());
 		var backpack = new BackPack(agent.getId());
 		this.backpackByPerson.put(agent.getId(), backpack);
 	}
@@ -112,6 +123,8 @@ public class ScoringDataCollector implements BasicEventHandler {
 			}
 		}
 		for (var backpack : msg.backPacks()) {
+			if (backpack.personId().toString().equals("1099"))
+				log.info("#{} Agent {} arrives on partition", networkPartition.getIndex(), backpack.personId());
 			this.backpackByPerson.put(backpack.personId(), backpack);
 			if (backpack.isInVehicle()) {
 				this.backpackByVehicle
@@ -151,22 +164,27 @@ public class ScoringDataCollector implements BasicEventHandler {
 			backpackByVehicle.get(backpack.currentVehicle()).remove(backpack);
 		}
 
+		if (backpack.personId().toString().equals("1099"))
+			log.info("#{} Finishing agent {}", networkPartition.getIndex(), backpack.personId());
+
 		backpack.backpackPlan().finish(network, transitSchedule);
 		eods.score(backpack);
 		plansCollector.addExperiencedPlan(agentId, backpack.backpackPlan().experiencedPlan());
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
-		var backPack = backpackByPerson.remove(id);
-		if (backPack.isInVehicle()) {
+		var backpack = backpackByPerson.remove(id);
+		if (backpack.personId().toString().equals("1099"))
+			log.info("#{} agent {} leaving partition", networkPartition.getIndex(), backpack.personId());
+		if (backpack.isInVehicle()) {
 			var backpacksInVehicle = backpackByVehicle
-				.get(backPack.currentVehicle());
-			backpacksInVehicle.remove(backPack);
+				.get(backpack.currentVehicle());
+			backpacksInVehicle.remove(backpack);
 			if (backpacksInVehicle.isEmpty()) {
-				backpackByVehicle.remove(backPack.currentVehicle());
+				backpackByVehicle.remove(backpack.currentVehicle());
 			}
 		}
-		simStepMessaging.collectBackPack(backPack, toPart);
+		simStepMessaging.collectBackPack(backpack, toPart);
 	}
 
 	@Override
@@ -181,6 +199,8 @@ public class ScoringDataCollector implements BasicEventHandler {
 				var backpack = backpackByPerson.get(hpi.getPersonId());
 				backpack.addSpecialScoringEvent(e);
 			}
+			if (hpi.getPersonId().toString().equals("1099"))
+				log.info("#{} handling {}", networkPartition.getIndex(), hpi);
 		}
 
 		if (e instanceof TransitDriverStartsEvent tdse) {
