@@ -96,7 +96,7 @@ public class ScoringRegressionTest {
 		var comparisonPopulation = PopulationUtils.readPopulation(utils.getInputDirectory() + "expected_experienced_plans.xml.gz");
 		for (var person : scenario.getPopulation().getPersons().values()) {
 			var ep = comparisonPopulation.getPersons().get(person.getId());
-			assertEquals(ep.getSelectedPlan().getScore(), person.getSelectedPlan().getScore(), 1.);
+			assertEquals(ep.getSelectedPlan().getScore(), person.getSelectedPlan().getScore(), 1., "Person " + person.getId() + " has different score");
 		}
 	}
 
