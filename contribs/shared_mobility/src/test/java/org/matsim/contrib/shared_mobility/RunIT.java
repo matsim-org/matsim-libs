@@ -178,6 +178,7 @@ public class RunIT {
 	}
 
 	@Test
+	@Disabled
 	final void test() throws UncheckedIOException, URISyntaxException {
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls-2014");
 

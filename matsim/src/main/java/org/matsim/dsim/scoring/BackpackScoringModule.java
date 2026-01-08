@@ -32,6 +32,8 @@ public class BackpackScoringModule extends AbstractModule {
 		bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).in(Singleton.class);
 		bind(ExperiencedPlansService.class).to(ExperiencedPlansCollector.class).in(Singleton.class);
 
+		// The original code also writes partial scores for each scored element. We have now changed the scoring
+		// to be ready for trip-based scoring. Don't know whether it makes sense to still have these partial scores.
 		if (getConfig().scoring().isWriteExperiencedPlans()) {
 			bind(WriteExperiencedPlans.class).in(Singleton.class);
 			addControllerListenerBinding().to(WriteExperiencedPlans.class);

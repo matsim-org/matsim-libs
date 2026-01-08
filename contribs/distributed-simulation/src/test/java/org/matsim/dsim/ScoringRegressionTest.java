@@ -81,45 +81,45 @@ public class ScoringRegressionTest {
 	public void kelheim() {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("kelheim");
 		Path configPath = getConfigPath(scenarioUrl, "config.xml");
-		var config = ConfigUtils.loadConfig(configPath.toString());
-		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controller().setLastIteration(0);
-		config.controller().setWritePlansInterval(1);
-		config.controller().setMobsim("dsim");
-		config.dsim().setStartTime(0);
-		config.dsim().setEndTime(24 * 3600);
-		Activities.addScoringParams(config);
-
-		var scenario = ScenarioUtils.loadScenario(config);
-		// Need to prepare network for freight
-		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-		scenario.getNetwork().getLinks().values().parallelStream()
-			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-			.forEach(l -> l.setAllowedModes(carandfreight));
-
-		var controler = new Controler(scenario);
-		controler.run();
-
-//		var config2 = ConfigUtils.loadConfig(configPath.toString());
-//		config2.controller().setOutputDirectory(utils.getOutputDirectory());
-//		config2.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//		config2.controller().setLastIteration(0);
-//		config2.controller().setWritePlansInterval(1);
-//		config2.controller().setMobsim("qsim");
-//		config2.qsim().setStartTime(0);
-//		config2.qsim().setEndTime(24 * 3600);
-//		Activities.addScoringParams(config2);
+//		var config = ConfigUtils.loadConfig(configPath.toString());
+//		config.controller().setOutputDirectory(utils.getOutputDirectory());
+//		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//		config.controller().setLastIteration(0);
+//		config.controller().setWritePlansInterval(1);
+//		config.controller().setMobsim("dsim");
+//		config.dsim().setStartTime(0);
+//		config.dsim().setEndTime(24 * 3600);
+//		Activities.addScoringParams(config);
 //
-//		var scenario2 = ScenarioUtils.loadScenario(config2);
+//		var scenario = ScenarioUtils.loadScenario(config);
 //		// Need to prepare network for freight
-//		var carandfreight2 = Set.of(TransportMode.car, "freight", TransportMode.ride);
-//		scenario2.getNetwork().getLinks().values().parallelStream()
+//		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
+//		scenario.getNetwork().getLinks().values().parallelStream()
 //			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-//			.forEach(l -> l.setAllowedModes(carandfreight2));
+//			.forEach(l -> l.setAllowedModes(carandfreight));
 //
-//		var controler2 = new Controler(scenario2);
-//		controler2.run();
+//		var controler = new Controler(scenario);
+//		controler.run();
+
+		var config2 = ConfigUtils.loadConfig(configPath.toString());
+		config2.controller().setOutputDirectory(utils.getOutputDirectory());
+		config2.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config2.controller().setLastIteration(0);
+		config2.controller().setWritePlansInterval(1);
+		config2.controller().setMobsim("qsim");
+		config2.qsim().setStartTime(0);
+		config2.qsim().setEndTime(24 * 3600);
+		Activities.addScoringParams(config2);
+
+		var scenario2 = ScenarioUtils.loadScenario(config2);
+		// Need to prepare network for freight
+		var carandfreight2 = Set.of(TransportMode.car, "freight", TransportMode.ride);
+		scenario2.getNetwork().getLinks().values().parallelStream()
+			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
+			.forEach(l -> l.setAllowedModes(carandfreight2));
+
+		var controler2 = new Controler(scenario2);
+		controler2.run();
 
 //		var comparisonPopulation = scenario2.getPopulation();//PopulationUtils.readPopulation(utils.getInputDirectory() + "expected_experienced_plans.xml.gz");
 //		for (var person : scenario.getPopulation().getPersons().values()) {
