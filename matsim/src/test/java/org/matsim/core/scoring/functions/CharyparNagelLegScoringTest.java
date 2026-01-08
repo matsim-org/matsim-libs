@@ -63,9 +63,8 @@ public class CharyparNagelLegScoringTest {
 	@Test
 	void scoreSinglePtTrip() throws URISyntaxException, MalformedURLException {
 
-		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch");
-		var configUrl = scenarioUrl.toURI().resolve("config.xml").toURL();
-		var config = ConfigUtils.loadConfig(configUrl);
+		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
+		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
 		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan.xml.gz").toAbsolutePath();
 		config.plans().setInputFile(plansPath.toString());
 		var scenario = ScenarioUtils.loadScenario(config);
@@ -91,9 +90,8 @@ public class CharyparNagelLegScoringTest {
 
 	@Test
 	void scoreMultiplePtTripsWithLineSwitch() throws URISyntaxException, MalformedURLException {
-		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch");
-		var configUrl = scenarioUrl.toURI().resolve("config.xml").toURL();
-		var config = ConfigUtils.loadConfig(configUrl);
+		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
+		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
 		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan-line-switch.xml.gz").toAbsolutePath();
 		config.plans().setInputFile(plansPath.toString());
 		var scenario = ScenarioUtils.loadScenario(config);
