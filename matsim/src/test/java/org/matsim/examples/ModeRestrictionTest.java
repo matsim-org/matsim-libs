@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -32,6 +33,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -59,7 +61,7 @@ public class ModeRestrictionTest {
 		List<String> restrictedModes = List.of("car", "bike");
 
 		return links.stream()
-					.flatMap(link -> restrictedModes.stream().map(restrictedMode -> Arguments.of(link, restrictedMode)));
+			.flatMap(link -> restrictedModes.stream().map(restrictedMode -> Arguments.of(link, restrictedMode)));
 	}
 
 	/**
@@ -101,8 +103,8 @@ public class ModeRestrictionTest {
 		RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> runController(scenario, firstLegRouteCheck));
 		Assertions.assertInstanceOf(ProvisionException.class, exception);
 		Assertions.assertTrue(((ProvisionException) exception).getErrorMessages().stream()
-															  .map(Message::getMessage)
-															  .anyMatch(m -> m.equals("java.lang.RuntimeException: Network for mode '" + restrictedMode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.")));
+			.map(Message::getMessage)
+			.anyMatch(m -> m.equals("java.lang.RuntimeException: Network for mode '" + restrictedMode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.")));
 	}
 
 	/**
@@ -148,12 +150,12 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: Network and routes are cleaned before simulation. Link before the activity is restricted. Consistency check is turned off.
+	 * Setting: Network and routes are cleaned before simulation. Link before the activity is restricted. Consistency check is turned on.
 	 * Expected behaviour: The agent using the restricted are mode is rerouted. The new link of the activity for this agent is the one which is closest to the activity.
 	 */
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
-	void testCleanNetworkAndRerouteBeforeSim_toActNotPossible_withConsistencyCheck_ok(String restrictedMode){
+	void testCleanNetworkAndRerouteBeforeSim_toActNotPossible_withConsistencyCheck_ok(String restrictedMode) {
 		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("6");
@@ -176,18 +178,18 @@ public class ModeRestrictionTest {
 	}
 
 	/**
-	 * Setting: Network and routes are cleaned before simulation. Link from the activity is restricted. Consistency check is turned off.
+	 * Setting: Network and routes are cleaned before simulation. Link from the activity is restricted. Consistency check is turned on.
 	 * Expected behaviour: The agent using the restricted are mode is rerouted. The new link of the activity for this agent is the one which is closest to the activity.
 	 */
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
-	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossible_withConsistencyCheck_ok(String restrictedMode){
+	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossible_withConsistencyCheck_ok(String restrictedMode) {
 		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("15");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(),  l -> Map.of(link, Set.of(restrictedMode)).getOrDefault(l, Set.of()));
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), l -> Map.of(link, Set.of(restrictedMode)).getOrDefault(l, Set.of()));
 		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
 
 		// New route. Note that the end link is 20, but the activity's link in the input was 6.
@@ -198,6 +200,89 @@ public class ModeRestrictionTest {
 		String other = restrictedMode.equals("car") ? "bike" : "car";
 
 		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId(restrictedMode), newRoute, Id.createPersonId(other), oldRoute));
+		runController(scenario, firstLegRouteCheck);
+		firstLegRouteCheck.assertActualEqualsExpected();
+		assertEventFilesSame();
+	}
+
+	/**
+	 * Setting: Network and routes are cleaned before simulation. Link from the activity is restricted for all modes. Consistency check is turned off.
+	 * Expected behaviour: The agent using the restricted are mode is rerouted. However, because the activity link id points to a link that is cleaned away, there is an exception.
+	 */
+	@Test
+	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withoutConsistencyCheck_throws() {
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+
+		Id<Link> link = Id.createLinkId("15");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), l -> Map.of(link, Set.of("car", "bike")).getOrDefault(l, Set.of()));
+		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
+
+		// New route. Note that the end link is 20, but the activity's link in the input was 6.
+		// But since we restricted the mode for link 6 AND 15, 20 is used as fallback.
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
+
+		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId("car"), newRoute, Id.createPersonId("bike"), newRoute));
+
+		RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> runController(scenario, firstLegRouteCheck));
+
+		//we can't check the root exception because the check is done in another thread. So we check for the more general exception.
+		Assertions.assertTrue(
+			exception.getMessage().contains("java.lang.NullPointerException: Cannot invoke \"org.matsim.api.core.v01.network.Link.getToNode()\" because \"destLink\" is null"));
+	}
+
+	/**
+	 * Setting: Network and routes are cleaned before simulation. Link from the activity is restricted for all modes. Consistency check is turned on.
+	 * Expected behaviour: The agent using the restricted are mode is rerouted. However, because the activity link id points to a link that is cleaned away, there is an exception.
+	 */
+	@Test
+	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withConsistencyCheck_throws() {
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+
+		Id<Link> link = Id.createLinkId("15");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), l -> Map.of(link, Set.of("car", "bike")).getOrDefault(l, Set.of()));
+		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
+
+		// New route. Note that the end link is 20, but the activity's link in the input was 6.
+		// But since we restricted the mode for link 6 AND 15, 20 is used as fallback.
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
+
+		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId("car"), newRoute, Id.createPersonId("bike"), newRoute));
+
+		RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> runController(scenario, firstLegRouteCheck));
+
+		//we can't check the root exception because the check is done in another thread. So we check for the more general exception.
+		Assertions.assertTrue(
+			exception.getMessage().contains("Exception while processing persons. Cannot guarantee that all persons have been fully processed."));
+	}
+
+	/**
+	 * Setting: Network and routes are cleaned before simulation. Also, activity ids are cleaned. Link from the activity is restricted for all modes. Consistency check is turned on.
+	 * Expected behaviour: The agent using the restricted are mode is rerouted. However, because the activity link id points to a link that is cleaned away, there is an exception.
+	 */
+	@Test
+	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withConsistencyCheck_ok() {
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+
+		Id<Link> link = Id.createLinkId("15");
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		NetworkUtils.restrictModesAndCleanNetwork(scenario.getNetwork(), l -> Map.of(link, Set.of("car", "bike")).getOrDefault(l, Set.of()));
+		PopulationUtils.checkRouteModeAndReset(scenario.getPopulation(), scenario.getNetwork());
+
+		scenario.getPopulation().getPersons().values().stream()
+			.flatMap(p -> p.getPlans().stream())
+			.flatMap(p -> TripStructureUtils.getActivities(p, TripStructureUtils.StageActivityHandling.StagesAsNormalActivities).stream())
+			.forEach(a -> a.setLinkId(null));
+
+		// New route. Note that the end link is 20, but the activity's link in the input was 6.
+		// But since we restricted the mode for link 6 AND 15, 20 is used as fallback.
+		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
+
+		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId("car"), newRoute, Id.createPersonId("bike"), newRoute));
 		runController(scenario, firstLegRouteCheck);
 		firstLegRouteCheck.assertActualEqualsExpected();
 		assertEventFilesSame();
@@ -228,12 +313,42 @@ public class ModeRestrictionTest {
 	}
 
 	/**
+	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has x-y-coordinate. Consistency check is turned on.
+	 * Expected behaviour: The agents (both car & bike) are rerouted to the nearest link to the activity's coordinate.
+	 */
+//	@Test
+//	void testRerouteBeforeSim_actOnAllModesRestrictedLinkWithCoords_ok() {
+//		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+//
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		removeModeFromLink(scenario.getNetwork().getLinks().get(Id.createLinkId("15")), "car");
+//		removeModeFromLink(scenario.getNetwork().getLinks().get(Id.createLinkId("15")), "bike");
+//
+//		for (Person person : scenario.getPopulation().getPersons().values()) {
+//			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
+//			leg.setRoute(null);
+//		}
+//
+//		// New route. Note that the end link is 20, but the activity's link in the input was 15.
+//		// But since we restricted the mode for link 15, 20 is used as fallback.
+//		List<Id<Link>> newRoute = List.of(Id.createLinkId("1"), Id.createLinkId("10"), Id.createLinkId("19"), Id.createLinkId("20"));
+//		List<Id<Link>> oldRoute = List.of(Id.createLinkId("1"), Id.createLinkId("6"), Id.createLinkId("15"));
+//
+//		String other = restrictedMode.equals("car") ? "bike" : "car";
+//
+//		FirstLegVisitedLinksCheck firstLegRouteCheck = new FirstLegVisitedLinksCheck(Map.of(Id.createPersonId(restrictedMode), newRoute, Id.createPersonId(other), oldRoute));
+//		runController(scenario, firstLegRouteCheck);
+//		firstLegRouteCheck.assertActualEqualsExpected();
+//		assertEventFilesSame();
+//	}
+
+	/**
 	 * Setting: The agents (both car & bike) have no route. The mode of the activity's link is restricted. Activity has no x-y-coordinate. Consistency check is turned off.
 	 * Expected behaviour: The router throws an exception since there is no fallback x-y-coordinate.
 	 */
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
-	void testRerouteBeforeSim_actOnRestrictedLinkWithoutCoord_throws(String restrictedMode){
+	void testRerouteBeforeSim_actOnRestrictedLinkWithoutCoord_throws(String restrictedMode) {
 		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 
 		Id<Person> person = Id.createPersonId(restrictedMode);
@@ -254,11 +369,11 @@ public class ModeRestrictionTest {
 		config.routing().setNetworkRouteConsistencyCheck(consistencyCheck);
 		config.plans().setInputFile(plansFile);
 
-		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike") ;
+		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike");
 		config.scoring().addModeParams(params);
 
-		config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;
-		config.routing().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
+		config.qsim().setMainModes(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.bike)));
+		config.routing().setNetworkModes(Arrays.asList(TransportMode.car, TransportMode.bike));
 		config.routing().removeTeleportedModeParams("bike");
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 
@@ -347,8 +462,8 @@ public class ModeRestrictionTest {
 			}
 			actual.putIfAbsent(personId, Lists.newArrayList(linkId));
 			List<Id<Link>> linkIds = actual.get(personId);
-			if (linkIds.get(linkIds.size()-1) == null || linkIds.get(linkIds.size()-1) == linkId) {
-			//if (linkIds.getLast() == null || linkIds.getLast() == linkId) {
+			if (linkIds.get(linkIds.size() - 1) == null || linkIds.get(linkIds.size() - 1) == linkId) {
+				//if (linkIds.getLast() == null || linkIds.getLast() == linkId) {
 				return;
 			}
 			linkIds.add(linkId);
@@ -371,8 +486,9 @@ public class ModeRestrictionTest {
 
 
 	private static class BikeTravelTime implements TravelTime {
-		@Override public double getLinkTravelTime( Link link, double time, Person person, Vehicle vehicle ){
-			return 1. ;
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return 1.;
 		}
 	}
 

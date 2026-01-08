@@ -75,8 +75,8 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 		this.rmLegs = rmLegs;
 	}
 
-	public static void main(String[] args) {
-		System.exit(new CommandLine(new CleanPopulationBuilder().createCleanPopulation()).execute(args));
+	static void main(String[] args) {
+		System.exit(new CommandLine(new CleanPopulationBuilder().build()).execute(args));
 	}
 
 	@Override
@@ -170,14 +170,6 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 	public static void removeActivityLocation(PlanElement el) {
 		if (el instanceof Activity act) {
 			act.setLinkId(null);
-
-//			only remove facility id if the act has a coord.
-//			otherwise the act would have no location information (linkId=null, facilityId=null, coord=null). -sm0625
-			if (act.getCoord() != null) {
-				act.setFacilityId(null);
-			} else {
-				log.info("Activity {}\n has no coord. Its activity facility is therefore not removed because it would have ended up without any location: linkId=null, facilityId=null, coord=null.", act);
-			}
 		}
 	}
 
@@ -239,7 +231,7 @@ public class CleanPopulation implements MATSimAppCommand, PersonAlgorithm {
 			return this;
 		}
 
-		public CleanPopulation createCleanPopulation() {
+		public CleanPopulation build() {
 			return new CleanPopulation(rmUnselected, rmActivityLocations, rmActivityFacilities, rmRoutes, tripsToLegs, rmLegs);
 		}
 	}

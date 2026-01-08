@@ -20,11 +20,12 @@
 
 package org.matsim.core.config.groups;
 
-import java.net.URL;
-import java.util.Map;
-
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.net.URL;
+import java.util.Map;
 
 /**
  * @author mrieser / Senozon AG
@@ -33,15 +34,15 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "facilities";
 
-	private static final String INPUT_FILE= "inputFacilitiesFile";
+	private static final String INPUT_FILE = "inputFacilitiesFile";
 	private static final String INPUT_FACILITY_ATTRIBUTES_FILE = "inputFacilityAttributesFile";
 	private static final String INPUT_CRS = "inputCRS";
-	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedFacilitiesAttributeFile" ;
+	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedFacilitiesAttributeFile";
 
 	private String inputFile = null;
 	private String inputFacilitiesAttributesFile = null;
 	private String inputCRS = null;
-	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
+	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false;
 
 	// following params are required only if activitiesFacilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
 	private String idPrefix = "f_auto_";
@@ -50,45 +51,48 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 //	private boolean assigningLinksToFacilitiesIfMissing = true;
 
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
-	public enum FacilitiesSource {none, fromFile, setInScenario, onePerActivityLinkInPlansFile,
-		onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven, onePerActivityLocationInPlansFile}
+
+	public enum FacilitiesSource {
+		none, fromFile, setInScenario, onePerActivityLinkInPlansFile,
+		onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven, onePerActivityLocationInPlansFile
+	}
 
 	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
 //	private boolean addEmptyActivityOption = false;
 
-//	private static final String ADD_EMPTY_ACTIVITY_OPTIONS = "addEmptyActivityOption";
-	private static final String ID_PREFIX="idPrefix";
+	//	private static final String ADD_EMPTY_ACTIVITY_OPTIONS = "addEmptyActivityOption";
+	private static final String ID_PREFIX = "idPrefix";
 //	private static final String REMOVING_LINKS_AND_COORDINATES = "removingLinksAndCoordinates";
 //	private static final String ASSIGNING_OPENING_TIME = "assigningOpeningTime";
 //	private static final String ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING="assigningLinksToFacilitiesIfMissing";
 
 	public static final String FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate facilities attribute file is deprecated.  Add the information directly into each facility, using " +
-			"the Attributable feature.  If you insist on continuing to use the separate facility attribute file, set " +
-			"insistingOnUsingDeprecatedFacilityAttributeFile to true.  The file will then be read, but the values " +
-			"will be entered into each facility using Attributable, and written as such to output_facilities.";
+		"the Attributable feature.  If you insist on continuing to use the separate facility attribute file, set " +
+		"insistingOnUsingDeprecatedFacilityAttributeFile to true.  The file will then be read, but the values " +
+		"will be entered into each facility using Attributable, and written as such to output_facilities.";
 
 	public FacilitiesConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	@Override
-	public Map<String,String> getComments() {
-		final Map<String,String> comments = super.getComments();
+	public Map<String, String> getComments() {
+		final Map<String, String> comments = super.getComments();
 
-		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
-				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
-				"be converted back at export. If not specified, no conversion happens." );
+		comments.put(INPUT_CRS, "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+			" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
+			"be converted back at export. If not specified, no conversion happens.");
 
 		{
 			StringBuilder options = new StringBuilder();
-			for ( FacilitiesSource source : FacilitiesSource.values() ) {
+			for (FacilitiesSource source : FacilitiesSource.values()) {
 				options.append(source);
 				options.append(' ');
 			}
-			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: "+options.toString());
+			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: " + options.toString());
 		}
 
-		comments.put( ID_PREFIX, "A prefix to be used for auto-generated IDs.");
+		comments.put(ID_PREFIX, "A prefix to be used for auto-generated IDs.");
 
 //		comments.put(ONE_FACILITY_PER_LINK, "Sets whether all activities on a link should be collected within one ActivityFacility." +
 //				" Default is 'true'. If set to 'false', for each coordinate found in the population's activities a separate ActivityFacility will be created.");
@@ -108,11 +112,12 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	/* direct access */
 
-	@StringGetter( INPUT_FILE )
+	@StringGetter(INPUT_FILE)
 	public String getInputFile() {
 		return this.inputFile;
 	}
-	@StringSetter( INPUT_FILE )
+
+	@StringSetter(INPUT_FILE)
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
@@ -121,24 +126,24 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
 
-	@StringGetter( INPUT_FACILITY_ATTRIBUTES_FILE )
+	@StringGetter(INPUT_FACILITY_ATTRIBUTES_FILE)
 	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputFacilitiesAttributesFile() {
 		return this.inputFacilitiesAttributesFile;
 	}
 
-	@StringSetter( INPUT_FACILITY_ATTRIBUTES_FILE )
+	@StringSetter(INPUT_FACILITY_ATTRIBUTES_FILE)
 	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public void setInputFacilitiesAttributesFile(String inputFacilitiesAttributesFile) {
 		this.inputFacilitiesAttributesFile = inputFacilitiesAttributesFile;
 	}
 
-	@StringGetter( INPUT_CRS )
+	@StringGetter(INPUT_CRS)
 	public String getInputCRS() {
 		return inputCRS;
 	}
 
-	@StringSetter( INPUT_CRS )
+	@StringSetter(INPUT_CRS)
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
 	}
@@ -178,7 +183,8 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 //		return assigningOpeningTime;
 //	}
 //
-////	@StringSetter(ASSIGNING_OPENING_TIME)
+
+	/// /	@StringSetter(ASSIGNING_OPENING_TIME)
 //	public void setAssigningOpeningTime(boolean assigningOpeningTime) {
 //		this.assigningOpeningTime = assigningOpeningTime;
 //	}
@@ -192,7 +198,6 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 //	public void setAssigningLinksToFacilitiesIfMissing(boolean assigningLinksToFacilitiesIfMissing) {
 //		this.assigningLinksToFacilitiesIfMissing = assigningLinksToFacilitiesIfMissing;
 //	}
-
 	@StringGetter(FACILITIES_SOURCE)
 	public FacilitiesSource getFacilitiesSource() {
 		return this.facilitiesSource;
@@ -204,15 +209,29 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
-	public final void setInsistingOnUsingDeprecatedFacilitiesAttributeFile( boolean val ) {
-		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
+	public final void setInsistingOnUsingDeprecatedFacilitiesAttributeFile(boolean val) {
+		this.insistingOnUsingDeprecatedPersonAttributeFile = val;
 	}
+
 	@StringGetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
 	public final boolean isInsistingOnUsingDeprecatedFacilitiesAttributeFile() {
 		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
 
-////	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (config.facilities().getInputFile() != null && config.facilities().getFacilitiesSource() != FacilitiesSource.fromFile) {
+			throw new IllegalStateException("If an input facilities file is specified, the facilities source must be 'fromFile'.");
+		}
+
+		if (config.facilities().getFacilitiesSource() == FacilitiesSource.fromFile && config.facilities().getInputFile() == null) {
+			throw new IllegalStateException("If the facilities source is 'fromFile', an input facilities file must be specified.");
+		}
+	}
+
+	////	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)
 //	public boolean isAddEmptyActivityOption() {
 //		return addEmptyActivityOption;
 //	}

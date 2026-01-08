@@ -19,17 +19,17 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.router;
+package org.matsim.core.router;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -38,27 +38,33 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.timing.TimeInterpretation;
 
-import com.google.inject.name.Named;
-
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkRoutingProvider implements Provider<RoutingModule>{
-	private static final Logger log = LogManager.getLogger( NetworkRoutingProvider.class ) ;
+public class NetworkRoutingProvider implements Provider<RoutingModule> {
+	private static final Logger log = LogManager.getLogger(NetworkRoutingProvider.class);
 
 	private final String routingMode;
 	private boolean alreadyCheckedConsistency = false;
 
-	@Inject Map<String, TravelTime> travelTimes;
-	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-	@Inject SingleModeNetworksCache singleModeNetworksCache;
+	@Inject
+	Map<String, TravelTime> travelTimes;
+	@Inject
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+	@Inject
+	SingleModeNetworksCache singleModeNetworksCache;
 	@Inject
 	RoutingConfigGroup routingConfigGroup;
-	@Inject PopulationFactory populationFactory;
-	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	@Inject Scenario scenario ;
-	@Inject TimeInterpretation timeInterpretation;
-	@Inject MultimodalLinkChooser multimodalLinkChooser;
+	@Inject
+	PopulationFactory populationFactory;
+	@Inject
+	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	@Inject
+	Scenario scenario;
+	@Inject
+	TimeInterpretation timeInterpretation;
+	@Inject
+	MultimodalLinkChooser multimodalLinkChooser;
 	@Inject
 	@Named(TransportMode.walk)
 	private RoutingModule walkRouter;
@@ -70,7 +76,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	 * @param mode
 	 */
 	public NetworkRoutingProvider(String mode) {
-		this( mode, mode ) ;
+		this(mode, mode);
 	}
 
 	/**
@@ -81,19 +87,19 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 	 * @param mode
 	 * @param routingMode
 	 */
-	public NetworkRoutingProvider(String mode, String routingMode ) {
+	public NetworkRoutingProvider(String mode, String routingMode) {
 //		log.setLevel(Level.DEBUG);
 
 		this.mode = mode;
-		this.routingMode = routingMode ;
+		this.routingMode = routingMode;
 	}
 
 	private final String mode;
 
 	@Override
 	public RoutingModule get() {
-		log.debug( "requesting network routing module with routingMode="
-						   + routingMode + ";\tmode=" + mode) ;
+		log.debug("requesting network routing module with routingMode="
+			+ routingMode + ";\tmode=" + mode);
 
 		// the network refers to the (transport)mode:
 		Network filteredNetwork = singleModeNetworksCache.getOrCreateSingleModeNetwork(mode);
@@ -103,20 +109,20 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		// the travel time & disutility refer to the routing mode:
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
 		if (travelDisutilityFactory == null) {
-			throw new RuntimeException("No TravelDisutilityFactory bound for mode "+routingMode+".");
+			throw new RuntimeException("No TravelDisutilityFactory bound for mode " + routingMode + ".");
 		}
 		TravelTime travelTime = travelTimes.get(routingMode);
 		if (travelTime == null) {
-			throw new RuntimeException("No TravelTime bound for mode "+routingMode+".");
+			throw new RuntimeException("No TravelTime bound for mode " + routingMode + ".");
 		}
 		LeastCostPathCalculator routeAlgo =
-				leastCostPathCalculatorFactory.createPathCalculator(
-						filteredNetwork,
-						travelDisutilityFactory.createTravelDisutility(travelTime),
-						travelTime);
+			leastCostPathCalculatorFactory.createPathCalculator(
+				filteredNetwork,
+				travelDisutilityFactory.createTravelDisutility(travelTime),
+				travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( !routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if (!routingConfigGroup.getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
 			/*
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass a standard
@@ -130,25 +136,26 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 			if (mode.equals(TransportMode.walk)) {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null, timeInterpretation, multimodalLinkChooser);
 			} else {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter, timeInterpretation, multimodalLinkChooser);
 			}
 		} else {
 			log.warn("[mode: {}; routingMode: {}] Using deprecated routing module without access/egress. Consider using AccessEgressNetworkRouter instead.", mode, routingMode);
-			log.warn( "This can be achieved by something like" );
+			log.warn("This can be achieved by something like");
 			log.warn("\t\tconfig.routing().setAccessEgressType( AccessEgressType.accessEgressModeToLink );");
-			log.warn( "in code or" );
-			log.warn( "\t<module name=\"routing\" >" );
-			log.warn( "\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />" );
-			log.warn( "in the config xml.");
+			log.warn("in code or");
+			log.warn("\t<module name=\"routing\" >");
+			log.warn("\t\t<param name=\"accessEgressType\" value=\"accessEgressModeToLink\" />");
+			log.warn("in the config xml.");
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
-		}	}
+		}
+	}
 
 	private void checkNetwork(Network filteredNetwork) {
-		if(routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if (routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
 			return;
 		}
 
-		if(alreadyCheckedConsistency){
+		if (alreadyCheckedConsistency) {
 			return;
 		}
 
@@ -159,7 +166,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule>{
 		NetworkUtils.cleanNetwork(filteredNetwork, Set.of(this.routingMode));
 		boolean changed = nLinks != filteredNetwork.getLinks().size() || nNodes != filteredNetwork.getNodes().size();
 
-		if(changed) {
+		if (changed) {
 			String errorMessage = "Network for mode '" + mode + "' has unreachable links and nodes. This may be caused by mode restrictions on certain links. Aborting.";
 			log.error(errorMessage + "\n If you restricted modes on some links, consider doing that with NetworkUtils.restrictModesAndCleanNetwork(). This makes sure, that the network is consistent for each mode." +
 				"\n If this network topology is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");

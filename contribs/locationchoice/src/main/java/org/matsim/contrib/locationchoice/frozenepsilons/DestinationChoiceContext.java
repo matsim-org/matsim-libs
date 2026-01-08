@@ -19,12 +19,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import java.io.UncheckedIOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -52,8 +48,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 //import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 
@@ -69,7 +68,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
-//	private ActTypeConverter actTypeConverter;
+	//	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private ScoringParameters params;
 	private FrozenTastesConfigGroup dccg;
@@ -86,7 +85,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private TObjectIntMap<Id<Person>> personIndices;
 
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
-	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
+	private TreeMap<String, ActivityFacilityImpl[]> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl[]>();
 
 	public DestinationChoiceContext(Scenario scenario) {
 		this.scenario = scenario;
@@ -94,36 +93,36 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		this.init(); // actually wanted to leave this away to be able to create but not yet fill the context.
 
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
-		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
+		scenario.addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 		// is ONLY there to make the personsMaxDCScoreUnscaled available, yyyy which would now be much better be done with person.getAttributes().putAttribute(...). kai,
 		// mar'19
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(this);
 
-		computer.readOrCreateMaxDCScore( this.kValsAreRead() );
+		computer.readOrCreateMaxDCScore(this.kValsAreRead());
 		// the k vals are read or computed in DestinationChoiceContext.  lcContest.kValsAreRead() is set accordingly.  If they were read, the method here attempts to also
 		// read the max dc score values, otherwise it computes them.
 
-		dcScore.setPersonsMaxDCScoreUnscaled( computer.getPersonsMaxEpsUnscaled() );
+		dcScore.setPersonsMaxDCScoreUnscaled(computer.getPersonsMaxEpsUnscaled());
 
 
 	}
 
 	public void init() {
-		if ( params==null ){
-			this.params = new ScoringParameters.Builder( scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters( null ),
-				  scenario.getConfig().scenario() ).build();
-			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
-			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
+		if (params == null) {
+			this.params = new ScoringParameters.Builder(scenario.getConfig().scoring(), scenario.getConfig().scoring().getScoringParameters(null),
+				scenario.getConfig().scenario()).build();
+			this.dccg = ConfigUtils.addOrGetModule(this.scenario.getConfig(), FrozenTastesConfigGroup.class);
+			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 			this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 //			this.actTypeConverter = defineFlexibleActivities.getConverter();
 			this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
 
-			this.readOrCreateKVals( dccg.getRandomSeed() );
+			this.readOrCreateKVals(dccg.getRandomSeed());
 			this.readFacilitesAttributesAndBetas();
 			this.readPrefs();
 
-			log.info( "dc context initialized" );
+			log.info("dc context initialized");
 		}
 	}
 
@@ -158,14 +157,14 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private void readFacilitesAttributesAndBetas() {
 		String pBetasFileName = this.dccg.getpBetasFile();
 		String fAttributesFileName = this.dccg.getfAttributesFile();
-		if (pBetasFileName != null && fAttributesFileName!= null) {
+		if (pBetasFileName != null && fAttributesFileName != null) {
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
 			try {
 				personsBetasReader.readFile(pBetasFileName);
 				facilitiesAttributesReader.readFile(fAttributesFileName);
-				log.info("reading betas and facilities attributes from: \n"+ pBetasFileName + "\n" + fAttributesFileName);
-			} catch  (UncheckedIOException e) {
+				log.info("reading betas and facilities attributes from: \n" + pBetasFileName + "\n" + fAttributesFileName);
+			} catch (UncheckedIOException e) {
 				// reading was not successful
 				log.error("unsuccessful betas and facilities attributes from files!\n" + pBetasFileName + "\n" + fAttributesFileName);
 			}
@@ -178,8 +177,8 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {
 				prefsReader.readFile(prefsFileName);
-				log.info("reading prefs attributes from: \n"+ prefsFileName);
-			} catch  (UncheckedIOException e) {
+				log.info("reading prefs attributes from: \n" + prefsFileName);
+			} catch (UncheckedIOException e) {
 				// reading was not successful
 				log.error("unsuccessful prefs reading from files!\n" + prefsFileName);
 			}
@@ -188,13 +187,13 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			for (ActivityParams activityParams : this.scenario.getConfig().scoring().getActivityParams()) {
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
-							activityParams.getTypicalDuration());
+						activityParams.getTypicalDuration());
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(),
-							activityParams.getLatestStartTime());
+						activityParams.getLatestStartTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(),
-							activityParams.getEarliestEndTime());
+						activityParams.getEarliestEndTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(),
-							activityParams.getMinimalDuration());
+						activityParams.getMinimalDuration());
 				}
 			}
 		}
@@ -212,7 +211,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 //		}
 //	}
 
-	Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities( String activityType ) {
+	Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities(String activityType) {
 		/**
 		 * If this is set to true, QuadTrees are stored in memory.
 		 * As a result...
@@ -223,7 +222,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		 * introduction the feature.
 		 */
 		boolean cacheQuadTrees = false;
-		if ( cacheQuadTrees ) {
+		if (cacheQuadTrees) {
 			QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get(activityType);
 			ActivityFacilityImpl[] facilities = this.facilitiesOfType.get(activityType);
 			if (quadTree == null || facilities == null) {
@@ -232,7 +231,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 				this.facilitiesOfType.put(activityType, tuple.getSecond());
 
 				return tuple;
-			} else return new Tuple<>( quadTree, facilities );
+			} else return new Tuple<>(quadTree, facilities);
 		} else return getTuple(activityType);
 	}
 
@@ -348,7 +347,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		private final ActivityFacility activityFacility;
 		private final int index;
 
-		ActivityFacilityWithIndex( ActivityFacility activityFacility, int index ) {
+		ActivityFacilityWithIndex(ActivityFacility activityFacility, int index) {
 			this.activityFacility = activityFacility;
 			this.index = index;
 		}
@@ -390,7 +389,12 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 		@Override
 		public void setCoord(Coord coord) {
-			throw new RuntimeException("not implemented") ;
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void setLinkId(Id<Link> linkId) {
+			this.activityFacility.setLinkId(linkId);
 		}
 
 		@Override
