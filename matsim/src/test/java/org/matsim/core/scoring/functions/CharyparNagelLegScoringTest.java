@@ -20,6 +20,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -60,11 +61,11 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	@Test
-	void scoreSinglePtTrip() throws URISyntaxException {
+	void scoreSinglePtTrip() throws URISyntaxException, MalformedURLException {
 
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch");
-		var configPath = Paths.get(scenarioUrl.toURI()).resolve("config.xml");
-		var config = ConfigUtils.loadConfig(configPath.toString());
+		var configUrl = scenarioUrl.toURI().resolve("config.xml").toURL();
+		var config = ConfigUtils.loadConfig(configUrl);
 		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan.xml.gz").toAbsolutePath();
 		config.plans().setInputFile(plansPath.toString());
 		var scenario = ScenarioUtils.loadScenario(config);
@@ -89,10 +90,10 @@ public class CharyparNagelLegScoringTest {
 	}
 
 	@Test
-	void scoreMultiplePtTripsWithLineSwitch() throws URISyntaxException {
+	void scoreMultiplePtTripsWithLineSwitch() throws URISyntaxException, MalformedURLException {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch");
-		var configPath = Paths.get(scenarioUrl.toURI()).resolve("config.xml");
-		var config = ConfigUtils.loadConfig(configPath.toString());
+		var configUrl = scenarioUrl.toURI().resolve("config.xml").toURL();
+		var config = ConfigUtils.loadConfig(configUrl);
 		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan-line-switch.xml.gz").toAbsolutePath();
 		config.plans().setInputFile(plansPath.toString());
 		var scenario = ScenarioUtils.loadScenario(config);
