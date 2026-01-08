@@ -31,6 +31,8 @@ public interface SimLink {
 
 	DistributedMobsimVehicle popVehicle();
 
+	Collection<DistributedMobsimVehicle> removeAllVehicles();
+
 	void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now);
 
 	void addLeaveHandler(OnLeaveQueue onLeaveQueue);
@@ -168,6 +170,18 @@ public interface SimLink {
 				throw new RuntimeException("The simulation attempted to take a vehicle from the buffer of a link "
 					+ this.id + ", but the buffer was empty. Call 'isOffering' first.");
 			}
+		}
+
+		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			var result = new ArrayList<DistributedMobsimVehicle>();
+			while (q.peek() != null) {
+				result.add(q.poll(Double.MIN_VALUE));
+			}
+			while (buffer.peek() != null) {
+				result.add(buffer.pollFirst());
+			}
+			return result;
 		}
 
 		@Override
@@ -320,6 +334,11 @@ public interface SimLink {
 		}
 
 		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			return this.q;
+		}
+
+		@Override
 		public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 			if (LinkPosition.QStart != position)
 				throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
@@ -414,6 +433,11 @@ public interface SimLink {
 			var result = localLink.popVehicle();
 			localLink.activateLink.accept(this);
 			return result;
+		}
+
+		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			return this.localLink.removeAllVehicles();
 		}
 
 		@Override

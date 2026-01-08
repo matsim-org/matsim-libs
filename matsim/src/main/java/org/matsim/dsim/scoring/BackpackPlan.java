@@ -87,28 +87,15 @@ public class BackpackPlan {
 	 * This takes the arrival event as well as the network and the transit schedule. This has the advantage that the object does not store these
 	 * objects as the backpack plan is passed around when agents switch from one to another partition.
 	 */
-	void handleEvent(PersonArrivalEvent e, Network network, TransitSchedule transitSchedule) {
+	void handleEvent(PersonArrivalEvent e) {
 
 		if (currentLeg == null) throw new IllegalStateException("Agent arrives but never started");
 
-		currentLeg.arrivalTime(e.getTime());
-
-		var route = finishRoute(e, network, transitSchedule);
-		var leg = PopulationUtils.createLeg(currentLeg.legMode());
-		leg.setDepartureTime(currentLeg.departureTime());
-		leg.setRoutingMode(currentLeg.routingMode());
-		leg.setTravelTime(currentLeg.travelTime());
-		leg.setRoute(route);
-
-		if (currentVehicleLeg != null) {
-			leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, currentVehicleLeg.enterVehicleTime());
-			leg.getAttributes().putAttribute(VEHICLE_ID_ATTRIBUTE_NAME, currentVehicleLeg.vehicleId());
+		if (currentVehicleLeg == null && currentPtLeg == null) {
+			// this was a teleported leg with a generic route. Add the arrival link
+			currentLeg.addLink(e.getLinkId());
 		}
-
-		experiencedPlan.addLeg(leg);
-		currentLeg = null;
-		currentVehicleLeg = null;
-		currentPtLeg = null;
+		currentLeg.arrivalTime(e.getTime());
 	}
 
 	void handleEvent(TeleportationArrivalEvent e) {
@@ -147,20 +134,51 @@ public class BackpackPlan {
 		currentVehicleLeg.addLink(e.getLinkId());
 	}
 
-	void finish() {
-		// overnight activities don't have an activity end event
-		if (currentActivity != null) experiencedPlan.addActivity(currentActivity);
+	void handleEvent(PersonStuckEvent e) {
+		// if the agent is performing a leg, we count the stuck time, as the arrival time.
+		// if the agent gets stuck while performing an activity, this usually means the simulation has finished, but the
+		// agent has not. We
+		if (currentLeg != null) {
+			currentLeg.arrivalTime(e.getTime());
+		}
 	}
 
-	private Route finishRoute(PersonArrivalEvent pae, Network network, TransitSchedule transitSchedule) {
+	void finish(Network network, TransitSchedule transitSchedule) {
+		// overnight activities don't have an activity end event
+		if (currentActivity != null) experiencedPlan.addActivity(currentActivity);
+
+		// if finish gets called while conducting a leg, finish this one.
+		if (currentLeg != null) {
+			finishLeg(network, transitSchedule);
+		}
+	}
+
+	void finishLeg(Network network, TransitSchedule transitSchedule) {
+		var route = finishRoute(network, transitSchedule);
+		var leg = PopulationUtils.createLeg(currentLeg.legMode());
+		leg.setDepartureTime(currentLeg.departureTime());
+		leg.setRoutingMode(currentLeg.routingMode());
+		leg.setTravelTime(currentLeg.travelTime());
+		leg.setRoute(route);
+
+		if (currentVehicleLeg != null) {
+			leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, currentVehicleLeg.enterVehicleTime());
+			leg.getAttributes().putAttribute(VEHICLE_ID_ATTRIBUTE_NAME, currentVehicleLeg.vehicleId());
+		}
+
+		experiencedPlan.addLeg(leg);
+		currentLeg = null;
+		currentVehicleLeg = null;
+		currentPtLeg = null;
+	}
+
+	private Route finishRoute(Network network, TransitSchedule transitSchedule) {
 
 		if (currentPtLeg != null) {
 			return createTransitRoute(network, transitSchedule);
 		} else if (currentVehicleLeg != null) {
 			return createNetworkRoute(network);
 		} else {
-			// this was a teleported leg with a generic route. Add the arrival link
-			currentLeg.addLink(pae.getLinkId());
 			return createGenericRoute();
 		}
 	}

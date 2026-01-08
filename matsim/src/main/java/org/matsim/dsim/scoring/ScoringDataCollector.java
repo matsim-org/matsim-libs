@@ -61,6 +61,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private final ExperiencedPlansCollector plansCollector;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
+	@SuppressWarnings("FieldMayBeFinal")
 	@Inject(optional = true)
 	private TransitSchedule transitSchedule;
 
@@ -141,14 +142,18 @@ public class ScoringDataCollector implements BasicEventHandler {
 		personLeavingPartition(agent.getId(), targetPart);
 	}
 
-	public void finishPerson(DistributedMobsimAgent agent) {
-		var backpack = backpackByPerson.remove(agent.getId());
-		// the netsim calls finish for each agent, but some are not scored, for example pt drivers.
-		if (backpack != null) {
-			backpack.backpackPlan().finish();
-			eods.score(backpack);
-			plansCollector.addExperiencedPlan(agent.getId(), backpack.backpackPlan().experiencedPlan());
+	public void finishPerson(Id<Person> agentId) {
+
+		if (!backpackByPerson.containsKey(agentId)) return;
+
+		var backpack = backpackByPerson.remove(agentId);
+		if (backpack.isInVehicle()) {
+			backpackByVehicle.get(backpack.currentVehicle()).remove(backpack);
 		}
+
+		backpack.backpackPlan().finish(network, transitSchedule);
+		eods.score(backpack);
+		plansCollector.addExperiencedPlan(agentId, backpack.backpackPlan().experiencedPlan());
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
@@ -257,10 +262,15 @@ public class ScoringDataCollector implements BasicEventHandler {
 			backpack.backpackPlan().handleEvent(pde);
 		} else if (e instanceof PersonArrivalEvent pae) {
 			var backpack = backpackByPerson.get(pae.getPersonId());
-			backpack.backpackPlan().handleEvent(pae, network, transitSchedule);
+			backpack.backpackPlan().handleEvent(pae);
+			backpack.backpackPlan().finishLeg(network, transitSchedule);
 		} else if (e instanceof TeleportationArrivalEvent tae) {
 			var backpack = backpackByPerson.get(tae.getPersonId());
 			backpack.backpackPlan().handleEvent(tae);
+		} else if (e instanceof PersonStuckEvent pse) {
+			var backpack = backpackByPerson.get(pse.getPersonId());
+			backpack.backpackPlan().handleEvent(pse);
+			finishPerson(pse.getPersonId());
 		}
 	}
 

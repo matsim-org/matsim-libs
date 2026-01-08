@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -16,6 +17,8 @@ public class DefaultWait2Link implements Wait2Link {
 
 	private final Map<Id<Link>, Queue<Waiting>> waitingVehicles = new HashMap<>();
 	private final EventsManager em;
+
+	private double now;
 
 	@Inject
 	public DefaultWait2Link(EventsManager em) {
@@ -32,6 +35,7 @@ public class DefaultWait2Link implements Wait2Link {
 
 	@Override
 	public void moveWaiting(double now) {
+		this.now = now;
 		var it = waitingVehicles.values().iterator();
 		while (it.hasNext()) {
 			var q = it.next();
@@ -48,6 +52,15 @@ public class DefaultWait2Link implements Wait2Link {
 
 			if (q.isEmpty()) {
 				it.remove();
+			}
+		}
+	}
+
+	@Override
+	public void afterSim() {
+		for (var q : waitingVehicles.values()) {
+			for (var veh : q) {
+				em.processEvent(new PersonStuckEvent(now, veh.vehicle().getDriver().getId(), veh.link().getId(), veh.vehicle().getDriver().getMode()));
 			}
 		}
 	}

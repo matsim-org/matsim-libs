@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,8 +43,8 @@ class BackpackPlanTest {
 
 		backpackPlan.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), startLink, TransportMode.walk, TransportMode.pt));
 		backpackPlan.handleEvent(new TeleportationArrivalEvent(30.0, Id.create("1", Person.class), 50.0, TransportMode.walk));
-		backpackPlan.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), endLink, TransportMode.walk), scenario.getNetwork(), scenario.getTransitSchedule());
-		backpackPlan.finish();
+		backpackPlan.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), endLink, TransportMode.walk));
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
 
 		assertSingleLeg(backpackPlan.experiencedPlan(), 10., 20., 50., TransportMode.walk, TransportMode.pt);
 		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();
@@ -72,8 +73,8 @@ class BackpackPlanTest {
 		backpackPlan.handleEvent(new LinkEnterEvent(11.0, vehId, middleLink));
 		backpackPlan.handleEvent(new LinkEnterEvent(16.0, vehId, endLink));
 		backpackPlan.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, endLink, vehId, "car", 1.0));
-		backpackPlan.handleEvent(new PersonArrivalEvent(30.0, agentId, endLink, "car"), scenario.getNetwork(), scenario.getTransitSchedule());
-		backpackPlan.finish();
+		backpackPlan.handleEvent(new PersonArrivalEvent(30.0, agentId, endLink, "car"));
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
 
 		assertSingleLeg(backpackPlan.experiencedPlan(), 10., 20., 550., "car", "car");
 		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();
@@ -92,6 +93,54 @@ class BackpackPlanTest {
 	}
 
 	@Test
+	void createsLegWithAbortedRoute() {
+		Scenario scenario = EventsToLegsTest.createTriangularNetwork();
+		var backpackPlan = new BackpackPlan();
+
+		Id<Person> agentId = Id.create("1", Person.class);
+		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
+		var startLink = Id.createLinkId("l1");
+		var middleLink = Id.createLinkId("l2");
+		var endLink = Id.createLinkId("l3");
+
+		backpackPlan.handleEvent(new ActivityEndEvent(0.0, agentId, startLink, null, "home", null));
+		backpackPlan.handleEvent(new PersonDepartureEvent(10.0, agentId, startLink, "car", "car"));
+		backpackPlan.handleEvent(new PersonEntersVehicleEvent(10.0, agentId, vehId));
+		backpackPlan.handleEvent(new VehicleEntersTrafficEvent(10.0, agentId, startLink, vehId, "car", 1.0));
+		backpackPlan.handleEvent(new LinkEnterEvent(11.0, vehId, middleLink));
+		backpackPlan.handleEvent(new LinkEnterEvent(16.0, vehId, endLink));
+		backpackPlan.handleEvent(new PersonStuckEvent(17., agentId, endLink, "car"));
+		// Stuck after entering endLink
+
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
+
+		Plan experiencedPlan = backpackPlan.experiencedPlan();
+		assertEquals(2, experiencedPlan.getPlanElements().size());
+
+		assertInstanceOf(Activity.class, experiencedPlan.getPlanElements().getFirst());
+		var act = (Activity) experiencedPlan.getPlanElements().getFirst();
+		assertEquals("home", act.getType());
+		assertEquals(startLink, act.getLinkId());
+
+		assertInstanceOf(Leg.class, experiencedPlan.getPlanElements().getLast());
+		var leg = (Leg) experiencedPlan.getPlanElements().getLast();
+		assertEquals(10., leg.getDepartureTime().seconds(), 1e-9);
+		// we don't really care about the travel time here. It should just be positive.
+		assertEquals(7., leg.getTravelTime().seconds(), 1e-9);
+		assertEquals("car", leg.getMode());
+
+		assertInstanceOf(NetworkRoute.class, leg.getRoute());
+		var route = (NetworkRoute) leg.getRoute();
+		assertEquals(startLink, route.getStartLinkId());
+		assertEquals(endLink, route.getEndLinkId());
+		assertEquals(1, route.getLinkIds().size());
+		// the first link was entered at the end, so no distance, the middle link was traveresed, the end link is not counted,
+		// as the agent got stuck on that link. Therefore, the travelled distance should be equal to the middle links length.
+		assertEquals(scenario.getNetwork().getLinks().get(middleLink).getLength(), route.getDistance(), 1e-9);
+		assertEquals(vehId, route.getVehicleId());
+	}
+
+	@Test
 	void testCreatesLegWithRoute_withoutEnteringTraffic() {
 		var scenario = EventsToLegsTest.createTriangularNetwork();
 		var backpackPlan = new BackpackPlan();
@@ -103,8 +152,8 @@ class BackpackPlanTest {
 		backpackPlan.handleEvent(new PersonDepartureEvent(10.0, personId, startLinkId, "car", "car"));
 		backpackPlan.handleEvent(new PersonEntersVehicleEvent(10.0, personId, vehId));
 		//driver leaves out vehicle after 10 seconds, no driving at all
-		backpackPlan.handleEvent(new PersonArrivalEvent(20.0, personId, startLinkId, "car"), scenario.getNetwork(), scenario.getTransitSchedule());
-		backpackPlan.finish();
+		backpackPlan.handleEvent(new PersonArrivalEvent(20.0, personId, startLinkId, "car"));
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
 
 		assertSingleLeg(backpackPlan.experiencedPlan(), 10., 10., 0., "car", "car");
 		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();
@@ -129,8 +178,8 @@ class BackpackPlanTest {
 			new VehicleEntersTrafficEvent(10.0, personId, startLinkId, vehId, "car", 0.0));
 		backpackPlan.handleEvent(
 			new VehicleLeavesTrafficEvent(25.0, personId, startLinkId, vehId, "car", 1.0));
-		backpackPlan.handleEvent(new PersonArrivalEvent(20.0, personId, startLinkId, "car"), scenario.getNetwork(), scenario.getTransitSchedule());
-		backpackPlan.finish();
+		backpackPlan.handleEvent(new PersonArrivalEvent(20.0, personId, startLinkId, "car"));
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
 
 		assertSingleLeg(backpackPlan.experiencedPlan(), 10., 10., 500., "car", "car");
 		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();
@@ -204,8 +253,8 @@ class BackpackPlanTest {
 		backpackPlan.handleEvent(new LinkEnterEvent(11.0, transitVehiceId, middleLink.getId()));
 		backpackPlan.handleEvent(new LinkEnterEvent(25.0, transitVehiceId, egressLinkId));
 		backpackPlan.handleEvent(new VehicleArrivesAtFacilityEvent(50, transitVehiceId, egressFacilityId, 0.0));
-		backpackPlan.handleEvent(new PersonArrivalEvent(50.0, passengerId, egressLinkId, "pt"), scenario.getNetwork(), scenario.getTransitSchedule());
-		backpackPlan.finish();
+		backpackPlan.handleEvent(new PersonArrivalEvent(50.0, passengerId, egressLinkId, "pt"));
+		backpackPlan.finish(scenario.getNetwork(), scenario.getTransitSchedule());
 
 		assertSingleLeg(backpackPlan.experiencedPlan(), 11., 39., 300, "pt", "pt");
 		var leg = (Leg) backpackPlan.experiencedPlan().getPlanElements().getFirst();

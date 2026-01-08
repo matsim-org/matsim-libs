@@ -8,8 +8,11 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -29,10 +32,12 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class NetworkTrafficEngineTest {
 
@@ -104,6 +109,49 @@ class NetworkTrafficEngineTest {
 		do {
 			engine.doSimStep(i.get());
 		} while (i.getAndIncrement() <= 120);
+	}
+
+	@Test
+	public void afterSimShouldProcessStuckVehiclesAndNotifyWait2Link() {
+		var wait2Link = mock(Wait2Link.class);
+		var simNetwork = mock(SimNetwork.class);
+		var eventsManager = mock(EventsManager.class);
+		var sdc = mock(ScoringDataCollector.class);
+		var engine = new NetworkTrafficEngine(mock(AgentSourcesContainer.class), simNetwork, mock(ActiveNodes.class),
+			mock(ActiveLinks.class), mock(ParkedVehicles.class), wait2Link, eventsManager, sdc);
+
+		var link1 = mock(SimLink.class);
+		var linkId1 = Id.createLinkId("l1");
+		when(link1.getId()).thenReturn(linkId1);
+		var link2 = mock(SimLink.class);
+		var linkId2 = Id.createLinkId("l2");
+		when(link2.getId()).thenReturn(linkId2);
+
+		when(simNetwork.getLinks()).thenReturn(Map.of(linkId1, link1, linkId2, link2));
+
+		var vehicle1 = mock(DistributedMobsimVehicle.class);
+		var agent1 = mock(MobsimDriverAgent.class);
+		when(vehicle1.getDriver()).thenReturn(agent1);
+		when(vehicle1.getCurrentLinkId()).thenReturn(linkId1);
+		when(agent1.getId()).thenReturn(Id.createPersonId("p1"));
+		when(agent1.getMode()).thenReturn("car");
+
+		var vehicle2 = mock(DistributedMobsimVehicle.class);
+		var agent2 = mock(MobsimDriverAgent.class);
+		when(vehicle2.getDriver()).thenReturn(agent2);
+		when(vehicle2.getCurrentLinkId()).thenReturn(linkId2);
+		when(agent2.getId()).thenReturn(Id.createPersonId("p2"));
+		when(agent2.getMode()).thenReturn("car");
+
+		when(link1.removeAllVehicles()).thenReturn(List.of(vehicle1));
+		when(link2.removeAllVehicles()).thenReturn(List.of(vehicle2));
+
+		engine.afterSim();
+
+		verify(wait2Link, times(1)).afterSim();
+		verify(eventsManager, times(2)).processEvent(any(PersonStuckEvent.class));
+		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p1"))));
+		verify(eventsManager).processEvent(argThat(event -> event instanceof PersonStuckEvent e && e.getPersonId().equals(Id.createPersonId("p2"))));
 	}
 
 	private static List<Event> createExpectedEvents() {

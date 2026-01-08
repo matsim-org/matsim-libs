@@ -61,10 +61,10 @@ public class PendingLeg {
 	}
 
 	Route route() {
-		if (this.route.size() < 2)
-			throw new IllegalStateException("Route must contain at least two links");
+		if (this.route.isEmpty())
+			throw new IllegalStateException("Route must contain at least one link");
 
+		// in case of only one link, first and last point to the same link.
 		return RouteUtils.createGenericRouteImpl(route.getFirst(), route.getLast());
-
 	}
 }

@@ -224,9 +224,9 @@ public class RouteUtils {
 	}
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds) {
-		Id<Link> startLinkId = routeLinkIds.get(0);
+		Id<Link> startLinkId = routeLinkIds.getFirst();
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
-		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+		Id<Link> endLinkId = routeLinkIds.getLast();
 		NetworkRoute route = createLinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;

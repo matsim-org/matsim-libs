@@ -3,6 +3,7 @@ package org.matsim.dsim.simulation.net;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -27,6 +28,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	//private final Set<String> modes;
 
 	private InternalInterface internalInterface;
+	private double now;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -111,11 +113,22 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 		// Move vehicles over nodes, then add waiting vehicles onto links and then move vehicles from the queue into link buffers
 		// This mimiks the order in which the QSim does it.
 		activeNodes.doSimStep(now);
 		wait2Link.moveWaiting(now);
 		activeLinks.doSimStep(now);
+	}
+
+	@Override
+	public void afterSim() {
+		wait2Link.afterSim();
+		for (SimLink link : simNetwork.getLinks().values()) {
+			for (var veh : link.removeAllVehicles()) {
+				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
+			}
+		}
 	}
 
 	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {

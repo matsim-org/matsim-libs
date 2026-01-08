@@ -30,6 +30,8 @@ public class ExperiencedPlansCollector implements ExperiencedPlansService {
 	}
 
 	public void addExperiencedPlan(Id<Person> personId, Plan plan) {
+		if (!population.getPersons().containsKey(personId)) return;
+
 		plans.put(personId, plan);
 	}
 

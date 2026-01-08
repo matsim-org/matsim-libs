@@ -50,12 +50,13 @@ class EndOfDayScoringTest {
 		backpack.backpackPlan().handleEvent(new ActivityEndEvent(10, personId, link1, startFacilityId, "start", new Coord(0, 0)));
 		backpack.backpackPlan().handleEvent(new PersonDepartureEvent(10., personId, link1, "walk", "walk"));
 		backpack.backpackPlan().handleEvent(new TeleportationArrivalEvent(25, personId, 339, "walk"));
-		backpack.backpackPlan().handleEvent(new PersonArrivalEvent(25, personId, link2, "walk"), network, null);
+		backpack.backpackPlan().handleEvent(new PersonArrivalEvent(25, personId, link2, "walk"));
+		backpack.backpackPlan().finishLeg(network, null);
 		backpack.backpackPlan().handleEvent(new ActivityStartEvent(25, personId, link2, null, "last", new Coord(1001, 0)));
 		backpack.addSpecialScoringEvent(new PersonMoneyEvent(10, personId, -10, "pay", "partner", "ref"));
 		backpack.addSpecialScoringEvent(new PersonScoreEvent(10, personId, -100, "special kind"));
 		backpack.addSpecialScoringEvent(new PersonStuckEvent(10, personId, link2, "stuckMode", "some reason"));
-		backpack.backpackPlan().finish();
+		backpack.backpackPlan().finish(network, null);
 
 		// we have collected all the data but not yet scored the plan.
 		assertNull(backpack.backpackPlan().experiencedPlan().getScore());
