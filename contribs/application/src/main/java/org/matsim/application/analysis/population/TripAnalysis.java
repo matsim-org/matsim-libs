@@ -1059,18 +1059,30 @@ public class TripAnalysis implements MATSimAppCommand {
 			IntColumn.create("departure_h", departure.intStream().toArray()),
 			IntColumn.create("arrival_h", arrival.intStream().toArray())
 		);
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+			Table filtered = trips.where(
+				trips.stringColumn("modelType").isEqualTo(ModelType.PERSON_TRAFFIC.id)
+			);
+			calculateArrivalAndDepartures(ModelType.PERSON_TRAFFIC.id, filtered);
 
-		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-			Table filtered = trips.where(
-				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
-			);
-			calculateArrivalAndDepartures(group, filtered);
+			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+				filtered = trips.where(
+					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+				);
+				calculateArrivalAndDepartures(group, filtered);
+			}
 		}
-		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
 			Table filtered = trips.where(
-				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+				trips.stringColumn("modelType").isEqualTo(ModelType.COMMERCIAL_TRAFFIC.id)
 			);
-			calculateArrivalAndDepartures(group, filtered);
+			calculateArrivalAndDepartures(ModelType.COMMERCIAL_TRAFFIC.id, filtered);
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				filtered = trips.where(
+					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+				);
+				calculateArrivalAndDepartures(group, filtered);
+			}
 		}
 		calculateArrivalAndDepartures("total", trips);
 	}
@@ -1081,7 +1093,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		tArrival.column(0).setName("purpose");
 		tArrival.column(1).setName("h");
 
-		DoubleColumn share = tArrival.numberColumn(2).divide(tArrival.numberColumn(2).sum()).setName("arrival");
+		DoubleColumn share = tArrival.numberColumn(2).divide(tArrival.numberColumn(2).sum()).setName("arrivals");
 		tArrival.replaceColumn(2, share);
 
 		Table tDeparture = filtered.summarize("trip_id", count).by("end_activity_type", "departure_h");
@@ -1089,14 +1101,14 @@ public class TripAnalysis implements MATSimAppCommand {
 		tDeparture.column(0).setName("purpose");
 		tDeparture.column(1).setName("h");
 
-		share = tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("departure");
+		share = tDeparture.numberColumn(2).divide(tDeparture.numberColumn(2).sum()).setName("departures");
 		tDeparture.replaceColumn(2, share);
 
 
 		Table table = new DataFrameJoiner(tArrival, "purpose", "h").fullOuter(tDeparture).sortOn(0, 1);
 
-		table.doubleColumn("departure").setMissingTo(0.0);
-		table.doubleColumn("arrival").setMissingTo(0.0);
+		table.doubleColumn("departures").setMissingTo(0.0);
+		table.doubleColumn("arrivals").setMissingTo(0.0);
 
 		table.write().csv(output.getPath("trip_purposes_by_hour_%s.csv", group).toFile());
 	}

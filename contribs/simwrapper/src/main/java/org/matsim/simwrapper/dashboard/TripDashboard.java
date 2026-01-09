@@ -408,41 +408,38 @@ public class TripDashboard implements Dashboard {
 
 		createDistancePlot(layout, args, finalTab, columnForModeShare, tabTitle, rowSuffix);
 
-		layout.row("departures" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
+		if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")){
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, "total");
+		}
+		else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, finalTab);
+		}
+		else {
+			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+		}
+	}
 
-			viz.title = "Departures";
-			viz.description = "by hour and purpose";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Hour").build())
-				.yAxis(Axis.builder().title("Share").build())
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", finalTab)).mapping()
-					.name("purpose", ColorScheme.Spectral)
-					.x("h")
-					.y("departure")
-			);
-		});
+	private static void createArrivalsAndDepartures(Layout layout, String rowSuffix, String tabTitle, String finalTab) {
+		String [] typesOfTimeDifferentiation = {"departures", "arrivals"};
+		for (String type : typesOfTimeDifferentiation) {
+			layout.row(type + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
 
-		layout.row("arrivals" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
-
-			viz.title = "Arrivals";
-			viz.description = "by hour and purpose";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Hour").build())
-				.yAxis(Axis.builder().title("Share").build())
-				.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
-				.build();
-			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-				viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", finalTab)).mapping()
-					.name("purpose", ColorScheme.Spectral)
-					.x("h")
-					.y("arrival")
-			);
-		});
+				viz.title = StringUtils.capitalize(type);
+				viz.description = "by hour and purpose";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Hour").build())
+					.yAxis(Axis.builder().title("Share").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", finalTab)).mapping()
+						.name("purpose", ColorScheme.Spectral)
+						.x("h")
+						.y(type)
+				);
+			});
+		}
 	}
 
 	private void createDistancePlot(Layout layout, String[] args, String tab, String columnForModeShare, String tabTitle, String rowSuffix) {
