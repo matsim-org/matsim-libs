@@ -941,37 +941,20 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 		for (String group : tripsPerPerson.keySet()) {
 			totalAvgTripsPerSubpopulation.put(group, tripsPerPerson.get(group).values().intStream().average().orElse(0d));
-			if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty() || !groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
-
-				Table table = Table.create("modal_share", StringColumn.create("main_mode"), DoubleColumn.create("user"),
-					StringColumn.create("group"));
-				for (String m : modeOrder) {
-					int n = usedModes.get(group).getInt(m);
-					if (n == 0) continue;
-
-					double share = new BigDecimal(n / totalMobilePerSubpopulation.get(group)).setScale(2, RoundingMode.HALF_UP).doubleValue();
-
-					table.stringColumn("main_mode").append(m);
-					table.doubleColumn("user").append(share);
-					table.stringColumn("group").append(group);
-				}
-				table.write().csv(output.getPath("mode_users_%s.csv", group).toFile());
-			}
 		}
 
-		Table table = Table.create("modal_share",	StringColumn.create("main_mode"),DoubleColumn.create("user"), StringColumn.create("group"));
-		for (String m : modeOrder) {
-			int n = usedModes.values().stream().mapToInt(map -> map.getInt(m)).sum();
-			if (n == 0) continue;
-
-			double share = new BigDecimal(n / (double)totalMobilePerSubpopulation.values().stream().mapToInt(Double::intValue).sum()).setScale(2, RoundingMode.HALF_UP).doubleValue();
-
-			table.stringColumn("main_mode").append(m);
-			table.doubleColumn("user").append(share);
-			table.stringColumn("group").append("total");
+		for (String group : tripsPerPerson.keySet()) {
+			writeModeUsages(group, null, usedModes, totalMobilePerSubpopulation, modeOrder, output);
 		}
-		table.write().csv(output.getPath("mode_users_%s.csv", "total").toFile());
-
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+			writeModeUsages(ModelType.PERSON_TRAFFIC.id, groupsOfSubpopulationsForPersonAnalysis.keySet(), usedModes, totalMobilePerSubpopulation,
+				modeOrder, output);
+		}
+		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
+			writeModeUsages(ModelType.COMMERCIAL_TRAFFIC.id, groupsOfSubpopulationsForCommercialAnalysis.keySet(), usedModes,
+				totalMobilePerSubpopulation, modeOrder, output);
+		}
+		writeModeUsages("total", usedModes.keySet(), usedModes, totalMobilePerSubpopulation, modeOrder, output);
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
 			if (groupsOfSubpopulationsForPersonAnalysis.isEmpty() && groupsOfSubpopulationsForCommercialAnalysis.isEmpty())
@@ -1011,6 +994,41 @@ public class TripAnalysis implements MATSimAppCommand {
 			printer.printRecord(recordAvgTrips);
 			printer.printRecord(recordAvgTripsMobile);
 		}
+	}
+
+	private void writeModeUsages(String groupId, Collection<String> groupsToAggregate, HashMap<String, Object2IntMap<String>> usedModes,
+								 Map<String, Double> totalMobilePerSubpopulation, List<String> modeOrder, OutputOptions output) {
+
+		// if groupsToAggregate is null, only use groupId
+		Collection<String> groups = groupsToAggregate != null
+			? groupsToAggregate
+			: Collections.singleton(groupId);
+
+		Table table = Table.create("modal_share", StringColumn.create("main_mode"), DoubleColumn.create("user"), StringColumn.create("group"));
+
+		// number of mobile persons in the selected groups
+		double numberMobilePersons = groups.stream()
+			.mapToDouble(g -> totalMobilePerSubpopulation.getOrDefault(g, 0d))
+			.sum();
+
+		if (numberMobilePersons == 0) return;
+
+		for (String m : modeOrder) {
+			int n = groups.stream()
+				.mapToInt(g -> usedModes.get(g).getInt(m))
+				.sum();
+
+			if (n == 0) continue;
+
+			double share = BigDecimal.valueOf(n / numberMobilePersons)
+				.setScale(2, RoundingMode.HALF_UP)
+				.doubleValue();
+
+			table.stringColumn("main_mode").append(m);
+			table.doubleColumn("user").append(share);
+			table.stringColumn("group").append(groupId);
+		}
+		table.write().csv(output.getPath("mode_users_%s.csv", groupId).toFile());
 	}
 
 	private void writeTripPurposes(Table trips) {
