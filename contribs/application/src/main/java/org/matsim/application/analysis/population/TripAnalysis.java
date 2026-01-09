@@ -331,10 +331,10 @@ public class TripAnalysis implements MATSimAppCommand {
 			trips = trips.where(Selection.with(idx.toIntArray()));
 		}
 
-		TripByGroupAnalysis groups = null;
+		TripBySociodemographicGroupsAnalysis sociodemographicGroups = null;
 		if (refData != null) {
-			groups = new TripByGroupAnalysis(refData);
-			groups.groupPersons(persons);
+			sociodemographicGroups = new TripBySociodemographicGroupsAnalysis(refData);
+			sociodemographicGroups.groupPersons(persons);
 		}
 
 		// Use longest_distance_mode where main_mode is not present
@@ -369,17 +369,17 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		writeModeShare(joined, labels);
 
-		if (groups != null) {
+		if (sociodemographicGroups != null) {
 			// filters for all subpopulations that are used for person analysis
 			if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
 				Table filteredForPersons = joined.where(
 					joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
 						.flatMap(Collection::stream)
 						.collect(Collectors.toSet())));
-				groups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+				sociodemographicGroups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 			}
 			else
-				groups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+				sociodemographicGroups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {

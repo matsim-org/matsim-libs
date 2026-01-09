@@ -18,12 +18,12 @@ import java.util.function.Function;
 import static tech.tablesaw.aggregate.AggregateFunctions.count;
 
 /**
- * Helper class to analyze trips by groups.
+ * Helper class to analyze trips by sociodemographic groups.
  * This class can not be used on its own, but will be called by {@link TripAnalysis}.
  */
-final class TripByGroupAnalysis {
+final class TripBySociodemographicGroupsAnalysis {
 
-	private final static Logger log = LogManager.getLogger(TripByGroupAnalysis.class);
+	private final static Logger log = LogManager.getLogger(TripBySociodemographicGroupsAnalysis.class);
 
 	/**
 	 * Contains detected groups and their reference data.
@@ -32,7 +32,7 @@ final class TripByGroupAnalysis {
 
 	private final Map<String, Category> categories;
 
-	TripByGroupAnalysis(String refData) throws IOException {
+	TripBySociodemographicGroupsAnalysis(String refData) throws IOException {
 
 		try (BufferedReader reader = IOUtils.getBufferedReader(refData)) {
 			Table ref = Table.read().csv(CsvReadOptions.builder(reader)
