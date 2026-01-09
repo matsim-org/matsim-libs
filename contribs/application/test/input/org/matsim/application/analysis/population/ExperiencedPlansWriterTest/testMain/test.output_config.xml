@@ -274,7 +274,7 @@
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
 		<param name="networkModes" value="car" />
 		<!-- Defines whether the network consistency should be checked. -->
-		<param name="networkRouteConsistencyCheck" value="abortOnInconsistency" />
+		<param name="networkConsistencyCheck" value="abortOnInconsistency"/>
 		<!-- strength of the randomness for the utility of money in routing under toll.  Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value.  -->
 		<param name="routingRandomness" value="3.0" />
 		<parameterset type="teleportedModeParameters" >
