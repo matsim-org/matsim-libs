@@ -237,7 +237,7 @@ public class TripDashboard implements Dashboard {
 		}
 		else
 			tabTitle = tab;
-		Layout.Row first = layout.row("first" + rowSuffix, tabTitle); //TODO vielleicht analog im commercialDashboard
+		Layout.Row first = layout.row("first" + rowSuffix, tabTitle);
 
 		String finalTab = tab;
 		first.el(Plotly.class, (viz, data) -> {
@@ -355,10 +355,8 @@ public class TripDashboard implements Dashboard {
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
-				if (finalTab.equals("total")) {
+				if (finalTab.equals("total"))
 					headerPopStats.addAll(groupsOfPersonSubpopulations.keySet());
-					headerPopStats.add("total");
-				}
 				else
 					headerPopStats.add(finalTab);
 				viz.show = headerPopStats;
