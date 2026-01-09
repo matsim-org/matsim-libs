@@ -19,7 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.jupiter.api.Assertions;
@@ -54,12 +53,17 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author mrieser / Senozon AG
  */
 public class LinkSpeedCalculatorIntegrationTest {
 
-	@RegisterExtension private MatsimTestUtils helper = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils helper = new MatsimTestUtils();
 
 	@Test
 	void testIntegration_Default() {
@@ -94,11 +98,11 @@ public class LinkSpeedCalculatorIntegrationTest {
 	void testIntegration_Slow() {
 		Fixture f = new Fixture();
 
-		final Scenario scenario = f.scenario ;
+		final Scenario scenario = f.scenario;
 
 		// so we get the default events manager:
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule() ) ;
-		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule());
+		EventsManager eventsManager = injector.getInstance(EventsManager.class);
 		eventsManager.initProcessing();
 
 		EventsCollector collector = new EventsCollector();
@@ -106,25 +110,30 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(new EventsLogger());
 
 		AbstractQSimModule overrides = new AbstractQSimModule() {
-			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0) ;
-			@Override public void configureQSim() {
-				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
-					@Inject private EventsManager events ;
-					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-						factory.setLinkSpeedCalculator(linkSpeedCalculator);
-						return factory ;
-					}
-				} ) ;
-			}
-		} ;
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0);
 
-		QSimBuilder builder = new QSimBuilder( scenario.getConfig() ).useDefaults() ;
-		builder.addOverridingQSimModule( overrides ) ;
+			@Override
+			public void configureQSim() {
+				bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+					@Inject
+					private EventsManager events;
+
+					@Override
+					public QNetworkFactory get() {
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+						factory.setLinkSpeedCalculator(linkSpeedCalculator);
+						return factory;
+					}
+				});
+			}
+		};
+
+		QSimBuilder builder = new QSimBuilder(scenario.getConfig()).useDefaults();
+		builder.addOverridingQSimModule(overrides);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
-		builder.build( scenario, eventsManager ).run() ;
+		builder.build(scenario, eventsManager).run();
 
 		List<Event> events = collector.getEvents();
 		Assertions.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -146,9 +155,9 @@ public class LinkSpeedCalculatorIntegrationTest {
 	void testIntegration_Fast() {
 		Fixture f = new Fixture();
 
-		final Scenario scenario = f.scenario ;
-		final Config config = scenario.getConfig() ;
-		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		final Scenario scenario = f.scenario;
+		final Config config = scenario.getConfig();
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 //		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
 //		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
@@ -156,22 +165,27 @@ public class LinkSpeedCalculatorIntegrationTest {
 //		defaultsModules.add( new DefaultMobsimModule() ) ;
 
 		AbstractQSimModule overrides = new AbstractQSimModule() {
-			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
-			@Override public void configureQSim() {
-				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
-					@Inject private EventsManager events ;
-					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0);
+
+			@Override
+			public void configureQSim() {
+				bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+					@Inject
+					private EventsManager events;
+
+					@Override
+					public QNetworkFactory get() {
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
 						factory.setLinkSpeedCalculator(linkSpeedCalculator);
-						return factory ;
+						return factory;
 					}
-				} ) ;
+				});
 			}
-		} ;
+		};
 
 //		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ;
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule() ) ;
-		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new EventsManagerModule());
+		EventsManager eventsManager = injector.getInstance(EventsManager.class);
 		eventsManager.initProcessing();
 
 		EventsCollector collector = new EventsCollector();
@@ -181,7 +195,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
 //		injector.getInstance( Mobsim.class ).run();
-		new QSimBuilder( config ).useDefaults().addOverridingQSimModule( overrides ).build( scenario, eventsManager ).run() ;
+		new QSimBuilder(config).useDefaults().addOverridingQSimModule(overrides).build(scenario, eventsManager).run();
 
 		List<Event> events = collector.getEvents();
 		Assertions.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -224,7 +238,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 		public Fixture() {
 			Config config = ConfigUtils.createConfig();
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 			this.scenario = ScenarioUtils.createScenario(config);
 
 			Id<Node>[] nodeIds = new Id[5];
@@ -256,7 +270,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 			Set<String> modes = new HashSet<String>();
 			modes.add("car");
-			for (Link l : new Link[] {l1, l2, l3}) {
+			for (Link l : new Link[]{l1, l2, l3}) {
 				l.setLength(100);
 				l.setFreespeed(10.0);
 				l.setAllowedModes(modes);
@@ -271,9 +285,9 @@ public class LinkSpeedCalculatorIntegrationTest {
 			Person person = pf.createPerson(Id.create(1, Person.class));
 			Plan plan = pf.createPlan();
 			Activity homeAct = pf.createActivityFromLinkId("home", linkIds[1]);
-			homeAct.setEndTime(7*3600);
+			homeAct.setEndTime(7 * 3600);
 			Leg leg = pf.createLeg("car");
-			Route route = RouteUtils.createLinkNetworkRouteImpl(linkIds[1], new Id[] { linkIds[2] }, linkIds[3]);
+			Route route = RouteUtils.createLinkNetworkRouteImpl(linkIds[1], new Id[]{linkIds[2]}, linkIds[3]);
 			leg.setRoute(route);
 			Activity workAct = pf.createActivityFromLinkId("work", linkIds[1]);
 

@@ -68,29 +68,29 @@ public class DeparturesOnSameLinkSameTimeTest {
 
 		Id<Link> departureLink = Id.createLinkId(1);
 
-		Map<Id<Vehicle>,Map<Id<Link>, Double>> motorbikeLinkLeaveTime = getLinkEnterTime("motorbike",3600);
-		Map<Id<Vehicle>,Map<Id<Link>, Double>> carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3600);
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> motorbikeLinkLeaveTime = getLinkEnterTime("motorbike", 3600);
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> carLinkLeaveTime = getLinkEnterTime(TransportMode.car, 3600);
 
 		double diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assertions.assertEquals(1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON, "Both car agents should leave at the gap of 1 sec." );
+		Assertions.assertEquals(1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON, "Both car agents should leave at the gap of 1 sec.");
 
 		double diff_motorbikeAgents_departureLink_LeaveTimes = motorbikeLinkLeaveTime.get(secondAgent).get(departureLink) - motorbikeLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assertions.assertEquals(0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both motorbike agents should leave at the same time." );
+		Assertions.assertEquals(0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both motorbike agents should leave at the same time.");
 
 		// for flow cap more than 3600, both cars also should leave link l_1 at the same time.
-		carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3601);
+		carLinkLeaveTime = getLinkEnterTime(TransportMode.car, 3601);
 
 		diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
-		Assertions.assertEquals(0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both car agents should leave at the same time" );
+		Assertions.assertEquals(0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON, "Both car agents should leave at the same time");
 	}
 
-	private Map<Id<Vehicle>,Map<Id<Link>, Double>> getLinkEnterTime (String travelMode, double departureLinkCapacity){
+	private Map<Id<Vehicle>, Map<Id<Link>, Double>> getLinkEnterTime(String travelMode, double departureLinkCapacity) {
 
 		PseudoInputs inputs = new PseudoInputs(travelMode);
 		inputs.createNetwork(departureLinkCapacity);
 		inputs.createPopulation();
 
-		final Map<Id<Vehicle>,Map<Id<Link>, Double>> linkLeaveTimes = new HashMap<>() ;
+		final Map<Id<Vehicle>, Map<Id<Link>, Double>> linkLeaveTimes = new HashMap<>();
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LinkLeaveEventHandler() {
@@ -103,7 +103,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 
-				if(linkLeaveTimes.containsKey(event.getVehicleId())){
+				if (linkLeaveTimes.containsKey(event.getVehicleId())) {
 
 					Map<Id<Link>, Double> times = linkLeaveTimes.get(event.getVehicleId());
 					times.put(event.getLinkId(), event.getTime());
@@ -145,15 +145,15 @@ public class DeparturesOnSameLinkSameTimeTest {
 
 		public PseudoInputs(String travelMode) {
 			this.travelMode = travelMode;
-			config=ConfigUtils.createConfig();
+			config = ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 			//following is necessary for mixed traffic, providing a route was obstructing
 			// the requirement of these which might be all right in some cases. Amit Jan'18
 			config.routing().setNetworkModes(Arrays.asList(travelMode));
-			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode );
+			config.travelTimeCalculator().setAnalyzedModesAsString(travelMode);
 			config.travelTimeCalculator().setSeparateModes(true);
 			config.scoring().getOrCreateModeParams(travelMode);
 
@@ -161,7 +161,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 			population = this.scenario.getPopulation();
 		}
 
-		private void createNetwork(double departureLinkCapacity){
+		private void createNetwork(double departureLinkCapacity) {
 
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(0, 0));
 			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(100, 10));
@@ -177,11 +177,11 @@ public class DeparturesOnSameLinkSameTimeTest {
 			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), fromNode1, toNode1, 1000.0, 20.0, 3600, 1, null, "7");
 		}
 
-		private void createPopulation(){
+		private void createPopulation() {
 
 			// Vehicles info
 //			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
+			scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
@@ -189,7 +189,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 			vt.setPcuEquivalents(travelMode == "motorbike" ? 0.25 : 1.0);
 			scenario.getVehicles().addVehicleType(vt);
 
-			for(int i=1;i<3;i++){
+			for (int i = 1; i < 3; i++) {
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();

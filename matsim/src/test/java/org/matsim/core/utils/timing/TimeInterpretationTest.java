@@ -20,32 +20,27 @@
 
 package org.matsim.core.utils.timing;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup.TripDurationHandling;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TimeInterpretationTest {
 
@@ -56,7 +51,7 @@ public class TimeInterpretationTest {
 	@Test
 	void testIgnoreDelays() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.ignoreDelays);
 
 		Controler controller = prepareController(config);
@@ -78,7 +73,7 @@ public class TimeInterpretationTest {
 	@Test
 	void testShiftActivityEndTime() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.plans().setTripDurationHandling(TripDurationHandling.shiftActivityEndTimes);
 
 		Controler controller = prepareController(config);
@@ -98,7 +93,7 @@ public class TimeInterpretationTest {
 
 	private Controler prepareController(Config config) {
 		config.controller()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+			.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controller().setLastIteration(0);
 
 		ActivityParams genericParams = new ActivityParams("generic");
@@ -108,9 +103,9 @@ public class TimeInterpretationTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		Node firstNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId("firstNode"),
-				new Coord(0.0, 0.0));
+			new Coord(0.0, 0.0));
 		Node secondNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId("secondeNode"),
-				new Coord(0.0, 0.0));
+			new Coord(0.0, 0.0));
 		Link link = scenario.getNetwork().getFactory().createLink(Id.createLinkId("link"), firstNode, secondNode);
 
 		scenario.getNetwork().addNode(firstNode);

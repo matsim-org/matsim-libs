@@ -106,10 +106,10 @@ public final class RoutingConfigGroup extends ConfigGroup {
 																		"settings for helper modes such as for " + TransportMode.non_network_walk;
 	private boolean clearingDefaultModeRoutingParams = false ;
 
-	private static final String NETWORK_ROUTE_CONSISTENCY_CHECK = "networkRouteConsistencyCheck";
-	private NetworkRouteConsistencyCheck networkRouteConsistencyCheck = NetworkRouteConsistencyCheck.abortOnInconsistency;
+	private static final String NETWORK_CONSISTENCY_CHECK = "networkConsistencyCheck";
+	private NetworkConsistencyCheck networkConsistencyCheck = NetworkConsistencyCheck.abortOnInconsistency;
 
-	public enum NetworkRouteConsistencyCheck {
+	public enum NetworkConsistencyCheck {
 		disable, abortOnInconsistency
 	}
 
@@ -562,8 +562,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		}
 		else if (ACCESSEGRESSTYPE.equals( key ) ) {
 			this.setAccessEgressType(AccessEgressType.valueOf(value));
-		} else if (NETWORK_ROUTE_CONSISTENCY_CHECK.equals(key)){
-			this.setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck.valueOf(value));
+		} else if (NETWORK_CONSISTENCY_CHECK.equals(key)) {
+			this.setNetworkConsistencyCheck(NetworkConsistencyCheck.valueOf(value));
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -577,7 +577,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
 		map.put(  ACCESSEGRESSTYPE, getAccessEgressType().toString()) ;
-		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, NetworkRouteConsistencyCheck.abortOnInconsistency.toString());
+		map.put(NETWORK_CONSISTENCY_CHECK, NetworkConsistencyCheck.abortOnInconsistency.toString());
 		return map;
 	}
 
@@ -593,7 +593,8 @@ public final class RoutingConfigGroup extends ConfigGroup {
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
 		map.put(ACCESSEGRESSTYPE, ACCESSEGRESSTYPE_CMT);
-		map.put(NETWORK_ROUTE_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked.");
+		map.put(NETWORK_CONSISTENCY_CHECK, "Defines whether the network consistency should be checked. If set to abortOnInconsistency, the simulation " +
+			"will abort if network has unreachable nodes and plans contain activities at non existing links or routes on links that do not allow the corresponding leg mode.");
 		return map;
 	}
 
@@ -697,14 +698,14 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		this.routingRandomness = routingRandomness;
 	}
 
-	@StringGetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
-	public NetworkRouteConsistencyCheck getNetworkRouteConsistencyCheck() {
-		return networkRouteConsistencyCheck;
+	@StringGetter(NETWORK_CONSISTENCY_CHECK)
+	public NetworkConsistencyCheck getNetworkConsistencyCheck() {
+		return networkConsistencyCheck;
 	}
 
-	@StringSetter(NETWORK_ROUTE_CONSISTENCY_CHECK)
-	public void setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck networkRouteConsistencyCheck) {
-		this.networkRouteConsistencyCheck = networkRouteConsistencyCheck;
+	@StringSetter(NETWORK_CONSISTENCY_CHECK)
+	public void setNetworkConsistencyCheck(NetworkConsistencyCheck networkConsistencyCheck) {
+		this.networkConsistencyCheck = networkConsistencyCheck;
 	}
 
 	@Override protected void checkConsistency(Config config) {

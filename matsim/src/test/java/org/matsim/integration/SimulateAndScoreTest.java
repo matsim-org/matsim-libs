@@ -20,11 +20,7 @@
 
 package org.matsim.integration;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,12 +30,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -69,17 +60,16 @@ import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimulateAndScoreTest {
 
@@ -90,7 +80,7 @@ public class SimulateAndScoreTest {
 	@Test
 	void testRealPtScore() {
 		final Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 
 		ScoringConfigGroup.ActivityParams h = new ScoringConfigGroup.ActivityParams("h");
@@ -142,7 +132,6 @@ public class SimulateAndScoreTest {
 		network.addLink(link3);
 
 
-
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(100, 0), false);
 		stop1.setLinkId(link1.getId());
@@ -155,7 +144,7 @@ public class SimulateAndScoreTest {
 		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link3.getId());
 		route.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
-		TransitRoute route1 = builder.createTransitRoute(Id.create("R1", TransitRoute.class), route, Arrays.asList( builder.createTransitRouteStop(stop1,0,10), builder.createTransitRouteStop(stop2,0,20), builder.createTransitRouteStop(stop3,0,30)), TransportMode.car);
+		TransitRoute route1 = builder.createTransitRoute(Id.create("R1", TransitRoute.class), route, Arrays.asList(builder.createTransitRouteStop(stop1, 0, 10), builder.createTransitRouteStop(stop2, 0, 20), builder.createTransitRouteStop(stop3, 0, 30)), TransportMode.car);
 		line1.addRoute(route1);
 		Departure d1 = builder.createDeparture(Id.create("D1", Departure.class), 100);
 		d1.setVehicleId(Id.create("V1", Vehicle.class));
@@ -198,7 +187,7 @@ public class SimulateAndScoreTest {
 				install(new TravelTimeCalculatorModule());
 				install(new EventsManagerModule());
 				install(new TimeInterpretationModule());
-				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config ));
+				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config));
 			}
 		});
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
@@ -207,7 +196,6 @@ public class SimulateAndScoreTest {
 		Activity a2 = populationFactory.createActivityFromCoord("w", link3.getCoord());
 		((Activity) a2).setLinkId(link3.getId());
 		plan.addActivity(a2);
-
 
 
 		person.addPlan(plan);
@@ -222,10 +210,10 @@ public class SimulateAndScoreTest {
 			.useDefaults() //
 			.build(scenario, events);
 		EventsToScore scorer =
-				EventsToScore.createWithScoreUpdating(
-						scenario,
-						new CharyparNagelScoringFunctionFactory(
-								scenario), events);
+			EventsToScore.createWithScoreUpdating(
+				scenario,
+				new CharyparNagelScoringFunctionFactory(
+					scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
@@ -243,7 +231,7 @@ public class SimulateAndScoreTest {
 	@Test
 	void testTeleportationScore() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0, 0));
@@ -264,7 +252,7 @@ public class SimulateAndScoreTest {
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromLinkId("h", link1.getId());
-		a1.setEndTime(6*3600);
+		a1.setEndTime(6 * 3600);
 		plan.addActivity(a1);
 
 		Leg leg = populationFactory.createLeg(TransportMode.pt);

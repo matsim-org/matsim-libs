@@ -77,9 +77,9 @@ public class MultiModalTripRouterTest {
 		config.routing().addParam("teleportedModeSpeed_ride", "15.0");
 		config.routing().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
 		config.routing().addParam("teleportedModeSpeed_walk", "1.34");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
-		config.scoring().addModeParams( new ScoringConfigGroup.ModeParams( TransportMode.ride ) );
+		config.scoring().addModeParams(new ScoringConfigGroup.ModeParams(TransportMode.ride));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		createNetwork(scenario);
@@ -112,19 +112,19 @@ public class MultiModalTripRouterTest {
 		MultiModalModule multiModalModule = new MultiModalModule();
 		multiModalModule.setLinkSlopes(linkSlopes);
 		com.google.inject.Injector injector = Injector.createInjector(
-				config,
-				AbstractModule.override(Collections.singleton(new AbstractModule() {
-					@Override
-					public void install() {
-						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(config));
-						install(new ScenarioByInstanceModule(scenario));
-						install(new TripRouterModule());
-						install(new TravelTimeCalculatorModule());
-						install(new TravelDisutilityModule());
-						install(new TimeInterpretationModule());
-						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
-					}
-				}), multiModalModule));
+			config,
+			AbstractModule.override(Collections.singleton(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(config));
+					install(new ScenarioByInstanceModule(scenario));
+					install(new TripRouterModule());
+					install(new TravelTimeCalculatorModule());
+					install(new TravelDisutilityModule());
+					install(new TimeInterpretationModule());
+					bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
+				}
+			}), multiModalModule));
 
 		TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		PlanRouter planRouter = new PlanRouter(tripRouter, injector.getInstance(TimeInterpretation.class));
@@ -193,7 +193,7 @@ public class MultiModalTripRouterTest {
 		person.addPlan(plan);
 
 		Activity startActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("start", Id.create("startLink", Link.class));
-		startActivity.setEndTime(8*3600);
+		startActivity.setEndTime(8 * 3600);
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 		Activity endActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("end", Id.create("endLink", Link.class));
 
@@ -254,7 +254,7 @@ public class MultiModalTripRouterTest {
 
 		Link fromCarLink = scenario.getNetwork().getFactory().createLink(Id.create("fromCarLink", Link.class), carNode, joinNode);
 		Link fromPtLink = scenario.getNetwork().getFactory().createLink(Id.create("fromPtLink", Link.class), ptNode, joinNode);
-		Link fromWalkLink = scenario.getNetwork().getFactory().createLink(Id.create("fromWalkLink", Link.class),  walkNode, joinNode);
+		Link fromWalkLink = scenario.getNetwork().getFactory().createLink(Id.create("fromWalkLink", Link.class), walkNode, joinNode);
 		Link fromBikeLink = scenario.getNetwork().getFactory().createLink(Id.create("fromBikeLink", Link.class), bikeNode, joinNode);
 		Link fromRideLink = scenario.getNetwork().getFactory().createLink(Id.create("fromRideLink", Link.class), rideNode, joinNode);
 
@@ -276,18 +276,18 @@ public class MultiModalTripRouterTest {
 		fromRideLink.setLength(10.0);
 		endLink.setLength(1.0);
 
-		startLink.setFreespeed(120.0/3.6);
-		toCarLink.setFreespeed(120.0/3.6);
-		toPtLink.setFreespeed(120.0/3.6);
-		toWalkLink.setFreespeed(120.0/3.6);
-		toBikeLink.setFreespeed(120.0/3.6);
-		toRideLink.setFreespeed(120.0/3.6);
-		fromCarLink.setFreespeed(120.0/3.6);
-		fromPtLink.setFreespeed(120.0/3.6);
-		fromWalkLink.setFreespeed(120.0/3.6);
-		fromBikeLink.setFreespeed(120.0/3.6);
-		fromRideLink.setFreespeed(120.0/3.6);
-		endLink.setFreespeed(120.0/3.6);
+		startLink.setFreespeed(120.0 / 3.6);
+		toCarLink.setFreespeed(120.0 / 3.6);
+		toPtLink.setFreespeed(120.0 / 3.6);
+		toWalkLink.setFreespeed(120.0 / 3.6);
+		toBikeLink.setFreespeed(120.0 / 3.6);
+		toRideLink.setFreespeed(120.0 / 3.6);
+		fromCarLink.setFreespeed(120.0 / 3.6);
+		fromPtLink.setFreespeed(120.0 / 3.6);
+		fromWalkLink.setFreespeed(120.0 / 3.6);
+		fromBikeLink.setFreespeed(120.0 / 3.6);
+		fromRideLink.setFreespeed(120.0 / 3.6);
+		endLink.setFreespeed(120.0 / 3.6);
 
 		toCarLink.setAllowedModes(createSet(new String[]{TransportMode.car}));
 		toPtLink.setAllowedModes(createSet(new String[]{TransportMode.pt}));
@@ -332,7 +332,7 @@ public class MultiModalTripRouterTest {
 
 	private Set<String> createSet(String[] entries) {
 		Set<String> set = new HashSet<>();
-        Collections.addAll(set, entries);
+		Collections.addAll(set, entries);
 		return set;
 	}
 }

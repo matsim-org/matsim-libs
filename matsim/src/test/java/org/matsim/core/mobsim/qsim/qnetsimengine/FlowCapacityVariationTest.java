@@ -62,28 +62,28 @@ public class FlowCapacityVariationTest {
 
 	@Test
 	void twoCarsLeavingTimes() {
-		vehiclesLeavingSameTime(TransportMode.car,3601);
+		vehiclesLeavingSameTime(TransportMode.car, 3601);
 	}
 
 	@Test
-	void twoMotorbikesTravelTime(){
+	void twoMotorbikesTravelTime() {
 		/* linkCapacity higher than 1PCU/sec*/
-		vehiclesLeavingSameTime("motorbike",3601);
+		vehiclesLeavingSameTime("motorbike", 3601);
 
 		/*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-		vehiclesLeavingSameTime("motorbike",1800);
+		vehiclesLeavingSameTime("motorbike", 1800);
 	}
 
 	@Test
-	void twoBikesTravelTime(){
+	void twoBikesTravelTime() {
 		/* linkCapacity higher than 1PCU/sec */
-		vehiclesLeavingSameTime(TransportMode.bike,3601);
+		vehiclesLeavingSameTime(TransportMode.bike, 3601);
 
 		/* link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-		vehiclesLeavingSameTime(TransportMode.bike,1800);
+		vehiclesLeavingSameTime(TransportMode.bike, 1800);
 	}
 
-	private void vehiclesLeavingSameTime(String travelMode, double linkCapacity){
+	private void vehiclesLeavingSameTime(String travelMode, double linkCapacity) {
 		PseudoInputs net = new PseudoInputs(travelMode);
 		net.createNetwork(linkCapacity);
 		net.createPopulation();
@@ -102,20 +102,20 @@ public class FlowCapacityVariationTest {
 		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 		Map<Id<Link>, double[]> times2 = vehicleLinkTravelTimes.get(Id.create("2", Vehicle.class));
 
-		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0];
-		int linkEnterTime2 = (int)times2.get(Id.create("2", Link.class))[0];
+		int linkEnterTime1 = (int) times1.get(Id.create("2", Link.class))[0];
+		int linkEnterTime2 = (int) times2.get(Id.create("2", Link.class))[0];
 
-		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1];
-		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
+		int linkLeaveTime1 = (int) times1.get(Id.create("2", Link.class))[1];
+		int linkLeaveTime2 = (int) times2.get(Id.create("2", Link.class))[1];
 
-		Assertions.assertEquals(0, linkEnterTime1-linkEnterTime2, travelMode+ " entered at different time");
-		Assertions.assertEquals(0, linkLeaveTime1-linkLeaveTime2, travelMode +" entered at same time but not leaving the link at the same time.");
+		Assertions.assertEquals(0, linkEnterTime1 - linkEnterTime2, travelMode + " entered at different time");
+		Assertions.assertEquals(0, linkLeaveTime1 - linkLeaveTime2, travelMode + " entered at same time but not leaving the link at the same time.");
 	}
 
-	private static final class PseudoInputs{
+	private static final class PseudoInputs {
 
 		final Config config;
-		final Scenario scenario ;
+		final Scenario scenario;
 		Network network;
 		final Population population;
 		Link link1;
@@ -123,7 +123,7 @@ public class FlowCapacityVariationTest {
 		Link link3;
 		private String travelMode;
 
-		public PseudoInputs(String travelMode){
+		public PseudoInputs(String travelMode) {
 
 			this.travelMode = travelMode;
 
@@ -131,11 +131,11 @@ public class FlowCapacityVariationTest {
 			config = scenario.getConfig();
 			config.qsim().setMainModes(Arrays.asList(travelMode));
 			config.qsim().setUsingFastCapacityUpdate(true);
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 			population = scenario.getPopulation();
 		}
 
-		private void createNetwork(double linkCapacity){
+		private void createNetwork(double linkCapacity) {
 
 			network = scenario.getNetwork();
 
@@ -158,18 +158,18 @@ public class FlowCapacityVariationTest {
 
 		}
 
-		private void createPopulation(){
+		private void createPopulation() {
 
 			// Vehicles info
 //			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			scenario.getConfig().qsim().setVehiclesSource( VehiclesSource.fromVehiclesData ) ;
+			scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
-			vt.setMaximumVelocity(travelMode == "bike" ? 5.0 : 20.0 );
+			vt.setMaximumVelocity(travelMode == "bike" ? 5.0 : 20.0);
 			vt.setPcuEquivalents(travelMode == "car" ? 1.0 : 0.25);
 			scenario.getVehicles().addVehicleType(vt);
 
-			for(int i=1;i<3;i++){
+			for (int i = 1; i < 3; i++) {
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
@@ -215,16 +215,16 @@ public class FlowCapacityVariationTest {
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times == null) {
 				times = new HashMap<>();
-				double [] linkEnterLeaveTime = {Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
+				double[] linkEnterLeaveTime = {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY};
 				times.put(event.getLinkId(), linkEnterLeaveTime);
 				this.vehicleLinkEnterLeaveTimes.put(event.getVehicleId(), times);
 			}
 			double linkLeaveTime;
-			if(times.get(event.getLinkId())!=null){
+			if (times.get(event.getLinkId()) != null) {
 				linkLeaveTime = times.get(event.getLinkId())[1];
 			} else linkLeaveTime = Double.POSITIVE_INFINITY;
 
-			double [] linkEnterTime = {event.getTime(),linkLeaveTime};
+			double[] linkEnterTime = {event.getTime(), linkLeaveTime};
 			times.put(event.getLinkId(), linkEnterTime);
 		}
 
@@ -234,7 +234,7 @@ public class FlowCapacityVariationTest {
 			Map<Id<Link>, double[]> times = this.vehicleLinkEnterLeaveTimes.get(event.getVehicleId());
 			if (times != null) {
 				double linkEnterTime = times.get(event.getLinkId())[0];
-				double [] linkEnterLeaveTime = {linkEnterTime,event.getTime()};
+				double[] linkEnterLeaveTime = {linkEnterTime, event.getTime()};
 				times.put(event.getLinkId(), linkEnterLeaveTime);
 			}
 		}

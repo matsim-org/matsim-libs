@@ -221,7 +221,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	}
 
 	private void checkFacilityLinks() {
-		if (scenario.getConfig().routing().getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if (scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
 			return;
 		}
 

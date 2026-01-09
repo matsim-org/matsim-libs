@@ -46,67 +46,68 @@ public class EquilWithCarrierWithPersonsIT {
 
 	private Controler controler;
 
-	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	static Config commonConfig( MatsimTestUtils testUtils ) {
+	static Config commonConfig(MatsimTestUtils testUtils) {
 		Config config = ConfigUtils.createConfig();
 
-		config.scoring().addActivityParams( new ActivityParams("w").setTypicalDuration(60 * 60 * 8 ) );
-		config.scoring().addActivityParams( new ActivityParams("h").setTypicalDuration(16 * 60 * 60 ) );
+		config.scoring().addActivityParams(new ActivityParams("w").setTypicalDuration(60 * 60 * 8));
+		config.scoring().addActivityParams(new ActivityParams("h").setTypicalDuration(16 * 60 * 60));
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(2);
 
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
-		config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
+		config.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml");
 
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		return config;
 	}
 
 	@BeforeEach
-	public void setUp(){
-		Config config = commonConfig( testUtils );
+	public void setUp() {
+		Config config = commonConfig(testUtils);
 
-		config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
+		config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans100.xml");
 		config.replanning().setMaxAgentPlanMemorySize(5);
-		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("BestScore" ).setWeight(1.0 ) );
-		config.replanning().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.0 ).setDisableAfter(300 ) );
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("BestScore").setWeight(1.0));
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.0).setDisableAfter(300));
 
-		Scenario scenario = commonScenario( config, testUtils );
+		Scenario scenario = commonScenario(config, testUtils);
 
 		controler = new Controler(scenario);
 	}
 
-	static Scenario commonScenario( Config config, MatsimTestUtils testUtils ){
-		Scenario scenario = ScenarioUtils.loadScenario( config );
+	static Scenario commonScenario(Config config, MatsimTestUtils testUtils) {
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( carrierVehicleTypes ).readFile(Path.of(testUtils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString());
+		new CarrierVehicleTypeReader(carrierVehicleTypes).readFile(Path.of(testUtils.getPackageInputDirectory()).getParent().resolve("vehicleTypes_v2.xml").toString());
 
-		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario );
-		new CarrierPlanXmlReader( carriers, carrierVehicleTypes ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
+		new CarrierPlanXmlReader(carriers, carrierVehicleTypes).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
 		return scenario;
 	}
 
 	@Test
-	void testScoringInMeters(){
+	void testScoringInMeters() {
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
 		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
-		Assertions.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0);
 
 		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assertions.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0);
 	}
 
 }

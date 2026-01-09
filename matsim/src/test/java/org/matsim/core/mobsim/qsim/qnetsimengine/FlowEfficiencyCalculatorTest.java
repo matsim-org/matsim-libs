@@ -113,7 +113,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 
 		@Override
-        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
+		public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
 			return factor;
 		}
 	}
@@ -133,7 +133,7 @@ public class FlowEfficiencyCalculatorTest {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		ActivityParams genericParams = new ActivityParams("generic");
 		genericParams.setTypicalDuration(1.0);

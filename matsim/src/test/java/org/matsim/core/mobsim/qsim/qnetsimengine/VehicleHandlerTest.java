@@ -180,7 +180,7 @@ public class VehicleHandlerTest {
 
 	private Scenario createScenario() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());

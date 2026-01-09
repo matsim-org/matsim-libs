@@ -71,7 +71,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@MethodSource("intersectLinkAndMode")
 	void testNoRouteChange_noConsistencyCheck_ok(String link, String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link20.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link20.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Id<Link> linkId = Id.createLinkId(link);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -92,7 +92,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@MethodSource("intersectLinkAndMode")
 	void testNoRouteChange_withConsistencyCheck_throws(String link, String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link20.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		final Config config = prepareConfig("plans_act_link20.xml", RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> linkId = Id.createLinkId(link);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -114,7 +114,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testRerouteBeforeSim_toActNotPossible_throws(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Id<Link> link = Id.createLinkId("6");
 
@@ -135,7 +135,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testRerouteBeforeSim_fromActNotPossible_throws(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Id<Link> link = Id.createLinkId("15");
 
@@ -156,7 +156,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testCleanNetworkAndRerouteBeforeSim_toActNotPossible_withConsistencyCheck_ok(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("6");
 
@@ -184,7 +184,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossible_withConsistencyCheck_ok(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("15");
 
@@ -211,7 +211,7 @@ public class ModeRestrictionTest {
 	 */
 	@Test
 	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withoutConsistencyCheck_throws() {
-		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Id<Link> link = Id.createLinkId("15");
 
@@ -238,7 +238,7 @@ public class ModeRestrictionTest {
 	 */
 	@Test
 	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withConsistencyCheck_throws() {
-		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("15");
 
@@ -265,7 +265,7 @@ public class ModeRestrictionTest {
 	 */
 	@Test
 	void testCleanNetworkAndRerouteBeforeSim_fromActNotPossibleForAll_withConsistencyCheck_ok() {
-		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		final Config config = prepareConfig("plans_act_link6.xml", RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 
 		Id<Link> link = Id.createLinkId("15");
 
@@ -295,7 +295,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testRerouteBeforeSim_actOnRestrictedLinkWithCoords_ok(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Scenario scenario = restrictLinkAndResetRoutes(config, Id.createLinkId("15"), restrictedMode);
 
@@ -349,7 +349,7 @@ public class ModeRestrictionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"car", "bike"})
 	void testRerouteBeforeSim_actOnRestrictedLinkWithoutCoord_throws(String restrictedMode) {
-		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = prepareConfig("plans_act_link15.xml", RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		Id<Person> person = Id.createPersonId(restrictedMode);
 		Scenario scenario = restrictLinkAndResetRoutes(config, Id.createLinkId("15"), restrictedMode);
@@ -364,9 +364,9 @@ public class ModeRestrictionTest {
 			exception.getMessage().contains("Exception while processing persons. Cannot guarantee that all persons have been fully processed."));
 	}
 
-	private Config prepareConfig(String plansFile, RoutingConfigGroup.NetworkRouteConsistencyCheck consistencyCheck) {
+	private Config prepareConfig(String plansFile, RoutingConfigGroup.NetworkConsistencyCheck consistencyCheck) {
 		final Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml", MatsimTestUtils.TestMethodType.Parameterized);
-		config.routing().setNetworkRouteConsistencyCheck(consistencyCheck);
+		config.routing().setNetworkConsistencyCheck(consistencyCheck);
 		config.plans().setInputFile(plansFile);
 
 		ScoringConfigGroup.ModeParams params = new ScoringConfigGroup.ModeParams("bike");

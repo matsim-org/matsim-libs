@@ -20,12 +20,7 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -43,11 +38,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -68,6 +59,11 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsLogger;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * Tests that the QSim takes a TimeVariant Network into account.
@@ -82,8 +78,8 @@ public class QSimIntegrationTest {
 
 	@Test
 	void testFreespeed() {
-		Config config = utils.loadConfig((String)null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Config config = utils.loadConfig((String) null);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -93,16 +89,16 @@ public class QSimIntegrationTest {
 		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 
 		// add a freespeed change to 20 at 8am.
-		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
+		NetworkChangeEvent change = new NetworkChangeEvent(8 * 3600.0);
 		change.addLink(link2);
 		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
 		final NetworkChangeEvent event = change;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event);
+		NetworkUtils.addNetworkChangeEvent(((Network) network), event);
 
 		// create a population
 		Population plans = scenario.getPopulation();
-		Person person1 = createPersons(7*3600, link1, link3, network, 1).get(0);
-		Person person2 = createPersons(9*3600, link1, link3, network, 1).get(0);
+		Person person1 = createPersons(7 * 3600, link1, link3, network, 1).get(0);
+		Person person2 = createPersons(9 * 3600, link1, link3, network, 1).get(0);
 		plans.addPerson(person1);
 		plans.addPerson(person2);
 
@@ -133,8 +129,8 @@ public class QSimIntegrationTest {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
-		Config config = utils.loadConfig((String)null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Config config = utils.loadConfig((String) null);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -149,27 +145,27 @@ public class QSimIntegrationTest {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event = change1;
-		NetworkUtils.addNetworkChangeEvent(network,event);
+		NetworkUtils.addNetworkChangeEvent(network, event);
 		/*
 		 * Create a network event the restores the capacity to its original value.
 		 */
 		NetworkChangeEvent change2 = new NetworkChangeEvent(3600);
 		change2.addLink(link2);
-		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1/capacityFactor));
+		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1 / capacityFactor));
 		final NetworkChangeEvent event1 = change2;
-		NetworkUtils.addNetworkChangeEvent(network,event1);
+		NetworkUtils.addNetworkChangeEvent(network, event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population pop = scenario.getPopulation();
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
-		for(Person p : persons1) {
+		for (Person p : persons1) {
 			pop.addPerson(p);
 		}
 		Person person1 = persons1.get(personsPerWave - 1);
 
 		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
-		for(Person p : persons2) {
+		for (Person p : persons2) {
 			pop.addPerson(p);
 		}
 		Person person2 = persons2.get(personsPerWave - 1);
@@ -205,8 +201,8 @@ public class QSimIntegrationTest {
 	void testZeroCapacity() {
 		final double capacityFactor = 0.0;
 
-		Config config = utils.loadConfig((String)null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Config config = utils.loadConfig((String) null);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.network().setTimeVariantNetwork(true);
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;
@@ -229,14 +225,14 @@ public class QSimIntegrationTest {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event1 = change1;
-		NetworkUtils.addNetworkChangeEvent(network,event1);
+		NetworkUtils.addNetworkChangeEvent(network, event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
 		Population plans = scenario.getPopulation();
 		List<Person> persons1 = createPersons(0, link1, link3, network, 1);
 		final Id<Person> personId = persons1.get(0).getId();
-		for(Person p : persons1) {
+		for (Person p : persons1) {
 			plans.addPerson(p);
 		}
 
@@ -246,9 +242,10 @@ public class QSimIntegrationTest {
 		 */
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventsLogger());
-		events.addHandler(new LinkEnterEventHandler(){
+		events.addHandler(new LinkEnterEventHandler() {
 			@Override
-			public void reset(int iteration) {}
+			public void reset(int iteration) {
+			}
 
 			@Override
 			public void handleEvent(LinkEnterEvent event) {
@@ -261,7 +258,8 @@ public class QSimIntegrationTest {
 
 		events.addHandler(new PersonStuckEventHandler() {
 			@Override
-			public void reset(int iteration) {}
+			public void reset(int iteration) {
+			}
 
 			@Override
 			public void handleEvent(PersonStuckEvent event) {
@@ -277,7 +275,6 @@ public class QSimIntegrationTest {
 			.build(scenario, events) //
 			.run();
 	}
-
 
 
 	/**
@@ -298,13 +295,13 @@ public class QSimIntegrationTest {
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 300, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1);
 		final Node fromNode1 = node2;
 		final Node toNode1 = node3;
-		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1);
 		final Node fromNode2 = node3;
 		final Node toNode2 = node4;
-		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1);
 
 		return network;
 	}
@@ -312,24 +309,25 @@ public class QSimIntegrationTest {
 	/**
 	 * Creates <tt>count</tt> persons with departure time
 	 * <tt>depTime<tt> + index(person).
-	 * @param depTime the departure time for the first person.
-	 * @param depLink the departure link.
+	 *
+	 * @param depTime  the departure time for the first person.
+	 * @param depLink  the departure link.
 	 * @param destLink the destination link.
 	 * @param network
-	 * @param count the number of persons to create
+	 * @param count    the number of persons to create
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
 	private static List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final Network network,
-			final int count) {
+											  final int count) {
 		double departureTime = depTime;
 		List<Person> persons = new ArrayList<Person>(count);
-		for(int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i + (int) departureTime, Person.class));
 			Plan plan1 = PersonUtils.createAndAddPlan(person, true);
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan1, "h", depLink.getId());
 			a1.setEndTime(departureTime);
-			Leg leg1 = PopulationUtils.createAndAddLeg( plan1, TransportMode.car );
+			Leg leg1 = PopulationUtils.createAndAddLeg(plan1, TransportMode.car);
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
 			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(depLink.getId(), destLink.getId());
@@ -397,9 +395,9 @@ public class QSimIntegrationTest {
 
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
-			if (event.getPersonId().equals(personId1)){
+			if (event.getPersonId().equals(personId1)) {
 				vehicleId1 = event.getVehicleId();
-			} else if (event.getPersonId().equals(personId2)){
+			} else if (event.getPersonId().equals(personId2)) {
 				vehicleId2 = event.getVehicleId();
 			}
 		}

@@ -18,12 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -43,9 +37,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.NodeTransition;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.NodeTransition;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
@@ -54,17 +48,19 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.*;
+
 /**
  * Test the different node transition options that one can choose in the qsim config group.
  * EmptyBufferAfterBuffer and blockNodeWhenSingleOutlinkFull = false currently is the MATSim standard.
- *
+ * <p>
  * This test checks the throughput of links in two different scenarios:
  * 1. A merge situation, where agents coming from three different links all want to enter the same downstream link with restricted capacity.
  * 2. An intersection, where agents coming from two different links do not use same links but might affect each other when the flag blockNodeWhenSingleOutlinkFull is set to true.
- *
+ * <p>
  * While implementing and significantly testing the new node transitions some bugs have been found in QueueWithBuffer regarding half empty buffers and time step sizes < 1.
  * This tests therefore also validates the bug fixes (see e.g. testNodeTransitionWithTimeStepSizeSmallerOne).
- *
+ * <p>
  * The results should be the same independently of slow/fast capacity update. That's why the test is run for both (parameterized).
  *
  * @author tthunig
@@ -95,18 +91,21 @@ public class NodeTransitionTest {
 			.run();
 
 		// this is the time before the downstream link (7_8) gets full and with that no inflow capacity is valid
-		int timeInterval1Start = 110; int timeInterval1End = 180;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 180;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (7_8) is already full and only 2 vehicles per second can enter but the third commodity has not started sending vehicles yet
-		int timeInterval2Start = 210; int timeInterval2End = 340;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 340;
 		Map<Id<Link>, Double> avgThroughputCongestedTwoLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when all three commodities send vehicles and the downstream link (7_8) is still full and only 2 vehicles per second can enter
-		int timeInterval3Start = 360; int timeInterval3End = 500;
+		int timeInterval3Start = 360;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedThreeLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
 		}
 
 		/* since this node dynamic is a random distribution we allow a somewhat bigger difference here.
@@ -126,8 +125,8 @@ public class NodeTransitionTest {
 		 * with probability of 1/3 link 2_7 is selected and sends all vehicles from its buffer, i.e. 1 and afterwards link 4_7 can send the remaining 1.
 		 * this means, the expected average throughput of link 2_7 is 1/3 and the expected average throughput of link 4_7 is 2*2/3 + 1/3 = 5/3.
 		 */
-		Assertions.assertEquals(1./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.25384615384615383
-		Assertions.assertEquals(5./3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.7461538461538462
+		Assertions.assertEquals(1. / 3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.25384615384615383
+		Assertions.assertEquals(5. / 3, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.7461538461538462
 		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
@@ -136,9 +135,9 @@ public class NodeTransitionTest {
 		 * with probability of 1/5 link 2_7 is selected and sends all vehicles from its buffer, i.e. 1 and afterwards link 4_7 or link 6_7 can send the remaining 1.
 		 * this means, the expected average throughput of link 2_7 is 1/5 and the expected average throughput of link 4_7 and link 6_7 is 2*2/5 + 1/10 = 9/10.
 		 */
-		Assertions.assertEquals(1./5, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.17857142857142858
-		Assertions.assertEquals(9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8928571428571429
-		Assertions.assertEquals(9./10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.9285714285714286
+		Assertions.assertEquals(1. / 5, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.17857142857142858
+		Assertions.assertEquals(9. / 10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8928571428571429
+		Assertions.assertEquals(9. / 10, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.9285714285714286
 	}
 
 	@ParameterizedTest
@@ -164,18 +163,21 @@ public class NodeTransitionTest {
 			.run();
 
 		// this is the time before the downstream link (7_8) gets full and with that no inflow capacity is valid
-		int timeInterval1Start = 110; int timeInterval1End = 180;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 180;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (7_8) is already full and only 2 vehicles per second can enter but the third commodity has not started sending vehicles yet
-		int timeInterval2Start = 210; int timeInterval2End = 340;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 340;
 		Map<Id<Link>, Double> avgThroughputCongestedTwoLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when all three commodities send vehicles and the downstream link (7_8) is still full and only 2 vehicles per second can enter
-		int timeInterval3Start = 360; int timeInterval3End = 500;
+		int timeInterval3Start = 360;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedThreeLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
 		}
 
 		/* since this node dynamic is a random distribution we allow a somewhat bigger difference here.
@@ -199,8 +201,8 @@ public class NodeTransitionTest {
 		 * the numbers are as follows: the expected average throughput of link 2_7 is 2/3*1/3*1 + 1/3*1 = 5/9
 		 * and the expected average throughput of link 4_7 is 2/3*2/3*2 + 2/3*1/3*1 + 1/3*1 = 13/9
 		 */
-		Assertions.assertEquals(5./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.5307692307692308
-		Assertions.assertEquals(13./9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.4692307692307693
+		Assertions.assertEquals(5. / 9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.5307692307692308
+		Assertions.assertEquals(13. / 9, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 1.4692307692307693
 		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), MatsimTestUtils.EPSILON, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
@@ -212,9 +214,9 @@ public class NodeTransitionTest {
 		 * the numbers are as follows: the expected average throughput of link 2_7 is 1/5*1/2*1 + 1/5*1/2*1 + 2/5*1/5*1 + 2/5*1/5*1 = 9/25 = 0.36
 		 * and the expected average throughput of link 4_7 and 6_7 is 1/5*1/2*1 + 2/5*2/5*2 + 2/5*1/5*1 + 2/5*2/5*1 + 2/5*2/5*1 = 41/50
 		 */
-		Assertions.assertEquals(9./25, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.34285714285714286
-		Assertions.assertEquals(41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
-		Assertions.assertEquals(41./50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8571428571428571
+		Assertions.assertEquals(9. / 25, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.34285714285714286
+		Assertions.assertEquals(41. / 50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
+		Assertions.assertEquals(41. / 50, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8571428571428571
 	}
 
 	@ParameterizedTest
@@ -241,18 +243,21 @@ public class NodeTransitionTest {
 			.run();
 
 		// this is the time before the downstream link (7_8) gets full and with that no inflow capacity is valid
-		int timeInterval1Start = 110; int timeInterval1End = 180;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 180;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (7_8) is already full and only 2 vehicles per second can enter but the third commodity has not started sending vehicles yet
-		int timeInterval2Start = 210; int timeInterval2End = 340;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 340;
 		Map<Id<Link>, Double> avgThroughputCongestedTwoLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when all three commodities send vehicles and the downstream link (7_8) is still full and only 2 vehicles per second can enter
-		int timeInterval3Start = 360; int timeInterval3End = 500;
+		int timeInterval3Start = 360;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedThreeLinks = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedTwoLinks.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedThreeLinks.get(link));
 		}
 
 		/* since this node dynamic does not rely on a random distribution but updates link priorities each time step,
@@ -274,17 +279,17 @@ public class NodeTransitionTest {
 		/* the deterministic node transition should distribute the free slots on the downstream link exactly proportional to the outflow capacity of the links,
 		 * i.e. 1:2 in this case
 		 */
-		Assertions.assertEquals(1./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), deltaPeriodic, "Troughput on link 2_7 is wrong"); // 0.6692307692307692
-		Assertions.assertEquals(2./3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), deltaPeriodic, "Troughput on link 4_7 is wrong"); // 1.3307692307692307
+		Assertions.assertEquals(1. / 3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("2_7")), deltaPeriodic, "Troughput on link 2_7 is wrong"); // 0.6692307692307692
+		Assertions.assertEquals(2. / 3 * 2, avgThroughputCongestedTwoLinks.get(Id.createLinkId("4_7")), deltaPeriodic, "Troughput on link 4_7 is wrong"); // 1.3307692307692307
 		Assertions.assertEquals(0, avgThroughputCongestedTwoLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong");
 
 		// test throughput for the third time interval
 		/* the deterministic node transition should distribute the free slots on the downstream link exactly proportional to the outflow capacity of the links,
 		 * i.e. 1:2:2 in this case.
 		 */
-		Assertions.assertEquals(1./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.4
-		Assertions.assertEquals(2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
-		Assertions.assertEquals(2./5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8
+		Assertions.assertEquals(1. / 5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("2_7")), delta, "Troughput on link 2_7 is wrong"); // 0.4
+		Assertions.assertEquals(2. / 5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("4_7")), delta, "Troughput on link 4_7 is wrong"); // 0.8
+		Assertions.assertEquals(2. / 5 * 2, avgThroughputCongestedThreeLinks.get(Id.createLinkId("6_7")), delta, "Troughput on link 6_7 is wrong"); // 0.8
 	}
 
 	@ParameterizedTest
@@ -293,7 +298,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
-		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		scenario.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -322,18 +327,21 @@ public class NodeTransitionTest {
 //				+ ", link 4_5: " + (avgThroughputUntil210.get(Id.createLinkId("4_5")) * 210 / 1) );
 
 		// this is the time before the downstream link (5_8) gets full and with that no inflow capacity is valid and no node is blocked
-		int timeInterval1Start = 110; int timeInterval1End = 200;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 200;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (5_8) is full and also no vehicles are leaving this link such that no vehicles can enter and the node stays blocked
-		int timeInterval2Start = 210; int timeInterval2End = 300;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 300;
 		Map<Id<Link>, Double> avgThroughputCongestedNodeBlocked = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when one vehicle per second is allowed to enter 5_8, i.e. 2_5 is restricted to half of its outflow capacity
-		int timeInterval3Start = 310; int timeInterval3End = 500;
+		int timeInterval3Start = 310;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedRestrictFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
 		}
 
 		/* since this node dynamic is a random distribution we allow a somewhat bigger difference here.
@@ -355,7 +363,7 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
 		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
-		Assertions.assertEquals(1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.36666666666666664
+		Assertions.assertEquals(1. / 3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.36666666666666664
 		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
@@ -366,7 +374,7 @@ public class NodeTransitionTest {
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
-		Assertions.assertEquals(1./3, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3263157894736842
+		Assertions.assertEquals(1. / 3, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3263157894736842
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
@@ -376,7 +384,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
-		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		scenario.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -405,18 +413,21 @@ public class NodeTransitionTest {
 //				+ ", link 4_5: " + (avgThroughputUntil210.get(Id.createLinkId("4_5")) * 210 / 1) );
 
 		// this is the time before the downstream link (5_8) gets full and with that no inflow capacity is valid and no node is blocked
-		int timeInterval1Start = 110; int timeInterval1End = 200;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 200;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (5_8) is full and also no vehicles are leaving this link such that no vehicles can enter and the node stays blocked
-		int timeInterval2Start = 210; int timeInterval2End = 300;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 300;
 		Map<Id<Link>, Double> avgThroughputCongestedNodeBlocked = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when one vehicle per second is allowed to enter 5_8, i.e. 2_5 is restricted to half of its outflow capacity
-		int timeInterval3Start = 310; int timeInterval3End = 500;
+		int timeInterval3Start = 310;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedRestrictFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
 		}
 
 		/* since this node dynamic is a random distribution we allow a somewhat bigger difference here.
@@ -438,7 +449,7 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be zero here.
 		 */
 		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
-		Assertions.assertEquals(1./3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3333333333333333
+		Assertions.assertEquals(1. / 3, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.3333333333333333
 		Assertions.assertEquals(0, avgThroughputCongestedNodeBlocked.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 
 		// test throughput for the third time interval
@@ -450,7 +461,7 @@ public class NodeTransitionTest {
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), MatsimTestUtils.EPSILON, "Troughput on link 2_5 is wrong");
-		Assertions.assertEquals(5./9, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.5736842105263158
+		Assertions.assertEquals(5. / 9, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong"); // 0.5736842105263158
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), MatsimTestUtils.EPSILON, "Troughput on link 5_8 is wrong");
 	}
 
@@ -460,7 +471,7 @@ public class NodeTransitionTest {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
-		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		scenario.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -489,18 +500,21 @@ public class NodeTransitionTest {
 //				+ ", link 4_5: " + (avgThroughputUntil210.get(Id.createLinkId("4_5")) * 210 / 1) );
 
 		// this is the time before the downstream link (5_8) gets full and with that no inflow capacity is valid and no node is blocked
-		int timeInterval1Start = 110; int timeInterval1End = 200;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 200;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 1);
 		// this is the time when the downstream link (5_8) is full and also no vehicles are leaving this link such that no vehicles can enter and the node stays blocked
-		int timeInterval2Start = 210; int timeInterval2End = 300;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 300;
 		Map<Id<Link>, Double> avgThroughputCongestedNodeBlocked = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 1);
 		// this is the time when one vehicle per second is allowed to enter 5_8, i.e. 2_5 is restricted to half of its outflow capacity, i.e. 4_5 gets also restricted to half of it's capacity
-		int timeInterval3Start = 310; int timeInterval3End = 500;
+		int timeInterval3Start = 310;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedRestrictFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 1);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
 		}
 
 		/* since this node dynamic does not rely on a random distribution but updates link priorities each time step,
@@ -533,8 +547,8 @@ public class NodeTransitionTest {
 		 * the first vehicles reach the end of link 5_8 around sec 300, i.e. throughput of link 5_8 should be equal to the flow
 		 * capacity of link 5_8 here, i.e. 1 veh per time step (=sec).
 		 */
-		Assertions.assertEquals(1./2 * 2, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
-		Assertions.assertEquals(1./2 * 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
+		Assertions.assertEquals(1. / 2 * 2, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("2_5")), delta, "Troughput on link 2_5 is wrong");
+		Assertions.assertEquals(1. / 2 * 1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("4_5")), delta, "Troughput on link 4_5 is wrong");
 		Assertions.assertEquals(1, avgThroughputCongestedRestrictFlow.get(Id.createLinkId("5_8")), delta, "Troughput on link 5_8 is wrong");
 	}
 
@@ -552,7 +566,7 @@ public class NodeTransitionTest {
 		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
-		scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		scenario.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		List<Id<Link>> linksOfInterest = new LinkedList<>();
@@ -581,18 +595,21 @@ public class NodeTransitionTest {
 //				+ ", link 4_5: " + (avgThroughputUntil210.get(Id.createLinkId("4_5")) * 210 / 0.5) );
 
 		// this is the time before the downstream link (5_8) gets full and with that no inflow capacity is valid and no node is blocked
-		int timeInterval1Start = 110; int timeInterval1End = 200;
+		int timeInterval1Start = 110;
+		int timeInterval1End = 200;
 		Map<Id<Link>, Double> avgThroughputFreeFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval1Start, timeInterval1End, 0.5);
 		// this is the time when the downstream link (5_8) is full and also no vehicles are leaving this link such that no vehicles can enter and the node stays blocked
-		int timeInterval2Start = 210; int timeInterval2End = 300;
+		int timeInterval2Start = 210;
+		int timeInterval2End = 300;
 		Map<Id<Link>, Double> avgThroughputCongestedNodeBlocked = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval2Start, timeInterval2End, 0.5);
 		// this is the time when one vehicle per second is allowed to enter 5_8, i.e. 2_5 is restricted to half of its outflow capacity
-		int timeInterval3Start = 310; int timeInterval3End = 500;
+		int timeInterval3Start = 310;
+		int timeInterval3End = 500;
 		Map<Id<Link>, Double> avgThroughputCongestedRestrictFlow = throughputAnalyzer.calculateAvgThroughputPerTimeStepOfTimeInterval(timeInterval3Start, timeInterval3End, 0.5);
 		for (Id<Link> link : linksOfInterest) {
 			System.out.println("avgThroughput link " + link + " time interval [" + timeInterval1Start + ", " + timeInterval1End + "]: " + avgThroughputFreeFlow.get(link)
-					+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
-					+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
+				+ "\t; time interval [" + timeInterval2Start + ", " + timeInterval2End + "]: " + avgThroughputCongestedNodeBlocked.get(link)
+				+ "\t; time interval [" + timeInterval3Start + ", " + timeInterval3End + "]: " + avgThroughputCongestedRestrictFlow.get(link));
 		}
 
 		/* since this node dynamic does not rely on a random distribution but updates link priorities each time step,
@@ -636,13 +653,13 @@ public class NodeTransitionTest {
 			Config config = ConfigUtils.createConfig();
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
-			config.qsim().setStuckTime(24*3600);
+			config.qsim().setStuckTime(24 * 3600);
 			config.qsim().setRemoveStuckVehicles(false);
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
-	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.scoring().addActivityParams(dummyAct);
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			dummyAct.setTypicalDuration(12 * 3600);
+			config.scoring().addActivityParams(dummyAct);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -657,14 +674,14 @@ public class NodeTransitionTest {
 			Node node7 = NetworkUtils.createAndAddNode(network, Id.create("7", Node.class), new Coord(2000, 0));
 			Node node8 = NetworkUtils.createAndAddNode(network, Id.create("8", Node.class), new Coord(3000, 0));
 			Node node9 = NetworkUtils.createAndAddNode(network, Id.create("9", Node.class), new Coord(4000, 0));
-			Link link12 = NetworkUtils.createAndAddLink(network,Id.create("1_2", Link.class), node1, node2, 1000, 10, 3600, 1 );
-			Link link27 = NetworkUtils.createAndAddLink(network,Id.create("2_7", Link.class), node2, node7, 1000, 10, 3600, 1 );
-			Link link34 = NetworkUtils.createAndAddLink(network,Id.create("3_4", Link.class), node3, node4, 1000, 10, 7200, 2 );
-			Link link47 = NetworkUtils.createAndAddLink(network,Id.create("4_7", Link.class), node4, node7, 1000, 10, 7200, 2 );
-			Link link56 = NetworkUtils.createAndAddLink(network,Id.create("5_6", Link.class), node5, node6, 1000, 10, 7200, 2 );
-			Link link67 = NetworkUtils.createAndAddLink(network,Id.create("6_7", Link.class), node6, node7, 1000, 10, 7200, 2 );
-			Link link78 = NetworkUtils.createAndAddLink(network,Id.create("7_8", Link.class), node7, node8, 1000, 10, 7200, 2 );
-			Link link89 = NetworkUtils.createAndAddLink(network,Id.create("8_9", Link.class), node8, node9, 1000, 10, 7200, 2 );
+			Link link12 = NetworkUtils.createAndAddLink(network, Id.create("1_2", Link.class), node1, node2, 1000, 10, 3600, 1);
+			Link link27 = NetworkUtils.createAndAddLink(network, Id.create("2_7", Link.class), node2, node7, 1000, 10, 3600, 1);
+			Link link34 = NetworkUtils.createAndAddLink(network, Id.create("3_4", Link.class), node3, node4, 1000, 10, 7200, 2);
+			Link link47 = NetworkUtils.createAndAddLink(network, Id.create("4_7", Link.class), node4, node7, 1000, 10, 7200, 2);
+			Link link56 = NetworkUtils.createAndAddLink(network, Id.create("5_6", Link.class), node5, node6, 1000, 10, 7200, 2);
+			Link link67 = NetworkUtils.createAndAddLink(network, Id.create("6_7", Link.class), node6, node7, 1000, 10, 7200, 2);
+			Link link78 = NetworkUtils.createAndAddLink(network, Id.create("7_8", Link.class), node7, node8, 1000, 10, 7200, 2);
+			Link link89 = NetworkUtils.createAndAddLink(network, Id.create("8_9", Link.class), node8, node9, 1000, 10, 7200, 2);
 
 			/* build plans */
 			fillPopulationWithOneCommodity(scenario.getPopulation(), 1, 500, 0, link12.getId(), link89.getId());
@@ -679,11 +696,11 @@ public class NodeTransitionTest {
 			Config config = ConfigUtils.createConfig();
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
-			config.qsim().setStuckTime(24*3600);
+			config.qsim().setStuckTime(24 * 3600);
 			config.qsim().setRemoveStuckVehicles(false);
 			ScoringConfigGroup.ActivityParams dummyAct = new ScoringConfigGroup.ActivityParams("dummy");
-	        dummyAct.setTypicalDuration(12 * 3600);
-	        config.scoring().addActivityParams(dummyAct);
+			dummyAct.setTypicalDuration(12 * 3600);
+			config.scoring().addActivityParams(dummyAct);
 
 			Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -698,14 +715,14 @@ public class NodeTransitionTest {
 			Node node7 = NetworkUtils.createAndAddNode(network, Id.create("7", Node.class), new Coord(2000, 0));
 			Node node8 = NetworkUtils.createAndAddNode(network, Id.create("8", Node.class), new Coord(3000, 2000));
 			Node node9 = NetworkUtils.createAndAddNode(network, Id.create("9", Node.class), new Coord(4000, 2000));
-			Link link12 = NetworkUtils.createAndAddLink(network,Id.create("1_2", Link.class), node1, node2, 1000, 10, 7200, 2 );
-			Link link25 = NetworkUtils.createAndAddLink(network,Id.create("2_5", Link.class), node2, node5, 1000, 10, 7200, 2 );
-			Link link34 = NetworkUtils.createAndAddLink(network,Id.create("3_4", Link.class), node3, node4, 1000, 10, 3600, 1 );
-			Link link45 = NetworkUtils.createAndAddLink(network,Id.create("4_5", Link.class), node4, node5, 1000, 10, 3600, 1 );
-			Link link56 = NetworkUtils.createAndAddLink(network,Id.create("5_6", Link.class), node5, node6, 1000, 10, 3600, 1 );
-			Link link67 = NetworkUtils.createAndAddLink(network,Id.create("6_7", Link.class), node6, node7, 1000, 10, 3600, 1 );
-			Link link58 = NetworkUtils.createAndAddLink(network,Id.create("5_8", Link.class), node5, node8, 1000, 5, 3600, 1 );
-			Link link89 = NetworkUtils.createAndAddLink(network,Id.create("8_9", Link.class), node8, node9, 1000, 10, 7200, 2 );
+			Link link12 = NetworkUtils.createAndAddLink(network, Id.create("1_2", Link.class), node1, node2, 1000, 10, 7200, 2);
+			Link link25 = NetworkUtils.createAndAddLink(network, Id.create("2_5", Link.class), node2, node5, 1000, 10, 7200, 2);
+			Link link34 = NetworkUtils.createAndAddLink(network, Id.create("3_4", Link.class), node3, node4, 1000, 10, 3600, 1);
+			Link link45 = NetworkUtils.createAndAddLink(network, Id.create("4_5", Link.class), node4, node5, 1000, 10, 3600, 1);
+			Link link56 = NetworkUtils.createAndAddLink(network, Id.create("5_6", Link.class), node5, node6, 1000, 10, 3600, 1);
+			Link link67 = NetworkUtils.createAndAddLink(network, Id.create("6_7", Link.class), node6, node7, 1000, 10, 3600, 1);
+			Link link58 = NetworkUtils.createAndAddLink(network, Id.create("5_8", Link.class), node5, node8, 1000, 5, 3600, 1);
+			Link link89 = NetworkUtils.createAndAddLink(network, Id.create("8_9", Link.class), node8, node9, 1000, 10, 7200, 2);
 
 			/* build plans */
 			fillPopulationWithOneCommodity(scenario.getPopulation(), 2, 500, 0, link12.getId(), link89.getId());
@@ -715,28 +732,28 @@ public class NodeTransitionTest {
 		}
 
 		private static void fillPopulationWithOneCommodity(Population population, double agentsPerSec, double simulationPeriod, double startTime,
-				Id<Link> sourceLink, Id<Link> sinkLink) {
+														   Id<Link> sourceLink, Id<Link> sinkLink) {
 
-			for (int i=0; i< agentsPerSec * simulationPeriod; i++) {
+			for (int i = 0; i < agentsPerSec * simulationPeriod; i++) {
 				// create a person
-	            Person person = population.getFactory().createPerson(Id.createPersonId("agent-" + sourceLink + "-" + sinkLink + "-" + i));
-	            population.addPerson(person);
+				Person person = population.getFactory().createPerson(Id.createPersonId("agent-" + sourceLink + "-" + sinkLink + "-" + i));
+				population.addPerson(person);
 
-	            // create a plan for the person that contains all this information
-	            Plan plan = population.getFactory().createPlan();
-	            person.addPlan(plan);
+				// create a plan for the person that contains all this information
+				Plan plan = population.getFactory().createPlan();
+				person.addPlan(plan);
 
-	            // create a start activity at the from link
-	            Activity startAct = population.getFactory().createActivityFromLinkId("dummy", sourceLink);
-	            startAct.setEndTime(startTime + (double)(i)/agentsPerSec);
-	            plan.addActivity(startAct);
+				// create a start activity at the from link
+				Activity startAct = population.getFactory().createActivityFromLinkId("dummy", sourceLink);
+				startAct.setEndTime(startTime + (double) (i) / agentsPerSec);
+				plan.addActivity(startAct);
 
-	            // create a dummy leg
-	            plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+				// create a dummy leg
+				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 
-	            // create a drain activity at the to link
-	            Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", sinkLink);
-	            plan.addActivity(drainAct);
+				// create a drain activity at the to link
+				Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", sinkLink);
+				plan.addActivity(drainAct);
 			}
 		}
 

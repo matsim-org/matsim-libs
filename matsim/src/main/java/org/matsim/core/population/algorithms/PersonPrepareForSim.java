@@ -193,7 +193,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 
 	private void checkActivityLocationConsistent(Activity act) {
-		if (this.scenario.getConfig().routing().getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if (this.scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
 			return;
 		}
 
@@ -212,7 +212,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 
 	private void checkModeConsistent(Person person, Leg leg) {
-		if (this.scenario.getConfig().routing().getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if (this.scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
 			return;
 		}
 

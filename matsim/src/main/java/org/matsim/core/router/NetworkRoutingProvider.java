@@ -151,7 +151,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	}
 
 	private void checkNetwork(Network filteredNetwork) {
-		if (routingConfigGroup.getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+		if (routingConfigGroup.getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
 			return;
 		}
 

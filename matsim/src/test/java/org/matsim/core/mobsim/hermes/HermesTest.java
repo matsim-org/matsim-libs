@@ -20,41 +20,22 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
@@ -77,6 +58,10 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class HermesTest {
 
@@ -124,9 +109,9 @@ public class HermesTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(6*3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a1.setEndTime(6 * 3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -144,8 +129,8 @@ public class HermesTest {
 
 		/* finish */
 		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
-		Assertions.assertEquals(6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
-		Assertions.assertEquals(6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(6.0 * 3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0 * 3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 
@@ -166,19 +151,19 @@ public class HermesTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		{
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a1.setEndTime(6*3600);
+			a1.setEndTime(6 * 3600);
 		}
 		{
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		}
 		{
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			act.setEndTime(6*3600);
+			act.setEndTime(6 * 3600);
 		}
 		{
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		}
 		f.plans.addPerson(person);
 
@@ -192,8 +177,8 @@ public class HermesTest {
 //
 //		/* finish */
 		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
-		Assertions.assertEquals(6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
-		Assertions.assertEquals(6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(6.0 * 3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0 * 3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -211,9 +196,9 @@ public class HermesTest {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a1.setEndTime((6+i)*3600);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			a1.setEndTime((6 + i) * 3600);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -232,10 +217,10 @@ public class HermesTest {
 
 		/* finish */
 		Assertions.assertEquals(4, collector.events.size(), "wrong number of link enter events.");
-		Assertions.assertEquals(6.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
-		Assertions.assertEquals(6.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
-		Assertions.assertEquals(7.0*3600, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
-		Assertions.assertEquals(7.0*3600 + 11, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(6.0 * 3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(6.0 * 3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(7.0 * 3600, collector.events.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(7.0 * 3600 + 11, collector.events.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -251,9 +236,9 @@ public class HermesTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(6*3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, "other" );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a1.setEndTime(6 * 3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, "other");
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		Route route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
 		route.setTravelTime(15.0);
 		leg.setRoute(route);
@@ -299,8 +284,8 @@ public class HermesTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(0);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -319,8 +304,8 @@ public class HermesTest {
 
 		/* finish */
 		Assertions.assertEquals(2, collector.events.size(), "wrong number of link enter events.");
-		Assertions.assertEquals(0.0*3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
-		Assertions.assertEquals(0.0*3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
+		Assertions.assertEquals(0.0 * 3600, collector.events.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in first event.");
+		Assertions.assertEquals(0.0 * 3600 + 11, collector.events.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in second event.");
 	}
 
 	/**
@@ -343,9 +328,9 @@ public class HermesTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(6*3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a1.setEndTime(6 * 3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		route.setLinkIds(f.link1.getId(), new ArrayList<Id<Link>>(0), f.link1.getId());
 		leg.setRoute(route);
@@ -379,31 +364,31 @@ public class HermesTest {
 		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(7).getClass(), "wrong type of 8th event.");
 
 
-		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in 1st event.");
-		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in 2nd event.");
-		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in 3rd event.");
-		Assertions.assertEquals(6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in 4th event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(0).getTime(), MatsimTestUtils.EPSILON, "wrong time in 1st event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(1).getTime(), MatsimTestUtils.EPSILON, "wrong time in 2nd event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(2).getTime(), MatsimTestUtils.EPSILON, "wrong time in 3rd event.");
+		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(3).getTime(), MatsimTestUtils.EPSILON, "wrong time in 4th event.");
 
 		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(4).getTime(),
-				MatsimTestUtils.EPSILON,
-				"wrong time in 5th event.");
+			MatsimTestUtils.EPSILON,
+			"wrong time in 5th event.");
 		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(5).getTime(),
-				MatsimTestUtils.EPSILON,
-				"wrong time in 6th event.");
+			MatsimTestUtils.EPSILON,
+			"wrong time in 6th event.");
 		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(6).getTime(),
-				MatsimTestUtils.EPSILON,
-				"wrong time in 7th event.");
+			MatsimTestUtils.EPSILON,
+			"wrong time in 7th event.");
 		Assertions.assertEquals(6.0 * 3600 + 0, allEvents.get(7).getTime(),
-				MatsimTestUtils.EPSILON,
-				"wrong time in 8th event.");
+			MatsimTestUtils.EPSILON,
+			"wrong time in 8th event.");
 
 
-		Assertions.assertEquals(f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId(), "wrong link in 1st event." );
-		Assertions.assertEquals(f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId(), "wrong link in 2nd event." );
-		Assertions.assertEquals(f.link1.getId(), ((VehicleEntersTrafficEvent) allEvents.get(3)).getLinkId(), "wrong link in 4th event." );
-		Assertions.assertEquals(f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId(), "wrong link in 5th event." );
-		Assertions.assertEquals(f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId(), "wrong link in 7th event." );
-		Assertions.assertEquals(f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId(), "wrong link in 8th event." );
+		Assertions.assertEquals(f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId(), "wrong link in 1st event.");
+		Assertions.assertEquals(f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId(), "wrong link in 2nd event.");
+		Assertions.assertEquals(f.link1.getId(), ((VehicleEntersTrafficEvent) allEvents.get(3)).getLinkId(), "wrong link in 4th event.");
+		Assertions.assertEquals(f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId(), "wrong link in 5th event.");
+		Assertions.assertEquals(f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId(), "wrong link in 7th event.");
+		Assertions.assertEquals(f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId(), "wrong link in 8th event.");
 	}
 
 	/**
@@ -415,15 +400,15 @@ public class HermesTest {
 	@Test
 	void testSingleAgent_LastLinkIsLoop() {
 		Fixture f = new Fixture();
-		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
+		Link loopLink = NetworkUtils.createAndAddLink(f.network, Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
 
 		// add a single person with leg from link1 to loop-link
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(6*3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a1.setEndTime(6 * 3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), loopLink.getId());
 		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>();
 		links.add(f.link2.getId());
@@ -439,7 +424,7 @@ public class HermesTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		f.config.qsim().setEndTime(7*3600);
+		f.config.qsim().setEndTime(7 * 3600);
 		Hermes sim = createHermes(f, events);
 		sim.run();
 
@@ -467,10 +452,12 @@ public class HermesTest {
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
 		public final ArrayList<LinkEnterEvent> events = new ArrayList<LinkEnterEvent>();
+
 		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			this.events.add(event);
 		}
+
 		@Override
 		public void reset(final int iteration) {
 			this.events.clear();
@@ -545,8 +532,8 @@ public class HermesTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.walk);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		leg.setRoute(RouteUtils.createGenericRouteImpl(f.link1.getId(), f.link2.getId()));
 		leg.getRoute().setTravelTime(0.); // retrofitting to repair failing test.  kai, apr'15
 		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "work", f.link2.getId());
@@ -577,15 +564,15 @@ public class HermesTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
-		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
+		a1.setEndTime(7.0 * 3600);
+		Leg l1 = PopulationUtils.createAndAddLeg(plan, TransportMode.other);
+		TripStructureUtils.setRoutingMode(l1, TransportMode.other);
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(GenericRouteImpl.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
-		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
+		a2.setEndTime(7.0 * 3600 + 20);
+		Leg l2 = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(l2, TransportMode.car);
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -628,14 +615,14 @@ public class HermesTest {
 	@Test
 	void testCircleAsRoute() {
 		Fixture f = new Fixture();
-		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
+		Link link4 = NetworkUtils.createAndAddLink(f.network, Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
+		a1.setEndTime(7.0 * 3600);
+		Leg l1 = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(l1, TransportMode.car);
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -690,14 +677,14 @@ public class HermesTest {
 	@Test
 	void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture();
-		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
+		Link link4 = NetworkUtils.createAndAddLink(f.network, Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
+		a1.setEndTime(7.0 * 3600);
+		Leg l1 = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(l1, TransportMode.car);
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -746,16 +733,16 @@ public class HermesTest {
 		Assertions.assertEquals(ActivityStartEvent.class, allEvents.get(19).getClass(), "wrong type of event.");
 	}
 
-	/** Prepares miscellaneous data for the testConsistentRoutes() tests:
+	/**
+	 * Prepares miscellaneous data for the testConsistentRoutes() tests:
 	 * Creates a network of 6 links, and a population of one person driving from
 	 * link 1 to link 5, and then from link 5 to link 6.
 	 *
 	 * @param startLinkId the start link of the route for the first leg
-	 * @param linkIds the links the agent should travel along on the first leg
-	 * @param endLinkId the end link of the route for the first leg
-	 * @param events the Events object to be used by the simulation.
+	 * @param linkIds     the links the agent should travel along on the first leg
+	 * @param endLinkId   the end link of the route for the first leg
+	 * @param events      the Events object to be used by the simulation.
 	 * @return A QueueSimulation which can be started immediately.
-	 *
 	 * @author mrieser
 	 **/
 	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
@@ -809,11 +796,11 @@ public class HermesTest {
 	void testStartAndEndTime() {
 
 		final Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		// ---
 
-		MutableScenario scenario = ScenarioUtils.createMutableScenario( config );
+		MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
@@ -832,11 +819,11 @@ public class HermesTest {
 		Person person = pb.createPerson(Id.create("1", Person.class));
 		Plan plan = pb.createPlan();
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
-		act1.setEndTime(7.0*3600);
+		act1.setEndTime(7.0 * 3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
-		TripStructureUtils.setRoutingMode( leg, TransportMode.walk );
+		TripStructureUtils.setRoutingMode(leg, TransportMode.walk);
 		Route route = RouteUtils.createGenericRouteImpl(link.getId(), link.getId());
-		route.setTravelTime(5.0*3600);
+		route.setTravelTime(5.0 * 3600);
 		leg.setRoute(route);
 		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
 		plan.addActivity(act1);
@@ -852,8 +839,8 @@ public class HermesTest {
 		Hermes sim = createHermes(scenario, events);
 		HermesConfigGroup.SIM_STEPS = 11 * 3600;
 		sim.run();
-		Assertions.assertEquals(7.0*3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(7.0 * 3600, collector.firstEvent.getTime(), MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(11.0 * 3600, collector.lastEvent.getTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -866,9 +853,9 @@ public class HermesTest {
 	void testCleanupSim_EarlyEnd() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
-		double simEndTime = 8.0*3600;
+		double simEndTime = 8.0 * 3600;
 
 		// build simple network with 2 links
 		Network network = scenario.getNetwork();
@@ -896,10 +883,10 @@ public class HermesTest {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
-		TripStructureUtils.setRoutingMode( leg1, TransportMode.car );
+		TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
 		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
-		leg1.setTravelTime(5.0*3600);
+		leg1.setTravelTime(5.0 * 3600);
 		Activity act1_2 = pb.createActivityFromLinkId("w", link2.getId());
 		plan1.addActivity(act1_1);
 		plan1.addLeg(leg1);
@@ -912,7 +899,7 @@ public class HermesTest {
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
 		Leg leg2 = pb.createLeg(TransportMode.walk);
-		TripStructureUtils.setRoutingMode( leg2, TransportMode.walk );
+		TripStructureUtils.setRoutingMode(leg2, TransportMode.walk);
 		Route route2 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg2.setRoute(route2);
 		leg2.setTravelTime(2000);
@@ -928,7 +915,7 @@ public class HermesTest {
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
-		TripStructureUtils.setRoutingMode( leg3, TransportMode.walk );
+		TripStructureUtils.setRoutingMode(leg3, TransportMode.walk);
 		Route route3 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg3.setRoute(route3);
 		leg3.setTravelTime(1000);
@@ -993,7 +980,7 @@ public class HermesTest {
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 
 			/* build network */
@@ -1003,9 +990,9 @@ public class HermesTest {
 			this.node2 = NetworkUtils.createAndAddNode(this.network, Id.create("2", Node.class), new Coord(100, 0));
 			this.node3 = NetworkUtils.createAndAddNode(this.network, Id.create("3", Node.class), new Coord(1100, 0));
 			this.node4 = NetworkUtils.createAndAddNode(this.network, Id.create("4", Node.class), new Coord(1200, 0));
-			this.link1 = NetworkUtils.createAndAddLink(this.network,Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9 );
-			this.link2 = NetworkUtils.createAndAddLink(this.network,Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2 );
-			this.link3 = NetworkUtils.createAndAddLink(this.network,Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9 );
+			this.link1 = NetworkUtils.createAndAddLink(this.network, Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9);
+			this.link2 = NetworkUtils.createAndAddLink(this.network, Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2);
+			this.link3 = NetworkUtils.createAndAddLink(this.network, Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9);
 
 			/* build plans */
 			this.plans = scenario.getPopulation();

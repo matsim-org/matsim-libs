@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -37,11 +33,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.MultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
@@ -59,6 +51,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class StuckAgentTest {
 
 	private static final Logger log = LogManager.getLogger(StuckAgentTest.class);
@@ -70,9 +66,9 @@ public class StuckAgentTest {
 	void testStuckEvents() {
 		Config config = ConfigUtils.createConfig();
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
-		config.qsim().setEndTime(24*3600);
+		config.qsim().setEndTime(24 * 3600);
 
 		config.controller().setLastIteration(0);
 		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
@@ -81,12 +77,12 @@ public class StuckAgentTest {
 
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
-        multiModalConfigGroup.setMultiModalSimulationEnabled(true);
+		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
 		multiModalConfigGroup.setSimulatedModes("walk,bike,other");
 		config.addModule(multiModalConfigGroup);
 
 		ActivityParams homeParams = new ActivityParams("home");
-		homeParams.setTypicalDuration(16*3600);
+		homeParams.setTypicalDuration(16 * 3600);
 		config.scoring().addActivityParams(homeParams);
 
 		// set default walk speed; according to Weidmann 1.34 [m/s]
@@ -101,7 +97,7 @@ public class StuckAgentTest {
 		double unknownModeSpeed = 2.0;
 		config.routing().setTeleportedModeSpeed("other", unknownModeSpeed);
 
-        config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setFilterModes(true);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -137,26 +133,26 @@ public class StuckAgentTest {
 		scenario.getNetwork().addLink(link3);
 
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Route route0 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l1 & l2
-		Route route1 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l2
+		Route route0 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));    // missing l1 & l2
+		Route route1 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));    // missing l2
 		List<Id<Link>> linkIds = new ArrayList<>();
 		linkIds.add(Id.create("l0", Link.class));
 		((NetworkRoute) route1).setLinkIds(Id.create("l0", Link.class), linkIds, Id.create("l3", Link.class));
 
-		scenario.getPopulation().addPerson(createPerson(scenario, "p0", "bike", route0, 6.5*3600));	// stuck
-		scenario.getPopulation().addPerson(createPerson(scenario, "p1", "walk", route1, 7.5*3600));	// stuck
-		scenario.getPopulation().addPerson(createPerson(scenario, "p2", "walk", null, 8.5*3600));	// regular
-		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "walk", null, 23.5*3600));	// en-route when simulation ends
-		scenario.getPopulation().addPerson(createPerson(scenario, "p4", "walk", null, 24.5*3600));	// departs after simulation has ended
+		scenario.getPopulation().addPerson(createPerson(scenario, "p0", "bike", route0, 6.5 * 3600));    // stuck
+		scenario.getPopulation().addPerson(createPerson(scenario, "p1", "walk", route1, 7.5 * 3600));    // stuck
+		scenario.getPopulation().addPerson(createPerson(scenario, "p2", "walk", null, 8.5 * 3600));    // regular
+		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "walk", null, 23.5 * 3600));    // en-route when simulation ends
+		scenario.getPopulation().addPerson(createPerson(scenario, "p4", "walk", null, 24.5 * 3600));    // departs after simulation has ended
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 
 		controler.addOverridingModule(new MultiModalModule());
 
-        EventsCollector collector = new EventsCollector();
+		EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 		controler.getEvents().addHandler(new EventsPrinter());
 

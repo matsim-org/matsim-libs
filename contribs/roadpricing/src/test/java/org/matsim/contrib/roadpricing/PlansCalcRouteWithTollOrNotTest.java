@@ -22,8 +22,7 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.util.List;
-
+import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -35,6 +34,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
@@ -51,13 +51,12 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.timing.TimeInterpretation;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.google.inject.Provider;
 import org.matsim.vehicles.PersonVehicles;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.List;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -66,7 +65,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 public class PlansCalcRouteWithTollOrNotTest {
-	private static final Logger log = LogManager.getLogger( PlansCalcRouteWithTollOrNotTest.class );
+	private static final Logger log = LogManager.getLogger(PlansCalcRouteWithTollOrNotTest.class);
 
 	@RegisterExtension
 	private MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -79,15 +78,15 @@ public class PlansCalcRouteWithTollOrNotTest {
 	void testBestAlternatives() {
 		Config config = matsimTestUtils.createConfig();
 		config.routing().setAccessEgressType(AccessEgressType.none);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
-		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
+		log.warn("access/egress?" + config.routing().getAccessEgressType());
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario);
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
@@ -103,17 +102,17 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
+		log.warn("access/egress?" + config.routing().getAccessEgressType());
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress?" + config.routing().getAccessEgressType() );
+		log.warn("access/egress?" + config.routing().getAccessEgressType());
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
-		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
-		log.warn( "access/egress? " + config.routing().getAccessEgressType() );
+		Cost afternoonCost = toll.createAndAddCost(14 * 3600, 18 * 3600, 0.12);
+		log.warn("access/egress? " + config.routing().getAccessEgressType());
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress? " + config.routing().getAccessEgressType() );
+		log.warn("access/egress? " + config.routing().getAccessEgressType());
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
@@ -135,8 +134,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);
 		toll.removeCost(afternoonCost);
-		toll.createAndAddCost(6*3600, 10*3600, 0.7);
-		toll.createAndAddCost(14*3600, 18*3600, 0.7);
+		toll.createAndAddCost(6 * 3600, 10 * 3600, 0.7);
+		toll.createAndAddCost(14 * 3600, 18 * 3600, 0.7);
 		// the agent should now decide to drive around
 		runOnAll(testee(scenario, toll), population);
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
@@ -144,10 +143,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	private static Leg getLeg1(Config config, Population population, Id<Person> id1) {
 		final List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
-		for ( PlanElement pe : planElements ) {
-			log.warn( pe );
+		for (PlanElement pe : planElements) {
+			log.warn(pe);
 		}
-		if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+		if (config.routing().getAccessEgressType().equals(AccessEgressType.none)) {
 			return (Leg) (planElements.get(1));
 		} else {
 			return (Leg) (planElements.get(3));
@@ -172,13 +171,13 @@ public class PlansCalcRouteWithTollOrNotTest {
 //				.getInstance(PlansCalcRouteWithTollOrNot.class);
 
 		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll),
-				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(),
-				new NewControlerModule()).getProvider(TripRouter.class);
+			new RoadPricingModuleDefaults(toll),
+			new ScenarioByInstanceModule(scenario),
+			new ControlerDefaultCoreListenersModule(),
+			new NewControlerModule()).getProvider(TripRouter.class);
 
-			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()) ) ;
-			// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
+		return new PlansCalcRouteWithTollOrNot(toll, tripRouterProvider, TimeInterpretation.create(scenario.getConfig()));
+		// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
 	}
 
 	/**
@@ -187,15 +186,15 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testTolledActLink() {
 		Config config = matsimTestUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario);
 		toll.setType("area");
 		Id.createLinkId("7");
-		toll.createAndAddCost(6*3600, 10*3600, 0.06);
+		toll.createAndAddCost(6 * 3600, 10 * 3600, 0.06);
 
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
@@ -209,7 +208,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		PersonVehicles vehicles = new PersonVehicles();
 		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
 		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : scenario.getPopulation().getPersons().values()){
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
 		}
 
@@ -228,16 +227,16 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testAllAlternativesTolled() {
 		Config config = matsimTestUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario);
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
-		toll.createAndAddCost(6*3600, 10*3600, 0.06);
+		toll.createAndAddCost(6 * 3600, 10 * 3600, 0.06);
 
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
@@ -252,7 +251,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		PersonVehicles vehicles = new PersonVehicles();
 		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
 		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : scenario.getPopulation().getPersons().values()){
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
 		}
 
@@ -265,16 +264,16 @@ public class PlansCalcRouteWithTollOrNotTest {
 	}
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
-		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
-		if ( config.routing().getAccessEgressType().equals(AccessEgressType.none) ) {
+		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
+		if (config.routing().getAccessEgressType().equals(AccessEgressType.none)) {
 			return (Leg) (planElements.get(3));
 		} else {
-			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;
-			List<Leg> legs = trips.get(1).getLegsOnly() ;
-			if ( legs.size()==1 ) {
-				return legs.get(0) ;
+			List<Trip> trips = TripStructureUtils.getTrips(planElements);
+			List<Leg> legs = trips.get(1).getLegsOnly();
+			if (legs.size() == 1) {
+				return legs.get(0);
 			} else {
-				return legs.get(1) ;
+				return legs.get(1);
 			}
 		}
 	}
@@ -282,16 +281,16 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	void testOutsideTollTime() {
 		Config config = matsimTestUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario);
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
-		toll.createAndAddCost(8*3600, 10*3600, 1.0); // high costs!
+		toll.createAndAddCost(8 * 3600, 10 * 3600, 1.0); // high costs!
 
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
@@ -306,7 +305,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		PersonVehicles vehicles = new PersonVehicles();
 		vehicles.addModeVehicle(TransportMode.car, Id.createVehicleId(1));
 		vehicles.addModeVehicle(TransportMode.walk, Id.createVehicleId(1));
-		for (Person p : scenario.getPopulation().getPersons().values()){
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			VehicleUtils.insertVehicleIdsIntoPersonAttributes(p, vehicles.getModeVehicles());
 		}
 

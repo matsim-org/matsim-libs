@@ -1,28 +1,20 @@
 package org.matsim.integration.drtAndPt;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
 import org.matsim.contrib.drt.optimizer.constraints.DrtOptimizationConstraintsSetImpl;
 import org.matsim.contrib.drt.optimizer.insertion.extensive.ExtensiveInsertionSearchParams;
@@ -39,16 +31,19 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.ActivityEngineModule;
+import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
+import org.matsim.core.mobsim.qsim.PreplanningUtils;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
@@ -57,12 +52,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import static java.util.stream.Collectors.toList;
 
 public class PtAlongALine2Test {
 	private static final Logger log = LogManager.getLogger(PtAlongALine2Test.class);
@@ -111,23 +106,23 @@ public class PtAlongALine2Test {
 		// === ROUTER: ===
 
 		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		// (as of today, will also influence router. kai, jun'19)
 
 		if (drtMode == DrtMode.teleportBeeline) {// (configure teleportation router)
 			config.routing()
-					.addModeRoutingParams(
-							new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt ).setTeleportedModeSpeed(100. / 3.6 ) );
+				.addModeRoutingParams(
+					new RoutingConfigGroup.TeleportedModeParams().setMode(TransportMode.drt).setTeleportedModeSpeed(100. / 3.6));
 			if (drt2) {
 				config.routing()
-						.addModeRoutingParams(
-								new RoutingConfigGroup.TeleportedModeParams().setMode("drt2" ).setTeleportedModeSpeed(100. / 3.6 ) );
+					.addModeRoutingParams(
+						new RoutingConfigGroup.TeleportedModeParams().setMode("drt2").setTeleportedModeSpeed(100. / 3.6));
 			}
 			if (drt3) {
 				config.routing()
-						.addModeRoutingParams(
-								new RoutingConfigGroup.TeleportedModeParams().setMode("drt3" ).setTeleportedModeSpeed(100. / 3.6 ) );
+					.addModeRoutingParams(
+						new RoutingConfigGroup.TeleportedModeParams().setMode("drt3").setTeleportedModeSpeed(100. / 3.6));
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if (drtMode == DrtMode.teleportBasedOnNetworkRoute) {// (route as network route)
@@ -143,51 +138,51 @@ public class PtAlongALine2Test {
 		}
 
 		config.routing()
-				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk" ).setTeleportedModeSpeed(5. / 3.6 ) );
+			.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk").setTeleportedModeSpeed(5. / 3.6));
 
 		// set up walk2 so we don't need walk in raptor:
 		config.routing()
-				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2" ).setTeleportedModeSpeed(5. / 3.6 ) );
+			.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams().setMode("walk2").setTeleportedModeSpeed(5. / 3.6));
 
 		// === RAPTOR: ===
 		{
 			//config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased); // we'll set up SwissRailRaptor ourself, so disable it here to prevent conflicts
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule(config,
-					SwissRailRaptorConfigGroup.class);
+				SwissRailRaptorConfigGroup.class);
 
 			if (drtMode != DrtMode.none) {
 				configRaptor.setUseIntermodalAccessEgress(true);
 
 				//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
 				configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode("walk2")
-						.setMaxRadius(1000000)
-						.setInitialSearchRadius(1000000)
-						.setSearchExtensionRadius(10000));
+					.setMaxRadius(1000000)
+					.setInitialSearchRadius(1000000)
+					.setSearchExtensionRadius(10000));
 				// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 				// the reduced drt network we should be able to see differentiation.)
 
 				// drt
 				configRaptor.addIntermodalAccessEgress(
-						new IntermodalAccessEgressParameterSet().setMode(TransportMode.drt)
-								.setMaxRadius(1000000)
-								.setInitialSearchRadius(1000000)
-								.setSearchExtensionRadius(10000));
+					new IntermodalAccessEgressParameterSet().setMode(TransportMode.drt)
+						.setMaxRadius(1000000)
+						.setInitialSearchRadius(1000000)
+						.setSearchExtensionRadius(10000));
 
 				if (drt2) {
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode("drt2")
-							.setMaxRadius(1000000)
-							.setInitialSearchRadius(1000000)
-							.setSearchExtensionRadius(10000));
+						.setMaxRadius(1000000)
+						.setInitialSearchRadius(1000000)
+						.setSearchExtensionRadius(10000));
 				}
 				if (drt3) {
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode("drt3")
-							.setMaxRadius(1000000)
-							.setInitialSearchRadius(1000000)
-							.setSearchExtensionRadius(10000));
+						.setMaxRadius(1000000)
+						.setInitialSearchRadius(1000000)
+						.setSearchExtensionRadius(10000));
 				}
 			}
 
@@ -199,14 +194,14 @@ public class PtAlongALine2Test {
 		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+				.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			if (drt2) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 			if (drt3) {
 				config.scoring()
-						.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
+					.addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
 		config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
@@ -231,8 +226,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.setMode(TransportMode.drt);
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
-                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                                .addOrGetDefaultDrtOptimizationConstraintsSet();
+					drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.setMaxTravelTimeAlpha(2.0);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
@@ -248,8 +243,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.setMode("drt2");
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
-                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                                .addOrGetDefaultDrtOptimizationConstraintsSet();
+					drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
@@ -264,8 +259,8 @@ public class PtAlongALine2Test {
 				DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 				drtConfigGroup.setMode("drt3");
 				DrtOptimizationConstraintsSetImpl defaultConstraintsSet =
-                        drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
-                                .addOrGetDefaultDrtOptimizationConstraintsSet();
+					drtConfigGroup.addOrGetDrtOptimizationConstraintsParams()
+						.addOrGetDefaultDrtOptimizationConstraintsSet();
 				defaultConstraintsSet.setMaxTravelTimeAlpha(1.3);
 				defaultConstraintsSet.setMaxTravelTimeBeta(5. * 60.);
 				drtConfigGroup.setStopDuration(60.);
@@ -284,7 +279,7 @@ public class PtAlongALine2Test {
 
 		if (drtMode == DrtMode.withPrebooking) {
 			QSimComponentsConfigGroup qsimComponentsConfig = ConfigUtils.addOrGetModule(config,
-					QSimComponentsConfigGroup.class);
+				QSimComponentsConfigGroup.class);
 			List<String> components = qsimComponentsConfig.getActiveComponents();
 			components.remove(ActivityEngineModule.COMPONENT_NAME);
 			components.add(ActivityEngineWithWakeup.COMPONENT_NAME);
@@ -320,19 +315,19 @@ public class PtAlongALine2Test {
 			plan.addLeg(leg);
 
 			Activity shop = pf.createActivityFromActivityFacilityId("dummy",
-					Id.create("999-1000", ActivityFacility.class));
+				Id.create("999-1000", ActivityFacility.class));
 			plan.addActivity(shop);
 		}
 
 		if (drtMode == DrtMode.full || drtMode == DrtMode.withPrebooking) {
 			scenario.getPopulation()
-					.getFactory()
-					.getRouteFactories()
-					.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+				.getFactory()
+				.getRouteFactories()
+				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		}
 		if (drtMode == DrtMode.withPrebooking) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
-				PreplanningUtils.setPrebookingOffset_s( person.getSelectedPlan(), 7200. );
+				PreplanningUtils.setPrebookingOffset_s(person.getSelectedPlan(), 7200.);
 			}
 		}
 
@@ -350,22 +345,22 @@ public class PtAlongALine2Test {
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if (drt2) {
 			scenario.getVehicles()
-					.addVehicleType(
-							vf.createVehicleType(Id.create("drt2", VehicleType.class)).setMaximumVelocity(25. / 3.6));
+				.addVehicleType(
+					vf.createVehicleType(Id.create("drt2", VehicleType.class)).setMaximumVelocity(25. / 3.6));
 		}
 		if (drt3) {
 			scenario.getVehicles()
-					.addVehicleType(
-							vf.createVehicleType(Id.create("drt3", VehicleType.class)).setMaximumVelocity(25. / 3.6));
+				.addVehicleType(
+					vf.createVehicleType(Id.create("drt3", VehicleType.class)).setMaximumVelocity(25. / 3.6));
 		}
 		scenario.getVehicles()
-				.addVehicleType(vf.createVehicleType(Id.create(TransportMode.drt, VehicleType.class))
-						.setMaximumVelocity(25. / 3.6));
+			.addVehicleType(vf.createVehicleType(Id.create(TransportMode.drt, VehicleType.class))
+				.setMaximumVelocity(25. / 3.6));
 
 		// (does not work without; I don't really know why. kai)
 		scenario.getVehicles()
-				.addVehicleType(vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class))
-						.setMaximumVelocity(25. / 3.6));
+			.addVehicleType(vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class))
+				.setMaximumVelocity(25. / 3.6));
 
 		//		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
 
@@ -394,8 +389,8 @@ public class PtAlongALine2Test {
 						@Override
 						protected void configureQSim() {
 							this.addQSimComponentBinding(ActivityEngineWithWakeup.COMPONENT_NAME)
-									.to(ActivityEngineWithWakeup.class)
-									.in(Singleton.class);
+								.to(ActivityEngineWithWakeup.class)
+								.in(Singleton.class);
 						}
 					});
 				}
@@ -405,20 +400,20 @@ public class PtAlongALine2Test {
 		// TODO: avoid really writing out these files. However so far it is unclear how
 		// to configure DRT and load the vehicles otherwise
 		controler.addOverridingModule(
-				PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
-						Id.createLinkId("0-1"), 1));
+			PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
+				Id.createLinkId("0-1"), 1));
 		if (drt2) {
 			controler.addOverridingModule(PtAlongALineTest.createGeneratedFleetSpecificationModule("drt2", "DRT2-", 10,
-					Id.createLinkId("999-1000"), 4));
+				Id.createLinkId("999-1000"), 4));
 		}
 		if (drt3) {
 			controler.addOverridingModule(PtAlongALineTest.createGeneratedFleetSpecificationModule("drt3", "DRT3-", 10,
-					Id.createLinkId("500-501"), 4));
+				Id.createLinkId("500-501"), 4));
 		}
 
 		controler.addOverridingModule(
-				PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
-						Id.createLinkId("0-1"), 1));
+			PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
+				Id.createLinkId("0-1"), 1));
 
 		if ("true".equals(System.getProperty("runOTFVis"))) {
 			// This will start otfvis
@@ -454,11 +449,11 @@ public class PtAlongALine2Test {
 		for (String agent : testAgents) {
 			System.out.println("\n\n**** AGENT : " + agent);
 			List<PlanElement> pes = controler.getScenario()
-					.getPopulation()
-					.getPersons()
-					.get(Id.createPersonId("agent" + agent))
-					.getSelectedPlan()
-					.getPlanElements();
+				.getPopulation()
+				.getPersons()
+				.get(Id.createPersonId("agent" + agent))
+				.getSelectedPlan()
+				.getPlanElements();
 			pes.stream().filter(s -> s instanceof Leg).forEach(s -> System.out.println(s.toString()));
 		}
 
@@ -468,15 +463,15 @@ public class PtAlongALine2Test {
 		 */
 
 		List<PlanElement> planFullCase1 = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(0)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(0)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase1 = planFullCase1.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase1.get(0).getMode().contains("walk"), "Incorrect Mode, case 1");
 		Assertions.assertTrue(planLegCase1.get(1).getMode().equals("pt"), "Incorrect Mode, case 1");
 		Assertions.assertTrue(planLegCase1.get(2).getMode().contains("walk"), "Incorrect Mode, case 1");
@@ -487,15 +482,15 @@ public class PtAlongALine2Test {
 		 */
 
 		List<PlanElement> planFullCase2a = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(1)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(1)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase2a = planFullCase2a.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase2a.get(0).getMode().contains("walk"), "Incorrect Mode, case 2a");
 		Assertions.assertTrue(planLegCase2a.get(1).getMode().equals("drt"), "Incorrect Mode, case 2a");
 		Assertions.assertTrue(planLegCase2a.get(2).getMode().contains("walk"), "Incorrect Mode, case 2a");
@@ -507,15 +502,15 @@ public class PtAlongALine2Test {
 		 * intermodal access to the middle pt stop. The plan should be walk -> drt -> walk -> pt -> walk
 		 */
 		List<PlanElement> planFullCase2b = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(2)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(2)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase2b = planFullCase2b.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase2b.get(0).getMode().contains("walk"), "Incorrect Mode, case 2b");
 		Assertions.assertTrue(planLegCase2b.get(1).getMode().equals("drt"), "Incorrect Mode, case 2b");
 		Assertions.assertTrue(planLegCase2b.get(2).getMode().contains("walk"), "Incorrect Mode, case 2b");
@@ -527,15 +522,15 @@ public class PtAlongALine2Test {
 		 * intermodal access to the middle pt stop. The plan should be walk -> drt3 -> walk -> pt -> walk
 		 */
 		List<PlanElement> planFullCase2c = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(3)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(3)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase2c = planFullCase2c.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase2c.get(0).getMode().contains("walk"), "Incorrect Mode, case 2c");
 		Assertions.assertTrue(planLegCase2c.get(1).getMode().equals("drt3"), "Incorrect Mode, case 2c");
 		Assertions.assertTrue(planLegCase2c.get(2).getMode().contains("walk"), "Incorrect Mode, case 2c");
@@ -547,15 +542,15 @@ public class PtAlongALine2Test {
 		 * transit_walk to get to his/her destination.
 		 */
 		List<PlanElement> planFullCase3a = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(4)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(4)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase3a = planFullCase3a.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase3a.get(0).getMode().equals("walk"), "Incorrect Mode, case 3a");
 
 		/**
@@ -564,15 +559,15 @@ public class PtAlongALine2Test {
 		 * agent is expected to use transit_walk to get to his/her destination.
 		 */
 		List<PlanElement> planFullCase3b = controler.getScenario()
-				.getPopulation()
-				.getPersons()
-				.get(Id.createPersonId("agent" + testAgents.get(5)))
-				.getSelectedPlan()
-				.getPlanElements();
+			.getPopulation()
+			.getPersons()
+			.get(Id.createPersonId("agent" + testAgents.get(5)))
+			.getSelectedPlan()
+			.getPlanElements();
 		List<Leg> planLegCase3b = planFullCase3b.stream()
-				.filter(pe -> pe instanceof Leg)
-				.map(pe -> (Leg)pe)
-				.collect(toList());
+			.filter(pe -> pe instanceof Leg)
+			.map(pe -> (Leg) pe)
+			.collect(toList());
 		Assertions.assertTrue(planLegCase3b.get(0).getMode().equals("walk"), "Incorrect Mode, case 3b");
 
 	}
@@ -612,23 +607,23 @@ public class PtAlongALine2Test {
 		config.routing().setNetworkModes(new HashSet<>(Arrays.asList(TransportMode.drt, "drt2")));
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		config.routing().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6 ) );
+		config.routing().addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams("walk2").setTeleportedModeSpeed(5. / 3.6));
 
 		config.routing()
-				.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0. ) );
+			.addModeRoutingParams(new RoutingConfigGroup.TeleportedModeParams(TransportMode.walk).setTeleportedModeSpeed(0.));
 		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===
 		{
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule(config,
-					SwissRailRaptorConfigGroup.class);
+				SwissRailRaptorConfigGroup.class);
 			configRaptor.setUseIntermodalAccessEgress(true);
 
 			// "walk":
 			configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode("walk2")
-					.setMaxRadius(1000000)
-					.setInitialSearchRadius(1000000)
-					.setSearchExtensionRadius(10000));
+				.setMaxRadius(1000000)
+				.setInitialSearchRadius(1000000)
+				.setSearchExtensionRadius(10000));
 			// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 			// the reduced drt network we should be able to see differentiation.)
 
@@ -637,15 +632,15 @@ public class PtAlongALine2Test {
 
 			// drt
 			configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode(TransportMode.drt)
-					.setMaxRadius(1000000)
-					.setInitialSearchRadius(1000000)
-					.setSearchExtensionRadius(10000));
+				.setMaxRadius(1000000)
+				.setInitialSearchRadius(1000000)
+				.setSearchExtensionRadius(10000));
 
 			if (drt2) {
 				configRaptor.addIntermodalAccessEgress(new IntermodalAccessEgressParameterSet().setMode("drt2")
-						.setMaxRadius(1000000)
-						.setInitialSearchRadius(1000000)
-						.setSearchExtensionRadius(10000));
+					.setMaxRadius(1000000)
+					.setInitialSearchRadius(1000000)
+					.setSearchExtensionRadius(10000));
 
 				//				paramSetDrt2.setPersonFilterAttribute( null );
 				//				paramSetDrt2.setStopFilterAttribute( null );
@@ -655,11 +650,11 @@ public class PtAlongALine2Test {
 		// === SCORING: ===
 		{
 			double margUtlTravPt = config.scoring()
-					.getModes()
-					.get(TransportMode.pt)
-					.getMarginalUtilityOfTraveling();
+				.getModes()
+				.get(TransportMode.pt)
+				.getMarginalUtilityOfTraveling();
 			config.scoring()
-					.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+				.addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
 			config.scoring().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			config.scoring().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 		}
@@ -686,16 +681,16 @@ public class PtAlongALine2Test {
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if (drt2) {
 			scenario.getVehicles()
-					.addVehicleType(
-							vf.createVehicleType(Id.create("drt2", VehicleType.class)).setMaximumVelocity(25. / 3.6));
+				.addVehicleType(
+					vf.createVehicleType(Id.create("drt2", VehicleType.class)).setMaximumVelocity(25. / 3.6));
 		}
 		scenario.getVehicles()
-				.addVehicleType(vf.createVehicleType(Id.create(TransportMode.drt, VehicleType.class))
-						.setMaximumVelocity(25. / 3.6));
+			.addVehicleType(vf.createVehicleType(Id.create(TransportMode.drt, VehicleType.class))
+				.setMaximumVelocity(25. / 3.6));
 
 		scenario.getVehicles()
-				.addVehicleType(vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class))
-						.setMaximumVelocity(100. / 3.6));
+			.addVehicleType(vf.createVehicleType(Id.create(TransportMode.car, VehicleType.class))
+				.setMaximumVelocity(100. / 3.6));
 		// (does not work without; I don't really know why. kai)
 
 		scenario.getPopulation().getPersons().values().removeIf(person -> !person.getId().toString().equals("3"));
@@ -783,7 +778,7 @@ public class PtAlongALine2Test {
 		// === RAPTOR: ===
 		{
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule(config,
-					SwissRailRaptorConfigGroup.class);
+				SwissRailRaptorConfigGroup.class);
 
 			configRaptor.setUseIntermodalAccessEgress(true);
 			{

@@ -363,7 +363,7 @@ public class LinkStatsControllerListenerTest {
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(7);
 		config.controller().setWritePlansInterval(0);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
 		lsConfig.setWriteLinkStatsInterval(3);

@@ -19,11 +19,6 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -34,12 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup;
@@ -57,12 +47,17 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
-* Tests if network change events are considered by {@link WithinDayTravelTime}.
-*
-* @author ikaddoura
-*
-*/
+ * Tests if network change events are considered by {@link WithinDayTravelTime}.
+ *
+ * @author ikaddoura
+ *
+ */
 public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 	@RegisterExtension
@@ -78,12 +73,12 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		String outputDirectory = testUtils.getOutputDirectory() + "output_TTviaMobsimAfterSimStepListener/";
 
 		final Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(outputDirectory);
-		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		config.qsim().setStartTime(6. * 3600.);
 		config.qsim().setEndTime(11 * 3600.);
@@ -118,8 +113,9 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 		final TtmobsimListener ttmobsimListener = new TtmobsimListener(nce);
 
-		controler.addOverridingModule( new AbstractModule() {
-			@Override public void install() {
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
 
 				this.bind(TravelTime.class).toInstance(travelTime);
 				this.addEventHandlerBinding().toInstance(travelTime);
@@ -128,7 +124,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 				this.addMobsimListenerBinding().toInstance(ttmobsimListener);
 
 			}
-		}) ;
+		});
 
 		controler.run();
 
@@ -139,7 +135,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 
 	private void createPopulation(Scenario scenario) {
 		Population population = scenario.getPopulation();
-        PopulationFactory popFactory = scenario.getPopulation().getFactory();
+		PopulationFactory popFactory = scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Leg leg = popFactory.createLeg("car");
@@ -190,7 +186,7 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(2000., 0.));
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord(3000., 0.));
 
-		Link link1 = network.getFactory().createLink(link01 , node0, node1);
+		Link link1 = network.getFactory().createLink(link01, node0, node1);
 		Link link2 = network.getFactory().createLink(link12, node1, node2);
 		Link link3 = network.getFactory().createLink(link23, node2, node3);
 

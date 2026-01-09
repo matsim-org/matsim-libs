@@ -45,13 +45,9 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.*;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactoryImpl;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalsystems.v20.*;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
@@ -61,9 +57,9 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -86,8 +82,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	void test2SequentialPlansCompleteDay(){
-		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*24.0);
+	void test2SequentialPlansCompleteDay() {
+		ScenarioRunner runner = new ScenarioRunner(0.0, 3600 * 1.0, 3600 * 1.0, 3600 * 24.0);
 		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 
@@ -110,8 +106,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlansUncompleteDayEnd(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*2.0)).run();
+	void test2SequentialPlansUncompleteDayEnd() {
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(0.0, 3600 * 1.0, 3600 * 1.0, 3600 * 2.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last start plan event at time " + signalAnalyzer.getLastPlanStartEventTime());
@@ -126,7 +122,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(3600 * 2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
 		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on after 2am.");
@@ -138,8 +134,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlansUncompleteDayStart(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, 3600*2.0, 3600*24.0)).run();
+	void test2SequentialPlansUncompleteDayStart() {
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600 * 1.0, 3600 * 2.0, 3600 * 2.0, 3600 * 24.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last start plan event at time " + signalAnalyzer.getLastPlanStartEventTime());
@@ -151,7 +147,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 2am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(2));
 		log.info("Number of signal events between 0am and 1am " + signalAnalyzer.getNumberOfSignalEventsInHour(0));
 		// test time when signal plans are switched on and off
-		Assertions.assertEquals(3600*1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
+		Assertions.assertEquals(3600 * 1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*2, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
 		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
@@ -166,8 +162,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlans1SecGap(){
-		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0+1, 3600*24.0);
+	void test2SequentialPlans1SecGap() {
+		ScenarioRunner runner = new ScenarioRunner(0.0, 3600 * 1.0, 3600 * 1.0 + 1, 3600 * 24.0);
 		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 
@@ -190,8 +186,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlans1HourGap(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*24.0)).run();
+	void test2SequentialPlans1HourGap() {
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600 * 0.0, 3600 * 1.0, 3600 * 2.0, 3600 * 24.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last start plan event at time " + signalAnalyzer.getLastPlanStartEventTime());
@@ -206,7 +202,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*2, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(3600*1, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(3600 * 1, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
 		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		// test if break between signal plans is simulated correctly
@@ -219,8 +215,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlans1HourGap2TimesOff(){
-		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*3.0);
+	void test2SequentialPlans1HourGap2TimesOff() {
+		ScenarioRunner runner = new ScenarioRunner(3600 * 0.0, 3600 * 1.0, 3600 * 2.0, 3600 * 3.0);
 		runner.setNoSimHours(3);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 
@@ -237,7 +233,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal events after 3am " + signalAnalyzer.getNumberOfSignalEventsInHour(3));
 		// test time when signal plans are switched on and off
 		Assertions.assertEquals(0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
-		Assertions.assertEquals(3600*3, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(3600 * 3, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		/* "5 + " because there is SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH of 5 seconds that is added to each signal plans end time as buffer */
 		Assertions.assertEquals(2, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on between the signal plans.");
@@ -252,8 +248,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SequentialPlansOverMidnight(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*22.0, 3600*1.0, 3600*1.0, 3600*22.0)).run();
+	void test2SequentialPlansOverMidnight() {
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600 * 22.0, 3600 * 1.0, 3600 * 1.0, 3600 * 22.0)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last start plan event at time " + signalAnalyzer.getLastPlanStartEventTime());
@@ -274,8 +270,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test1SignalPlanUncompleteDay(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, null, null)).run();
+	void test1SignalPlanUncompleteDay() {
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600 * 1.0, 3600 * 2.0, null, null)).run();
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last start plan event at time " + signalAnalyzer.getLastPlanStartEventTime());
@@ -291,7 +287,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		Assertions.assertEquals(3600.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 1, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*1, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(3600 * 2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on before 1am.");
 		Assertions.assertTrue(1 > signalAnalyzer.getNumberOfSignalEventsInHour(0), "Signals where unexpectedly switched on before 1am.");
@@ -308,7 +304,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 2. all day signal plan starts again/ is still active, when simulation time exceeds 12pm
 	 */
 	@Test
-	void test1AllDaySignalPlanOverMidnightLateStart(){
+	void test1AllDaySignalPlanOverMidnightLateStart() {
 		ScenarioRunner runner = new ScenarioRunner(null, null, null, null); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
 		runner.setSimStart_h(23);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -321,7 +317,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(23));
 		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
 		// test time when signal plan is switched on and off
-		Assertions.assertEquals(3600*23, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
+		Assertions.assertEquals(3600 * 23, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*24, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
 		Assertions.assertNull(signalAnalyzer.getLastSignalOffEventTime(), "There was an unexpected event that switches off signals.");
@@ -337,7 +333,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 2. should directly start at time 0.0
 	 */
 	@Test
-	void test1AllDaySignalPlanMidnightStart(){
+	void test1AllDaySignalPlanMidnightStart() {
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(null, null, null, null)).run(); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
 
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -357,8 +353,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2SignalPlanFor25h(){
-		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*12.0, 3600*12.0, 3600*24.0);
+	void test2SignalPlanFor25h() {
+		ScenarioRunner runner = new ScenarioRunner(3600 * 0.0, 3600 * 12.0, 3600 * 12.0, 3600 * 24.0);
 		runner.setNoSimHours(25);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 
@@ -383,8 +379,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void testSimStartAfterFirstDayPlan(){
-		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*23.0, 3600*24.0);
+	void testSimStartAfterFirstDayPlan() {
+		ScenarioRunner runner = new ScenarioRunner(3600 * 0.0, 3600 * 1.0, 3600 * 23.0, 3600 * 24.0);
 		runner.setSimStart_h(23);
 		runner.setNoSimHours(3);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
@@ -401,10 +397,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		log.info("Number of signal events before 11pm " + signalAnalyzer.getNumberOfSignalEventsInHour(22));
 		log.info("Number of signal events after 1am next day " + signalAnalyzer.getNumberOfSignalEventsInHour(25));
 		// test time when signal plans are switched on and off
-		Assertions.assertEquals(23*3600, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
+		Assertions.assertEquals(23 * 3600, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "First signal state event unexpected.");
 //		Assert.assertEquals("Number of plan start events is wrong.", 2, signalAnalyzer.getNumberOfPlanStartEvents());
 //		Assert.assertEquals("Time when last plan starts is wrong.", 3600*24, signalAnalyzer.getLastPlanStartEventTime(), MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(3600*25, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
+		Assertions.assertEquals(3600 * 25, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON, "Time when signals are finally switched off is wrong.");
 		Assertions.assertEquals(1, signalAnalyzer.getNumberOfOffEvents(), "Number of signal off events is wrong.");
 		Assertions.assertEquals(0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(22), MatsimTestUtils.EPSILON, "Signals where unexpectedly switched on before 11pm.");
 		Assertions.assertTrue(1 > signalAnalyzer.getNumberOfSignalEventsInHour(22), "Signals where unexpectedly switched on before 11pm.");
@@ -420,10 +416,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 1. overlapping signal plans (uncomplete day) result in an exception
 	 */
 	@Test
-	void test2PlansSameTimesUncompleteDay(){
+	void test2PlansSameTimesUncompleteDay() {
 		final String exceptionMessageOverlapping21 = "Signal plans SignalPlan2 and SignalPlan1 of signal system SignalSystem-3 overlap.";
 
-		try{
+		try {
 			(new ScenarioRunner(0.0, 1.0, 0.0, 1.0)).run();
 			Assertions.fail("The simulation has not stopped with an exception although the signal plans overlap.");
 		} catch (UnsupportedOperationException e) {
@@ -437,11 +433,11 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	 * 1. overlapping signal plans (complete day) result in an exception
 	 */
 	@Test
-	void test2PlansSameTimesCompleteDay(){
+	void test2PlansSameTimesCompleteDay() {
 		final String exceptionMessageHoleDay = "Signal system SignalSystem-3 has multiple plans but at least one of them covers the hole day. "
-				+ "If multiple signal plans are used, they are not allowed to overlap.";
+			+ "If multiple signal plans are used, they are not allowed to overlap.";
 
-		try{
+		try {
 			(new ScenarioRunner(0.0, 0.0, 0.0, 0.0)).run();
 //			(new ScenarioRunner(1.0, 1.0, 1.0, 1.0)).run(); // alternativ. produces same results
 			Assertions.fail("The simulation has not stopped with an exception although multiple signal plans exist and at least one of them covers the hole day (i.e. they overlap).");
@@ -452,10 +448,10 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 	}
 
 	@Test
-	void test2OverlappingPlans(){
+	void test2OverlappingPlans() {
 		final String exceptionMessageOverlapping12 = "Signal plans SignalPlan1 and SignalPlan2 of signal system SignalSystem-3 overlap.";
 
-		try{
+		try {
 			(new ScenarioRunner(0.0, 2.0, 1.0, 3.0)).run();
 			Assertions.fail("The simulation has not stopped with an exception although the signal plans overlap.");
 		} catch (UnsupportedOperationException e) {
@@ -475,8 +471,8 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a RED-switch at second 57
 		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
-		Assertions.assertEquals(60+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!");
+		Assertions.assertEquals(60 + offset1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+			+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
@@ -490,13 +486,13 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		// in this case, the first event should be a GREEN-switch at second 0
 		log.info("Offset " + offset1 + " leads to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
-		Assertions.assertEquals(120+offset1 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!");
+		Assertions.assertEquals(120 + offset1, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+			+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
-	void testTwoPlansWithNegativeOffsets(){
-		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
+	void testTwoPlansWithNegativeOffsets() {
+		ScenarioRunner sr = new ScenarioRunner(0.0 * 3600, 1.0 * 3600, 1.0 * 3600, 2. * 3600);
 
 		int offset1 = -3;
 		int offset2 = -5;
@@ -506,19 +502,19 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		//Simulation starts 1h late
 		int simStart_s = 3600;
-		sr.setSimStart_h(simStart_s/3600);
+		sr.setSimStart_h(simStart_s / 3600);
 
 		SignalEventAnalyzer signalAnalyzer = sr.run();
 
 		// in this case, the first event should be a RED-switch at second 3625
 		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
- 		Assertions.assertEquals(simStart_s+30+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!");
+		Assertions.assertEquals(simStart_s + 30 + offset2, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+			+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
 	@Test
-	void testTwoPlansWithNegativeOffsetsEqualCycleTime(){
-		ScenarioRunner sr = new ScenarioRunner(0.0*3600, 1.0*3600, 1.0*3600, 2.*3600 );
+	void testTwoPlansWithNegativeOffsetsEqualCycleTime() {
+		ScenarioRunner sr = new ScenarioRunner(0.0 * 3600, 1.0 * 3600, 1.0 * 3600, 2. * 3600);
 
 		int offset1 = -3;
 		int offset2 = -60;
@@ -528,24 +524,24 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		//Simulation starts 1h late
 		int simStart_s = 3600;
-		sr.setSimStart_h(simStart_s/3600);
+		sr.setSimStart_h(simStart_s / 3600);
 
 		SignalEventAnalyzer signalAnalyzer = sr.run();
 
 		// in this case, the first event should be a GREEN-switch at second 3600
 		log.info("Offsets " + offset1 + " and " + offset2 + " with a simulation start at second " + simStart_s + " lead to the first signal event at second: " + signalAnalyzer.getFirstSignalEventTime());
- 		Assertions.assertEquals(simStart_s+60+offset2 , signalAnalyzer.getFirstSignalEventTime() , MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
-				+ "cycle time and plan start time. Also if the offset is negative!");
+		Assertions.assertEquals(simStart_s + 60 + offset2, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON, "The first signal event should be at the first second after simulation start corresponding to offset, "
+			+ "cycle time and plan start time. Also if the offset is negative!");
 	}
 
-	private class ScenarioRunner{
+	private class ScenarioRunner {
 
 		private Double plan1StartTime;
 		private Double plan1EndTime;
 		private Double plan2StartTime;
 		private Double plan2EndTime;
 		private int noSimHours = 2;
-		private int simStart_h= 0;
+		private int simStart_h = 0;
 		private int offsetPlan1 = 0;
 		private int offsetPlan2 = 0;
 
@@ -613,7 +609,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 		/**
 		 * Creates a network like this:
-		 *
+		 * <p>
 		 * 1 ----> 2 ----> 3 ----> 4 ----> 5
 		 */
 		private void createNetwork() {
@@ -628,12 +624,12 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 			String[] links = {"1_2", "2_3", "3_4", "4_5"};
 
-			for (String linkId : links){
+			for (String linkId : links) {
 				String fromNodeId = linkId.split("_")[0];
 				String toNodeId = linkId.split("_")[1];
 				Link link = fac.createLink(Id.createLinkId(linkId),
-						net.getNodes().get(Id.createNodeId(fromNodeId)),
-						net.getNodes().get(Id.createNodeId(toNodeId)));
+					net.getNodes().get(Id.createNodeId(fromNodeId)),
+					net.getNodes().get(Id.createNodeId(toNodeId)));
 				link.setCapacity(7200);
 				link.setLength(1000);
 				link.setFreespeed(10);
@@ -649,7 +645,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 			Population pop = scenario.getPopulation();
 
 			// one person every half an hour
-			for (int i = simStart_h*3600; i <= simStart_h*3600 + noSimHours*3600; i+=1800) {
+			for (int i = simStart_h * 3600; i <= simStart_h * 3600 + noSimHours * 3600; i += 1800) {
 				// create a person
 				Person person = pop.getFactory().createPerson(Id.createPersonId("1_2-4_5-" + i));
 				pop.addPerson(person);
@@ -720,17 +716,17 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 		private Config defineConfig() {
 			Config config = ConfigUtils.createConfig();
 			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 			// set number of iterations
 			config.controller().setLastIteration(0);
 
-			config.qsim().setStartTime(simStart_h*3600);
-	        config.qsim().setUsingFastCapacityUpdate(false);
+			config.qsim().setStartTime(simStart_h * 3600);
+			config.qsim().setUsingFastCapacityUpdate(false);
 
 			// able or enable signals and lanes
 			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
-			signalConfigGroup.setUseSignalSystems( true );
+			signalConfigGroup.setUseSignalSystems(true);
 
 			// define strategies:
 			{
@@ -740,7 +736,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 				strat.setDisableAfter(config.controller().getLastIteration());
 				config.replanning().addStrategySettings(strat);
 			}
-			config.qsim().setStuckTime( 3600 );
+			config.qsim().setStuckTime(3600);
 			config.qsim().setRemoveStuckVehicles(false);
 
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -763,7 +759,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 
 	}
 
-	private class SignalEventAnalyzer implements SignalGroupStateChangedEventHandler{
+	private class SignalEventAnalyzer implements SignalGroupStateChangedEventHandler {
 
 		Double lastSignalOffEventTime = null;
 		int noOffEvents;
@@ -791,7 +787,7 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 			return lastSignalOffEventTime;
 		}
 
-		public int getNumberOfSignalEventsInHour(int hourOfDay){
+		public int getNumberOfSignalEventsInHour(int hourOfDay) {
 			return noSignalEventsPerHour[hourOfDay];
 		}
 
@@ -813,25 +809,25 @@ public class DefaultPlanbasedSignalSystemControllerIT {
 			// count number of signal events per hour
 			noSignalEventsPerHour[hourOfDay]++;
 
-			if (firstSignalEventTime == null){
+			if (firstSignalEventTime == null) {
 				firstSignalEventTime = event.getTime();
 			}
 
-			if (event.getNewState().equals(SignalGroupState.OFF)){
+			if (event.getNewState().equals(SignalGroupState.OFF)) {
 				lastSignalOffEventTime = event.getTime();
 				noOffEvents++;
 				return;
-			} else if (event.getNewState().equals(SignalGroupState.START_PLAN)){
+			} else if (event.getNewState().equals(SignalGroupState.START_PLAN)) {
 				lastPlanStartEventTime = event.getTime();
 				noPlanStartEvents++;
 				return;
 			}
 
 			// fill cycle time array
-			if (cycleTimesOfFirstCyclePerHour[hourOfDay] == 0.0){
+			if (cycleTimesOfFirstCyclePerHour[hourOfDay] == 0.0) {
 				// first cycle time of this hour not yet determined
-				if (event.getNewState().equals(SignalGroupState.GREEN)){
-					if (lastGreenSwitchOfThisCycle == null){
+				if (event.getNewState().equals(SignalGroupState.GREEN)) {
+					if (lastGreenSwitchOfThisCycle == null) {
 						// this is the first green switch of this cycle
 						lastGreenSwitchOfThisCycle = event.getTime();
 					} else {

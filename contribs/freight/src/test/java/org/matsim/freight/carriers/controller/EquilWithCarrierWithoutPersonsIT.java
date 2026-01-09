@@ -21,8 +21,6 @@
 
 package org.matsim.freight.carriers.controller;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,26 +31,25 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.freight.carriers.Carrier;
-import org.matsim.freight.carriers.CarriersUtils;
-import org.matsim.freight.carriers.FreightCarriersConfigGroup;
-import org.matsim.freight.carriers.ScheduledTour;
-import org.matsim.freight.carriers.Tour;
+import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.freight.carriers.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.freight.carriers.mobsim.TimeScoringFunctionFactoryForTests;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class EquilWithCarrierWithoutPersonsIT {
 
 	private Controler controler;
 
-	@RegisterExtension private MatsimTestUtils testUtils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	public void setUp() {
-		Config config = EquilWithCarrierWithPersonsIT.commonConfig( testUtils );
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario( config, testUtils );
+		Config config = EquilWithCarrierWithPersonsIT.commonConfig(testUtils);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
+		Scenario scenario = EquilWithCarrierWithPersonsIT.commonScenario(config, testUtils);
 		controler = new Controler(scenario);
 	}
 
@@ -63,7 +60,7 @@ public class EquilWithCarrierWithoutPersonsIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
@@ -104,35 +101,35 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	void testScoringInMeters(){
+	void testScoringInMeters() {
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
 		controler.run();
 
 		Carrier carrier1 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
-		Assertions.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore(), 0.0);
 
 		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assertions.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore(), 0.0);
 	}
 
 	@Test
-	void testScoringInSecondsWoTimeWindowEnforcement(){
+	void testScoringInSecondsWoTimeWindowEnforcement() {
 		setUp();
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(), FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);
-		controler.addOverridingModule( new CarrierModule( ) );
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
@@ -142,21 +139,21 @@ public class EquilWithCarrierWithoutPersonsIT {
 		Assertions.assertEquals(-240.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
 		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assertions.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0);
 
 	}
 
 	@Test
-	void testScoringInSecondsWTimeWindowEnforcement(){
+	void testScoringInSecondsWTimeWindowEnforcement() {
 		setUp();
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(), FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
-		final CarrierModule carrierModule = new CarrierModule( );
-		controler.addOverridingModule( carrierModule );
+		final CarrierModule carrierModule = new CarrierModule();
+		controler.addOverridingModule(carrierModule);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
@@ -166,21 +163,21 @@ public class EquilWithCarrierWithoutPersonsIT {
 		Assertions.assertEquals(-4873.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
 		Carrier carrier2 = CarriersUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
-		Assertions.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
+		Assertions.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0);
 
 	}
 
 	@Test
-	void testScoringInSecondsWithWithinDayRescheduling(){
+	void testScoringInSecondsWithWithinDayRescheduling() {
 		setUp();
-		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule( controler.getConfig(), FreightCarriersConfigGroup.class );
+		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(), FreightCarriersConfigGroup.class);
 		freightCarriersConfigGroup.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.enforceBeginnings);
 		CarrierModule carrierControler = new CarrierModule();
 		controler.addOverridingModule(carrierControler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
@@ -191,20 +188,20 @@ public class EquilWithCarrierWithoutPersonsIT {
 	}
 
 	@Test
-	void testEventFilesAreEqual(){
+	void testEventFilesAreEqual() {
 		setUp();
 		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind( CarrierStrategyManager.class ).toProvider(StrategyManagerFactoryForTests.class ).asEagerSingleton();
+				bind(CarrierStrategyManager.class).toProvider(StrategyManagerFactoryForTests.class).asEagerSingleton();
 				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
 			}
 		});
 		controler.run();
 
-		String expected = testUtils.getClassInputDirectory() + "/output_events.xml.gz" ;
-		String actual = testUtils.getOutputDirectory() + "/output_events.xml.gz" ;
+		String expected = testUtils.getClassInputDirectory() + "/output_events.xml.gz";
+		String actual = testUtils.getOutputDirectory() + "/output_events.xml.gz";
 		MatsimTestUtils.assertEqualEventsFiles(expected, actual);
 
 	}

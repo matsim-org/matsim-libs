@@ -71,7 +71,7 @@ public class TripRouterFactoryImplTest {
 	void testRestrictedNetworkNoPt(RoutingConfigGroup.AccessEgressType accessEgressType) throws Exception {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(false);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.routing().setAccessEgressType(accessEgressType);
 
 		testRestrictedNetwork(config);
@@ -166,7 +166,7 @@ public class TripRouterFactoryImplTest {
 	@EnumSource(value = RoutingConfigGroup.AccessEgressType.class, names = {"none", "accessEgressModeToLink"})
 	void testMonomodalNetwork(RoutingConfigGroup.AccessEgressType accessEgressType) throws Exception {
 		final Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.routing().setAccessEgressType(accessEgressType);
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();

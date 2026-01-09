@@ -19,23 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -56,6 +44,11 @@ import org.matsim.testcases.utils.SelectiveEventsCollector;
 import org.matsim.vehicles.MatsimVehicleReader;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.List;
+
 /**
  * @author mrieser
  */
@@ -65,38 +58,38 @@ public class QSimIntegrationTest {
 	void test_twoStopsOnFirstLink() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
-				"<?xml version='1.0' encoding='UTF-8'?>" +
-				"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
-				"<transitSchedule>" +
-				"	<transitStops>" +
-				"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
-				"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-				"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"3\"/>" +
-				"	</transitStops>" +
-				"	<transitLine id=\"A\">" +
-				"		<transitRoute id=\"Aa\">" +
-				"			<transportMode>train</transportMode>" +
-				"			<routeProfile>" +
-				"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
-				"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
-				"				<stop refId=\"3\" arrivalOffset=\"00:06:00\"/>" +
-				"			</routeProfile>" +
-				"			<route>" +
-				"				<link refId=\"2\"/>" +
-				"				<link refId=\"3\"/>" +
-				"			</route>" +
-				"			<departures>" +
-				"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
-				"			</departures>" +
-				"		</transitRoute>" +
-				"	</transitLine>" +
-				"</transitSchedule>";
+			"<?xml version='1.0' encoding='UTF-8'?>" +
+			"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+			"<transitSchedule>" +
+			"	<transitStops>" +
+			"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"3\"/>" +
+			"	</transitStops>" +
+			"	<transitLine id=\"A\">" +
+			"		<transitRoute id=\"Aa\">" +
+			"			<transportMode>train</transportMode>" +
+			"			<routeProfile>" +
+			"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+			"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
+			"				<stop refId=\"3\" arrivalOffset=\"00:06:00\"/>" +
+			"			</routeProfile>" +
+			"			<route>" +
+			"				<link refId=\"2\"/>" +
+			"				<link refId=\"3\"/>" +
+			"			</route>" +
+			"			<departures>" +
+			"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+			"			</departures>" +
+			"		</transitRoute>" +
+			"	</transitLine>" +
+			"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
-				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
-				LinkEnterEvent.class);
+			PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+			LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
@@ -125,40 +118,40 @@ public class QSimIntegrationTest {
 	void test_multipleStopsOnFirstLink_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
-		"<?xml version='1.0' encoding='UTF-8'?>" +
-		"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
-		"<transitSchedule>" +
-		"	<transitStops>" +
-		"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"	</transitStops>" +
-		"	<transitLine id=\"A\">" +
-		"		<transitRoute id=\"Aa\">" +
-		"			<transportMode>train</transportMode>" +
-		"			<routeProfile>" +
-		"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
-		"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
-		"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
-		"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
-		"			</routeProfile>" +
-		"			<route>" +
-		"				<link refId=\"2\"/>" +
-		"				<link refId=\"2\"/>" +
-		"			</route>" +
-		"			<departures>" +
-		"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
-		"			</departures>" +
-		"		</transitRoute>" +
-		"	</transitLine>" +
-		"</transitSchedule>";
+			"<?xml version='1.0' encoding='UTF-8'?>" +
+			"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+			"<transitSchedule>" +
+			"	<transitStops>" +
+			"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"	</transitStops>" +
+			"	<transitLine id=\"A\">" +
+			"		<transitRoute id=\"Aa\">" +
+			"			<transportMode>train</transportMode>" +
+			"			<routeProfile>" +
+			"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+			"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
+			"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
+			"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
+			"			</routeProfile>" +
+			"			<route>" +
+			"				<link refId=\"2\"/>" +
+			"				<link refId=\"2\"/>" +
+			"			</route>" +
+			"			<departures>" +
+			"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+			"			</departures>" +
+			"		</transitRoute>" +
+			"	</transitLine>" +
+			"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
-				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
-				LinkEnterEvent.class);
+			PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+			LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
@@ -188,55 +181,55 @@ public class QSimIntegrationTest {
 	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtFirstStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
-				"<?xml version='1.0' encoding='UTF-8'?>" +
-				"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
-				"<transitSchedule>" +
-				"	<transitStops>" +
-				"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
-				"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-				"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-				"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-				"	</transitStops>" +
-				"	<transitLine id=\"A\">" +
-				"		<transitRoute id=\"Aa\">" +
-				"			<transportMode>train</transportMode>" +
-				"			<routeProfile>" +
-				"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
-				"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
-				"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
-				"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
-				"			</routeProfile>" +
-				"			<route>" +
-				"				<link refId=\"2\"/>" +
-				"				<link refId=\"2\"/>" +
-				"			</route>" +
-				"			<departures>" +
-				"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
-				"			</departures>" +
-				"		</transitRoute>" +
-				"	</transitLine>" +
-				"</transitSchedule>";
+			"<?xml version='1.0' encoding='UTF-8'?>" +
+			"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+			"<transitSchedule>" +
+			"	<transitStops>" +
+			"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"	</transitStops>" +
+			"	<transitLine id=\"A\">" +
+			"		<transitRoute id=\"Aa\">" +
+			"			<transportMode>train</transportMode>" +
+			"			<routeProfile>" +
+			"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+			"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
+			"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
+			"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
+			"			</routeProfile>" +
+			"			<route>" +
+			"				<link refId=\"2\"/>" +
+			"				<link refId=\"2\"/>" +
+			"			</route>" +
+			"			<departures>" +
+			"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+			"			</departures>" +
+			"		</transitRoute>" +
+			"	</transitLine>" +
+			"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		String plansXml = "<?xml version=\"1.0\" ?>" +
-				"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
-				"<plans>" +
-				"<person id=\"1\">" +
-				"	<plan>" +
-				"		<act type=\"h\" x=\"1000\" y=\"1000\" link=\"2\" end_time=\"05:45\" />" +
-				"		<leg mode=\"pt\">" +
-				"			<route>PT1===1===A===Aa===3</route>" +
-				"		</leg>" +
-				"		<act type=\"w\" x=\"10000\" y=\"0\" link=\"3\" dur=\"00:10\" />" +
-				"	</plan>" +
-				"</person>" +
-				"</plans>";
+			"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
+			"<plans>" +
+			"<person id=\"1\">" +
+			"	<plan>" +
+			"		<act type=\"h\" x=\"1000\" y=\"1000\" link=\"2\" end_time=\"05:45\" />" +
+			"		<leg mode=\"pt\">" +
+			"			<route>PT1===1===A===Aa===3</route>" +
+			"		</leg>" +
+			"		<act type=\"w\" x=\"10000\" y=\"0\" link=\"3\" dur=\"00:10\" />" +
+			"	</plan>" +
+			"</person>" +
+			"</plans>";
 		new PopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
-				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
-				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
+			PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+			LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
@@ -273,55 +266,55 @@ public class QSimIntegrationTest {
 	void test_multipleStopsOnFirstLink_singleLinkRoute_withPassengersAtSecondStop() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
-		"<?xml version='1.0' encoding='UTF-8'?>" +
-		"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
-		"<transitSchedule>" +
-		"	<transitStops>" +
-		"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
-		"	</transitStops>" +
-		"	<transitLine id=\"A\">" +
-		"		<transitRoute id=\"Aa\">" +
-		"			<transportMode>train</transportMode>" +
-		"			<routeProfile>" +
-		"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
-		"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
-		"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
-		"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
-		"			</routeProfile>" +
-		"			<route>" +
-		"				<link refId=\"2\"/>" +
-		"				<link refId=\"2\"/>" +
-		"			</route>" +
-		"			<departures>" +
-		"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
-		"			</departures>" +
-		"		</transitRoute>" +
-		"	</transitLine>" +
-		"</transitSchedule>";
+			"<?xml version='1.0' encoding='UTF-8'?>" +
+			"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+			"<transitSchedule>" +
+			"	<transitStops>" +
+			"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"2\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"3\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"		<stopFacility id=\"4\" x=\"2050\" y=\"2940\" linkRefId=\"2\"/>" +
+			"	</transitStops>" +
+			"	<transitLine id=\"A\">" +
+			"		<transitRoute id=\"Aa\">" +
+			"			<transportMode>train</transportMode>" +
+			"			<routeProfile>" +
+			"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+			"				<stop refId=\"2\" arrivalOffset=\"00:03:00\"/>" +
+			"				<stop refId=\"3\" arrivalOffset=\"00:04:00\"/>" +
+			"				<stop refId=\"4\" arrivalOffset=\"00:05:00\"/>" +
+			"			</routeProfile>" +
+			"			<route>" +
+			"				<link refId=\"2\"/>" +
+			"				<link refId=\"2\"/>" +
+			"			</route>" +
+			"			<departures>" +
+			"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+			"			</departures>" +
+			"		</transitRoute>" +
+			"	</transitLine>" +
+			"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		String plansXml = "<?xml version=\"1.0\" ?>" +
-		"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
-		"<plans>" +
-		"<person id=\"1\">" +
-		"	<plan>" +
-		"		<act type=\"h\" x=\"1000\" y=\"1000\" link=\"2\" end_time=\"05:45\" />" +
-		"		<leg mode=\"pt\">" +
-		"			<route>PT1===2===A===Aa===4</route>" +
-		"		</leg>" +
-		"		<act type=\"w\" x=\"10000\" y=\"0\" link=\"3\" dur=\"00:10\" />" +
-		"	</plan>" +
-		"</person>" +
-		"</plans>";
+			"<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">" +
+			"<plans>" +
+			"<person id=\"1\">" +
+			"	<plan>" +
+			"		<act type=\"h\" x=\"1000\" y=\"1000\" link=\"2\" end_time=\"05:45\" />" +
+			"		<leg mode=\"pt\">" +
+			"			<route>PT1===2===A===Aa===4</route>" +
+			"		</leg>" +
+			"		<act type=\"w\" x=\"10000\" y=\"0\" link=\"3\" dur=\"00:10\" />" +
+			"	</plan>" +
+			"</person>" +
+			"</plans>";
 		new PopulationReader(f.scenario).parse(new ByteArrayInputStream(plansXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
-				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
-				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
+			PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+			LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
@@ -359,7 +352,7 @@ public class QSimIntegrationTest {
 	 * But think about round-trip ship cruises, tourist buses etc and it makes more sense.
 	 * To add a twist assume some non-useful (because automatically generated) network route with only a single link and no
 	 * real round-trip route.
-	 *
+	 * <p>
 	 * And yes, this case has appeared in real data, that's why there is a test case for it... (mrieser, jan2014)
 	 *
 	 * @throws SAXException
@@ -370,35 +363,35 @@ public class QSimIntegrationTest {
 	void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
 		Fixture f = new Fixture();
 		String scheduleXml = "" +
-		"<?xml version='1.0' encoding='UTF-8'?>" +
-		"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
-		"<transitSchedule>" +
-		"	<transitStops>" +
-		"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
-		"	</transitStops>" +
-		"	<transitLine id=\"A\">" +
-		"		<transitRoute id=\"Aa\">" +
-		"			<transportMode>train</transportMode>" +
-		"			<routeProfile>" +
-		"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
-		"				<stop refId=\"1\" arrivalOffset=\"00:15:00\"/>" +
-		"			</routeProfile>" +
-		"			<route>" +
-		"				<link refId=\"2\"/>" +
-		"				<link refId=\"2\"/>" +
-		"			</route>" +
-		"			<departures>" +
-		"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
-		"			</departures>" +
-		"		</transitRoute>" +
-		"	</transitLine>" +
-		"</transitSchedule>";
+			"<?xml version='1.0' encoding='UTF-8'?>" +
+			"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+			"<transitSchedule>" +
+			"	<transitStops>" +
+			"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+			"	</transitStops>" +
+			"	<transitLine id=\"A\">" +
+			"		<transitRoute id=\"Aa\">" +
+			"			<transportMode>train</transportMode>" +
+			"			<routeProfile>" +
+			"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+			"				<stop refId=\"1\" arrivalOffset=\"00:15:00\"/>" +
+			"			</routeProfile>" +
+			"			<route>" +
+			"				<link refId=\"2\"/>" +
+			"				<link refId=\"2\"/>" +
+			"			</route>" +
+			"			<departures>" +
+			"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+			"			</departures>" +
+			"		</transitRoute>" +
+			"	</transitLine>" +
+			"</transitSchedule>";
 		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
-				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
-				LinkEnterEvent.class);
+			PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+			LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
@@ -423,12 +416,13 @@ public class QSimIntegrationTest {
 
 	private static class Fixture {
 		public final MutableScenario scenario;
+
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
 			config.transit().setUseTransit(true);
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-			config.qsim().setEndTime(8.0*3600);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
+			config.qsim().setEndTime(8.0 * 3600);
 
 			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -464,22 +458,22 @@ public class QSimIntegrationTest {
 
 			// setup: vehicles
 			String vehiclesXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-			"<vehicleDefinitions xmlns=\"http://www.matsim.org/files/dtd\"" +
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-			" xsi:schemaLocation=\"http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd\">" +
-			"	<vehicleType id=\"1\">" +
-			"		<description>Small Train</description>" +
-			"		<capacity>" +
-			"			<seats persons=\"50\"/>" +
-			"			<standingRoom persons=\"30\"/>" +
-			"		</capacity>" +
-			"		<length meter=\"50.0\"/>" +
-			"	</vehicleType>" +
-			"	<vehicle id=\"tr_1\" type=\"1\"/>" +
-			"	<vehicle id=\"tr_2\" type=\"1\"/>" +
-			"	<vehicle id=\"tr_3\" type=\"1\"/>" +
-			"</vehicleDefinitions>";
-			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readStream(new ByteArrayInputStream(vehiclesXml.getBytes()) );
+				"<vehicleDefinitions xmlns=\"http://www.matsim.org/files/dtd\"" +
+				" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
+				" xsi:schemaLocation=\"http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd\">" +
+				"	<vehicleType id=\"1\">" +
+				"		<description>Small Train</description>" +
+				"		<capacity>" +
+				"			<seats persons=\"50\"/>" +
+				"			<standingRoom persons=\"30\"/>" +
+				"		</capacity>" +
+				"		<length meter=\"50.0\"/>" +
+				"	</vehicleType>" +
+				"	<vehicle id=\"tr_1\" type=\"1\"/>" +
+				"	<vehicle id=\"tr_2\" type=\"1\"/>" +
+				"	<vehicle id=\"tr_3\" type=\"1\"/>" +
+				"</vehicleDefinitions>";
+			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readStream(new ByteArrayInputStream(vehiclesXml.getBytes()));
 		}
 
 		private void setDefaultLinkAttributes(final Link link) {

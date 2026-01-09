@@ -1,45 +1,44 @@
 /**
  * se.vti.atap
- * 
+ * <p>
  * Copyright (C) 2025 by Gunnar Flötteröd (VTI, LiU).
- * 
+ * <p>
  * VTI = Swedish National Road and Transport Institute
  * LiU = Linköping University, Sweden
- * 
+ * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms
- * of the GNU General Public License as published by the Free Software Foundation, either 
+ * of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ * <p>
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ * <p>
  * You should have received a copy of the GNU General Public License along with this program.
  * If not, see <https://www.gnu.org/licenses/>. See also COPYING and WARRANTY file.
  */
 package se.vti.atap.matsim.examples.parallel_links;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.RoutingConfigGroup.NetworkRouteConsistencyCheck;
+import org.matsim.core.config.groups.RoutingConfigGroup.NetworkConsistencyCheck;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-
 import se.vti.atap.matsim.ATAP;
 import se.vti.atap.matsim.ATAPConfigGroup;
 import se.vti.atap.matsim.ATAPConfigGroup.ReplannerIdentifierType;
 import se.vti.emulation.EmulationConfigGroup;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+
 /**
- * 
+ *
  * @author GunnarF
  *
  */
@@ -63,7 +62,7 @@ public class ExampleRunner {
 		config.travelTimeCalculator().setTraveltimeBinSize(60);
 		config.qsim().setStuckTime(Double.POSITIVE_INFINITY);
 		config.addModule(new EmulationConfigGroup());
-		config.routing().setNetworkRouteConsistencyCheck(NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(NetworkConsistencyCheck.disable);
 
 		ATAPConfigGroup atapConfig = new ATAPConfigGroup();
 		atapConfig.setReplannerIdentifier(replannerIdentifier);
@@ -87,9 +86,9 @@ public class ExampleRunner {
 			}
 			ConfigUtils.writeMinimalConfig(config, Paths.get(scenarioFolder, "config.xml").toString());
 			NetworkUtils.writeNetwork(scenario.getNetwork(),
-					Paths.get(scenarioFolder, scenario.getConfig().network().getInputFile()).toString());
+				Paths.get(scenarioFolder, scenario.getConfig().network().getInputFile()).toString());
 			PopulationUtils.writePopulation(scenario.getPopulation(),
-					Paths.get(scenarioFolder, scenario.getConfig().plans().getInputFile()).toString());
+				Paths.get(scenarioFolder, scenario.getConfig().plans().getInputFile()).toString());
 		}
 
 		var atap = new ATAP();
@@ -118,8 +117,8 @@ public class ExampleRunner {
 //		 System.out.println("SORTING METHOD");
 //		 runSmallExampleWithSorting();
 
-		 System.out.println("PROPOSED METHOD");
-		 runSmallExampleWithProposed();
+		System.out.println("PROPOSED METHOD");
+		runSmallExampleWithProposed();
 	}
 
 }

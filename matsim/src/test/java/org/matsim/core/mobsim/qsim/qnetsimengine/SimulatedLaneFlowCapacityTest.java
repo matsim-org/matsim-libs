@@ -21,13 +21,7 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,11 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
@@ -61,6 +51,12 @@ import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * test flow capacity of links with lanes in the simulation, i.e. the number of vehicles that leave the link or lane per hour
@@ -186,10 +182,10 @@ public class SimulatedLaneFlowCapacityTest {
 			Person person = population.getFactory().createPerson(Id.createPersonId(i));
 			// create a start activity at link 0 with end time 50*60
 			Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId("0"));
-			startAct.setEndTime(50*60);
+			startAct.setEndTime(50 * 60);
 			// create a drain activity at link 2
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy", Id.createLinkId("2"));
+				"dummy", Id.createLinkId("2"));
 			// create a dummy leg
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			leg.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId("0"), Collections.singletonList(Id.createLinkId("1")), Id.createLinkId("2")));
@@ -211,7 +207,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -240,7 +236,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -273,7 +269,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -295,7 +291,7 @@ public class SimulatedLaneFlowCapacityTest {
 		// check simulated capacity values
 		assertEquals(simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), simulatedCapacity.getSimulatedLinkCapacity(), MatsimTestUtils.EPSILON);
 		assertEquals(1800, simulatedCapacity.getSimulatedLaneCapacity(Id.create("1.ol", Lane.class)), MatsimTestUtils.EPSILON);
-		assertEquals(2*900, simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), MatsimTestUtils.EPSILON);
+		assertEquals(2 * 900, simulatedCapacity.getSimulatedLaneCapacity(Id.create("1", Lane.class)), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -307,7 +303,7 @@ public class SimulatedLaneFlowCapacityTest {
 	@Test
 	void testCapacityWithThreeLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.scoring().addActivityParams(dummyAct);
@@ -345,7 +341,7 @@ public class SimulatedLaneFlowCapacityTest {
 	 *
 	 * @author tthunig
 	 */
-	static class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler{
+	static class SimulatedCapacityHandler implements LinkLeaveEventHandler, LaneLeaveEventHandler {
 
 		private double linkCapacity;
 		private Map<Id<Lane>, Double> laneCapacities = new HashMap<>();
@@ -359,29 +355,29 @@ public class SimulatedLaneFlowCapacityTest {
 		@Override
 		public void handleEvent(LaneLeaveEvent event) {
 			// count lane leave events on link 1 in the second hour
-			if (event.getLinkId().equals(Id.createLinkId(1)) && event.getTime() >= 3600 && event.getTime() < 2*3600){
-				if (!laneCapacities.containsKey(event.getLaneId())){
+			if (event.getLinkId().equals(Id.createLinkId(1)) && event.getTime() >= 3600 && event.getTime() < 2 * 3600) {
+				if (!laneCapacities.containsKey(event.getLaneId())) {
 					laneCapacities.put(event.getLaneId(), 0.);
 				}
-				laneCapacities.put(event.getLaneId(), laneCapacities.get(event.getLaneId())+1);
+				laneCapacities.put(event.getLaneId(), laneCapacities.get(event.getLaneId()) + 1);
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			// count link leave events on link 1 in the second hour
-			if (event.getLinkId().equals(Id.createLinkId(1)) && event.getTime() >= 3600 && event.getTime() < 2*3600){
+			if (event.getLinkId().equals(Id.createLinkId(1)) && event.getTime() >= 3600 && event.getTime() < 2 * 3600) {
 				linkCapacity++;
 			}
 
 		}
 
-		double getSimulatedLinkCapacity(){
+		double getSimulatedLinkCapacity() {
 			return linkCapacity;
 		}
 
-		double getSimulatedLaneCapacity(Id<Lane> laneId){
-			return laneCapacities.containsKey(laneId)? laneCapacities.get(laneId) : 0;
+		double getSimulatedLaneCapacity(Id<Lane> laneId) {
+			return laneCapacities.containsKey(laneId) ? laneCapacities.get(laneId) : 0;
 		}
 	}
 }

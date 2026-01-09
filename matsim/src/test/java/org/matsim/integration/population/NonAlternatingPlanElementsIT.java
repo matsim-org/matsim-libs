@@ -19,9 +19,6 @@
 
 package org.matsim.integration.population;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -29,11 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
@@ -43,15 +36,12 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests that a simple simulation can be run with plans where
@@ -61,7 +51,8 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class NonAlternatingPlanElementsIT {
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	void test_Controler_QSim_Routechoice_acts() {
@@ -90,7 +81,7 @@ public class NonAlternatingPlanElementsIT {
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setCreateGraphs(false);
-        controler.run();
+		controler.run();
 
 		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
@@ -98,7 +89,7 @@ public class NonAlternatingPlanElementsIT {
 	@Test
 	void test_Controler_QSim_Routechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.controller().setMobsim("qsim");
 		config.controller().setLastIteration(10);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
@@ -123,7 +114,7 @@ public class NonAlternatingPlanElementsIT {
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setCreateGraphs(false);
-        controler.run();
+		controler.run();
 
 		Assertions.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
@@ -144,7 +135,7 @@ public class NonAlternatingPlanElementsIT {
 		leg1.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg2 = pf.createLeg("pt");
-		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(14, Link.class), new Id[] {Id.create(20, Link.class)}, Id.create(21, Link.class)));
+		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(14, Link.class), new Id[]{Id.create(20, Link.class)}, Id.create(21, Link.class)));
 		leg2.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg3 = pf.createLeg("transit_walk");
@@ -157,7 +148,7 @@ public class NonAlternatingPlanElementsIT {
 		((Activity) work).setCoord(new Coord((double) 5000, y));
 
 		Leg leg4 = pf.createLeg("car");
-		leg4.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg4.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[]{Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg4.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
@@ -200,7 +191,7 @@ public class NonAlternatingPlanElementsIT {
 		((Activity) shop).setCoord(new Coord((double) 5000, y));
 
 		Leg leg2 = pf.createLeg("car");
-		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[]{Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg2.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
@@ -243,7 +234,7 @@ public class NonAlternatingPlanElementsIT {
 		schedule.addStopFacility(stopFacility2);
 
 		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
-		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[]{Id.create("20", Link.class)}, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStopBuilder(stopFacility1).departureOffset(0).build());
 		stops.add(f.createTransitRouteStopBuilder(stopFacility2).arrivalOffset(180).build());
