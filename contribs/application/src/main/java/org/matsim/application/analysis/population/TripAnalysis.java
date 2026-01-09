@@ -1124,19 +1124,32 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		double[] bins = IntStream.range(0, (int) (max / 100)).mapToDouble(i -> i * 100).toArray();
 		double[] x = Arrays.copyOf(bins, bins.length - 1);
-		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
 			Table filtered = trips.where(
-				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+				trips.stringColumn("modelType").isEqualTo(ModelType.PERSON_TRAFFIC.id)
 			);
-			writeTripDistributionPerGroup(filtered, bins, inp, x, group);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, ModelType.PERSON_TRAFFIC.id);
+
+			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+				filtered = trips.where(
+					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+				);
+				writeTripDistributionPerGroup(filtered, bins, inp, x, group);
+			}
 		}
-		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
 			Table filtered = trips.where(
-				trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+				trips.stringColumn("modelType").isEqualTo(ModelType.COMMERCIAL_TRAFFIC.id)
 			);
-			writeTripDistributionPerGroup(filtered, bins, inp, x, group);
+			writeTripDistributionPerGroup(filtered, bins, inp, x, ModelType.COMMERCIAL_TRAFFIC.id);
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				filtered = trips.where(
+					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
+				);
+				writeTripDistributionPerGroup(filtered, bins, inp, x, group);
+			}
+			writeTripDistributionPerGroup(trips, bins, inp, x, "total");
 		}
-		writeTripDistributionPerGroup(trips, bins, inp, x, "total");
 	}
 
 	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, String group) throws IOException {

@@ -406,15 +406,16 @@ public class TripDashboard implements Dashboard {
 				viz.csv = data.compute(TripAnalysis.class, "mode_shift.csv", args);
 			});
 
-		createDistancePlot(layout, args, finalTab, columnForModeShare, tabTitle, rowSuffix);
-
 		if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")){
+			createDistancePlot(layout, rowSuffix, tabTitle, "total");
 			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, "total");
 		}
 		else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
+			createDistancePlot(layout, rowSuffix, tabTitle, finalTab);
 			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, finalTab);
 		}
 		else {
+			createDistancePlot(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 			createArrivalsAndDepartures(layout, rowSuffix, tabTitle, TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 		}
 	}
@@ -442,7 +443,7 @@ public class TripDashboard implements Dashboard {
 		}
 	}
 
-	private void createDistancePlot(Layout layout, String[] args, String tab, String columnForModeShare, String tabTitle, String rowSuffix) {
+	private void createDistancePlot(Layout layout, String rowSuffix, String tabTitle, String finalTab) {
 
 		layout.row("dist-dist" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
 
@@ -458,7 +459,7 @@ public class TripDashboard implements Dashboard {
 			viz.interactive = Plotly.Interactive.dropdown;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", tab, args))
+					data.computeWithPlaceholder(TripAnalysis.class, "mode_share_distance_distribution_%s.csv", finalTab))
 				.pivot(List.of("dist"), "main_mode", "share")
 				.constant("source", "Sim");
 
