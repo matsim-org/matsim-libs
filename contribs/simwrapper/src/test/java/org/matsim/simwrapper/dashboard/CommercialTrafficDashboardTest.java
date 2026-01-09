@@ -91,15 +91,19 @@ public class CommercialTrafficDashboardTest {
 		});
 		PopulationFactory popFactory = PopulationUtils.getFactory();
 		for (int i = 1; i < 8; i++) {
-			//Id<Person> personId =
+
 			Person person = popFactory.createPerson(Id.createPersonId("person_" + i));
-			PopulationUtils.putSubpopulation(person, "person");
+			if (i % 2 == 0)
+				PopulationUtils.putSubpopulation(person, "person_odd");
+			else
+				PopulationUtils.putSubpopulation(person, "person_even");
+
 			Plan plan = PopulationUtils.createPlan(person);
 			Link homelink = scenario.getNetwork().getLinks().get(Id.createLinkId("i(" + i + ",0)"));
 			Link worklink = scenario.getNetwork().getLinks().get(Id.createLinkId("i(" + (9 - i) + ",0)"));
 			person.getAttributes().putAttribute("home_x", homelink.getCoord().getX());
 			person.getAttributes().putAttribute("home_y", homelink.getCoord().getY());
-			String mode = i % 3 == 0 ? "ride" : "car";
+			String mode = i == 2 || i == 3 || i == 5 ? "ride" : "car";
 			Activity act1 = PopulationUtils.createAndAddActivityFromCoord(plan, "home", homelink.getCoord());
 			act1.setEndTime(i * 1.5 * 3600);
 			if (i != 1) {
@@ -125,7 +129,7 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 		sw.addDashboard(
-			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroup=person").setGroupsOfSubpopulationsForCommercialAnalysis(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
 				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
 			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
