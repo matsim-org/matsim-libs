@@ -304,9 +304,13 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode Statistics";
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "total", args);
 			}
+			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
+				viz.title = "Mode Statistics * " + tabTitle + " *";
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", tabTitle, args);
+			}
 			else {
-				viz.title = "Mode Statistics * " + "personTraffic" + " *";
-				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "personTraffic", args);
+				viz.title = "Mode Statistics * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
+				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args);
 			}
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
 			viz.showAllRows = true;
@@ -364,8 +368,23 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode usage";
 				viz.description = "Share of persons using a main mode at least once per day";
 				viz.width = 2d;
-				Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", finalTab));
+				Plotly.DataSet ds;
+				if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals("total")){
+					viz.title = "Mode usage";
+					ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", "total", args));
+				}
+				else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
+					viz.title = "Mode usage * " + tabTitle + " *";
+					ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", tabTitle, args));
+				}
+				else {
+					viz.title = "Mode usage * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
+					ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args));
+				}
+
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()
 					.x("main_mode")
 					.y("user")
