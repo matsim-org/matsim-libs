@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,18 +33,19 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
- public class NewControlerTest {
+public class NewControlerTest {
 
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	 @Test
-	 void testInjectionBeforeControler() {
+	@Test
+	void testInjectionBeforeControler() {
 		Config config = testUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
 		// a scenario is created and none of the files are loaded;
 		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
+		config.facilities().setInputFile(null);
 
 		config.controller().setLastIteration(1);
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());

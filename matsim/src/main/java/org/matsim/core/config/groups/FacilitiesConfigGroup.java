@@ -223,6 +223,9 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 		super.checkConsistency(config);
 
 		if (config.facilities().getInputFile() != null && config.facilities().getFacilitiesSource() != FacilitiesSource.fromFile) {
+			// I deliberately throw an exception here and don't just warn. Since there is a tendency of too many warnings and users easily overlook them,
+			// an exception is much more explicit. Since FacilitiesSource.none is the default, it can easily happen that a user specifies an input file
+			// but forgets to set the source to fromFile. paul, jan'26.
 			throw new IllegalStateException("If an input facilities file is specified, the facilities source must be 'fromFile'.");
 		}
 

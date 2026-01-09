@@ -2,21 +2,25 @@ package org.matsim.application.prepare.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
@@ -25,7 +29,6 @@ import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -228,6 +231,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		config.network().setTimeVariantNetwork(true);
 		if (facilityPath != null) {
 			config.facilities().setInputFile(facilityPath);
+			config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		}
 		scenario = ScenarioUtils.loadScenario(config);
 
@@ -621,8 +625,8 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 		// Remove all unselected plans because these are not handled
 		List<Plan> plans = new ArrayList<>(person.getPlans());
-		for(Plan p : plans){
-			if (p != person.getSelectedPlan()){
+		for (Plan p : plans) {
+			if (p != person.getSelectedPlan()) {
 				person.removePlan(p);
 			}
 		}

@@ -154,9 +154,23 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadActivityFacilities() {
-		if (this.config.facilities() != null &&
-			this.config.facilities().getFacilitiesSource() == FacilitiesConfigGroup.FacilitiesSource.fromFile &&
-			this.config.facilities().getInputFile() != null) {
+		if (this.config.facilities() == null) {
+			log.info("facilities config group is not present; therefore not loading any facilities.");
+			return;
+		}
+
+		var fac = this.config.facilities();
+
+		if (fac.getFacilitiesSource() == FacilitiesConfigGroup.FacilitiesSource.fromFile && fac.getInputFile() == null) {
+			throw new IllegalStateException("Facilities source is set to 'fromFile' in the config, but no input file is specified.");
+		}
+
+		if (fac.getInputFile() != null && fac.getFacilitiesSource() != FacilitiesConfigGroup.FacilitiesSource.fromFile) {
+			throw new IllegalStateException("An input file for facilities is specified in the config, but the facilities source is set to 'none'.");
+		}
+
+		if (fac.getFacilitiesSource() == FacilitiesConfigGroup.FacilitiesSource.fromFile) {
+			// at this point, input is not null for sure
 			URL facilitiesFileName = this.config.facilities().getInputFileURL(config.getContext());
 			log.info("loading facilities from " + facilitiesFileName);
 
@@ -171,11 +185,12 @@ class ScenarioLoaderImpl {
 		} else {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
-		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
-			if (!this.config.facilities().isInsistingOnUsingDeprecatedFacilitiesAttributeFile()) {
+
+		if (fac.getInputFacilitiesAttributesFile() != null) {
+			if (!fac.isInsistingOnUsingDeprecatedFacilitiesAttributeFile()) {
 				throw new RuntimeException(FacilitiesConfigGroup.FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE);
 			}
-			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
+			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), fac.getInputFacilitiesAttributesFile());
 			log.info("loading facility attributes from " + facilitiesAttributesURL);
 			parseObjectAttributesToAttributable(
 				facilitiesAttributesURL,

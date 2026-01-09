@@ -8,20 +8,23 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -168,9 +171,14 @@ class CreateScenarioCutOutTest {
 		referenceConfig.global().setCoordinateSystem("EPSG:25832");
 		referenceConfig.network().setTimeVariantNetwork(true);
 		referenceConfig.network().setInputFile(utils.getClassInputDirectory() + folder + "cut_network.xml");
-		if (withEvents) referenceConfig.network().setChangeEventsInputFile(utils.getClassInputDirectory() + folder + "cut_change_events.xml");
+		if (withEvents) {
+			referenceConfig.network().setChangeEventsInputFile(utils.getClassInputDirectory() + folder + "cut_change_events.xml");
+		}
 		referenceConfig.plans().setInputFile(utils.getClassInputDirectory() + folder + "cut_population.xml");
-		if (withFacilities) referenceConfig.facilities().setInputFile(utils.getClassInputDirectory() + folder + "cut_facilities.xml");
+		if (withFacilities) {
+			referenceConfig.facilities().setInputFile(utils.getClassInputDirectory() + folder + "cut_facilities.xml");
+			referenceConfig.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+		}
 		return ScenarioUtils.loadScenario(referenceConfig);
 	}
 
@@ -184,7 +192,10 @@ class CreateScenarioCutOutTest {
 		outputConfig.network().setInputFile(utils.getOutputDirectory() + "cut_network.xml");
 		if (withEvents) outputConfig.network().setChangeEventsInputFile(utils.getOutputDirectory() + "cut_change_events.xml");
 		outputConfig.plans().setInputFile(utils.getOutputDirectory() + "cut_population.xml");
-		if (withFacilities) outputConfig.facilities().setInputFile(utils.getOutputDirectory() + "cut_facilities.xml");
+		if (withFacilities) {
+			outputConfig.facilities().setInputFile(utils.getOutputDirectory() + "cut_facilities.xml");
+			outputConfig.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+		}
 		return ScenarioUtils.loadScenario(outputConfig);
 	}
 
