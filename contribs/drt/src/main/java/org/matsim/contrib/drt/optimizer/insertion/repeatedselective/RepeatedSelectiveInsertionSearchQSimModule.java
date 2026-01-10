@@ -78,7 +78,6 @@ public class RepeatedSelectiveInsertionSearchQSimModule extends AbstractDvrpMode
 					drtCfg,
 					getter.get(MatsimServices.class),
 					getter.getModal(StopTimeCalculator.class),
-					getter.getModal(TravelTimeMatrix.class),
 					getter.getModal(AdaptiveTravelTimeMatrix.class)
 				);
 			});
