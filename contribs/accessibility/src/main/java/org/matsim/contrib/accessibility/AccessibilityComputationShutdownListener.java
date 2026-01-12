@@ -285,11 +285,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 			for (String mode : getModes() ) {
 				// Defaulting to NaN allows accessibility calculations to be skipped for certain time slices for certain modes
 				final double value = accessibilitiesMap.get(tuple).getOrDefault(mode, Double.NaN);
-				if (!Double.isNaN(value)) {
-					writer.writeField(value);
-				} else {
-					writer.writeField(Double.NaN);
-				}
+				writer.writeField(value);
 			}
 			for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Again: Iterate over all additional data collections
 				String additionalDataName = additionalDataFacilities.getName();

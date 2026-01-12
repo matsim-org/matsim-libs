@@ -40,13 +40,15 @@ import java.util.stream.Collectors;
 
 
 
-public class PreparePois implements MATSimAppCommand {
-	private static final Logger log = LogManager.getLogger(PreparePois.class);
+public class PreparePoisForSimWrapper implements MATSimAppCommand {
+	private static final Logger log = LogManager.getLogger(PreparePoisForSimWrapper.class);
+
+	// MATSim output directory; this should already contain the "analysis/accessibility/" subdirectories, as the Accessibility Post-Processing should have already occurred
+	// should contain "analysis/accessibility/{POI}/pois.csv" file containing the coordiantes for the POIs (xcoord, ycoord are the column names)
 
 	@CommandLine.Mixin
-	private final InputOptions input = InputOptions.ofCommand(PreparePois.class);
+	private final InputOptions input = InputOptions.ofCommand(PreparePoisForSimWrapper.class);
 	@CommandLine.Mixin
-	private final OutputOptions output = OutputOptions.ofCommand(PreparePois.class);
 	public SimpleFeatureBuilder builder;
 
 	@CommandLine.Mixin
@@ -55,7 +57,7 @@ public class PreparePois implements MATSimAppCommand {
 
 
 	public static void main(String[] args) {
-		new PreparePois().execute(args);
+		new PreparePoisForSimWrapper().execute(args);
 	}
 
 	@Override
@@ -88,8 +90,8 @@ public class PreparePois implements MATSimAppCommand {
 
 
 		for (String activityOption : activityOptions) {
-			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois.shp";
 			String inputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois.csv";
+			String outputPath = input.getRunDirectory() + "/analysis/accessibility/" + activityOption + "/pois.shp";
 
 
 			try {

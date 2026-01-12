@@ -1,8 +1,8 @@
 package org.matsim.simwrapper.dashboard;
 
-import org.matsim.application.analysis.accessibility.AccessibilityAnalysis;
+import org.matsim.application.analysis.accessibility.PrepareAccessibilityForSimWrapperConverter;
 //import org.matsim.application.analysis.accessibility.PreparePois;
-import org.matsim.application.analysis.accessibility.PreparePois;
+import org.matsim.application.analysis.accessibility.PreparePoisForSimWrapper;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
@@ -80,14 +80,14 @@ public class AccessibilityDashboard implements Dashboard {
 		viz.projection = this.coordinateSystem;
 		viz.center = data.context().getCenter();
 		viz.zoom = data.context().getMapZoomLevel();
-		viz.file = data.computeWithPlaceholder(AccessibilityAnalysis.class, "%s/accessibilities_simwrapper.csv", poi);
+		viz.file = data.computeWithPlaceholder(PrepareAccessibilityForSimWrapperConverter.class, "%s/accessibilities_simwrapper.csv", poi);
 		viz.valueColumn = columnName;
 		viz.height = 12.;
 
 		viz.timeSelector = GridMap.TimeSelector.discrete;
 
 		// add poi in background
-		String poiFilename = data.computeWithPlaceholder(PreparePois.class, "%s/pois.shp", poi, "--input-crs", coordinateSystem);
+		String poiFilename = data.computeWithPlaceholder(PreparePoisForSimWrapper.class, "%s/pois.shp", poi, "--input-crs", coordinateSystem);
 		BackgroundLayer poiBackgroundLayer = new BackgroundLayer(poiFilename);
 		poiBackgroundLayer.setOnTop(true);
 		poiBackgroundLayer.setBorderWidth(10);

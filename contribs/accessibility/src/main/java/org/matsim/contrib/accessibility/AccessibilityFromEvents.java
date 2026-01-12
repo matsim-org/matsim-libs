@@ -43,6 +43,7 @@ public final class AccessibilityFromEvents{
 		private final List<String> actTypes;
 		private DrtEstimator drtEstimator;
 		private Scenario scenario;
+		// events file is required to calculate congestion levels on network, which would affect the accessibility of modes like car & drt, which are routed on the network
 		private String eventsFile;
 		private final List<FacilityDataExchangeInterface> dataListeners = new ArrayList<>() ;
 
@@ -56,7 +57,7 @@ public final class AccessibilityFromEvents{
 			this.drtEstimator = null;
 		}
 
-		public void addDrtEstimator(DrtEstimator drtEstimator) {
+		public void setDrtEstimator(DrtEstimator drtEstimator) {
 			this.drtEstimator = drtEstimator;
 		}
 

@@ -20,8 +20,6 @@
 package org.matsim.contrib.accessibility.run;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.drt.estimator.DrtEstimator;
@@ -87,8 +84,6 @@ import java.util.*;
 
 public class EstimatedDrtAccessibilityTest {
 
-	private static final Logger LOG = LogManager.getLogger(EstimatedDrtAccessibilityTest.class);
-
 	@RegisterExtension
 	private static final MatsimTestUtils utils = new MatsimTestUtils();
 	public static double gapBtwnNodes = 1000.;
@@ -115,29 +110,11 @@ public class EstimatedDrtAccessibilityTest {
 	 */
 	@Test
 	void runFromEvents() {
-
-
 		// Create Network
 		Network network = createLineNetwork();
 
-		// Create  & Update Config
-		final Config config = createTestConfig();
+		Config config = createTestConfig(network);
 
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(-250).setBoundingBoxTop(250).setBoundingBoxLeft(0).setBoundingBoxRight(4000);
-		acg.setTileSize_m(500);
-
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt) || mode.equals(Modes4Accessibility.teleportedWalk));
-		}
-
-		acg.setUseParallelization(false);
-
-		addDrtParamsToConfig(config, network);
-
-
-		// Create  Scenario
 		final Scenario scenario = createTestScenario(config, network);
 
 		// Set up DRT estimator
@@ -153,7 +130,7 @@ public class EstimatedDrtAccessibilityTest {
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
 		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
 		builder.addDataListener(dataListener);
-		builder.addDrtEstimator(drtEstimator);
+		builder.setDrtEstimator(drtEstimator);
 
 		builder.build().run();
 
@@ -167,10 +144,11 @@ public class EstimatedDrtAccessibilityTest {
 		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMap = dataListener.getAccessibilitiesMap();
 		Double walkBeelineFactor = config.routing().getBeelineDistanceFactors().get("walk");
 		Double walkSpeed = config.routing().getTeleportedModeSpeeds().get("walk");
+		int marginalUtilityOfTime_s = -12;
 		for (Map.Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> tupleMapEntry : accessibilitiesMap.entrySet()) {
 			double dist = Math.abs(positionOfOpportunity - tupleMapEntry.getKey().getFirst().getCoord().getX()) * walkBeelineFactor;
 			// time converted into hours x -12
-			double accessibilityShould = dist / walkSpeed / 3600 * -12;
+			double accessibilityShould = dist / walkSpeed / 3600 * marginalUtilityOfTime_s;
 			// we compare this "hand-calculated" value with the result from the accessibility analysis
 			double accessibilityActual = tupleMapEntry.getValue().get(Modes4Accessibility.teleportedWalk.name());
 			Assertions.assertEquals(accessibilityShould, accessibilityActual, MatsimTestUtils.EPSILON, "Unexpected accessibility for walk at " + tupleMapEntry.getKey().getFirst().getCoord().getX());
@@ -182,13 +160,16 @@ public class EstimatedDrtAccessibilityTest {
 		// Access Walk: we expect agent to walk 250 to closest DRT stop (back to node 0)
 		// DRT trip is 3000m @ 2.7m/s + waiting time of 300 seconds. We assume -12 (=-6 -6) utils/hr.
 		// Egress walk should be 400m x 1.3 (beeline factor) and walk speed of 0.83 m/s.
+		int egressWalkDist = 400;
+		int accessWalkDist = 250;
 		{
 			int x = 250;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
-			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
-			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
-			double drtTripUtility = (Math.round(3000 / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * -12;
-			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+			double accessWalkUtility = accessWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
+			// Note Method "addLink" in SpeedyGraphBuilder rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
+			int drtTravelDist = 3000;
+			double drtTripUtility = (Math.round(drtTravelDist / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * marginalUtilityOfTime_s;
+			double egressWalkUtility = egressWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
 
 			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
 			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
@@ -204,10 +185,10 @@ public class EstimatedDrtAccessibilityTest {
 		{
 			int x = 750;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
-			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
-			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
-			double drtTripUtility = (Math.round(2000 / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * -12;
-			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+			double accessWalkUtility = accessWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
+			int drtTravelDist = 2000;
+			double drtTripUtility = (Math.round(drtTravelDist / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * marginalUtilityOfTime_s;
+			double egressWalkUtility = egressWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
 
 			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
 			double drtUtilityActual = accMap.get(Modes4Accessibility.estimatedDrt.name());
@@ -226,10 +207,10 @@ public class EstimatedDrtAccessibilityTest {
 		{
 			int x = 2250;
 			Map<String, Double> accMap = accessibilitiesMap.entrySet().stream().filter(entry -> entry.getKey().getFirst().getCoord().equals(new Coord(x, 0))).map(Map.Entry::getValue).findFirst().get();
-			double accessWalkUtility = 250 * walkBeelineFactor / walkSpeed / 3600 * -12;
-			// Note Method "addLink" in SpeedyGraphBuilder also rounds two 2 decimal places; if we don't do that, the difference exceeds our EPSILON
-			double drtTripUtility = (Math.round(1000 / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * -12;
-			double egressWalkUtility = 400 * walkBeelineFactor / walkSpeed / 3600 * -12;
+			double accessWalkUtility = accessWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
+			int drtTravelDist = 1000;
+			double drtTripUtility = (Math.round(drtTravelDist / carSpeed * 100.) / 100. + drtWaitTime) / 3600 * marginalUtilityOfTime_s;
+			double egressWalkUtility = egressWalkDist * walkBeelineFactor / walkSpeed / 3600 * marginalUtilityOfTime_s;
 
 			double drtUtilityShould = accessWalkUtility + drtTripUtility + egressWalkUtility;
 			// I do not have to recalculate walk by hand, since we checked the calculation in part a of this test.
@@ -260,30 +241,9 @@ public class EstimatedDrtAccessibilityTest {
 	@Test
 	void testDetourFactorsAndWaitTimeAndDistanceCosts() {
 
-		// Create Network
 		Network network = createLineNetwork();
 
-		// Create  & Update Config
-		final Config config = createTestConfig();
-
-
-
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(-250).
-			setBoundingBoxTop(250).
-			setBoundingBoxLeft(0).
-			setBoundingBoxRight(4000);
-
-		acg.setTileSize_m(500);
-
-		for(Modes4Accessibility mode :Modes4Accessibility.values()) {
-			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt));
-		}
-
-		acg.setUseParallelization(false);
-
-		addDrtParamsToConfig(config, network);
+		Config config = createTestConfig(network);
 
 		config.scoring().getModes().get(TransportMode.drt).setMarginalUtilityOfDistance(-0.001);
 
@@ -304,7 +264,7 @@ public class EstimatedDrtAccessibilityTest {
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
 		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
 		builder.addDataListener(dataListener);
-		builder.addDrtEstimator(drtEstimator);
+		builder.setDrtEstimator(drtEstimator);
 
 		builder.build().run();
 
@@ -348,31 +308,9 @@ public class EstimatedDrtAccessibilityTest {
 	@Test
 	void testFallbackWalkIfDrtStopsSame() {
 
-		// Create Network
 		Network network = createLineNetwork();
 
-		// Create  & Update Config
-		final Config config = createTestConfig();
-
-
-
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
-		acg.setBoundingBoxBottom(-250).
-			setBoundingBoxTop(250).
-			setBoundingBoxLeft(0).
-			setBoundingBoxRight(4000);
-
-		acg.setTileSize_m(500);
-
-		for(Modes4Accessibility mode :Modes4Accessibility.values()) {
-			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt) || mode.equals(Modes4Accessibility.teleportedWalk));
-
-		}
-
-		acg.setUseParallelization(false);
-
-		addDrtParamsToConfig(config, network);
+		Config config = createTestConfig(network);
 
 		config.scoring().getModes().get(TransportMode.drt).setConstant(10);
 
@@ -393,7 +331,7 @@ public class EstimatedDrtAccessibilityTest {
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder(scenario, emptyEventsFileName);
 		TinyAccessibilityTest.ResultsComparator dataListener = new TinyAccessibilityTest.ResultsComparator();
 		builder.addDataListener(dataListener);
-		builder.addDrtEstimator(drtEstimator);
+		builder.setDrtEstimator(drtEstimator);
 
 		builder.build().run();
 
@@ -432,38 +370,6 @@ public class EstimatedDrtAccessibilityTest {
 
 	}
 
-	private void addDrtParamsToConfig(Config config, Network network)  {
-		String stopsInputFileName = utils.getClassInputDirectory() + "drtStops.xml";
-
-		try {
-			createDrtStopsFile(stopsInputFileName, network);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-
-		ScoringConfigGroup.ModeParams drtParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
-//		drtParams.setMarginalUtilityOfTraveling(0);
-		config.scoring().addModeParams(drtParams);
-
-		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
-
-		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
-		drtConfigGroup.setTransitStopFile( stopsInputFileName);
-
-		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(200);
-
-
-		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
-		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
-		config.addModule(multiModeDrtConfigGroup);
-		config.addModule(drtConfigGroup);
-	}
-
-
-
-
 
 	private void createDrtStopsFile(String stopsInputFileName, Network network) throws IOException {
 		Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -489,14 +395,63 @@ public class EstimatedDrtAccessibilityTest {
 
 
 
-	Config createTestConfig() {
+	Config createTestConfig(Network network) {
 		final Config config = ConfigUtils.createConfig();
 
+		// General
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.routing().setRoutingRandomness(0.);
+
+
+		// Accessibility Config Group
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+
+		acg.setBoundingBoxBottom(-250).setBoundingBoxTop(250).setBoundingBoxLeft(0).setBoundingBoxRight(4000);
+		acg.setTileSize_m(500);
+
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			acg.setComputingAccessibilityForMode(mode, mode.equals(Modes4Accessibility.estimatedDrt) || mode.equals(Modes4Accessibility.teleportedWalk));
+		}
+
+		acg.setUseParallelization(false);
+
+
+		// DRT
+		// DRT: Scoring Params
+		ScoringConfigGroup.ModeParams drtScoringParams = new ScoringConfigGroup.ModeParams(TransportMode.drt);
+		config.scoring().addModeParams(drtScoringParams);
+
+		// DRT: DVRP Config Group
+		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class );
+
+		// DRT: MultiModeDrtConfigGroup + DrtConfigGroup
+
+		String stopsInputFileName = utils.getClassInputDirectory() + "drtStops.xml";
+
+		try {
+			createDrtStopsFile(stopsInputFileName, network);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+
+
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
+		drtConfigGroup.setTransitStopFile( stopsInputFileName);
+
+		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(1000);
+
+
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
+		config.addModule(drtConfigGroup);
+
 
 		return config;
 	}

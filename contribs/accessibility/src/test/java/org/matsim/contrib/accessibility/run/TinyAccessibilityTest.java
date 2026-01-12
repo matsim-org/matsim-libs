@@ -177,7 +177,7 @@ public class TinyAccessibilityTest {
 		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , emptyEventsFileName );
 		ResultsComparator dataListener = new ResultsComparator();
 		builder.addDataListener(dataListener);
-		builder.addDrtEstimator(drtEstimator);
+		builder.setDrtEstimator(drtEstimator);
 
 		builder.build().run() ;
 
@@ -258,14 +258,14 @@ public class TinyAccessibilityTest {
 		AccessibilityFromEvents.Builder builderUncongested = new AccessibilityFromEvents.Builder( scenarioUncongested , emptyEventsFileName );
 		ResultsComparator dataListenerUncongested = new ResultsComparator();
 		builderUncongested.addDataListener(dataListenerUncongested);
-		builderUncongested.addDrtEstimator(drtEstimator);
+		builderUncongested.setDrtEstimator(drtEstimator);
 		builderUncongested.build().run() ;
 		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMapUncongested = dataListenerUncongested.accessibilitiesMap;
 
 		AccessibilityFromEvents.Builder builderCongested = new AccessibilityFromEvents.Builder(scenarioCongested, congestedEventsFileName);
 		ResultsComparator dataListenerCongested = new ResultsComparator();
 		builderCongested.addDataListener(dataListenerCongested);
-		builderCongested.addDrtEstimator(drtEstimator);
+		builderCongested.setDrtEstimator(drtEstimator);
 		builderCongested.build().run() ;
 		Map<Tuple<ActivityFacility, Double>, Map<String, Double>> accessibilitiesMapCongested = dataListenerCongested.accessibilitiesMap;
 
@@ -306,7 +306,7 @@ public class TinyAccessibilityTest {
 		drtConfigGroup.setTransitStopFile( stopsInputFileName);
 
 		drtConfigGroup.addOrGetDrtOptimizationConstraintsParams().addOrGetDefaultDrtOptimizationConstraintsSet().setMaxWalkDistance(200);
-		
+
 
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);

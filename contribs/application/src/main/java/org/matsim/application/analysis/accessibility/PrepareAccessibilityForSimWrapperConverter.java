@@ -1,11 +1,8 @@
 package org.matsim.application.analysis.accessibility;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.InputOptions;
-import org.matsim.application.options.OutputOptions;
 
 import picocli.CommandLine;
 import tech.tablesaw.api.DoubleColumn;
@@ -32,25 +29,25 @@ import java.util.stream.Collectors;
 )
 
 
-public class AccessibilityAnalysis implements MATSimAppCommand {
+public class PrepareAccessibilityForSimWrapperConverter implements MATSimAppCommand {
 
 
-	private static final Logger log = LogManager.getLogger(AccessibilityAnalysis.class);
 
+	// MATSim output directory; this should already contain the "analysis/accessibility/" subdirectories, as the Accessibility Post-Processing should have already occurred
+	// should contain "analysis/accessibility/{POI}/accessibilities.csv" file containing the coordiantes for the measuring point (xcoord, ycoord)
+	// as well as accessibilities for different modes (i.e. freespeed_accessibility, pt_accessibility)
 	@CommandLine.Mixin
-	private final InputOptions input = InputOptions.ofCommand(AccessibilityAnalysis.class);
-	@CommandLine.Mixin
-	private final OutputOptions output = OutputOptions.ofCommand(AccessibilityAnalysis.class);
-
+	private final InputOptions input = InputOptions.ofCommand(PrepareAccessibilityForSimWrapperConverter.class);
 
 	public static void main(String[] args) {
-		new AccessibilityAnalysis().execute(args);
+		new PrepareAccessibilityForSimWrapperConverter().execute(args);
 	}
 
 	@Override
 	public Integer call() throws Exception {
 
 
+		// Checks for what POIs the accesibility analysis has been run
 		Set<String> activityOptions = null;
 		try {
 			activityOptions = Files.list(input.getRunDirectory().resolve("analysis/accessibility/"))
@@ -62,6 +59,7 @@ public class AccessibilityAnalysis implements MATSimAppCommand {
 			e.printStackTrace();
 		}
 
+		// for each opportunity type, we copy the accessibilities.csv file and simply rename two columns (x,y)
 		for (String activityOption : activityOptions) {
 
 			String folderNameForActivityOption = input.getRunDirectory() + "/analysis/accessibility/" + activityOption;
