@@ -3,6 +3,8 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -16,6 +18,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -57,6 +60,8 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update. TODO Update to PLv5
  */
 public class PHEMTest {
+
+	private static final Logger logger = LogManager.getLogger(PHEMTest.class);
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
@@ -694,7 +699,6 @@ public class PHEMTest {
 //		return NetworkUtils.getNearestLinkExactly(network, coordLo29).getId();
 	}
 
-	// TODO Fix -Inf and NaN entries
 	///  Returns a list of interpolated point between start and end point, interpolation happens every meter
 	private List<PretoriaGPSEntry> interpolateGpsEntries(PretoriaGPSEntry start, PretoriaGPSEntry end){
 		double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
@@ -757,6 +761,37 @@ public class PHEMTest {
 		return interpolatedEntries;
 	}
 
+	/**
+	 * Returns the time spent on the start and endLink for two switching GPSEntries. Needed to accurately estimate the traveltime for each link,
+	 * especially if velocity is high and/or the links are short.
+	 * @param startPoint last gps point, that has been assigned to the startLink
+	 * @param endPoint first gps point, that has been assigned to the endLink
+	 * @param startLink prior traversed link (must incident to endlink)
+	 * @param endLink post traversed link
+	 * @return (t1,t2) with t1 being time spent on startLink and t2 being time spent on endLink.
+	 */
+	private Tuple<Double, Double> computeGPSEdgeTimes(PretoriaGPSEntry startPoint, PretoriaGPSEntry endPoint, Link startLink, Link endLink){
+		Coord startProjection = CoordUtils.orthogonalProjectionOnLineSegment(startLink.getFromNode().getCoord(), startLink.getToNode().getCoord(), startPoint.coord);
+		Coord endProjection = CoordUtils.orthogonalProjectionOnLineSegment(endLink.getFromNode().getCoord(), endLink.getToNode().getCoord(), endPoint.coord);
+		double totalTime = endPoint.time - startPoint.time;
+
+		// Get the node, that is shared by both links
+		Coord sharedNode = null;
+		if (startLink.getFromNode().equals(endLink.getFromNode()) || startLink.getFromNode().equals(endLink.getToNode())) {
+			sharedNode = startLink.getFromNode().getCoord();
+		} else if (startLink.getToNode().equals(endLink.getFromNode()) || startLink.getToNode().equals(endLink.getToNode())) {
+			sharedNode = startLink.getToNode().getCoord();
+		} else {
+			logger.warn("The given links ({}, {}) are not incident!", startLink.getId(), endLink.getId());
+			return new Tuple<>(totalTime/2, totalTime/2);
+		}
+
+		double startLength = CoordUtils.length(CoordUtils.minus(sharedNode, startProjection));
+		double endLength = CoordUtils.length(CoordUtils.minus(endProjection, sharedNode));
+		double totalLength = startLength + endLength;
+		return new Tuple<>(totalTime*startLength/totalLength, totalTime*endLength/totalLength);
+	}
+
 	/// Computes the diff time between the date and the referenceDate
 	private double getCycleTimeFromDate(String date, String referenceDate) {
 		try {
@@ -780,8 +815,10 @@ public class PHEMTest {
 
 	// TODO Remove for final commit, as this was just used once for data preparation
 	public static void main(String[] args) {
-		Network n = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
-		for(var link : n.getLinks().values()){
+		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
+		Network full = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_hbefa.xml.gz");
+
+		for(var link : cRoute.getLinks().values()){
 			link.getAttributes().removeAttribute("CO");
 			link.getAttributes().removeAttribute("CO2_TOTAL");
 			link.getAttributes().removeAttribute("CO2_pems");
@@ -794,10 +831,73 @@ public class PHEMTest {
 			link.getAttributes().removeAttribute("timeOut");
 		}
 
-		/*for(var node : n.getNodes().values()){
+		// Fix the wrong route
+		cRoute.removeLink(Id.createLinkId("burnett1"));
+		cRoute.removeLink(Id.createLinkId("33150"));
+		cRoute.removeLink(Id.createLinkId("9159"));
+		cRoute.removeLink(Id.createLinkId("45106"));
+		cRoute.removeLink(Id.createLinkId("45107"));
+		cRoute.removeLink(Id.createLinkId("9148"));
+		cRoute.removeLink(Id.createLinkId("9144"));
+		cRoute.removeLink(Id.createLinkId("49854"));
+		cRoute.removeLink(Id.createLinkId("52267"));
+		cRoute.removeLink(Id.createLinkId("46065"));
+
+		// Section 1
+
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395953")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395954")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395955")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("282871644")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5837011387")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507042")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507043")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507044")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507045")));
+
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36669")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36680")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36674")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36671")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36676")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("36678")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("42188")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("46067")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("46070")));
+
+		// Section 2
+
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("25290978")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("25291065")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("5838748611")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("799905988")));
+		cRoute.addNode(full.getNodes().get(Id.createNodeId("799906053")));
+
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("38199")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("38404")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("42127")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("6010")));
+		cRoute.addLink(full.getLinks().get(Id.createLinkId("7080")));
+
+		// Missing link
+
+		NetworkUtils.createAndAddLink(
+			cRoute,
+			Id.createLinkId("cRouteLink"),
+			cRoute.getNodes().get(Id.createNodeId("25290978")),
+			cRoute.getNodes().get(Id.createNodeId("25395955")),
+			490,
+			50./3.,
+			3000,
+			3
+		);
+
+		cRoute.getLinks().get(Id.createLinkId("cRouteLink")).getAttributes().putAttribute("hbefa_road_type", "URB/Distr/60");
+
+		/*for(var node : cRoute.getNodes().values()){
 			node.setCoord(new Coord(-node.getCoord().getX(), -node.getCoord().getY()));
 		}*/
-		NetworkUtils.writeNetwork(n, "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC.xml");
+		NetworkUtils.writeNetwork(cRoute, "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
 	}
 
 	// ----- Main-test method -----
@@ -944,7 +1044,7 @@ public class PHEMTest {
 		System.out.println(vehHbefaInfo);
 
 		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC.xml");
+		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
 
 		// Create Scenario and EventManager
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -996,7 +1096,7 @@ public class PHEMTest {
 			throw new RuntimeException(e);
 		}
 
-		// Now generate the interpolated points
+		// Now generate the interpolated points TODO Check if this distorts the results
 		List<PretoriaGPSEntry> pretoriaGPSEntriesInterpolated = new ArrayList<>();
 		for (int i = 1; i < pretoriaGPSEntries.size(); i++){
 			PretoriaGPSEntry previous = pretoriaGPSEntries.get(i-1);
@@ -1008,11 +1108,10 @@ public class PHEMTest {
 			pretoriaGPSEntriesInterpolated.addAll(interpolateGpsEntries(pretoriaGPSEntries.get(i-1), pretoriaGPSEntries.get(i)));
 
 		}
-		//pretoriaGPSEntries = pretoriaGPSEntriesInterpolated; TODO (maybe) put this back in
 
 		// Attach gps-information to the matsim links
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
-		Map<Integer, Map<Id<Link>, Tuple<Double, Double>>> tripId2linkId2enterTimeAndLeaveTimes = new ArrayMap<>();
+		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2traversalTime = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
 
 		// TODO debug only, remove this var
@@ -1021,13 +1120,14 @@ public class PHEMTest {
 		// TODO Check if ArrayMaps or HashMaps are faster here
 		int previousTripId = -1;
 		Id<Link> previousLinkId = null;
+		PretoriaGPSEntry previousGpsEntry = null;
 		int i = 0;
-		for(var gpsEntry : pretoriaGPSEntries){
+		for(var gpsEntry : pretoriaGPSEntriesInterpolated){
 			var tripId = gpsEntry.trip;
 			tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
-			tripId2linkId2enterTimeAndLeaveTimes.putIfAbsent(tripId, new HashMap<>());
+			tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
 
-			var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();;
+			var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
 			tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
 			tripId2linkId2pretoriaGpsEntries.get(tripId).get(linkId).add(gpsEntry);
 
@@ -1035,29 +1135,41 @@ public class PHEMTest {
 
 			// Check if a new trip has started OR if vehicle arrived at new link
 			if(previousTripId != tripId || previousLinkId != linkId){
+				Link startLink = pretoriaNetwork.getLinks().get(previousLinkId);
+				Link endLink = pretoriaNetwork.getLinks().get(linkId);
+
+				// Get the edgeTimes
+				Tuple<Double, Double> edgeTimes = previousTripId != tripId ? new Tuple<>(0., 0.) :
+				computeGPSEdgeTimes(
+					previousGpsEntry,
+					gpsEntry,
+					startLink,
+					endLink
+				);
+
+				// TODO Check if the skipped links cause problems later on!
 				// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We simply skip these points.
-				if(tripId2linkId2enterTimeAndLeaveTimes.get(tripId).containsKey(linkId)) {
+				if(tripId2linkId2traversalTime.get(tripId).containsKey(linkId)) {
 					continue;
 				}
 
-				// Start new entry
-				tripId2linkId2enterTimeAndLeaveTimes.get(tripId).put(linkId, new Tuple<>(gpsEntry.time, Double.MAX_VALUE));
+				// Start new entry with arrival time
+				tripId2linkId2traversalTime.get(tripId).put(linkId, gpsEntry.time - edgeTimes.getSecond());
 
 				// Finish old entry (except when we started a new trip)
 				if (previousTripId == tripId) {
-					double enterTime = tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).get(previousLinkId).getFirst();
-					tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).put(previousLinkId, new Tuple<>(enterTime, gpsEntry.time));
+					tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> gpsEntry.time + edgeTimes.getFirst() - arrivalTime);
 				}
 			}
 
 			previousTripId = tripId;
 			previousLinkId = linkId;
+			previousGpsEntry = gpsEntry;
 			i++;
 		}
 
-		// Add last entry TODO Check if this works properly
-		double enterTime = tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).get(previousLinkId).getFirst();
-		tripId2linkId2enterTimeAndLeaveTimes.get(previousTripId).put(previousLinkId, new Tuple<>(enterTime, pretoriaGPSEntries.getLast().time));
+		// Finish last entry TODO Check if this works properly
+		tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> pretoriaGPSEntriesInterpolated.getLast().time - arrivalTime);
 
 		// Get the emission values (PEMS and MATSim)
 		EmissionModule module = new EmissionModule(scenario, manager);
@@ -1076,12 +1188,8 @@ public class PHEMTest {
 
 				// Compute the MATSim emissions
 				// TODO Add cold emissions
-
-				double time = tripId2linkId2enterTimeAndLeaveTimes.get(tripId).get(linkId).getSecond() - tripId2linkId2enterTimeAndLeaveTimes.get(tripId).get(linkId).getFirst();
-				assert time > 0;
-
 				var emissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-					time,
+					tripId2linkId2traversalTime.get(tripId).get(linkId),
 					(String) link.getAttributes().getAttribute("hbefa_road_type"),
 					link.getFreespeed(),
 					link.getLength(),
@@ -1148,7 +1256,7 @@ public class PHEMTest {
 			"linkId"
 		);
 
-		pretoriaGPSEntries.forEach(e ->
+		pretoriaGPSEntriesInterpolated.forEach(e ->
 		{
 			try {
 				if (e.trip == 1)
