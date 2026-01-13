@@ -55,6 +55,10 @@ public interface EventHandler extends MatsimExtensionPoint, MessageProcessor {
 		return 1 * 60;
 	}
 
+	default double getSyncInterval() {
+		return Double.POSITIVE_INFINITY;
+	}
+
 	/**
 	 * Display name of the event handler.
 	 */

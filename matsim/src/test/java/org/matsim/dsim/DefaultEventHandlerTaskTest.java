@@ -15,51 +15,127 @@ import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultEventHandlerTaskTest {
 
 	@Test
-	public void buildPattern() {
+	public void syncTimeStep() {
 
-		var handler = new TestEventHandler();
-		var em = mock(DistributedEventsManager.class);
+		var handler1 = new TestEventHandler();
+		var handler2 = new TestEventHandler();
 		var serializationProvider = new SerializationProvider();
 		var computeNode = ComputeNode.builder()
 			.rank(0)
 			.parts(IntList.of(0, 1))
+			.distributed(true)
 			.build();
 		var topology = Topology.builder()
 			.computeNodes(List.of(computeNode))
 			.totalPartitions(2)
 			.build();
 		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology);
+		var em = mock(DistributedEventsManager.class);
+		when(em.getComputeNode()).thenReturn(computeNode);
 
-		var counter = new AtomicInteger();
-		var task1 = new DefaultEventHandlerTask(handler, 0, 2, em, serializationProvider, null);
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializationProvider, null);
 		task1.setBroker(broker);
 		broker.register(task1, 0);
-		var task2 = new DefaultEventHandlerTask(handler, 1, 2, em, serializationProvider, null);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializationProvider, null);
 		task2.setBroker(broker);
 		broker.register(task2, 1);
 
-		task1.add(new GenericEvent("test event 1", 1.));
-		task2.add(new GenericEvent("test event 2", 1.));
+		var e1 = new GenericEvent("test event 1", 1.);
+		task1.add(e1);
+
+		// this should process e1 in the handleEvent method of the handler
+		task1.setTime(5);
+		task1.beforeExecution();
+		task1.run();
+
+		assertEquals(e1, handler1.handledEvent);
+		assertEquals(0, handler1.handledMessages.size());
+
+		// this should trigger a sync message to other partitions.
+		task1.setTime(6);
+		task1.beforeExecution();
+		task1.run();
+
+		// the message is not yet received.
+		assertEquals(0, handler1.handledMessages.size());
+		assertEquals(0, handler2.handledMessages.size());
+
+		task2.setTime(7);
+		task2.beforeExecution();
+		task2.run();
+
+		// handler 1 receives no message
+		assertEquals(0, handler1.handledMessages.size());
+		//handler 2 receives one message
+		assertEquals(1, handler2.handledMessages.size());
+		// handler 1 still has the one direct event
+		assertEquals(e1, handler1.handledEvent);
+		// handler2 has received no events
+		assertNull(handler2.handledEvent);
+	}
+
+	@Test
+	public void oneCleanupSync() {
+
+		var handler1 = new TestEventHandler();
+		var handler2 = new TestEventHandler();
+		var serializationProvider = new SerializationProvider();
+		var computeNode = ComputeNode.builder()
+			.rank(0)
+			.parts(IntList.of(0, 1))
+			.distributed(true)
+			.build();
+		var topology = Topology.builder()
+			.computeNodes(List.of(computeNode))
+			.totalPartitions(2)
+			.build();
+		MessageBroker broker = new MessageBroker(new NullCommunicator(), topology);
+		var em = mock(DistributedEventsManager.class);
+		when(em.getComputeNode()).thenReturn(computeNode);
+
+		var task1 = new DefaultEventHandlerTask(handler1, 0, 2, em, serializationProvider, null);
+		task1.setBroker(broker);
+		broker.register(task1, 0);
+		var task2 = new DefaultEventHandlerTask(handler2, 1, 2, em, serializationProvider, null);
+		task2.setBroker(broker);
+		broker.register(task2, 1);
+
+		// this should trigger a send once, even though it is not the sync interval
+		task1.cleanup();
+		task1.setTime(5);
 		task1.beforeExecution();
 		task1.run();
 		task2.beforeExecution();
 		task2.run();
+		assertEquals(0, handler1.handledMessages.size());
+		assertEquals(1, handler2.handledMessages.size());
+
+		// try a second time
+		task1.run();
+		assertEquals(0, handler1.handledMessages.size());
+		assertEquals(1, handler2.handledMessages.size());
 	}
 
 	@DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 	public static class TestEventHandler implements BasicEventHandler, AggregatingEventHandler<TestMessage> {
 
+		private Event handledEvent;
+		private final List<TestMessage> handledMessages = new ArrayList<>();
+
 		@Override
 		public void handleEvent(Event event) {
-			System.out.println(event);
+			this.handledEvent = event;
 		}
 
 		@Override
@@ -69,9 +145,12 @@ class DefaultEventHandlerTaskTest {
 
 		@Override
 		public void receive(List<TestMessage> messages) {
-			for (var msg : messages) {
-				System.out.println(msg.data());
-			}
+			this.handledMessages.addAll(messages);
+		}
+
+		@Override
+		public double getSyncInterval() {
+			return 3;
 		}
 	}
 

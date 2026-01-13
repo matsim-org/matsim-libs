@@ -361,11 +361,12 @@ public final class DistributedEventsManager implements EventsManager {
 	@Override
 	public void resetHandlers(int iteration) {
 		for (EventHandlerTask task : tasks) {
-			task.getHandler().reset(iteration);
-
-			if (task instanceof DefaultEventHandlerTask deht) {
-				deht.isCleanUp = -1;
-			}
+			task.resetTask(iteration);
+//			task.getHandler().reset(iteration);
+//
+//			if (task instanceof DefaultEventHandlerTask deht) {
+//				deht.isCleanUp = -1;
+//			}
 		}
 	}
 

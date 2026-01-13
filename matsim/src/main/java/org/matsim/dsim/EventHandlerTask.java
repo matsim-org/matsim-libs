@@ -36,8 +36,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		return handler;
 	}
 
-	protected final DistributedEventsManager manager;
-
 	/**
 	 * Partition number.
 	 */
@@ -104,11 +102,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	protected int isCleanUp = -1;
-
-	public EventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition, boolean async) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async) {
 		this.handler = handler;
-		this.manager = manager;
 		this.partition = partition;
 		this.async = async;
 	}
@@ -144,7 +139,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@SuppressWarnings("unchecked")
-	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
+	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer, boolean isDistributed) {
 
 		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		boolean node = distributed != null && distributed.value() == DistributedMode.NODE;
@@ -192,7 +187,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE || distributed.value() == DistributedMode.NODE_CONCURRENT);
 
 		// Singleton handlers on one jvm don't need to communicate
-		if (singleton && !manager.getComputeNode().isDistributed()) {
+		if (singleton && !isDistributed) {
 			return null;
 		}
 
@@ -240,16 +235,21 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 	@Override
 	public final boolean needsExecution() {
-		return isExecutionTime() || isCleanUp > 0;
+		// always execute
+		return SimTask.super.needsExecution();
 	}
 
 	protected boolean isExecutionTime() {
 		return time > 0 && time % handler.getProcessInterval() == 0;
 	}
 
+	protected boolean isSyncTime() {
+		return (time > 0 && time % handler.getSyncInterval() == 0);
+	}
+
 	@Override
-	public void cleanup() {
-		isCleanUp = 2;
+	public void resetTask(int iteration) {
+		this.handler.reset(iteration);
 	}
 
 	public final IntSet getSupportedMessages() {

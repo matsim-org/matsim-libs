@@ -31,6 +31,8 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	@Nullable
 	private final EventMessagingPattern pattern;
 
+	private final DistributedEventsManager em;
+
 	/**
 	 * Total number partitions this event handler is running on. (on this node)
 	 */
@@ -58,14 +60,17 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean();
 
+	private boolean isCleanupSync = false;
+
 
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
-								   DistributedEventsManager manager, SerializationProvider serializer,
+								   DistributedEventsManager em, SerializationProvider serializer,
 								   @Nullable AtomicInteger counter) {
-		super(handler, manager, partition, supportsAsync(handler));
+		super(handler, partition, supportsAsync(handler));
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
-		this.pattern = buildConsumers(serializer);
+		this.pattern = buildConsumers(serializer, em.getComputeNode().isDistributed());
+		this.em = em;
 
 		if (pattern != null && async)
 			throw new IllegalArgumentException("Message pattern and async execution together are not supported.");
@@ -93,7 +98,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 	public IntSet waitForOtherRanks(double time) {
 
-		if (pattern != null && needsExecution()) {
+		if (pattern != null && isSyncTime()) {
 			return pattern.waitForOtherRanks(time);
 		}
 
@@ -101,10 +106,16 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	}
 
 	@Override
+	public void cleanup() {
+		super.cleanup();
+		this.isCleanupSync = true;
+	}
+
+	@Override
 	public void run() {
 		long t = System.nanoTime();
 
-		manager.setContext(partition);
+		em.setContext(partition);
 		ManyToOneConcurrentLinkedQueue<Message> queue = phase.get() ? queueEven : queueOdd;
 		Message msg;
 
@@ -135,27 +146,18 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 			}
 
 		if (pattern != null) {
-			if (counter != null) {
-				// always receive if we have messages
-				pattern.process(handler);
-				var count = counter.incrementAndGet();
-				if (count == totalPartitions) {
-					counter.set(0);
-					// sometimes send
-					if (isExecutionTime() || isCleanUp == 2) {
-						pattern.communicate(broker, handler);
-						isCleanUp--;
-					}
-				}
-			} else {
-				if (isExecutionTime() || isCleanUp == 2) {
-					pattern.communicate(broker, handler);
-					isCleanUp--;
-				}
+			// always process in the inbox
+			pattern.process(handler);
+			if (shouldThisTaskSend() && isSync()) {
+				// sometimes send messages to other handlers
+				pattern.communicate(broker, handler);
+				// only send messages once on cleanup
+				isCleanupSync = false;
 			}
+		}
 
-			// In the case of a NODE_CONCURRENT handler, we have n tasks, but only one handler, which collects all the data on one node.
-			// The task which reaches this point last should perform the communication with other nodes.
+		// In the case of a NODE_CONCURRENT handler, we have n tasks, but only one handler, which collects all the data on one node.
+		// The task which reaches this point last should perform the communication with other nodes.
 //			if (counter != null && counter.incrementAndGet() == totalPartitions) {
 //				pattern.communicate(broker, handler);
 //				pattern.process(handler);
@@ -164,7 +166,6 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 //				pattern.communicate(broker, handler);
 //				pattern.process(handler);
 //			}
-		}
 
 		// only run cleanup once.
 //		if (isCleanUp) {
@@ -181,7 +182,19 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 		return annotation != null && !annotation.blocking().equals(BlockingMode.SIM_STEP);
 	}
 
-	private boolean shouldSend(final int taskCounter) {
-		return pattern != null && counter != null && counter.incrementAndGet() == totalPartitions;
+	private boolean isSync() {
+		return isSyncTime() || isCleanupSync;
+	}
+
+	private boolean shouldThisTaskSend() {
+		if (counter == null) return true;
+		// In the case of a NODE_CONCURRENT handler, we have n tasks, but only one handler, which collects all the data on one node.
+		// The task which reaches this point last should perform the communication with other nodes.
+		if (counter.incrementAndGet() == totalPartitions) {
+			counter.set(0);
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
