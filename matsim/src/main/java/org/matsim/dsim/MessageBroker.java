@@ -40,6 +40,7 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Class responsible for routing messages to the correct recipient.
@@ -334,10 +335,16 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 	void beforeSimStep(double time) {
 		// Offset the sequence to avoid interference with other seq ids
-		seq = 1000 + (int) (time * 100);
+		// to trigger final sync, we pass Infinity as time. To avoid overflow and a negative sequence value,
+		// get the absolute value.
+		seq = Math.abs(1000 + (int) (time * 100));
 	}
 
 	void syncTimestep(double time, boolean last) {
+
+		// TODO remove
+		this.currentTime = time;
+
 		if (comm.getSize() == 1) {
 			return;
 		}
@@ -396,6 +403,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private void queueSend(Message msg, int rank, int partition) {
 
+		log.info("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
 		AtomicInteger oldPos = dataSize[rank + 1];
 
 		ThreadSafeFury fury = serialization.getFury();
@@ -461,6 +469,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				dataSize[i].set(0);
 			}
 		}
+		log.info("#{} after send", comm.getRank());
 
 		int size = aheadMsgs.size();
 		int i = 0;
@@ -474,13 +483,19 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				throw new UncheckedIOException(e);
 			}
 		}
-
+		log.info("#{} after ahead msgs", comm.getRank());
 		comm.recv(this, this);
+		log.info("#{} after recv", comm.getRank());
 	}
+
+	private double currentTime = -1;
 
 	@Override
 	public boolean expectsMoreMessages() {
 //		System.out.println(comm.getRank() + " t " + (seq - 1000) + " wait for " + waitFor);
+		if (!waitFor.isEmpty()) {
+			log.info("#{}: {} waiting for {}", this.getRank(), currentTime, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
+		}
 		return !waitFor.isEmpty();
 	}
 
@@ -525,6 +540,17 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 
 		if (tag > seq || tag < 0) {
+//			var dup = data.duplicate();
+//			MemoryBuffer mbLogging = MemoryBuffer.fromByteBuffer(data);
+//			int ltag = mbLogging.readInt32();
+//			int lsender = mbLogging.readInt32();
+//			int lreceiver = mbLogging.readInt32();
+//			var l_ = mbLogging.readInt32();
+//			var ltype = mbLogging.readInt32();
+//			var msg = serialization.getFuryParser(tag).parse(in);
+//
+//			log.info("#{} received ahead msg from {}: {}", receiver, sender, msg);
+			log.info("#{} received ahead msg from #{}", comm.getRank(), sender);
 			aheadMsgs.add(clone(data));
 			return;
 		}
@@ -536,6 +562,8 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
+
+			log.info("#{} received from {}: {}", receiver, sender, msg);
 
 			if (partition == NODE_MESSAGE) {
 				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
@@ -554,8 +582,12 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// Need to differentiate if a message iy received as broadcast to all or as directed message
 		if (receiver == Communicator.BROADCAST_TO_ALL) {
 			topology.getNode(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
-		} else
+			log.info("#{} remove broadcast sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
+		} else {
 			topology.getNode(sender).getParts().forEach(waitFor::remove);
+			log.info("#{} remove point2point sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
+		}
+
 
 //        log.debug("Rank #{}, t{}: Waiting for message from partitions: {}", comm.getRank(), tag, waitFor);
 	}

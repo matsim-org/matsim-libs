@@ -160,7 +160,6 @@ public final class DistributedEventsManager implements EventsManager {
 	private <T extends EventHandler> List<T> addPartitionHandler(T firstHandler, Provider<T> provider) {
 
 		// set up stuff to create multiple handlers
-		var partitionCounter = new AtomicInteger();
 		var result = new ArrayList<T>();
 
 		// keep a reference to the last handler added, to ensure each partition receives a distinct handler instance
@@ -173,7 +172,7 @@ public final class DistributedEventsManager implements EventsManager {
 				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
 			handler = nextHandler;
-			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
 			addTaskForSinglePart(task, part);
 			result.add(handler);
 		}
@@ -363,6 +362,10 @@ public final class DistributedEventsManager implements EventsManager {
 	public void resetHandlers(int iteration) {
 		for (EventHandlerTask task : tasks) {
 			task.getHandler().reset(iteration);
+
+			if (task instanceof DefaultEventHandlerTask deht) {
+				deht.isCleanUp = -1;
+			}
 		}
 	}
 

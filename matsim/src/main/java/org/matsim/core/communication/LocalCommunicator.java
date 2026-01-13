@@ -3,11 +3,12 @@ package org.matsim.core.communication;
 import org.agrona.concurrent.BackoffIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,95 +17,126 @@ import java.util.List;
  */
 public class LocalCommunicator implements Communicator {
 
-    private final int rank;
-    private final int size;
+	private static final Logger log = LogManager.getLogger(LocalCommunicator.class);
+	private final int rank;
+	private final int size;
 
-    private final IdleStrategy idle = new BackoffIdleStrategy();
+	private final IdleStrategy idle = new BackoffIdleStrategy();
 
-    /**
-     * The incoming queues of all other ranks.
-     */
-    private final List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues;
+	/**
+	 * The incoming queues of all other ranks.
+	 */
+	private final List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues;
 
-    public LocalCommunicator(int rank, int size, List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues) {
-        this.rank = rank;
-        this.size = size;
-        this.queues = queues;
-    }
+	public LocalCommunicator(int rank, int size, List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues) {
+		this.rank = rank;
+		this.size = size;
+		this.queues = queues;
+	}
 
-    /**
-     * Create a set of communicators that can exchange messages with each other.
-     */
-    public static List<Communicator> create(int size) {
+	/**
+	 * Create a set of communicators that can exchange messages with each other.
+	 */
+	public static List<Communicator> create(int size) {
 
-        List<Communicator> communicators = new ArrayList<>(size);
-        List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues = new ArrayList<>(size);
+		List<Communicator> communicators = new ArrayList<>(size);
+		List<ManyToOneConcurrentLinkedQueue<ByteBuffer>> queues = new ArrayList<>(size);
 
-        // Create a queue for each communicator
-        for (int i = 0; i < size; i++) {
-            queues.add(new ManyToOneConcurrentLinkedQueue<>());
-        }
+		// Create a queue for each communicator
+		for (int i = 0; i < size; i++) {
+			queues.add(new ManyToOneConcurrentLinkedQueue<>());
+		}
 
-        for (int i = 0; i < size; i++) {
-            communicators.add(new LocalCommunicator(i, size, queues));
-        }
+		for (int i = 0; i < size; i++) {
+			communicators.add(new LocalCommunicator(i, size, queues));
+		}
 
-        return communicators;
-    }
+		return communicators;
+	}
 
-    static ByteBuffer clone(MemorySegment data, long offset, long length) {
-        ByteBuffer clone = ByteBuffer.allocate(Math.toIntExact(length));
-        clone.put(data.asByteBuffer().position(Math.toIntExact(offset)).limit(Math.toIntExact(offset + length)));
-        clone.flip();
-        return clone;
-    }
+	static ByteBuffer clone(MemorySegment data, long offset, long length) {
+		ByteBuffer clone = ByteBuffer.allocate(Math.toIntExact(length));
+		clone.put(data.asByteBuffer().position(Math.toIntExact(offset)).limit(Math.toIntExact(offset + length)));
+		clone.flip();
+		return clone;
+	}
 
-    @Override
-    public int getRank() {
-        return rank;
-    }
+	@Override
+	public int getRank() {
+		return rank;
+	}
 
-    @Override
-    public int getSize() {
-        return size;
-    }
+	@Override
+	public int getSize() {
+		return size;
+	}
 
-    @Override
-    public void send(int receiver, MemorySegment data, long offset, long length) {
+	@Override
+	public void send(int receiver, MemorySegment data, long offset, long length) {
 
-        ByteBuffer buf = clone(data, offset, length);
-        // Every receiver needs a copy of the buffer
-        if (receiver == Communicator.BROADCAST_TO_ALL) {
-            for (int i = 0; i < size; i++) {
-                if (i != rank) {
-                    queues.get(i).offer(buf.duplicate());
-                }
-            }
-        } else {
-            queues.get(receiver).offer(buf.duplicate());
-        }
-    }
+		ByteBuffer buf = clone(data, offset, length);
+		// Every receiver needs a copy of the buffer
+		if (receiver == Communicator.BROADCAST_TO_ALL) {
+			try {
+				if (length >= 20) {
+					ByteBuffer b = data.asByteBuffer().order(ByteOrder.LITTLE_ENDIAN);
+					var sequence = b.getInt(0);
+					var senderRank = b.getInt(4);
+					var receiverRank = b.getInt(8);
+					var partition = b.getInt(12);
+					var type = b.getInt(16);
+					log.info("#{} broadcasting: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
+				}
+			} catch (Throwable e) {
+				log.error("Error when trying to log message buffer.");
+			}
+			for (int i = 0; i < size; i++) {
+				if (i != rank) {
+					queues.get(i).offer(buf.duplicate());
+				}
+			}
+		} else {
+			ByteBuffer b = data.asByteBuffer().order(ByteOrder.LITTLE_ENDIAN);
+			var sequence = b.getInt(0);
+			var senderRank = b.getInt(4);
+			var receiverRank = b.getInt(8);
+			var partition = b.getInt(12);
+			var type = b.getInt(16);
+			log.info("#{} sending: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
+			queues.get(receiver).offer(buf.duplicate());
+		}
+	}
 
-    @Override
-    public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
+	@Override
+	public void recv(MessageReceiver expectsNext, MessageConsumer handleReceive) {
 
-        ManyToOneConcurrentLinkedQueue<ByteBuffer> self = queues.get(rank);
-        while (expectsNext.expectsMoreMessages()) {
+		ManyToOneConcurrentLinkedQueue<ByteBuffer> self = queues.get(rank);
+		while (expectsNext.expectsMoreMessages()) {
 
-            ByteBuffer poll = self.poll();
-            if (poll == null) {
-                idle.idle();
-                continue;
-            }
+			ByteBuffer poll = self.poll();
+			if (poll == null) {
+				idle.idle();
+				continue;
+			}
 
 			try {
+				ByteBuffer b = poll.duplicate();
+				b.order(ByteOrder.LITTLE_ENDIAN);
+				var sequence = b.getInt(0);
+				var senderRank = b.getInt(4);
+				var receiverRank = b.getInt(8);
+				var partition = b.getInt(12);
+				var type = b.capacity() > 16 ? b.getInt(16) : -1;
+				log.info("#{} recv: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
 				handleReceive.consume(poll);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+			} catch (Throwable e) {
+				log.error("Error in recv message. In LocalCommunicator");
+				log.error(e);
+				throw new RuntimeException(e);
 			}
 
 			idle.reset();
-        }
-    }
+		}
+	}
 
 }

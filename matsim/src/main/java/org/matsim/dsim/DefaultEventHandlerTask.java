@@ -135,19 +135,41 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 			}
 
 		if (pattern != null) {
-			// If there is a counter, only the last event handler will perform communication
 			if (counter != null) {
-				if (counter.incrementAndGet() == totalPartitions) {
-					pattern.process(handler);
-					pattern.communicate(broker, handler);
+				// always receive if we have messages
+				pattern.process(handler);
+				var count = counter.incrementAndGet();
+				if (count == totalPartitions) {
 					counter.set(0);
+					// sometimes send
+					if (isExecutionTime() || isCleanUp == 2) {
+						pattern.communicate(broker, handler);
+						isCleanUp--;
+					}
 				}
 			} else {
-				pattern.process(handler);
-				pattern.communicate(broker, handler);
+				if (isExecutionTime() || isCleanUp == 2) {
+					pattern.communicate(broker, handler);
+					isCleanUp--;
+				}
 			}
+
+			// In the case of a NODE_CONCURRENT handler, we have n tasks, but only one handler, which collects all the data on one node.
+			// The task which reaches this point last should perform the communication with other nodes.
+//			if (counter != null && counter.incrementAndGet() == totalPartitions) {
+//				pattern.communicate(broker, handler);
+//				pattern.process(handler);
+//				counter.set(0);
+//			} else {
+//				pattern.communicate(broker, handler);
+//				pattern.process(handler);
+//			}
 		}
 
+		// only run cleanup once.
+//		if (isCleanUp) {
+//			isCleanUp = false;
+//		}
 		storeRuntime(t);
 	}
 
@@ -157,5 +179,9 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	public static boolean supportsAsync(EventHandler handler) {
 		DistributedEventHandler annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		return annotation != null && !annotation.blocking().equals(BlockingMode.SIM_STEP);
+	}
+
+	private boolean shouldSend(final int taskCounter) {
+		return pattern != null && counter != null && counter.incrementAndGet() == totalPartitions;
 	}
 }

@@ -104,6 +104,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
+	protected int isCleanUp = -1;
+
 	public EventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition, boolean async) {
 		this.handler = handler;
 		this.manager = manager;
@@ -238,7 +240,16 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 	@Override
 	public final boolean needsExecution() {
+		return isExecutionTime() || isCleanUp > 0;
+	}
+
+	protected boolean isExecutionTime() {
 		return time > 0 && time % handler.getProcessInterval() == 0;
+	}
+
+	@Override
+	public void cleanup() {
+		isCleanUp = 2;
 	}
 
 	public final IntSet getSupportedMessages() {

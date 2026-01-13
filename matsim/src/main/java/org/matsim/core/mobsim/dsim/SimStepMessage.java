@@ -10,6 +10,17 @@ import java.util.List;
 public record SimStepMessage(double simstep, List<CapacityUpdate> capUpdates, List<Teleportation> teleportations,
 							 List<VehicleContainer> vehicles, List<BackPack> backPacks) implements Message {
 
+	@Override
+	public String toString() {
+		return "SimStepMessage " + getType() + " {" +
+			"simstep=" + simstep +
+			", capUpdates=" + capUpdates +
+			", teleportations=" + teleportations +
+			", vehicles=" + vehicles +
+			", backPacks=" + backPacks +
+			'}';
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}

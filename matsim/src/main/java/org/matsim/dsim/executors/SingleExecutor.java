@@ -71,7 +71,9 @@ public final class SingleExecutor implements LPExecutor {
 		}
 
 		for (SimTask task : tasks) {
-			task.run();
+			if (task.needsExecution()) {
+				task.run();
+			}
 		}
 	}
 
