@@ -42,7 +42,7 @@
     </module>
     <module name="routing">
         <!-- We have a one directional network, which will be cleaned by the network cleaner otherwise -->
-		<param name="networkRouteConsistencyCheck" value="disable"/>
+        <param name="networkConsistencyCheck" value="disable"/>
     </module>
     <module name="scoring">
         <parameterset type="scoringParameters">

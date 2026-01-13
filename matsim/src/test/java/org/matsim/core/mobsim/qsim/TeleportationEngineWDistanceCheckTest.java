@@ -31,17 +31,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -55,74 +50,79 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class TeleportationEngineWDistanceCheckTest {
-	private static final Logger log = LogManager.getLogger( TeleportationEngineWDistanceCheckTest.class ) ;
+	private static final Logger log = LogManager.getLogger(TeleportationEngineWDistanceCheckTest.class);
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils() ;
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	final void test() {
 		Config config = ConfigUtils.createConfig();
-		config.controller().setOutputDirectory( utils.getOutputDirectory() );
-		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(0);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
-		ActivityParams params = new ActivityParams("dummy" ) ;
+		ActivityParams params = new ActivityParams("dummy");
 		config.scoring().addActivityParams(params);
 		params.setScoringThisActivityAtAll(false);
 
-		StrategySettings stratSets = new StrategySettings() ;
-		stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
 		stratSets.setWeight(1.);
-		config.replanning().addStrategySettings( stratSets );
+		config.replanning().addStrategySettings(stratSets);
 
-		Scenario scenario = ScenarioUtils.createScenario( config ) ;
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Network network = scenario.getNetwork() ;
-		NetworkFactory nf = network.getFactory() ;
+		Network network = scenario.getNetwork();
+		NetworkFactory nf = network.getFactory();
 
 		final int N_NODES = 2;
-		Node prevNode = null ;
-		for ( int ii=0 ; ii<=N_NODES ; ii++ ) {
-			Node node = nf.createNode( Id.createNodeId( ii), new Coord(10000.*ii,0.) ) ;
+		Node prevNode = null;
+		for (int ii = 0; ii <= N_NODES; ii++) {
+			Node node = nf.createNode(Id.createNodeId(ii), new Coord(10000. * ii, 0.));
 			network.addNode(node);
-			if ( ii >= 1 ) {
-				Link link = nf.createLink( Id.createLinkId( Integer.toString(ii-1) + "-" + Integer.toString(ii) ), prevNode, node ) ;
+			if (ii >= 1) {
+				Link link = nf.createLink(Id.createLinkId(Integer.toString(ii - 1) + "-" + Integer.toString(ii)), prevNode, node);
 				network.addLink(link);
 			}
-			prevNode = node ;
+			prevNode = node;
 		}
 
-		Population population = scenario.getPopulation() ;
-		PopulationFactory pf = population.getFactory() ;
+		Population population = scenario.getPopulation();
+		PopulationFactory pf = population.getFactory();
 
-		Person person = pf.createPerson( Id.createPersonId(0) ) ;
-		population.addPerson( person );
+		Person person = pf.createPerson(Id.createPersonId(0));
+		population.addPerson(person);
 
 		Plan plan = pf.createPlan();
-		person.addPlan( plan ) ;
+		person.addPlan(plan);
 		{
-			Activity act = pf.createActivityFromCoord("dummy",new Coord(0.,-10000.) ) ;
+			Activity act = pf.createActivityFromCoord("dummy", new Coord(0., -10000.));
 			plan.addActivity(act);
 			act.setEndTime(0.);
 		}
 		{
-			Leg leg = pf.createLeg( TransportMode.car ) ;
-			plan.addLeg( leg );
+			Leg leg = pf.createLeg(TransportMode.car);
+			plan.addLeg(leg);
 		}
 		{
-			Activity act = pf.createActivityFromCoord("dummy",new Coord(20000.,-1.) ) ;
+			Activity act = pf.createActivityFromCoord("dummy", new Coord(20000., -1.));
 			plan.addActivity(act);
 		}
 
-		Controler controler = new Controler( scenario ) ;
-		controler.addOverridingModule( new AbstractModule(){
-			@Override public void install() {
-				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
-					@Override public void reset(int iteration) {
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(new BasicEventHandler() {
+					@Override
+					public void reset(int iteration) {
 					}
-					@Override public void handleEvent(Event event) {
-						log.warn( event.toString() ) ;
+
+					@Override
+					public void handleEvent(Event event) {
+						log.warn(event.toString());
 					}
 
 				});

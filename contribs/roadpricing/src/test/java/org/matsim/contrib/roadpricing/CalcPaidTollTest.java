@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -44,6 +42,8 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.Map;
+
 /**
  * Tests that {@link RoadPricingTollCalculator} calculates the correct tolls
  * and adds them to the scores of the executed plans.
@@ -59,7 +59,7 @@ public class CalcPaidTollTest {
 	@Test
 	void testDistanceToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing1.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -68,35 +68,35 @@ public class CalcPaidTollTest {
 		Id<Person> id4 = Id.create("4", Person.class);
 		Id<Person> id5 = Id.create("5", Person.class);
 
-		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1( config ).getPersons();
-		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "distance", config ).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1(config).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "distance", config).getPersons();
 
 		compareScores(
-				referencePopulation.get(id1).getPlans().get(0).getScore(),
-				population.get(id1).getPlans().get(0).getScore(),
-				200 * 0.00020 + 100 * 0.00030);
+			referencePopulation.get(id1).getPlans().get(0).getScore(),
+			population.get(id1).getPlans().get(0).getScore(),
+			200 * 0.00020 + 100 * 0.00030);
 		compareScores(
-				referencePopulation.get(id2).getPlans().get(0).getScore(),
-				population.get(id2).getPlans().get(0).getScore(),
-				200 * 0.00010 + 100 * 0.00020);
+			referencePopulation.get(id2).getPlans().get(0).getScore(),
+			population.get(id2).getPlans().get(0).getScore(),
+			200 * 0.00010 + 100 * 0.00020);
 		compareScores(
-				referencePopulation.get(id3).getPlans().get(0).getScore(),
-				population.get(id3).getPlans().get(0).getScore(),
-				200 * 0.00020 + 100 * 0.00030);
+			referencePopulation.get(id3).getPlans().get(0).getScore(),
+			population.get(id3).getPlans().get(0).getScore(),
+			200 * 0.00020 + 100 * 0.00030);
 		compareScores(
-				referencePopulation.get(id4).getPlans().get(0).getScore(),
-				population.get(id4).getPlans().get(0).getScore(),
-				100 * 0.00020 + 100 * 0.00010 + 100 * 0.00020);
+			referencePopulation.get(id4).getPlans().get(0).getScore(),
+			population.get(id4).getPlans().get(0).getScore(),
+			100 * 0.00020 + 100 * 0.00010 + 100 * 0.00020);
 		compareScores(
-				referencePopulation.get(id5).getPlans().get(0).getScore(),
-				population.get(id5).getPlans().get(0).getScore(),
-				100 * 0.00020 + 100 * 0.00030); // agent departs on a tolled link which must NOT be paid.
+			referencePopulation.get(id5).getPlans().get(0).getScore(),
+			population.get(id5).getPlans().get(0).getScore(),
+			100 * 0.00020 + 100 * 0.00030); // agent departs on a tolled link which must NOT be paid.
 	}
 
 	@Test
 	void testAreaToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing2.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -108,47 +108,47 @@ public class CalcPaidTollTest {
 		Id<Person> id8 = Id.create("8", Person.class);
 		Id<Person> id10 = Id.create("10", Person.class);
 
-		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1( config ).getPersons();
-		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "area", config ).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1(config).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "area", config).getPersons();
 
 		compareScores(
-				referencePopulation.get(id1).getPlans().get(0).getScore(),
-				population.get(id1).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id1).getPlans().get(0).getScore(),
+			population.get(id1).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id2).getPlans().get(0).getScore(),
-				population.get(id2).getPlans().get(0).getScore(),
-				0.00);
+			referencePopulation.get(id2).getPlans().get(0).getScore(),
+			population.get(id2).getPlans().get(0).getScore(),
+			0.00);
 		compareScores(
-				referencePopulation.get(id3).getPlans().get(0).getScore(),
-				population.get(id3).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id3).getPlans().get(0).getScore(),
+			population.get(id3).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id4).getPlans().get(0).getScore(),
-				population.get(id4).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id4).getPlans().get(0).getScore(),
+			population.get(id4).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id5).getPlans().get(0).getScore(),
-				population.get(id5).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id5).getPlans().get(0).getScore(),
+			population.get(id5).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id7).getPlans().get(0).getScore(),
-				population.get(id7).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id7).getPlans().get(0).getScore(),
+			population.get(id7).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id8).getPlans().get(0).getScore(),
-				population.get(id8).getPlans().get(0).getScore(),
-				2.00);
+			referencePopulation.get(id8).getPlans().get(0).getScore(),
+			population.get(id8).getPlans().get(0).getScore(),
+			2.00);
 		compareScores(
-				referencePopulation.get(id10).getPlans().get(0).getScore(),
-				population.get(id10).getPlans().get(0).getScore(),
-				2.00); // drives out of the area, must still pay the toll
+			referencePopulation.get(id10).getPlans().get(0).getScore(),
+			population.get(id10).getPlans().get(0).getScore(),
+			2.00); // drives out of the area, must still pay the toll
 	}
 
 	@Test
 	void testCordonToll() {
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		final String tollFile = utils.getClassInputDirectory() + "/roadpricing3.xml";
 
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -159,25 +159,25 @@ public class CalcPaidTollTest {
 		Id<Person> id7 = Id.create("7", Person.class);
 		Id<Person> id8 = Id.create("8", Person.class);
 
-		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1( config ).getPersons();
-		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "link", config ).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = RoadPricingTestUtils.createReferencePopulation1(config).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "link", config).getPersons();
 
 		compareScores(
-				referencePopulation.get(id1).getPlans().get(0).getScore(),
-				population.get(id1).getPlans().get(0).getScore(),
-				3.00);
+			referencePopulation.get(id1).getPlans().get(0).getScore(),
+			population.get(id1).getPlans().get(0).getScore(),
+			3.00);
 		compareScores(
-				referencePopulation.get(id2).getPlans().get(0).getScore(),
-				population.get(id2).getPlans().get(0).getScore(),
-				1.50);
+			referencePopulation.get(id2).getPlans().get(0).getScore(),
+			population.get(id2).getPlans().get(0).getScore(),
+			1.50);
 		compareScores(
-				referencePopulation.get(id3).getPlans().get(0).getScore(),
-				population.get(id3).getPlans().get(0).getScore(),
-				3.00);
+			referencePopulation.get(id3).getPlans().get(0).getScore(),
+			population.get(id3).getPlans().get(0).getScore(),
+			3.00);
 		compareScores(
-				referencePopulation.get(id4).getPlans().get(0).getScore(),
-				population.get(id4).getPlans().get(0).getScore(),
-				2.0);
+			referencePopulation.get(id4).getPlans().get(0).getScore(),
+			population.get(id4).getPlans().get(0).getScore(),
+			2.0);
 //		compareScores(
 //				referencePopulation.get(id5).getPlans().get(0).getScore(),
 //				population.get(id5).getPlans().get(0).getScore(),
@@ -205,15 +205,16 @@ public class CalcPaidTollTest {
 
 	/**
 	 * FIXME This needs re-implementing with RoadPricingModule.
+	 *
 	 * @param tollFile path to roadpricing.xml file
 	 * @param tollType one of four road pricing types
-	 * @param config the config object/class.
+	 * @param config   the config object/class.
 	 * @return the post-mobsim population.
 	 */
 	private Population runTollSimulation(final String tollFile, final String tollType, final Config config) {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( config );
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork1(scenario);
-        RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.readFile(tollFile);
 		Assertions.assertEquals(tollType, scheme.getType());

@@ -20,8 +20,7 @@
 
 package org.matsim.contrib.locationchoice;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -43,10 +42,10 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -68,7 +67,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import com.google.inject.Inject;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LocationChoiceIT {
 
@@ -83,8 +82,8 @@ public class LocationChoiceIT {
 	@Test
 	void testLocationChoice() {
 
-		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config2.xml");
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = localCreateConfig(utils.getPackageInputDirectory() + "config2.xml");
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -94,7 +93,7 @@ public class LocationChoiceIT {
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
+		Link link = NetworkUtils.createAndAddLink(network, Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1);
 		ActivityFacility facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 0, (double) 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
 		ActivityFacility facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 0, (double) 400));
@@ -102,7 +101,7 @@ public class LocationChoiceIT {
 		ActivityFacility facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 0, (double) 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
-		Person person = localCreatePopWOnePerson(scenario, facility1, 17.*60.*60. );
+		Person person = localCreatePopWOnePerson(scenario, facility1, 17. * 60. * 60.);
 
 		Controler controler = new Controler(scenario);
 
@@ -112,7 +111,8 @@ public class LocationChoiceIT {
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("MyLocationChoice").toProvider(new Provider<PlanStrategy>() {
-					@Inject TimeInterpretation timeInterpretation;
+					@Inject
+					TimeInterpretation timeInterpretation;
 
 					@Override
 					public PlanStrategy get() {
@@ -124,7 +124,7 @@ public class LocationChoiceIT {
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
 		// should pull the best response test away from the other (old) test.  kai, feb'13
 
-		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// test that everything worked as expected
@@ -137,19 +137,20 @@ public class LocationChoiceIT {
 		assertEquals(2, person.getPlans().size(), "number of plans in person.");
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
-		if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none) ) {
+		if (!config.routing().getAccessEgressType().equals(RoutingConfigGroup.AccessEgressType.none)) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
-		assertNotNull( newWork ) ;
-		assertNotNull( newWork.getFacilityId() ) ;
+		assertNotNull(newWork);
+		assertNotNull(newWork.getFacilityId());
 		assertTrue(newWork.getFacilityId().equals(Id.create(2, ActivityFacility.class)) || newWork.getFacilityId().equals(Id.create(3, ActivityFacility.class)));
 	}
 
 	/**
 	 * setup population with one person
+	 *
 	 * @param workActEndTime TODO
 	 */
-	public static Person localCreatePopWOnePerson( Scenario scenario, ActivityFacility facility1, double workActEndTime ) {
+	public static Person localCreatePopWOnePerson(Scenario scenario, ActivityFacility facility1, double workActEndTime) {
 
 		Population population = scenario.getPopulation();
 
@@ -157,54 +158,54 @@ public class LocationChoiceIT {
 		population.addPerson(person);
 
 		Plan plan = population.getFactory().createPlan();
-		person.addPlan(plan) ;
+		person.addPlan(plan);
 
 		{
-			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0)) ;
+			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0));
 			//		act.setLinkId(link.getId());
 			act.setEndTime(8.0 * 3600);
-			plan.addActivity(act) ;
+			plan.addActivity(act);
 		}
-		plan.addLeg(population.getFactory().createLeg(TransportMode.car)) ;
+		plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 		{
-			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getFacilities().get(facility1.getId()).getCoord() ) ;
+			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getFacilities().get(facility1.getId()).getCoord());
 			act.setEndTime(workActEndTime);
-			((Activity)act).setFacilityId(facility1.getId());
-			plan.addActivity(act) ;
+			((Activity) act).setFacilityId(facility1.getId());
+			plan.addActivity(act);
 		}
-		plan.addLeg(population.getFactory().createLeg(TransportMode.car)) ;
+		plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 		{
 			//		act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 			//		act.setLinkId(link.getId());
-			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0)) ;
-			plan.addActivity(act) ;
+			Activity act = population.getFactory().createActivityFromCoord("home", new Coord((double) 0, (double) 0));
+			plan.addActivity(act);
 		}
 
 		return person;
 	}
 
-	static Config localCreateConfig( String configFileName ) {
+	static Config localCreateConfig(String configFileName) {
 		// setup config
-		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() , new FrozenTastesConfigGroup() ) ;
+		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup(), new FrozenTastesConfigGroup());
 
 		config.global().setNumberOfThreads(0);
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(1);
 		config.controller().setMobsim("qsim");
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue) ;
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
-		dccg.setAlgorithm(Algotype.random );
-		dccg.setFlexibleTypes("work" );
+		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class);
+		dccg.setAlgorithm(Algotype.random);
+		dccg.setFlexibleTypes("work");
 
 		ActivityParams home = new ActivityParams("home");
-		home.setTypicalDuration(12*60*60);
+		home.setTypicalDuration(12 * 60 * 60);
 		config.scoring().addActivityParams(home);
 		ActivityParams work = new ActivityParams("work");
-		work.setTypicalDuration(12*60*60);
+		work.setTypicalDuration(12 * 60 * 60);
 		config.scoring().addActivityParams(work);
 		ActivityParams shop = new ActivityParams("shop");
-		shop.setTypicalDuration(1.*60*60);
+		shop.setTypicalDuration(1. * 60 * 60);
 		config.scoring().addActivityParams(shop);
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
@@ -212,10 +213,10 @@ public class LocationChoiceIT {
 		strategySettings.setWeight(1.0);
 		config.replanning().addStrategySettings(strategySettings);
 
-		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.) ;
-		config.qsim().setLinkWidthForVis((float)1.) ;
-		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
-		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.);
+		config.qsim().setLinkWidthForVis((float) 1.);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
 
 		return config;
 	}
@@ -226,7 +227,7 @@ public class LocationChoiceIT {
 			QSim qSim = new QSimBuilder(sc.getConfig()).useDefaults().build(sc, eventsManager);
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
-			return qSim ;
+			return qSim;
 		}
 	}
 

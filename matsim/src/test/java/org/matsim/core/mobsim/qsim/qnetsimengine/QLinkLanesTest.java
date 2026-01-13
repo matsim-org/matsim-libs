@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -47,6 +44,9 @@ import org.matsim.lanes.LanesFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * Test for QLinkLanes' and QLanes capacity calculations
  *
@@ -58,7 +58,7 @@ public class QLinkLanesTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 
-  private static void initNetwork(Network network) {
+	private static void initNetwork(Network network) {
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
@@ -73,7 +73,7 @@ public class QLinkLanesTest {
 		network.addLink(l1);
 		Link l2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
 		network.addLink(l2);
-  }
+	}
 
 	private static void createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
@@ -138,7 +138,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 
@@ -157,7 +157,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 1);
@@ -194,7 +194,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createOneLane(scenario, 2);
@@ -232,7 +232,7 @@ public class QLinkLanesTest {
 	@Test
 	void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		initNetwork(scenario.getNetwork());
 		createThreeLanes(scenario);
@@ -270,11 +270,10 @@ public class QLinkLanesTest {
 		assertEquals(3, ql.getOfferingQLanes().size());
 		double totalFlowCapacity = 0.0;
 		for (QLaneI qll : ql.getOfferingQLanes()) {
-			if (((QueueWithBuffer)qll).getId().equals(Id.create(2, Lane.class))) {
+			if (((QueueWithBuffer) qll).getId().equals(Id.create(2, Lane.class))) {
 				assertEquals(0.5, qll.getSimulatedFlowCapacityPerTimeStep(), 0);
 				assertEquals(28.0, qll.getStorageCapacity(), 0);
-			}
-			else {
+			} else {
 				assertEquals(0.25, qll.getSimulatedFlowCapacityPerTimeStep(), 0);
 				assertEquals(14.0, qll.getStorageCapacity(), 0);
 			}

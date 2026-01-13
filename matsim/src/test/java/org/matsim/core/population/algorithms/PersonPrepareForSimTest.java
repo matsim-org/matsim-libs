@@ -19,10 +19,6 @@
 
 package org.matsim.core.population.algorithms;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,12 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -53,6 +44,10 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author mrieser / senozon
@@ -147,7 +142,7 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg),"wrong routing mode!");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg), "wrong routing mode!");
 		}
 
 		// test routing mode set
@@ -168,7 +163,7 @@ public class PersonPrepareForSimTest {
 
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg),"wrong routing mode!");
+			Assertions.assertEquals(TransportMode.pt, TripStructureUtils.getRoutingMode(leg), "wrong routing mode!");
 		}
 	}
 
@@ -224,7 +219,7 @@ public class PersonPrepareForSimTest {
 			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
 			Assertions.assertEquals("drt67_fallback", leg.getMode(), "wrong leg mode replacement");
-			Assertions.assertEquals("drt67_fallback", TripStructureUtils.getRoutingMode(leg),"wrong routing mode set");
+			Assertions.assertEquals("drt67_fallback", TripStructureUtils.getRoutingMode(leg), "wrong routing mode set");
 		}
 	}
 
@@ -245,13 +240,13 @@ public class PersonPrepareForSimTest {
 			TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
 			plan.addLeg(leg1);
 			Activity activity2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) 0, -10),
-					null, TransportMode.car);
+				null, TransportMode.car);
 			plan.addActivity(activity2);
 			Leg leg2 = pf.createLeg(TransportMode.car);
 			TripStructureUtils.setRoutingMode(leg2, TransportMode.car);
 			plan.addLeg(leg2);
 			Activity activity3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord((double) -10, -10),
-					null, TransportMode.car);
+				null, TransportMode.car);
 			plan.addActivity(activity3);
 			Leg leg3 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg3, TransportMode.car);
@@ -431,15 +426,15 @@ public class PersonPrepareForSimTest {
 		Id<Link> startLink = Id.createLinkId("1");
 		Id<Link> endLink = Id.createLinkId("2");
 		TransitStopFacility stopFacility1 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
-				Id.create("stop1", TransitStopFacility.class),
-				sc.getNetwork().getLinks().get(startLink).getToNode().getCoord(),
-				false);
+			Id.create("stop1", TransitStopFacility.class),
+			sc.getNetwork().getLinks().get(startLink).getToNode().getCoord(),
+			false);
 		stopFacility1.setLinkId(startLink);
 		sc.getTransitSchedule().addStopFacility(stopFacility1);
 		TransitStopFacility stopFacility2 = sc.getTransitSchedule().getFactory().createTransitStopFacility(
-				Id.create("stop2", TransitStopFacility.class),
-				sc.getNetwork().getLinks().get(endLink).getToNode().getCoord(),
-				false);
+			Id.create("stop2", TransitStopFacility.class),
+			sc.getNetwork().getLinks().get(endLink).getToNode().getCoord(),
+			false);
 		stopFacility2.setLinkId(endLink);
 		sc.getTransitSchedule().addStopFacility(stopFacility2);
 		Population pop = sc.getPopulation();
@@ -453,7 +448,7 @@ public class PersonPrepareForSimTest {
 		Id<TransitLine> line = Id.create("line", TransitLine.class);
 		Id<TransitRoute> route = Id.create("route", TransitRoute.class);
 		ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
-				stopFacility1, stopFacility2, line, route);
+			stopFacility1, stopFacility2, line, route);
 		leg.setRoute(experimentalTransitRoute);
 		plan.addLeg(leg);
 		Activity activity2 = pf.createActivityFromLinkId("w", endLink);
@@ -476,7 +471,7 @@ public class PersonPrepareForSimTest {
 	void testLegRouteModeConsistency_throws() {
 		// set config, such that exception is thrown due to inconsistency
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.abortOnInconsistency);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.abortOnInconsistency);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 
@@ -488,7 +483,7 @@ public class PersonPrepareForSimTest {
 	void testLegRouteModeConsistency_ignored() {
 		// set config, such that inconsistency is ignored
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Person person = createInconsistentPersonForModeConsistencyCheck(scenario);
 
@@ -525,6 +520,7 @@ public class PersonPrepareForSimTest {
 
 	private static class DummyRouter implements PlanAlgorithm {
 		private int counter = 0;
+
 		@Override
 		public void run(final Plan plan) {
 			counter++;

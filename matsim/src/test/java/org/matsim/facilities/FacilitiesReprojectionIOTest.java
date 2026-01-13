@@ -80,65 +80,66 @@ public class FacilitiesReprojectionIOTest {
 
 	 @Test
 	 void testWithControlerAndObjectAttributes() {
-		// accept a rounding error of 1 cm.
-		// this is used both to compare equality and non-equality, so the more we accept difference between input
-		// and output coordinates, the more we require the internally reprojected coordinates to be different.
-		// It is thus OK to use a reasonably "high" tolerance compared to usual double comparisons.
-		final double epsilon = 0.01;
+		 // accept a rounding error of 1 cm.
+		 // this is used both to compare equality and non-equality, so the more we accept difference between input
+		 // and output coordinates, the more we require the internally reprojected coordinates to be different.
+		 // It is thus OK to use a reasonably "high" tolerance compared to usual double comparisons.
+		 final double epsilon = 0.01;
 
-		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		 final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		 new MatsimFacilitiesReader(originalScenario).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
-		ProjectionUtils.putCRS(originalScenario.getActivityFacilities(), INITIAL_CRS);
-		new FacilitiesWriter(originalScenario.getActivityFacilities()).write(utils.getOutputDirectory()+"/facilities.xml");
+		 ProjectionUtils.putCRS(originalScenario.getActivityFacilities(), INITIAL_CRS);
+		 new FacilitiesWriter(originalScenario.getActivityFacilities()).write(utils.getOutputDirectory() + "/facilities.xml");
 
-		// write scenario and re-read it
-		final Config config = ConfigUtils.createConfig();
-		config.facilities().setInputFile(utils.getOutputDirectory()+"/facilities.xml");
-		config.global().setCoordinateSystem( TARGET_CRS );
+		 // write scenario and re-read it
+		 final Config config = ConfigUtils.createConfig();
+		 config.facilities().setInputFile(utils.getOutputDirectory() + "/facilities.xml");
+		 config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+		 config.global().setCoordinateSystem(TARGET_CRS);
 
-		// TODO: test also with loading from Controler C'tor?
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		for ( Id<ActivityFacility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
-			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
-			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
+		 // TODO: test also with loading from Controler C'tor?
+		 final Scenario scenario = ScenarioUtils.loadScenario(config);
+		 for (Id<ActivityFacility> id : originalScenario.getActivityFacilities().getFacilities().keySet()) {
+			 final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get(id).getCoord();
+			 final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get(id).getCoord();
 
-			Assertions.assertEquals(
-					transformation.transform(originalCoord),
-					internalCoord,
-					"Wrong coordinate transform performed!");
-		}
+			 Assertions.assertEquals(
+				 transformation.transform(originalCoord),
+				 internalCoord,
+				 "Wrong coordinate transform performed!");
+		 }
 
-		Assertions.assertEquals(
-				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getActivityFacilities()),
-				"wrong CRS information after loading");
+		 Assertions.assertEquals(
+			 TARGET_CRS,
+			 ProjectionUtils.getCRS(scenario.getActivityFacilities()),
+			 "wrong CRS information after loading");
 
-		config.controller().setLastIteration( -1 );
-		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controller().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
-		controler.run();
+		 config.controller().setLastIteration(-1);
+		 final String outputDirectory = utils.getOutputDirectory() + "/output/";
+		 config.controller().setOutputDirectory(outputDirectory);
+		 final Controler controler = new Controler(scenario);
+		 controler.run();
 
-		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
-		new MatsimFacilitiesReader( dumpedScenario ).readFile( outputDirectory+"/output_facilities.xml.gz" );
+		 final Scenario dumpedScenario = ScenarioUtils.createScenario(config);
+		 new MatsimFacilitiesReader(dumpedScenario).readFile(outputDirectory + "/output_facilities.xml.gz");
 
-		for ( Id<ActivityFacility> id : scenario.getActivityFacilities().getFacilities().keySet() ) {
-			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
-			final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
+		 for (Id<ActivityFacility> id : scenario.getActivityFacilities().getFacilities().keySet()) {
+			 final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get(id).getCoord();
+			 final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get(id).getCoord();
 
-			Assertions.assertEquals(
-					internalCoord.getX(),
-					dumpedCoord.getX(),
-					epsilon,
-					"coordinates were reprojected for dump" );
-			Assertions.assertEquals(
-					internalCoord.getY(),
-					dumpedCoord.getY(),
-					epsilon,
-					"coordinates were reprojected for dump" );
-		}
-	}
+			 Assertions.assertEquals(
+				 internalCoord.getX(),
+				 dumpedCoord.getX(),
+				 epsilon,
+				 "coordinates were reprojected for dump");
+			 Assertions.assertEquals(
+				 internalCoord.getY(),
+				 dumpedCoord.getY(),
+				 epsilon,
+				 "coordinates were reprojected for dump");
+		 }
+	 }
 
 	 @Test
 	 void testWithControlerAndConfigParameters() {

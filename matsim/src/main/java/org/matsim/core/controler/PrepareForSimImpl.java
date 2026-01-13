@@ -24,21 +24,20 @@ package org.matsim.core.controler;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -53,12 +52,12 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import jakarta.annotation.Nullable;
 import java.util.*;
 
 import static org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData;
@@ -168,6 +167,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				throw new RuntimeException("Facilities source '" + this.facilitiesConfigGroup.getFacilitiesSource() + "' is not implemented.");
 		}
 
+		checkFacilityLinks();
+
 		// get links for facilities
 		// using car only network to get the links for facilities. Amit July'18
 		XY2LinksForFacilities.run(carOnlyNetwork, this.activityFacilities);
@@ -217,6 +218,30 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
+	}
+
+	private void checkFacilityLinks() {
+		if (scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
+			return;
+		}
+
+		for (ActivityFacility value : scenario.getActivityFacilities().getFacilities().values()) {
+			Id<Link> linkId = value.getLinkId();
+
+			if (linkId == null) {
+				continue;
+			}
+
+			boolean linkExists = scenario.getNetwork().getLinks().get(linkId) != null;
+
+			if (!linkExists) {
+				String errorMessage = "Facility " + value.getId() + " is assigned to non-existing link " + linkId;
+				log.error("{}\n Probably, you removed links from the network but did not update the facilities accordingly. " +
+					"Run the org.matsim.application.prepare.facilities.CleanFacilities with rmLinkIds = true. If this is intended, set the routing config " +
+					"parameter 'networkRouteConsistencyCheck' to 'disable'.", errorMessage);
+				throw new RuntimeException(errorMessage);
+			}
+		}
 	}
 
 	// only warn once that legacy vehicle id is used

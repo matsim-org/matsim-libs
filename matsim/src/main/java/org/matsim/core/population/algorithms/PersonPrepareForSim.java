@@ -27,11 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -46,7 +42,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -82,23 +77,23 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		}
 		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
-		this.scenario = scenario ;
+		this.scenario = scenario;
 	}
 
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
 		Network net = scenario.getNetwork();
-		if (NetworkUtils.isMultimodal( scenario.getNetwork() )) {
+		if (NetworkUtils.isMultimodal(scenario.getNetwork())) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter( scenario.getNetwork() );
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 			net = NetworkUtils.createNetwork(scenario.getConfig().network());
 			filter.filter(net, Set.of(TransportMode.car));
 		}
 
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
-		this.scenario = scenario ;
+		this.scenario = scenario;
 	}
 
 	@Override
@@ -122,7 +117,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			checkAndAddRoutingMode(plan);
 
 			// make sure all the plans have valid act-locations and valid routes
-			planLoop: for (PlanElement pe : plan.getPlanElements()) {
+			planLoop:
+			for (PlanElement pe : plan.getPlanElements()) {
 				switch (pe) {
 					case Activity act -> {
 						boolean needsReComputation = needsReComputation(act);
@@ -151,8 +147,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	private boolean needsReRoute(Person person, Leg leg) {
 		if (TripStructureUtils.getRoutingMode(leg) == null) {
 			String errorMessage = "Routing mode not set for leg :" + leg + " of agent id " + person.getId().toString();
-			log.error( errorMessage );
-			throw new RuntimeException( errorMessage );
+			log.error(errorMessage);
+			throw new RuntimeException(errorMessage);
 		}
 
 		if (leg.getRoute() == null) {
@@ -161,7 +157,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 		checkModeConsistent(person, leg);
 
-		if(!Double.isNaN(leg.getRoute().getDistance())){
+		if (!Double.isNaN(leg.getRoute().getDistance())) {
 			return false;
 		}
 
@@ -171,56 +167,76 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 
 	private void adaptRoute(Leg leg) {
-		if (leg.getRoute() instanceof NetworkRoute){
+		if (leg.getRoute() instanceof NetworkRoute) {
 			/* So far, 1.0 is always used as relative position on start and end link.
 			 * This means that the end link is considered in route distance and the start link not.
 			 * tt feb'16
 			 */
-			double relativePositionStartLink = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
-			double relativePositionEndLink  = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
+			double relativePositionStartLink = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink();
+			double relativePositionEndLink = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink();
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
-			double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
+			double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork());
 			leg.getRoute().setDistance(dist);
 			// using the full network for the distance calculation.  kai, jul'18
 		} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
 			// replace deprecated ExperimentalTransitRoute with DefaultTransitPassengerRoute
 			ExperimentalTransitRoute oldRoute = (ExperimentalTransitRoute) leg.getRoute();
 			DefaultTransitPassengerRoute newRoute = new DefaultTransitPassengerRoute(
-					oldRoute.getStartLinkId(),
-					oldRoute.getEndLinkId(),
-					oldRoute.getAccessStopId(),
-					oldRoute.getEgressStopId(),
-					oldRoute.getLineId(),
-					oldRoute.getRouteId());
+				oldRoute.getStartLinkId(),
+				oldRoute.getEndLinkId(),
+				oldRoute.getAccessStopId(),
+				oldRoute.getEgressStopId(),
+				oldRoute.getLineId(),
+				oldRoute.getRouteId());
 			leg.setRoute(newRoute);
 		}
 	}
 
-	private void checkModeConsistent(Person person, Leg leg) {
-		if(this.scenario.getConfig().routing().getNetworkRouteConsistencyCheck() == RoutingConfigGroup.NetworkRouteConsistencyCheck.disable) {
+	private void checkActivityLocationConsistent(Activity act) {
+		if (this.scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
 			return;
 		}
 
-		if(!(leg.getRoute() instanceof NetworkRoute networkRoute)) {
+		if (act.getLinkId() == null) {
+			return;
+		}
+
+		boolean linkExists = scenario.getNetwork().getLinks().get(act.getLinkId()) != null;
+		if (!linkExists) {
+			String errorMessage = "Activity " + act + " has a linkId that does not exist in the network.";
+			log.error("{}\n Probably, you removed links from the network but did not update the plans accordingly. " +
+				"Run the class org.matsim.application.prepare.population.CleanPopulation with rmActivityLocations = true. If this is intended, set the routing config " +
+				"parameter 'networkRouteConsistencyCheck' to 'disable'", errorMessage);
+			throw new RuntimeException(errorMessage);
+		}
+	}
+
+	private void checkModeConsistent(Person person, Leg leg) {
+		if (this.scenario.getConfig().routing().getNetworkConsistencyCheck() == RoutingConfigGroup.NetworkConsistencyCheck.disable) {
+			return;
+		}
+
+		if (!(leg.getRoute() instanceof NetworkRoute networkRoute)) {
 			return;
 		}
 
 		Optional<Id<Link>> inconsistentLink = networkRoute.getLinkIds().stream()
-												  .filter(linkId -> {
-													  Link link = scenario.getNetwork().getLinks().get(linkId);
-													  return link == null || !link.getAllowedModes().contains(leg.getMode());
-												  })
+			.filter(linkId -> {
+				Link link = scenario.getNetwork().getLinks().get(linkId);
+				return link == null || !link.getAllowedModes().contains(leg.getMode());
+			})
 			.findFirst();
 
 		if (inconsistentLink.isPresent()) {
 			String errorMessage = "Route inconsistent with link modes for link: " + inconsistentLink.get() + " Person " + person.getId() + "; Leg '" + leg + "'";
-			log.error(errorMessage + "\n Consider cleaning inconsistent routes by using PopulationUtils.checkRouteModeAndReset()." +
-				"\n If this is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.");
+			log.error("{}\n Consider cleaning inconsistent routes by running the class org.matsim.application.prepare.population.CleanPopulation with rmRoutes = true. If this is intended, set the routing config parameter 'networkRouteConsistencyCheck' to 'disable'.", errorMessage);
 			throw new RuntimeException(errorMessage);
 		}
 	}
 
 	private boolean needsReComputation(Activity act) {
+		checkActivityLocationConsistent(act);
+
 		return act.getLinkId() == null // neither activity nor facility has a link
 			&&
 			//this check is necessary here, else, XY2Links will put the link/coord back to activity which is clear violation of facilitiesConfigGroup.removingLinksAndCoordinates =true. Amit July'18
@@ -244,14 +260,14 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							// outdated initial plan without routingMode
 						} else {
 							String errorMessage = "Found a mixed trip, some legs with routingMode and others without. "
-									+ "This is inconsistent. Agent id: " + plan.getPerson().getId().toString();
+								+ "This is inconsistent. Agent id: " + plan.getPerson().getId().toString();
 							log.error(errorMessage);
 							throw new RuntimeException(errorMessage);
 						}
 					} else {
 						if (!routingMode.equals(existingRoutingMode)) {
 							String errorMessage = "Found a trip whose legs have different routingModes. "
-									+ "This is inconsistent. Agent id: " + plan.getPerson().getId().toString();
+								+ "This is inconsistent. Agent id: " + plan.getPerson().getId().toString();
 							log.error(errorMessage);
 							throw new RuntimeException(errorMessage);
 						}
@@ -265,16 +281,16 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 						routingMode = legs.get(0).getMode();
 						if (routingMode.equals(TransportMode.transit_walk)) {
 							String errorMessage = "Found a trip of only one leg of mode transit_walk. "
-									+ "This should not happen during simulation since transit_walk was replaced by walk and "
-									+ "routingMode. Agent id: " + plan.getPerson().getId().toString();
+								+ "This should not happen during simulation since transit_walk was replaced by walk and "
+								+ "routingMode. Agent id: " + plan.getPerson().getId().toString();
 							log.error(errorMessage);
 							throw new RuntimeException(errorMessage);
 						}
 						TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
 					} else {
 						String errorMessage = "Found a trip whose legs have no routingMode. "
-								+ "This is only allowed for (outdated) input plans, not during simulation (after PrepareForSim). Agent id: "
-								+ plan.getPerson().getId().toString();
+							+ "This is only allowed for (outdated) input plans, not during simulation (after PrepareForSim). Agent id: "
+							+ plan.getPerson().getId().toString();
 						log.error(errorMessage);
 						throw new RuntimeException(errorMessage);
 					}

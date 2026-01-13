@@ -19,8 +19,10 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.controler;
+package org.matsim.core.controler;
 
-
+/**
+ * This interface is called to prepare the scenario right before the mobsim is started, i.e. at the beginning of every iteration.
+ */
 public interface PrepareForMobsim extends Runnable {
 }

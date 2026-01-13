@@ -31,15 +31,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.RoutingConfigGroup;
-import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
  * @author aneumann
@@ -70,18 +70,18 @@ public class TravelTimeFourWaysTest {
 		runQSimWithSignals(scenario);
 	}
 
-	private Scenario createTestScenario(){
+	private Scenario createTestScenario() {
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		conf.controller().setMobsim("qsim");
 		conf.network().setInputFile("network.xml.gz");
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.qsim().setUseLanes(true);
-	    conf.qsim().setUsingFastCapacityUpdate(false);
-		conf.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		conf.qsim().setUsingFastCapacityUpdate(false);
+		conf.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 
-		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class );
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
 		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
@@ -90,7 +90,7 @@ public class TravelTimeFourWaysTest {
 		signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
 
 		Scenario scenario = ScenarioUtils.createScenario(conf);
-		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
 		return scenario;
 	}
 
@@ -109,7 +109,7 @@ public class TravelTimeFourWaysTest {
 //		EventsManager events = injector.getInstance(EventsManager.class);
 //		events.initProcessing();
 
-		EventsManager events = EventsUtils.createEventsManager() ;
+		EventsManager events = EventsUtils.createEventsManager();
 
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
@@ -119,15 +119,15 @@ public class TravelTimeFourWaysTest {
 //		Mobsim mobsim = injector.getInstance(Mobsim.class);
 //		mobsim.run();
 
-		new QSimBuilder( scenario.getConfig() )
-				.useDefaults()
-				.addOverridingModule( new SignalsModule() )
-				.addOverridingQSimModule( new SignalsQSimModule() )
-				.build( scenario, events ).run();
+		new QSimBuilder(scenario.getConfig())
+			.useDefaults()
+			.addOverridingModule(new SignalsModule())
+			.addOverridingQSimModule(new SignalsQSimModule())
+			.build(scenario, events).run();
 
 		eventsXmlWriter.closeFile();
 //	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
-		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut ) );
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, new EventsFileComparator().setIgnoringCoordinates(true).runComparison(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut));
 	}
 
 }

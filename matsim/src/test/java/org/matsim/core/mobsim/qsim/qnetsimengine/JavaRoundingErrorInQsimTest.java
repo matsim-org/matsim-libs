@@ -18,10 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,6 +46,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * This test is to show that qsim returns actualTravelTime+1 because of java rounding errors.
@@ -57,23 +58,24 @@ import org.matsim.vehicles.Vehicle;
  * In such scenarios, flowCapacityFraction is accumulated in every second and that's where
  * problem starts. For e.g. 0.2+0.1 = 0.30000000004 also 0.6+0.1=0.79999999999999999
  * See, nice article http://floating-point-gui.de/basic/
- *
+ * <p>
  * See small numerical test also
+ *
  * @author amit
  */
 
 public class JavaRoundingErrorInQsimTest {
 
 	@Test
-	void printDecimalSum(){
+	void printDecimalSum() {
 		double a = 0.1;
-		double sum =0;
+		double sum = 0;
 		double counter = 0;
 
-		for(int i=0; i<10;i++){
+		for (int i = 0; i < 10; i++) {
 			sum += a;
 			counter++;
-			System.out.println("Sum at counter "+counter+" is "+sum);
+			System.out.println("Sum at counter " + counter + " is " + sum);
 		}
 	}
 
@@ -96,10 +98,10 @@ public class JavaRoundingErrorInQsimTest {
 			.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
-		Assertions.assertEquals( 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 2");
+		Assertions.assertEquals(41.0, vehicleLinkTravelTime.get(Id.createVehicleId(2)), MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 2");
 
 		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one.
-		Assertions.assertEquals( 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 1");
+		Assertions.assertEquals(51.0, vehicleLinkTravelTime.get(Id.createVehicleId(1)), MatsimTestUtils.EPSILON, "Wrong travel time for on link 2 for vehicle 1");
 		LogManager.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for vehicle 1. This is done intentionally in order to keep this in mind for future.");
 	}
 
@@ -113,15 +115,15 @@ public class JavaRoundingErrorInQsimTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			if( event.getLinkId().equals(Id.createLinkId(2))){
-				vehicleTravelTime.put(event.getVehicleId(), - event.getTime());
+			if (event.getLinkId().equals(Id.createLinkId(2))) {
+				vehicleTravelTime.put(event.getVehicleId(), -event.getTime());
 			}
 
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if( event.getLinkId().equals(Id.createLinkId(2)) ){
+			if (event.getLinkId().equals(Id.createLinkId(2))) {
 				vehicleTravelTime.put(event.getVehicleId(), vehicleTravelTime.get(event.getVehicleId()) + event.getTime());
 			}
 		}
@@ -131,23 +133,23 @@ public class JavaRoundingErrorInQsimTest {
 		}
 	}
 
-	private static final class PseudoInputs{
+	private static final class PseudoInputs {
 
-		final Scenario scenario ;
+		final Scenario scenario;
 		Network network;
 		final Population population;
 		Link link1;
 		Link link2;
 		Link link3;
 
-		public PseudoInputs(){
+		public PseudoInputs() {
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
-			scenario.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			scenario.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 			population = scenario.getPopulation();
 		}
 
-		private void createNetwork(double linkCapacity){
+		private void createNetwork(double linkCapacity) {
 
 			network = (Network) scenario.getNetwork();
 
@@ -159,34 +161,34 @@ public class JavaRoundingErrorInQsimTest {
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
 			final double capacity = linkCapacity;
-			link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 25, capacity, (double) 1, null, "22");
+			link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 25, capacity, (double) 1, null, "22");
 			final Node fromNode2 = node3;
 			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
+			link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, (double) 1000, (double) 25, (double) 7200, (double) 1, null, "22");
 
 		}
 
-		private void createPopulation(){
+		private void createPopulation() {
 
-			for(int i=1;i<3;i++){
+			for (int i = 1; i < 3; i++) {
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(TransportMode.car);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link3.getId());
 				leg.setRoute(route);

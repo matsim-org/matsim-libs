@@ -20,12 +20,7 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,31 +29,25 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.TransitPassengerRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransitControlerIntegrationTest {
 
@@ -68,8 +57,8 @@ public class TransitControlerIntegrationTest {
 
 	@Test
 	void testTransitRouteCopy() {
-		Config config = utils.loadConfig((String)null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		Config config = utils.loadConfig((String) null);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.transit().setUseTransit(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -116,7 +105,7 @@ public class TransitControlerIntegrationTest {
 		netRoute.setLinkIds(link1.getId(), Collections.<Id<Link>>emptyList(), link2.getId());
 		TransitRoute tRoute1 = sBuilder.createTransitRoute(Id.create("1", TransitRoute.class), netRoute, stops, "bus");
 
-		tRoute1.addDeparture(sBuilder.createDeparture(Id.create("1", Departure.class), 7.0*3600));
+		tRoute1.addDeparture(sBuilder.createDeparture(Id.create("1", Departure.class), 7.0 * 3600));
 		tLine1.addRoute(tRoute1);
 		schedule.addTransitLine(tLine1);
 
@@ -129,7 +118,7 @@ public class TransitControlerIntegrationTest {
 		Person person1 = pBuilder.createPerson(Id.create("1", Person.class));
 		Plan plan = pBuilder.createPlan();
 		Activity homeAct = pBuilder.createActivityFromLinkId("h", linkId1);
-		homeAct.setEndTime(7.0*3600);
+		homeAct.setEndTime(7.0 * 3600);
 		plan.addActivity(homeAct);
 		Leg leg = pBuilder.createLeg(TransportMode.pt);
 		TransitPassengerRoute tRoute = new DefaultTransitPassengerRoute(stopF1, tLine1, tRoute1, stopF2);
@@ -144,10 +133,10 @@ public class TransitControlerIntegrationTest {
 		config.controller().setLastIteration(1);
 
 		ActivityParams params = new ActivityParams("h");
-		params.setTypicalDuration(16.0*3600);
+		params.setTypicalDuration(16.0 * 3600);
 		config.scoring().addActivityParams(params);
 		params = new ActivityParams("w");
-		params.setTypicalDuration(8.0*3600);
+		params.setTypicalDuration(8.0 * 3600);
 		config.scoring().addActivityParams(params);
 
 		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));

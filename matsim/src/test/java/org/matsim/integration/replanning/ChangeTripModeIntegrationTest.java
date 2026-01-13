@@ -20,9 +20,6 @@
 
 package org.matsim.integration.replanning;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -31,21 +28,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.RoutingConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
-import org.matsim.core.controler.PrepareForMobsim;
-import org.matsim.core.controler.PrepareForMobsimImpl;
-import org.matsim.core.controler.PrepareForSim;
-import org.matsim.core.controler.PrepareForSimImpl;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
@@ -66,6 +53,9 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.timing.TimeInterpretationModule;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * @author mrieser
  */
@@ -78,15 +68,15 @@ public class ChangeTripModeIntegrationTest {
 	@Test
 	void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
-		final Config config = utils.loadConfig((String)null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		final Config config = utils.loadConfig((String) null);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
 		config.replanning().addStrategySettings(strategySettings);
 		//		config.setParam("changeMode", "modes", "car,walk");
-		String[] str = {"car","walk"} ;
+		String[] str = {"car", "walk"};
 		config.changeMode().setModes(str);
 
 		// setup network
@@ -95,7 +85,7 @@ public class ChangeTripModeIntegrationTest {
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
+		Link link = NetworkUtils.createAndAddLink(network, Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1);
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
@@ -105,7 +95,7 @@ public class ChangeTripModeIntegrationTest {
 		Activity act = PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
 		act.setLinkId(link.getId());
 		act.setEndTime(8.0 * 3600);
-		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddLeg(plan, TransportMode.car);
 		act = PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 500));
 		act.setLinkId(link.getId());
 
@@ -124,8 +114,8 @@ public class ChangeTripModeIntegrationTest {
 				install(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
 				install(new TimeInterpretationModule());
-				bind( PrepareForSim.class ).to( PrepareForSimImpl.class ) ;
-				bind( PrepareForMobsim.class ).to( PrepareForMobsimImpl.class ) ;
+				bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+				bind(PrepareForMobsim.class).to(PrepareForMobsimImpl.class);
 			}
 		});
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);

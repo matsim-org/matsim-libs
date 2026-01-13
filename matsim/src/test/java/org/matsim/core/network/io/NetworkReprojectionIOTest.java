@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.core.network.io;
+package org.matsim.core.network.io;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,212 +41,212 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
-	/**
+/**
  * @author thibautd
  */
 public class NetworkReprojectionIOTest {
-    private static final String INITIAL_CRS = "EPSG:3857";
+	private static final String INITIAL_CRS = "EPSG:3857";
 	private static final String TARGET_CRS = "WGS84";
 	private static final CoordinateTransformation transformation =
-			TransformationFactory.getCoordinateTransformation(
-					INITIAL_CRS,
-					TARGET_CRS);
+		TransformationFactory.getCoordinateTransformation(
+			INITIAL_CRS,
+			TARGET_CRS);
 
 	@RegisterExtension
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	 @Test
-	 void testInput() {
-		final String networkFile = utils.getOutputDirectory()+"/network.xml";
+	@Test
+	void testInput() {
+		final String networkFile = utils.getOutputDirectory() + "/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
 
-		new NetworkWriter( initialNetwork ).write( networkFile );
+		new NetworkWriter(initialNetwork).write(networkFile);
 
 		final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
-				INITIAL_CRS, TARGET_CRS,
-				readNetwork ).readFile( networkFile );
+			INITIAL_CRS, TARGET_CRS,
+			readNetwork).readFile(networkFile);
 
 		Assertions.assertEquals(
-				2,
-				readNetwork.getNodes().size(),
-				"unexpected network size" );
+			2,
+			readNetwork.getNodes().size(),
+			"unexpected network size");
 
-		for ( Node n : readNetwork.getNodes().values() ) {
+		for (Node n : readNetwork.getNodes().values()) {
 			Node initialNode = initialNetwork.getNodes().get(n.getId());
 
-			Assertions.assertEquals( transformation.transform(initialNode.getCoord()),
-					n.getCoord(),
-					"Unexpected coordinate" );
+			Assertions.assertEquals(transformation.transform(initialNode.getCoord()),
+				n.getCoord(),
+				"Unexpected coordinate");
 		}
 	}
 
-	 @Test
-	 void testOutput() {
-		final String networkFile = utils.getOutputDirectory()+"/network.xml";
+	@Test
+	void testOutput() {
+		final String networkFile = utils.getOutputDirectory() + "/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
 
 		new NetworkWriter(
-				transformation,
-				initialNetwork ).write( networkFile );
+			transformation,
+			initialNetwork).write(networkFile);
 
-        final Network readNetwork = NetworkUtils.createNetwork();
+		final Network readNetwork = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(
-				readNetwork ).readFile( networkFile );
+			readNetwork).readFile(networkFile);
 
 		Assertions.assertEquals(
-				2,
-				readNetwork.getNodes().size(),
-				"unexpected network size" );
+			2,
+			readNetwork.getNodes().size(),
+			"unexpected network size");
 
-		for ( Node n : readNetwork.getNodes().values() ) {
+		for (Node n : readNetwork.getNodes().values()) {
 			Node initialNode = initialNetwork.getNodes().get(n.getId());
 			Assertions.assertEquals(
-					transformation.transform(initialNode.getCoord()),
-					n.getCoord(),
-					"Unexpected coordinate" );
+				transformation.transform(initialNode.getCoord()),
+				n.getCoord(),
+				"Unexpected coordinate");
 		}
 	}
 
-	 @Test
-	 void testWithControlerAndAttributes() {
-		final String networkFile = utils.getOutputDirectory()+"/network.xml";
+	@Test
+	void testWithControlerAndAttributes() {
+		final String networkFile = utils.getOutputDirectory() + "/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
 		ProjectionUtils.putCRS(initialNetwork, INITIAL_CRS);
 
-		new NetworkWriter( initialNetwork ).write( networkFile );
+		new NetworkWriter(initialNetwork).write(networkFile);
 
 		final Config config = ConfigUtils.createConfig();
-		 config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-		config.network().setInputFile( networkFile );
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
+		config.network().setInputFile(networkFile);
 
 		// web mercator. This would be a pretty silly choice for simulation,
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
-		config.global().setCoordinateSystem( TARGET_CRS );
+		config.global().setCoordinateSystem(TARGET_CRS);
 
 		// TODO: test also with loading from Controler C'tor?
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		for ( Id<Node> id : initialNetwork.getNodes().keySet() ) {
-			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
-			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		for (Id<Node> id : initialNetwork.getNodes().keySet()) {
+			final Coord originalCoord = initialNetwork.getNodes().get(id).getCoord();
+			final Coord internalCoord = scenario.getNetwork().getNodes().get(id).getCoord();
 
 			Assertions.assertEquals(
-					transformation.transform(originalCoord),
-					internalCoord,
-					"No coordinates transform performed!");
+				transformation.transform(originalCoord),
+				internalCoord,
+				"No coordinates transform performed!");
 		}
 
 		Assertions.assertEquals(
-				TARGET_CRS,
-				ProjectionUtils.getCRS(scenario.getNetwork()),
-				"wrong CRS information after loading");
+			TARGET_CRS,
+			ProjectionUtils.getCRS(scenario.getNetwork()),
+			"wrong CRS information after loading");
 
-		config.controller().setLastIteration( 0 );
-		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controller().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
+		config.controller().setLastIteration(0);
+		final String outputDirectory = utils.getOutputDirectory() + "/output/";
+		config.controller().setOutputDirectory(outputDirectory);
+		final Controler controler = new Controler(scenario);
 		controler.run();
 
-        final Network dumpedNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader( dumpedNetwork ).readFile( outputDirectory+"/output_network.xml.gz" );
+		final Network dumpedNetwork = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(dumpedNetwork).readFile(outputDirectory + "/output_network.xml.gz");
 
-		for ( Id<Node> id : scenario.getNetwork().getNodes().keySet() ) {
-			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
-			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
+		for (Id<Node> id : scenario.getNetwork().getNodes().keySet()) {
+			final Coord internalCoord = scenario.getNetwork().getNodes().get(id).getCoord();
+			final Coord dumpedCoord = dumpedNetwork.getNodes().get(id).getCoord();
 
 			Assertions.assertEquals(
-					internalCoord,
-					dumpedCoord,
-					"coordinates were reprojected for dump");
+				internalCoord,
+				dumpedCoord,
+				"coordinates were reprojected for dump");
 		}
 	}
 
-	 @Test
-	 void testWithControlerAndConfigParameters() {
-		final String networkFile = utils.getOutputDirectory()+"/network.xml";
+	@Test
+	void testWithControlerAndConfigParameters() {
+		final String networkFile = utils.getOutputDirectory() + "/network.xml";
 
 		final Network initialNetwork = createInitialNetwork();
-		new NetworkWriter( initialNetwork ).write( networkFile );
+		new NetworkWriter(initialNetwork).write(networkFile);
 
 		final Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
-		config.network().setInputFile( networkFile );
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
+		config.network().setInputFile(networkFile);
 
-		config.network().setInputCRS( INITIAL_CRS );
+		config.network().setInputCRS(INITIAL_CRS);
 		// web mercator. This would be a pretty silly choice for simulation,
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
-		config.global().setCoordinateSystem( TARGET_CRS );
+		config.global().setCoordinateSystem(TARGET_CRS);
 
 		// TODO: test also with loading from Controler C'tor?
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		for ( Id<Node> id : initialNetwork.getNodes().keySet() ) {
-			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
-			final Coord internalCoord = scenario.getNetwork().getNodes().get( id ).getCoord();
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		for (Id<Node> id : initialNetwork.getNodes().keySet()) {
+			final Coord originalCoord = initialNetwork.getNodes().get(id).getCoord();
+			final Coord internalCoord = scenario.getNetwork().getNodes().get(id).getCoord();
 
 			Assertions.assertNotEquals(
-					originalCoord.getX(),
-					internalCoord.getX(),
-					MatsimTestUtils.EPSILON,
-					"No coordinates transform performed!" );
+				originalCoord.getX(),
+				internalCoord.getX(),
+				MatsimTestUtils.EPSILON,
+				"No coordinates transform performed!");
 			Assertions.assertNotEquals(
-					originalCoord.getY(),
-					internalCoord.getY(),
-					MatsimTestUtils.EPSILON,
-					"No coordinates transform performed!" );
+				originalCoord.getY(),
+				internalCoord.getY(),
+				MatsimTestUtils.EPSILON,
+				"No coordinates transform performed!");
 		}
 
-		config.controller().setLastIteration( 0 );
-		final String outputDirectory = utils.getOutputDirectory()+"/output/";
-		config.controller().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
+		config.controller().setLastIteration(0);
+		final String outputDirectory = utils.getOutputDirectory() + "/output/";
+		config.controller().setOutputDirectory(outputDirectory);
+		final Controler controler = new Controler(scenario);
 		controler.run();
 
-        final Network dumpedNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader( dumpedNetwork ).readFile( outputDirectory+"/output_network.xml.gz" );
+		final Network dumpedNetwork = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(dumpedNetwork).readFile(outputDirectory + "/output_network.xml.gz");
 
-		for ( Id<Node> id : initialNetwork.getNodes().keySet() ) {
-			final Coord originalCoord = initialNetwork.getNodes().get( id ).getCoord();
-			final Coord dumpedCoord = dumpedNetwork.getNodes().get( id ).getCoord();
+		for (Id<Node> id : initialNetwork.getNodes().keySet()) {
+			final Coord originalCoord = initialNetwork.getNodes().get(id).getCoord();
+			final Coord dumpedCoord = dumpedNetwork.getNodes().get(id).getCoord();
 
 			Assertions.assertNotEquals(
-					originalCoord.getX(),
-					dumpedCoord.getX(),
-					MatsimTestUtils.EPSILON,
-					"coordinates were reprojected for dump" );
+				originalCoord.getX(),
+				dumpedCoord.getX(),
+				MatsimTestUtils.EPSILON,
+				"coordinates were reprojected for dump");
 			Assertions.assertNotEquals(
-					originalCoord.getY(),
-					dumpedCoord.getY(),
-					MatsimTestUtils.EPSILON,
-					"coordinates were reprojected for dump" );
+				originalCoord.getY(),
+				dumpedCoord.getY(),
+				MatsimTestUtils.EPSILON,
+				"coordinates were reprojected for dump");
 		}
 	}
 
 	private Network createInitialNetwork() {
-        final Network network = NetworkUtils.createNetwork();
+		final Network network = NetworkUtils.createNetwork();
 
 		final Node node1 =
-				network.getFactory().createNode(
-						Id.createNodeId( 1 ),
-						new Coord( 45 , 45 ) );
-		network.addNode( node1 );
+			network.getFactory().createNode(
+				Id.createNodeId(1),
+				new Coord(45, 45));
+		network.addNode(node1);
 
 		final Node node2 =
-				network.getFactory().createNode(
-						Id.createNodeId( 2 ),
-						new Coord( 20  , 20 ) );
-		network.addNode( node2 );
+			network.getFactory().createNode(
+				Id.createNodeId(2),
+				new Coord(20, 20));
+		network.addNode(node2);
 
 		final Link l =
-				network.getFactory().createLink(
-						Id.createLinkId( "l" ),
-						node1,
-						node2 );
-		network.addLink( l );
+			network.getFactory().createLink(
+				Id.createLinkId("l"),
+				node1,
+				node2);
+		network.addLink(l);
 
 		return network;
 	}

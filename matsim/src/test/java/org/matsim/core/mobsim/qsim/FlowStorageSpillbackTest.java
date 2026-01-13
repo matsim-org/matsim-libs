@@ -19,8 +19,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.*;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,6 +46,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.*;
+
 /**
  * Tests the flow capacity for two vehicles that are leaving a link
  * when the storage capacity on the next link (downstream) is reached.
@@ -74,7 +74,7 @@ public class FlowStorageSpillbackTest {
 
 	@ParameterizedTest
 	@ValueSource(booleans = {false, true})
-	final void testFlowCongestion(boolean isUsingFastCapacityUpdate){
+	final void testFlowCongestion(boolean isUsingFastCapacityUpdate) {
 
 		Scenario sc = loadScenario();
 		setPopulation(sc);
@@ -83,7 +83,7 @@ public class FlowStorageSpillbackTest {
 
 		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 
-		events.addHandler( new LinkLeaveEventHandler() {
+		events.addHandler(new LinkLeaveEventHandler() {
 
 			@Override
 			public void reset(int iteration) {
@@ -98,7 +98,7 @@ public class FlowStorageSpillbackTest {
 
 		final Map<Id<Person>, Id<Vehicle>> vehicleOfPerson = new HashMap<>();
 
-		events.addHandler( new PersonEntersVehicleEventHandler() {
+		events.addHandler(new PersonEntersVehicleEventHandler() {
 
 			@Override
 			public void reset(int iteration) {
@@ -112,16 +112,16 @@ public class FlowStorageSpillbackTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events) //
-				.run();
+			.useDefaults() //
+			.build(sc, events) //
+			.run();
 
 		for (LinkLeaveEvent event : linkLeaveEvents) {
 			System.out.println(event.toString());
 
 			if (event.getVehicleId().equals(vehicleOfPerson.get(this.testAgent4)) && event.getLinkId().equals(this.linkId2)) {
 //				if(this.isUsingFastCapacityUpdate) {
-					Assertions.assertEquals(169., event.getTime(), MatsimTestUtils.EPSILON, "wrong link leave time.");
+				Assertions.assertEquals(169., event.getTime(), MatsimTestUtils.EPSILON, "wrong link leave time.");
 //				} else {
 //					Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
 //				}
@@ -129,10 +129,11 @@ public class FlowStorageSpillbackTest {
 		}
 
 	}
+
 	private void setPopulation(Scenario scenario) {
 
 		Population population = scenario.getPopulation();
-        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
+		PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity lastActLink3 = popFactory.createActivityFromLinkId("work", linkId3);
@@ -231,7 +232,7 @@ public class FlowStorageSpillbackTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 
 		Config config = testUtils.loadConfig((String) null);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 
 		Network network = (Network) scenario.getNetwork();

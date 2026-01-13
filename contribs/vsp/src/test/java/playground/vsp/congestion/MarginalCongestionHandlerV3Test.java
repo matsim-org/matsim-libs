@@ -22,11 +22,6 @@
  */
 package playground.vsp.congestion;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.jupiter.api.Assertions;
@@ -44,10 +39,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -63,35 +62,43 @@ public class MarginalCongestionHandlerV3Test {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	final void testCongestionExample(){
+	final void testCongestionExample() {
 
-		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3Test/config.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "MarginalCongestionHandlerV3Test/config.xml";
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-		Config config = ConfigUtils.loadConfig( configFile ) ;
+		Config config = ConfigUtils.loadConfig(configFile);
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addEventHandlerBinding().toProvider(new Provider<EventHandler>() {
-					@Inject EventsManager eventsManager;
-					@Inject Scenario scenario;
-					@Override public EventHandler get() {
+					@Inject
+					EventsManager eventsManager;
+					@Inject
+					Scenario scenario;
+
+					@Override
+					public EventHandler get() {
 						return new CongestionHandlerImplV3(eventsManager, scenario);
 					}
 				});
 				addEventHandlerBinding().toInstance(new CongestionEventHandler() {
-					@Override public void reset(int iteration) { }
-					@Override public void handleEvent(CongestionEvent event) {
+					@Override
+					public void reset(int iteration) {
+					}
+
+					@Override
+					public void handleEvent(CongestionEvent event) {
 						congestionEvents.add(event);
 					}
 				});
 			}
 		});
 
-		controler.getConfig().controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 		// process
@@ -112,7 +119,7 @@ public class MarginalCongestionHandlerV3Test {
 
 			totalDelay = totalDelay + event.getDelay();
 
-			if (personId2causedDelay.containsKey(event.getCausingAgentId())){
+			if (personId2causedDelay.containsKey(event.getCausingAgentId())) {
 				double causedSoFar = personId2causedDelay.get(event.getCausingAgentId());
 				double causedNewValue = causedSoFar + event.getDelay();
 				personId2causedDelay.put(event.getCausingAgentId(), causedNewValue);
@@ -120,7 +127,7 @@ public class MarginalCongestionHandlerV3Test {
 				personId2causedDelay.put(event.getCausingAgentId(), event.getDelay());
 			}
 
-			if (personId2affectedDelay.containsKey(event.getAffectedAgentId())){
+			if (personId2affectedDelay.containsKey(event.getAffectedAgentId())) {
 				double affectedSoFar = personId2affectedDelay.get(event.getAffectedAgentId());
 				double affectedNewValue = affectedSoFar + event.getDelay();
 				personId2affectedDelay.put(event.getAffectedAgentId(), affectedNewValue);
@@ -143,5 +150,5 @@ public class MarginalCongestionHandlerV3Test {
 		Assertions.assertEquals(38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON, "wrong values for testAgent7");
 		Assertions.assertEquals(12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON, "wrong values for testAgent7");
 		// ...
-	 }
+	}
 }

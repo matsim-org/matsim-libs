@@ -19,10 +19,6 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -36,11 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,6 +50,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public class StorageCapacityTest {
 
 	/**
@@ -69,7 +65,7 @@ public class StorageCapacityTest {
 	void testStorageCapacity() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
@@ -122,7 +118,7 @@ public class StorageCapacityTest {
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		config.hermes().setFlowCapacityFactor(0.1);
 		config.hermes().setStorageCapacityFactor(0.1);
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
 
@@ -172,7 +168,7 @@ public class StorageCapacityTest {
 	void testStorageCapacityWithDifferentPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
@@ -346,6 +342,7 @@ public class StorageCapacityTest {
 			this.link = relevantLink;
 			starttime = 0;
 		}
+
 		VehiclesOnLinkCounter(Id<Link> relevantLink, double starttime) {
 			this.link = relevantLink;
 			this.starttime = starttime;

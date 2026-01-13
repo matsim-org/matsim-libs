@@ -1,8 +1,5 @@
 package org.matsim.contrib.signals.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -10,18 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,19 +23,22 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author tschlenther
  * this class tests the functionality of TtTotalDelay in playground.dgrether.koehlerstrehlersignal.analysis
  * which calculates the total delay of all agents in a network
- *
+ * <p>
  * having only one agent in a network, the total delay should be 0 (testGetTotalDelayOnePerson)
  * calculation of the delay of all persons in a network should be made in awareness of matsim's step logic
- *
+ * <p>
  * the network generated in this tests basically consists of 4 links of 1000m with a free speed of 201 m/s
  * output is optionally written to outputDirectory of this testClass
  * -> set field writeOutput to do so
- *
+ * <p>
  * the number of persons to be set in the network for the test can be modified
  * they will get an insertion delay due to the capacity of the first link
  */
@@ -56,7 +46,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class DelayAnalysisToolTest {
 
-	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
+	@RegisterExtension
+	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
 	private final Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
@@ -68,18 +59,19 @@ public class DelayAnalysisToolTest {
 	private static final int NUMBER_OF_PERSONS = 5;
 
 	@Test
-	void testGetTotalDelayOnePerson(){
+	void testGetTotalDelayOnePerson() {
 		Scenario scenario = prepareTest(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		DelayAnalysisTool handler = new DelayAnalysisTool(scenario.getNetwork(), events);
 
 		final List<Event> eventslist = new ArrayList<Event>();
-		events.addHandler(new BasicEventHandler(){
+		events.addHandler(new BasicEventHandler() {
 			@Override
 			public void reset(int iteration) {
 				eventslist.clear();
 			}
+
 			@Override
 			public void handleEvent(Event event) {
 				eventslist.add(event);
@@ -90,24 +82,25 @@ public class DelayAnalysisToolTest {
 		new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, events).run();
 
 		Assertions.assertEquals(0.0, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay of one agent is not correct");
-		if(WRITE_OUTPUT){
+		if (WRITE_OUTPUT) {
 			generateOutput(scenario, eventslist);
 		}
 	}
 
 	@Test
-	void testGetTotalDelaySeveralPerson(){
+	void testGetTotalDelaySeveralPerson() {
 		Scenario scenario = prepareTest(NUMBER_OF_PERSONS);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		DelayAnalysisTool handler = new DelayAnalysisTool(scenario.getNetwork(), events);
 
 		final List<Event> eventslist = new ArrayList<Event>();
-		events.addHandler(new BasicEventHandler(){
+		events.addHandler(new BasicEventHandler() {
 			@Override
 			public void reset(int iteration) {
 				eventslist.clear();
 			}
+
 			@Override
 			public void handleEvent(Event event) {
 				eventslist.add(event);
@@ -117,38 +110,38 @@ public class DelayAnalysisToolTest {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()).useDefaults().build(scenario, events).run();
 
-		if(WRITE_OUTPUT){
+		if (WRITE_OUTPUT) {
 			generateOutput(scenario, eventslist);
 		}
 
 		//expectedDelay = inserting delay as a result of capacity of first link being 3600 vh/h
 		int expectedDelay = 0;
-		for(int i=0; i<NUMBER_OF_PERSONS; i++){
-			expectedDelay +=  i;
+		for (int i = 0; i < NUMBER_OF_PERSONS; i++) {
+			expectedDelay += i;
 		}
 		Assertions.assertEquals(expectedDelay, handler.getTotalDelay(), MatsimTestUtils.EPSILON, "Total Delay for " + NUMBER_OF_PERSONS + " persons is not correct.");
 	}
 
 	private void generateOutput(Scenario scenario, final List<Event> eventslist) {
-			EventWriterXML eventWriter = new EventWriterXML(utils.getOutputDirectory() + "events.xml");
-			for (Event e : eventslist) {
-				eventWriter.handleEvent(e);
-			}
-			eventWriter.closeFile();
-			NetworkWriter nw = new NetworkWriter(scenario.getNetwork());
-			nw.write(utils.getOutputDirectory() + "network");
+		EventWriterXML eventWriter = new EventWriterXML(utils.getOutputDirectory() + "events.xml");
+		for (Event e : eventslist) {
+			eventWriter.handleEvent(e);
+		}
+		eventWriter.closeFile();
+		NetworkWriter nw = new NetworkWriter(scenario.getNetwork());
+		nw.write(utils.getOutputDirectory() + "network");
 	}
 
 	private Scenario prepareTest(int numberOfPersons) {
 		Config config = ConfigUtils.createConfig();
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createNetwork(scenario);
 		createPopulation(scenario, numberOfPersons);
 		return scenario;
 	}
 
-	void createNetwork(Scenario scenario){
+	void createNetwork(Scenario scenario) {
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 
@@ -176,7 +169,7 @@ public class DelayAnalysisToolTest {
 		link2.setFreespeed(201);
 		network.addLink(link2);
 
-		Link link3 = factory.createLink((LINK_ID3), node3 , node4);
+		Link link3 = factory.createLink((LINK_ID3), node3, node4);
 		link3.setCapacity(3600);
 		link3.setLength(1000);
 		link3.setFreespeed(201);
@@ -191,10 +184,10 @@ public class DelayAnalysisToolTest {
 
 	private void createPopulation(Scenario scenario, int numberOfPersons) {
 		Population population = scenario.getPopulation();
-        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
+		PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
-		for (int i= 1; i <= numberOfPersons; i++){
+		for (int i = 1; i <= numberOfPersons; i++) {
 			Activity workAct = popFactory.createActivityFromLinkId("work", LINK_ID4);
 
 			Leg leg = popFactory.createLeg("car");

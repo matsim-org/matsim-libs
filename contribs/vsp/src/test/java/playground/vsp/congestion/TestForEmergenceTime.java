@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.vsp.congestion;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,11 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,10 +44,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author amit
@@ -65,15 +60,15 @@ public class TestForEmergenceTime {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	final void emergenceTimeTest_v4(){
+	final void emergenceTimeTest_v4() {
 
-		String [] congestionPricingImpl = {"v4"};
+		String[] congestionPricingImpl = {"v4"};
 
-		for(String impl :congestionPricingImpl){
+		for (String impl : congestionPricingImpl) {
 			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
-			for(CongestionEvent event : congestionEvents){
-				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
-					Assertions.assertEquals(8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON, "wrong emergence time");
+			for (CongestionEvent event : congestionEvents) {
+				if (event.getCausingAgentId().equals(Id.createPersonId("21"))) {
+					Assertions.assertEquals(8 * 3600 + 55, event.getEmergenceTime(), MatsimTestUtils.EPSILON, "wrong emergence time");
 					Assertions.assertEquals(Id.createLinkId("3"), event.getLinkId(), "wrong linkId");
 				}
 			}
@@ -96,7 +91,7 @@ public class TestForEmergenceTime {
 //		}
 //	}
 
-	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
+	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl) {
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
@@ -110,13 +105,13 @@ public class TestForEmergenceTime {
 		sc.getVehicles().addVehicleType(car);
 
 		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-		sc.getConfig().routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		sc.getConfig().routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		EventsManager events = EventsUtils.createEventsManager();
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-		events.addHandler( new CongestionEventHandler() {
+		events.addHandler(new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {
@@ -129,7 +124,7 @@ public class TestForEmergenceTime {
 
 		});
 
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
+		if (congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
 //		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
@@ -140,23 +135,23 @@ public class TestForEmergenceTime {
 
 	/**
 	 * generates network with 8 links. Even persons will go on one branch (down) and odd persons will go on other (up). A person come from top.
-	 *<p>
-	 *<p>				  o
-	 *<p> 				  |
-	 *<p>				  8
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>				  o
-	 *<p> 				  |
-	 *<p>				  7
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>  o--1---o---2---o----3----o----4----o
-	 *<p>				  |
-	 *<p>				  |
-	 *<p>				  5
-	 *<p>				  |
-	 *<p>				  o----6----o
+	 * <p>
+	 * <p>				  o
+	 * <p> 				  |
+	 * <p>				  8
+	 * <p>				  |
+	 * <p>				  |
+	 * <p>				  o
+	 * <p> 				  |
+	 * <p>				  7
+	 * <p>				  |
+	 * <p>				  |
+	 * <p>  o--1---o---2---o----3----o----4----o
+	 * <p>				  |
+	 * <p>				  |
+	 * <p>				  5
+	 * <p>				  |
+	 * <p>				  o----6----o
 	 */
 	private class createPseudoInputs {
 		Scenario scenario;
@@ -170,16 +165,17 @@ public class TestForEmergenceTime {
 		Link link5;
 		Link link6;
 		Link link7;
-		public createPseudoInputs(){
-			config=ConfigUtils.createConfig();
+
+		public createPseudoInputs() {
+			config = ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (Network) this.scenario.getNetwork();
+			network = (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
-		private void createNetwork(){
+		private void createNetwork() {
 
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0));
 			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 100));
 			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, (double) 90));
 			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 500, (double) 200));
@@ -190,44 +186,44 @@ public class TestForEmergenceTime {
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode2 = node3;
 			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 10.0, 20.0, (double) 360, (double) 1, null, (String) "7");
+			link3 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 10.0, 20.0, (double) 360, (double) 1, null, (String) "7");
 			final Node fromNode3 = node4;
 			final Node toNode3 = node5;
-			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link4 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode4 = node3;
 			final Node toNode4 = node6;
-			link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link5 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode5 = node6;
 			final Node toNode5 = node7;
-			link6 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("6")), fromNode5, toNode5, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link6 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("6")), fromNode5, toNode5, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 			final Node fromNode6 = node8;
 			final Node toNode6 = node3;
-			link7 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("7")), fromNode6, toNode6, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			link7 = NetworkUtils.createAndAddLink(network, Id.createLinkId(String.valueOf("7")), fromNode6, toNode6, 1000.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 		}
 
-		private void createPopulation(int numberOfPersons){
+		private void createPopulation(int numberOfPersons) {
 
-			for(int i=0;i<numberOfPersons;i++){
+			for (int i = 0; i < numberOfPersons; i++) {
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-				a1.setEndTime(8*3600+i);
+				a1.setEndTime(8 * 3600 + i);
 				Leg leg = population.getFactory().createLeg(TransportMode.car);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				if(i%2==0) {
-					route= (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
+				if (i % 2 == 0) {
+					route = (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
 					linkIds.add(link2.getId());
 					linkIds.add(link3.getId());
 					route.setLinkIds(link1.getId(), linkIds, link4.getId());
@@ -251,7 +247,7 @@ public class TestForEmergenceTime {
 			Plan plan = population.getFactory().createPlan();
 			p.addPlan(plan);
 			Activity a1 = population.getFactory().createActivityFromLinkId("h", link7.getId());
-			a1.setEndTime(8*3600+54);
+			a1.setEndTime(8 * 3600 + 54);
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			plan.addActivity(a1);
 			plan.addLeg(leg);

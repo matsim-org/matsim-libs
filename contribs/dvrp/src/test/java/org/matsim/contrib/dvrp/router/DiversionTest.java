@@ -1,10 +1,6 @@
 package org.matsim.contrib.dvrp.router;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
+import com.google.inject.Singleton;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
@@ -17,12 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
-import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.*;
 import org.matsim.contrib.dvrp.load.DvrpLoadModule;
 import org.matsim.contrib.dvrp.load.DvrpLoadParams;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -31,12 +22,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.schedule.DefaultDriveTask;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -69,7 +55,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Singleton;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Sebastian Hörl (sebhoerl)
@@ -83,17 +72,17 @@ public class DiversionTest {
 	 * experiment is constructed as folows: We have one DVRP vehicle which moves
 	 * along 8 links (l0 to l8) with a distance of 1000m each and a odd freespeed to
 	 * that the QSim will perform rounding.
-	 *
+	 * <p>
 	 * To do so, before the simulation starts, the route from l0 to l8 is calculated
 	 * and assigned to a drive task, which is added to the vehicle. Here, we already
 	 * have an estimated for the arrival time, which should predict correctly the
 	 * final arrival time of the vehicle at l8. This is the first fact to check.
-	 *
+	 * <p>
 	 * After, we divert the vehicle every N seconds. To do so, we obtain the next
 	 * possible diversion point from the drive task tracker and perform a routing
 	 * from there to l8. Again, any time we do that, we should obtain the correct
 	 * arrival time if prediction is correct.
-	 *
+	 * <p>
 	 * State 1 Nov 2021 is the following: In this scenario:
 	 *
 	 * <ul>
@@ -105,7 +94,7 @@ public class DiversionTest {
 	 * <li>once the vehicle enters l8 all remaining diversions give 657s
 	 * (correct)</li>
 	 * </ul>
-	 *
+	 * <p>
 	 * Hypotheses for the time being:
 	 *
 	 * <ul>
@@ -128,7 +117,7 @@ public class DiversionTest {
 
 		{
 			/* Create some necessary configuration for the test */
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
 
@@ -174,12 +163,12 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(4) //
-					.id(Id.create("vehicle", DvrpVehicle.class)) //
-					.serviceBeginTime(0.0) //
-					.serviceEndTime(2000.0) //
-					.startLinkId(Id.createLinkId("l0")) //
-					.build());
+				.capacity(4) //
+				.id(Id.create("vehicle", DvrpVehicle.class)) //
+				.serviceBeginTime(0.0) //
+				.serviceEndTime(2000.0) //
+				.startLinkId(Id.createLinkId("l0")) //
+				.build());
 		}
 
 		// Set up tracker
@@ -224,18 +213,18 @@ public class DiversionTest {
 
 		// Took the fixed value from the simulation, to make sure this stays consistent
 		// over refactorings
-		Assertions.assertEquals(testTracker.eventBasedArrivalTime,  657.0, 0);
+		Assertions.assertEquals(testTracker.eventBasedArrivalTime, 657.0, 0);
 
 		// Initially calculated arrival time should predict correctly the final arrival
 		// time
-		Assertions.assertEquals(testTracker.initialArrivalTime,  657.0, 0);
+		Assertions.assertEquals(testTracker.initialArrivalTime, 657.0, 0);
 
 		// Along the route, when diverting to the same destination, arrival time should
 		// stay constant
-		testTracker.diversionArrivalTimes.forEach(t -> Assertions.assertEquals(t,  657.0, 0));
+		testTracker.diversionArrivalTimes.forEach(t -> Assertions.assertEquals(t, 657.0, 0));
 
 		// Also ,the task end time should be consistent with the path
-		testTracker.taskEndTimes.forEach(t -> Assertions.assertEquals(t,  657.0, 0));
+		testTracker.taskEndTimes.forEach(t -> Assertions.assertEquals(t, 657.0, 0));
 	}
 
 	static private class TestModeModule extends AbstractDvrpModeModule {
@@ -304,8 +293,8 @@ public class DiversionTest {
 			bindModal(VrpAgentLogic.DynActionCreator.class).toProvider(modalProvider(getter -> {
 				return (DynAgent dynAgent, DvrpVehicle vehicle, double now) -> {
 					return VrpLegFactory.createWithOnlineTracker(TransportMode.car, vehicle,
-							(DvrpVehicle v, Link nextLink) -> {
-							}, getter.get(MobsimTimer.class));
+						(DvrpVehicle v, Link nextLink) -> {
+						}, getter.get(MobsimTimer.class));
 				};
 			}));
 		}
@@ -325,7 +314,7 @@ public class DiversionTest {
 		private TestTracker testTracker;
 
 		public TestOptimizerSameDestination(MobsimTimer timer, Network network, Fleet fleet, QSimConfigGroup qsimConfig,
-				TestTracker testTracker) {
+											TestTracker testTracker) {
 			this.timer = timer;
 			this.testTracker = testTracker;
 
@@ -355,7 +344,7 @@ public class DiversionTest {
 			 * the end link
 			 */
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(startLink, endLink, timer.getTimeOfDay(), router,
-					travelTime);
+				travelTime);
 
 			// ... and we add it as the first and only task to the schedule
 			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
@@ -384,7 +373,7 @@ public class DiversionTest {
 
 						// (2) Perform rerouting from the diversion point
 						VrpPathWithTravelData path = VrpPaths.calcAndCreatePathForDiversion(diversionPoint, endLink, router,
-								travelTime);
+							travelTime);
 
 						// (3) Implement the diversion
 						tracker.divertPath(path);
@@ -437,11 +426,11 @@ public class DiversionTest {
 	 * the route as the vehicle will just arrive on the last link. This is why there
 	 * is a special implementation for the calculation of the last link's travel
 	 * time in VrpPaths.
-	 *
+	 * <p>
 	 * Now, when diverting from the last link, the vehicle *will* pass the node at
 	 * the end of that link, so we need to add back one second when calculating the
 	 * diversion point.
-	 *
+	 * <p>
 	 * In this test, we let the vehicle traverse L0 to L8 as before, however the
 	 * network has an additional L9. In every diversion step, we calculate the
 	 * arrival time at L9 if we would divert, but we *do not* implement the
@@ -459,7 +448,7 @@ public class DiversionTest {
 
 			config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			config.controller().setLastIteration(0);
-			config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+			config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 			config.qsim().setStartTime(0.0);
 			config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
@@ -503,12 +492,12 @@ public class DiversionTest {
 			/* Create fleet specification of one vehicle at the first link (id = l0) */
 
 			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder() //
-					.capacity(4) //
-					.id(Id.create("vehicle", DvrpVehicle.class)) //
-					.serviceBeginTime(0.0) //
-					.serviceEndTime(2000.0) //
-					.startLinkId(Id.createLinkId("l0")) //
-					.build());
+				.capacity(4) //
+				.id(Id.create("vehicle", DvrpVehicle.class)) //
+				.serviceBeginTime(0.0) //
+				.serviceEndTime(2000.0) //
+				.startLinkId(Id.createLinkId("l0")) //
+				.build());
 		}
 
 		// Set up tracker
@@ -537,7 +526,7 @@ public class DiversionTest {
 					Fleet fleet = getter.getModal(Fleet.class);
 
 					return new TestOptimizerDifferentDestinationFromLastLink(timer, network, fleet, getConfig().qsim(),
-							testTracker);
+						testTracker);
 				})).in(Singleton.class);
 			}
 		});
@@ -554,22 +543,22 @@ public class DiversionTest {
 
 		// Took the fixed value from the simulation, to make sure this stays consistent
 		// over refactorings - same as previous unit test
-		Assertions.assertEquals(testTracker.eventBasedArrivalTime,  657.0, 0);
+		Assertions.assertEquals(testTracker.eventBasedArrivalTime, 657.0, 0);
 
 		// Initially calculated arrival time should predict correctly the final arrival
 		// time - as in the first unit test as we route to L8
-		Assertions.assertEquals(testTracker.initialArrivalTime,  657.0, 0);
+		Assertions.assertEquals(testTracker.initialArrivalTime, 657.0, 0);
 
 		// Along the route, when diverting to the same destination, arrival time should
 		// stay constant
-		testTracker.diversionArrivalTimes.forEach(t -> Assertions.assertEquals(t,  739.0, 0));
+		testTracker.diversionArrivalTimes.forEach(t -> Assertions.assertEquals(t, 739.0, 0));
 
 		// Without fix in OnlineDriveTaskTrackerImpl, the last test will lead to a
 		// difference of one second for the samples at late times
 	}
 
 	static private class TestOptimizerDifferentDestinationFromLastLink
-			implements VrpOptimizer, MobsimBeforeSimStepListener {
+		implements VrpOptimizer, MobsimBeforeSimStepListener {
 		private final MobsimTimer timer;
 
 		private final TravelTime travelTime;
@@ -584,7 +573,7 @@ public class DiversionTest {
 		private TestTracker testTracker;
 
 		public TestOptimizerDifferentDestinationFromLastLink(MobsimTimer timer, Network network, Fleet fleet,
-				QSimConfigGroup qsimConfig, TestTracker testTracker) {
+															 QSimConfigGroup qsimConfig, TestTracker testTracker) {
 			this.timer = timer;
 			this.testTracker = testTracker;
 
@@ -615,7 +604,7 @@ public class DiversionTest {
 			 * the end link
 			 */
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(startLink, initialEndLink, timer.getTimeOfDay(),
-					router, travelTime);
+				router, travelTime);
 
 			// ... and we add it as the first and only task to the schedule
 			DriveTask driveTask = new DefaultDriveTask(() -> "drive", path);
@@ -641,7 +630,7 @@ public class DiversionTest {
 
 						// (2) Perform rerouting from the diversion point
 						VrpPathWithTravelData path = VrpPaths.calcAndCreatePathForDiversion(diversionPoint, updatedEndLink, router,
-								travelTime);
+							travelTime);
 
 						// (3) Implement the diversion (acutally, NOT)
 						// tracker.divertPath(path);

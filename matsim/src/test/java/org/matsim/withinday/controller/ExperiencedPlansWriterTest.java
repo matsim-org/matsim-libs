@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.controller;
 
+import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
@@ -63,7 +64,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
-import com.google.inject.Inject;
 import java.io.File;
 import java.util.*;
 
@@ -72,7 +72,7 @@ import java.util.*;
  */
 public class ExperiencedPlansWriterTest {
 
-private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTest.class);
+	private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTest.class);
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -83,15 +83,15 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Config config = ConfigUtils.createConfig();
 
 		config.controller().setOutputDirectory(this.utils.getOutputDirectory());
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		config.qsim().setEndTime(24 * 3600);
 
 		config.controller().setLastIteration(0);
-		config.controller().setRoutingAlgorithmType( ControllerConfigGroup.RoutingAlgorithmType.Dijkstra );
+		config.controller().setRoutingAlgorithmType(ControllerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		ActivityParams homeParams = new ActivityParams("home");
-		homeParams.setTypicalDuration(16*3600);
+		homeParams.setTypicalDuration(16 * 3600);
 		config.scoring().addActivityParams(homeParams);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -103,11 +103,11 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		population.addPerson(createPerson(scenario, "p02"));
 
 		Controler controler = new Controler(scenario);
-        controler.getConfig().controller().setCreateGraphs(false);
+		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
 		controler.getConfig().controller().setWriteEventsInterval(0);
 		controler.getConfig().controller().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+			OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -125,12 +125,12 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		 * routes match what we expect (route 01 unchanged, route 02 adapted).
 		 */
 		File file = new File(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
-				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
+			ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
 		Assertions.assertTrue(file.exists());
 
 		Config experiencedConfig = ConfigUtils.createConfig();
 		experiencedConfig.plans().setInputFile(this.utils.getOutputDirectory() + "/ITERS/it.0/0." +
-				ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
+			ExecutedPlansServiceImpl.EXECUTEDPLANSFILE);
 
 		Scenario experiencedScenario = ScenarioUtils.loadScenario(experiencedConfig);
 
@@ -149,9 +149,12 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 
 	private static class WriterInitializer implements StartupListener {
 
-		@Inject private Scenario scenario;
-		@Inject private ActivityReplanningMap activityReplanningMap;
-		@Inject private WithinDayEngine withinDayEngine;
+		@Inject
+		private Scenario scenario;
+		@Inject
+		private ActivityReplanningMap activityReplanningMap;
+		@Inject
+		private WithinDayEngine withinDayEngine;
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
@@ -212,7 +215,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 
 			log.info("Replanning agent " + withinDayAgent.getId());
 
- 			Plan plan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
+			Plan plan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
 			Leg leg = (Leg) plan.getPlanElements().get(1);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -242,7 +245,7 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		public WithinDayDuringActivityReplanner createReplanner() {
 			Id<WithinDayReplanner> id = super.getId();
 			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario,
-					this.getWithinDayEngine().getActivityRescheduler());
+				this.getWithinDayEngine().getActivityRescheduler());
 			return replanner;
 		}
 	}
@@ -306,8 +309,8 @@ private static final Logger log = LogManager.getLogger(ExperiencedPlansWriterTes
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l2", Link.class));
 
-		from.setEndTime(8*3600);
-		leg.setDepartureTime(8*3600);
+		from.setEndTime(8 * 3600);
+		leg.setDepartureTime(8 * 3600);
 
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
 		Id<Link> startLinkId = Id.create("l0", Link.class);

@@ -45,7 +45,7 @@ public class NoiseConfigGroupIT {
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	final void test0(){
+	final void test0() {
 
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
@@ -73,12 +73,12 @@ public class NoiseConfigGroupIT {
 	}
 
 	@Test
-	final void test1(){
+	final void test1() {
 
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
-		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.routing().setNetworkConsistencyCheck(RoutingConfigGroup.NetworkConsistencyCheck.disable);
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
