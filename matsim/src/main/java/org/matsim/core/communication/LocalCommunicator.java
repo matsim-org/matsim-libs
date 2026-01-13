@@ -138,5 +138,4 @@ public class LocalCommunicator implements Communicator {
 			idle.reset();
 		}
 	}
-
 }

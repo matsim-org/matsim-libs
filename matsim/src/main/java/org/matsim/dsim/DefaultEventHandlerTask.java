@@ -60,7 +60,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean();
 
-	private boolean isCleanupSync = false;
+	private int cleanupSync = -1;
 
 
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
@@ -98,7 +98,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 	public IntSet waitForOtherRanks(double time) {
 
-		if (pattern != null && isSyncTime()) {
+		if (pattern != null && (isSyncTime() || cleanupSync > 0)) {
 			return pattern.waitForOtherRanks(time);
 		}
 
@@ -108,7 +108,13 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		this.isCleanupSync = true;
+		this.cleanupSync = 2;
+	}
+
+	@Override
+	public void resetTask(int iteration) {
+		super.resetTask(iteration);
+		this.cleanupSync = -1;
 	}
 
 	@Override
@@ -148,11 +154,11 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 		if (pattern != null) {
 			// always process in the inbox
 			pattern.process(handler);
-			if (shouldThisTaskSend() && isSync()) {
+			if (shouldThisTaskSend() && (isSyncTime() || cleanupSync > 1)) {
 				// sometimes send messages to other handlers
 				pattern.communicate(broker, handler);
 				// only send messages once on cleanup
-				isCleanupSync = false;
+				cleanupSync -= 1;
 			}
 		}
 
@@ -180,10 +186,6 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	public static boolean supportsAsync(EventHandler handler) {
 		DistributedEventHandler annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
 		return annotation != null && !annotation.blocking().equals(BlockingMode.SIM_STEP);
-	}
-
-	private boolean isSync() {
-		return isSyncTime() || isCleanupSync;
 	}
 
 	private boolean shouldThisTaskSend() {
