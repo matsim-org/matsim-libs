@@ -27,18 +27,18 @@ public class EndOfDayScoring {
 		this.iterationInformation = iterationInformation;
 	}
 
-	public void score(BackPack backPack) {
+	public void score(FinishedBackpack backPack) {
 
 		var person = population.getPersons().get(backPack.personId());
 
 		if (person == null) {
-			return;
+			throw new IllegalStateException("Person " + backPack.personId() + " not found in population");
 		}
 
 		var scoringFunction = scoringFunctionFactory.createNewScoringFunction(person);
 
 		// replay events relevant for scoring function first
-		for (var e : backPack.specialScoringEvents()) {
+		for (var e : backPack.events()) {
 			if (e instanceof PersonMoneyEvent pme) {
 				scoringFunction.addMoney(pme.getAmount());
 			} else if (e instanceof PersonScoreEvent pse) {
@@ -49,7 +49,7 @@ public class EndOfDayScoring {
 		}
 
 		// We pass activities and legs as well as trips. The scoring function can decide whether to use it.
-		var experiencedPlan = backPack.backpackPlan().experiencedPlan();
+		var experiencedPlan = backPack.experiencedPlan();
 		var trips = TripStructureUtils.getTrips(experiencedPlan);
 		for (var trip : trips) {
 			// pass all elements except the last activity, as it will be included in the next trip as well

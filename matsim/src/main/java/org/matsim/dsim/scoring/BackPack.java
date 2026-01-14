@@ -16,9 +16,14 @@ public class BackPack {
 	private final Id<Person> personId;
 	private final Collection<Event> events;
 	private final BackpackPlan backpackPlan;
+	private final int startingPartition;
 
 	public Id<Person> personId() {
 		return personId;
+	}
+
+	public int startingPartition() {
+		return startingPartition;
 	}
 
 	public Id<Vehicle> currentVehicle() {
@@ -33,8 +38,9 @@ public class BackPack {
 		return backpackPlan;
 	}
 
-	public BackPack(Id<Person> personId) {
+	public BackPack(Id<Person> personId, int startingPartition) {
 		this.personId = personId;
+		this.startingPartition = startingPartition;
 		this.events = new ArrayList<>();
 		backpackPlan = new BackpackPlan();
 	}

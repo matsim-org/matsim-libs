@@ -11,8 +11,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.scoring.NewScoreAssigner;
@@ -30,7 +34,12 @@ public class BackpackScoringModule extends AbstractModule {
 		bind(IterationInformation.class).in(Singleton.class);
 		addControllerListenerBinding().to(IterationInformation.class);
 		bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).in(Singleton.class);
-		bind(ExperiencedPlansService.class).to(ExperiencedPlansCollector.class).in(Singleton.class);
+		bind(EndOfDayScoring.class).in(Singleton.class);
+		bind(FinishedBackpackCollector.class).in(Singleton.class);
+		bind(ExperiencedPlansService.class).to(FinishedBackpackCollector.class);
+
+		bind(BackpackScoringListener.class).in(Singleton.class);
+		addControllerListenerBinding().to(BackpackScoringListener.class);
 
 		// The original code also writes partial scores for each scored element. We have now changed the scoring
 		// to be ready for trip-based scoring. Don't know whether it makes sense to still have these partial scores.
@@ -47,6 +56,27 @@ public class BackpackScoringModule extends AbstractModule {
 		installQSimModule(new BackpackScoringQSimModule());
 	}
 
+	static class BackpackScoringListener implements ScoringListener {
+
+		private final FinishedBackpackCollector collector;
+		private final EndOfDayScoring scoring;
+
+		@Inject
+		BackpackScoringListener(FinishedBackpackCollector collector, EndOfDayScoring scoring) {
+			this.collector = collector;
+			this.scoring = scoring;
+		}
+
+		@Override
+		public void notifyScoring(ScoringEvent event) {
+			collector.exchangePlansForScoring();
+			var backpacks = collector.backpacks();
+			for (var backpack : backpacks) {
+				scoring.score(backpack);
+			}
+		}
+	}
+
 	static class ExperiencedPlansMemorizer implements IterationEndsListener {
 
 		private final Population population;
@@ -60,9 +90,15 @@ public class BackpackScoringModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			for (var person : this.population.getPersons().values()) {
-				var experiencedPlan = experiencedPlansService.getExperiencedPlans().get(person.getId());
+
+			// iterate over the experienced plans. Each compute node loads all persons into memory, but each compute node only has
+			// experienced plans for the persons which start on that node. Exception is the head node, which might have all the
+			// experienced plans if the current iteration is an iteration where experienced plans are written to disk. See {@link WriteExperiencedPlans}
+			for (var experiencedEntry : experiencedPlansService.getExperiencedPlans().entrySet()) {
+				var personId = experiencedEntry.getKey();
+				var person = this.population.getPersons().get(personId);
 				var selectedPlan = person.getSelectedPlan();
+				var experiencedPlan = experiencedEntry.getValue();
 				selectedPlan.getCustomAttributes().put(ScoringConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan);
 			}
 		}
@@ -87,11 +123,10 @@ public class BackpackScoringModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			// TODO make sure this is only done on the head node
-			// I think we don't really need this.
-			experiencedPlansService.finishIteration();
 
 			if (isWriteIteration(event.getIteration()) || event.isLastIteration()) {
+
+				experiencedPlansService.finishIteration();
 
 				var filename = outputDirectoryHierarchy.getIterationFilename(
 					event.getIteration(), Controler.DefaultFiles.experiencedPlans, config.controller().getCompressionType());
@@ -105,15 +140,17 @@ public class BackpackScoringModule extends AbstractModule {
 		}
 	}
 
-	public static class Cleanup implements AfterMobsimListener {
+	public static class Cleanup implements AfterMobsimListener, IterationStartsListener {
 
 		private final ScoringDataCollectorRegistry registry;
 		private final EventsManager em;
+		private final FinishedBackpackCollector backpackCollector;
 
 		@Inject
-		private Cleanup(ScoringDataCollectorRegistry registry, EventsManager em) {
+		private Cleanup(ScoringDataCollectorRegistry registry, EventsManager em, FinishedBackpackCollector backpackCollector) {
 			this.registry = registry;
 			this.em = em;
+			this.backpackCollector = backpackCollector;
 		}
 
 		@Override
@@ -123,6 +160,11 @@ public class BackpackScoringModule extends AbstractModule {
 			}
 			registry.clear();
 		}
+
+		@Override
+		public void notifyIterationStarts(IterationStartsEvent event) {
+			backpackCollector.reset();
+		}
 	}
 
 	private static class BackpackScoringQSimModule extends AbstractQSimModule {
@@ -130,7 +172,7 @@ public class BackpackScoringModule extends AbstractModule {
 		@Override
 		protected void configureQSim() {
 			bind(ScoringDataCollector.class).in(Singleton.class);
-			bind(EndOfDayScoring.class).in(Singleton.class);
+
 		}
 	}
 

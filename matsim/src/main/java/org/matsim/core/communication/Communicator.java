@@ -81,6 +81,7 @@ public interface Communicator extends AutoCloseable {
 	 */
 	void send(int receiver, MemorySegment data, long offset, long length);
 
+
 	/**
 	 * Receive messages from other processes. This method may also ensure that async write operations are performed.
 	 */
@@ -103,6 +104,20 @@ public interface Communicator extends AutoCloseable {
 		}
 
 		recv(expectsNext, handleReceive);
+	}
+
+	default <T extends Message> void send(int receiver, T msg, int tag, SerializationProvider provider) {
+
+		var serializedMsg = provider.toBytes(msg);
+		try (Arena arena = Arena.ofConfined()) {
+			var data = arena.allocate(serializedMsg.length + Integer.BYTES * 3);
+			var buffer = data.asByteBuffer();
+			buffer.putInt(0, tag); // tag
+			buffer.putInt(Integer.BYTES, getRank()); // sender
+			buffer.putInt(Integer.BYTES * 2, receiver); // receiver
+			buffer.put(Integer.BYTES * 3, serializedMsg);
+			send(receiver, data, 0, data.byteSize());
+		}
 	}
 
 	/**

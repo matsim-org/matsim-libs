@@ -60,7 +60,9 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	 */
 	private final AtomicBoolean phase = new AtomicBoolean();
 
-	private int cleanupSync = -1;
+	private CleanupState cleanupState = CleanupState.BEFORE_CLEANUP;
+
+	private enum CleanupState {BEFORE_CLEANUP, LAST_SYNC, LAST_RECEIVE}
 
 
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
@@ -98,7 +100,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 
 	public IntSet waitForOtherRanks(double time) {
 
-		if (pattern != null && (isSyncTime() || cleanupSync > 0)) {
+		if (pattern != null && (isSyncTime() || cleanupState == CleanupState.LAST_RECEIVE)) {
 			return pattern.waitForOtherRanks(time);
 		}
 
@@ -108,13 +110,13 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		this.cleanupSync = 2;
+		this.cleanupState = CleanupState.LAST_SYNC;
 	}
 
 	@Override
 	public void resetTask(int iteration) {
 		super.resetTask(iteration);
-		this.cleanupSync = -1;
+		this.cleanupState = CleanupState.BEFORE_CLEANUP;
 	}
 
 	@Override
@@ -154,29 +156,14 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 		if (pattern != null) {
 			// always process in the inbox
 			pattern.process(handler);
-			if (shouldThisTaskSend() && (isSyncTime() || cleanupSync > 1)) {
+			if (shouldThisTaskSend() && (isSyncTime() || cleanupState == CleanupState.LAST_SYNC)) {
 				// sometimes send messages to other handlers
 				pattern.communicate(broker, handler);
 				// only send messages once on cleanup
-				cleanupSync -= 1;
+				cleanupState = CleanupState.LAST_RECEIVE;
 			}
 		}
 
-		// In the case of a NODE_CONCURRENT handler, we have n tasks, but only one handler, which collects all the data on one node.
-		// The task which reaches this point last should perform the communication with other nodes.
-//			if (counter != null && counter.incrementAndGet() == totalPartitions) {
-//				pattern.communicate(broker, handler);
-//				pattern.process(handler);
-//				counter.set(0);
-//			} else {
-//				pattern.communicate(broker, handler);
-//				pattern.process(handler);
-//			}
-
-		// only run cleanup once.
-//		if (isCleanUp) {
-//			isCleanUp = false;
-//		}
 		storeRuntime(t);
 	}
 

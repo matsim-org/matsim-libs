@@ -46,7 +46,7 @@ class EndOfDayScoringTest {
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
 
 		var startFacilityId = Id.create("f1", ActivityFacility.class);
-		var backpack = new BackPack(personId);
+		var backpack = new BackPack(personId, 0);
 		backpack.backpackPlan().handleEvent(new ActivityEndEvent(10, personId, link1, startFacilityId, "start", new Coord(0, 0)));
 		backpack.backpackPlan().handleEvent(new PersonDepartureEvent(10., personId, link1, "walk", "walk"));
 		backpack.backpackPlan().handleEvent(new TeleportationArrivalEvent(25, personId, 339, "walk"));
@@ -65,7 +65,8 @@ class EndOfDayScoringTest {
 		var scoringFunction = new TestScoringFunction();
 		ScoringFunctionFactory sff = _ -> scoringFunction;
 		var eods = new EndOfDayScoring(population, sff, newScoreAssigner, new IterationInformation());
-		eods.score(backpack);
+		var finishedBackpack = new FinishedBackpack(personId, 0, backpack.specialScoringEvents(), backpack.backpackPlan().experiencedPlan());
+		eods.score(finishedBackpack);
 
 		assertEquals(2, scoringFunction.activities.size());
 		assertEquals(1, scoringFunction.legs.size());

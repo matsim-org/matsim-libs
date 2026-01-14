@@ -148,7 +148,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		this.addresses = new int[topology.getTotalPartitions()];
 		for (int i = 0; i < topology.getNodesCount(); i++) {
-			ComputeNode n = topology.getNode(i);
+			ComputeNode n = topology.getNodeByIndex(i);
 			for (int p : n.getParts()) {
 				addresses[p] = n.getRank();
 			}
@@ -163,7 +163,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			dataSize[i] = new AtomicInteger(0);
 		}
 
-		this.ownParts = new IntOpenHashSet(topology.getNode(comm.getRank()).getParts());
+		this.ownParts = new IntOpenHashSet(topology.getNodeByIndex(comm.getRank()).getParts());
 		this.otherParts = new IntOpenHashSet();
 		for (int i = 0; i < topology.getTotalPartitions(); i++) {
 			if (!ownParts.contains(i)) {
@@ -299,7 +299,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	public void addWaitForRank(int rank) {
 		// Copy all partitions of the rank to wait list
-		waitFor.addAll(topology.getNode(rank).getParts());
+		waitFor.addAll(topology.getNodeByIndex(rank).getParts());
 	}
 
 	/**
@@ -522,7 +522,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			log.error("Sender node: {}, Receiver node: {}", sender, receiver);
 			log.error("Node {} contains partitions: {}", comm.getRank(), ownParts);
 			log.error("Node {} currently supposed to wait for partitions: {}", comm.getRank(), waitFor);
-			log.error("Message covered partitions: {}", topology.getNode(sender).getParts());
+			log.error("Message covered partitions: {}", topology.getNodeByIndex(sender).getParts());
 			log.error("Message contents:");
 
 			while (in.readerIndex() < length) {
@@ -581,10 +581,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// The communication between two nodes may be split up into two separate messages.
 		// Need to differentiate if a message iy received as broadcast to all or as directed message
 		if (receiver == Communicator.BROADCAST_TO_ALL) {
-			topology.getNode(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
+			topology.getNodeByIndex(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
 			log.info("#{} remove broadcast sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
 		} else {
-			topology.getNode(sender).getParts().forEach(waitFor::remove);
+			topology.getNodeByIndex(sender).getParts().forEach(waitFor::remove);
 			log.info("#{} remove point2point sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
 		}
 

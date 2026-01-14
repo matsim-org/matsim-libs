@@ -54,7 +54,7 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
@@ -66,12 +66,12 @@ class ScoringDataCollectorTest {
 		collector.handleEvent(new ActivityStartEvent(25, person, link2, null, "work", new Coord(1001, 0)));
 		collector.finishPerson(distAggent.getId());
 
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eods, times(1)).score(backPackCaptor.capture());
 
 		var backpack = backPackCaptor.getValue();
 		assertEquals(person, backpack.personId());
-		var experiencedPlan = backpack.backpackPlan().experiencedPlan();
+		var experiencedPlan = backpack.experiencedPlan();
 		assertEquals(3, experiencedPlan.getPlanElements().size());
 
 		assertInstanceOf(Activity.class, experiencedPlan.getPlanElements().getFirst());
@@ -124,7 +124,7 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
@@ -195,7 +195,7 @@ class ScoringDataCollectorTest {
 		schedule.addTransitLine(transitLine);
 
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), eods, eps);
 
@@ -224,10 +224,10 @@ class ScoringDataCollectorTest {
 		collector.handleEvent(new ActivityStartEvent(135., person, link2, null, "work", new Coord(1000, 0)));
 		collector.finishPerson(distAgent.getId());
 
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eods).score(backPackCaptor.capture());
 
-		var leg = (Leg) backPackCaptor.getValue().backpackPlan().experiencedPlan().getPlanElements().get(1);
+		var leg = (Leg) backPackCaptor.getValue().experiencedPlan().getPlanElements().get(1);
 		assertEquals("pt", leg.getMode());
 		assertInstanceOf(TransitPassengerRoute.class, leg.getRoute());
 		assertEquals(35., leg.getTravelTime().seconds(), 1e-9);
@@ -274,7 +274,7 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
@@ -296,11 +296,11 @@ class ScoringDataCollectorTest {
 		collector.handleEvent(new ActivityStartEvent(130., person, link3, null, "work", new Coord(3000, 0)));
 		collector.finishPerson(distAggent.getId());
 
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eods).score(backPackCaptor.capture());
-		assertEquals(3, backPackCaptor.getValue().backpackPlan().experiencedPlan().getPlanElements().size());
+		assertEquals(3, backPackCaptor.getValue().experiencedPlan().getPlanElements().size());
 
-		var leg = (Leg) backPackCaptor.getValue().backpackPlan().experiencedPlan().getPlanElements().get(1);
+		var leg = (Leg) backPackCaptor.getValue().experiencedPlan().getPlanElements().get(1);
 		assertEquals("car", leg.getMode());
 		assertEquals("car", leg.getRoutingMode());
 		assertEquals(30., leg.getTravelTime().seconds(), 1e-9);
@@ -352,7 +352,7 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
@@ -392,7 +392,7 @@ class ScoringDataCollectorTest {
 		collector.finishPerson(distAgent1.getId());
 		collector.finishPerson(distAgent2.getId());
 
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eods, times(2)).score(backPackCaptor.capture());
 
 		var backPacks = backPackCaptor.getAllValues();
@@ -400,13 +400,13 @@ class ScoringDataCollectorTest {
 		var bp2 = backPacks.stream().filter(b -> b.personId().equals(person2)).findFirst().orElseThrow();
 
 		// Assertions for Person 2 (the rider who left early)
-		var leg2 = (Leg) bp2.backpackPlan().experiencedPlan().getPlanElements().get(1);
+		var leg2 = (Leg) bp2.experiencedPlan().getPlanElements().get(1);
 		assertEquals("ride", leg2.getMode());
 		assertEquals(15.0, leg2.getTravelTime().seconds());
 		assertEquals(link2, leg2.getRoute().getEndLinkId());
 
 		// Assertions for Person 1 (the driver who went the full distance)
-		var leg1 = (Leg) bp1.backpackPlan().experiencedPlan().getPlanElements().get(1);
+		var leg1 = (Leg) bp1.experiencedPlan().getPlanElements().get(1);
 		assertEquals("car", leg1.getMode());
 		assertEquals(30.0, leg1.getTravelTime().seconds());
 		assertEquals(link3, leg1.getRoute().getEndLinkId());
@@ -428,7 +428,7 @@ class ScoringDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(ExperiencedPlansCollector.class);
+		var eps = mock(FinishedBackpackCollector.class);
 
 		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
 
@@ -441,11 +441,11 @@ class ScoringDataCollectorTest {
 		collector.handleEvent(new PersonStuckEvent(120., person, link1, "walk"));
 
 		// Verify scoring and plan collection
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(eods).score(backPackCaptor.capture());
-		verify(eps).addExperiencedPlan(eq(person), any());
+		verify(eps).addBackpack(any());
 
-		var experiencedPlan = backPackCaptor.getValue().backpackPlan().experiencedPlan();
+		var experiencedPlan = backPackCaptor.getValue().experiencedPlan();
 		assertEquals(2, experiencedPlan.getPlanElements().size());
 
 		assertInstanceOf(Activity.class, experiencedPlan.getPlanElements().get(0));

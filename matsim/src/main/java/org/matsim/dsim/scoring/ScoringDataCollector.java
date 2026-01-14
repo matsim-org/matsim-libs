@@ -24,7 +24,6 @@ import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -62,7 +61,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 	private final AgentSourcesContainer asc;
 	private final EndOfDayScoring eods;
-	private final ExperiencedPlansCollector plansCollector;
+	private final FinishedBackpackCollector backpackCollector;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
 	@SuppressWarnings("FieldMayBeFinal")
@@ -74,30 +73,26 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private NetworkPartition networkPartition;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods, ExperiencedPlansService eps, NetworkPartition partition) {
-		this(simStepMessaging, network, null, asc, eods, eps);
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods, FinishedBackpackCollector fbc, NetworkPartition partition) {
+		this(simStepMessaging, network, null, asc, eods, fbc);
 		this.networkPartition = partition;
 	}
 
 	/**
 	 * Constructor for testing, which includes all dependencies
 	 */
-	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods, ExperiencedPlansService eps) {
+	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods, FinishedBackpackCollector fbc) {
 		this.simStepMessaging = simStepMessaging;
 		this.partitioning = network.getPartitioning();
 		this.network = network;
 		this.asc = asc;
 		this.eods = eods;
 		this.transitSchedule = transitSchedule;
-		if (eps instanceof ExperiencedPlansCollector) {
-			this.plansCollector = (ExperiencedPlansCollector) eps;
-		} else {
-			throw new RuntimeException("ScoringDataCollector requires an ExperiencedPlansCollector. The explicit dependency can be removed once the interface supports this data model");
-		}
+		this.backpackCollector = fbc;
 	}
 
 	public void registerAgent(MobsimAgent agent) {
-		var backpack = new BackPack(agent.getId());
+		var backpack = new BackPack(agent.getId(), networkPartition.getIndex());
 		this.backpackByPerson.put(agent.getId(), backpack);
 	}
 
@@ -161,8 +156,18 @@ public class ScoringDataCollector implements BasicEventHandler {
 		}
 
 		backpack.backpackPlan().finish(network, transitSchedule);
-		eods.score(backpack);
-		plansCollector.addExperiencedPlan(agentId, backpack.backpackPlan().experiencedPlan());
+		var finishedBackpack = new FinishedBackpack(agentId, backpack.startingPartition(), backpack.specialScoringEvents(), backpack.backpackPlan().experiencedPlan());
+		backpackCollector.addBackpack(finishedBackpack);
+
+		//	eods.score(backpack);
+
+		//plansCollector.addExperiencedPlan(agentId, backpack.backpackPlan().experiencedPlan());
+	}
+
+	public void finishAllPersons() {
+		for (var backpack : backpackByPerson.values()) {
+			finishPerson(backpack.personId());
+		}
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
