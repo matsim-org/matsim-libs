@@ -217,7 +217,65 @@ public class PretoriaTest {
 		return tripId2pretoriaGPSEntries;
 	}
 
-	// TODO clusterGpsEntries()
+	/// Removes clusters, that happen due to standing times TODO Check if correct
+	private List<PretoriaGPSEntry> clusterStandingGpsEntries(List<PretoriaGPSEntry> gpsEntries){
+		List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
+
+		int i = 2;
+		while(i < cleanedEntries.size()){
+			PretoriaGPSEntry start = cleanedEntries.get(i-2);
+			PretoriaGPSEntry middle = cleanedEntries.get(i-1);
+			PretoriaGPSEntry end = cleanedEntries.get(i);
+
+			// Do not cluster between different trips
+			if (!(start.trip == middle.trip && middle.trip == end.trip))
+				throw new IllegalArgumentException("Tried to cluster entries from different driving trips!");
+
+			// If the directions change too sharply, the entry is removed and its stats are added to the next entry
+			Coord vec0 = CoordUtils.minus(cleanedEntries.get(i-2).coord, cleanedEntries.get(i-1).coord);
+			Coord vec1 = CoordUtils.minus(cleanedEntries.get(i-1).coord, cleanedEntries.get(i).coord);
+
+			// Check if the angle is larger than (or eq.) 90 degree
+			if (vec0.getX() * vec1.getX() + vec0.getY() * vec1.getY() <= 0){
+				// Angle is too sharp, save data of i-1
+				double CO = cleanedEntries.get(i-1).CO;
+				double CO2 = cleanedEntries.get(i-1).CO2;
+				double NOx = cleanedEntries.get(i-1).NOx;
+
+				// Create updated entry i
+				var updatedEntry = new PretoriaGPSEntry(
+					cleanedEntries.get(i).time,
+					cleanedEntries.get(i).trip,
+					cleanedEntries.get(i).driver,
+					cleanedEntries.get(i).route,
+					cleanedEntries.get(i).load,
+					cleanedEntries.get(i).coldStart,
+					cleanedEntries.get(i).coord,
+					cleanedEntries.get(i).gpsAlt,
+					cleanedEntries.get(i).gpsVel,
+					cleanedEntries.get(i).vehVel,
+					cleanedEntries.get(i).CO + CO,
+					cleanedEntries.get(i).CO2 + CO2,
+					cleanedEntries.get(i).NOx + NOx
+					);
+
+				// Update the list
+				cleanedEntries.set(i, updatedEntry);
+				cleanedEntries.remove(i-1);
+			} else {
+				i++;
+			}
+		}
+
+		assert gpsEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() -
+			cleanedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() < 1e-6;
+		assert gpsEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() -
+			cleanedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() < 1e-6;
+		assert gpsEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() -
+			cleanedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() < 1e-6;
+
+		return cleanedEntries;
+	}
 
 	///  Returns a list of interpolated points, interpolation happens every meter
 	private List<PretoriaGPSEntry> interpolateGpsEntries(List<PretoriaGPSEntry> gpsEntries){
@@ -375,8 +433,7 @@ public class PretoriaTest {
 
 		// Read in the csv with Pretoria GPS/PEMS data for C-route
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
-		// TODO Clustering
-		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> interpolateGpsEntries(entries));
+		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries)));
 
 		// Attach gps-information to the matsim links TODO Extract into seperate method
@@ -522,21 +579,19 @@ public class PretoriaTest {
 			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/points_" + vehicle + ".csv"),
 			CSVFormat.DEFAULT);
 		writer2.printRecord(
+			"time",
 			"x",
 			"y",
 			"linkId"
 		);
 
-		tripId2pretoriaGpsEntries.forEach((trip, map) -> map.forEach( e ->
-			{
-				try {
-					if (trip == 2)
-						writer2.printRecord(-e.coord.getX(), -e.coord.getY(), pretoriaGpsEntry2linkId.get(e));
-				} catch (IOException ex) {
-					throw new RuntimeException(ex);
-				}
+		tripId2pretoriaGpsEntries.get(2).forEach( e -> {
+			try {
+				writer2.printRecord(e.time, -e.coord.getX(), -e.coord.getY(), pretoriaGpsEntry2linkId.get(e));
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
 			}
-		));
+		});
 
 		writer2.flush();
 		writer2.close();
