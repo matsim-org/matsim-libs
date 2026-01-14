@@ -49,6 +49,10 @@ public final class OsmRailwayReader extends SupersonicOsmNetworkReader {
 			link.getAttributes().putAttribute(OsmTags.USAGE, tags.get(OsmTags.USAGE));
 		}
 
+		if (tags.containsKey(OsmTags.SERVICE)) {
+			link.getAttributes().putAttribute(OsmTags.SERVICE, tags.get(OsmTags.SERVICE));
+		}
+
 		if (tags.containsKey(OsmTags.GAUGE)) {
 			link.getAttributes().putAttribute(OsmTags.GAUGE, tags.get(OsmTags.GAUGE));
 		}
