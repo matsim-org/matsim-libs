@@ -3,8 +3,6 @@ package org.matsim.contrib.emissions;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -13,12 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -26,10 +21,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.ArrayMap;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,13 +30,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.math.IEEE754rUtils.max;
@@ -61,8 +48,6 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  */
 public class PHEMTest {
 
-	private static final Logger logger = LogManager.getLogger(PHEMTest.class);
-
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -72,9 +57,6 @@ public class PHEMTest {
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
-
-	// WGS83 -> SA_Lo29
-	private final static GeotoolsTransformation TRANSFORMATION = new GeotoolsTransformation("EPSG:4326", "SA_Lo29");
 
 	// ----- Helper methods -----
 
@@ -687,219 +669,6 @@ public class PHEMTest {
 		Assertions.assertTrue(testAverages[4]/refComparison.size()-1 <= refAverages[4]/refComparison.size()-1);
 	}
 
-	/// Returns coord in SA_Lo29 format, that the GPS coordinates maps to.
-	private Coord convertWGS84toLo29(double gpsLat, double gpsLon){
-		Coord coordWGS84 = new Coord(gpsLon, gpsLat);
-		return TRANSFORMATION.transform(coordWGS84);
-
-		// TODO Remove this
-		// Flip XY
-//		coordLo29 = new Coord(-coordLo29.getX(), -coordLo29.getY());
-
-//		return NetworkUtils.getNearestLinkExactly(network, coordLo29).getId();
-	}
-
-	///  Returns a list of interpolated point between start and end point, interpolation happens every meter
-	private List<PretoriaGPSEntry> interpolateGpsEntries(PretoriaGPSEntry start, PretoriaGPSEntry end){
-		double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
-
-		// Return an empty list, if the distance between the points is too small
-		if (Math.floor(distance) == 0)
-			return new ArrayList<>();
-
-		// Do not interpolate between different trips
-		if (start.trip != end.trip)
-			throw new IllegalArgumentException("Tried to interpolate two entries from different driving trips!");
-
-		// Create one interpolation point per meter
-		List<PretoriaGPSEntry> interpolatedEntries = new ArrayList<>();
-		for(double d = 0; d < Math.floor(distance); d += 1){
-			double interpTime = start.time + (d/distance)*(end.time-start.time);
-			double interpAlt = start.gpsAlt + (d/distance)*(end.gpsAlt-start.gpsAlt);
-			Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d/distance, CoordUtils.minus(end.coord, start.coord)));
-//			Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d/distance, end.coord));
-
-			interpolatedEntries.add(new PretoriaGPSEntry(
-				interpTime,
-				end.trip,
-				end.driver,
-				end.route,
-				end.load,
-				end.coldStart,
-				interpCoord,
-				interpAlt,
-				0,
-				0,
-				(1/distance)*end.CO,
-				(1/distance)*end.CO2,
-				(1/distance)*end.NOx
-				));
-		}
-
-		// Add one last entry with remaining emissions (replacing the end point)
-		interpolatedEntries.add(new PretoriaGPSEntry(
-			end.time,
-			end.trip,
-			end.driver,
-			end.route,
-			end.load,
-			end.coldStart,
-			end.coord,
-			end.gpsAlt,
-			0,
-			0,
-			(1-(double)interpolatedEntries.size()/distance)*end.CO,
-			(1-(double)interpolatedEntries.size()/distance)*end.CO2,
-			(1-(double)interpolatedEntries.size()/distance)*end.NOx
-		));
-
-		// Final checks to make sure, that the interpolation values do not deviate from original values
-		assert interpolatedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() - end.CO < 1e-6;
-		assert interpolatedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() - end.CO2 < 1e-6;
-		assert interpolatedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() - end.NOx < 1e-6;
-
-		return interpolatedEntries;
-	}
-
-	/**
-	 * Returns the time spent on the start and endLink for two switching GPSEntries. Needed to accurately estimate the traveltime for each link,
-	 * especially if velocity is high and/or the links are short.
-	 * @param startPoint last gps point, that has been assigned to the startLink
-	 * @param endPoint first gps point, that has been assigned to the endLink
-	 * @param startLink prior traversed link (must incident to endlink)
-	 * @param endLink post traversed link
-	 * @return (t1,t2) with t1 being time spent on startLink and t2 being time spent on endLink.
-	 */
-	private Tuple<Double, Double> computeGPSEdgeTimes(PretoriaGPSEntry startPoint, PretoriaGPSEntry endPoint, Link startLink, Link endLink){
-		Coord startProjection = CoordUtils.orthogonalProjectionOnLineSegment(startLink.getFromNode().getCoord(), startLink.getToNode().getCoord(), startPoint.coord);
-		Coord endProjection = CoordUtils.orthogonalProjectionOnLineSegment(endLink.getFromNode().getCoord(), endLink.getToNode().getCoord(), endPoint.coord);
-		double totalTime = endPoint.time - startPoint.time;
-
-		// Get the node, that is shared by both links
-		Coord sharedNode = null;
-		if (startLink.getFromNode().equals(endLink.getFromNode()) || startLink.getFromNode().equals(endLink.getToNode())) {
-			sharedNode = startLink.getFromNode().getCoord();
-		} else if (startLink.getToNode().equals(endLink.getFromNode()) || startLink.getToNode().equals(endLink.getToNode())) {
-			sharedNode = startLink.getToNode().getCoord();
-		} else {
-			logger.warn("The given links ({}, {}) are not incident!", startLink.getId(), endLink.getId());
-			return new Tuple<>(totalTime/2, totalTime/2);
-		}
-
-		double startLength = CoordUtils.length(CoordUtils.minus(sharedNode, startProjection));
-		double endLength = CoordUtils.length(CoordUtils.minus(endProjection, sharedNode));
-		double totalLength = startLength + endLength;
-		return new Tuple<>(totalTime*startLength/totalLength, totalTime*endLength/totalLength);
-	}
-
-	/// Computes the diff time between the date and the referenceDate
-	private double getCycleTimeFromDate(String date, String referenceDate) {
-		try {
-			Instant d1 = Instant.parse(date);
-			Instant d2 = Instant.parse(referenceDate);
-			return Duration.between(d2, d1).toNanos() / 1_000_000_000.0;
-		} catch (Exception e1) {
-			try {
-				DateTimeFormatter formatter =
-					DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss.SSS Z");
-
-				ZonedDateTime d1 = ZonedDateTime.parse(date, formatter);
-				ZonedDateTime d2 = ZonedDateTime.parse(referenceDate, formatter);
-
-				return Duration.between(d2, d1).toNanos() / 1_000_000_000.0;
-			} catch (Exception e2) {
-				throw e2;
-			}
-		}
-	}
-
-	// TODO Remove for final commit, as this was just used once for data preparation
-	public static void main(String[] args) {
-		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
-		Network full = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_hbefa.xml.gz");
-
-		for(var link : cRoute.getLinks().values()){
-			link.getAttributes().removeAttribute("CO");
-			link.getAttributes().removeAttribute("CO2_TOTAL");
-			link.getAttributes().removeAttribute("CO2_pems");
-			link.getAttributes().removeAttribute("CO2_rep");
-			link.getAttributes().removeAttribute("CO2e");
-			link.getAttributes().removeAttribute("CO_pems");
-			link.getAttributes().removeAttribute("NO2");
-			link.getAttributes().removeAttribute("NOx");
-			link.getAttributes().removeAttribute("NOx_pems");
-			link.getAttributes().removeAttribute("timeOut");
-		}
-
-		// Fix the wrong route
-		cRoute.removeLink(Id.createLinkId("burnett1"));
-		cRoute.removeLink(Id.createLinkId("33150"));
-		cRoute.removeLink(Id.createLinkId("9159"));
-		cRoute.removeLink(Id.createLinkId("45106"));
-		cRoute.removeLink(Id.createLinkId("45107"));
-		cRoute.removeLink(Id.createLinkId("9148"));
-		cRoute.removeLink(Id.createLinkId("9144"));
-		cRoute.removeLink(Id.createLinkId("49854"));
-		cRoute.removeLink(Id.createLinkId("52267"));
-		cRoute.removeLink(Id.createLinkId("46065"));
-
-		// Section 1
-
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395953")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395954")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("25395955")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("282871644")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5837011387")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507042")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507043")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507044")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5846507045")));
-
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36669")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36680")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36674")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36671")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36676")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("36678")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("42188")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("46067")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("46070")));
-
-		// Section 2
-
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("25290978")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("25291065")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("5838748611")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("799905988")));
-		cRoute.addNode(full.getNodes().get(Id.createNodeId("799906053")));
-
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("38199")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("38404")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("42127")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("6010")));
-		cRoute.addLink(full.getLinks().get(Id.createLinkId("7080")));
-
-		// Missing link
-
-		NetworkUtils.createAndAddLink(
-			cRoute,
-			Id.createLinkId("cRouteLink"),
-			cRoute.getNodes().get(Id.createNodeId("25290978")),
-			cRoute.getNodes().get(Id.createNodeId("25395955")),
-			490,
-			50./3.,
-			3000,
-			3
-		);
-
-		cRoute.getLinks().get(Id.createLinkId("cRouteLink")).getAttributes().putAttribute("hbefa_road_type", "URB/Distr/60");
-
-		/*for(var node : cRoute.getNodes().values()){
-			node.setCoord(new Coord(-node.getCoord().getX(), -node.getCoord().getY()));
-		}*/
-		NetworkUtils.writeNetwork(cRoute, "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
-	}
-
 	// ----- Main-test method -----
 
 	/// Start the main-test with the given settings
@@ -1006,271 +775,6 @@ public class PHEMTest {
 	}
 
 	// ----- Additional/Experimental tests -----
-
-	@ParameterizedTest
-	@EnumSource(PretoriaVehicle.class)
-	public void pretoriaInputsExpTest(PretoriaVehicle vehicle) throws IOException{
-//		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-
-		// Prepare emission-config
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
-		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
-		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
-		ecg.setHandlesHighAverageSpeeds(true);
-//		ecg.setAverageWarmEmissionFactorsFile(SVN + "7eff8f308633df1b8ac4d06d05180dd0c5fdf577.enc");
-//		ecg.setAverageColdEmissionFactorsFile(SVN + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc");
-//		ecg.setDetailedWarmEmissionFactorsFile(SVN + "944637571c833ddcf1d0dfcccb59838509f397e6.enc");
-//		ecg.setDetailedColdEmissionFactorsFile(SVN + "54adsdas478ss457erhzj5415476dsrtzu.enc");
-		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
-		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
-		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
-		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
-
-		// Create config
-		Config config = ConfigUtils.createConfig(ecg);
-
-		// Define vehicle
-		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
-		vehicleAttributes.setHbefaTechnology(vehicle.hbefaTechnology);
-		vehicleAttributes.setHbefaEmConcept(vehicle.hbefaEmConcept);
-		vehicleAttributes.setHbefaSizeClass(vehicle.hbefaSizeClass);
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo = new Tuple<>(
-			vehicle.hbefaVehicleCategory,
-			vehicleAttributes);
-
-		System.out.println(vehHbefaInfo);
-
-		// Read in the Pretoria network file with real emissions
-		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
-
-		// Create Scenario and EventManager
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		EventsManager manager = EventsUtils.createEventsManager(config);
-
-		// Read in the csv with Pretoria GPS/PEMS data for C-route
-		List<PretoriaGPSEntry> pretoriaGPSEntries = new ArrayList<>();
-
-		var format = CSVFormat.DEFAULT.builder()
-			.setDelimiter(",")
-			.setSkipHeaderRecord(true)
-			.setHeader()
-			.build();
-
-		Path gps_path = switch (vehicle){
-			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
-			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
-		};
-
-		String referenceDate = switch(vehicle){
-			case PretoriaVehicle.ETIOS -> "2022-11-15T07:34:18.115Z";
-			case PretoriaVehicle.FIGO -> "07/27/2021 10:03:03.131 +0200";
-		};
-
-		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
-			for(var record : parser){
-				var CO = Double.parseDouble(record.get("CO_mass"));
-				var CO2 = Double.parseDouble(record.get("CO2_mass"));
-				var NOx = Double.parseDouble(record.get("NOx_mass"));
-
-				pretoriaGPSEntries.add(new PretoriaGPSEntry(
-					getCycleTimeFromDate(record.get("date"), referenceDate),
-					Integer.parseInt(record.get("trip")),
-					Integer.parseInt(record.get("driver")),
-					Integer.parseInt(record.get("route")),
-					Integer.parseInt(record.get("load")),
-					Boolean.parseBoolean(record.get("coldStart")),
-					convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
-					Double.parseDouble(record.get("gps_alt")),
-					Double.parseDouble(record.get("gps_speed")),
-					Double.parseDouble(record.get("speed_vehicle")),
-
-					CO < 0 ? 0 : CO,
-					CO2 < 0 ? 0 : CO2,
-					NOx < 0 ? 0 : NOx
-				));
-			}
-		} catch(IOException e){
-			throw new RuntimeException(e);
-		}
-
-		// Now generate the interpolated points TODO Check if this distorts the results
-		List<PretoriaGPSEntry> pretoriaGPSEntriesInterpolated = new ArrayList<>();
-		for (int i = 1; i < pretoriaGPSEntries.size(); i++){
-			PretoriaGPSEntry previous = pretoriaGPSEntries.get(i-1);
-			PretoriaGPSEntry current = pretoriaGPSEntries.get(i);
-
-			if (previous.trip != current.trip)
-				continue;
-
-			pretoriaGPSEntriesInterpolated.addAll(interpolateGpsEntries(pretoriaGPSEntries.get(i-1), pretoriaGPSEntries.get(i)));
-
-		}
-
-		// Attach gps-information to the matsim links
-		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
-		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2traversalTime = new ArrayMap<>();
-		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
-
-		// TODO debug only, remove this var
-		Map<PretoriaGPSEntry, Id<Link>> pretoriaGpsEntry2linkId = new HashMap<>();
-
-		// TODO Check if ArrayMaps or HashMaps are faster here
-		int previousTripId = -1;
-		Id<Link> previousLinkId = null;
-		PretoriaGPSEntry previousGpsEntry = null;
-		int i = 0;
-		for(var gpsEntry : pretoriaGPSEntriesInterpolated){
-			var tripId = gpsEntry.trip;
-			tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
-			tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
-
-			var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
-			tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
-			tripId2linkId2pretoriaGpsEntries.get(tripId).get(linkId).add(gpsEntry);
-
-			pretoriaGpsEntry2linkId.put(gpsEntry, linkId);
-
-			// Check if a new trip has started OR if vehicle arrived at new link
-			if(previousTripId != tripId || previousLinkId != linkId){
-				Link startLink = pretoriaNetwork.getLinks().get(previousLinkId);
-				Link endLink = pretoriaNetwork.getLinks().get(linkId);
-
-				// Get the edgeTimes
-				Tuple<Double, Double> edgeTimes = previousTripId != tripId ? new Tuple<>(0., 0.) :
-				computeGPSEdgeTimes(
-					previousGpsEntry,
-					gpsEntry,
-					startLink,
-					endLink
-				);
-
-				// TODO Check if the skipped links cause problems later on!
-				// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We simply skip these points.
-				if(tripId2linkId2traversalTime.get(tripId).containsKey(linkId)) {
-					continue;
-				}
-
-				// Start new entry with arrival time
-				tripId2linkId2traversalTime.get(tripId).put(linkId, gpsEntry.time - edgeTimes.getSecond());
-
-				// Finish old entry (except when we started a new trip)
-				if (previousTripId == tripId) {
-					tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> gpsEntry.time + edgeTimes.getFirst() - arrivalTime);
-				}
-			}
-
-			previousTripId = tripId;
-			previousLinkId = linkId;
-			previousGpsEntry = gpsEntry;
-			i++;
-		}
-
-		// Finish last entry TODO Check if this works properly
-		tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> pretoriaGPSEntriesInterpolated.getLast().time - arrivalTime);
-
-		// Get the emission values (PEMS and MATSim)
-		EmissionModule module = new EmissionModule(scenario, manager);
-
-		for(var tripEntry : tripId2linkId2pretoriaGpsEntries.entrySet()){
-			var tripId = tripEntry.getKey();
-
-			for(var linkEntry : tripEntry.getValue().entrySet()){
-				var linkId = linkEntry.getKey();
-				var link = pretoriaNetwork.getLinks().get(linkId);
-
-				// Extract the PEMS information
-				double CO_pems = linkEntry.getValue().stream().mapToDouble(e -> e.CO).filter(d -> d != Double.POSITIVE_INFINITY && d != Double.NEGATIVE_INFINITY).reduce(Double::sum).getAsDouble();
-				double CO2_pems = linkEntry.getValue().stream().mapToDouble(e -> e.CO2).filter(d -> d != Double.POSITIVE_INFINITY && d != Double.NEGATIVE_INFINITY).reduce(Double::sum).getAsDouble();
-				double NOx_pems = linkEntry.getValue().stream().mapToDouble(e -> e.NOx).filter(d -> d != Double.POSITIVE_INFINITY && d != Double.NEGATIVE_INFINITY).reduce(Double::sum).getAsDouble();
-
-				// Compute the MATSim emissions
-				// TODO Add cold emissions
-				var emissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
-					tripId2linkId2traversalTime.get(tripId).get(linkId),
-					(String) link.getAttributes().getAttribute("hbefa_road_type"),
-					link.getFreespeed(),
-					link.getLength(),
-					vehHbefaInfo
-				);
-
-				double CO_matsim = emissionsMatsim.get(Pollutant.CO);
-				double CO2_matsim = emissionsMatsim.get(Pollutant.CO2_TOTAL);
-				double NOx_matsim = emissionsMatsim.get(Pollutant.NOx);
-
-				tripId2linkId2pollutant2emissions.putIfAbsent(tripId, new HashMap<>());
-				tripId2linkId2pollutant2emissions.get(tripId).putIfAbsent(linkId, new HashMap<>());
-
-				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.CO, new Tuple<>(CO_matsim, CO_pems));
-				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.CO2_TOTAL, new Tuple<>(CO2_matsim, CO2_pems));
-				tripId2linkId2pollutant2emissions.get(tripId).get(linkId).put(Pollutant.NOx, new Tuple<>(NOx_matsim, NOx_pems));
-			}
-		}
-
-		// Save the results in a file
-		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + vehicle + ".csv"),
-			CSVFormat.DEFAULT);
-		writer.printRecord(
-			"tripId",
-			"linkId",
-			"CO_MATSim",
-			"CO_pems",
-			"CO2_MATSim",
-			"CO2_pems",
-			"NOx_MATSim",
-			"NOx_pems"
-		);
-
-		tripId2linkId2pollutant2emissions.forEach((tripId, linkMap) -> {
-			linkMap.forEach((linkId, pollutantMap) -> {
-				try {
-					writer.printRecord(
-						tripId,
-						linkId,
-						pollutantMap.get(Pollutant.CO).getFirst(),
-						pollutantMap.get(Pollutant.CO).getSecond(),
-						pollutantMap.get(Pollutant.CO2_TOTAL).getFirst(),
-						pollutantMap.get(Pollutant.CO2_TOTAL).getSecond(),
-						pollutantMap.get(Pollutant.NOx).getFirst(),
-						pollutantMap.get(Pollutant.NOx).getSecond()
-					);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			});
-		});
-
-		writer.flush();
-		writer.close();
-
-		// TODO debug only, remove later
-		CSVPrinter writer2 = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/points_" + vehicle + ".csv"),
-			CSVFormat.DEFAULT);
-		writer2.printRecord(
-			"x",
-			"y",
-			"linkId"
-		);
-
-		pretoriaGPSEntriesInterpolated.forEach(e ->
-		{
-			try {
-				if (e.trip == 1)
-					writer2.printRecord(-e.coord.getX(), -e.coord.getY(), pretoriaGpsEntry2linkId.get(e));
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		});
-
-		writer2.flush();
-		writer2.close();
-
-	}
-
 
 	@TestFactory
 	Collection<DynamicTest> aggregatedPMExpTest() {
@@ -1396,8 +900,6 @@ public class PHEMTest {
 
 	// ----- Helper definitions -----
 
-	private record PretoriaGPSEntry(double time, int trip, int driver, int route, int load, boolean coldStart, Coord coord, double gpsAlt, double gpsVel, double vehVel, double CO, double CO2, double NOx){};
-
 	private record DrivingCycleSecond(int second, double vel, double acc){}
 
 	/**
@@ -1511,31 +1013,6 @@ public class PHEMTest {
 		WLTP_derivated_acc,
 		WLTP_inverted_time,
 		CADC
-	}
-
-	public enum PretoriaVehicle{
-		/// Toyota Etios 1.5 (1496ccm, 66kW) Sprint hatchback light passenger vehicle with a Euro 6 classification (138g/km) (file: public-etios.csv).
-		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
-
-		// TODO Euro 5 or Euro 6? (contradicting information)
-		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
-		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR);
-
-		/* TODO Add, when detailed HBEFA table for HGV available
-		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "PC D Euro-3", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);*/
-
-		final String hbefaTechnology;
-		final String hbefaEmConcept;
-		final String hbefaSizeClass;
-		final HbefaVehicleCategory hbefaVehicleCategory;
-
-		PretoriaVehicle(String hbefaTechnology, String hbefaEmConcept, String hbefaSizeClass, HbefaVehicleCategory hbefaVehicleCategory) {
-			this.hbefaTechnology = hbefaTechnology;
-			this.hbefaEmConcept = hbefaEmConcept;
-			this.hbefaSizeClass = hbefaSizeClass;
-			this.hbefaVehicleCategory = hbefaVehicleCategory;
-		}
 	}
 }
 
