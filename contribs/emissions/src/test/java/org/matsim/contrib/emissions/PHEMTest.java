@@ -1071,21 +1071,21 @@ public class PHEMTest {
 
 		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
 			for(var record : parser){
-				var CO = Double.parseDouble(record.get(39));
-				var CO2 = Double.parseDouble(record.get(38));
-				var NOx = Double.parseDouble(record.get(41));
+				var CO = Double.parseDouble(record.get("CO_mass"));
+				var CO2 = Double.parseDouble(record.get("CO2_mass"));
+				var NOx = Double.parseDouble(record.get("NOx_mass"));
 
 				pretoriaGPSEntries.add(new PretoriaGPSEntry(
-					getCycleTimeFromDate(record.get(0), referenceDate),
-					Integer.parseInt(record.get(1)),
-					Integer.parseInt(record.get(2)),
-					Integer.parseInt(record.get(3)),
-					Integer.parseInt(record.get(4)),
-					Boolean.parseBoolean(record.get(5)),
-					convertWGS84toLo29(Double.parseDouble(record.get(6)), Double.parseDouble(record.get(7))),
-					Double.parseDouble(record.get(8)),
-					Double.parseDouble(record.get(9)),
-					Double.parseDouble(record.get(14)),
+					getCycleTimeFromDate(record.get("date"), referenceDate),
+					Integer.parseInt(record.get("trip")),
+					Integer.parseInt(record.get("driver")),
+					Integer.parseInt(record.get("route")),
+					Integer.parseInt(record.get("load")),
+					Boolean.parseBoolean(record.get("coldStart")),
+					convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
+					Double.parseDouble(record.get("gps_alt")),
+					Double.parseDouble(record.get("gps_speed")),
+					Double.parseDouble(record.get("speed_vehicle")),
 
 					CO < 0 ? 0 : CO,
 					CO2 < 0 ? 0 : CO2,
