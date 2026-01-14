@@ -34,10 +34,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PretoriaTest {
 
@@ -143,6 +140,12 @@ public class PretoriaTest {
 	// WGS83 -> SA_Lo29
 	private final static GeotoolsTransformation TRANSFORMATION = new GeotoolsTransformation("EPSG:4326", "SA_Lo29");
 
+	/// Returns coord in SA_Lo29 format, that the GPS coordinates maps to.
+	private Coord convertWGS84toLo29(double gpsLat, double gpsLon){
+		Coord coordWGS84 = new Coord(gpsLon, gpsLat);
+		return TRANSFORMATION.transform(coordWGS84);
+	}
+
 	private static EmissionsConfigGroup getEmissionsConfigGroup() {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
@@ -162,70 +165,124 @@ public class PretoriaTest {
 		return ecg;
 	}
 
-	/// Returns coord in SA_Lo29 format, that the GPS coordinates maps to.
-	private Coord convertWGS84toLo29(double gpsLat, double gpsLon){
-		Coord coordWGS84 = new Coord(gpsLon, gpsLat);
-		return TRANSFORMATION.transform(coordWGS84);
+	private Map<Integer, List<PretoriaGPSEntry>> readGpsEntries(PretoriaVehicle vehicle){
+		// Read in the csv with Pretoria GPS/PEMS data for C-route
+		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGPSEntries = new HashMap<>();
+
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(",")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
+
+		Path gps_path = switch (vehicle){
+			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
+			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
+		};
+
+		String referenceDate = switch(vehicle){
+			case PretoriaVehicle.ETIOS -> "2022-11-15T07:34:18.115Z";
+			case PretoriaVehicle.FIGO -> "07/27/2021 10:03:03.131 +0200";
+		};
+
+		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				var tripId = Integer.parseInt(record.get("trip"));
+				var CO = Double.parseDouble(record.get("CO_mass"));
+				var CO2 = Double.parseDouble(record.get("CO2_mass"));
+				var NOx = Double.parseDouble(record.get("NOx_mass"));
+
+				tripId2pretoriaGPSEntries.putIfAbsent(tripId, new ArrayList<>());
+				tripId2pretoriaGPSEntries.get(tripId).add(new PretoriaGPSEntry(
+					getCycleTimeFromDate(record.get("date"), referenceDate),
+					tripId,
+					Integer.parseInt(record.get("driver")),
+					Integer.parseInt(record.get("route")),
+					Integer.parseInt(record.get("load")),
+					Boolean.parseBoolean(record.get("coldStart")),
+					convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
+					Double.parseDouble(record.get("gps_alt")),
+					Double.parseDouble(record.get("gps_speed")),
+					Double.parseDouble(record.get("speed_vehicle")),
+
+					CO < 0 ? 0 : CO,
+					CO2 < 0 ? 0 : CO2,
+					NOx < 0 ? 0 : NOx
+				));
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+
+		return tripId2pretoriaGPSEntries;
 	}
 
-	///  Returns a list of interpolated point between start and end point, interpolation happens every meter
-	private List<PretoriaGPSEntry> interpolateGpsEntries(PretoriaGPSEntry start, PretoriaGPSEntry end){
-		double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
+	// TODO clusterGpsEntries()
 
-		// Return an empty list, if the distance between the points is too small
-		if (Math.floor(distance) == 0)
-			return new ArrayList<>();
-
-		// Do not interpolate between different trips
-		if (start.trip != end.trip)
-			throw new IllegalArgumentException("Tried to interpolate two entries from different driving trips!");
-
-		// Create one interpolation point per meter
+	///  Returns a list of interpolated points, interpolation happens every meter
+	private List<PretoriaGPSEntry> interpolateGpsEntries(List<PretoriaGPSEntry> entries){
 		List<PretoriaGPSEntry> interpolatedEntries = new ArrayList<>();
-		for(double d = 0; d < Math.floor(distance); d += 1){
-			double interpTime = start.time + (d/distance)*(end.time-start.time);
-			double interpAlt = start.gpsAlt + (d/distance)*(end.gpsAlt-start.gpsAlt);
-			Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d/distance, CoordUtils.minus(end.coord, start.coord)));
-//			Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d/distance, end.coord));
 
+		for (int i = 1; i < entries.size(); i++) {
+			PretoriaGPSEntry start = entries.get(i-1);
+			PretoriaGPSEntry end = entries.get(i);
+
+			double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
+
+			// Return an empty list, if the distance between the points is too small
+			if (Math.floor(distance) == 0)
+				return new ArrayList<>();
+
+			// Do not interpolate between different trips
+			if (start.trip != end.trip)
+				throw new IllegalArgumentException("Tried to interpolate two entries from different driving trips!");
+
+			// Create one interpolation point per meter
+			for (double d = 0; d < Math.floor(distance); d += 1) {
+				double interpTime = start.time + (d / distance) * (end.time - start.time);
+				double interpAlt = start.gpsAlt + (d / distance) * (end.gpsAlt - start.gpsAlt);
+				Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d / distance, CoordUtils.minus(end.coord, start.coord)));
+
+				interpolatedEntries.add(new PretoriaGPSEntry(
+					interpTime,
+					end.trip,
+					end.driver,
+					end.route,
+					end.load,
+					end.coldStart,
+					interpCoord,
+					interpAlt,
+					0,
+					0,
+					(1 / distance) * end.CO,
+					(1 / distance) * end.CO2,
+					(1 / distance) * end.NOx
+				));
+			}
+
+			// Add one last entry with remaining emissions (replacing the end point)
 			interpolatedEntries.add(new PretoriaGPSEntry(
-				interpTime,
+				end.time,
 				end.trip,
 				end.driver,
 				end.route,
 				end.load,
 				end.coldStart,
-				interpCoord,
-				interpAlt,
+				end.coord,
+				end.gpsAlt,
 				0,
 				0,
-				(1/distance)*end.CO,
-				(1/distance)*end.CO2,
-				(1/distance)*end.NOx
+				(1 - (double) interpolatedEntries.size() / distance) * end.CO,
+				(1 - (double) interpolatedEntries.size() / distance) * end.CO2,
+				(1 - (double) interpolatedEntries.size() / distance) * end.NOx
 			));
+
+			// Final checks to make sure, that the interpolation values do not deviate from original values
+			assert interpolatedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() - end.CO < 1e-6;
+			assert interpolatedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() - end.CO2 < 1e-6;
+			assert interpolatedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() - end.NOx < 1e-6;
+
 		}
-
-		// Add one last entry with remaining emissions (replacing the end point)
-		interpolatedEntries.add(new PretoriaGPSEntry(
-			end.time,
-			end.trip,
-			end.driver,
-			end.route,
-			end.load,
-			end.coldStart,
-			end.coord,
-			end.gpsAlt,
-			0,
-			0,
-			(1-(double)interpolatedEntries.size()/distance)*end.CO,
-			(1-(double)interpolatedEntries.size()/distance)*end.CO2,
-			(1-(double)interpolatedEntries.size()/distance)*end.NOx
-		));
-
-		// Final checks to make sure, that the interpolation values do not deviate from original values
-		assert interpolatedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() - end.CO < 1e-6;
-		assert interpolatedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() - end.CO2 < 1e-6;
-		assert interpolatedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() - end.NOx < 1e-6;
 
 		return interpolatedEntries;
 	}
@@ -258,7 +315,11 @@ public class PretoriaTest {
 		double startLength = CoordUtils.length(CoordUtils.minus(sharedNode, startProjection));
 		double endLength = CoordUtils.length(CoordUtils.minus(endProjection, sharedNode));
 		double totalLength = startLength + endLength;
-		return new Tuple<>(totalTime*startLength/totalLength, totalTime*endLength/totalLength);
+
+		double startTime = totalTime*startLength/totalLength;
+		double endTime = totalTime*endLength/totalLength;
+		assert startTime + endTime - totalTime < 1e-6;
+		return new Tuple<>(startTime, endTime);
 	}
 
 	/// Computes the diff time between the date and the referenceDate
@@ -283,10 +344,8 @@ public class PretoriaTest {
 	public void pretoriaInputsExpTest(PretoriaVehicle vehicle) throws IOException {
 //		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
 
-		// Prepare emission-config
+		// Prepare config
 		EmissionsConfigGroup ecg = getEmissionsConfigGroup();
-
-		// Create config
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define vehicle
@@ -308,125 +367,72 @@ public class PretoriaTest {
 		EventsManager manager = EventsUtils.createEventsManager(config);
 
 		// Read in the csv with Pretoria GPS/PEMS data for C-route
-		List<PretoriaGPSEntry> pretoriaGPSEntries = new ArrayList<>();
+		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
+		// TODO Clustering
+		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> interpolateGpsEntries(entries));
 
-		var format = CSVFormat.DEFAULT.builder()
-			.setDelimiter(",")
-			.setSkipHeaderRecord(true)
-			.setHeader()
-			.build();
-
-		Path gps_path = switch (vehicle){
-			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
-			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
-		};
-
-		String referenceDate = switch(vehicle){
-			case PretoriaVehicle.ETIOS -> "2022-11-15T07:34:18.115Z";
-			case PretoriaVehicle.FIGO -> "07/27/2021 10:03:03.131 +0200";
-		};
-
-		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
-			for(var record : parser){
-				var CO = Double.parseDouble(record.get("CO_mass"));
-				var CO2 = Double.parseDouble(record.get("CO2_mass"));
-				var NOx = Double.parseDouble(record.get("NOx_mass"));
-
-				pretoriaGPSEntries.add(new PretoriaGPSEntry(
-					getCycleTimeFromDate(record.get("date"), referenceDate),
-					Integer.parseInt(record.get("trip")),
-					Integer.parseInt(record.get("driver")),
-					Integer.parseInt(record.get("route")),
-					Integer.parseInt(record.get("load")),
-					Boolean.parseBoolean(record.get("coldStart")),
-					convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
-					Double.parseDouble(record.get("gps_alt")),
-					Double.parseDouble(record.get("gps_speed")),
-					Double.parseDouble(record.get("speed_vehicle")),
-
-					CO < 0 ? 0 : CO,
-					CO2 < 0 ? 0 : CO2,
-					NOx < 0 ? 0 : NOx
-				));
-			}
-		} catch(IOException e){
-			throw new RuntimeException(e);
-		}
-
-		// Now generate the interpolated points TODO Check if this distorts the results
-		List<PretoriaGPSEntry> pretoriaGPSEntriesInterpolated = new ArrayList<>();
-		for (int i = 1; i < pretoriaGPSEntries.size(); i++){
-			PretoriaGPSEntry previous = pretoriaGPSEntries.get(i-1);
-			PretoriaGPSEntry current = pretoriaGPSEntries.get(i);
-
-			if (previous.trip != current.trip)
-				continue;
-
-			pretoriaGPSEntriesInterpolated.addAll(interpolateGpsEntries(pretoriaGPSEntries.get(i-1), pretoriaGPSEntries.get(i)));
-
-		}
-
-		// Attach gps-information to the matsim links
+		// Attach gps-information to the matsim links TODO Extract into seperate method
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2traversalTime = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
 
-		// TODO debug only, remove this var
+		// TODO debug only, remove these vars
 		Map<PretoriaGPSEntry, Id<Link>> pretoriaGpsEntry2linkId = new HashMap<>();
+		Set<Tuple<PretoriaGPSEntry, Id<Link>>> skippedEntries = new HashSet<>();
 
-		// TODO Check if ArrayMaps or HashMaps are faster here
-		int previousTripId = -1;
-		Id<Link> previousLinkId = null;
-		PretoriaGPSEntry previousGpsEntry = null;
-		int i = 0;
-		for(var gpsEntry : pretoriaGPSEntriesInterpolated){
-			var tripId = gpsEntry.trip;
-			tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
-			tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
+		for(var gpsTripEntries : tripId2pretoriaGpsEntries.entrySet()){
 
-			var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
-			tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
-			tripId2linkId2pretoriaGpsEntries.get(tripId).get(linkId).add(gpsEntry);
+			Id<Link> previousLinkId = null;
+			PretoriaGPSEntry previousGpsEntry = null;
+			var tripId = gpsTripEntries.getKey();
 
-			pretoriaGpsEntry2linkId.put(gpsEntry, linkId);
+			for(var gpsEntry : gpsTripEntries.getValue()){
+				tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
+				tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
 
-			// Check if a new trip has started OR if vehicle arrived at new link
-			if(previousTripId != tripId || previousLinkId != linkId){
-				Link startLink = pretoriaNetwork.getLinks().get(previousLinkId);
-				Link endLink = pretoriaNetwork.getLinks().get(linkId);
+				var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
+				tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
+				tripId2linkId2pretoriaGpsEntries.get(tripId).get(linkId).add(gpsEntry);
 
-				// Get the edgeTimes
-				Tuple<Double, Double> edgeTimes = previousTripId != tripId ? new Tuple<>(0., 0.) :
-					computeGPSEdgeTimes(
-						previousGpsEntry,
-						gpsEntry,
-						startLink,
-						endLink
-					);
+				pretoriaGpsEntry2linkId.put(gpsEntry, linkId);
 
-				// TODO Check if the skipped links cause problems later on!
-				// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We simply skip these points.
-				if(tripId2linkId2traversalTime.get(tripId).containsKey(linkId)) {
-					continue;
+				// Check  if vehicle arrived at new link
+				if(previousLinkId != linkId){
+					Link startLink = pretoriaNetwork.getLinks().get(previousLinkId);
+					Link endLink = pretoriaNetwork.getLinks().get(linkId);
+
+					// Get the edgeTimes
+					Tuple<Double, Double> edgeTimes = previousGpsEntry == null ? new Tuple<>(0., 0.) :
+						computeGPSEdgeTimes(
+							previousGpsEntry,
+							gpsEntry,
+							startLink,
+							endLink
+						);
+
+					// Finish old entry
+					if(previousLinkId != null)
+						tripId2linkId2traversalTime.get(tripId).compute(previousLinkId, (k, arrivalTime) -> gpsEntry.time + edgeTimes.getFirst() - arrivalTime);
+
+					// TODO Check if the skipped links cause problems later on!
+					// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We skip the next points.
+					if(tripId2linkId2traversalTime.get(tripId).containsKey(linkId)) {
+						if(!linkId.equals(Id.createLinkId("6555")))
+							throw new RuntimeException("Duplicate entry for non-start link! (linkId=" + linkId + ")");
+
+						skippedEntries.add(new Tuple<>(gpsEntry, linkId));
+
+						break;
+					}
+
+					// Start new entry with arrival time
+					tripId2linkId2traversalTime.get(tripId).put(linkId, gpsEntry.time - edgeTimes.getSecond());
 				}
 
-				// Start new entry with arrival time
-				tripId2linkId2traversalTime.get(tripId).put(linkId, gpsEntry.time - edgeTimes.getSecond());
-
-				// Finish old entry (except when we started a new trip)
-				if (previousTripId == tripId) {
-					tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> gpsEntry.time + edgeTimes.getFirst() - arrivalTime);
-				}
+				previousLinkId = linkId;
+				previousGpsEntry = gpsEntry;
 			}
-
-			previousTripId = tripId;
-			previousLinkId = linkId;
-			previousGpsEntry = gpsEntry;
-			i++;
 		}
-
-		// Finish last entry TODO Check if this works properly
-		tripId2linkId2traversalTime.get(previousTripId).compute(previousLinkId, (k, arrivalTime) -> pretoriaGPSEntriesInterpolated.getLast().time - arrivalTime);
 
 		// Get the emission values (PEMS and MATSim)
 		EmissionModule module = new EmissionModule(scenario, manager);
@@ -513,15 +519,16 @@ public class PretoriaTest {
 			"linkId"
 		);
 
-		pretoriaGPSEntriesInterpolated.forEach(e ->
-		{
-			try {
-				if (e.trip == 1)
-					writer2.printRecord(-e.coord.getX(), -e.coord.getY(), pretoriaGpsEntry2linkId.get(e));
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
+		tripId2pretoriaGpsEntries.forEach((trip, map) -> map.forEach( e ->
+			{
+				try {
+					if (trip == 2)
+						writer2.printRecord(-e.coord.getX(), -e.coord.getY(), pretoriaGpsEntry2linkId.get(e));
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
 			}
-		});
+		));
 
 		writer2.flush();
 		writer2.close();
