@@ -131,6 +131,7 @@ public class ThreeLinkIntegrationTest {
 	@Test
 	@Order(2)
 	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
+
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
 

@@ -53,10 +53,9 @@ class ScoringDataCollectorTest {
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
-		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(FinishedBackpackCollector.class);
+		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
@@ -67,7 +66,7 @@ class ScoringDataCollectorTest {
 		collector.finishPerson(distAggent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
-		verify(eods, times(1)).score(backPackCaptor.capture());
+		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
 
 		var backpack = backPackCaptor.getValue();
 		assertEquals(person, backpack.personId());
@@ -123,10 +122,9 @@ class ScoringDataCollectorTest {
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
-		var eods = mock(EndOfDayScoring.class);
 		var eps = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eps);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
@@ -193,11 +191,9 @@ class ScoringDataCollectorTest {
 		var transitRoute = schedule.getFactory().createTransitRoute(routeId, networkRoute, List.of(), "bus");
 		transitLine.addRoute(transitRoute);
 		schedule.addTransitLine(transitLine);
+		var fbc = mock(FinishedBackpackCollector.class);
 
-		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(FinishedBackpackCollector.class);
-
-		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), eods, eps);
+		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), fbc);
 
 		collector.registerAgent(distAgent);
 
@@ -225,7 +221,7 @@ class ScoringDataCollectorTest {
 		collector.finishPerson(distAgent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
-		verify(eods).score(backPackCaptor.capture());
+		verify(fbc).addBackpack(backPackCaptor.capture());
 
 		var leg = (Leg) backPackCaptor.getValue().experiencedPlan().getPlanElements().get(1);
 		assertEquals("pt", leg.getMode());
@@ -273,10 +269,9 @@ class ScoringDataCollectorTest {
 
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
-		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(FinishedBackpackCollector.class);
+		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., person, link1, null, "home", new Coord(0, 0)));
@@ -297,7 +292,7 @@ class ScoringDataCollectorTest {
 		collector.finishPerson(distAggent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
-		verify(eods).score(backPackCaptor.capture());
+		verify(fbc).addBackpack(backPackCaptor.capture());
 		assertEquals(3, backPackCaptor.getValue().experiencedPlan().getPlanElements().size());
 
 		var leg = (Leg) backPackCaptor.getValue().experiencedPlan().getPlanElements().get(1);
@@ -351,10 +346,9 @@ class ScoringDataCollectorTest {
 
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
-		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(FinishedBackpackCollector.class);
+		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
@@ -393,7 +387,7 @@ class ScoringDataCollectorTest {
 		collector.finishPerson(distAgent2.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
-		verify(eods, times(2)).score(backPackCaptor.capture());
+		verify(fbc, times(2)).addBackpack(backPackCaptor.capture());
 
 		var backPacks = backPackCaptor.getAllValues();
 		var bp1 = backPacks.stream().filter(b -> b.personId().equals(person1)).findFirst().orElseThrow();
@@ -427,10 +421,9 @@ class ScoringDataCollectorTest {
 
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
-		var eods = mock(EndOfDayScoring.class);
-		var eps = mock(FinishedBackpackCollector.class);
+		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eods, eps);
+		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(person);
@@ -442,8 +435,7 @@ class ScoringDataCollectorTest {
 
 		// Verify scoring and plan collection
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
-		verify(eods).score(backPackCaptor.capture());
-		verify(eps).addBackpack(any());
+		verify(fbc).addBackpack(backPackCaptor.capture());
 
 		var experiencedPlan = backPackCaptor.getValue().experiencedPlan();
 		assertEquals(2, experiencedPlan.getPlanElements().size());

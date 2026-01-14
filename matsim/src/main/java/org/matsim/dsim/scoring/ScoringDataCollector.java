@@ -2,8 +2,6 @@ package org.matsim.dsim.scoring;
 
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
@@ -23,6 +21,7 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
@@ -49,7 +48,6 @@ import java.util.Set;
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class ScoringDataCollector implements BasicEventHandler {
 
-	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
 	private final Map<Id<Vehicle>, TransitInformation> transitInformation = new HashMap<>();
@@ -60,38 +58,39 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private final Network network;
 
 	private final AgentSourcesContainer asc;
-	private final EndOfDayScoring eods;
 	private final FinishedBackpackCollector backpackCollector;
+
+	private NetworkPartition networkPartition;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
 	@SuppressWarnings("FieldMayBeFinal")
 	@Inject(optional = true)
 	private TransitSchedule transitSchedule;
 
-
-	// TODO remove
-	private NetworkPartition networkPartition;
-
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, EndOfDayScoring eods, FinishedBackpackCollector fbc, NetworkPartition partition) {
-		this(simStepMessaging, network, null, asc, eods, fbc);
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, FinishedBackpackCollector fbc, NetworkPartition partition) {
+		this(simStepMessaging, network, null, asc, fbc);
 		this.networkPartition = partition;
 	}
 
 	/**
 	 * Constructor for testing, which includes all dependencies
 	 */
-	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, EndOfDayScoring eods, FinishedBackpackCollector fbc) {
+	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this.simStepMessaging = simStepMessaging;
 		this.partitioning = network.getPartitioning();
 		this.network = network;
 		this.asc = asc;
-		this.eods = eods;
 		this.transitSchedule = transitSchedule;
 		this.backpackCollector = fbc;
 	}
 
 	public void registerAgent(MobsimAgent agent) {
+
+		// don't track drivers. I find this quite brittle, as we will have to hedge agains other drivers as well. I would much rather have
+		// a positive test for agents which need scoring.
+		if (agent instanceof TransitDriverAgent) return;
+
 		var backpack = new BackPack(agent.getId(), networkPartition.getIndex());
 		this.backpackByPerson.put(agent.getId(), backpack);
 	}
@@ -155,19 +154,23 @@ public class ScoringDataCollector implements BasicEventHandler {
 			backpackByVehicle.get(backpack.currentVehicle()).remove(backpack);
 		}
 
-		backpack.backpackPlan().finish(network, transitSchedule);
-		var finishedBackpack = new FinishedBackpack(agentId, backpack.startingPartition(), backpack.specialScoringEvents(), backpack.backpackPlan().experiencedPlan());
-		backpackCollector.addBackpack(finishedBackpack);
-
-		//	eods.score(backpack);
-
-		//plansCollector.addExperiencedPlan(agentId, backpack.backpackPlan().experiencedPlan());
+		finishBackpack(backpack);
 	}
 
+	/**
+	 * This method finishes all backpacks and passes the finished backpacks to the finished backpack collector.
+	 * This is the terminating method. This collector will not clean up its state, as it is expected that a new
+	 * instance of ScoringDataCollector will be created for the next iteration.
+	 */
 	public void finishAllPersons() {
 		for (var backpack : backpackByPerson.values()) {
-			finishPerson(backpack.personId());
+			finishBackpack(backpack);
 		}
+	}
+
+	private void finishBackpack(BackPack backpack) {
+		var finishedBackpack = backpack.finish(network, transitSchedule);
+		backpackCollector.addBackpack(finishedBackpack);
 	}
 
 	private void personLeavingPartition(Id<Person> id, int toPart) {
@@ -283,8 +286,10 @@ public class ScoringDataCollector implements BasicEventHandler {
 			backpack.backpackPlan().handleEvent(tae);
 		} else if (e instanceof PersonStuckEvent pse) {
 			var backpack = backpackByPerson.get(pse.getPersonId());
-			backpack.backpackPlan().handleEvent(pse);
-			finishPerson(pse.getPersonId());
+			if (backpack != null) {
+				backpack.backpackPlan().handleEvent(pse);
+				finishPerson(pse.getPersonId());
+			}
 		}
 	}
 

@@ -47,6 +47,9 @@ import java.util.stream.Collectors;
  */
 public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
+	/**
+	 * This class has a few 'trace' statements, which can be enabled by passing -Dlog4j2.level=TRACE to the VM
+	 */
 	private static final Logger log = LogManager.getLogger(MessageBroker.class);
 
 	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
@@ -329,7 +332,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		} else {
 			list = byAddress.get(address(receiverPartition, msg.getType()));
 		}
-//        log.info("#{} received message to send local. {}", getRank(), msg);
 		list.forEach(t -> t.add(msg));
 	}
 
@@ -369,12 +371,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// remove all that are on the same partition
 		waitFor.removeAll(ownParts);
 
-//		log.info("Rank #{}, seq{} waiting for partitions: {}", comm.getRank(), seq, waitFor);
-
 		for (int rank : sendNullMsgs) {
 			int length = dataSize[rank + 1].get();
 			if (length == 0) {
-//                log.info("Node {} sending null message to {}", comm.getRank(), rank);
 				send(EmptyMessage.INSTANCE, rank);
 			}
 		}
@@ -403,7 +402,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private void queueSend(Message msg, int rank, int partition) {
 
-		log.info("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
+		log.trace("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
 		AtomicInteger oldPos = dataSize[rank + 1];
 
 		ThreadSafeFury fury = serialization.getFury();
@@ -462,14 +461,11 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			int length = dataSize[i].get();
 			if (length > 0) {
 				int receiver = i - 1;
-//                log.debug("Rank #{}, seq{}: Send message to {}", comm.getRank(), seq, receiver);
-
 				sizes.recordValue(length);
 				comm.send(receiver, outgoing[i], 0, length);
 				dataSize[i].set(0);
 			}
 		}
-		log.info("#{} after send", comm.getRank());
 
 		int size = aheadMsgs.size();
 		int i = 0;
@@ -483,20 +479,22 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				throw new UncheckedIOException(e);
 			}
 		}
-		log.info("#{} after ahead msgs", comm.getRank());
 		comm.recv(this, this);
-		log.info("#{} after recv", comm.getRank());
 	}
 
 	private double currentTime = -1;
 
 	@Override
 	public boolean expectsMoreMessages() {
-//		System.out.println(comm.getRank() + " t " + (seq - 1000) + " wait for " + waitFor);
 		if (!waitFor.isEmpty()) {
-			log.info("#{}: {} waiting for {}", this.getRank(), currentTime, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
+			log.trace(this::traceWaiting);
 		}
 		return !waitFor.isEmpty();
+	}
+
+	private String traceWaiting() {
+		var waitForParts = waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
+		return "#" + getRank() + " at t:" + currentTime + " waiting for: [" + waitForParts + "]";
 	}
 
 	@Override
@@ -508,8 +506,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		int tag = in.readInt32();
 		int sender = in.readInt32();
 		int receiver = in.readInt32();
-
-//        log.debug("Rank #{}, seq{}: Received message from {} to {}", comm.getRank(), tag, sender, receiver);
 
 		// Ignore messages that are not for this rank
 		// This might happen depending on the underlying communicator
@@ -540,17 +536,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 
 		if (tag > seq || tag < 0) {
-//			var dup = data.duplicate();
-//			MemoryBuffer mbLogging = MemoryBuffer.fromByteBuffer(data);
-//			int ltag = mbLogging.readInt32();
-//			int lsender = mbLogging.readInt32();
-//			int lreceiver = mbLogging.readInt32();
-//			var l_ = mbLogging.readInt32();
-//			var ltype = mbLogging.readInt32();
-//			var msg = serialization.getFuryParser(tag).parse(in);
-//
-//			log.info("#{} received ahead msg from {}: {}", receiver, sender, msg);
-			log.info("#{} received ahead msg from #{}", comm.getRank(), sender);
+			log.trace("#{} on seq {} received ahead msg from #{} for seq {}", comm.getRank(), seq, sender, tag);
 			aheadMsgs.add(clone(data));
 			return;
 		}
@@ -562,8 +548,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
-
-			log.info("#{} received from {}: {}", receiver, sender, msg);
+			log.trace("#{} received from {}: {}", receiver, sender, msg);
 
 			if (partition == NODE_MESSAGE) {
 				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
@@ -573,7 +558,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			if (msg instanceof Event m) {
 				events.add(m);
 			} else {
-				//log.info("#{} received message: {}", getRank(), msg.toDebugString());
 				sendLocal(msg, partition);
 			}
 		}
@@ -582,14 +566,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// Need to differentiate if a message iy received as broadcast to all or as directed message
 		if (receiver == Communicator.BROADCAST_TO_ALL) {
 			topology.getNodeByIndex(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
-			log.info("#{} remove broadcast sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
 		} else {
 			topology.getNodeByIndex(sender).getParts().forEach(waitFor::remove);
-			log.info("#{} remove point2point sender {}. Wait list is now: {}", comm.getRank(), sender, waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(",")));
 		}
-
-
-//        log.debug("Rank #{}, t{}: Waiting for message from partitions: {}", comm.getRank(), tag, waitFor);
 	}
 
 	public Histogram getRuntime() {

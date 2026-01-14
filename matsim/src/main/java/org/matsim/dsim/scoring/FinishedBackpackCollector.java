@@ -77,7 +77,8 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 		// sort backpacks by compute node
 		for (var backpack : backpacks) {
 			var partition = backpack.startingPartition();
-			backpacksByPartition.get(partition)
+			var targetNode = topology.getNodeByPartition(partition);
+			backpacksByPartition.get(targetNode.getRank())
 				.add(backpack);
 		}
 		// send a message to each node
@@ -92,11 +93,11 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 
 		// now receive a message from each othernode
 		var received = recvFromOthers(tag);
-		log.info("#{} Received {} backpacks from other nodes", selfNode.getRank(), received);
 		var selfBackpacks = backpacksByPartition.get(selfNode.getRank()).backpacks();
 		// add the received backpacks as well as our own backpacks.
 		backpacks.addAll(received);
 		backpacks.addAll(selfBackpacks);
+		log.trace("#{} Received {} backpacks from other nodes. Total number of backpacks to score is: {}", selfNode.getRank(), received.size(), backpacks.size());
 	}
 
 	private Collection<FinishedBackpack> recvFromOthers(int tag) {
@@ -173,12 +174,12 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 		if (selfNode.isHeadNode()) {
 			// receive all the experienced plans except from ourselfs
 			var received = recvFromOthers(tag);
-			log.info("#{} recv on finish {}", selfNode.getRank(), received);
+			log.trace("#{} recv {} backpacks on finish", selfNode.getRank(), received.size());
 			this.backpacks.addAll(received);
 		} else {
 			// send the backpacks
 			var msg = new FinishedBackpackMsg(backpacks);
-			log.info("#{} sending on finish {}", selfNode.getRank(), msg);
+			log.trace("#{} sending {} backpacks on finish", selfNode.getRank(), backpacks.size());
 			comm.send(0, msg, tag, serializer);
 			backpacks.clear();
 		}

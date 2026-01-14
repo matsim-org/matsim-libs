@@ -23,12 +23,12 @@ public class Topology implements Message, Iterable<ComputeNode> {
 
 	private final Int2IntMap part2index = new Int2IntOpenHashMap();
 
-	Topology(int totalPartitions, @Nonnull List<ComputeNode> computeNodes) {
+	Topology(int totalPartitions, @Nonnull List<ComputeNode> computeNodesArg) {
 		this.totalPartitions = totalPartitions;
 		this.computeNodes = new ArrayList<>();
-		for (var node : computeNodes) {
+		for (var node : computeNodesArg) {
 			for (int part : node.getParts()) {
-				part2index.put(part, computeNodes.size());
+				part2index.put(part, this.computeNodes.size());
 			}
 			this.computeNodes.add(node);
 		}

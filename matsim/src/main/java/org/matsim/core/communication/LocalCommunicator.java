@@ -6,6 +6,7 @@ import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,7 +18,11 @@ import java.util.List;
  */
 public class LocalCommunicator implements Communicator {
 
+	/**
+	 * This class has a few 'trace' statements, which can be enabled by passing -Dlog4j2.level=TRACE to the VM
+	 */
 	private static final Logger log = LogManager.getLogger(LocalCommunicator.class);
+
 	private final int rank;
 	private final int size;
 
@@ -77,32 +82,14 @@ public class LocalCommunicator implements Communicator {
 		ByteBuffer buf = clone(data, offset, length);
 		// Every receiver needs a copy of the buffer
 		if (receiver == Communicator.BROADCAST_TO_ALL) {
-			try {
-				if (length >= 20) {
-					ByteBuffer b = data.asByteBuffer().order(ByteOrder.LITTLE_ENDIAN);
-					var sequence = b.getInt(0);
-					var senderRank = b.getInt(4);
-					var receiverRank = b.getInt(8);
-					var partition = b.getInt(12);
-					var type = b.getInt(16);
-					log.info("#{} broadcasting: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
-				}
-			} catch (Throwable e) {
-				log.error("Error when trying to log message buffer.");
-			}
+			log.trace(() -> traceMsg(rank, "broadcast", data.asByteBuffer()));
 			for (int i = 0; i < size; i++) {
 				if (i != rank) {
 					queues.get(i).offer(buf.duplicate());
 				}
 			}
 		} else {
-			ByteBuffer b = data.asByteBuffer().order(ByteOrder.LITTLE_ENDIAN);
-			var sequence = b.getInt(0);
-			var senderRank = b.getInt(4);
-			var receiverRank = b.getInt(8);
-			var partition = b.getInt(12);
-			var type = b.getInt(16);
-			log.info("#{} sending: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
+			log.trace(() -> traceMsg(rank, "send", data.asByteBuffer()));
 			queues.get(receiver).offer(buf.duplicate());
 		}
 	}
@@ -118,24 +105,31 @@ public class LocalCommunicator implements Communicator {
 				idle.idle();
 				continue;
 			}
-
+			log.trace(() -> traceMsg(rank, "recv", poll));
 			try {
-				ByteBuffer b = poll.duplicate();
-				b.order(ByteOrder.LITTLE_ENDIAN);
-				var sequence = b.getInt(0);
-				var senderRank = b.getInt(4);
-				var receiverRank = b.getInt(8);
-				var partition = b.getInt(12);
-				var type = b.capacity() > 16 ? b.getInt(16) : -1;
-				log.info("#{} recv: {seq: {}, sRank: {}, rRank: {}, rPart: {}, Mtype: {}}", rank, sequence, senderRank, receiverRank, partition, type);
 				handleReceive.consume(poll);
-			} catch (Throwable e) {
-				log.error("Error in recv message. In LocalCommunicator");
-				log.error(e);
+			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-
 			idle.reset();
+		}
+	}
+
+	private static String traceMsg(int selfRank, String method, ByteBuffer mem) {
+		// make a defensive copy, and reset the needle in the buffer.
+		var buf = mem.duplicate().order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().rewind();
+		if (buf.limit() >= 3) {
+			var seq = buf.get();
+			var senderRank = buf.get();
+			var receiverRank = buf.get();
+			return "#" + selfRank + " " + method + ": { seq: " + seq + ", sRank: " + senderRank + ", rRank: " + receiverRank + "}";
+		} else {
+			var b = new StringBuilder("#" + selfRank + " " + method + ": [");
+			while (buf.hasRemaining()) {
+				b.append(buf.get());
+			}
+			b.append("]");
+			return b.toString();
 		}
 	}
 }
