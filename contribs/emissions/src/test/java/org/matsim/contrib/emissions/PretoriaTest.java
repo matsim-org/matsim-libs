@@ -220,25 +220,29 @@ public class PretoriaTest {
 	// TODO clusterGpsEntries()
 
 	///  Returns a list of interpolated points, interpolation happens every meter
-	private List<PretoriaGPSEntry> interpolateGpsEntries(List<PretoriaGPSEntry> entries){
-		List<PretoriaGPSEntry> interpolatedEntries = new ArrayList<>();
+	private List<PretoriaGPSEntry> interpolateGpsEntries(List<PretoriaGPSEntry> gpsEntries){
+		List<PretoriaGPSEntry> interpolatedEntries = new LinkedList<>();
+		interpolatedEntries.add(gpsEntries.getFirst());
 
-		for (int i = 1; i < entries.size(); i++) {
-			PretoriaGPSEntry start = entries.get(i-1);
-			PretoriaGPSEntry end = entries.get(i);
-
-			double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
-
-			// Return an empty list, if the distance between the points is too small
-			if (Math.floor(distance) == 0)
-				return new ArrayList<>();
+		for (int i = 1; i < gpsEntries.size(); i++) {
+			PretoriaGPSEntry start = gpsEntries.get(i-1);
+			PretoriaGPSEntry end = gpsEntries.get(i);
 
 			// Do not interpolate between different trips
 			if (start.trip != end.trip)
 				throw new IllegalArgumentException("Tried to interpolate two entries from different driving trips!");
 
+			double distance = CoordUtils.calcEuclideanDistance(start.coord, end.coord);
+
+			// Return an empty list, if the distance between the points is too small
+			if (distance <= 1){
+				interpolatedEntries.add(end);
+				continue;
+			}
+
 			// Create one interpolation point per meter
-			for (double d = 0; d < Math.floor(distance); d += 1) {
+			double traversedDistance = 0;
+			for (double d = 1; d < distance; d += 1) {
 				double interpTime = start.time + (d / distance) * (end.time - start.time);
 				double interpAlt = start.gpsAlt + (d / distance) * (end.gpsAlt - start.gpsAlt);
 				Coord interpCoord = CoordUtils.plus(start.coord, CoordUtils.scalarMult(d / distance, CoordUtils.minus(end.coord, start.coord)));
@@ -258,6 +262,8 @@ public class PretoriaTest {
 					(1 / distance) * end.CO2,
 					(1 / distance) * end.NOx
 				));
+
+				traversedDistance += 1;
 			}
 
 			// Add one last entry with remaining emissions (replacing the end point)
@@ -272,17 +278,18 @@ public class PretoriaTest {
 				end.gpsAlt,
 				0,
 				0,
-				(1 - (double) interpolatedEntries.size() / distance) * end.CO,
-				(1 - (double) interpolatedEntries.size() / distance) * end.CO2,
-				(1 - (double) interpolatedEntries.size() / distance) * end.NOx
+				(1 - traversedDistance / distance) * end.CO,
+				(1 - traversedDistance / distance) * end.CO2,
+				(1 - traversedDistance / distance) * end.NOx
 			));
-
-			// Final checks to make sure, that the interpolation values do not deviate from original values
-			assert interpolatedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() - end.CO < 1e-6;
-			assert interpolatedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() - end.CO2 < 1e-6;
-			assert interpolatedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() - end.NOx < 1e-6;
-
 		}
+
+		assert gpsEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() -
+			interpolatedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() < 1e-6;
+		assert gpsEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() -
+			interpolatedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() < 1e-6;
+		assert gpsEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() -
+			interpolatedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() < 1e-6;
 
 		return interpolatedEntries;
 	}
@@ -370,6 +377,7 @@ public class PretoriaTest {
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
 		// TODO Clustering
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> interpolateGpsEntries(entries));
+		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries)));
 
 		// Attach gps-information to the matsim links TODO Extract into seperate method
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
