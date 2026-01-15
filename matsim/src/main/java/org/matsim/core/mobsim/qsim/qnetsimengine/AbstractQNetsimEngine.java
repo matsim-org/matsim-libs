@@ -237,8 +237,10 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		}
 		QLinkI qlink = qNetwork.getNetsimLinks().get(startLinkId );
 		if (qlink == null) {
-			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
-					+ "or activities or facilities are registered to a different network.") ;
+			final String message = "vehicleId=" + veh.getId() + " requested link with id=" + startLinkId + ", which does not exist in network. Possibly, vehicles "
+									   + "or activities or facilities are registered to a different network.";
+			log.fatal( message );
+			throw new RuntimeException( message ) ;
 		}
 		qlink.addParkedVehicle(veh);
 	}

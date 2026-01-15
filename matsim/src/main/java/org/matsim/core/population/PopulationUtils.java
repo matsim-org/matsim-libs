@@ -1348,7 +1348,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case if network links were
 	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
 	 *
 	 * @param population
@@ -1359,5 +1359,8 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
+	}
+	public static void cleanPopulation( Scenario scenario ) {
+		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
 	}
 }
