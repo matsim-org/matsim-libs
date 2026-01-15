@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -102,6 +103,7 @@ public class TurnRestrictionsNetworkCleaner {
             // colored node copy still present, but not the original
             if (network.getNodes().containsKey(nodeId) && !network.getNodes().containsKey(coloredNode.node().getId())) {
                 Node nodeCopy = NetworkUtils.createNode(coloredNode.node().getId(), coloredNode.node().getCoord());
+                AttributesUtils.copyAttributesFromTo(coloredNode.node(), nodeCopy);
                 network.addNode(nodeCopy);
                 for (TurnRestrictionsContext.ColoredLink coloredLink : coloredNode.inLinks()) {
                     if (network.getLinks().containsKey(coloredLink.link.getId())) {
