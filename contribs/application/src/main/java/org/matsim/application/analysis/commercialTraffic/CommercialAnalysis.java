@@ -76,7 +76,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
 	private final Map<String, String> groupsOfSubpopulationsForCommercialAnalysisRaw = new HashMap<>();
 
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		new CommercialAnalysis().execute(args);
 	}
 
@@ -345,9 +345,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			if (PopulationUtils.getSubpopulation(person) == null)
 				log.error("This agent has no populationGroup {}, This should not happen", personId);
 			return groupsOfSubpopulationsForCommercialAnalysis.get(populationGroup).contains(PopulationUtils.getSubpopulation(person));
-		}).forEach(personId -> {
-			filteredList.put(personId, distancesPerTripPerPerson.get(personId));
-		});
+		}).forEach(personId -> filteredList.put(personId, distancesPerTripPerPerson.get(personId)));
 		return filteredList;
 	}
 
@@ -413,7 +411,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						printer.print(String.valueOf(
 							Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
 					} else {
-						log.warn("Vehicle type " + vehicleType + " not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN");
+						log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
 						printer.print("NaN");
 						printer.print("NaN");
 					}
