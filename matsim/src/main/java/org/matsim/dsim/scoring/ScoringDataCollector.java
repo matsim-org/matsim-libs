@@ -8,8 +8,6 @@ import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkPartition;
-import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -54,13 +52,10 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 
 	private final SimStepMessaging simStepMessaging;
-	private final NetworkPartitioning partitioning;
 	private final Network network;
 
 	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
-
-	private NetworkPartition networkPartition;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
 	@SuppressWarnings("FieldMayBeFinal")
@@ -68,9 +63,8 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private TransitSchedule transitSchedule;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, FinishedBackpackCollector fbc, NetworkPartition partition) {
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this(simStepMessaging, network, null, asc, fbc);
-		this.networkPartition = partition;
 	}
 
 	/**
@@ -78,7 +72,6 @@ public class ScoringDataCollector implements BasicEventHandler {
 	 */
 	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this.simStepMessaging = simStepMessaging;
-		this.partitioning = network.getPartitioning();
 		this.network = network;
 		this.asc = asc;
 		this.transitSchedule = transitSchedule;
@@ -91,7 +84,9 @@ public class ScoringDataCollector implements BasicEventHandler {
 		// a positive test for agents which need scoring.
 		if (agent instanceof TransitDriverAgent) return;
 
-		var backpack = new BackPack(agent.getId(), networkPartition.getIndex());
+		var startLink = agent.getCurrentLinkId();
+		var startPartition = network.getPartitioning().getPartition(startLink);
+		var backpack = new BackPack(agent.getId(), startPartition);
 		this.backpackByPerson.put(agent.getId(), backpack);
 	}
 
@@ -126,7 +121,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
 		var driverId = vehicle.getDriver().getId();
-		var targetPart = partitioning.getPartition(vehicle.getCurrentLinkId());
+		var targetPart = network.getPartitioning().getPartition(vehicle.getCurrentLinkId());
 
 		// we don't want to send data for transit drivers, but we want to remove them from our bookkeeping
 		if (transitDrivers.contains(driverId)) {
@@ -141,7 +136,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 	}
 
 	public void teleportedPersonLeavesPartition(DistributedMobsimAgent agent) {
-		var targetPart = partitioning.getPartition(agent.getDestinationLinkId());
+		var targetPart = network.getPartitioning().getPartition(agent.getDestinationLinkId());
 		personLeavingPartition(agent.getId(), targetPart);
 	}
 

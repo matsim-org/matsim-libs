@@ -236,9 +236,6 @@ class DistributedEventsManagerTest {
 		}
 	}
 
-	/**
-	 * @param expectedData = new ArrayList<>(List.of("partition-0", "partition-1"));
-	 */
 	@DistributedEventHandler(value = DistributedMode.NODE_CONCURRENT)
 	private record NodeConcurrentTestHandler(List<String> expectedData) implements TestEvent.Handler {
 
@@ -253,9 +250,6 @@ class DistributedEventsManagerTest {
 		}
 	}
 
-	/**
-	 * @param expectedData = new ArrayList<>(List.of("partition-0", "partition-1"));
-	 */
 	@DistributedEventHandler(value = DistributedMode.NODE_CONCURRENT, processing = ProcessingMode.DIRECT)
 	private record NodeConcurrentDirectTestHandler(List<String> expectedData) implements TestEvent.Handler {
 
@@ -311,6 +305,8 @@ class DistributedEventsManagerTest {
 		}
 
 		interface Handler extends EventHandler {
+			// it is in fact used, but through the events manager and not directly in the test code.
+			@SuppressWarnings("unused")
 			void handleEvent(TestEvent e);
 		}
 	}

@@ -136,8 +136,6 @@ public class DistributedIntegrationTest {
 
 					Config local = createScenario();
 					local.dsim().setThreads(1);
-					local.dsim().setStartTime(50);
-					local.dsim().setEndTime(70);
 
 					Scenario scenario = prepareScenario(local);
 
