@@ -2,6 +2,8 @@ package org.matsim.dsim.scoring;
 
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
@@ -9,6 +11,7 @@ import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -19,7 +22,6 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
@@ -46,13 +48,15 @@ import java.util.Set;
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class ScoringDataCollector implements BasicEventHandler {
 
+	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
 	private final Map<Id<Vehicle>, TransitInformation> transitInformation = new HashMap<>();
-	private final Set<Id<Person>> transitDrivers = new HashSet<>();
+	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
 	private final SimStepMessaging simStepMessaging;
 	private final Network network;
+	private final Population population;
 
 	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
@@ -63,16 +67,17 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private TransitSchedule transitSchedule;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
-		this(simStepMessaging, network, null, asc, fbc);
+	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
+		this(simStepMessaging, network, population, null, asc, fbc);
 	}
 
 	/**
 	 * Constructor for testing, which includes all dependencies
 	 */
-	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
+	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this.simStepMessaging = simStepMessaging;
 		this.network = network;
+		this.population = population;
 		this.asc = asc;
 		this.transitSchedule = transitSchedule;
 		this.backpackCollector = fbc;
@@ -80,17 +85,28 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 	public void registerAgent(MobsimAgent agent) {
 
-		// don't track drivers. I find this quite brittle, as we will have to hedge agains other drivers as well. I would much rather have
-		// a positive test for agents which need scoring.
-		if (agent instanceof TransitDriverAgent) return;
-
-		var startLink = agent.getCurrentLinkId();
-		var startPartition = network.getPartitioning().getPartition(startLink);
-		var backpack = new BackPack(agent.getId(), startPartition);
-		this.backpackByPerson.put(agent.getId(), backpack);
+		// only persons which are part of the population are scored. Other agents such as transit drivers, or drt agents
+		// can be ignored. If this assumption turns out to be incorect, we should probably mark agents as 'scorable' instead
+		if (population.getPersons().containsKey(agent.getId())) {
+			var startLink = agent.getCurrentLinkId();
+			var startPartition = network.getPartitioning().getPartition(startLink);
+			var backpack = new BackPack(agent.getId(), startPartition);
+			this.backpackByPerson.put(agent.getId(), backpack);
+		} else {
+			ignoredAgents.add(agent.getId());
+		}
 	}
 
 	public void process(SimStepMessage msg) {
+
+		for (var backpack : msg.backPacks()) {
+			this.backpackByPerson.put(backpack.personId(), backpack);
+			if (backpack.isInVehicle()) {
+				this.backpackByVehicle
+					.computeIfAbsent(backpack.currentVehicle(), _ -> new HashSet<>())
+					.add(backpack);
+			}
+		}
 
 		// we tap into the vehicle messages to get the state of the transit vehicle. In particular, we need to connect the driver id
 		// with the line and route information. This information is needed to recreate TransitPassengerRoutes.
@@ -100,23 +116,21 @@ public class ScoringDataCollector implements BasicEventHandler {
 		// janek, marcel Dec' 2025
 		for (VehicleContainer vehicle : msg.vehicles()) {
 			var veh = asc.vehicleFromContainer(vehicle);
+
+			// if the driver does not bring a backpack, we can ignore it.
+			var driverId = veh.getDriver().getId();
+			if (!backpackByPerson.containsKey(driverId)) {
+				ignoredAgents.add(driverId);
+			}
 			if (veh instanceof TransitVehicle) {
 				if (veh.getDriver() instanceof AbstractTransitDriverAgent td) {
 					var route = td.getTransitRoute().getId();
 					var line = td.getTransitLine().getId();
 					transitInformation.put(veh.getId(), new TransitInformation(route, line));
-					transitDrivers.add(veh.getDriver().getId());
 				}
 			}
 		}
-		for (var backpack : msg.backPacks()) {
-			this.backpackByPerson.put(backpack.personId(), backpack);
-			if (backpack.isInVehicle()) {
-				this.backpackByVehicle
-					.computeIfAbsent(backpack.currentVehicle(), _ -> new HashSet<>())
-					.add(backpack);
-			}
-		}
+
 	}
 
 	public void vehicleLeavesPartition(DistributedMobsimVehicle vehicle) {
@@ -124,7 +138,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 		var targetPart = network.getPartitioning().getPartition(vehicle.getCurrentLinkId());
 
 		// we don't want to send data for transit drivers, but we want to remove them from our bookkeeping
-		if (transitDrivers.contains(driverId)) {
+		if (ignoredAgents.contains(driverId)) {
 			transitInformation.remove(driverId);
 		} else {
 			personLeavingPartition(driverId, targetPart);
@@ -186,7 +200,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 		// short circuit on transit drivers and pass on special scoring events
 		if (e instanceof HasPersonId hpi) {
-			if (transitDrivers.contains(hpi.getPersonId())) {
+			if (ignoredAgents.contains(hpi.getPersonId())) {
 				return;
 			}
 			if (BackPack.isRelevantForScoring(e) && backpackByPerson.containsKey(hpi.getPersonId())) {
@@ -197,7 +211,7 @@ public class ScoringDataCollector implements BasicEventHandler {
 
 		if (e instanceof TransitDriverStartsEvent tdse) {
 			transitInformation.put(tdse.getVehicleId(), new TransitInformation(tdse.getTransitRouteId(), tdse.getTransitLineId()));
-			transitDrivers.add(tdse.getDriverId());
+			ignoredAgents.add(tdse.getDriverId());
 		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
 			var backpacksInVehicle = backpackByVehicle.get(pcive.getVehicleId());
 			var backpack = backpackByPerson.get(pcive.getPersonId());

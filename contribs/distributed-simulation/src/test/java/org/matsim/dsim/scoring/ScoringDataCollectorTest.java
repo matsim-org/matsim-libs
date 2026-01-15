@@ -11,8 +11,12 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
+import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
+import org.matsim.core.mobsim.dsim.VehicleContainer;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -35,11 +39,14 @@ class ScoringDataCollectorTest {
 	@Test
 	void testTeleportation() {
 
-		var person = Id.createPersonId("p1");
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var pId = Id.createPersonId("p1");
+		var person = pop.getFactory().createPerson(pId);
+		pop.addPerson(person);
 		var link1 = Id.createLinkId("l1");
 		var link2 = Id.createLinkId("l2");
 		var distAggent = mock(DistributedMobsimAgent.class);
-		when(distAggent.getId()).thenReturn(person);
+		when(distAggent.getId()).thenReturn(pId);
 
 		var messaging = mock(SimStepMessaging.class);
 		var network = NetworkUtils.createNetwork();
@@ -55,21 +62,21 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
-		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(1., person, link1, "walk", "walk"));
-		collector.handleEvent(new TeleportationArrivalEvent(25, person, 339, "walk"));
-		collector.handleEvent(new PersonArrivalEvent(25, person, link2, "walk"));
-		collector.handleEvent(new ActivityStartEvent(25, person, link2, null, "work", new Coord(1001, 0)));
+		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
+		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
+		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
+		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
 		collector.finishPerson(distAggent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
 		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
 
 		var backpack = backPackCaptor.getValue();
-		assertEquals(person, backpack.personId());
+		assertEquals(pId, backpack.personId());
 		var experiencedPlan = backpack.experiencedPlan();
 		assertEquals(3, experiencedPlan.getPlanElements().size());
 
@@ -104,11 +111,16 @@ class ScoringDataCollectorTest {
 
 	@Test
 	void testTeleportationBetweenPartitions() {
-		var person = Id.createPersonId("p1");
+
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var pId = Id.createPersonId("p1");
+		var person = pop.getFactory().createPerson(pId);
+		pop.addPerson(person);
+
 		var link1 = Id.createLinkId("l1");
 		var link2 = Id.createLinkId("l2");
 		var distAggent = mock(DistributedMobsimAgent.class);
-		when(distAggent.getId()).thenReturn(person);
+		when(distAggent.getId()).thenReturn(pId);
 
 		var messaging = mock(SimStepMessaging.class);
 		var network = NetworkUtils.createNetwork();
@@ -124,13 +136,13 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var eps = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, eps);
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, eps);
 
 		collector.registerAgent(distAggent);
-		collector.handleEvent(new ActivityEndEvent(1., person, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(1., person, link1, "walk", "walk"));
+		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(1., pId, link1, "walk", "walk"));
 
-		// the following simulates how a person leaves and enters a partition. The simulation calls the leave method, which passes a person's backpack
+		// the following simulates how a pId leaves and enters a partition. The simulation calls the leave method, which passes a pId's backpack
 		// to the messaging. Then the other partition passes the received message to its collector, which then receives the events for that agent.
 		collector.teleportedPersonLeavesPartition(distAggent);
 
@@ -144,9 +156,9 @@ class ScoringDataCollectorTest {
 		collector.process(msg);
 
 		// now, process the remaining events.
-		collector.handleEvent(new TeleportationArrivalEvent(25, person, 339, "walk"));
-		collector.handleEvent(new PersonArrivalEvent(25, person, link2, "walk"));
-		collector.handleEvent(new ActivityStartEvent(25, person, link2, null, "work", new Coord(1001, 0)));
+		collector.handleEvent(new TeleportationArrivalEvent(25, pId, 339, "walk"));
+		collector.handleEvent(new PersonArrivalEvent(25, pId, link2, "walk"));
+		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
 		collector.finishPerson(distAggent.getId());
 
 		// make sure all plan elements are present. The other values should be the same as in the test above.
@@ -155,14 +167,19 @@ class ScoringDataCollectorTest {
 
 	@Test
 	void testPtTrip() {
-		var person = Id.createPersonId("p1");
+
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var pId = Id.createPersonId("p1");
+		var person = pop.getFactory().createPerson(pId);
+		pop.addPerson(person);
+
 		var transitVehicle = Id.createVehicleId("bus1");
 		var driver = Id.createPersonId("driver1");
 		var link1 = Id.createLinkId("l1");
 		var link2 = Id.createLinkId("l2");
 
 		var distAgent = mock(DistributedMobsimAgent.class);
-		when(distAgent.getId()).thenReturn(person);
+		when(distAgent.getId()).thenReturn(pId);
 
 		var scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		var network = scenario.getNetwork();
@@ -193,7 +210,7 @@ class ScoringDataCollectorTest {
 		schedule.addTransitLine(transitLine);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, schedule, mock(AgentSourcesContainer.class), fbc);
+		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, pop, schedule, mock(AgentSourcesContainer.class), fbc);
 
 		collector.registerAgent(distAgent);
 
@@ -201,23 +218,23 @@ class ScoringDataCollectorTest {
 		collector.handleEvent(new TransitDriverStartsEvent(0.0, driver, transitVehicle, lineId, routeId, Id.create("dep1", Departure.class)));
 
 		// 2. Passenger ends activity and departs
-		collector.handleEvent(new ActivityEndEvent(100., person, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(100., person, link1, "pt", "pt"));
+		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "pt", "pt"));
 
 		// 3. PT movement and boarding
 		collector.handleEvent(new VehicleArrivesAtFacilityEvent(105., transitVehicle, stop1.getId(), 0.0));
-		collector.handleEvent(new PersonEntersVehicleEvent(110., person, transitVehicle));
+		collector.handleEvent(new PersonEntersVehicleEvent(110., pId, transitVehicle));
 		collector.handleEvent(new VehicleDepartsAtFacilityEvent(115., transitVehicle, stop1.getId(), 0.0));
 
 		collector.handleEvent(new LinkLeaveEvent(120., transitVehicle, link1));
 		collector.handleEvent(new LinkEnterEvent(120., transitVehicle, link2));
 
 		collector.handleEvent(new VehicleArrivesAtFacilityEvent(130., transitVehicle, stop2.getId(), 0.0));
-		collector.handleEvent(new PersonLeavesVehicleEvent(135., person, transitVehicle));
+		collector.handleEvent(new PersonLeavesVehicleEvent(135., pId, transitVehicle));
 
 		// 4. Arrival at destination
-		collector.handleEvent(new PersonArrivalEvent(135., person, link2, "pt"));
-		collector.handleEvent(new ActivityStartEvent(135., person, link2, null, "work", new Coord(1000, 0)));
+		collector.handleEvent(new PersonArrivalEvent(135., pId, link2, "pt"));
+		collector.handleEvent(new ActivityStartEvent(135., pId, link2, null, "work", new Coord(1000, 0)));
 		collector.finishPerson(distAgent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
@@ -239,13 +256,18 @@ class ScoringDataCollectorTest {
 
 	@Test
 	void testCarTripThreeLinks() {
-		var person = Id.createPersonId("p1");
+
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var pId = Id.createPersonId("p1");
+		var person = pop.getFactory().createPerson(pId);
+		pop.addPerson(person);
+
 		var vehicle = Id.createVehicleId("p1");
 		var link1 = Id.createLinkId("l1");
 		var link2 = Id.createLinkId("l2");
 		var link3 = Id.createLinkId("l3");
 		var distAggent = mock(DistributedMobsimAgent.class);
-		when(distAggent.getId()).thenReturn(person);
+		when(distAggent.getId()).thenReturn(pId);
 
 		var messaging = mock(SimStepMessaging.class);
 		var network = NetworkUtils.createNetwork();
@@ -271,24 +293,24 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
-		collector.handleEvent(new ActivityEndEvent(100., person, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(100., person, link1, "car", "car"));
+		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(100., pId, link1, "car", "car"));
 
 		// Movement through 3 links: l1 (start) -> l2 (middle) -> l3 (end)
-		collector.handleEvent(new PersonEntersVehicleEvent(100., person, vehicle));
-		collector.handleEvent(new VehicleEntersTrafficEvent(101., person, link1, vehicle, "car", 1.0));
+		collector.handleEvent(new PersonEntersVehicleEvent(100., pId, vehicle));
+		collector.handleEvent(new VehicleEntersTrafficEvent(101., pId, link1, vehicle, "car", 1.0));
 		collector.handleEvent(new LinkLeaveEvent(110., vehicle, link1));
 		collector.handleEvent(new LinkEnterEvent(110., vehicle, link2));
 		collector.handleEvent(new LinkLeaveEvent(120., vehicle, link2));
 		collector.handleEvent(new LinkEnterEvent(120., vehicle, link3));
-		collector.handleEvent(new VehicleLeavesTrafficEvent(130., person, link3, vehicle, "car", 1.0));
-		collector.handleEvent(new PersonLeavesVehicleEvent(130., person, vehicle));
+		collector.handleEvent(new VehicleLeavesTrafficEvent(130., pId, link3, vehicle, "car", 1.0));
+		collector.handleEvent(new PersonLeavesVehicleEvent(130., pId, vehicle));
 
-		collector.handleEvent(new PersonArrivalEvent(130., person, link3, "car"));
-		collector.handleEvent(new ActivityStartEvent(130., person, link3, null, "work", new Coord(3000, 0)));
+		collector.handleEvent(new PersonArrivalEvent(130., pId, link3, "car"));
+		collector.handleEvent(new ActivityStartEvent(130., pId, link3, null, "work", new Coord(3000, 0)));
 		collector.finishPerson(distAggent.getId());
 
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
@@ -313,8 +335,12 @@ class ScoringDataCollectorTest {
 
 	@Test
 	void testJointTrip() {
-		var person1 = Id.createPersonId("p1");
-		var person2 = Id.createPersonId("p2");
+		var pId1 = Id.createPersonId("p1");
+		var pId2 = Id.createPersonId("p2");
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		pop.addPerson(pop.getFactory().createPerson(pId1));
+		pop.addPerson(pop.getFactory().createPerson(pId2));
+
 		var vehicle = Id.createVehicleId("v1");
 		var link1 = Id.createLinkId("l1");
 		var link2 = Id.createLinkId("l2");
@@ -322,8 +348,8 @@ class ScoringDataCollectorTest {
 
 		var distAgent1 = mock(DistributedMobsimAgent.class);
 		var distAgent2 = mock(DistributedMobsimAgent.class);
-		when(distAgent1.getId()).thenReturn(person1);
-		when(distAgent2.getId()).thenReturn(person2);
+		when(distAgent1.getId()).thenReturn(pId1);
+		when(distAgent2.getId()).thenReturn(pId2);
 
 		var messaging = mock(SimStepMessaging.class);
 		var network = NetworkUtils.createNetwork();
@@ -348,40 +374,40 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
 
 		// Both end activities at l1
-		collector.handleEvent(new ActivityEndEvent(100., person1, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(100., person1, link1, "car", "car"));
-		collector.handleEvent(new ActivityEndEvent(100., person2, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(100., person2, link1, "ride", "ride"));
+		collector.handleEvent(new ActivityEndEvent(100., pId1, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(100., pId1, link1, "car", "car"));
+		collector.handleEvent(new ActivityEndEvent(100., pId2, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(100., pId2, link1, "ride", "ride"));
 
 		// Both enter the same vehicle
-		collector.handleEvent(new PersonEntersVehicleEvent(100., person1, vehicle));
-		collector.handleEvent(new PersonEntersVehicleEvent(100., person2, vehicle));
+		collector.handleEvent(new PersonEntersVehicleEvent(100., pId1, vehicle));
+		collector.handleEvent(new PersonEntersVehicleEvent(100., pId2, vehicle));
 
 		// Vehicle moves l1 -> l2
-		collector.handleEvent(new VehicleEntersTrafficEvent(101., person1, link1, vehicle, "car", 1.0));
+		collector.handleEvent(new VehicleEntersTrafficEvent(101., pId1, link1, vehicle, "car", 1.0));
 		collector.handleEvent(new LinkLeaveEvent(110., vehicle, link1));
 		collector.handleEvent(new LinkEnterEvent(110., vehicle, link2));
-		collector.handleEvent(new VehicleLeavesTrafficEvent(115., person1, link2, vehicle, "car", 1.0));
+		collector.handleEvent(new VehicleLeavesTrafficEvent(115., pId1, link2, vehicle, "car", 1.0));
 
 		// Person 2 leaves early at link 2
-		collector.handleEvent(new PersonLeavesVehicleEvent(115., person2, vehicle));
-		collector.handleEvent(new PersonArrivalEvent(115., person2, link2, "ride"));
-		collector.handleEvent(new ActivityStartEvent(115., person2, link2, null, "work", new Coord(1000, 0)));
+		collector.handleEvent(new PersonLeavesVehicleEvent(115., pId2, vehicle));
+		collector.handleEvent(new PersonArrivalEvent(115., pId2, link2, "ride"));
+		collector.handleEvent(new ActivityStartEvent(115., pId2, link2, null, "work", new Coord(1000, 0)));
 
 		// Vehicle continues l2 -> l3 for Person 1
-		collector.handleEvent(new VehicleEntersTrafficEvent(115., person1, link2, vehicle, "car", 1.0));
+		collector.handleEvent(new VehicleEntersTrafficEvent(115., pId1, link2, vehicle, "car", 1.0));
 		collector.handleEvent(new LinkLeaveEvent(120., vehicle, link2));
 		collector.handleEvent(new LinkEnterEvent(120., vehicle, link3));
-		collector.handleEvent(new VehicleLeavesTrafficEvent(130., person1, link3, vehicle, "car", 1.0));
-		collector.handleEvent(new PersonLeavesVehicleEvent(130., person1, vehicle));
-		collector.handleEvent(new PersonArrivalEvent(130., person1, link3, "car"));
-		collector.handleEvent(new ActivityStartEvent(130., person1, link3, null, "work", new Coord(2000, 0)));
+		collector.handleEvent(new VehicleLeavesTrafficEvent(130., pId1, link3, vehicle, "car", 1.0));
+		collector.handleEvent(new PersonLeavesVehicleEvent(130., pId1, vehicle));
+		collector.handleEvent(new PersonArrivalEvent(130., pId1, link3, "car"));
+		collector.handleEvent(new ActivityStartEvent(130., pId1, link3, null, "work", new Coord(2000, 0)));
 
 		collector.finishPerson(distAgent1.getId());
 		collector.finishPerson(distAgent2.getId());
@@ -390,8 +416,8 @@ class ScoringDataCollectorTest {
 		verify(fbc, times(2)).addBackpack(backPackCaptor.capture());
 
 		var backPacks = backPackCaptor.getAllValues();
-		var bp1 = backPacks.stream().filter(b -> b.personId().equals(person1)).findFirst().orElseThrow();
-		var bp2 = backPacks.stream().filter(b -> b.personId().equals(person2)).findFirst().orElseThrow();
+		var bp1 = backPacks.stream().filter(b -> b.personId().equals(pId1)).findFirst().orElseThrow();
+		var bp2 = backPacks.stream().filter(b -> b.personId().equals(pId2)).findFirst().orElseThrow();
 
 		// Assertions for Person 2 (the rider who left early)
 		var leg2 = (Leg) bp2.experiencedPlan().getPlanElements().get(1);
@@ -408,7 +434,10 @@ class ScoringDataCollectorTest {
 
 	@Test
 	void testAgentStuckDuringTeleportation() {
-		var person = Id.createPersonId("p1");
+
+		var pId = Id.createPersonId("p1");
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		pop.addPerson(pop.getFactory().createPerson(pId));
 		var link1 = Id.createLinkId("l1");
 
 		var messaging = mock(SimStepMessaging.class);
@@ -423,15 +452,15 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, transitSchedule, asc, fbc);
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
-		when(distAgent.getId()).thenReturn(person);
+		when(distAgent.getId()).thenReturn(pId);
 		collector.registerAgent(distAgent);
 
-		collector.handleEvent(new ActivityEndEvent(100., person, link1, null, "home", new Coord(0, 0)));
-		collector.handleEvent(new PersonDepartureEvent(110., person, link1, "walk", "walk"));
-		collector.handleEvent(new PersonStuckEvent(120., person, link1, "walk"));
+		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
+		collector.handleEvent(new PersonDepartureEvent(110., pId, link1, "walk", "walk"));
+		collector.handleEvent(new PersonStuckEvent(120., pId, link1, "walk"));
 
 		// Verify scoring and plan collection
 		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
@@ -448,5 +477,90 @@ class ScoringDataCollectorTest {
 		assertEquals(110., leg.getDepartureTime().seconds(), 1e-9);
 		// Stuck time (120) - departure time (110) = 10
 		assertEquals(10., leg.getTravelTime().seconds(), 1e-9);
+	}
+
+	@Test
+	public void testDontRegisterUnknownAgent() {
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var ignored = Id.createPersonId("p1");
+		var ignoredAgent = mock(DistributedMobsimAgent.class);
+		when(ignoredAgent.getId()).thenReturn(ignored);
+		var registered = Id.createPersonId("p2");
+		var registeredAgent = mock(DistributedMobsimAgent.class);
+		when(registeredAgent.getId()).thenReturn(registered);
+		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
+
+		var link1 = Id.createLinkId("l1");
+		var messaging = mock(SimStepMessaging.class);
+		var network = NetworkUtils.createNetwork();
+		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
+		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addLink(network.getFactory().createLink(link1, node1, node2));
+
+		var transitSchedule = mock(TransitSchedule.class);
+		var asc = mock(AgentSourcesContainer.class);
+		var fbc = mock(FinishedBackpackCollector.class);
+
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+
+		collector.registerAgent(ignoredAgent);
+		collector.registerAgent(registeredAgent);
+
+		// make sure the collector doesn't crash when we send it events with the ignored agent.
+		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
+
+		collector.finishAllPersons();
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
+		assertEquals(registered, backPackCaptor.getValue().personId());
+	}
+
+	@Test
+	public void testDontProcessUnknownAgent() {
+		var pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		var ignored = Id.createPersonId("p1");
+		var ignoredAgent = mock(DistributedMobsimAgent.class);
+		when(ignoredAgent.getId()).thenReturn(ignored);
+		var registered = Id.createPersonId("p2");
+		var registeredAgent = mock(DistributedMobsimAgent.class);
+		when(registeredAgent.getId()).thenReturn(registered);
+		pop.addPerson(pop.getFactory().createPerson(registeredAgent.getId()));
+
+		var link1 = Id.createLinkId("l1");
+		var messaging = mock(SimStepMessaging.class);
+		var network = NetworkUtils.createNetwork();
+		var node1 = network.getFactory().createNode(Id.createNodeId("n1"), new Coord(0, 0));
+		var node2 = network.getFactory().createNode(Id.createNodeId("n2"), new Coord(1000, 0));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addLink(network.getFactory().createLink(link1, node1, node2));
+
+		var transitSchedule = mock(TransitSchedule.class);
+		var asc = mock(AgentSourcesContainer.class);
+		var ignoredVehicle = mock(DistributedMobsimVehicle.class);
+		var ignoredDriver = mock(MobsimDriverAgent.class);
+		when(ignoredDriver.getId()).thenReturn(ignored);
+		when(ignoredVehicle.getDriver()).thenReturn(ignoredDriver);
+		when(asc.vehicleFromContainer(any())).thenReturn(ignoredVehicle);
+		var fbc = mock(FinishedBackpackCollector.class);
+
+		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+
+		var msg = SimStepMessage.builder()
+			.addBackPack(new BackPack(registered, 0))
+			.addVehicleContainer(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of()))
+			.build();
+		collector.process(msg);
+
+		// make sure the collector doesn't crash when we send it events with the ignored agent.
+		collector.handleEvent(new ActivityEndEvent(100., ignored, link1, null, "home", new Coord(0, 0)));
+
+		collector.finishAllPersons();
+
+		var backPackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(fbc, times(1)).addBackpack(backPackCaptor.capture());
+		assertEquals(registered, backPackCaptor.getValue().personId());
 	}
 }

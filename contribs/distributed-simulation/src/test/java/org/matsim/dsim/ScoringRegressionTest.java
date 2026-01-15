@@ -63,6 +63,7 @@ public class ScoringRegressionTest {
 	public void ptTrip() {
 
 		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
+		config.controller().setMobsim("qsim");
 		var scenario = ScenarioUtils.loadScenario(config);
 		var controler = new Controler(scenario);
 		controler.run();
