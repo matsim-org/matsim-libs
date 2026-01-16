@@ -9,7 +9,6 @@ import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
-import tech.tablesaw.plotly.components.Marker;
 import tech.tablesaw.plotly.traces.BarTrace;
 import tech.tablesaw.plotly.traces.HistogramTrace;
 import tech.tablesaw.plotly.traces.ScatterTrace;
@@ -356,16 +355,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.x("vehicleType")
 						.y("distanceInKm_"+group)
 				);
-				viz.addTrace(
-					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-						.mode(ScatterTrace.Mode.MARKERS)
-						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
-						.build(),
-					ds.mapping()
-						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
-						.x("vehicleType")
-						.y("distanceInKm_"+group)
-				);
+//				viz.addTrace(
+//					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+//						.mode(ScatterTrace.Mode.MARKERS)
+//						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+//						.build(),
+//					ds.mapping()
+//						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+//						.x("vehicleType")
+//						.y("distanceInKm_"+group)
+//				);
 			});
 		}
 		layout.row("durations", "Tours").el(TextBlock.class, (viz, data) -> {
@@ -450,16 +449,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.x("vehicleType")
 						.y("tourDurationsInHours_"+group)
 				);
-				viz.addTrace(
-					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-						.mode(ScatterTrace.Mode.MARKERS)
-						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
-						.build(),
-					ds.mapping()
-						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
-						.x("vehicleType")
-						.y("tourDurationsInHours_"+group)
-				);
+//				viz.addTrace(
+//					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+//						.mode(ScatterTrace.Mode.MARKERS)
+//						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+//						.build(),
+//					ds.mapping()
+//						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+//						.x("vehicleType")
+//						.y("tourDurationsInHours_"+group)
+//				);
 			});
 		}
 
@@ -559,16 +558,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.x("vehicleType")
 						.y("jobsPerTour_"+group)
 				);
-				viz.addTrace(
-					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-						.mode(ScatterTrace.Mode.MARKERS)
-						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
-						.build(),
-					ds.mapping()
-						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
-						.x("vehicleType")
-						.y("jobsPerTour_"+group)
-				);
+//				viz.addTrace(
+//					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+//						.mode(ScatterTrace.Mode.MARKERS)
+//						.marker(Marker.builder().size(6).opacity(0.4).color("blue").build())
+//						.build(),
+//					ds.mapping()
+//						.name("vehicleId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+//						.x("vehicleType")
+//						.y("jobsPerTour_"+group)
+//				);
 			});
 		}
 
@@ -654,16 +653,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.x("activityType")
 						.y("activityDurationInMinutes_"+group)
 				);
-				viz.addTrace(
-					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
-						.mode(ScatterTrace.Mode.MARKERS)
-						.marker(Marker.builder().size(6).opacity(0.2).color("red").sizeMode(Marker.SizeMode.DIAMETER).build())
-						.build(),
-					ds.mapping()
-						.name("activityId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
-						.x("activityType")
-						.y("activityDurationInMinutes_"+group)
-				);
+//				viz.addTrace(
+//					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
+//						.mode(ScatterTrace.Mode.MARKERS)
+//						.marker(Marker.builder().size(6).opacity(0.2).color("red").sizeMode(Marker.SizeMode.DIAMETER).build())
+//						.build(),
+//					ds.mapping()
+//						.name("activityId")      // <<< erzeugt pro vehicleId eine eigene (Ein-Punkt-)Serie
+//						.x("activityType")
+//						.y("activityDurationInMinutes_"+group)
+//				);
 			});
 		}
 	}
