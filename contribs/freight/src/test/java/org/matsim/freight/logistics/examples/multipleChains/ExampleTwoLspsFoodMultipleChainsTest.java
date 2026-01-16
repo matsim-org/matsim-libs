@@ -45,7 +45,6 @@ public class ExampleTwoLspsFoodMultipleChainsTest {
 	 * janek Jan' 26
 	 */
 	@Test
-	@Disabled
 	public void testOutputIsEqual() {
 
 		try {
