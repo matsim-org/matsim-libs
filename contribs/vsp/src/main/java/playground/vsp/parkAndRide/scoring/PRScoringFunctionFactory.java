@@ -27,12 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.*;
 
 /**
  * Park-and-ride specific scoring function accumulator which extends the CharyparNagelActivityScoring
@@ -41,7 +36,7 @@ import org.matsim.core.scoring.functions.ScoringParameters;
  *
  */
 public class PRScoringFunctionFactory implements ScoringFunctionFactory {
-	
+
 	private static final Logger log = LogManager.getLogger(PRScoringFunctionFactory.class);
 	private final ScoringParametersForPerson charyparNagelConfigParameters;
 	private final double interModalTransferPenalty;
@@ -49,7 +44,7 @@ public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public PRScoringFunctionFactory(final Scenario scenario, double intermodalTransferPenalty) {
 		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = new SubpopulationScoringParameters( scenario );
+		this.charyparNagelConfigParameters = new SubpopulationScoringParameters(scenario);
 		this.interModalTransferPenalty = intermodalTransferPenalty;
 		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
 		this.network = scenario.getNetwork();
@@ -59,15 +54,15 @@ public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 	public ScoringFunction createNewScoringFunction(Person person) {
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
-		final ScoringParameters parameters = charyparNagelConfigParameters.getScoringParameters( person );
-		
+		final ScoringParameters parameters = charyparNagelConfigParameters.getScoringParameters(person);
+
 		// Park-and-ride specific activity scoring extension
-		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction( parameters , this.interModalTransferPenalty));
-		
+		scoringFunctionAccumulator.addScoringFunction(new PRActivityScoringFunction(parameters, this.interModalTransferPenalty));
+
 		// standard scoring functions
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(parameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
 		return scoringFunctionAccumulator;
 	}
 

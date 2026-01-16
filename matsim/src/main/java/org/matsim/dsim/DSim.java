@@ -183,9 +183,12 @@ public final class DSim implements Mobsim {
 			time = timer.incrementTime();
 		}
 
-		manager.finishProcessing();
-
+		// notify the mobsim that the simulation is finished/terminated
 		executor.afterSim();
+		// handle all events that were generated during afterSim -- these get the same timestep as the last simulation time step
+		executor.runEventHandler();
+		// notify the events manager to trigger events processing, as well as syncing.
+		manager.finishProcessing();
 
 		double mu = histogram.getMean() / 1000;
 

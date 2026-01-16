@@ -19,9 +19,6 @@
 
 package org.matsim.core.population.routes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,15 +37,20 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
 /**
  * Provides helper methods to work with routes.
  *
  * @author mrieser
  */
 public class RouteUtils {
-	private static final Logger log = LogManager.getLogger( RouteUtils.class ) ;
+	private static final Logger log = LogManager.getLogger(RouteUtils.class);
 
-	private RouteUtils(){} // do not instantiate
+	private RouteUtils() {
+	} // do not instantiate
 
 	/**
 	 * Returns all nodes the route passes between the start- and the end-link of the route.
@@ -152,11 +154,12 @@ public class RouteUtils {
 		return dist;
 	}
 
-	public static double calcTravelTimeExcludingStartEndLink( final NetworkRoute networkRoute, double now, Person person, Vehicle vehicle, final
-	Network network, TravelTime travelTime ) {
+	public static double calcTravelTimeExcludingStartEndLink(final NetworkRoute networkRoute, double now, Person person, Vehicle vehicle, final
+	Network network, TravelTime travelTime) {
 		double newTravelTime = 0.0;
-		for (Id<Link> routeLinkId : networkRoute.getLinkIds()) newTravelTime += travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-					now + newTravelTime, person, vehicle);
+		for (Id<Link> routeLinkId : networkRoute.getLinkIds())
+			newTravelTime += travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
+				now + newTravelTime, person, vehicle);
 		return newTravelTime;
 	}
 
@@ -167,7 +170,7 @@ public class RouteUtils {
 	 *
 	 * @param networkRoute
 	 * @param relPosOnDepartureLink relative position on the departure link where vehicles start traveling
-	 * @param relPosOnArrivalLink relative position on the arrival link where vehicles stop traveling
+	 * @param relPosOnArrivalLink   relative position on the arrival link where vehicles stop traveling
 	 * @param network
 	 * @return
 	 */
@@ -176,7 +179,7 @@ public class RouteUtils {
 		double routeDistance = calcDistanceExcludingStartEndLink(networkRoute, network);
 		// add relative distance of departure link
 		routeDistance += network.getLinks().get(networkRoute.getStartLinkId()).getLength() * (1.0 - relPosOnDepartureLink);
-		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
+		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())) {
 			// add relative distance of arrival link
 			routeDistance += network.getLinks().get(networkRoute.getEndLinkId()).getLength() * relPosOnArrivalLink;
 		} else { // i.e. departure = arrival link
@@ -186,42 +189,44 @@ public class RouteUtils {
 		return routeDistance;
 	}
 
-	public static double calcTravelTime( final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink,
-					     double now, Person person, Vehicle vehicle, final Network network, TravelTime travelTime) {
+	public static double calcTravelTime(final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink,
+										double now, Person person, Vehicle vehicle, final Network network, TravelTime travelTime) {
 
-		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
+		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())) {
 			return 0.;
 		}
 		double startTime = now;
 
 		// add relative distance of departure link
-		now += (1.0 - relPosOnDepartureLink) * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getStartLinkId() ), now, person, vehicle );
+		now += (1.0 - relPosOnDepartureLink) * travelTime.getLinkTravelTime(network.getLinks().get(networkRoute.getStartLinkId()), now, person, vehicle);
 
 		// sum distance of all link besides departure and arrival link
-		 now += calcTravelTimeExcludingStartEndLink( networkRoute, now, person, vehicle, network, travelTime);
+		now += calcTravelTimeExcludingStartEndLink(networkRoute, now, person, vehicle, network, travelTime);
 
 		// add time on arrival link
-		now += relPosOnArrivalLink * travelTime.getLinkTravelTime( network.getLinks().get( networkRoute.getEndLinkId() ), now, person, vehicle );
+		now += relPosOnArrivalLink * travelTime.getLinkTravelTime(network.getLinks().get(networkRoute.getEndLinkId()), now, person, vehicle);
 
 		return now - startTime;
 	}
 
 	@Deprecated // rename to calcDistanceExcludingStartEndLink.  kai, feb'25
-	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
-		double length = 0. ;
-		for ( Link link : path.links ) {
-			length += link.getLength() ;
+	public static double calcDistance(final LeastCostPathCalculator.Path path) {
+		double length = 0.;
+		for (Link link : path.links) {
+			length += link.getLength();
 		}
-		return length ;
+		return length;
 	}
+
 	@Deprecated // network argument is not needed; please inline.  kai, sep'20
-	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds, Network network ) {
-		return createNetworkRoute( routeLinkIds );
+	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, Network network) {
+		return createNetworkRoute(routeLinkIds);
 	}
-	public static NetworkRoute createNetworkRoute( List<Id<Link>> routeLinkIds ) {
-		Id<Link> startLinkId = routeLinkIds.get(0);
+
+	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds) {
+		Id<Link> startLinkId = routeLinkIds.getFirst();
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
-		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+		Id<Link> endLinkId = routeLinkIds.getLast();
 		NetworkRoute route = createLinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
@@ -251,33 +256,24 @@ public class RouteUtils {
 	public static double calcDistance(TransitRoute tr, TransitStopFacility accessFacility, TransitStopFacility egressFacility, Network network) {
 		Id<Link> enterLinkId = accessFacility.getLinkId();
 		Id<Link> exitLinkId = egressFacility.getLinkId();
-
 		NetworkRoute nr = tr.getRoute();
-		double dist = 0;
-		boolean count = false;
-		if (enterLinkId.equals(nr.getStartLinkId())) {
-			count = true;
+
+		// Go over all links in the network route, which are between the enter and the exit link.
+		// sum lengths of all links. Use enterIndex instead of dropWhile, as we want to exclude the
+		// enter link
+		var enterIndex = nr.getStartLinkId().equals(enterLinkId) ? -1 : nr.getLinkIds().indexOf(enterLinkId);
+		double dist = nr.getLinkIds().stream()
+			.skip(enterIndex + 1)
+			.takeWhile(new TransitRouteEndCondition(exitLinkId))
+			.mapToDouble(id -> network.getLinks().get(id).getLength())
+			.sum();
+
+		// the last link is not included in the list of links of the network route and must be
+		// particularly handled.
+		if (nr.getEndLinkId().equals(exitLinkId)) {
+			dist += network.getLinks().get(exitLinkId).getLength();
 		}
-		for (Id<Link> linkId : nr.getLinkIds()) {
-			if (count) {
-				Link l = network.getLinks().get(linkId);
-				if ( l==null ) {
-					log.error( "link is null; linkId=" + linkId + "; network=" + network ) ;
-				}
-				dist += l.getLength();
-			}
-			if (enterLinkId.equals(linkId)) {
-				count = true;
-			}
-			if (exitLinkId.equals(linkId)) {
-				count = false;
-				break;
-			}
-		}
-		if (count) {
-			Link l = network.getLinks().get(nr.getEndLinkId());
-			dist += l.getLength();
-		}
+
 		return dist;
 	}
 
@@ -289,25 +285,25 @@ public class RouteUtils {
 	 * @param route2
 	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
 	 */
-	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network ) {
-		Gbl.assertNotNull( route1 );
-		Gbl.assertNotNull( route2 );
-		Gbl.assertNotNull( network );
+	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network) {
+		Gbl.assertNotNull(route1);
+		Gbl.assertNotNull(route2);
+		Gbl.assertNotNull(network);
 
-		double routeLength = 0. ;
-		double coveredLength = 0. ;
-		for ( Id<Link> id : route1.getLinkIds() ) {
-			final Link link = network.getLinks().get( id );
-			Gbl.assertNotNull( link );
-			routeLength += link.getLength() ;
-			if ( route2.getLinkIds().contains(id) ) {
-				coveredLength += link.getLength() ;
+		double routeLength = 0.;
+		double coveredLength = 0.;
+		for (Id<Link> id : route1.getLinkIds()) {
+			final Link link = network.getLinks().get(id);
+			Gbl.assertNotNull(link);
+			routeLength += link.getLength();
+			if (route2.getLinkIds().contains(id)) {
+				coveredLength += link.getLength();
 			}
 		}
-		if ( routeLength > 0. ) {
-			return coveredLength/routeLength ;
+		if (routeLength > 0.) {
+			return coveredLength / routeLength;
 		} else {
-			return 1. ; // route has zero length = fully covered by any other route.  (but they are not similar!?!?!?)
+			return 1.; // route has zero length = fully covered by any other route.  (but they are not similar!?!?!?)
 		}
 	}
 
@@ -320,13 +316,38 @@ public class RouteUtils {
 	}
 
 	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, List<Id<Link>> linkIds,
-			Id<Link> endLinkId) {
+														  Id<Link> endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
 	}
 
 	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, Id<Link>[] linkIds,
-			Id<Link> endLinkId) {
+														  Id<Link> endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
+	}
+
+	/**
+	 * End condition for takeWhile in calcDistance. takeWhile takes elements until the condition is false.
+	 * The first element for which false is returned is excluded from the stream. However, we need to
+	 * include the end link in the distance calculation. This is why we remember that we have found
+	 * the end link, return true one more time and on the next call return false.
+	 */
+	private static class TransitRouteEndCondition implements Predicate<Id<Link>> {
+
+		private final Id<Link> endLinkId;
+		private boolean foundEnd = false;
+
+		private TransitRouteEndCondition(Id<Link> endLinkId) {
+			this.endLinkId = endLinkId;
+		}
+
+		@Override
+		public boolean test(Id<Link> linkId) {
+			if (foundEnd) return false;
+			if (linkId.equals(endLinkId)) {
+				foundEnd = true;
+			}
+			return true;
+		}
 	}
 
 }

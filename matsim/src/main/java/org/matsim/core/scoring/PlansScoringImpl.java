@@ -73,7 +73,11 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 			return;
 
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
+
+		for (var person : population.getPersons().values()) {
+			var sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
+			newScoreAssigner.assignNewScore(event.getIteration(), sf, person);
+		}
 	}
 
 	@Override

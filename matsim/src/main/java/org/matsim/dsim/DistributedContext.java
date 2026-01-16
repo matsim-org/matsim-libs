@@ -39,7 +39,7 @@ public final class DistributedContext implements ExecutionContext {
 		this.comm = comm;
 		this.topology = topology;
 		this.serializer = serializer;
-		this.computeNode = topology.getNode(comm.getRank());
+		this.computeNode = topology.getNodeByIndex(comm.getRank());
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class DistributedContext implements ExecutionContext {
 		Topology topology = createTopology(comm, threads, serializer);
 
 		log.info("Topology has {} partitions on {} nodes. Node {} has parts: {}",
-			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNode(comm.getRank()).getParts());
+			topology.getTotalPartitions(), topology.getNodesCount(), comm.getRank(), topology.getNodeByIndex(comm.getRank()).getParts());
 
 		return new DistributedContext(comm, topology, serializer);
 	}
