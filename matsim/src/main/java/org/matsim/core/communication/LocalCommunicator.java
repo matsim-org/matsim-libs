@@ -119,10 +119,10 @@ public class LocalCommunicator implements Communicator {
 		// make a defensive copy, and reset the needle in the buffer.
 		var buf = mem.duplicate().order(ByteOrder.LITTLE_ENDIAN).asIntBuffer().rewind();
 		if (buf.limit() >= 3) {
-			var seq = buf.get();
+			var tag = buf.get();
 			var senderRank = buf.get();
 			var receiverRank = buf.get();
-			return "#" + selfRank + " " + method + ": { seq: " + seq + ", sRank: " + senderRank + ", rRank: " + receiverRank + "}";
+			return "#" + selfRank + " " + method + ": { tag: " + tag + ", sRank: " + senderRank + ", rRank: " + receiverRank + "}";
 		} else {
 			var b = new StringBuilder("#" + selfRank + " " + method + ": [");
 			while (buf.hasRemaining()) {

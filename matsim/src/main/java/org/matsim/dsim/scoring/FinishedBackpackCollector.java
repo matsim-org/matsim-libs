@@ -20,38 +20,34 @@ import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.core.utils.collections.Tuple;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class FinishedBackpackCollector implements ExperiencedPlansService {
 
 	private static final Logger log = LogManager.getLogger(FinishedBackpackCollector.class);
-	private final Set<FinishedBackpack> backpacks = ConcurrentHashMap.newKeySet();
 
 	private final Config config;
 	private final Population population;
 	private final Network network;
-	private final Communicator comm;
 	private final ComputeNode selfNode;
-	private final SerializationProvider serializer;
 	private final Topology topology;
+	private final Communicator comm;
+	private final SerializationProvider serializer;
 
+	private Set<FinishedBackpack> backpacks = ConcurrentHashMap.newKeySet();
 	private boolean finished = false;
 
 	@Inject
-	public FinishedBackpackCollector(Config config, Population population, Network network, Communicator comm, ComputeNode node, SerializationProvider serializer, Topology topology) {
+	public FinishedBackpackCollector(Config config, Population population, Network network, ComputeNode node, Topology topology, Communicator comm, SerializationProvider serializer) {
 		this.config = config;
 		this.population = population;
 		this.network = network;
-		this.comm = comm;
 		this.selfNode = node;
-		this.serializer = serializer;
 		this.topology = topology;
+		this.comm = comm;
+		this.serializer = serializer;
 	}
 
 	public void addBackpack(FinishedBackpack backpack) {
@@ -68,54 +64,36 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 
 	public void exchangePlansForScoring() {
 
-		var tag = 43;
-		var backpacksByPartition = new Int2ObjectOpenHashMap<FinishedBackpackMsg>();
+		var backpacksByRank = new Int2ObjectOpenHashMap<FinishedBackpackMsg>();
+		var ownBackpacks = new HashSet<FinishedBackpack>();
+
 		// we must send a message to each node.
 		for (ComputeNode node : topology) {
-			backpacksByPartition.put(node.getRank(), new FinishedBackpackMsg(new HashSet<>()));
+			if (node.getRank() != selfNode.getRank()) {
+				backpacksByRank.put(node.getRank(), new FinishedBackpackMsg(new HashSet<>()));
+			}
 		}
 		// sort backpacks by compute node
 		for (var backpack : backpacks) {
 			var partition = backpack.startingPartition();
 			var targetNode = topology.getNodeByPartition(partition);
-			backpacksByPartition.get(targetNode.getRank())
-				.add(backpack);
-		}
-		// send a message to each node
-		for (var entry : backpacksByPartition.int2ObjectEntrySet()) {
-			var targetRank = entry.getIntKey();
-			if (targetRank != selfNode.getRank()) {
-				comm.send(targetRank, entry.getValue(), tag, serializer);
+			if (targetNode.getRank() == selfNode.getRank()) {
+				ownBackpacks.add(backpack);
+			} else {
+				backpacksByRank.get(targetNode.getRank())
+					.add(backpack);
 			}
 		}
-		// all backpacks are send away
-		backpacks.clear();
+		// send and receive backpacks
+		var receivedMsgs = comm.allToAll(backpacksByRank, serializer);
+		var receivedBackpacks = receivedMsgs.stream()
+			.flatMap(msg -> msg.backpacks().stream())
+			.collect(Collectors.toSet());
+		// only store the backpacks we own.
+		this.backpacks = ownBackpacks;
+		this.backpacks.addAll(receivedBackpacks);
 
-		// now receive a message from each othernode
-		var received = recvFromOthers(tag);
-		var selfBackpacks = backpacksByPartition.get(selfNode.getRank()).backpacks();
-		// add the received backpacks as well as our own backpacks.
-		backpacks.addAll(received);
-		backpacks.addAll(selfBackpacks);
-		log.trace("#{} Received {} backpacks from other nodes. Total number of backpacks to score is: {}", selfNode.getRank(), received.size(), backpacks.size());
-	}
-
-	private Collection<FinishedBackpack> recvFromOthers(int tag) {
-		var recvCounter = new AtomicInteger();
-		var receivedBackpacks = new HashSet<FinishedBackpack>();
-
-		comm.recv(() -> recvCounter.get() < topology.getNodesCount() - 1, serializedMsg -> {
-			int t = serializedMsg.getInt();
-			if (tag != t)
-				throw new IllegalStateException("Unexpected tag, got: %d, expected: %d".formatted(t, tag));
-			serializedMsg.getInt(); // sender
-			serializedMsg.getInt(); // receiver
-
-			FinishedBackpackMsg msg = serializer.parse(serializedMsg);
-			receivedBackpacks.addAll(msg.backpacks());
-			recvCounter.incrementAndGet();
-		});
-		return receivedBackpacks;
+		log.trace("#{} Received {} backpacks from other nodes. Total number of backpacks to score is: {}", selfNode.getRank(), receivedBackpacks.size(), backpacks.size());
 	}
 
 	@Override
@@ -168,24 +146,44 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 	public void finishIteration() {
 
 		finished = true;
-		var tag = 42; // select some tag
 
 		// everyone except the head node sends to the head node
 		if (selfNode.isHeadNode()) {
+			try {
+				log.info("Waiting for 1 second on the head node to simulate imbalance");
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 			// receive all the experienced plans except from ourselfs
-			var received = recvFromOthers(tag);
-			log.trace("#{} recv {} backpacks on finish", selfNode.getRank(), received.size());
-			this.backpacks.addAll(received);
+			var received = comm.gatherFromAll(FinishedBackpackMsg.class, serializer);
+			log.trace(() -> traceMsg(received));
+
+			for (var msg : received) {
+				this.backpacks.addAll(msg.backpacks());
+			}
 		} else {
 			// send the backpacks
 			var msg = new FinishedBackpackMsg(backpacks);
 			log.trace("#{} sending {} backpacks on finish", selfNode.getRank(), backpacks.size());
-			comm.send(0, msg, tag, serializer);
+			comm.gatherTo(0, msg, serializer);
 			backpacks.clear();
 		}
 	}
 
-	record FinishedBackpackMsg(Collection<FinishedBackpack> backpacks) implements Message {
+	private String traceMsg(List<FinishedBackpackMsg> msgs) {
+		var backpackCount = msgs.stream()
+			.mapToInt(msg -> msg.backpacks().size())
+			.sum();
+		return "#" + selfNode.getRank() + " received " + backpackCount + " backpacks on finish";
+	}
+
+	/**
+	 * Must be public, so the serialization provider can pick it up automatically
+	 *
+	 * @param backpacks
+	 */
+	public record FinishedBackpackMsg(Collection<FinishedBackpack> backpacks) implements Message {
 
 		void add(FinishedBackpack backpack) {
 			backpacks.add(backpack);
