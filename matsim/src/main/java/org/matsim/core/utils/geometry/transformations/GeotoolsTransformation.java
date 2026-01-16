@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.geometry.transformations;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.MathTransform;
@@ -38,6 +40,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
  * @author laemmel
  */
 public class GeotoolsTransformation implements CoordinateTransformation {
+	private static final Logger logger = LogManager.getLogger(GeotoolsTransformation.class );
 
 	private MathTransform transform;
 
@@ -57,6 +60,7 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(to);
 
 		try {
+			logger.info( "CRS.getAuthorityFactory={}", CRS.getAuthorityFactory(true ).getClass() );
 			this.transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
 		} catch (FactoryException e) {
 			throw new RuntimeException(e);
