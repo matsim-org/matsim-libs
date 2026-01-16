@@ -17,10 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 
@@ -81,28 +78,9 @@ public class ScoringRegressionTest {
 	@Test
 	public void kelheim() {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("kelheim");
-		Path configPath = getConfigPath(scenarioUrl, "config.xml");
-//		var config = ConfigUtils.loadConfig(configPath.toString());
-//		config.controller().setOutputDirectory(utils.getOutputDirectory());
-//		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-//		config.controller().setLastIteration(0);
-//		config.controller().setWritePlansInterval(1);
-//		config.controller().setMobsim("dsim");
-//		config.dsim().setStartTime(0);
-//		config.dsim().setEndTime(24 * 3600);
-//		Activities.addScoringParams(config);
-//
-//		var scenario = ScenarioUtils.loadScenario(config);
-//		// Need to prepare network for freight
-//		var carandfreight = Set.of(TransportMode.car, "freight", TransportMode.ride);
-//		scenario.getNetwork().getLinks().values().parallelStream()
-//			.filter(l -> l.getAllowedModes().contains(TransportMode.car))
-//			.forEach(l -> l.setAllowedModes(carandfreight));
-//
-//		var controler = new Controler(scenario);
-//		controler.run();
+		var configPath = getConfigPath(scenarioUrl, "config.xml");
 
-		var config2 = ConfigUtils.loadConfig(configPath.toString());
+		var config2 = ConfigUtils.loadConfig(configPath);
 		config2.controller().setOutputDirectory(utils.getOutputDirectory());
 		config2.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config2.controller().setLastIteration(0);
@@ -131,9 +109,9 @@ public class ScoringRegressionTest {
 
 	private static @NonNull Config loadConfig(String scenarioName, String outputDir, String... configFile) {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL(scenarioName);
-		Path configPath = getConfigPath(scenarioUrl, configFile);
+		var configPath = getConfigPath(scenarioUrl, configFile);
 
-		var config = ConfigUtils.loadConfig(configPath.toString());
+		var config = ConfigUtils.loadConfig(configPath);
 		config.controller().setLastIteration(2);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setOutputDirectory(outputDir);
@@ -149,16 +127,12 @@ public class ScoringRegressionTest {
 		return config;
 	}
 
-	private static @NonNull Path getConfigPath(URL scenarioUrl, String... configFile) {
+	private static @NonNull String getConfigPath(URL scenarioUrl, String... configFile) {
 
 		assert configFile.length < 2 : "Only one config file is supported";
 
 		var fileName = configFile.length == 0 ? "config.xml" : configFile[0];
-		try {
-			return Paths.get(scenarioUrl.toURI()).resolve(fileName);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
+		return scenarioUrl.toString() + fileName;
 	}
 
 	private static @NonNull Scenario loadScenarioAndResetRoutes(Config config) {
