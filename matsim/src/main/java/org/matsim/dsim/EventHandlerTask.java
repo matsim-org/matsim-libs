@@ -235,11 +235,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 	@Override
 	public final boolean needsExecution() {
-		// always execute
-		return SimTask.super.needsExecution();
-	}
-
-	protected boolean isExecutionTime() {
 		return time > 0 && time % handler.getProcessInterval() == 0;
 	}
 

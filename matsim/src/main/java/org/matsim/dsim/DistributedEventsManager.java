@@ -362,11 +362,6 @@ public final class DistributedEventsManager implements EventsManager {
 	public void resetHandlers(int iteration) {
 		for (EventHandlerTask task : tasks) {
 			task.resetTask(iteration);
-//			task.getHandler().reset(iteration);
-//
-//			if (task instanceof DefaultEventHandlerTask deht) {
-//				deht.isCleanUp = -1;
-//			}
 		}
 	}
 
@@ -381,8 +376,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 		if (events.isEmpty())
 			return;
-
-//        log.debug("Received {} events from other nodes", events.size());
 
 		// Only global handlers may have received events from other nodes
 		for (Event event : events) {
@@ -411,8 +404,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 				int receiver = kv.getIntKey();
 				ManyToOneConcurrentLinkedQueue<Event> events = remoteEvents.get(receiver);
-
-//                log.debug("Syncing {} events to {}", events.size(), receiver);
 
 				Event e;
 				while ((e = events.poll()) != null) {

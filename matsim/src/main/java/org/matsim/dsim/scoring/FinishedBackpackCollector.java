@@ -192,12 +192,6 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 
 		// everyone except the head node sends to the head node
 		if (selfNode.isHeadNode()) {
-			try {
-				log.info("Waiting for 1 second on the head node to simulate imbalance");
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
 			// receive all the experienced plans except from ourselfs
 			var received = comm.gatherFromAll(FinishedBackpackMsg.class, serializer);
 			log.trace(() -> traceMsg(received));

@@ -25,20 +25,13 @@ public class DSimComponentsModule extends AbstractQSimModule {
 
 		bind(SimStepMessaging.class).in(Singleton.class);
 		bind(AgentSourcesContainer.class).in(Singleton.class);
-//		bind(ScoringDataCollector.class).in(Singleton.class);
-//		bind(EndOfDayScoring.class).in(Singleton.class);
-//		// expose the iteration number to dsim components, as they cannot listen for iteration start events because they are
-//		// only instantiated after the event has been issued.
-//		bind(IterationInformation.class).toProvider(() -> new IterationInformation(getIterationNumber()));
-
 
 		bind(TeleportationEngine.class).to(DistributedTeleportationEngine.class).in(Singleton.class);
 		addQSimComponentBinding(TeleportationModule.COMPONENT_NAME).to(DistributedTeleportationEngine.class);
 
 		bind(PopulationAgentSource.class).asEagerSingleton();
 		addQSimComponentBinding(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
-
-
+		
 		if (getConfig().transit().isUseTransit()) {
 			bind(Wait2Link.class).to(DistributedPtEngine.class).in(Singleton.class);
 		} else {
