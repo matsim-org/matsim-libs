@@ -57,6 +57,8 @@ public class CommercialTrafficDashboardTest {
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("service").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("pickup").setTypicalDuration(30 * 60));
 		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("delivery").setTypicalDuration(30 * 60));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_start").setTypicalDuration(30 * 60));
+		config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams("longDistance_end").setTypicalDuration(30 * 60));
 
 		List<String> commercialPersonTraffic = List.of("commercialPersonTraffic", "commercialPersonTraffic_service", "goodsTraffic");
 		commercialPersonTraffic.forEach(subpopulation -> {
@@ -86,6 +88,7 @@ public class CommercialTrafficDashboardTest {
 			if (link.getAllowedModes().contains("car") && !link.getAllowedModes().contains("car2")) {
 				Set<String> newModes = new HashSet<>(link.getAllowedModes());
 				newModes.add("ride");
+				newModes.add("truck40t");
 				link.setAllowedModes(newModes);
 			}
 		});
@@ -114,6 +117,20 @@ public class CommercialTrafficDashboardTest {
 			}
 			person.addPlan(plan);
 			scenario.getPopulation().addPerson(person);
+			 if ( i == 7) {
+				Person commercialPerson = popFactory.createPerson(Id.createPersonId("longDistanceFreight_1"));
+				PopulationUtils.putSubpopulation(commercialPerson, "longDistanceFreight");
+				Plan commercialPlan = PopulationUtils.createPlan(commercialPerson);
+				Link link1 = scenario.getNetwork().getLinks().get(Id.createLinkId("i(1,4)"));
+				Link link2 = scenario.getNetwork().getLinks().get(Id.createLinkId("i(8,4)"));
+				Activity cAct1 = PopulationUtils.createAndAddActivityFromCoord(commercialPlan, "longDistance_start", link1.getCoord());
+				cAct1.setEndTime(6 * 3600);
+				PopulationUtils.createAndAddLeg(commercialPlan, "truck40t");
+				Activity cAct2 = PopulationUtils.createAndAddActivityFromCoord(commercialPlan, "longDistance_end", link2.getCoord());
+				cAct2.setEndTime(10 * 360);
+				commercialPerson.addPlan(commercialPlan);
+				scenario.getPopulation().addPerson(commercialPerson);
+			 }
 		}
 		final Controler controler = new Controler(scenario);
 
@@ -130,9 +147,9 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 		sw.addDashboard(
 			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
-				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
 		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
-			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
 
 		controler.addOverridingModule(new SimWrapperModule(sw));
 
