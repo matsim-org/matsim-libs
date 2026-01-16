@@ -111,7 +111,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 					.constant("source", "Simulated")
 					.aggregate(List.of("main_mode"), "share_commercialTraffic", Plotly.AggrFunc.SUM);
 
@@ -129,7 +129,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 					Plotly.DataSet ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 						.constant("source", "Simulated")
 						.aggregate(List.of("subpopulation"), "share_commercialTraffic", Plotly.AggrFunc.SUM);
 
@@ -166,7 +166,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.multiIndex = Map.of("dist_group", "source");
 					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 						.aggregate(List.of("dist_group", "main_mode"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
@@ -190,7 +190,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				viz.multiIndex = Map.of("dist_group", "source");
 					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", "total"))
+							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 						.aggregate(List.of("dist_group", "subpopulation"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
