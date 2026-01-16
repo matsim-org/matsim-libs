@@ -51,7 +51,12 @@ import java.util.*;
  * @author Kai Martins-Turner (kturner)
  * <p>
  * I think the design of this class if fundamentally broken. Please reconcider if you want to use it. janek Jan' 26
+ *
+ *
+ * @deprecated Should be replaced by {@link org.matsim.freight.carriers.usecases.CarrierScorerEventBasedInclToll}. This will need a correct implementation of tolling in the coresponding classes.
+ * The very lazy implementation of tolling in this class is not sufficient. And now seems to cause the issues observed in the tests with the different scores.
  */
+@Deprecated
 class EventBasedCarrierScorer4MultipleChains implements CarrierScoringFunctionFactory, IterationEndsListener {
 
 	// I think these are never used, as the code instantiating this class binds to an instance constructed with no constructor arguments...
