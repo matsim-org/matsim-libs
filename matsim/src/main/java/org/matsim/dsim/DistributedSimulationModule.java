@@ -37,6 +37,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bind(MessageBroker.class).in(Singleton.class);
+		bind(DistributedEventsManager.class).in(Singleton.class);
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 		addControllerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
