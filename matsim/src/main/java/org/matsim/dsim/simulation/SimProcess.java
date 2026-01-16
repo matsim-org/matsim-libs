@@ -30,8 +30,8 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.dsim.DistributedEventsManager;
 import org.matsim.dsim.messages.SimStepMessageProcessor;
+import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.scoring.BackpackScoringModule;
-import org.matsim.dsim.scoring.ScoringDataCollector;
 import org.matsim.dsim.simulation.net.NetworkTrafficEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -55,7 +55,10 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final MobsimTimer currentTime;
 	private final AgentCounter agentCounter = new DummyAgentCounter();
 	private NetworkTrafficEngine networkTrafficEngine;
-	private final ScoringDataCollector scoringDataCollector;
+	// this is hard-wired in the simulation, as the collector needs to know when agents enter or leave a partition. Once we have a second 'thing' which
+	// needs to know this, we can think about a more abstract way of doing this. For now, we didn't want to introduce yet another signaling mechanism
+	// for this. Janek jan' 26
+	private final BackpackDataCollector backpackDataCollector;
 	/**
 	 * Additional agents that have been registered using {@link #registerAdditionalAgentOnLink(MobsimAgent)}.
 	 * This map does not contain the full set of agents in the simulation.
@@ -63,22 +66,20 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 	private final IdMap<Person, MobsimAgent> agents = new IdMap<>(Person.class);
 
 	@Inject
-	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, EventsManager em, ScoringDataCollector sdc, BackpackScoringModule.ScoringDataCollectorRegistry registry) {
+	SimProcess(Scenario scenario, NetworkPartition partition, SimStepMessaging messaging, AgentSourcesContainer asc, DistributedEventsManager em,
+			   BackpackDataCollector bdc, BackpackScoringModule.BackpackDataCollectorRegistry registry) {
 		this.scenario = scenario;
 		this.partition = partition;
 		this.messaging = messaging;
 		this.asc = asc;
 		this.em = em;
 		this.currentTime = new MobsimTimer();
-		this.scoringDataCollector = sdc;
+		this.backpackDataCollector = bdc;
 
-		// TODO can this happen somewhere else?
-		registry.register(sdc);
-
-		// TODO this could also happen somewhere in the wiring code
+		// register the collector, so it can be removed from the events manager eventually.
+		registry.register(bdc);
 		// Wire up the scoring data collector as single partition events handler.
-		DistributedEventsManager dem = (DistributedEventsManager) em;
-		dem.addHandler(scoringDataCollector, partition.getIndex());
+		em.addHandler(backpackDataCollector, partition.getIndex());
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.afterSim();
 		}
 
-		scoringDataCollector.finishAllPersons();
+		backpackDataCollector.finishAllPersons();
 	}
 
 	@Override
@@ -161,7 +162,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 		for (DistributedMobsimEngine engine : engines) {
 			engine.process(msg, now);
 		}
-		scoringDataCollector.process(msg);
+		backpackDataCollector.process(msg);
 	}
 
 	@Override
@@ -247,7 +248,7 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 
 	@Override
 	public void insertAgentIntoMobsim(MobsimAgent agent) {
-		scoringDataCollector.registerAgent(agent);
+		backpackDataCollector.registerAgent(agent);
 		arrangeNextAgentState(agent);
 	}
 

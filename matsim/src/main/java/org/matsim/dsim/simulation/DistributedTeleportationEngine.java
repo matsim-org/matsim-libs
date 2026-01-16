@@ -13,7 +13,7 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.dsim.scoring.ScoringDataCollector;
+import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final SimStepMessaging simStepMessaging;
 	private final AgentSourcesContainer asc;
-	private final ScoringDataCollector sdc;
+	private final BackpackDataCollector bdc;
 
 	private InternalInterface internalInterface;
 	// store the current time, so we can use it for after sim.
@@ -40,11 +40,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	@Inject
 	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc,
-								   ScoringDataCollector sdc) {
+								   BackpackDataCollector bdc) {
 		this.simStepMessaging = simStepMessaging;
 		this.em = em;
 		this.asc = asc;
-		this.sdc = sdc;
+		this.bdc = bdc;
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		if (simStepMessaging.isLocal(person.getDestinationLinkId())) {
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
-			sdc.teleportedPersonLeavesPartition(person);
+			bdc.teleportedPersonLeavesPartition(person);
 			simStepMessaging.collectTeleportation(person, exitTime);
 		}
 

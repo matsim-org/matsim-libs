@@ -10,7 +10,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.scoring.ScoringDataCollector;
+import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
@@ -24,7 +24,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
-	private final ScoringDataCollector sdc;
+	private final BackpackDataCollector bdc;
 	//private final Set<String> modes;
 
 	private InternalInterface internalInterface;
@@ -37,7 +37,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Inject
 	public NetworkTrafficEngine(AgentSourcesContainer asc, SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
-								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em, ScoringDataCollector sdc) {
+								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em, BackpackDataCollector bdc) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
@@ -45,7 +45,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		this.activeLinks = activeLinks;
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
-		this.sdc = sdc;
+		this.bdc = bdc;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 			// propagate an event.
 			if (link instanceof SimLink.SplitOutLink sol) {
 				sol.addLeaveHandler((vehicle, _, _) -> {
-					this.sdc.vehicleLeavesPartition(vehicle);
+					this.bdc.vehicleLeavesPartition(vehicle);
 					return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 				});
 			} else {

@@ -8,7 +8,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PendingLeg {
+class PendingLeg {
 
 	private final String legMode;
 	private final String routingMode;
@@ -18,7 +18,7 @@ public class PendingLeg {
 	private double arrivalTime;
 	private double travelDistance;
 
-	public PendingLeg(String legMode, String routingMode, double departureTime) {
+	PendingLeg(String legMode, String routingMode, double departureTime) {
 		this.legMode = legMode;
 		this.routingMode = routingMode;
 		this.departureTime = departureTime;

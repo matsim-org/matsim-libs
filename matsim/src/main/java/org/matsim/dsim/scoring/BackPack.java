@@ -13,6 +13,9 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Agents carry backpacks inside which they gather data of what they have experienced during the simulation.
+ */
 public class BackPack {
 
 	private final Id<Person> personId;
@@ -20,19 +23,19 @@ public class BackPack {
 	private final BackpackPlan backpackPlan;
 	private final int startingPartition;
 
-	public Id<Person> personId() {
+	Id<Person> personId() {
 		return personId;
 	}
 
-	public Id<Vehicle> currentVehicle() {
+	Id<Vehicle> currentVehicle() {
 		return backpackPlan.currentVehicle();
 	}
 
-	public boolean isInVehicle() {
+	boolean isInVehicle() {
 		return backpackPlan.isInVehicle();
 	}
 
-	public BackpackPlan backpackPlan() {
+	BackpackPlan backpackPlan() {
 		return backpackPlan;
 	}
 
@@ -52,15 +55,15 @@ public class BackPack {
 		}
 	}
 
-	public Collection<Event> specialScoringEvents() {
+	Collection<Event> specialScoringEvents() {
 		return events;
 	}
 
-	public static boolean isRelevantForScoring(Event e) {
+	static boolean isRelevantForScoring(Event e) {
 		return e instanceof PersonMoneyEvent || e instanceof PersonScoreEvent || e instanceof PersonStuckEvent;
 	}
 
-	public FinishedBackpack finish(Network network, TransitSchedule transitSchedule) {
+	FinishedBackpack finish(Network network, TransitSchedule transitSchedule) {
 		backpackPlan.finish(network, transitSchedule);
 		return new FinishedBackpack(personId, startingPartition, events, backpackPlan.experiencedPlan());
 	}

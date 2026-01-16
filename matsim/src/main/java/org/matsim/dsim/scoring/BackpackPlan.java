@@ -23,8 +23,11 @@ import org.matsim.vehicles.Vehicle;
 import static org.matsim.core.scoring.EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME;
 import static org.matsim.core.scoring.EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME;
 
-
-public class BackpackPlan {
+/**
+ * A backpack plan is collecting information about what a person has experienced during the simulation. Over the course
+ * of the simulation it produces an experienced plan, which can be used for scoring.
+ */
+class BackpackPlan {
 
 	private final Plan experiencedPlan = PopulationUtils.createPlan();
 

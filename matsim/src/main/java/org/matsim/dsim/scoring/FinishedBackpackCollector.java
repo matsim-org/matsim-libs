@@ -24,6 +24,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * This class holds all finished backpacks of a simulation. There should be one instance per compute node. All partitions running on that node
+ * can add their backpacks to this collector, as it is thread-safe.
+ * <p>
+ * The collector has two methods for synchronizing with other compute nodes:
+ * 1. {@link #exchangePlansForScoring()} sends backpacks to the starting compute node of agents, as only that node is expected to have the corresponding
+ * Person in its population
+ * 2. {@link #finishIteration()} sends all backpacks to the head node. This way the head node can write all experienced plans to disk.
+ * <p>
+ * A collector instance may be re-used between iterations but must be {@link #reset()} before the next iteration starts.
+ */
 public class FinishedBackpackCollector implements ExperiencedPlansService {
 
 	private static final Logger log = LogManager.getLogger(FinishedBackpackCollector.class);
@@ -50,18 +61,43 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 		this.serializer = serializer;
 	}
 
+	/**
+	 * Add a backpack to the collector. This method is thread-safe.
+	 *
+	 * @throws IllegalStateException if the collector is finished. The collector must be {@link #reset()} after {@link #finishIteration()}
+	 *                               before it accepts backpacks again.
+	 */
+
 	public void addBackpack(FinishedBackpack backpack) {
+
+		if (finished) {
+			throw new IllegalStateException("FinishedBackpackCollector is finished. Call reset() (possibly, during iteration start), before attempting to adding backpacks.");
+		}
+
 		backpacks.add(backpack);
 	}
 
+	/**
+	 * @return reference to the collected backpack collection.
+	 */
 	public Collection<FinishedBackpack> backpacks() {
 		return backpacks;
 	}
 
+	/**
+	 * Deletes collected backpacks and resets the collector state.
+	 */
 	public void reset() {
 		backpacks.clear();
+		finished = false;
 	}
 
+	/**
+	 * All backpacks are sent to the starting compute node of agents. This method must be called before handing experienced plans from
+	 * collected backpacks to the scoring, as agents are supposed to be scored on their starting compute node.
+	 * <p>
+	 * This method is a barrier, as it only proceeds after all compute nodes have exchanged backpacks.
+	 */
 	public void exchangePlansForScoring() {
 
 		var backpacksByRank = new Int2ObjectOpenHashMap<FinishedBackpackMsg>();
@@ -132,6 +168,11 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 		new PopulationWriter(tmpPop, null).write(filename);
 	}
 
+	/**
+	 * Returns a map of experienced plans, indexed by person ID.
+	 * <p>
+	 * NOTE: The map is computed every time this method is called.
+	 */
 	@Override
 	public Map<Id<Person>, Plan> getExperiencedPlans() {
 		return backpacks.stream()
@@ -140,7 +181,9 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 	}
 
 	/**
-	 * Collects all experienced plans on the head node, so that they can be written on that node.
+	 * Collects all experienced plans on the head node so that they can be written to disk on that node.
+	 * <p>
+	 * This method is a barrier. Compute nodes can only proceed after the head node has received a message from all other nodes.
 	 */
 	@Override
 	public void finishIteration() {

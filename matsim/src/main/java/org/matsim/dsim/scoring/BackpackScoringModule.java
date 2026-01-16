@@ -29,7 +29,7 @@ import java.util.List;
 public class BackpackScoringModule extends AbstractModule {
 	@Override
 	public void install() {
-		bind(ScoringDataCollectorRegistry.class).in(Singleton.class);
+		bind(BackpackDataCollectorRegistry.class).in(Singleton.class);
 		addControllerListenerBinding().to(Cleanup.class).in(Singleton.class);
 		bind(IterationInformation.class).in(Singleton.class);
 		addControllerListenerBinding().to(IterationInformation.class);
@@ -53,9 +53,19 @@ public class BackpackScoringModule extends AbstractModule {
 			addControllerListenerBinding().to(ExperiencedPlansMemorizer.class);
 		}
 
-		installQSimModule(new BackpackScoringQSimModule());
+		// each SimProcess must have its own data collector. So, bind it as QSimModule.
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				bind(BackpackDataCollector.class).in(Singleton.class);
+			}
+		});
 	}
 
+	/**
+	 * Binds the data collector to the scoring. This way we don't have to have events management in
+	 * those classes.
+	 */
 	static class BackpackScoringListener implements ScoringListener {
 
 		private final FinishedBackpackCollector collector;
@@ -77,6 +87,10 @@ public class BackpackScoringModule extends AbstractModule {
 		}
 	}
 
+	/**
+	 * This class adds experienced plans to the persons' selected plan. This used to be mashed together with experienced plans writing but I think
+	 * these things are not really related.
+	 */
 	static class ExperiencedPlansMemorizer implements IterationEndsListener {
 
 		private final Population population;
@@ -105,8 +119,9 @@ public class BackpackScoringModule extends AbstractModule {
 	}
 
 	/**
-	 * This mimicks the architecture of the old PlansScoringImpl. However, I think, the ExperiencedPlansCollector could itself
-	 * be an iteration ends listener and handle the writing of plans.
+	 * This mimicks the architecture of the old PlansScoringImpl. Though I think the FinishedPlansCollector could itself
+	 * be an iteration ends listener and handle the writing of plans, we'll have this structure here, to adhere to the
+	 * existing architecture of PlansScoringImpl.
 	 */
 	static class WriteExperiencedPlans implements IterationEndsListener {
 
@@ -140,14 +155,19 @@ public class BackpackScoringModule extends AbstractModule {
 		}
 	}
 
+	/**
+	 * Cleanup code for this module. At the moment it:
+	 * 1. Removes all backpack data collectors from the events manager and clears the corresponding registry after an iteration finishes.
+	 * 2. Resests the backpack collector, so it is ready for the next iteration.
+	 */
 	public static class Cleanup implements AfterMobsimListener, IterationStartsListener {
 
-		private final ScoringDataCollectorRegistry registry;
+		private final BackpackDataCollectorRegistry registry;
 		private final EventsManager em;
 		private final FinishedBackpackCollector backpackCollector;
 
 		@Inject
-		private Cleanup(ScoringDataCollectorRegistry registry, EventsManager em, FinishedBackpackCollector backpackCollector) {
+		private Cleanup(BackpackDataCollectorRegistry registry, EventsManager em, FinishedBackpackCollector backpackCollector) {
 			this.registry = registry;
 			this.em = em;
 			this.backpackCollector = backpackCollector;
@@ -167,24 +187,19 @@ public class BackpackScoringModule extends AbstractModule {
 		}
 	}
 
-	private static class BackpackScoringQSimModule extends AbstractQSimModule {
+	/**
+	 * This maintains a reference to all the backpack data collectors. We need to keep track of the collectors, so that we can remove them
+	 * from the events manager after an iteration finishes.
+	 */
+	public static class BackpackDataCollectorRegistry {
 
-		@Override
-		protected void configureQSim() {
-			bind(ScoringDataCollector.class).in(Singleton.class);
+		private final List<BackpackDataCollector> collectors = new ArrayList<>();
 
-		}
-	}
-
-	public static class ScoringDataCollectorRegistry {
-
-		private final List<ScoringDataCollector> collectors = new ArrayList<>();
-
-		public void register(ScoringDataCollector collector) {
+		public void register(BackpackDataCollector collector) {
 			collectors.add(collector);
 		}
 
-		public List<ScoringDataCollector> collectors() {
+		public List<BackpackDataCollector> collectors() {
 			return collectors;
 		}
 

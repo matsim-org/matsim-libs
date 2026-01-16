@@ -12,6 +12,18 @@ import org.matsim.core.scoring.NewScoreAssigner;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.dsim.simulation.IterationInformation;
 
+/**
+ * This class converts between finished backpacks and the {@link org.matsim.core.scoring.ScoringFunction} mechanism. It works on completed experienced
+ * plans, as well as collected events which are relevant for scoring ({@link PersonMoneyEvent}, {@link PersonScoreEvent}, {@link PersonStuckEvent}).
+ * First collected events are passed to a {@link org.matsim.api.core.v01.population.Person}'s {@link org.matsim.core.scoring.ScoringFunction}.
+ * <p>
+ * Afterward, the experienced plan is processed by breaking it up into {@link org.matsim.core.router.TripStructureUtils.Trip}s. First for each
+ * {@link org.matsim.api.core.v01.population.PlanElement} of the trip, {@link org.matsim.core.scoring.ScoringFunction#handleActivity} or
+ * {@link org.matsim.core.scoring.ScoringFunction#handleLeg)} are called. Before the last {@link Activity} of a trip is passed to the scoring function
+ * {@link org.matsim.core.scoring.ScoringFunction#handleTrip} is called.
+ * <p>
+ * After finishing the scoring function, {@link NewScoreAssigner#assignNewScore} is called.
+ */
 public class EndOfDayScoring {
 
 	private final ScoringFunctionFactory scoringFunctionFactory;

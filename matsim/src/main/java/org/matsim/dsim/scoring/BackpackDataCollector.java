@@ -2,8 +2,6 @@ package org.matsim.dsim.scoring;
 
 
 import com.google.inject.Inject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
@@ -36,7 +34,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Event handler to collect data relevant for scoring. Each partition in a DSim has one event handler.
+ * Event handler to collect data relevant for an agents backpack. At the moment, this includes data for experienced plans
+ * as well as data used for scoring.
+ * <p>
+ * Each partition in a DSim has one event handler.
  * Agents arriving on a partition are registered with the handler, agents leaving are de-registered.
  * Each agent carries a backpack with data that is used for scoring and which contains state, such as in which
  * vehicle an agent is currently in.
@@ -46,9 +47,8 @@ import java.util.Set;
  * agents might have left the partition already.
  */
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
-public class ScoringDataCollector implements BasicEventHandler {
+public class BackpackDataCollector implements BasicEventHandler {
 
-	private static final Logger log = LogManager.getLogger(ScoringDataCollector.class);
 	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
 	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
 	private final Map<Id<Vehicle>, TransitInformation> transitInformation = new HashMap<>();
@@ -67,14 +67,14 @@ public class ScoringDataCollector implements BasicEventHandler {
 	private TransitSchedule transitSchedule;
 
 	@Inject
-	public ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
+	public BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this(simStepMessaging, network, population, null, asc, fbc);
 	}
 
 	/**
 	 * Constructor for testing, which includes all dependencies
 	 */
-	ScoringDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
+	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
 		this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;

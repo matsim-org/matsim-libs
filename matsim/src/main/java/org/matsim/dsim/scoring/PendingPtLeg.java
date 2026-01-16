@@ -8,17 +8,11 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PendingPtLeg {
-
-//	private Id<TransitStopFacility> startFacility;
-//	private Id<TransitStopFacility> endFacility;
-//	private final Id<TransitLine> line;
-//	private final Id<TransitRoute> route;
-//	private final Id<Vehicle> vehicleId;
+class PendingPtLeg {
 
 	private final List<PtPart> chainedLegParts = new ArrayList<>();
 
-	public PendingPtLeg() {
+	PendingPtLeg() {
 	}
 
 	void startPart(Id<TransitLine> line, Id<TransitRoute> route) {

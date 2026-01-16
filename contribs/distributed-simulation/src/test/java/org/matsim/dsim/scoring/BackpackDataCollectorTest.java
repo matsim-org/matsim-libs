@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.*;
 
-class ScoringDataCollectorTest {
+class BackpackDataCollectorTest {
 
 	@Test
 	void testTeleportation() {
@@ -62,7 +62,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -136,7 +136,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var eps = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, eps);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, eps);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -210,7 +210,7 @@ class ScoringDataCollectorTest {
 		schedule.addTransitLine(transitLine);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(mock(SimStepMessaging.class), network, pop, schedule, mock(AgentSourcesContainer.class), fbc);
+		var collector = new BackpackDataCollector(mock(SimStepMessaging.class), network, pop, schedule, mock(AgentSourcesContainer.class), fbc);
 
 		collector.registerAgent(distAgent);
 
@@ -293,7 +293,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
@@ -374,7 +374,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
@@ -452,7 +452,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
@@ -503,7 +503,7 @@ class ScoringDataCollectorTest {
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		collector.registerAgent(ignoredAgent);
 		collector.registerAgent(registeredAgent);
@@ -546,7 +546,7 @@ class ScoringDataCollectorTest {
 		when(asc.vehicleFromContainer(any())).thenReturn(ignoredVehicle);
 		var fbc = mock(FinishedBackpackCollector.class);
 
-		var collector = new ScoringDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
 
 		var msg = SimStepMessage.builder()
 			.addBackPack(new BackPack(registered, 0))

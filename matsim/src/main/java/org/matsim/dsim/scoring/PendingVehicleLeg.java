@@ -6,7 +6,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class PendingVehicleLeg {
+class PendingVehicleLeg {
 
 	private final double enterVehicleTime;
 	private final PendingLeg basicLeg;
@@ -15,7 +15,7 @@ public class PendingVehicleLeg {
 	private double relativePositionOnDepartureLink;
 	private double relativePositionOnLastArrivalLink;
 
-	public PendingVehicleLeg(double enterVehicleTime, Id<Vehicle> vehicleId, PendingLeg basicLeg) {
+	PendingVehicleLeg(double enterVehicleTime, Id<Vehicle> vehicleId, PendingLeg basicLeg) {
 		this.enterVehicleTime = enterVehicleTime;
 		this.vehicleId = vehicleId;
 		this.basicLeg = basicLeg;
