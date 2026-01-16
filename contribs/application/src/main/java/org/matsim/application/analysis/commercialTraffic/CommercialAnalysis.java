@@ -455,7 +455,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	private void createRelationsAnalysis(Path relationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 		Map<Integer, Object2DoubleMap<String>> relations = linkDemandEventHandler.getRelations();
-		ArrayList<String> header = findHeader(relations);
+		ArrayList<String> header = getHeaderForRelations(relations);
 		ArrayList<Integer> relationNumbers = new ArrayList<>(relations.keySet());
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(relationsOutputFile), CSVFormat.DEFAULT)) {
 
@@ -483,7 +483,10 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	}
 
-	private ArrayList<String> findHeader(Map<Integer, Object2DoubleMap<String>> relations) {
+	/**
+	 * Extracts and sorts unique header values for relations output.
+	 */
+	private ArrayList<String> getHeaderForRelations(Map<Integer, Object2DoubleMap<String>> relations) {
 		ArrayList<String> header = new ArrayList<>();
 		for (Object2DoubleMap<String> relation : relations.values()) {
 			for (String value : relation.keySet()) {
