@@ -437,13 +437,19 @@ public class TripAnalysis implements MATSimAppCommand {
 		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("dist_group")));
 		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("main_mode")));
 		aggr = aggr.sortOn(cmp.thenComparing(cmp_modes).thenComparing(row -> row.getString("subpopulation")));
-		for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
-		}
-		for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-			subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
-		}
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+			subSetAnalysisForModeShares(labels, ModelType.PERSON_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
 
+			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+				subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
+			}
+		}
+		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
+			subSetAnalysisForModeShares(labels, ModelType.COMMERCIAL_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
+			}
+		}
 		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share_total");
 		aggr.addColumns(shareSum);
 

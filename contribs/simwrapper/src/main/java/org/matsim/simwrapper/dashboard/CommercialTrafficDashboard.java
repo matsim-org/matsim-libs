@@ -202,7 +202,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			});
 
 		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
-			viz.title = "Mode Statistics of group: *commercialTraffic*";
+			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "commercialTraffic");
 			viz.showAllRows = true;
