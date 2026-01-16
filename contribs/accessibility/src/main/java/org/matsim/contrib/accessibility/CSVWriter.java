@@ -8,10 +8,11 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 public final class CSVWriter {
-	private static final Logger log = LogManager.getLogger(CSVWriter.class);
+    private static final Logger log = LogManager.getLogger(CSVWriter.class);
 
 	public static final String FILE_NAME= "accessibilities.csv";
-	
+	public static final String POI_FILE_NAME = "pois.csv";
+
 	private static final String SEPARATOR = ",";
 	// comma is the correct choice for excel.  But gnuplot cannot deal with comma, needs "\t"!
 
@@ -51,7 +52,7 @@ public final class CSVWriter {
 			throw new RuntimeException("could not write");
 		}
 	}
-	
+
 	public final void writeField( String val ) {
 		try {
 			if ( first ) {
@@ -88,7 +89,7 @@ public final class CSVWriter {
 			log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
+
 }
