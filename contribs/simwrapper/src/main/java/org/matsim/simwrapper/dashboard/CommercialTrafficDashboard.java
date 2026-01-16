@@ -71,11 +71,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("General_first","General").el(PieChart.class, (viz, data) -> {
 				double sampleSize = data.config().getSampleSize();
-				if (data.context().getShp() != null) { //TODO was soll das?
-					setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
-				} else {
-					setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
-				}
+				setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
 				viz.dataset = data.compute(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_perMode.csv", args);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.description = "at final iteration";
@@ -205,14 +201,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 					);
 			});
 
-		layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
+		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of group: *commercialTraffic*";
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "commercialTraffic");
 			viz.showAllRows = true;
 		});
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
-			layout.row("trips_fourth", "Trips").el(Table.class, (viz, data) -> {
+			layout.row("trips_fourthB", "Trips").el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics of group: *" + group + "*";
 				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
