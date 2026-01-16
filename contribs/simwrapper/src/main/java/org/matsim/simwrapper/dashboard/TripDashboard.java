@@ -32,11 +32,11 @@ public class TripDashboard implements Dashboard {
 	private static final Logger log = LogManager.getLogger(TripDashboard.class);
 
 	@Nullable
-	private final String modeShareRefCsv;
+	private final String personModeShareRefCsv;
 	@Nullable
-	private final String modeShareDistRefCsv;
+	private final String personModeShareDistRefCsv;
 	@Nullable
-	private final String modeUsersRefCsv;
+	private final String personModeUsersRefCsv;
 
 	@Nullable
 	private String groupedRefCsv;
@@ -61,14 +61,14 @@ public class TripDashboard implements Dashboard {
 	 * Data format needs to be the same as produced by the analysis. Please refer to the dashboard output.
 	 * All given argument must be resources in the classpath.
 	 *
-	 * @param modeShareRefCsv     resource containing the mode share per distance group and mode, summing to a total of one
-	 * @param modeShareDistRefCsv resource with mode share, where each group sums to 1.
-	 * @param modeUsersRefCsv     resource with mode users data
+	 * @param personModeShareRefCsv     resource containing the mode share per distance group and mode, summing to a total of one
+	 * @param personModeShareDistRefCsv resource with mode share, where each group sums to 1.
+	 * @param personModeUsersRefCsv     resource with mode users data
 	 */
-	public TripDashboard(@Nullable String modeShareRefCsv, @Nullable String modeShareDistRefCsv, @Nullable String modeUsersRefCsv) {
-		this.modeShareRefCsv = modeShareRefCsv;
-		this.modeShareDistRefCsv = modeShareDistRefCsv;
-		this.modeUsersRefCsv = modeUsersRefCsv;
+	public TripDashboard(@Nullable String personModeShareRefCsv, @Nullable String personModeShareDistRefCsv, @Nullable String personModeUsersRefCsv) {
+		this.personModeShareRefCsv = personModeShareRefCsv;
+		this.personModeShareDistRefCsv = personModeShareDistRefCsv;
+		this.personModeUsersRefCsv = personModeUsersRefCsv;
 		args = new String[0];
 	}
 
@@ -251,8 +251,8 @@ public class TripDashboard implements Dashboard {
 				.constant("source", "Simulated")
 				.aggregate(List.of("main_mode"), finalColumnForModeShare, Plotly.AggrFunc.SUM);
 
-			if (modeShareRefCsv != null) {
-				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareRefCsv))
+			if (personModeShareRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareRefCsv))
 					.constant("source", "Reference");
 
 				if (!finalColumnForModeShare.equals(columnForModeShare)) {
@@ -287,6 +287,8 @@ public class TripDashboard implements Dashboard {
 			if (modeShareRefCsv != null) {
 				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareRefCsv))
 					.aggregate(List.of("dist_group"), columnForModeShare, Plotly.AggrFunc.SUM);
+			if (personModeShareRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareRefCsv))
 
 				if (!finalColumnForModeShare.equals(columnForModeShare)) {
 					refDs.rename(columnForModeShare, finalColumnForModeShare);
@@ -335,8 +337,8 @@ public class TripDashboard implements Dashboard {
 					.y(finalColumnForModeShare)
 			);
 
-			if (modeShareDistRefCsv != null) {
-				Plotly.DataSet refDs = viz.addDataset(data.resource(modeShareDistRefCsv))
+			if (personModeShareDistRefCsv != null) {
+				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareDistRefCsv))
 					.constant("source", "Ref")
 					.constant("subpopulation", "total")
 					.constant("modelType", "total")
@@ -388,10 +390,10 @@ public class TripDashboard implements Dashboard {
 					.y("user")
 					.name("main_mode")
 				);
-				if (modeUsersRefCsv != null) {
+				if (personModeUsersRefCsv != null) {
 					ds.constant("source", "sim");
 
-					viz.addDataset(data.resource(modeUsersRefCsv))
+					viz.addDataset(data.resource(personModeUsersRefCsv))
 						.constant("source", "ref")
 						.constant("group", "total"); //TODO stimmt das hier so? // TODO make this optional if data is not set for different groups
 

@@ -91,9 +91,9 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
-			.withGroupedRefData("mode_share_per_group_dist_ref.csv")
-			.withDistanceDistribution("mode_share_distance_distribution.csv")
+		TripDashboard dashboard = new TripDashboard("person_mode_share_ref.csv", "person_mode_share_per_dist_ref.csv", "person_mode_users_ref.csv")
+			.withGroupedRefData("person_mode_share_per_group_dist_ref.csv")
+			.withDistanceDistribution("person_mode_share_distance_distribution.csv")
 			.withChoiceEvaluation(true);
 
 		run(dashboard);
@@ -111,9 +111,9 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
-			.withGroupedRefData("mode_share_per_group_dist_ref.csv")
-			.withDistanceDistribution("mode_share_distance_distribution.csv")
+		TripDashboard dashboard = new TripDashboard("person_mode_share_ref.csv", "person_mode_share_per_dist_ref.csv", "person_mode_users_ref.csv")
+			.withGroupedRefData("person_mode_share_per_group_dist_ref.csv")
+			.withDistanceDistribution("person_mode_share_distance_distribution.csv")
 			.withChoiceEvaluation(true)
 			.setGroupsOfSubpopulationsForPersonAnalysis("personPerson=person;personFreight=freight");
 
