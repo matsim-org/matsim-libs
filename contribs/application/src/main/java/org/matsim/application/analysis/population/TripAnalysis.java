@@ -465,7 +465,10 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private static Table addModeSharesPerModelType(Table aggr) {
 		List<String> modelTypes = aggr.stringColumn("modelType").unique().asList();
-
+		if (modelTypes.size() == 1 && modelTypes.getFirst().equals(ModelType.UNASSIGNED.toString())) {
+			// No need to calculate shares per model type if there is only an unassigned model type
+			return aggr;
+		}
 		String[] keys = new String[] {"dist_group", "main_mode", "subpopulation"};
 
 		for (String mt : modelTypes) {
@@ -503,6 +506,9 @@ public class TripAnalysis implements MATSimAppCommand {
 		Table subset;
 		if (groupsOfSubpopulationsForAnalysis.isEmpty())
 			subset = aggr;
+		else if (group.equals(ModelType.PERSON_TRAFFIC.id) || group.equals(ModelType.COMMERCIAL_TRAFFIC.id))
+			subset = aggr.where(
+				aggr.stringColumn("modelType").isEqualTo(group));
 		else
 			subset = aggr.where(
 			aggr.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForAnalysis.get(group)));
@@ -1154,8 +1160,8 @@ public class TripAnalysis implements MATSimAppCommand {
 				);
 				writeTripDistributionPerGroup(filtered, bins, inp, x, group);
 			}
-			writeTripDistributionPerGroup(trips, bins, inp, x, "total");
 		}
+		writeTripDistributionPerGroup(trips, bins, inp, x, "total");
 	}
 
 	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, String group) throws IOException {
