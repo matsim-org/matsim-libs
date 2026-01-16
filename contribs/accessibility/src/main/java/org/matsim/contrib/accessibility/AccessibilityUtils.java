@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.GeoFileReader;
 import org.matsim.facilities.*;
@@ -385,4 +386,19 @@ public class AccessibilityUtils {
 		}
 		LOG.info("Finished assigning additional facilities data to measure point.");
 	}
+
+
+	// Extracts the single leg of a given mode from a plan. Throws an exception if there is not exactly one leg of this mode.
+	public static Leg extractLeg(List<? extends PlanElement> planElementsMain, String mode) {
+
+		List<Leg> legList = TripStructureUtils.getLegs(planElementsMain).stream().filter(leg -> leg.getMode().equals(mode)).toList();
+
+		if (legList.size() != 1) {
+			throw new RuntimeException("for these accessibility calculations, there should be exactly one leg of mode " + mode +
+				" in the plan. However, there are " + legList.size() + " legs of this mode.");
+		}
+
+		return legList.get(0);
+	}
+
 }

@@ -148,7 +148,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 	}
 //	private boolean checkSubtourModeChoiceConfigGroup( Config config, Level lvl, boolean problem ){
 //		if ( config.subtourModeChoice().considerCarAvailability() ) {
-////			problem = true;
+// //			problem = true;
 //			log.log( lvl, "you are considering car abailability; vsp config is not doing that.   Instead, we are using a daily monetary constant for car.");
 //		}
 //		return problem;
@@ -172,7 +172,9 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	private static boolean checkTimeAllocationMutatorConfigGroup(Config config, Level lvl, boolean problem) {
 		// added may'25
-		if (!config.timeAllocationMutator().isAffectingDuration()) {
+//		if (!config.timeAllocationMutator().isAffectingDuration()) {
+		if (config.timeAllocationMutator().isAffectingDuration()) {
+			// (this was the wrong way around until jan'26. :-( )
 			System.out.flush();
 			log.log(lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  Reason is that the upstream demand generation uses activityEndTimes " +
 				"for long activity types and duration for short activity types.  However, for a short activity of, say, 10min, a mutation of plus/minus the time mutation range leads to problems.");

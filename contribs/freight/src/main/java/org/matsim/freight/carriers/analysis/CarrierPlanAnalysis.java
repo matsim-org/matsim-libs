@@ -155,30 +155,44 @@ import org.matsim.freight.carriers.*;
 						bw1.write(delimiter + numberOfPlannedDemandSize);
 					}
 					case carriersPlans, carriersAndEvents -> {
-						int numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
-							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
-						int nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
-							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
-						int numberOfHandledJobs = numberOfHandledPickups + nuOfServiceHandled;
-						int notHandledJobs;
-						int numberOfHandledDemandSize;
-
-						if (jobsType == JobsType.shipments) {
-							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
-								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
-									te -> ((Tour.Pickup) te).getShipment().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlannedJobs - numberOfHandledPickups;
-						} else {
-							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
-								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
-									te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlannedJobs - nuOfServiceHandled;
+						int numberOfHandledPickups = 0, nuOfServiceHandled = 0, numberOfHandledDemandSize = 0;
+						int notHandledJobs = numberOfPlannedJobs;
+						if (carrier.getSelectedPlan() != null) {
+							numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
+								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
+							nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
+								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
+							if (jobsType == JobsType.shipments) {
+								numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+									t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
+										te -> ((Tour.Pickup) te).getShipment().getCapacityDemand()).sum()).sum();
+								notHandledJobs -= numberOfHandledPickups;
+							} else {
+								numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+									t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
+										te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
+								notHandledJobs -= nuOfServiceHandled;
+							}
 						}
+						int numberOfHandledJobs = numberOfHandledPickups + nuOfServiceHandled;
+
 						CarriersUtils.allJobsHandledBySelectedPlan(carrier);
 
-						bw1.write(delimiter + carrier.getSelectedPlan().getScore());
-						bw1.write(delimiter + carrier.getSelectedPlan().getJspritScore());
-						bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
+						CarrierPlan plan = carrier.getSelectedPlan();
+
+						Double score = null;
+						Double jspritScore = null;
+						int tours = 0;
+
+						if (plan instanceof CarrierPlan p) {
+							score = (p.getScore() instanceof Double s) ? s : null;
+							jspritScore = (p.getJspritScore() instanceof Double js) ? js : null;
+							tours = (p.getScheduledTours() != null) ? p.getScheduledTours().size() : 0;
+						}
+
+						bw1.write(delimiter + score);
+						bw1.write(delimiter + jspritScore);
+						bw1.write(delimiter + tours);
 						bw1.write(delimiter + jobsType);
 						bw1.write(delimiter + numberOfPlannedJobs);
 						bw1.write(delimiter + numberOfHandledJobs);
