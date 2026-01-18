@@ -269,7 +269,7 @@ public class RouteUtils {
 				// we need to include the last link id, so set the flag to false when we find it
 				// as takeWhile is exclusive
 				if (id.equals(exitLinkId)) {
-					continueTake.set(false);
+					return continueTake.getAndSet(false);
 				}
 				return continueTake.get();
 			})
