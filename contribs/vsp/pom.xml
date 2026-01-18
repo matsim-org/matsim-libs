@@ -332,5 +332,9 @@
 			<artifactId>annotations</artifactId>
 			<version>26.0.2-1</version>
 		</dependency>
+		<dependency>
+			<groupId>tech.tablesaw</groupId>
+			<artifactId>tablesaw-jsplot</artifactId>
+		</dependency>
 	</dependencies>
 </project>

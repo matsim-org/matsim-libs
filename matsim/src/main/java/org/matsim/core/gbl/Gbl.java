@@ -223,6 +223,14 @@ public abstract class Gbl {
 		throw new RuntimeException("failure; follow stack trace") ;
 	}
 
+	public static boolean equal( double dbl1, double dbl2, double epsilon ) {
+		if ( dbl2 - epsilon > dbl1 || dbl1 < dbl2 + epsilon ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public final static String RUN_MOB_SIM_NO_LONGER_POSSIBLE = "overriding runMobSim() no longer possible.  use the following syntax instead:\n"
 	+ "controler.addOverridingModule(new AbstractModule(){\n"
 	+ "@Override public void install() {\n"
