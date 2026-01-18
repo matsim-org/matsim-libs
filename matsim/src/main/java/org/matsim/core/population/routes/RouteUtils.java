@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides helper methods to work with routes.
@@ -262,9 +262,17 @@ public class RouteUtils {
 		// sum lengths of all links. Use enterIndex instead of dropWhile, as we want to exclude the
 		// enter link
 		var enterIndex = nr.getStartLinkId().equals(enterLinkId) ? -1 : nr.getLinkIds().indexOf(enterLinkId);
+		var continueTake = new AtomicBoolean(true);
 		double dist = nr.getLinkIds().stream()
 			.skip(enterIndex + 1)
-			.takeWhile(new TransitRouteEndCondition(exitLinkId))
+			.takeWhile(id -> {
+				// we need to include the last link id, so set the flag to false when we find it
+				// as takeWhile is exclusive
+				if (id.equals(exitLinkId)) {
+					continueTake.set(false);
+				}
+				return continueTake.get();
+			})
 			.mapToDouble(id -> network.getLinks().get(id).getLength())
 			.sum();
 
@@ -324,30 +332,4 @@ public class RouteUtils {
 														  Id<Link> endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
 	}
-
-	/**
-	 * End condition for takeWhile in calcDistance. takeWhile takes elements until the condition is false.
-	 * The first element for which false is returned is excluded from the stream. However, we need to
-	 * include the end link in the distance calculation. This is why we remember that we have found
-	 * the end link, return true one more time and on the next call return false.
-	 */
-	private static class TransitRouteEndCondition implements Predicate<Id<Link>> {
-
-		private final Id<Link> endLinkId;
-		private boolean foundEnd = false;
-
-		private TransitRouteEndCondition(Id<Link> endLinkId) {
-			this.endLinkId = endLinkId;
-		}
-
-		@Override
-		public boolean test(Id<Link> linkId) {
-			if (foundEnd) return false;
-			if (linkId.equals(endLinkId)) {
-				foundEnd = true;
-			}
-			return true;
-		}
-	}
-
 }
