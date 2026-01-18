@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.*;
-import java.util.function.Predicate;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -34,6 +31,12 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Helps to work on plans with complex trips.
@@ -59,40 +62,41 @@ public final class TripStructureUtils {
 
 	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 
-	private TripStructureUtils() {}
+	private TripStructureUtils() {
+	}
 
 	// also need this for plain old fashioned legs.  kai
 	public static List<Leg> getLegs(final Plan plan) {
-		return getLegs( plan.getPlanElements() );
+		return getLegs(plan.getPlanElements());
 	}
 
-	public static List<Leg> getLegs( final List<? extends PlanElement> planElements ) {
+	public static List<Leg> getLegs(final List<? extends PlanElement> planElements) {
 		final List<Leg> legs = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
-			if ( !(pe instanceof Leg) ) continue;
-			legs.add( (Leg) pe );
+			if (!(pe instanceof Leg)) continue;
+			legs.add((Leg) pe);
 		}
 
 		// it is not backed to the plan: fail if try to modify
-		return Collections.unmodifiableList( legs );
+		return Collections.unmodifiableList(legs);
 	}
 
 	public static List<Activity> getActivities(
-			final Plan plan,
-			final StageActivityHandling stageActivityHandling) {
+		final Plan plan,
+		final StageActivityHandling stageActivityHandling) {
 		return getActivities(
-				plan.getPlanElements(),
-				stageActivityHandling);
+			plan.getPlanElements(),
+			stageActivityHandling);
 	}
 
 	public static List<Activity> getActivities(
-			final List<? extends PlanElement> planElements,
-			final StageActivityHandling stageActivityHandling) {
+		final List<? extends PlanElement> planElements,
+		final StageActivityHandling stageActivityHandling) {
 		final List<Activity> activities = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
-			if ( !(pe instanceof Activity) ) continue;
+			if (!(pe instanceof Activity)) continue;
 			final Activity act = (Activity) pe;
 
 			switch (stageActivityHandling) {
@@ -110,26 +114,40 @@ public final class TripStructureUtils {
 		}
 
 		// it is not backed to the plan: fail if try to modify
-		return Collections.unmodifiableList( activities );
+		return Collections.unmodifiableList(activities);
 	}
 
-	public static List<Trip> getTrips( final Plan plan) {
-		return getTrips( plan.getPlanElements());
+	/**
+	 * See {@link TripStructureUtils#getTrips(List, Predicate)}
+	 */
+	public static List<Trip> getTrips(final Plan plan) {
+		return getTrips(plan.getPlanElements());
+	}
+
+	/**
+	 * See {@link TripStructureUtils#getTrips(List, Predicate)}
+	 */
+	public static List<Trip> getTrips(final Plan plan, final Predicate<String> isStageActivity) {
+		return getTrips(plan.getPlanElements(), isStageActivity);
 	}
 
 
-	public static List<Trip> getTrips( final Plan plan, final Predicate<String> isStageActivity) {
-		return getTrips( plan.getPlanElements(), isStageActivity);
+	/**
+	 * See {@link TripStructureUtils#getTrips(List, Predicate)}
+	 */
+	public static List<Trip> getTrips(final List<? extends PlanElement> planElements) {
+		return getTrips(planElements, TripStructureUtils::isStageActivityType);
 	}
 
-	public static List<Trip> getTrips( final List<? extends PlanElement> planElements) {
-		return getTrips(planElements, TripStructureUtils::isStageActivityType ) ;
-	}
-
-
+	/**
+	 * Extracts trips from plan elements. In contrast to {@link TripStructureUtils#getTrips2} this function only allows for closed trips.
+	 * This means trips must start and end with a main activity. Chains of activities or single activities are not considered a trip.
+	 * Also, open chains are also not considered a trip; for example, a trip starting with a leg, a single leg, or a chain which ends with a
+	 * leg are not considered trips.
+	 */
 	public static List<Trip> getTrips(
-			final List<? extends PlanElement> planElements,
-			final Predicate<String> isStageActivity ) {
+		final List<? extends PlanElement> planElements,
+		final Predicate<String> isStageActivity) {
 		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
@@ -137,47 +155,115 @@ public final class TripStructureUtils {
 		for (PlanElement pe : planElements) {
 			currentIndex++;
 
-			if ( !(pe instanceof Activity) ) continue;
+			if (!(pe instanceof Activity)) continue;
 			final Activity act = (Activity) pe;
 
 //			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || stageActivityTypes.contains( act.getType() )) continue;
 //			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || isStageActivity.test( act.getType() )) continue;
 			// I I don't like the || (= "or").  If I want to identify subtrips, then I want to put in a reduced number of stage
 			// activities!!!!  kai, jan'20
-			if ( isStageActivity.test( act.getType() ) ) {
+			if (isStageActivity.test(act.getType())) {
 				continue;
 			}
 
-			if ( currentIndex - originActivityIndex > 1 ) {
+			if (currentIndex - originActivityIndex > 1) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
 				// a trip.
 
-				trips.add( new Trip(
-						(Activity) planElements.get( originActivityIndex ),
-						// do not back the list by the list in the plan:
-						// according to the documentation, this would result
-						// in an undefined behavior if the full sequence was modified
-						// (for instance by modifying another trip)
-						Collections.unmodifiableList(
-								new ArrayList<>(
-										planElements.subList(
-												originActivityIndex + 1,
-												currentIndex))),
-						act ) );
+				trips.add(new Trip(
+					(Activity) planElements.get(originActivityIndex),
+					// do not back the list by the list in the plan:
+					// according to the documentation, this would result
+					// in an undefined behavior if the full sequence was modified
+					// (for instance by modifying another trip)
+					Collections.unmodifiableList(
+						new ArrayList<>(
+							planElements.subList(
+								originActivityIndex + 1,
+								currentIndex))),
+					act));
 			}
 
 			originActivityIndex = currentIndex;
 		}
 
-		return Collections.unmodifiableList( trips );
+		return Collections.unmodifiableList(trips);
 	}
 
-	public static Collection<Subtour> getSubtours( final Plan plan) {
-		return getSubtours( plan.getPlanElements(), 0 );
+	/**
+	 * See {@link TripStructureUtils#getTrips2(List, Predicate)}
+	 */
+	public static List<Trip> getTrips2(Plan plan) {
+		return getTrips2(plan.getPlanElements(), TripStructureUtils::isStageActivityType);
 	}
 
-	public static Collection<Subtour> getSubtours( final Plan plan, double coordDistance) {
-		return getSubtours( plan.getPlanElements(), coordDistance );
+	/**
+	 * See {@link TripStructureUtils#getTrips2(List, Predicate)}
+	 */
+	public static List<Trip> getTrips2(List<? extends PlanElement> planElements) {
+		return getTrips2(planElements, TripStructureUtils::isStageActivityType);
+	}
+
+	/**
+	 * Extracts trips but in contrast to {@link TripStructureUtils#getTrips} allows open trip chains.
+	 * The following are trips:
+	 * leg; leg->activity; activity->leg; activity->leg->activity; activity->leg->staging activity->leg->activity
+	 * <p>
+	 * Single activities or a chain of activities are not considered a trip.
+	 */
+	public static List<Trip> getTrips2(List<? extends PlanElement> planElements, Predicate<String> isStageActivity) {
+
+		var tmpElements = new ArrayList<PlanElement>();
+		var result = new ArrayList<Trip>();
+		var it = planElements.iterator();
+		while (it.hasNext()) {
+			var pe = it.next();
+
+			//for (var pe : planElements) {
+			tmpElements.add(pe);
+			if (!it.hasNext() || (pe instanceof Activity a && !isStageActivity.test(a.getType()))) {
+				if (isTrip(tmpElements)) {
+					var trip = createTrip(tmpElements);
+					result.add(trip);
+				}
+				// after building a trip, or after having multiple activities without legs in between, what comes next is going to be a new trip.
+				tmpElements.clear();
+				// re add the last activity in any case as it is part of the next trip.
+				tmpElements.add((pe));
+			}
+		}
+		return result;
+	}
+
+	private static boolean isTrip(List<? extends PlanElement> elements) {
+		var tripStart = startIndex(elements);
+		var tripEnd = endIndex(elements);
+		return tripEnd - tripStart >= 0;
+	}
+
+	private static Trip createTrip(List<? extends PlanElement> elements) {
+		var tripStart = startIndex(elements);
+		var tripEnd = endIndex(elements);
+		Activity originAct = tripStart > 0 ? (Activity) elements.getFirst() : null;
+		Activity destAct = tripEnd < elements.size() - 1 ? (Activity) elements.getLast() : null;
+		List<PlanElement> tripElements = new ArrayList<>(elements.subList(tripStart, tripEnd + 1));
+		return new Trip(originAct, tripElements, destAct);
+	}
+
+	private static int startIndex(List<? extends PlanElement> elements) {
+		return !elements.isEmpty() && elements.getFirst() instanceof Activity ? 1 : 0;
+	}
+
+	private static int endIndex(List<? extends PlanElement> elements) {
+		return !elements.isEmpty() && elements.getLast() instanceof Activity ? elements.size() - 2 : elements.size() - 1;
+	}
+
+	public static Collection<Subtour> getSubtours(final Plan plan) {
+		return getSubtours(plan.getPlanElements(), 0);
+	}
+
+	public static Collection<Subtour> getSubtours(final Plan plan, double coordDistance) {
+		return getSubtours(plan.getPlanElements(), coordDistance);
 	}
 
 	/**
@@ -210,17 +296,17 @@ public final class TripStructureUtils {
 	 * Theresa, VSP mode choice seminar in jul'22
 	 *
 	 * @param coordDistance if larger 0, also consider coordinates to be at same location if smaller than distance
-	 *
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
-	 * sequence
+	 *                          sequence
 	 */
-	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements, double coordDistance) {
-		return getSubtours(planElements, TripStructureUtils::isStageActivityType, coordDistance );
+	public static Collection<Subtour> getSubtours(final List<? extends PlanElement> planElements, double coordDistance) {
+		return getSubtours(planElements, TripStructureUtils::isStageActivityType, coordDistance);
 	}
 
 	/**
 	 * Returns the top-level tour as {@link Subtour} object even if it is unclosed. This subtour will always
 	 * contain all trips of a plan. Child tours will not be set.
+	 *
 	 * @see Subtour
 	 */
 	public static Subtour getUnclosedRootSubtour(final Plan plan) {
@@ -230,8 +316,8 @@ public final class TripStructureUtils {
 	// for contrib socnetsim only
 	// I think now that we should actually keep this.  kai, jan'20
 	@Deprecated
-	public static Collection<Subtour> getSubtours( final Plan plan, final Predicate<String> isStageActivity) {
-		return getSubtours( plan.getPlanElements(), isStageActivity, 0);
+	public static Collection<Subtour> getSubtours(final Plan plan, final Predicate<String> isStageActivity) {
+		return getSubtours(plan.getPlanElements(), isStageActivity, 0);
 	}
 
 	public static Collection<Subtour> getSubtours(
@@ -247,7 +333,7 @@ public final class TripStructureUtils {
 
 		// can be either id or coordinate
 		final List<Object> originIds = new ArrayList<>();
-		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
+		final List<Trip> nonAllocatedTrips = new ArrayList<>(trips);
 
 		for (Trip trip : trips) {
 			final Object originId;
@@ -260,13 +346,13 @@ public final class TripStructureUtils {
 				originId = trip.getOriginActivity().getLinkId();
 			}
 
-			if ( originId == null ) {
-				throw new NullPointerException( "Facility id, link id and coordinates for origin activity "+trip.getOriginActivity()+
-										" are null!" );
+			if (originId == null) {
+				throw new NullPointerException("Facility id, link id and coordinates for origin activity " + trip.getOriginActivity() +
+					" are null!");
 			}
 
-			if (destinationId != null && !originId.equals( destinationId )) {
-				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
+			if (destinationId != null && !originId.equals(destinationId)) {
+				throw new RuntimeException("unconsistent trip location sequence: " + destinationId + " != " + originId);
 			}
 
 			if (trip.getDestinationActivity().getFacilityId() != null) {
@@ -277,12 +363,12 @@ public final class TripStructureUtils {
 				destinationId = trip.getDestinationActivity().getLinkId();
 			}
 
-			if ( destinationId == null ) {
-				throw new NullPointerException( "Facility id, and link id and coordinates for destination activity "+trip.getDestinationActivity()+
-										" are null!" );
+			if (destinationId == null) {
+				throw new NullPointerException("Facility id, and link id and coordinates for destination activity " + trip.getDestinationActivity() +
+					" are null!");
 			}
 
-			originIds.add( originId );
+			originIds.add(originId);
 
 			int lastIdx = originIds.lastIndexOf(destinationId);
 
@@ -305,22 +391,22 @@ public final class TripStructureUtils {
 				final int subtourStartIndex = lastIdx;
 				final int subtourEndIndex = originIds.size();
 
-				final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
-				nonAllocatedTrips.removeAll( subtour );
+				final List<Trip> subtour = new ArrayList<>(trips.subList(subtourStartIndex, subtourEndIndex));
+				nonAllocatedTrips.removeAll(subtour);
 
 				// do not consider the locations visited in finished subtours
 				// as possible anchor points
-				for (int i=subtourStartIndex; i < subtourEndIndex; i++) {
-					originIds.set( i , null );
+				for (int i = subtourStartIndex; i < subtourEndIndex; i++) {
+					originIds.set(i, null);
 				}
 
 				addSubtourAndUpdateParents(
-						subtours,
-						new Subtour(
-								subtourStartIndex,
-								subtourEndIndex,
-								subtour,
-								true) );
+					subtours,
+					new Subtour(
+						subtourStartIndex,
+						subtourEndIndex,
+						subtour,
+						true));
 			}
 		}
 
@@ -328,25 +414,25 @@ public final class TripStructureUtils {
 			// "open" plan: the root is the sequence of all trips,
 			// even if it is not closed
 			addSubtourAndUpdateParents(
-					subtours,
-					new Subtour(
-							0,
-							trips.size(),
-							new ArrayList<>( trips ),
-							false));
+				subtours,
+				new Subtour(
+					0,
+					trips.size(),
+					new ArrayList<>(trips),
+					false));
 		}
 
-		return Collections.unmodifiableList( subtours );
+		return Collections.unmodifiableList(subtours);
 	}
 
 	private static void addSubtourAndUpdateParents(
-			final List<Subtour> subtours,
-			final Subtour newSubtour) {
+		final List<Subtour> subtours,
+		final Subtour newSubtour) {
 		// the parent of a subtour is the first found enclosing subtour
 		for (Subtour existingSubtour : subtours) {
-			if ( existingSubtour.parent != null ) continue;
-			if ( existingSubtour.startIndex < newSubtour.startIndex ) continue;
-			if ( existingSubtour.endIndex < newSubtour.startIndex ) continue;
+			if (existingSubtour.parent != null) continue;
+			if (existingSubtour.startIndex < newSubtour.startIndex) continue;
+			if (existingSubtour.endIndex < newSubtour.startIndex) continue;
 
 			// the trips are parsed in sequence, so it is not possible
 			// that a existing subtour contains elements later than the
@@ -355,9 +441,9 @@ public final class TripStructureUtils {
 			assert existingSubtour.endIndex <= newSubtour.endIndex;
 
 			existingSubtour.parent = newSubtour;
-			newSubtour.children.add( existingSubtour );
+			newSubtour.children.add(existingSubtour);
 		}
-		subtours.add( newSubtour );
+		subtours.add(newSubtour);
 	}
 
 	/**
@@ -385,25 +471,25 @@ public final class TripStructureUtils {
 		private final List<PlanElement> trip;
 		private final List<Leg> legs;
 
-		Trip( 	final Activity originActivity,
-			     final List<PlanElement> trip,
-			     final Activity destinationActivity) {
+		Trip(final Activity originActivity,
+			 final List<PlanElement> trip,
+			 final Activity destinationActivity) {
 			this.originActivity = originActivity;
 			this.trip = trip;
-			this.legs = extractLegs( trip );
+			this.legs = extractLegs(trip);
 			this.destinationActivity = destinationActivity;
 		}
 
-		private static List<Leg> extractLegs( final List<PlanElement> trip ) {
+		private static List<Leg> extractLegs(final List<PlanElement> trip) {
 			final List<Leg> legs = new ArrayList<>();
 
 			for (PlanElement pe : trip) {
-				if ( pe instanceof Leg ) {
-					legs.add( (Leg) pe );
+				if (pe instanceof Leg) {
+					legs.add((Leg) pe);
 				}
 			}
 
-			return Collections.unmodifiableList( legs );
+			return Collections.unmodifiableList(legs);
 		}
 
 		public Activity getOriginActivity() {
@@ -431,20 +517,20 @@ public final class TripStructureUtils {
 
 		@Override
 		public String toString() {
-			return "{Trip: origin="+originActivity+"; "+
-					       "trip="+trip+"; "+
-					       "destination="+destinationActivity + "; " +
-					       getTripAttributes().toString() + "}";
+			return "{Trip: origin=" + originActivity + "; " +
+				"trip=" + trip + "; " +
+				"destination=" + destinationActivity + "; " +
+				getTripAttributes().toString() + "}";
 		}
 
 		@Override
 		public boolean equals(final Object other) {
-			if ( !(other instanceof Trip) ) return false;
+			if (!(other instanceof Trip)) return false;
 
 			final Trip otherTrip = (Trip) other;
-			return otherTrip.originActivity.equals( originActivity ) &&
-					       otherTrip.trip.equals( trip ) &&
-					       otherTrip.destinationActivity.equals( destinationActivity );
+			return otherTrip.originActivity.equals(originActivity) &&
+				otherTrip.trip.equals(trip) &&
+				otherTrip.destinationActivity.equals(destinationActivity);
 		}
 
 		@Override
@@ -468,16 +554,16 @@ public final class TripStructureUtils {
 
 		// for tests
 		Subtour(final List<Trip> trips, final boolean isClosed) {
-			this( -1 , -1 , trips , isClosed );
+			this(-1, -1, trips, isClosed);
 		}
 
 		private Subtour(final int startIndex,
-				final int endIndex,
-				final List<Trip> trips,
-				final boolean isClosed) {
+						final int endIndex,
+						final List<Trip> trips,
+						final boolean isClosed) {
 			this.startIndex = startIndex;
 			this.endIndex = endIndex;
-			this.trips = Collections.unmodifiableList( trips );
+			this.trips = Collections.unmodifiableList(trips);
 			this.isClosed = isClosed;
 		}
 
@@ -491,14 +577,14 @@ public final class TripStructureUtils {
 			for (Trip t : trips) {
 				boolean isInChildSt = false;
 				for (Subtour child : children) {
-					if ( child.contains( t ) ) {
+					if (child.contains(t)) {
 						isInChildSt = true;
 						break;
 					}
 				}
 
-				if ( !isInChildSt ) {
-					list.add( t );
+				if (!isInChildSt) {
+					list.add(t);
 				}
 			}
 
@@ -506,7 +592,7 @@ public final class TripStructureUtils {
 		}
 
 		private boolean contains(final Trip t) {
-			return trips.contains( t );
+			return trips.contains(t);
 		}
 
 		public Subtour getParent() {
@@ -514,7 +600,7 @@ public final class TripStructureUtils {
 		}
 
 		public Collection<Subtour> getChildren() {
-			return Collections.unmodifiableList( children );
+			return Collections.unmodifiableList(children);
 		}
 
 		public boolean isClosed() {
@@ -524,17 +610,17 @@ public final class TripStructureUtils {
 		@Override
 		public boolean equals(final Object other) {
 			if (other == null) return false;
-			if ( !other.getClass().equals( getClass() ) ) return false;
+			if (!other.getClass().equals(getClass())) return false;
 			final Subtour s = (Subtour) other;
-			return s.trips.equals( trips ) &&
-					       areChildrenCompatible( children , s.children ) &&
-					       (s.parent == null ? parent == null : s.parent.equals( parent )) &&
-					       (s.isClosed == isClosed);
+			return s.trips.equals(trips) &&
+				areChildrenCompatible(children, s.children) &&
+				(s.parent == null ? parent == null : s.parent.equals(parent)) &&
+				(s.isClosed == isClosed);
 		}
 
 		private static boolean areChildrenCompatible(
-				final List<Subtour> children2,
-				final List<Subtour> children3) {
+			final List<Subtour> children2,
+			final List<Subtour> children3) {
 			return children2.size() == children3.size();// should check more, but risk of infinite recursion...
 
 		}
@@ -546,53 +632,54 @@ public final class TripStructureUtils {
 
 		@Override
 		public String toString() {
-			return "Subtour: "+trips.toString();
+			return "Subtour: " + trips.toString();
 		}
 	}
 
 	@Deprecated // use findTripAtPlanElement(...) instead.
-	public static Trip findCurrentTrip( PlanElement pe, Plan plan ) {
-		return findTripAtPlanElement( pe, plan ) ;
+	public static Trip findCurrentTrip(PlanElement pe, Plan plan) {
+		return findTripAtPlanElement(pe, plan);
 	}
 
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ){
-		return findTripAtPlanElement( currentPlanElement, plan, TripStructureUtils::isStageActivityType ) ;
+	public static Trip findTripAtPlanElement(PlanElement currentPlanElement, Plan plan) {
+		return findTripAtPlanElement(currentPlanElement, plan, TripStructureUtils::isStageActivityType);
 	}
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, Predicate<String> isStageActivity ) {
-		if ( currentPlanElement instanceof Activity ) {
+
+	public static Trip findTripAtPlanElement(PlanElement currentPlanElement, Plan plan, Predicate<String> isStageActivity) {
+		if (currentPlanElement instanceof Activity) {
 //			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
-			Gbl.assertIf( isStageActivity.test( ((Activity)currentPlanElement).getType() ) ) ;
+			Gbl.assertIf(isStageActivity.test(((Activity) currentPlanElement).getType()));
 		}
-		List<Trip> trips = getTrips(plan.getPlanElements(), isStageActivity) ;
-		for ( Trip trip : trips ) {
-			int index = trip.getTripElements().indexOf( currentPlanElement ) ;
-			if ( index != -1 ) {
-				return trip ;
-			}
-		}
-		return null ;
-	}
-
-	public static Trip findTripEndingAtActivity(Activity activity, Plan plan) {
-		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips(plan.getPlanElements()) ;
-		for ( Trip trip : trips ) {
-			if ( activity.equals( trip.getDestinationActivity() ) ) {
+		List<Trip> trips = getTrips(plan.getPlanElements(), isStageActivity);
+		for (Trip trip : trips) {
+			int index = trip.getTripElements().indexOf(currentPlanElement);
+			if (index != -1) {
 				return trip;
 			}
 		}
-		return null ;
+		return null;
 	}
 
-	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan ) {
-		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips( plan ) ;
-		for ( Trip trip : trips ) {
-			if ( trip.getOriginActivity().equals( activity ) ) {
-				return trip ;
+	public static Trip findTripEndingAtActivity(Activity activity, Plan plan) {
+		Gbl.assertIf(!StageActivityTypeIdentifier.isStageActivity(activity.getType()));
+		List<Trip> trips = getTrips(plan.getPlanElements());
+		for (Trip trip : trips) {
+			if (activity.equals(trip.getDestinationActivity())) {
+				return trip;
 			}
 		}
-		return null ;
+		return null;
+	}
+
+	public static Trip findTripStartingAtActivity(final Activity activity, final Plan plan) {
+		Gbl.assertIf(!StageActivityTypeIdentifier.isStageActivity(activity.getType()));
+		List<Trip> trips = getTrips(plan);
+		for (Trip trip : trips) {
+			if (trip.getOriginActivity().equals(activity)) {
+				return trip;
+			}
+		}
+		return null;
 	}
 
 	public static String getRoutingMode(Leg leg) {
@@ -608,12 +695,12 @@ public final class TripStructureUtils {
 		return new RoutingModeMainModeIdentifier();
 	}
 
-	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
+	public static String identifyMainMode(final List<? extends PlanElement> tripElements) {
 		// first try the routing mode:
-		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get( 0 )));
+		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get(0)));
 		// else see if trip has only one leg, if so, use that mode (situation after initial demand generation)
-		if ( mode == null && tripElements.size()==1 ) {
-			mode = ((Leg) tripElements.get(0)).getMode() ;
+		if (mode == null && tripElements.size() == 1) {
+			mode = ((Leg) tripElements.get(0)).getMode();
 		}
 		if (mode == null) {
 			log.error("Could not find routing mode for trip " + tripElements);
@@ -621,11 +708,12 @@ public final class TripStructureUtils {
 		return mode;
 	}
 
-	public static boolean isStageActivityType( String activityType ) {
-		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
+	public static boolean isStageActivityType(String activityType) {
+		return StageActivityTypeIdentifier.isStageActivity(activityType);
 	}
-	public static String createStageActivityType( String mode ) {
-		return ScoringConfigGroup.createStageActivityType( mode ) ;
+
+	public static String createStageActivityType(String mode) {
+		return ScoringConfigGroup.createStageActivityType(mode);
 	}
 
 }

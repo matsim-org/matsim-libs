@@ -322,6 +322,8 @@ public final class EventsToLegs
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
 			assert egressFacility != null : "egressFacility for lastFacilityId " + lastFacilityId + " is null.";
+			for (TransitLine value : transitSchedule.getTransitLines().values()) {
+			}
 
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility,
 				createChainedRoute(transitChains.remove(event.getPersonId())));

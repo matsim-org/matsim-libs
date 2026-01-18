@@ -2,6 +2,7 @@ package org.matsim.dsim.simulation;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -12,6 +13,7 @@ import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 import java.util.Collection;
@@ -25,8 +27,11 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	private final Queue<TeleportationEntry> personsTeleporting = new PriorityQueue<>(Comparator.comparingDouble(TeleportationEntry::exitTime));
 	private final SimStepMessaging simStepMessaging;
 	private final AgentSourcesContainer asc;
+	private final BackpackDataCollector bdc;
 
 	private InternalInterface internalInterface;
+	// store the current time, so we can use it for after sim.
+	private double now;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -34,10 +39,12 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 	}
 
 	@Inject
-	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc) {
+	DistributedTeleportationEngine(EventsManager em, SimStepMessaging simStepMessaging, AgentSourcesContainer asc,
+								   BackpackDataCollector bdc) {
 		this.simStepMessaging = simStepMessaging;
 		this.em = em;
 		this.asc = asc;
+		this.bdc = bdc;
 	}
 
 	@Override
@@ -65,6 +72,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 		if (simStepMessaging.isLocal(person.getDestinationLinkId())) {
 			personsTeleporting.add(new TeleportationEntry(person, exitTime));
 		} else {
+			bdc.teleportedPersonLeavesPartition(person);
 			simStepMessaging.collectTeleportation(person, exitTime);
 		}
 
@@ -89,6 +97,7 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 
 		while (firstPersonReady(now)) {
 			TeleportationEntry entry = personsTeleporting.remove();
@@ -102,6 +111,15 @@ public class DistributedTeleportationEngine implements DistributedDepartureHandl
 			person.endLegAndComputeNextState(now);
 			internalInterface.arrangeNextAgentState(person);
 		}
+	}
+
+	@Override
+	public void afterSim() {
+		for (var entry : personsTeleporting) {
+			var person = entry.person();
+			em.processEvent(new PersonStuckEvent(now, person.getId(), person.getDestinationLinkId(), person.getMode()));
+		}
+		personsTeleporting.clear();
 	}
 
 	@Override

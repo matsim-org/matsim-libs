@@ -1,8 +1,11 @@
 package org.matsim.api.core.v01;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.matsim.api.core.v01.messages.ComputeNode;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,9 +21,17 @@ public class Topology implements Message, Iterable<ComputeNode> {
 	@Nonnull
 	private final List<ComputeNode> computeNodes;
 
-	Topology(int totalPartitions, @Nonnull List<ComputeNode> computeNodes) {
+	private final Int2IntMap part2index = new Int2IntOpenHashMap();
+
+	Topology(int totalPartitions, @Nonnull List<ComputeNode> computeNodesArg) {
 		this.totalPartitions = totalPartitions;
-		this.computeNodes = computeNodes;
+		this.computeNodes = new ArrayList<>();
+		for (var node : computeNodesArg) {
+			for (int part : node.getParts()) {
+				part2index.put(part, this.computeNodes.size());
+			}
+			this.computeNodes.add(node);
+		}
 	}
 
 	public static TopologyBuilder builder() {
@@ -31,8 +42,13 @@ public class Topology implements Message, Iterable<ComputeNode> {
 		return computeNodes.size();
 	}
 
-	public ComputeNode getNode(int index) {
+	public ComputeNode getNodeByIndex(int index) {
 		return computeNodes.get(index);
+	}
+
+	public ComputeNode getNodeByPartition(int partition) {
+		var index = part2index.get(partition);
+		return getNodeByIndex(index);
 	}
 
 	/**
