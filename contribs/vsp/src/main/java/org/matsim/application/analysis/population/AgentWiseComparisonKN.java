@@ -212,11 +212,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		}
 //		log.warn("only keeping the least affluent 10% of the population; popSize before={}", basePopulation.getPersons().size() );
 
-
-		// ---
-
 		baseScenario.setPopulation( basePopulation );
-		// (need a scenario for injection!)
 
 //		URL url = Paths.get(
 //			"/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/drt-case-study/output-gartenfeld-v6.4-cutout-10pct-drt/analysis/drt/serviceArea.shp" ).toUri().toURL();
@@ -568,8 +564,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
-
 		Table rohDeltaTable = Table.create( joinedTable.column( PERSON_ID )
 			, joinedTable.column( UTL_OF_MONEY )
 //			, joinedTable.column( MUSL_h )
@@ -605,6 +599,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		formatTable( deltaTable, 0 );
 
 		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+
+		// ===
+
+		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
 
 		writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
 

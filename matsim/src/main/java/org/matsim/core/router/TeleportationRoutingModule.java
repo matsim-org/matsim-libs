@@ -115,10 +115,11 @@ public class TeleportationRoutingModule implements RoutingModule {
 //			toFacilityLinkId = FacilitiesUtils.decideOnLink( toFacility, scenario.getNetwork() ).getId() ;
 		}
 
-//		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
-		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, null, null );
+		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
+//		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, null, null );
 		// This means that this generic route will not have a starting/endingLinkId.  In principle, this should be possible, but I
 		// do not know if code possibly depends on having a link.  kai, dec'25
+		// --> no, it is not possible, it fails several tests plus the SwissRailRaptor. kai, jan'26
 
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / getTravelSpeed(person));
