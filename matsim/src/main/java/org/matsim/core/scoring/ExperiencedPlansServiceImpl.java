@@ -40,7 +40,7 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 
 	private final static Logger log = LogManager.getLogger(ExperiencedPlansServiceImpl.class);
 
-	@Inject Network network;
+	@Inject private Network network;
 	@Inject private Config config;
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
@@ -49,11 +49,11 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 	private boolean hasFinished = false;
 
 	@Inject
-    ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
-        controllerListenerManager.addControllerListener( this );
-        eventsToActivities.addActivityHandler(this);
-        eventsToLegs.addLegHandler(this);
-    }
+	ExperiencedPlansServiceImpl(ControllerListenerManager controllerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+		controllerListenerManager.addControllerListener( this );
+		eventsToActivities.addActivityHandler(this);
+		eventsToLegs.addLegHandler(this);
+	}
 
 	@Override public void notifyIterationStarts(IterationStartsEvent event) {
 		for (Person person : population.getPersons().values()) {
@@ -97,11 +97,11 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 			finishIteration();
 		}
 		Population tmpPop = PopulationUtils.createPopulation(config,network);
+		log.warn( "agentsRecords.size={}", agentRecords.size());
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 
-			// the following is new as of oct-25 ...
-
+			// copy the attributes from the original person to the experienced plans person:
 			Person originalPerson = population.getPersons().get( entry.getKey() );
 			for( Map.Entry<String, Object> entry2 : originalPerson.getAttributes().getAsMap().entrySet() ){
 				person.getAttributes().putAttribute( entry2.getKey(),entry2.getValue() );
@@ -109,13 +109,9 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 				// end we never know.  kai, oct'25
 			}
 
-			// ... up to here.
-
-			// There is EquilTwoAgentsTest, where I switched on the experienced plans writing in the scoring config.
-			// W/o the code lines above, the person attributes are not written.  W/ the code lines, they are written.
-			// This is, evidently, not a true regression test, but at least I had a look if the functionality works at all. kai, oct'25
-
 			Plan plan = entry.getValue();
+			plan.setScore( originalPerson.getSelectedPlan().getScore() );
+
 			person.addPlan(plan);
 			tmpPop.addPerson(person);
 		}
@@ -126,15 +122,19 @@ final class ExperiencedPlansServiceImpl implements ExperiencedPlansService, Even
 	public final void finishIteration() {
 		// I separated this from "writeExperiencedPlans" so that it can be called separately even when nothing is written.  Can't say
 		// if the design might be better served by an iteration ends listener.  kai, feb'17
-		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Plan plan = entry.getValue();
-			if (scoringFunctionsForPopulation != null) {
-				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
-				if (plan.getScore().isNaN()) {
-					log.warn("score is NaN; plan:" + plan.toString());
-				}
-			}
-		}
+//		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+//			Plan plan = entry.getValue();
+//			if (scoringFunctionsForPopulation != null) {
+//				final ScoringFunction scoringFunctionForAgent = scoringFunctionsForPopulation.getScoringFunctionForAgent( entry.getKey() );
+//				// yyyy not sure why this can happen. kai, jan'26
+//				if ( scoringFunctionForAgent != null ){
+//					plan.setScore( scoringFunctionForAgent.getScore() );
+//					if( plan.getScore().isNaN() ){
+//						log.warn( "score is NaN; plan:" + plan.toString() );
+//					}
+//				}
+//			}
+//		}
 		hasFinished = true;
 	}
 

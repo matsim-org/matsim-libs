@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -339,5 +340,18 @@ public class ConfigUtils implements MatsimExtensionPoint {
 	}
 	public static void writeMinimalConfig( final Config config, String filename ) {
 		new ConfigWriter(config,Verbosity.minimal).write(filename);
+	}
+	public static void copyFromTo( ConfigGroup source, ConfigGroup destination ) {
+		for (Map.Entry<String, String> e : source.getParams().entrySet()) {
+			destination.addParam(e.getKey(), e.getValue());
+		}
+
+		for ( Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
+			for (ConfigGroup sourceSet : sourceSets) {
+				ConfigGroup destinationSet = destination.createParameterSet(sourceSet.getName());
+				copyFromTo(sourceSet, destinationSet );
+				destination.addParameterSet(destinationSet);
+			}
+		}
 	}
 }

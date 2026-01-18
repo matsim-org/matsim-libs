@@ -48,7 +48,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 								  );
 
 		if ( isBaseTable ) {
-			table.addColumns( DoubleColumn.create( MUTTS_H ), DoubleColumn.create( UTL_OF_MONEY ), DoubleColumn.create( MUSL_h ) );
+			table.addColumns( DoubleColumn.create( MUTTS_H ), DoubleColumn.create( UTL_OF_MONEY ), DoubleColumn.create( MUSE_h ) );
 		}
 		// (This has the advantage that one does not need to run the VTTS code on the policy cases.)
 
@@ -86,7 +86,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 					}
 					Double musl_h = getMUSE_h( trip.getDestinationActivity() );
 					if( musl_h != null ){
-						table.doubleColumn( MUSL_h ).append( musl_h );
+						table.doubleColumn( MUSE_h ).append( musl_h );
 					} else{
 						throw new RuntimeException( "find default value" );
 					}
@@ -162,7 +162,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 		{
 			log.info( "print summary on full table:");
 			System.out.println( table.summary() );
-			final Table filteredTable = table.where( table.doubleColumn( MUSL_h ).isBetweenExclusive( 0.,  16.3096909) );
+			final Table filteredTable = table.where( table.doubleColumn( MUSE_h ).isBetweenExclusive( 0.,  16.3096909 ) );
 			log.info( "print summary on table after 0 and max(mUSL) are removed:");
 			System.out.println( filteredTable.summary() );
 		}
@@ -231,7 +231,7 @@ class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
 			, joinedTable.column( TTIME )
 			, joinedTable.column( deltaOf( TTIME ) )
 //			, joinedTable.column( MUTTS_H )
-			, joinedTable.column( MUSL_h )
+			, joinedTable.column( MUSE_h )
 			, joinedTable.column( deltaOf( MONEY ) )
 			, joinedTable.column( UTL_OF_MONEY)
 			, joinedTable.column( ASCS )

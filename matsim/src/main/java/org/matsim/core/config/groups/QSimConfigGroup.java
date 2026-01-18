@@ -721,19 +721,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.delayInstantTeleportationArrivals = val;
 	}
 
-	public static final String DELAY_INSTANT_TELEPORTATION_ARRIVALS = "delayInstantTeleportationArrivals";
-	public boolean delayInstantTeleportationArrivals = true;
-
-	@StringGetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
-	public boolean getDelayInstantTeleportationArrivals() {
-		return this.delayInstantTeleportationArrivals;
-	}
-
-	@StringSetter(DELAY_INSTANT_TELEPORTATION_ARRIVALS)
-	public void setDelayInstantTeleportationArrivals(boolean val) {
-		this.delayInstantTeleportationArrivals = val;
-	}
-
 	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING = //
 		"Flow capacity easing is activated for vehicles of size equal or smaller than the specified threshold. "
 			+ "Introduced to minimise the chances of buses being severely delayed in downsampled scenarios";
@@ -765,12 +752,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public void setInflowCapacitySetting(InflowCapacitySetting inflowCapacitySetting) {
 		this.inflowCapacitySetting = inflowCapacitySetting;
 	}
-
-////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
-//	public boolean isCreatingVehiclesForAllNetworkModes() {
-//		// yyyy do we really need this switch?  Quite in general, please try to avoid boolean switches.  kai, may'18
-//		return creatingVehiclesForAllNetworkModes;
-//	}
 
 ////	@StringSetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
 //	public void setCreatingVehiclesForAllNetworkModes(boolean creatingVehiclesForAllNetworkModes) {

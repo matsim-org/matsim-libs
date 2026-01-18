@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.mapdb.Atomic;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -13,10 +14,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -26,6 +24,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.GeometryUtils;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
@@ -100,19 +99,33 @@ class AgentWiseComparisonKNUtils{
 		log.warn("popSize before={}; popSize after={}; ", popSizeBefore, population.getPersons().size() );
 	}
 	static void cleanPopulation( Population basePopulation ){
-		long popSizeBefore = basePopulation.getPersons().size();
-		List<Id<Person>> personsToRemove = new ArrayList<>();
-		for( Person person : basePopulation.getPersons().values() ){
-			Id<Person> personId = person.getId();
-//			if ( personId.toString().contains("goods") || personId.toString().contains("commercial") || personId.toString().contains("freight")  ) {
-			if ( !"person".equals( PopulationUtils.getSubpopulation( person ) ) ) {
-				personsToRemove.add( person.getId() );
+		{
+			long popSizeBefore = basePopulation.getPersons().size();
+			List<Id<Person>> personsToRemove = new ArrayList<>();
+			for( Person person : basePopulation.getPersons().values() ){
+				if( !"person".equals( PopulationUtils.getSubpopulation( person ) ) ){
+					personsToRemove.add( person.getId() );
+				}
 			}
+			for( Id<Person> personId : personsToRemove ){
+				basePopulation.removePerson( personId );
+			}
+			log.warn( "removing non-persons; popSizeBefore={}; popSizeAfter={}", popSizeBefore, basePopulation.getPersons().size() );
 		}
-		for( Id<Person> personId : personsToRemove ){
-			basePopulation.removePerson( personId );
+		{
+			long popSizeBefore = basePopulation.getPersons().size();
+			List<Id<Person>> personsToRemove = new ArrayList<>();
+			for( Person person : basePopulation.getPersons().values() ){
+				if ( TripStructureUtils.getTrips( person.getSelectedPlan() ).isEmpty() ) {
+					personsToRemove.add( person.getId() );
+				}
+			}
+			for( Id<Person> personId : personsToRemove ){
+				basePopulation.removePerson( personId );
+			}
+			log.warn( "removing persons w/o trips; popSizeBefore={}; popSizeAfter={}", popSizeBefore, basePopulation.getPersons().size() );
 		}
-		log.warn( "popSizeBefore={}; popSizeAfter={}", popSizeBefore, basePopulation.getPersons().size() );
+
 	}
 
 	static void tagPersonsToAnalyse( Population basePopulation, List<PreparedGeometry> geometries, Scenario scenario ){
@@ -297,6 +310,7 @@ class AgentWiseComparisonKNUtils{
 	}
 	static void writeMatsimScoresSummaryTable( Path inputPath, Config config, Table deltaTable ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
+		final double matsim_score_sum = deltaTable.doubleColumn( deltaOf( MATSIM_SCORE) ).sum() * factor;
 		final double score_sum = deltaTable.doubleColumn( deltaOf( SCORE ) ).sum() * factor;
 		final double money_score = deltaTable.doubleColumn( deltaOf(MONEY_SCORE ) ).sum() * factor;
 		final double ascs_sum = deltaTable.doubleColumn( deltaOf( ASCS ) ).sum() * factor;
@@ -313,6 +327,7 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
 		final StringBuilder acts_score_cmt = new StringBuilder( "... are the activities score (= pure travel time) benefits." );
 		final StringBuilder alt_sum_cmt = new StringBuilder("is the sum of these contributions.") ;
+		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score from the output population");
 
 		final int maxLen = score_cmt.length();
 		alignLeft( weighted_ttime_cmt, maxLen );
@@ -323,6 +338,7 @@ class AgentWiseComparisonKNUtils{
 		alignLeft( sum_cmt, maxLen );
 		alignLeft( acts_score_cmt, maxLen );
 		alignLeft( alt_sum_cmt, maxLen );
+		alignLeft( matsim_score_cmt, maxLen );
 
 		// ---
 
@@ -348,6 +364,9 @@ class AgentWiseComparisonKNUtils{
 
 		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
 		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( matsim_score_sum );
+		summaryTable.stringColumn( "comment" ).append( matsim_score_cmt.toString() );
 
 		formatTable( summaryTable, 0 );
 
@@ -411,5 +430,20 @@ class AgentWiseComparisonKNUtils{
 				PersonUtils.setMarginalUtilityOfMoney( person, 1. );
 			}
 		}
+	}
+	static double computeMUSE_h( Activity act, ScoringFunction sfNormal, PopulationFactory pf, ScoringFunction sfEarly, double scoreNormalBefore,
+								 double scoreEarlyBefore ){
+		sfNormal.handleActivity( act );
+		Activity earlyActivity = pf.createActivityFromLinkId( act.getType(), act.getLinkId() );
+		PopulationUtils.copyFromTo( act, earlyActivity );
+		earlyActivity.setStartTime( earlyActivity.getStartTime().seconds() - 1 );
+		sfEarly.handleActivity( earlyActivity );
+		sfNormal.finish();
+		sfEarly.finish();
+		double scoreDiffNormal = sfNormal.getScore() - scoreNormalBefore;
+		double scoreDiffEarly = sfEarly.getScore() - scoreEarlyBefore;
+		final double muse_h = (scoreDiffEarly - scoreDiffNormal) * 3600.;
+		AddVttsEtcToActivities.setMUSE_h( act, muse_h );
+		return muse_h;
 	}
 }

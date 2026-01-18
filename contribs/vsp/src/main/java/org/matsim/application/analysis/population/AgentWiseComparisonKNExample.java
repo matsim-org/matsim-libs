@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,21 +13,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.RoutingConfigGroup;
-import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.PrepareForMobsim;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -40,7 +32,6 @@ import tech.tablesaw.api.Table;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 
 import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.setAnalysisPopulation;
 
@@ -92,7 +83,7 @@ class AgentWiseComparisonKNExample{
 		AgentWiseComparisonKNUtils.computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 
 		AgentWiseComparisonKN ccc = new AgentWiseComparisonKN();
-		ccc.scenario = scenario;
+		ccc.baseScenario = scenario;
 
 		{
 			com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario )
