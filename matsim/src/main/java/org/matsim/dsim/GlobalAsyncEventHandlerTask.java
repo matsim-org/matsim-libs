@@ -52,10 +52,13 @@ public final class GlobalAsyncEventHandlerTask extends EventHandlerTask {
 	 */
 	private final AtomicLong state = new AtomicLong();
 
+	private final DistributedEventsManager manager;
+
 	public GlobalAsyncEventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition,
 									   SerializationProvider serializer) {
-		super(handler, manager, partition, true);
-		buildConsumers(serializer);
+		super(handler, partition, true);
+		buildConsumers(serializer, manager.getComputeNode().isDistributed());
+		this.manager = manager;
 	}
 
 	private boolean updateState(long expected, int simCounter, int processCounter, byte byteValue) {

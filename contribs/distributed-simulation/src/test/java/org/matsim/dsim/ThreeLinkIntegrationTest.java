@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.communication.LocalCommunicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.config.Config;
@@ -15,6 +16,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
@@ -26,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ThreeLinkIntegrationTest {
@@ -128,6 +131,7 @@ public class ThreeLinkIntegrationTest {
 	@Test
 	@Order(2)
 	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
+
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
 
@@ -166,6 +170,53 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
+	void oneAgentThreeNodesTwoIterations() throws ExecutionException, InterruptedException, TimeoutException {
+		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
+		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
+		var size = 3;
+		var comms = LocalCommunicator.create(size);
+		try (var pool = Executors.newFixedThreadPool(size)) {
+			var futures = comms.stream()
+				.map(comm -> pool.submit(() -> {
+
+					Config local = ConfigUtils.loadConfig(configPath);
+					local.dsim().setThreads(1);
+					local.controller().setFirstIteration(0);
+					local.controller().setLastIteration(1);
+					local.controller().setOutputDirectory(outputDirectory);
+					local.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
+					Scenario scenario = ScenarioUtils.loadScenario(local);
+
+					Controler controler = new Controler(scenario, DistributedContext.create(comm, local));
+
+					controler.run();
+
+					try {
+						comm.close();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					return Tuple.of(comm.getRank(), scenario);
+				}))
+				.toList();
+
+			for (var f : futures) {
+				var result = f.get(2, TimeUnit.MINUTES);
+				assertEquals(1, result.getSecond().getPopulation().getPersons().size());
+				var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
+				// make sure that the score is sent back to the person.
+				if (result.getFirst() == 0) {
+					assertNotNull(person.getSelectedPlan().getScore());
+				} else {
+					assertNull(person.getSelectedPlan().getScore());
+				}
+			}
+		}
+	}
+
+	@Test
+	@Order(2)
 	void storageCapacityThreeNodes() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -189,47 +240,6 @@ public class ThreeLinkIntegrationTest {
 		config.network().setInputFile(netPath);
 		var controller = new DistributedController(new NullCommunicator(), config, 1);
 		controller.run();
-        /*
-        // start three instances each containing one partition
-        var size = 3;
-        var comms = LocalCommunicator.create(size);
-        var pool = Executors.newFixedThreadPool(size);
-        var futures = comms.stream()
-                .map(comm -> pool.submit(() -> {
-                    Config config = ConfigUtils.loadConfig(configPath, new DSimConfigGroup());
-                    config.controller().setOutputDirectory(outputDirectory + "output");
-                    config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-                    config.plans().setInputFile("three-links-plans-storage-cap.xml");
-                    DistributedController c = new DistributedController(comm, config, 1, 1);
-                    c.run();
-                    try {
-                        comm.close();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }))
-                .toList();
 
-        for (var f : futures) {
-            f.get();
-        }
-        var expectedEventsPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links.expected-events-1-plan.xml";
-        var actualEventsPath = utils.getOutputDirectory() + "three-links.output_events.xml";
-
-         */
-
-    /*    try (var reader = Files.newBufferedReader(Paths.get(actualEventsPath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                log.info(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-     */
-
-
-		//compareXmlFilesByLine(expectedEventsPath, actualEventsPath);
 	}
 }

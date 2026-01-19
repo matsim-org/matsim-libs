@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -171,7 +172,8 @@ public class FreeSpeedTravelTimeMatrixTest {
 			// generate from scratch
             assertFalse(new File(cachePath).exists());
 
-			config.controller().setOutputDirectory( "test\\output\\generic_dvrp_one_taxi_cacheViaConfig_1");
+			config.controller().setOutputDirectory(
+					Path.of("test", "output", "generic_dvrp_one_taxi_cacheViaConfig_1").toString());
 			Controler controller = new Controler(scenario);
 			controller.addOverridingModule(new DvrpModule());
 			controller.getInjector().getInstance(TravelTimeMatrix.class);
@@ -180,7 +182,8 @@ public class FreeSpeedTravelTimeMatrixTest {
 		{
 			// read from cache
 			assertTrue(new File(cachePath).exists());
-			config.controller().setOutputDirectory( "test\\output\\generic_dvrp_one_taxi_cacheViaConfig_2");
+			config.controller().setOutputDirectory(
+					Path.of("test", "output", "generic_dvrp_one_taxi_cacheViaConfig_2").toString());
 			Controler controller = new Controler(scenario);
 			controller.addOverridingModule(new DvrpModule());
 			controller.getInjector().getInstance(TravelTimeMatrix.class);

@@ -40,12 +40,16 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Class responsible for routing messages to the correct recipient.
  */
 public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
+	/**
+	 * This class has a few 'trace' statements, which can be enabled by passing -Dlog4j2.level=TRACE to the VM
+	 */
 	private static final Logger log = LogManager.getLogger(MessageBroker.class);
 
 	private static final boolean CHECK_SEQ = Objects.equals(System.getenv("CHECK_SEQ"), "1");
@@ -147,7 +151,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 		this.addresses = new int[topology.getTotalPartitions()];
 		for (int i = 0; i < topology.getNodesCount(); i++) {
-			ComputeNode n = topology.getNode(i);
+			ComputeNode n = topology.getNodeByIndex(i);
 			for (int p : n.getParts()) {
 				addresses[p] = n.getRank();
 			}
@@ -162,7 +166,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			dataSize[i] = new AtomicInteger(0);
 		}
 
-		this.ownParts = new IntOpenHashSet(topology.getNode(comm.getRank()).getParts());
+		this.ownParts = new IntOpenHashSet(topology.getNodeByIndex(comm.getRank()).getParts());
 		this.otherParts = new IntOpenHashSet();
 		for (int i = 0; i < topology.getTotalPartitions(); i++) {
 			if (!ownParts.contains(i)) {
@@ -298,7 +302,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	public void addWaitForRank(int rank) {
 		// Copy all partitions of the rank to wait list
-		waitFor.addAll(topology.getNode(rank).getParts());
+		waitFor.addAll(topology.getNodeByIndex(rank).getParts());
 	}
 
 	/**
@@ -328,16 +332,21 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		} else {
 			list = byAddress.get(address(receiverPartition, msg.getType()));
 		}
-//        log.info("#{} received message to send local. {}", getRank(), msg);
 		list.forEach(t -> t.add(msg));
 	}
 
 	void beforeSimStep(double time) {
 		// Offset the sequence to avoid interference with other seq ids
-		seq = 1000 + (int) (time * 100);
+		// to trigger final sync, we pass Infinity as time. To avoid overflow and a negative sequence value,
+		// get the absolute value.
+		seq = Math.abs(1000 + (int) (time * 100));
 	}
 
 	void syncTimestep(double time, boolean last) {
+
+		// TODO remove
+		this.currentTime = time;
+
 		if (comm.getSize() == 1) {
 			return;
 		}
@@ -362,12 +371,9 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// remove all that are on the same partition
 		waitFor.removeAll(ownParts);
 
-//		log.info("Rank #{}, seq{} waiting for partitions: {}", comm.getRank(), seq, waitFor);
-
 		for (int rank : sendNullMsgs) {
 			int length = dataSize[rank + 1].get();
 			if (length == 0) {
-//                log.info("Node {} sending null message to {}", comm.getRank(), rank);
 				send(EmptyMessage.INSTANCE, rank);
 			}
 		}
@@ -396,6 +402,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 	 */
 	private void queueSend(Message msg, int rank, int partition) {
 
+		log.trace("#{} queue send to {}/{}: {}", this.getRank(), rank, partition, msg);
 		AtomicInteger oldPos = dataSize[rank + 1];
 
 		ThreadSafeFury fury = serialization.getFury();
@@ -454,8 +461,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			int length = dataSize[i].get();
 			if (length > 0) {
 				int receiver = i - 1;
-//                log.debug("Rank #{}, seq{}: Send message to {}", comm.getRank(), seq, receiver);
-
 				sizes.recordValue(length);
 				comm.send(receiver, outgoing[i], 0, length);
 				dataSize[i].set(0);
@@ -474,14 +479,22 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 				throw new UncheckedIOException(e);
 			}
 		}
-
 		comm.recv(this, this);
 	}
 
+	private double currentTime = -1;
+
 	@Override
 	public boolean expectsMoreMessages() {
-//		System.out.println(comm.getRank() + " t " + (seq - 1000) + " wait for " + waitFor);
+		if (!waitFor.isEmpty()) {
+			log.trace(this::traceWaiting);
+		}
 		return !waitFor.isEmpty();
+	}
+
+	private String traceWaiting() {
+		var waitForParts = waitFor.intStream().mapToObj(String::valueOf).collect(Collectors.joining(","));
+		return "#" + getRank() + " at t:" + currentTime + " waiting for: [" + waitForParts + "]";
 	}
 
 	@Override
@@ -494,8 +507,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		int sender = in.readInt32();
 		int receiver = in.readInt32();
 
-//        log.debug("Rank #{}, seq{}: Received message from {} to {}", comm.getRank(), tag, sender, receiver);
-
 		// Ignore messages that are not for this rank
 		// This might happen depending on the underlying communicator
 		if (receiver != comm.getRank() && receiver != Communicator.BROADCAST_TO_ALL)
@@ -507,7 +518,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			log.error("Sender node: {}, Receiver node: {}", sender, receiver);
 			log.error("Node {} contains partitions: {}", comm.getRank(), ownParts);
 			log.error("Node {} currently supposed to wait for partitions: {}", comm.getRank(), waitFor);
-			log.error("Message covered partitions: {}", topology.getNode(sender).getParts());
+			log.error("Message covered partitions: {}", topology.getNodeByIndex(sender).getParts());
 			log.error("Message contents:");
 
 			while (in.readerIndex() < length) {
@@ -525,6 +536,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		}
 
 		if (tag > seq || tag < 0) {
+			log.trace("#{} on seq {} received ahead msg from #{} for seq {}", comm.getRank(), seq, sender, tag);
 			aheadMsgs.add(clone(data));
 			return;
 		}
@@ -536,6 +548,7 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
+			log.trace("#{} received from {}: {}", receiver, sender, msg);
 
 			if (partition == NODE_MESSAGE) {
 				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
@@ -545,7 +558,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			if (msg instanceof Event m) {
 				events.add(m);
 			} else {
-				//log.info("#{} received message: {}", getRank(), msg.toDebugString());
 				sendLocal(msg, partition);
 			}
 		}
@@ -553,11 +565,10 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 		// The communication between two nodes may be split up into two separate messages.
 		// Need to differentiate if a message iy received as broadcast to all or as directed message
 		if (receiver == Communicator.BROADCAST_TO_ALL) {
-			topology.getNode(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
-		} else
-			topology.getNode(sender).getParts().forEach(waitFor::remove);
-
-//        log.debug("Rank #{}, t{}: Waiting for message from partitions: {}", comm.getRank(), tag, waitFor);
+			topology.getNodeByIndex(sender).getParts().forEach(p -> waitFor.remove(broadcastAddress(p)));
+		} else {
+			topology.getNodeByIndex(sender).getParts().forEach(waitFor::remove);
+		}
 	}
 
 	public Histogram getRuntime() {

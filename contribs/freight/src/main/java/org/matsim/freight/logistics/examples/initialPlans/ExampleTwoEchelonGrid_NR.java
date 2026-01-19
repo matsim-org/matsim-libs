@@ -21,7 +21,6 @@
 
 package org.matsim.freight.logistics.examples.initialPlans;
 
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +32,10 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -53,6 +55,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * This is an academic example for the 2-echelon problem. It uses the 9x9-grid network from the
@@ -88,7 +92,8 @@ final class ExampleTwoEchelonGrid_NR {
 	private static final VehicleType VEH_TYPE_LARGE_50 = createVehTypeLarge50();
 	private static final VehicleType VEH_TYPE_SMALL_05 = createVehTypeSmall05();
 
-	private ExampleTwoEchelonGrid_NR() {} // so it cannot be instantiated
+	private ExampleTwoEchelonGrid_NR() {
+	} // so it cannot be instantiated
 
 	public static void main(String[] args) {
 		log.info("Prepare Config");
@@ -116,6 +121,7 @@ final class ExampleTwoEchelonGrid_NR {
 					carrierScorer.setToll(TOLL_VALUE);
 
 					bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+					addControllerListenerBinding().toInstance(carrierScorer);
 					bind(CarrierStrategyManager.class)
 						.toProvider(
 							() -> {
@@ -192,7 +198,7 @@ final class ExampleTwoEchelonGrid_NR {
 		}
 
 		log.info("Add LSP to the scenario");
-    LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
+		LSPUtils.loadLspsIntoScenario(scenario, Collections.singletonList(createLSP(scenario)));
 
 		return scenario;
 	}

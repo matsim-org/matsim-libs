@@ -69,7 +69,7 @@ public class RequestInsertWorker {
 
 	private static SortedSet<RequestData> createTreeSet()
 	{
-		return new ConcurrentSkipListSet<>(new TreeSet<>(REQUEST_DATA_COMPARATOR));
+		return new ConcurrentSkipListSet<>(REQUEST_DATA_COMPARATOR);
 	}
 
 	private void findInsertion(RequestData requestData, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries, double now) {

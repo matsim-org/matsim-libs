@@ -33,8 +33,8 @@ public final class SingleExecutor implements LPExecutor {
 	}
 
 	@Override
-	public EventHandlerTask register(EventHandler handler, DistributedEventsManager manager, int part, int totalParts, AtomicInteger counter) {
-		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, manager, serializer, counter);
+	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
+		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
 		tasks.add(task);
 		return task;
 	}
@@ -57,10 +57,21 @@ public final class SingleExecutor implements LPExecutor {
 
 	@Override
 	public void doSimStep(double time) {
+
+		// the following iterates over all tasks twice. This is necessary,
+		// as beforeExecution notifies the tasks that they need to finish
+		// their previous phase (For example, the last timestep). In the case
+		// of SimProcesses, the message queueus for polling and receiving are
+		// switched, which does not work if we have both steps in one loop.
 		for (SimTask task : tasks) {
 			task.setTime(time);
 			if (task.needsExecution()) {
 				task.beforeExecution();
+			}
+		}
+
+		for (SimTask task : tasks) {
+			if (task.needsExecution()) {
 				task.run();
 			}
 		}

@@ -23,6 +23,8 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,13 +41,9 @@ import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControllerConfigGroup.MobsimType;
-import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.ControlerI;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.replanning.PlanStrategy;
@@ -54,22 +52,16 @@ import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import java.io.IOException;
 import java.util.Collections;
 
-import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.*;
+import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 
 /**
  * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
@@ -93,14 +85,14 @@ public class CadytsCarIT {
 		config.controller().setLastIteration(0);
 
 		StrategySettings strategySettings = new StrategySettings(Id.create(1, StrategySettings.class));
-		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME) ;
-		strategySettings.setWeight(1.0) ;
+		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
+		strategySettings.setWeight(1.0);
 		config.replanning().addStrategySettings(strategySettings);
 		CadytsConfigGroup cadytsCar = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 //		cadytsCar.addParam("startTime", "04:00:00");
-		cadytsCar.setStartTime( 4*3600 );
+		cadytsCar.setStartTime(4 * 3600);
 //		cadytsCar.addParam("endTime", "20:00:00");
-		cadytsCar.setEndTime( 20*3600 );
+		cadytsCar.setEndTime(20 * 3600);
 		cadytsCar.addParam("regressionInertia", "0.95");
 		cadytsCar.addParam("useBruteForce", "true");
 		cadytsCar.addParam("minFlowStddevVehH", "8");
@@ -125,8 +117,11 @@ public class CadytsCarIT {
 					@Override
 					public void install() {
 						addPlanStrategyBinding(CADYTS_STRATEGY_NAME).toProvider(new Provider<PlanStrategy>() {
-							@Inject Scenario scenario;
-							@Inject CadytsContext cadytsContext;
+							@Inject
+							Scenario scenario;
+							@Inject
+							CadytsContext cadytsContext;
+
 							@Override
 							public PlanStrategy get() {
 								return new PlanStrategyImpl(new CadytsPlanChanger(scenario, cadytsContext));
@@ -157,8 +152,8 @@ public class CadytsCarIT {
 	@Test
 	final void testCalibrationAsScoring() throws IOException {
 
-		final double beta=30. ;
-		final int lastIteration = 20 ;
+		final double beta = 30.;
+		final int lastIteration = 20;
 
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
@@ -169,7 +164,7 @@ public class CadytsCarIT {
 
 		config.scoring().setBrainExpBeta(beta);
 
-		config.replanning().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
+		config.replanning().addStrategySettings(new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta).setWeight(1.0));
 
 		// ===
 
@@ -182,22 +177,26 @@ public class CadytsCarIT {
 					@Override
 					public void install() {
 						bindScoringFunctionFactory().toInstance(new ScoringFunctionFactory() {
-							@Inject private ScoringParametersForPerson parameters;
-							@Inject private Network network;
-							@Inject CadytsContext cadytsContext;
+							@Inject
+							private ScoringParametersForPerson parameters;
+							@Inject
+							private Network network;
+							@Inject
+							CadytsContext cadytsContext;
+
 							@Override
 							public ScoringFunction createNewScoringFunction(Person person) {
 								final ScoringParameters params = parameters.getScoringParameters(person);
 
 								SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
-								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, config.transit().getTransitModes()));
+								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 								final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-								final double cadytsScoringWeight = beta*30.;
-								scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-								scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+								final double cadytsScoringWeight = beta * 30.;
+								scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
+								scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 
 								return scoringFunctionAccumulator;
 							}
@@ -213,8 +212,8 @@ public class CadytsCarIT {
 
 		//scenario data  test
 		Scenario scenario = injector.getInstance(Scenario.class);
-		Assertions.assertEquals(scenario.getNetwork().getLinks().size() , 23, "Different number of links in network." );
-		Assertions.assertEquals(scenario.getNetwork().getNodes().size() , 15, "Different number of nodes in network." );
+		Assertions.assertEquals(scenario.getNetwork().getLinks().size(), 23, "Different number of links in network.");
+		Assertions.assertEquals(scenario.getNetwork().getNodes().size(), 15, "Different number of nodes in network.");
 
 		Assertions.assertNotNull(scenario.getPopulation(), "Population is null.");
 
@@ -228,53 +227,53 @@ public class CadytsCarIT {
 		Counts<Link> occupCounts = new Counts<>();
 		new MatsimCountsReader(occupCounts).readFile(scenario.getConfig().counts().getCountsFileName());
 
-		Count<Link> count =  occupCounts.getCount(Id.create(19, Link.class));
+		Count<Link> count = occupCounts.getCount(Id.create(19, Link.class));
 		Assertions.assertEquals(occupCounts.getDescription(), "counts values for equil net", "Occupancy counts description is wrong");
-		Assertions.assertEquals(count.getCsLabel() , "link_19", "CsId is wrong.");
-		Assertions.assertEquals(count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
-		Assertions.assertEquals(count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON, "Max count volume is wrong.");
+		Assertions.assertEquals(count.getCsLabel(), "link_19", "CsId is wrong.");
+		Assertions.assertEquals(count.getVolume(7).getValue(), 5.0, MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+		Assertions.assertEquals(count.getMaxVolume().getValue(), 5.0, MatsimTestUtils.EPSILON, "Max count volume is wrong.");
 
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".countscompare.txt";
 		AdHocCountsReaderCar reader = new AdHocCountsReaderCar(outCounts);
 
-		Id<Link> locId11 = Id.create( 11, Link.class );
+		Id<Link> locId11 = Id.create(11, Link.class);
 		{
-			double[] simValues = reader.getSimulatedValues( locId11 );
-			double[] realValues = reader.getRealValues( locId11 );
-			Assertions.assertEquals( 0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
-			Assertions.assertEquals( 0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			double[] simValues = reader.getSimulatedValues(locId11);
+			double[] realValues = reader.getRealValues(locId11);
+			Assertions.assertEquals(0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+			Assertions.assertEquals(0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
 		}
 		{
-			Id<Link> locId12 = Id.create( "12", Link.class );
-			double[] simValues = reader.getSimulatedValues( locId12 );
-			double[] realValues = reader.getRealValues( locId12 );
-			Assertions.assertEquals( 0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
-			Assertions.assertEquals( 0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Id<Link> locId12 = Id.create("12", Link.class);
+			double[] simValues = reader.getSimulatedValues(locId12);
+			double[] realValues = reader.getRealValues(locId12);
+			Assertions.assertEquals(0.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+			Assertions.assertEquals(0.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
 		}
-		Id<Link> locId19 = Id.create( "19", Link.class );
+		Id<Link> locId19 = Id.create("19", Link.class);
 		{
-			double[] simValues = reader.getSimulatedValues( locId19 );
-			double[] realValues = reader.getRealValues( locId19 );
-			Assertions.assertEquals( 5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
-			Assertions.assertEquals( 5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			double[] simValues = reader.getSimulatedValues(locId19);
+			double[] realValues = reader.getRealValues(locId19);
+			Assertions.assertEquals(5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+			Assertions.assertEquals(5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
 		}
 		{
-			Id<Link> locId21 = Id.create( "21", Link.class );
-			double[] simValues = reader.getSimulatedValues( locId21 );
-			double[] realValues = reader.getRealValues( locId21 );
-			Assertions.assertEquals( 5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
-			Assertions.assertEquals( 5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong" );
+			Id<Link> locId21 = Id.create("21", Link.class);
+			double[] simValues = reader.getSimulatedValues(locId21);
+			double[] realValues = reader.getRealValues(locId21);
+			Assertions.assertEquals(5.0, simValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
+			Assertions.assertEquals(5.0, realValues[6], MatsimTestUtils.EPSILON, "Volume of hour 6 is wrong");
 		}
 		// test calibration statistics
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
 
-		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
+		CalibrationStatReader.StatisticsData outStatData = calibrationStatReader.getCalStatMap().get(lastIteration);
 		// Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 		// Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
 //			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
-		Assertions.assertEquals("3.2261421242498865E-5", outStatData.getLink_lambda_avg(), "different Link_lambda_avg" );
+		Assertions.assertEquals("3.2261421242498865E-5", outStatData.getLink_lambda_avg(), "different Link_lambda_avg");
 //			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 //			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
 //			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
@@ -284,7 +283,7 @@ public class CadytsCarIT {
 //			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
 //			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
 		// Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
-		Assertions.assertEquals("0.0", outStatData.getTotal_ll(), "different Total_ll" );
+		Assertions.assertEquals("0.0", outStatData.getTotal_ll(), "different Total_ll");
 
 		//test link offsets
 		final Network network = scenario.getNetwork();
@@ -298,46 +297,46 @@ public class CadytsCarIT {
 		Link link19 = network.getLinks().get(locId19);
 
 		//find first offset value different from null to compare. Useful to test with different time bin sizes
-		int binIndex=-1;
+		int binIndex = -1;
 		boolean isZero;
 		do {
 			binIndex++;
-			isZero = (Math.abs(linkOffsets.getBinValue(link19 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
-		}while (isZero && binIndex<86400);
+			isZero = (Math.abs(linkOffsets.getBinValue(link19, binIndex) - 0.0) < MatsimTestUtils.EPSILON);
+		} while (isZero && binIndex < 86400);
 
 		Assertions.assertEquals(6, binIndex, "Wrong bin index for first link offset");
 
-		Assertions.assertEquals(0.0, linkOffsets.getBinValue(link11 , binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 11");
-		Assertions.assertEquals(0.0014707121641471912, linkOffsets.getBinValue(link19 , binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 19");
+		Assertions.assertEquals(0.0, linkOffsets.getBinValue(link11, binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 11");
+		Assertions.assertEquals(0.0014707121641471912, linkOffsets.getBinValue(link19, binIndex), MatsimTestUtils.EPSILON, "Wrong link offset of link 19");
 	}
 
 
 	//--------------------------------------------------------------
 
 
-
 	private static Config createTestConfig(String inputDir, String outputDir) {
-		Config config = ConfigUtils.createConfig() ;
-		config.global().setRandomSeed(4711) ;
-		config.network().setInputFile(inputDir + "network.xml") ;
-		config.plans().setInputFile(inputDir + "plans5.xml") ;
-		config.controller().setFirstIteration(1) ;
-		config.controller().setLastIteration(10) ;
-		config.controller().setOutputDirectory(outputDir) ;
-		config.controller().setWriteEventsInterval(1) ;
-		config.controller().setMobsim(MobsimType.qsim.toString()) ;
-		config.qsim().setFlowCapFactor(1.) ;
-		config.qsim().setStorageCapFactor(1.) ;
-		config.qsim().setStuckTime(10.) ;
-		config.qsim().setRemoveStuckVehicles(false) ;
+		Config config = ConfigUtils.createConfig();
+		config.global().setRandomSeed(4711);
+		config.network().setInputFile(inputDir + "network.xml");
+		config.plans().setInputFile(inputDir + "plans5.xml");
+		config.controller().setFirstIteration(1);
+		config.controller().setLastIteration(10);
+		config.controller().setOutputDirectory(outputDir);
+		config.controller().setWriteEventsInterval(1);
+		config.controller().setMobsim(MobsimType.qsim.toString());
+		config.qsim().setFlowCapFactor(1.);
+		config.qsim().setStorageCapFactor(1.);
+		config.qsim().setStuckTime(10.);
+		config.qsim().setRemoveStuckVehicles(false);
 		{
-			ActivityParams params = new ActivityParams("h") ;
-			config.scoring().addActivityParams(params ) ;
-			params.setTypicalDuration(12*60*60.) ;
-		}{
-			ActivityParams params = new ActivityParams("w") ;
-			config.scoring().addActivityParams(params ) ;
-			params.setTypicalDuration(8*60*60.) ;
+			ActivityParams params = new ActivityParams("h");
+			config.scoring().addActivityParams(params);
+			params.setTypicalDuration(12 * 60 * 60.);
+		}
+		{
+			ActivityParams params = new ActivityParams("w");
+			config.scoring().addActivityParams(params);
+			params.setTypicalDuration(8 * 60 * 60.);
 		}
 		config.counts().setInputFile(inputDir + "counts5.xml");
 		return config;
@@ -347,6 +346,7 @@ public class CadytsCarIT {
 	private static class DummyMobsim implements Mobsim {
 		public DummyMobsim() {
 		}
+
 		@Override
 		public void run() {
 		}
