@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * This class also automatically registers classes from the {@link Prepare} and {@link Analysis} annotations as subcommands.
  * These can be used to build a pipeline with command needed for preparation analysis.
  *
- * @see #run(Class, String...)
+ * @see #start(Class, String...)
  * @see #execute(Class, Config, String...)
  * @see #prepare(Class, Config, String...)
  * @see Prepare
@@ -153,11 +153,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull( configPath, "No default scenario location given" );
+			String path = Objects.requireNonNull(configPath, "No default scenario location given");
 			List<ConfigGroup> customModules = getCustomModules();
 
-			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
-			Config prepared = prepareConfig( config1 );
+			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0]));
+			Config prepared = prepareConfig(config1);
 
 			config = prepared != null ? prepared : config1;
 			// (The above lines of code come from inlining so maybe it happened there: I cannot see how prepared could be null but config1 not except if user code returns null which I would consider a bug.  kai, aug'24)
@@ -326,10 +326,18 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
-	 * Run the application class and terminates when done.
+	 * @deprecated use {@link MATSimApplication#start(Class, String...)} instead
+	 */
+	@Deprecated
+	public static void run(Class<? extends MATSimApplication> clazz, String... args) {
+		start(clazz, args);
+	}
+
+	/**
+	 * Start the application class and terminates when done.
 	 * This should never be used in tests and only in main methods.
 	 */
-	public static void run(Class<? extends MATSimApplication> clazz, String... args) {
+	public static void start(Class<? extends MATSimApplication> clazz, String... args) {
 		MATSimApplication app = newInstance(clazz, null);
 
 		// GUI does not pass any argument
@@ -371,6 +379,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	/**
+	 * @deprecated use {@link MATSimApplication#startWithDefaults(Class, String[], String...)} instead
+	 */
+	@Deprecated
+	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+		startWithDefaults(clazz, args, defaultArgs);
+	}
+
+	/**
 	 * <p>Convenience method to run a scenario from code or automatically with gui when desktop application is detected.
 	 * This method may also be used to predefine some default arguments.</p>
 	 *
@@ -385,7 +401,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * <p>defaultArgs could be used to provide defaults when calling this method here; they would go in addition to what is coming in from "upstream" which is typically the command line.</p>
 	 *
 	 * <p>There are many execution paths that can be reached from this class, but a typical one for matsim-scenarios seems to be:<ul>
-	 * <li> This method runs MATSimApplication.run( TheScenarioClass.class , args ).</li>
+	 * <li> This method runs MATSimApplication.start( TheScenarioClass.class , args ).</li>
 	 * <li> That run class will instantiate an instance of TheScenarioClass (*), then do some args consistenty checking, then call the piccoli execute method. </li>
 	 * <li> The piccoli execute method will essentially call the "call" method of MATSimApplication. </li>
 	 * <li> I think that in the described execution path, this.config in that call method will initially be null.  (The ctor of MATSimApplication was called via reflection at (*); I think that it was called there without a config argument.) </li>
@@ -408,7 +424,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * @param args        pass arguments from the main method
 	 * @param defaultArgs predefined default arguments that will always be present
 	 */
-	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
+	public static void startWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
 
 		if (ApplicationUtils.isRunFromDesktop() && args.length == 0) {
 
@@ -420,7 +436,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			}
 
 			// args are empty when run from desktop and is not used
-			run(clazz, "gui");
+			start(clazz, "gui");
 
 		} else {
 			// run if no other command is present
@@ -443,7 +459,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 			log.info("Running {} with: {}", clazz.getSimpleName(), String.join(" ", args));
 
-			run(clazz, args);
+			start(clazz, args);
 		}
 	}
 

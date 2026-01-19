@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.extension;
 
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -17,21 +18,19 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpModeLimitedMaxSpeedTravelTi
 import org.matsim.contrib.vsp.scenario.SnzActivities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
+import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -45,11 +44,13 @@ public class DrtTestScenario extends MATSimApplication {
 	private final Consumer<Config> prepareConfig;
 
 	public static void main(String[] args) {
-		run(DrtTestScenario.class, args);
+		start(DrtTestScenario.class, args);
 	}
 
 	public DrtTestScenario() {
-		this(controler -> {}, config -> {});
+		this(controler -> {
+		}, config -> {
+		});
 	}
 
 	public DrtTestScenario(Consumer<Controler> prepareControler, Consumer<Config> prepareConfig) {
@@ -59,8 +60,10 @@ public class DrtTestScenario extends MATSimApplication {
 
 	public DrtTestScenario(@Nullable Config config) {
 		super(config);
-		this.prepareControler = controler -> {};
-		this.prepareConfig = c -> {};
+		this.prepareControler = controler -> {
+		};
+		this.prepareConfig = c -> {
+		};
 	}
 
 	public static Config loadConfig(MatsimTestUtils utils) {
@@ -116,9 +119,9 @@ public class DrtTestScenario extends MATSimApplication {
 		}
 
 		scenario.getPopulation()
-				.getFactory()
-				.getRouteFactories()
-				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+			.getFactory()
+			.getRouteFactories()
+			.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 	}
 
 	@Override
@@ -137,14 +140,14 @@ public class DrtTestScenario extends MATSimApplication {
 
 		// Add speed limit to av vehicle
 		double maxSpeed = controler.getScenario()
-				.getVehicles()
-				.getVehicleTypes()
-				.get(Id.create("autonomous_vehicle", VehicleType.class))
-				.getMaximumVelocity();
+			.getVehicles()
+			.getVehicleTypes()
+			.get(Id.create("autonomous_vehicle", VehicleType.class))
+			.getMaximumVelocity();
 
 		controler.addOverridingModule(
-				new DvrpModeLimitedMaxSpeedTravelTimeModule("av", config.qsim().getTimeStepSize(),
-						maxSpeed));
+			new DvrpModeLimitedMaxSpeedTravelTimeModule("av", config.qsim().getTimeStepSize(),
+				maxSpeed));
 
 		controler.addOverridingModule(new SimWrapperModule());
 
