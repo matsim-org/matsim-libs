@@ -50,6 +50,8 @@ public class PretoriaTest {
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
+	private final static String HBEFA_HGV_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_HGV_Aleks.csv";
+
 	// TODO Remove for final commit, as this was just used once for data preparation
 	public static void main(String[] args) {
 		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
@@ -146,7 +148,7 @@ public class PretoriaTest {
 		return TRANSFORMATION.transform(coordWGS84);
 	}
 
-	private static EmissionsConfigGroup getEmissionsConfigGroup() {
+	private static EmissionsConfigGroup getEmissionsConfigGroup(PretoriaVehicle vehicle) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
@@ -158,10 +160,16 @@ public class PretoriaTest {
 //		ecg.setAverageColdEmissionFactorsFile(SVN + "22823adc0ee6a0e231f35ae897f7b224a86f3a7a.enc");
 //		ecg.setDetailedWarmEmissionFactorsFile(SVN + "944637571c833ddcf1d0dfcccb59838509f397e6.enc");
 //		ecg.setDetailedColdEmissionFactorsFile(SVN + "54adsdas478ss457erhzj5415476dsrtzu.enc");
+
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
-		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
 		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
+
+		switch (vehicle){
+			case PretoriaVehicle.ETIOS, PretoriaVehicle.FIGO -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
+			case PretoriaVehicle.RRV -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HGV_HOT_DET);
+		}
+
 		return ecg;
 	}
 
@@ -178,11 +186,13 @@ public class PretoriaTest {
 		Path gps_path = switch (vehicle){
 			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
 			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
+			case PretoriaVehicle.RRV -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-rrv.csv");
 		};
 
 		String referenceDate = switch(vehicle){
 			case PretoriaVehicle.ETIOS -> "2022-11-15T07:34:18.115Z";
 			case PretoriaVehicle.FIGO -> "07/27/2021 10:03:03.131 +0200";
+			case PretoriaVehicle.RRV -> "02/02/2021 10:09:42.773 +0200";
 		};
 
 		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
@@ -235,8 +245,8 @@ public class PretoriaTest {
 			Coord vec0 = CoordUtils.minus(cleanedEntries.get(i-2).coord, cleanedEntries.get(i-1).coord);
 			Coord vec1 = CoordUtils.minus(cleanedEntries.get(i-1).coord, cleanedEntries.get(i).coord);
 
-			// Check if the angle is larger than (or eq.) 90 degree
-			if (vec0.getX() * vec1.getX() + vec0.getY() * vec1.getY() <= 0){
+			// Check if the angle is larger than (or eq.) 90 degree OR if veh speed is less than 1 km/h
+			if (vec0.getX() * vec1.getX() + vec0.getY() * vec1.getY() <= 0 || middle.vehVel < 1){
 				// Angle is too sharp, save data of i-1
 				double CO = cleanedEntries.get(i-1).CO;
 				double CO2 = cleanedEntries.get(i-1).CO2;
@@ -410,7 +420,7 @@ public class PretoriaTest {
 //		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
 
 		// Prepare config
-		EmissionsConfigGroup ecg = getEmissionsConfigGroup();
+		EmissionsConfigGroup ecg = getEmissionsConfigGroup(vehicle);
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define vehicle
@@ -482,8 +492,10 @@ public class PretoriaTest {
 					// TODO Check if the skipped links cause problems later on!
 					// Duplicate link entries are not allowed. However, it can happen that the last points gets assigned to the first link. We skip the next points.
 					if(tripId2linkId2traversalTime.get(tripId).containsKey(linkId)) {
-						if(!linkId.equals(Id.createLinkId("6555")))
+						if(!linkId.equals(Id.createLinkId("6555"))) {
+							System.out.println(gpsEntry);
 							throw new RuntimeException("Duplicate entry for non-start link! (linkId=" + linkId + ")");
+						}
 
 						skippedEntries.add(new Tuple<>(gpsEntry, linkId));
 
@@ -630,11 +642,11 @@ public class PretoriaTest {
 
 		// TODO Euro 5 or Euro 6? (contradicting information)
 		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
-		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR);
+		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
 
-		/* TODO Add, when detailed HBEFA table for HGV available
+		//TODO Add, when detailed HBEFA table for HGV available
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "PC D Euro-3", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);*/
+		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 
 		final String hbefaTechnology;
 		final String hbefaEmConcept;
