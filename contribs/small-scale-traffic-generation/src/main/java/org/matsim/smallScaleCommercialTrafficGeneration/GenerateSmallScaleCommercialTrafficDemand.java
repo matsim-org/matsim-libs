@@ -76,7 +76,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
 
 /**
@@ -250,7 +249,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controller controller = prepareController(scenario);
 
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
@@ -387,6 +385,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
 // 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
@@ -663,8 +662,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (network != null)
 			config.network().setInputFile(network);
 
-		// Some files are written before the controller is created, deleting the directory is not an option
-		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
@@ -687,7 +685,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private Controller prepareController(Scenario scenario) {
 		Controller controller = ControllerUtils.createController(scenario);
-
+		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
+		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
+		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controller.addOverridingModule(new CarrierModule());
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
