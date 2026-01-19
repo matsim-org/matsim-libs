@@ -1033,7 +1033,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			if (n == 0) continue;
 
 			double share = BigDecimal.valueOf(n / numberMobilePersons)
-				.setScale(2, RoundingMode.HALF_UP)
+				.setScale(4, RoundingMode.HALF_UP)
 				.doubleValue();
 
 			table.stringColumn("main_mode").append(m);
