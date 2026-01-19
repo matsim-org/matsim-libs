@@ -73,7 +73,8 @@ public class TripAnalysis implements MATSimAppCommand {
 	public enum ModelType {
 		PERSON_TRAFFIC("personTraffic"),
 		COMMERCIAL_TRAFFIC("commercialTraffic"),
-		UNASSIGNED("undefinedGroup");
+		UNASSIGNED("undefinedGroup"),
+		COMPLETE_MODEL("total");
 
 		private final String id;
 		ModelType(String id) { this.id = id; }
@@ -454,13 +455,13 @@ public class TripAnalysis implements MATSimAppCommand {
 		aggr.addColumns(shareSum);
 
 		aggr = addModeSharesPerModelType(aggr);
-		aggr.write().csv(output.getPath("mode_share_%s.csv", "total").toFile());
+		aggr.write().csv(output.getPath("mode_share_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
 
 		// Norm each dist_group to 1
 		normDistanceGroups(labels, aggr);
 		aggr.removeColumns("Count [trip_id]");
 		//TODO sind die spalten count, subpopulation, modelType hier noch sinnvoll?
-		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", "total").toFile());
+		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
 	}
 
 	private static Table addModeSharesPerModelType(Table aggr) {
@@ -650,7 +651,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			analyseAndWriteTripStatsPerGroup(ModelType.COMMERCIAL_TRAFFIC.id, nBySubpopulationGroup, travelTimeBySubpopulationGroup,
 				travelDistanceBySubpopulationGroup, beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, groupsOfSubpopulationsForCommercialAnalysis.keySet());
 		}
-		analyseAndWriteTripStatsPerGroup("total", nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
+		analyseAndWriteTripStatsPerGroup(ModelType.COMPLETE_MODEL.id, nBySubpopulationGroup, travelTimeBySubpopulationGroup, travelDistanceBySubpopulationGroup,
 			beelineDistanceBySubpopulationGroup, speedsBySubpopulationGroup, null);
 	}
 
@@ -664,7 +665,7 @@ public class TripAnalysis implements MATSimAppCommand {
 			printer.print("Info");
 			List<String> modesToIgnore = new  ArrayList<>();
 			for (String m : modeOrder) {
-				if (Objects.equals(group, "total") || nBySubpopulationGroup.containsKey(group) && nBySubpopulationGroup.get(group).getInt(
+				if (Objects.equals(group, ModelType.COMPLETE_MODEL.id) || nBySubpopulationGroup.containsKey(group) && nBySubpopulationGroup.get(group).getInt(
 					m) > 0 || groupsOfThisTrafficType != null && groupsOfThisTrafficType.stream().anyMatch(
 					g -> nBySubpopulationGroup.get(g).getInt(m) > 0))
 					printer.print(m);
@@ -675,8 +676,8 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Number of trips");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
-				if (group.equals("total")) {
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					int sum = 0;
 					for (Object2IntMap<String> n : nBySubpopulationGroup.values()) {
 						sum += n.getInt(m);
@@ -699,9 +700,9 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Total time traveled [h]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				long seconds;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					long sum = 0L;
 					for (Object2LongMap<String> tt : travelTimeBySubpopulationGroup.values()) {
 						sum += tt.getLong(m);
@@ -725,9 +726,9 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Total distance traveled [km]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				long meters;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					long sum = 0L;
 					for (Object2LongMap<String> td : travelDistanceBySubpopulationGroup.values()) {
 						sum += td.getLong(m);
@@ -751,10 +752,10 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. speed [km/h]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				long seconds;
 				long meters;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					long secSum = 0L, mSum = 0L;
 					for (String sub : nBySubpopulationGroup.keySet()) {
 						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
@@ -790,10 +791,10 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. beeline speed [km/h]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				long seconds;
 				long metersBee;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					long secSum = 0L, beeSum = 0L;
 					for (String sub : nBySubpopulationGroup.keySet()) {
 						Object2LongMap<String> tt = travelTimeBySubpopulationGroup.get(sub);
@@ -829,10 +830,10 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. distance per trip [km]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				long meters;
 				int nTrips;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					long mSum = 0L;
 					int nSum = 0;
 					for (String sub : nBySubpopulationGroup.keySet()) {
@@ -868,9 +869,9 @@ public class TripAnalysis implements MATSimAppCommand {
 
 			printer.print("Avg. speed per trip [km]");
 			for (String m : modeOrder) {
-				if (!group.equals("total") && modesToIgnore.contains(m)) continue;
+				if (!group.equals(ModelType.COMPLETE_MODEL.id) && modesToIgnore.contains(m)) continue;
 				double avg;
-				if (group.equals("total")) {
+				if (group.equals(ModelType.COMPLETE_MODEL.id)) {
 					double sum = 0d;
 					long cnt = 0L;
 					for (Map.Entry<String, Map<String, DoubleList>> e : speedsBySubpopulationGroup.entrySet()) {
@@ -966,16 +967,16 @@ public class TripAnalysis implements MATSimAppCommand {
 			writeModeUsages(ModelType.COMMERCIAL_TRAFFIC.id, groupsOfSubpopulationsForCommercialAnalysis.keySet(), usedModes,
 				totalMobilePerSubpopulation, modeOrder, output);
 		}
-		writeModeUsages("total", usedModes.keySet(), usedModes, totalMobilePerSubpopulation, modeOrder, output);
+		writeModeUsages(ModelType.COMPLETE_MODEL.id, usedModes.keySet(), usedModes, totalMobilePerSubpopulation, modeOrder, output);
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
 			if (groupsOfSubpopulationsForPersonAnalysis.isEmpty() && groupsOfSubpopulationsForCommercialAnalysis.isEmpty())
-				printer.printRecord("Group", "total");
+				printer.printRecord("Group", ModelType.COMPLETE_MODEL.id);
 			else
 				printer.printRecord(
 					Stream.concat(
 						Stream.concat(Stream.of("Group"), tripsPerPerson.keySet().stream()),
-						Stream.of("total")
+						Stream.of(ModelType.COMPLETE_MODEL.id)
 					).toList()
 				);
 
@@ -1096,7 +1097,7 @@ public class TripAnalysis implements MATSimAppCommand {
 				calculateArrivalAndDepartures(group, filtered);
 			}
 		}
-		calculateArrivalAndDepartures("total", trips);
+		calculateArrivalAndDepartures(ModelType.COMPLETE_MODEL.id, trips);
 	}
 
 	private void calculateArrivalAndDepartures(String group, Table filtered) {
@@ -1161,7 +1162,7 @@ public class TripAnalysis implements MATSimAppCommand {
 				writeTripDistributionPerGroup(filtered, bins, inp, x, group);
 			}
 		}
-		writeTripDistributionPerGroup(trips, bins, inp, x, "total");
+		writeTripDistributionPerGroup(trips, bins, inp, x, ModelType.COMPLETE_MODEL.id);
 	}
 
 	private void writeTripDistributionPerGroup(Table trips, double[] bins, LoessInterpolator inp, double[] x, String group) throws IOException {
