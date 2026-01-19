@@ -544,6 +544,7 @@ public class PretoriaTest {
 		writer.printRecord(
 			"tripId",
 			"linkId",
+			"segment",
 			"CO_MATSim",
 			"CO_pems",
 			"CO2_MATSim",
@@ -552,12 +553,33 @@ public class PretoriaTest {
 			"NOx_pems"
 		);
 
-		tripId2linkId2pollutant2emissions.forEach((tripId, linkMap) -> {
-			linkMap.forEach((linkId, pollutantMap) -> {
+		String segment = "none";
+		for(var tripEntry : tripId2linkId2pollutant2emissions.entrySet()){
+			var tripId = tripEntry.getKey();
+			for(var linkEntry : tripEntry.getValue().entrySet()) {
+				var linkId = linkEntry.getKey();
+				var pollutantMap = linkEntry.getValue();
+
+				if(linkId.equals(Id.createLinkId("28948")))
+					segment = "A";
+				if(linkId.equals(Id.createLinkId("14100")))
+					segment = "none";
+
+				if(linkId.equals(Id.createLinkId("11614")))
+					segment = "B";
+				if(linkId.equals(Id.createLinkId("28906")))
+					segment = "none";
+
+				if(linkId.equals(Id.createLinkId("waterkloof4_waterkloof5")))
+					segment = "C";
+				if(linkId.equals(Id.createLinkId("37156")))
+					segment = "none";
+
 				try {
 					writer.printRecord(
 						tripId,
 						linkId,
+						segment,
 						pollutantMap.get(Pollutant.CO).getFirst(),
 						pollutantMap.get(Pollutant.CO).getSecond(),
 						pollutantMap.get(Pollutant.CO2_TOTAL).getFirst(),
@@ -568,8 +590,8 @@ public class PretoriaTest {
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
-			});
-		});
+			}
+		}
 
 		writer.flush();
 		writer.close();
