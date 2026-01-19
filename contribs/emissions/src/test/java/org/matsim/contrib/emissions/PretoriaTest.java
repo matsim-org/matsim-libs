@@ -434,7 +434,7 @@ public class PretoriaTest {
 		// Read in the csv with Pretoria GPS/PEMS data for C-route
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
-		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries)));
+//		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries))); // TODO Interpolation currently makes results worse!
 
 		// Attach gps-information to the matsim links TODO Extract into seperate method
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
@@ -544,6 +544,7 @@ public class PretoriaTest {
 		writer.printRecord(
 			"tripId",
 			"linkId",
+			"segment",
 			"CO_MATSim",
 			"CO_pems",
 			"CO2_MATSim",
@@ -552,8 +553,28 @@ public class PretoriaTest {
 			"NOx_pems"
 		);
 
-		tripId2linkId2pollutant2emissions.forEach((tripId, linkMap) -> {
-			linkMap.forEach((linkId, pollutantMap) -> {
+		String segment = "none";
+		for(var tripEntry : tripId2linkId2pollutant2emissions.entrySet()){
+			var tripId = tripEntry.getKey();
+			for(var linkEntry : tripEntry.getValue().entrySet()) {
+				var linkId = linkEntry.getKey();
+				var pollutantMap = linkEntry.getValue();
+
+				if(linkId.equals(Id.createLinkId("28948")))
+					segment = "A";
+				if(linkId.equals(Id.createLinkId("14100")))
+					segment = "none";
+
+				if(linkId.equals(Id.createLinkId("11614")))
+					segment = "B";
+				if(linkId.equals(Id.createLinkId("28906")))
+					segment = "none";
+
+				if(linkId.equals(Id.createLinkId("waterkloof4_waterkloof5")))
+					segment = "C";
+				if(linkId.equals(Id.createLinkId("37156")))
+					segment = "none";
+
 				try {
 					writer.printRecord(
 						tripId,
