@@ -444,12 +444,13 @@ public class PretoriaTest {
 		// Read in the csv with Pretoria GPS/PEMS data for C-route
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
-		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries)));
+//		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries))); // TODO Makes results worse
 
 		// Attach gps-information to the matsim links TODO Extract into seperate method
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2traversalTime = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
+		Map<Integer, Integer> tripId2load = new ArrayMap<>();
 
 		// TODO debug only, remove these vars
 		Map<PretoriaGPSEntry, Id<Link>> pretoriaGpsEntry2linkId = new HashMap<>();
@@ -464,6 +465,7 @@ public class PretoriaTest {
 			for(var gpsEntry : gpsTripEntries.getValue()){
 				tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
 				tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
+				tripId2load.putIfAbsent(tripId, gpsEntry.load);
 
 				var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
 				tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
@@ -526,6 +528,11 @@ public class PretoriaTest {
 				double CO2_pems = linkEntry.getValue().stream().mapToDouble(e -> e.CO2).filter(d -> d != Double.POSITIVE_INFINITY && d != Double.NEGATIVE_INFINITY).reduce(Double::sum).getAsDouble();
 				double NOx_pems = linkEntry.getValue().stream().mapToDouble(e -> e.NOx).filter(d -> d != Double.POSITIVE_INFINITY && d != Double.NEGATIVE_INFINITY).reduce(Double::sum).getAsDouble();
 
+				// If HGV: Update size class
+				if(vehicle.equals(PretoriaVehicle.RRV) && tripId2load.get(tripId) != 0){
+					vehicleAttributes.setHbefaSizeClass("RT >32t"); // TODO Seems like no size class matches the PEMS values. Why?
+				}
+
 				// Compute the MATSim emissions
 				// TODO Add cold emissions
 				var emissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
@@ -556,6 +563,7 @@ public class PretoriaTest {
 		writer.printRecord(
 			"tripId",
 			"linkId",
+			"load",
 			"segment",
 			"CO_MATSim",
 			"CO_pems",
@@ -591,6 +599,7 @@ public class PretoriaTest {
 					writer.printRecord(
 						tripId,
 						linkId,
+						tripId2load.get(tripId),
 						segment,
 						pollutantMap.get(Pollutant.CO).getFirst(),
 						pollutantMap.get(Pollutant.CO).getSecond(),
@@ -644,7 +653,7 @@ public class PretoriaTest {
 		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
 		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
 
-		//TODO Add, when detailed HBEFA table for HGV available
+		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
 		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 
