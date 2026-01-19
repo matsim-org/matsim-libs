@@ -203,6 +203,8 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		// load or create carrier
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		Controller controller = prepareController(scenario);
+
 		ShpOptions.Index indexShape = null;
 		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 		if (shp.isDefined()) {
@@ -220,8 +222,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 			selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
 			crsTransformationFromNetworkToShape);
 
-		// prepare the VRP and get a solution
-		Controller controller = prepareController(scenario);
 		demandGenerationSpecification.writeAdditionalOutputFiles(controller);
 
 		solveSelectedSolution(selectedSolution, config, controller);
@@ -457,7 +457,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
 			}});
-
+		controller.getInjector();
 		return controller;
 	}
 

@@ -250,6 +250,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			config.vehicles().setVehiclesFile(freightCarriersConfigGroup.getCarriersVehicleTypesFile());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controller controller = prepareController(scenario);
 
 		resultingDataPerZone = readDataDistribution(pathToDataDistributionToZones);
 		serviceDurationTimeSelector = commercialTourSpecifications.createStopDurationDistributionPerCategory(rng);
@@ -386,7 +387,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 //			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
 // 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
-			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
@@ -697,7 +697,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
-
+		controller.getInjector();
 		return controller;
 	}
 
