@@ -525,7 +525,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		DoubleColumn share = subset.numberColumn("Count [trip_id]")
 			.divide(subset.numberColumn("Count [trip_id]").sum())
-			.setName("share_"+group);
+			.setName("share");
 
 		subset = subset.replaceColumn("Count [trip_id]", share)
 			.sortOn(cmp);
