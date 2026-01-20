@@ -52,7 +52,7 @@ import java.util.*;
  */
 final class DemandReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(DemandReaderFromCSV.class);
-	private static final Random rand = new Random(4711);
+	private static Random rnd;
 
 	/**
 	 * DemandInformationElement is a set of information being read from the input
@@ -585,6 +585,7 @@ final class DemandReaderFromCSV {
 	static void createDemandForCarriers(Scenario scenario, ShpOptions.Index indexShape,
 										Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
 										CoordinateTransformation crsTransformationNetworkAndShape, DemandGenerationSpecification demandGenerationSpecification) {
+		rnd = new Random(scenario.getConfig().global().getRandomSeed());
 
 		for (DemandInformationElement newDemandInformationElement : demandInformation) {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
@@ -757,7 +758,7 @@ final class DemandReaderFromCSV {
 							usedServiceLocationsOrPersons, possiblePersonsForService, nearestLinkPerPerson,
 							crsTransformationNetworkAndShape, i);
 				} else {
-					linkPersonPair = usedServiceLocationsOrPersons.stream().skip(rand.nextInt(usedServiceLocationsOrPersons.size() - 1)).findFirst().get();
+					linkPersonPair = usedServiceLocationsOrPersons.stream().skip(rnd.nextInt(usedServiceLocationsOrPersons.size() - 1)).findFirst().get();
 				}
 				int demandForThisLink = demandGenerationSpecification.calculateDemandForThisLinkWithFixNumberOfJobs(demandToDistribute, numberOfJobs, distributedDemand,
 					linkPersonPair, null, i);
@@ -1455,7 +1456,7 @@ final class DemandReaderFromCSV {
 					}
 				}
 		} else {
-			linkPersonPair = usedLocationsOrPersons.get(rand.nextInt(usedLocationsOrPersons.size()));
+			linkPersonPair = usedLocationsOrPersons.get(rnd.nextInt(usedLocationsOrPersons.size()));
 		}
 		return linkPersonPair;
 	}
@@ -1575,16 +1576,16 @@ final class DemandReaderFromCSV {
 				} else {
 					if (possiblePersons.isEmpty()) {
 						Link newLink = scenario.getNetwork().getLinks().values().stream()
-							.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
+							.skip(rnd.nextInt(scenario.getNetwork().getLinks().size())).findFirst().get();
 						newLinkPersonPair = new LinkPersonPair(newLink, null);
 					}
 					else {
-						newLinkPersonPair = new LinkPersonPair(null, possiblePersons.values().stream().skip(rand.nextInt(possiblePersons.size()))
+						newLinkPersonPair = new LinkPersonPair(null, possiblePersons.values().stream().skip(rnd.nextInt(possiblePersons.size()))
 							.findFirst().get());
 					}
 				}
 			} else {
-					newLinkPersonPair = possibleLinkPersonPairs.stream().skip(rand.nextInt(possibleLinkPersonPairs.size())).findFirst().get();
+					newLinkPersonPair = possibleLinkPersonPairs.stream().skip(rnd.nextInt(possibleLinkPersonPairs.size())).findFirst().get();
 			}
 			// check if the selected link is possible for the demand
 			if (newLinkPersonPair.getLink() != null && checkLinkFeasibility(indexShape, areasForTheDemand, crsTransformationNetworkAndShape, newLinkPersonPair.getLink())) {

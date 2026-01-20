@@ -50,7 +50,7 @@ import java.util.*;
  */
 final class CarrierReaderFromCSV {
 	private static final Logger log = LogManager.getLogger(CarrierReaderFromCSV.class);
-
+	private static Random rnd;
 	/**
 	 * CarrierInformationElement is a set of information being read from the input
 	 * file. For one carrier several CarrierInformationElement can be read in. This
@@ -414,6 +414,7 @@ final class CarrierReaderFromCSV {
 												   Set<CarrierInformationElement> allNewCarrierInformation, FreightCarriersConfigGroup freightCarriersConfigGroup,
 												   ShpOptions.Index indexShape, int defaultJspritIterations,
 												   CoordinateTransformation crsTransformationNetworkAndShape) {
+		rnd = new Random(scenario.getConfig().global().getRandomSeed());
 
 		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
@@ -443,11 +444,10 @@ final class CarrierReaderFromCSV {
 			}
 			if (singleNewCarrier.getVehicleDepots() == null)
 				singleNewCarrier.setVehicleDepots(new ArrayList<>());
-			Random rand = new Random(singleNewCarrier.getName().hashCode());
 			int cnt = 0;
 			while (singleNewCarrier.getVehicleDepots().size() < singleNewCarrier.getNumberOfDepotsPerType()) {
 				Link link = scenario.getNetwork().getLinks().values().stream()
-					.skip(rand.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
+					.skip(rnd.nextInt(scenario.getNetwork().getLinks().size())).findAny().get();
 				cnt++;
 				if ((!singleNewCarrier.getVehicleDepots().contains(link.getId().toString())
 					|| cnt > scenario.getNetwork().getLinks().size())

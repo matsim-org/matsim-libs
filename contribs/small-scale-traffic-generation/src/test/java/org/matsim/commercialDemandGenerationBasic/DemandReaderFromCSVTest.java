@@ -371,7 +371,7 @@ public class DemandReaderFromCSVTest {
 			Assertions.assertEquals(1, shipment.getCapacityDemand());
 			Assertions.assertEquals(0, shipment.getPickupDuration(), MatsimTestUtils.EPSILON);
 			Assertions.assertEquals(180, shipment.getDeliveryDuration(), MatsimTestUtils.EPSILON);
-			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getPickupTimeWindow());
+			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getPickupStartingTimeWindow());
 			Assertions.assertEquals(TimeWindow.newInstance(25200, 64800), shipment.getDeliveryStartingTimeWindow());
 			locationsPerShipmentElement.computeIfAbsent("ShipmentElement1_pickup", (k) -> new HashSet<>())
 				.add(shipment.getPickupLinkId().toString());
