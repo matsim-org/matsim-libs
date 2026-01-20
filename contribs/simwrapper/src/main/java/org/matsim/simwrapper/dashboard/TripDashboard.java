@@ -436,7 +436,7 @@ public class TripDashboard implements Dashboard {
 			}).el(Sankey.class, (viz, data) -> { //TODO perhaps find way to have the same colors for the modes as in the other plots
 				viz.title = "Mode shift";
 				viz.width = 1.5d;
-				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode. Compares initial input with output after the last iteration", data, false);
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode. Compares initial input with output after the last iteration.", data, false);
 				if (groupsOfPersonSubpopulations.containsKey(tabTitle))
 					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", tabTitle, args);
 				else
