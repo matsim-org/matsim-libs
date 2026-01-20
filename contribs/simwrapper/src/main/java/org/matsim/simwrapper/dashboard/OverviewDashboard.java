@@ -4,6 +4,7 @@ import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DashboardUtils;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
@@ -30,6 +31,7 @@ public class OverviewDashboard implements Dashboard {
 		}).el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Simulated traffic volume";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 			viz.height = 7.5;
@@ -64,7 +66,7 @@ public class OverviewDashboard implements Dashboard {
 
 		}).el(PieChart.class, (viz, data) -> {
 			viz.title = "Mode Share";
-			viz.description = "at final Iteration";
+			viz.description = "at final Iteration; result of the complete population and without filtering by area or person attributes";
 			viz.dataset = data.output("(*.)?modestats.csv");
 			viz.ignoreColumns = List.of("iteration");
 			viz.useLastRow = true;
@@ -75,7 +77,7 @@ public class OverviewDashboard implements Dashboard {
 
 			viz.title = "Score";
 			viz.dataset = data.output("(*.)?scorestats.csv");
-			viz.description = "per Iteration";
+			viz.description = "per Iteration; result of the complete population and without filtering by area or person attributes";
 			viz.x = "iteration";
 			viz.columns = List.of("avg_executed", "avg_worst", "avg_best");
 			viz.xAxisName = "Iteration";
@@ -86,7 +88,7 @@ public class OverviewDashboard implements Dashboard {
 		layout.row("third")
 			.el(Area.class, (viz, data) -> {
 				viz.title = "Mode Share Progression";
-				viz.description = "per Iteration";
+				viz.description = "per Iteration; result of the complete population and without filtering by area or person attributes";
 				viz.dataset = data.output("(*.)?modestats.csv");
 				viz.x = "iteration";
 				viz.xAxisName = "Iteration";

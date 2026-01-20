@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DashboardUtils;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
@@ -70,6 +71,7 @@ public class TrafficDashboard implements Dashboard {
 		layout.row("map").el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Traffic statistics";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 

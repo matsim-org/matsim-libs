@@ -8,6 +8,7 @@ import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DashboardUtils;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
@@ -330,7 +331,7 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Mode Statistics * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args);
 			}
-			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling( "by main mode, over whole trip (including access & egress).", data, false);
 			viz.showAllRows = true;
 		});
 		layout.row("second" + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
@@ -384,7 +385,7 @@ public class TripDashboard implements Dashboard {
 		layout.row("third" + rowSuffix, tabTitle)
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
-				viz.description = "over simulated persons (not scaled by sample size)";
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("over simulated persons.", data, false);
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
@@ -435,8 +436,8 @@ public class TripDashboard implements Dashboard {
 			}).el(Sankey.class, (viz, data) -> { //TODO perhaps find way to have the same colors for the modes as in the other plots
 				viz.title = "Mode shift";
 				viz.width = 1.5d;
-				viz.description = "by main mode. Compares initial input with output after the last iteration";
 				viz.csv = data.compute(TripAnalysis.class, "mode_shift.csv", args);
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode. Compares initial input with output after the last iteration", data, false);
 			});
 
 		if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
