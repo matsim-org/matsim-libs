@@ -47,7 +47,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users_%s.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
 		"population_trip_stats.csv", "trip_purposes_by_hour_%s.csv",
-		"mode_share_distance_distribution_%s.csv", "mode_shift.csv", "mode_chains.csv",
+		"mode_share_distance_distribution_%s.csv", "mode_shift_%s.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
 	}
@@ -1231,16 +1231,28 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		Table joined = new DataFrameJoiner(trips, "trip_id").inner(true, originalTrips);
 
-		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty())
-			// filters for all subpopulations that are used for person analysis
-			joined = joined.where(joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
-				.flatMap(Collection::stream)
-				.collect(Collectors.toSet())));
+		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
+			Table filtered = joined.where(
+				joined.stringColumn("modelType").isEqualTo(ModelType.PERSON_TRAFFIC.id)
+			);
+			writeModeShiftFiles(filtered, ModelType.PERSON_TRAFFIC.id);
 
+			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
+				filtered = joined.where(
+					joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
+				);
+				writeModeShiftFiles(filtered, group);
+			}
+		}
+		else
+			writeModeShiftFiles(joined, ModelType.COMPLETE_MODEL.toString());
+	}
+
+	private void writeModeShiftFiles(Table joined, String group) {
 		Table aggr = joined.summarize("trip_id", count).by("original_mode", "main_mode");
 		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("original_mode")));
 		aggr = aggr.sortOn(cmp_modes);
-		aggr.write().csv(output.getPath("mode_shift.csv").toFile());
+		aggr.write().csv(output.getPath("mode_shift_%s.csv", group).toFile());
 	}
 
 	/**
