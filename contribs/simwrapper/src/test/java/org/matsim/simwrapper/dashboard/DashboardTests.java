@@ -60,7 +60,7 @@ public class DashboardTests {
 			.isDirectoryRecursivelyContaining("glob:**trip_stats_total.csv")
 			.isDirectoryRecursivelyContaining("glob:**mode_share_total.csv")
 			.isDirectoryRecursivelyContaining("glob:**mode_share_per_purpose.csv")
-			.isDirectoryRecursivelyContaining("glob:**mode_shift.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_shift_total.csv")
 			// Traffic stats
 			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_link_daily.csv")
 			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
