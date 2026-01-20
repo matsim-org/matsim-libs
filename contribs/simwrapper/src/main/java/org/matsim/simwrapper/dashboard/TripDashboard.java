@@ -168,7 +168,7 @@ public class TripDashboard implements Dashboard {
 	/** Adds the description depending on if groups are set or not.
 	 * @return description string
 	 */
-	private @NonNull String getDescription() {
+	private @NonNull String getPageDescription() {
 		if (groupsOfPersonSubpopulations.isEmpty() || groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())) {
 			return "General information about modal share and trip distributions.";
 		}
@@ -189,7 +189,7 @@ public class TripDashboard implements Dashboard {
 			if (groupsOfPersonSubpopulations.size() > 1)
 				groupsOfPersonSubpopulations.putFirst(TripAnalysis.ModelType.COMPLETE_MODEL.toString(), new ArrayList<>());
 		}
-		header.description = getDescription();
+		header.description = getPageDescription();
 
 		String[] args = new String[this.groupedRefCsv == null ? this.args.length : this.args.length + 2];
 		System.arraycopy(this.args, 0, args, 0, this.args.length);
