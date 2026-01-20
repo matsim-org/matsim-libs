@@ -538,7 +538,7 @@ public class TripAnalysis implements MATSimAppCommand {
 	}
 
 	private void normDistanceGroups(List<String> labels, Table aggr) {
-		List<String> share_Columns = aggr.columnNames().stream().filter(n -> n.toLowerCase().contains("share_")).toList();
+		List<String> share_Columns = aggr.columnNames().stream().filter(n -> n.toLowerCase().contains("share_") || n.equalsIgnoreCase("share")).toList();
 		for (String shareCol : share_Columns) {
 			for (String label : labels) {
 				DoubleColumn dist_group = aggr.doubleColumn(shareCol);
