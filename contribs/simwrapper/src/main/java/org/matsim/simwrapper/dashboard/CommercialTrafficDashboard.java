@@ -6,6 +6,7 @@ import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
 import org.matsim.simwrapper.Dashboard;
+import org.matsim.simwrapper.DashboardUtils;
 import org.matsim.simwrapper.Header;
 import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
@@ -94,7 +95,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			});
 		layout.row("General_second", "General").el(Links.class, (viz, data) -> {
 			viz.title = "Link volumes of the commercial traffic";
-			viz.description = "The volumes are scaled to 100% sample size.";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes are scaled to 100% sample size.", data, true);
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", args);
 			viz.network = data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
 			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
@@ -203,14 +204,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
-			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data, false);
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString());
 			viz.showAllRows = true;
 		});
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("trips_fourthB", "Trips").el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics of group: *" + group + "*";
-				viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data, false);
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
 				viz.showAllRows = true;
 			});
@@ -218,7 +219,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		layout.row("trips_fifth", "Trips")
 			.el(Table.class, (viz, data) -> {
 				viz.title = "Population statistics";
-				viz.description = "over simulated persons (not scaled by sample size)";
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("over simulated persons.", data, false);
 				viz.showAllRows = true;
 				viz.dataset = data.compute(TripAnalysis.class, "population_trip_stats.csv");
 				List<String> headerPopStats = new ArrayList<>(List.of("Group"));
@@ -481,7 +482,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("OD_first", "Activities").el(Hexagons.class, (viz, data) -> {
 			viz.title = "Origin-Destination of commercial trips";
-			viz.description = "The OD can be filtered according to defined groups of commercial subpopulations.";
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The OD can be filtered according to defined groups of commercial subpopulations.", data, false);
 			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addAggregation(group, "Origin",group+"_start_X",group+"_start_Y","Destination",group+"_act_X",group+"_act_Y");
