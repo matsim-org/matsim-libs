@@ -1,6 +1,5 @@
 package org.matsim.contrib.cadyts.car;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -9,74 +8,77 @@ import cadyts.supply.SimResults;
 
 /*package*/ class SimResultsContainerImpl implements SimResults<Link> {
 	private static final long serialVersionUID = 1L;
-	private final VolumesAnalyzer volumesAnalyzer;
+	private final PcuVolumesAnalyzer pcuVolumesAnalyzer;
 	private final double countsScaleFactor;
 
-	SimResultsContainerImpl(final VolumesAnalyzer volumesAnalyzer, final double countsScaleFactor) {
-		this.volumesAnalyzer = volumesAnalyzer;
+	SimResultsContainerImpl(final PcuVolumesAnalyzer pcuVolumesAnalyzer, final double countsScaleFactor) {
+		this.pcuVolumesAnalyzer = pcuVolumesAnalyzer;
 		this.countsScaleFactor = countsScaleFactor;
 	}
 
 	@Override
-	public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
+	public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) {
 
 		Id<Link> linkId = link.getId();
-		double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
-		
+		double[] values = pcuVolumesAnalyzer.getPcuVolumesForLink(linkId);
+
 		if (values == null) {
 			return 0;
 		}
-		
-		int startHour = startTime_s / 3600;
-		int endHour = (endTime_s-3599)/3600 ;
-		// (The javadoc specifies that endTime_s should be _exclusive_.  However, in practice I find 7199 instead of 7200.  So
-		// we are giving it an extra second, which should not do any damage if it is not used.) 
-		if (endHour < startHour) {
-			System.err.println(" startTime_s: " + startTime_s + "; endTime_s: " + endTime_s + "; startHour: " + startHour + "; endHour: " + endHour );
-			throw new RuntimeException("this should not happen; check code") ;
-		}
-		double sum = 0. ;
-		for ( int ii=startHour; ii<=endHour; ii++ ) {
-			sum += values[startHour] ;
-		}
-		switch(type){
-		case COUNT_VEH:
-			return sum * this.countsScaleFactor ;
-		case FLOW_VEH_H:
-			return 3600*sum / (endTime_s - startTime_s) * this.countsScaleFactor ;
-		default:
-			throw new RuntimeException("count type not implemented") ;
+
+		// Assuming analyzer bins are consistent with request (usually hourly or matching config)
+		// Usually Cadyts configures bin size to 3600s.
+		int binSize = 3600; // This should ideally match the analyzer's bin size
+		int startBin = startTime_s / binSize;
+		int endBin = (endTime_s - 1) / binSize;
+
+		double sum = 0.0;
+		for (int i = startBin; i <= endBin; i++) {
+			if (i >= 0 && i < values.length) {
+				sum += values[i];
+			}
 		}
 
+		switch(type){
+			case COUNT_VEH: // Cadyts expects "Count", we provide "PCU Count"
+				return sum * this.countsScaleFactor;
+			case FLOW_VEH_H:
+				return 3600.0 * sum / (endTime_s - startTime_s) * this.countsScaleFactor;
+			default:
+				throw new RuntimeException("count type not implemented");
+		}
 	}
 
 	@Override
 	public String toString() {
-		final StringBuffer stringBuffer2 = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		final String LINKID = "linkId: ";
 		final String VALUES = "; values:";
 		final char TAB = '\t';
 		final char RETURN = '\n';
 
-		for (Id linkId : this.volumesAnalyzer.getLinkIds()) { // Only occupancy!
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append(LINKID);
-			stringBuffer.append(linkId);
-			stringBuffer.append(VALUES);
+		for (Id<Link> linkId : this.pcuVolumesAnalyzer.getLinkIds()) {
+			StringBuilder linkSb = new StringBuilder();
+			linkSb.append(LINKID);
+			linkSb.append(linkId);
+			linkSb.append(VALUES);
 
-			boolean hasValues = false; // only prints stops with volumes > 0
-			int[] values = this.volumesAnalyzer.getVolumesForLink(linkId);
+			boolean hasValues = false; // only prints links with volumes > 0
+			double[] values = this.pcuVolumesAnalyzer.getPcuVolumesForLink(linkId);
 
-			for (int ii = 0; ii < values.length; ii++) {
-				hasValues = hasValues || (values[ii] > 0);
-
-				stringBuffer.append(TAB);
-				stringBuffer.append(values[ii]);
+			if (values != null) {
+				for (double value : values) {
+					hasValues = hasValues || (value > 0);
+					linkSb.append(TAB);
+					linkSb.append(value);
+				}
 			}
-			stringBuffer.append(RETURN);
-			if (hasValues) stringBuffer2.append(stringBuffer.toString());
+			linkSb.append(RETURN);
+			if (hasValues) {
+				sb.append(linkSb);
+			}
 		}
-		return stringBuffer2.toString();
+		return sb.toString();
 	}
 
 }

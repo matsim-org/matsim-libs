@@ -1,22 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package org.matsim.contrib.cadyts.general;
 
 import org.matsim.api.core.v01.Scenario;
@@ -26,17 +7,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
 import java.util.Map;
 
-/**
- * @author nagel
- */
 public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 
 	private final double beta ;
 	private double cadytsWeight = 1.0;
-
 	private CadytsContextI<T> cadytsContext;
 
 	public static final String CADYTS_CORRECTION = "cadytsCorrection";
@@ -53,22 +29,26 @@ public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 			return currentPlan;
 		}
 
-		// random plan:
+		double pcu = 1.0;
+		if (person instanceof Person) {
+			pcu = cadytsContext.getAgentWeight((Person) person);
+		}
+
 		Plan otherPlan;
 		do {
 			otherPlan = new RandomPlanSelector<Plan, Person>().selectPlan((person));
 		} while (otherPlan == currentPlan);
 
-		if (otherPlan.getScore() == null) {
-			return otherPlan;
-		}
+		if (otherPlan.getScore() == null) return otherPlan;
 
 		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(currentPlan);
-		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
+		// Scale by PCU
+		double currentPlanCadytsCorrection = (this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta) * pcu;
 		double currentScore = currentPlan.getScore() + cadytsWeight * currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(otherPlan);
-		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
+		// Scale by PCU
+		double otherPlanCadytsCorrection = (this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta) * pcu;
 		double otherScore = otherPlan.getScore() + cadytsWeight * otherPlanCadytsCorrection;
 
 		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
@@ -81,7 +61,6 @@ public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 
 		Plan selectedPlan = currentPlan;
 		if (MatsimRandom.getRandom().nextDouble() < 0.01 * weight) {
-			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
 			selectedPlan = otherPlan;
 		}
 		return selectedPlan;
