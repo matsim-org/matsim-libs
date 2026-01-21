@@ -214,9 +214,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(297.12)
-			.inVehicleTravelTimeMean(393.82)
-			.totalTravelTimeMean(690.95)
+			.waitAverage(298.06)
+			.inVehicleTravelTimeMean(387.24)
+			.totalTravelTimeMean(685.3)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -299,6 +299,40 @@ public class RunDrtExampleIT {
 	}
 
 	@Test
+	void testRunDrtExampleWithLateRequest() {
+		Id.resetCaches();
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		DvrpTravelTimeMatrixParams matrixParams = dvrpConfigGroup.getTravelTimeMatrixParams();
+		matrixParams.addParameterSet(matrixParams.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
+
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), dvrpConfigGroup,
+				new OTFVisConfigGroup());
+
+		// !!! IMPORTANT: use the plans with a late request
+		config.plans().setInputFile("plans_only_drt_1.0_with_late_request.xml.gz");
+
+		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
+			//replace extensive with selective search
+			drtCfg.removeParameterSet(drtCfg.getDrtInsertionSearchParams());
+			var selectiveInsertionSearchParams = new SelectiveInsertionSearchParams();
+			// using exactly free-speed estimates
+			selectiveInsertionSearchParams.setRestrictiveBeelineSpeedFactor(1);
+			drtCfg.addParameterSet(selectiveInsertionSearchParams);
+
+			//disable rejections
+			drtCfg.addOrGetDrtOptimizationConstraintsParams()
+					.addOrGetDefaultDrtOptimizationConstraintsSet()
+					.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
+		}
+
+		config.controller().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+	}
+
+	@Test
 	void testRunDrtExampleWithNoRejections_RepeatedSelectiveSearch() {
 		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -332,9 +366,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 			.rejectionRate(0.0)
 			.rejections(0)
-			.waitAverage(269.8)
-			.inVehicleTravelTimeMean(379.69)
-			.totalTravelTimeMean(649.49)
+			.waitAverage(262.73)
+			.inVehicleTravelTimeMean(382.16)
+			.totalTravelTimeMean(644.89)
 			.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -561,9 +595,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.04)
 				.rejections(14)
-				.waitAverage(236.87)
-				.inVehicleTravelTimeMean(389.63)
-				.totalTravelTimeMean(626.51)
+				.waitAverage(235.18)
+				.inVehicleTravelTimeMean(390.26)
+				.totalTravelTimeMean(625.45)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);
@@ -618,9 +652,9 @@ public class RunDrtExampleIT {
 		var expectedStats = Stats.newBuilder()
 				.rejectionRate(0.19)
 				.rejections(77)
-				.waitAverage(202.33)
+				.waitAverage(202.3)
 				.inVehicleTravelTimeMean(375.53)
-				.totalTravelTimeMean(577.86)
+				.totalTravelTimeMean(577.83)
 				.build();
 
 		verifyDrtCustomerStatsCloseToExpectedStats(utils.getOutputDirectory(), expectedStats);

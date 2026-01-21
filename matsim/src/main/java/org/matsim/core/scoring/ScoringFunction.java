@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.TripStructureUtils;
 
 /**
@@ -48,16 +49,17 @@ public interface ScoringFunction {
 	 * the simulation ends will have an endTime of Time.getUndefinedTime().
 	 * It is up to the implementation what to make of this,
 	 * especially to "wrap" it "around".
+	 *
 	 * @param activity
 	 */
-    void handleActivity(Activity activity);
+	void handleActivity(Activity activity);
 
-    /**
-     * Tells the scoring function about a Leg. Will contain complete route
-     * information for network routes (as you would expect in a Plan), but
-     * only a GenericRoute for everything else, especially transit.
-     */
-    void handleLeg(Leg leg);
+	/**
+	 * Tells the scoring function about a Leg. Will contain complete route
+	 * information for network routes (as you would expect in a Plan), but
+	 * only a GenericRoute for everything else, especially transit.
+	 */
+	void handleLeg(Leg leg);
 
 	/**
 	 * Tells the scoring function that the agent got stuck in the simulation and
@@ -66,7 +68,7 @@ public interface ScoringFunction {
 	 * An agent can get stuck while performing an activity or while driving.
 	 *
 	 * @param time The time at which the agent got stuck and was removed from the
-	 * simulation.
+	 *             simulation.
 	 */
 	void agentStuck(final double time);
 
@@ -97,14 +99,28 @@ public interface ScoringFunction {
 
 	/**
 	 * Returns the score for this plan.
-
+	 *
 	 * @return the score
 	 */
 	double getScore();
 
-	void handleEvent( Event event ) ;
+	/**
+	 * Handles any event that the Mobsim produces.
+	 *
+	 * @deprecated This method is going to be removed in a future release. Scoring functions should try to collect information via
+	 * {@link #handleActivity(Activity)} and {@link #handleLeg(Leg)}, and {@link #handleTrip(TripStructureUtils.Trip)}.
+	 * <p>
+	 * {@link org.matsim.api.core.v01.events.PersonStuckEvent}, {@link PersonMoneyEvent}, and {@link PersonScoreEvent} are passed to
+	 * scoring functions via the designated methods.
+	 * <p>
+	 * If a scoring function really needs other events, it must register as a regular event handler with the {@link EventsManager}.
+	 * However, the scoring mechanism in {@link org.matsim.dsim.DSim} does not support this method anymore, as it does not play well
+	 * with a distributed execution of the simulation.
+	 */
+	@Deprecated(forRemoval = true, since = "2026.0")
+	void handleEvent(Event event);
 
-	default void handleTrip( TripStructureUtils.Trip trip ) {
+	default void handleTrip(TripStructureUtils.Trip trip) {
 		// empty default implementation, since older implementations of the interface
 		// don't have this method, and work happily without. kai, sep'18
 	}

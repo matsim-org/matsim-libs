@@ -9,11 +9,11 @@ import org.matsim.api.core.v01.population.PopulationPartition;
 import org.matsim.core.communication.Communicator;
 import org.matsim.core.communication.NullCommunicator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.DistributedScoringListener;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 import org.matsim.dsim.executors.PoolExecutor;
 import org.matsim.dsim.executors.SingleExecutor;
+import org.matsim.dsim.scoring.BackpackScoringModule;
 
 public class DistributedSimulationModule extends AbstractModule {
 
@@ -37,6 +37,7 @@ public class DistributedSimulationModule extends AbstractModule {
 		bind(SerializationProvider.class).toInstance(dtx.getSerializer());
 
 		bind(MessageBroker.class).in(Singleton.class);
+		bind(DistributedEventsManager.class).in(Singleton.class);
 		bindEventsManager().to(DistributedEventsManager.class).in(Singleton.class);
 		addControllerListenerBinding().to(DSimControllerListener.class).in(Singleton.class);
 
@@ -51,13 +52,15 @@ public class DistributedSimulationModule extends AbstractModule {
 		if (ctx.isDistributed()) {
 
 			bind(PopulationPartition.class).toInstance(new LazyPopulationPartition(dtx.getComm().getRank()));
-			addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
+			//TODO think about whether we still need something similar to consolidate experienced plans in the end
+			//addControllerListenerBinding().to(DistributedScoringListener.class).in(Singleton.class);
 		}
 
 		// Need to define the set binder, in case no other module uses it
 		Multibinder.newSetBinder(binder(), LPProvider.class);
 
 		install(new DSimModule());
+		install(new BackpackScoringModule());
 	}
 
 	/**

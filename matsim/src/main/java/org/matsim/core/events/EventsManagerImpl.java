@@ -138,7 +138,7 @@ public final class EventsManagerImpl implements EventsManager {
 		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
 			log.info("=== Logging of event-handlers skipped ===");
 			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+				+ "or use Configurator...Level.DEBUG) in your run class.");
 		}
 		log.debug("adding Event-Handler: " + test.getName());
 		do {

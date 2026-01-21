@@ -22,13 +22,11 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.BlockingMode;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -47,16 +45,18 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.base.Preconditions;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author jbischoff
  * @author Michal Maciejewski
  */
-@DistributedEventHandler(async = true)
+@DistributedEventHandler(blocking = BlockingMode.ASYNC)
 public class DrtVehicleDistanceStats
-		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
-		TeleportationArrivalEventHandler {
+	implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
+	TeleportationArrivalEventHandler {
 
 	static class VehicleState {
 		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
@@ -112,10 +112,10 @@ public class DrtVehicleDistanceStats
 	private void initializeVehicles() {
 		int maxCapacity = VehicleOccupancyProfileCalculator.findMaxVehicleCapacity(fleetSpecification, loadType);
 		fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
-					new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
+			.values()
+			.stream()
+			.forEach(spec -> vehicleStates.put(Id.createVehicleId(spec.getId()),
+				new VehicleState(maxCapacity, spec.getServiceEndTime() - spec.getServiceBeginTime())));
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class DrtVehicleDistanceStats
 		if (event.getMode().equals(mode)) {
 			if (event.getVehicleId() != null) {
 				vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.put(event.getPersonId(),
-						new MutableDouble());
+					new MutableDouble());
 			}
 		}
 	}
@@ -143,12 +143,12 @@ public class DrtVehicleDistanceStats
 		if (event.getMode().equals(mode)) {
 			if (event.getVehicleId() != null) {
 				double distance = vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.remove(
-						event.getPersonId()).doubleValue();
+					event.getPersonId()).doubleValue();
 				travelDistances.put(event.getRequestId(), distance);
 			} else {
 				Preconditions.checkArgument(
-						soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,
-						"Duplicate entry for arriving passenger: (%s)", event.getPersonId());
+					soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,
+					"Duplicate entry for arriving passenger: (%s)", event.getPersonId());
 			}
 		}
 	}

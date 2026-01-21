@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class IntegersLoadType implements DvrpLoadType {
+public final class IntegersLoadType implements DvrpLoadType {
     private final IntegersLoad emptyLoad;
     private final List<String> dimensions;
 

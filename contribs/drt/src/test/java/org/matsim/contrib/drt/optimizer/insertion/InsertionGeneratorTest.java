@@ -492,7 +492,10 @@ public class InsertionGeneratorTest {
 		StopWaypoint stop1 = stop(70, link("stop"), LOAD_TYPE.getEmptyLoad());
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(prebookedRequest, entry,
-			new Insertion(prebookedRequest, entry, 2, 2));
+			new Insertion(prebookedRequest, entry, 1, 1),
+			new Insertion(prebookedRequest, entry, 1, 2),
+			new Insertion(prebookedRequest, entry, 2, 2)
+		);
 	}
 
 

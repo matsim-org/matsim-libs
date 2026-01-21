@@ -1,32 +1,26 @@
 /*
-  *********************************************************************** *
-  * project: org.matsim.*
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  * copyright       :  (C) 2024 by the members listed in the COPYING,       *
-  *                   LICENSE and WARRANTY file.                            *
-  * email           : info at matsim dot org                                *
-  *                                                                         *
-  * *********************************************************************** *
-  *                                                                         *
-  *   This program is free software; you can redistribute it and/or modify  *
-  *   it under the terms of the GNU General Public License as published by  *
-  *   the Free Software Foundation; either version 2 of the License, or     *
-  *   (at your option) any later version.                                   *
-  *   See also COPYING, LICENSE and WARRANTY file                           *
-  *                                                                         *
-  * ***********************************************************************
+ *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       :  (C) 2024 by the members listed in the COPYING,       *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * ***********************************************************************
  */
 
 package org.matsim.freight.logistics.examples.multipleChains;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -37,7 +31,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
@@ -57,6 +54,13 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MultipleChainsReplanningTest {
 
@@ -101,7 +105,7 @@ public class MultipleChainsReplanningTest {
 	private static LSP createLSP(Scenario scenario) {
 
 
-        // A plan with two different logistic chains on the left and right, with respective carriers is created
+		// A plan with two different logistic chains on the left and right, with respective carriers is created
 		LSPPlan multipleOneEchelonChainsPlan;
 		{
 			LogisticChainElement leftCarrierElement;
@@ -111,12 +115,12 @@ public class MultipleChainsReplanningTest {
 
 				CarriersUtils.addCarrierVehicle(carrierLeft, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierLeftResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierLeft)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
-						.build();
+					.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+					.build();
 
 				leftCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("leftCarrierElement", LogisticChainElement.class))
-						.setResource(carrierLeftResource)
-						.build();
+					.setResource(carrierLeftResource)
+					.build();
 			}
 
 			LogisticChainElement rightCarrierElement;
@@ -126,27 +130,27 @@ public class MultipleChainsReplanningTest {
 
 				CarriersUtils.addCarrierVehicle(carrierRight, CarrierVehicle.newInstance(Id.createVehicleId("veh_small"), DEPOT_LINK_ID, VEH_TYPE_LARGE_50));
 				LSPResource carrierRightResource = ResourceImplementationUtils.DistributionCarrierResourceBuilder.newInstance(carrierRight)
-						.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
-						.build();
+					.setDistributionScheduler(ResourceImplementationUtils.createDefaultDistributionCarrierScheduler(scenario))
+					.build();
 
 				rightCarrierElement = LSPUtils.LogisticChainElementBuilder.newInstance(Id.create("rightCarrierElement", LogisticChainElement.class))
-						.setResource(carrierRightResource)
-						.build();
+					.setResource(carrierRightResource)
+					.build();
 			}
 
 			LogisticChain leftChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("leftChain", LogisticChain.class))
-					.addLogisticChainElement(leftCarrierElement)
-					.build();
+				.addLogisticChainElement(leftCarrierElement)
+				.build();
 
 			LogisticChain rightChain = LSPUtils.LogisticChainBuilder.newInstance(Id.create("rightChain", LogisticChain.class))
-					.addLogisticChainElement(rightCarrierElement)
-					.build();
+				.addLogisticChainElement(rightCarrierElement)
+				.build();
 
 			final InitialShipmentAssigner shipmentAssigner = MultipleChainsUtils.createRoundRobinLogisticChainShipmentAssigner();
 			multipleOneEchelonChainsPlan = LSPUtils.createLSPPlan()
-					.addLogisticChain(leftChain)
-					.addLogisticChain(rightChain)
-					.setInitialShipmentAssigner(shipmentAssigner);
+				.addLogisticChain(leftChain)
+				.addLogisticChain(rightChain)
+				.setInitialShipmentAssigner(shipmentAssigner);
 
 			multipleOneEchelonChainsPlan.setType(MultipleChainsUtils.LspPlanTypes.MULTIPLE_ONE_ECHELON_CHAINS.toString());
 		}
@@ -155,9 +159,9 @@ public class MultipleChainsReplanningTest {
 		lspPlans.add(multipleOneEchelonChainsPlan);
 
 		LSP lsp = LSPUtils.LSPBuilder.getInstance(Id.create("myLSP", LSP.class))
-				.setInitialPlan(multipleOneEchelonChainsPlan)
-				.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
-				.build();
+			.setInitialPlan(multipleOneEchelonChainsPlan)
+			.setLogisticChainScheduler(ResourceImplementationUtils.createDefaultSimpleForwardLogisticChainScheduler(createResourcesListFromLSPPlans(lspPlans)))
+			.build();
 
 		for (LspShipment shipment : createInitialLSPShipments()) {
 			lsp.assignShipmentToLspPlan(shipment);
@@ -227,17 +231,18 @@ public class MultipleChainsReplanningTest {
 
 		Controller controller = ControllerUtils.createController(scenario);
 		controller.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					install(new LSPModule());
-				}
-			});
+			@Override
+			public void install() {
+				install(new LSPModule());
+			}
+		});
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				final EventBasedCarrierScorer4MultipleChains carrierScorer = new EventBasedCarrierScorer4MultipleChains();
 				bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+				addControllerListenerBinding().toInstance(carrierScorer);
 				bind(LSPScorerFactory.class).toInstance(MyLSPScorer::new);
 				bind(CarrierStrategyManager.class).toProvider(() -> {
 					CarrierStrategyManager strategyManager = CarrierControllerUtils.createDefaultCarrierStrategyManager();
@@ -247,9 +252,9 @@ public class MultipleChainsReplanningTest {
 				bind(LSPStrategyManager.class).toProvider(() -> {
 					LSPStrategyManager strategyManager = new LSPStrategyManagerImpl();
 
-                    GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
-                    strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
-                    strategyManager.addStrategy(strategy, null, 1);
+					GenericPlanStrategyImpl<LSPPlan, LSP> strategy = new GenericPlanStrategyImpl<>(new KeepSelected<>());
+					strategy.addStrategyModule(new LspRandomShipmentShiftingModule());
+					strategyManager.addStrategy(strategy, null, 1);
 					return strategyManager;
 				});
 			}

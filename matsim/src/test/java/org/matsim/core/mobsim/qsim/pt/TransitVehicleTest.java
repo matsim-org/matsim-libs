@@ -20,10 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
@@ -33,6 +29,10 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -48,13 +48,13 @@ public class TransitVehicleTest {
 
 	@Test
 	void testSizeInEquivalents() {
-		VehicleType carType = VehicleUtils.createVehicleType(Id.create("carType", VehicleType.class ) );
-		VehicleType busType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType carType = VehicleUtils.createVehicleType(Id.create("carType", VehicleType.class));
+		VehicleType busType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 		busType.setPcuEquivalents(2.5);
 		carType.getCapacity().setSeats(Integer.valueOf(5));
-		busType.getCapacity().setSeats( 5 );
-		Vehicle car = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), carType );
-		Vehicle bus = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), busType );
+		busType.getCapacity().setSeats(5);
+		Vehicle car = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), carType);
+		Vehicle bus = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), busType);
 		TransitQVehicle veh = new TransitQVehicle(car);
 		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestUtils.EPSILON);
 		veh = new TransitQVehicle(bus);
@@ -63,10 +63,10 @@ public class TransitVehicleTest {
 
 	@Test
 	void testInitialization_SeatAndStandCapacity() {
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 		vehType.getCapacity().setStandingRoom(Integer.valueOf(2));
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(7, veh.getPassengerCapacity());
@@ -74,9 +74,9 @@ public class TransitVehicleTest {
 
 	@Test
 	void testInitialization_SeatOnlyCapacity() {
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 		vehType.getCapacity().setSeats(Integer.valueOf(4));
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(4, veh.getPassengerCapacity());
@@ -84,26 +84,25 @@ public class TransitVehicleTest {
 
 	@Test
 	void testInitialization_NoCapacity() {
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		try {
 			createTransitVehicle(vehicle);
 			fail("missing exception.");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.info("caught expected exception.", e);
 		}
 	}
 
 	@Test
 	void testAddPassenger() {
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
-		vehType.getCapacity().setSeats(Integer.valueOf(5));
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
+		vehType.getCapacity().setSeats(5);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		ArrayList<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>(veh.getPassengerCapacity());
 		for (int i = 0; i < veh.getPassengerCapacity(); i++) {
-			PTPassengerAgent passenger = new FakePassengerAgent(null);
+			PTPassengerAgent passenger = new FakePassengerAgent(Id.createPersonId(i), null);
 			passengers.add(passenger);
 			assertFalse(veh.getPassengers().contains(passenger));
 			assertTrue(veh.addPassenger(passenger));
@@ -113,19 +112,19 @@ public class TransitVehicleTest {
 		for (PTPassengerAgent passenger : passengers) {
 			assertTrue(veh.getPassengers().contains(passenger));
 		}
-		assertFalse(veh.addPassenger(new FakePassengerAgent(null)));
+		assertFalse(veh.addPassenger(new FakePassengerAgent(Id.createPersonId("unknown"), null)));
 	}
 
 	@Test
 	void testRemovePassenger() {
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
-		PTPassengerAgent passenger1 = new FakePassengerAgent(null);
-		PTPassengerAgent passenger2 = new FakePassengerAgent(null);
-		PTPassengerAgent passenger3 = new FakePassengerAgent(null);
+		PTPassengerAgent passenger1 = new FakePassengerAgent(Id.createPersonId("p1"), null);
+		PTPassengerAgent passenger2 = new FakePassengerAgent(Id.createPersonId("p2"), null);
+		PTPassengerAgent passenger3 = new FakePassengerAgent(Id.createPersonId("p3"), null);
 		assertTrue(veh.addPassenger(passenger1));
 		assertTrue(veh.addPassenger(passenger2));
 		assertTrue(veh.addPassenger(passenger3));

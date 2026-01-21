@@ -28,10 +28,12 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.freight.carriers.*;
@@ -203,6 +205,8 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		// load or create carrier
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		Controller controller = prepareController(scenario);
+
 		ShpOptions.Index indexShape = null;
 		shp = new ShpOptions(shapeFilePath, shapeCRS, null);
 		if (shp.isDefined()) {
@@ -220,8 +224,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 			selectedPopulationSamplingOption, selectedPopulationOption, Boolean.parseBoolean(combineSimilarJobs),
 			crsTransformationFromNetworkToShape);
 
-		// prepare the VRP and get a solution
-		Controller controller = prepareController(scenario);
 		demandGenerationSpecification.writeAdditionalOutputFiles(controller);
 
 		solveSelectedSolution(selectedSolution, config, controller);
@@ -239,10 +241,18 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	 */
 	private Config prepareConfig(int lastMATSimIteration, String coordinateSystem) {
 		Config config = ConfigUtils.createConfig();
+		config.global().setInsistingOnDeprecatedConfigVersion(false);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.controller().setOutputDirectory(outputLocation.toString());
-		new OutputDirectoryHierarchy(config.controller().getOutputDirectory(), config.controller().getRunId(),
-			config.controller().getOverwriteFileSetting(), ControllerConfigGroup.CompressionType.gzip);
-		config.controller().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.scoring().setFractionOfIterationsToStartScoreMSA(0.8);
+		config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
+		ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();
+		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
+		stratSets.setWeight(1.);
+		config.replanning().addStrategySettings(stratSets);
+			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 		config.controller().setLastIteration(lastMATSimIteration);
 		config.global().setCoordinateSystem(coordinateSystem);
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
@@ -451,13 +461,16 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 	 */
 	private static Controller prepareController(Scenario scenario) {
 		Controller controller = ControllerUtils.createController(scenario);
+		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
+		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
+		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controller.addOverridingModule(new CarrierModule());
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(CarrierScoringFunctionFactory.class).to(CarrierScoringFunctionFactoryImpl.class);
 			}});
-
+		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		return controller;
 	}
 
@@ -490,10 +503,6 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		runJsprit(controller, useDistanceConstraint);
 		if (runMatSim)
 			controller.run();
-		else
-			log.warn(
-					"##Finished with the jsprit solution. If you also want to run MATSim, please change  case of optionsOfVRPSolutions");
-		CarriersUtils.writeCarriers(controller.getScenario(), "output_carriersWithPlans.xml");
 	}
 
 	/**

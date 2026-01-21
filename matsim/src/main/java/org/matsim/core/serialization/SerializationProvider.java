@@ -36,6 +36,10 @@ public class SerializationProvider {
 
 	public SerializationProvider() {
 
+		// Fury uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fury compiles classes into
+		// wire formats.
+		org.apache.fury.logging.LoggerFactory.disableLogging();
+
 		// multiple serializations of different objects.
 		fury = Fury.builder().withLanguage(Language.JAVA)
 			.withRefTracking(false)
@@ -93,7 +97,7 @@ public class SerializationProvider {
 		}
 	}
 
-	public static void main(String[] args) throws ClassNotFoundException {
+	public static void main() throws ClassNotFoundException {
 		System.out.println(new SerializationProvider());
 	}
 

@@ -29,7 +29,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -117,14 +120,14 @@ public final class ScenarioUtils {
 		scenarioLoader.setAttributeConverters(attributeConverters);
 		scenarioLoader.loadScenario();
 	}
-	
+
 	public final static class ScenarioBuilder {
 		private MutableScenario scenario;
 		public ScenarioBuilder( Config config ) {
 			this.scenario = new MutableScenario( config ) ;
 		}
 		public ScenarioBuilder addScenarioElement(String name, Object o) {
-			scenario.addScenarioElement(name, o); 
+			scenario.addScenarioElement(name, o);
 			return this ;
 		}
 		public ScenarioBuilder setHouseholds( Households households ) {
@@ -181,6 +184,12 @@ public final class ScenarioUtils {
 	 */
 	public static <T extends MatsimToplevelContainer & Attributable> void putScale(T container, Double scale) {
 		container.getAttributes().putAttribute(INPUT_SCALE_ATT, scale);
+	}
+
+	public static void cleanScenario( Scenario scenario ) {
+		NetworkUtils.cleanNetwork( scenario );
+		PopulationUtils.cleanPopulation( scenario );
+		FacilitiesUtils.cleanFacilities( scenario );
 	}
 
 }
