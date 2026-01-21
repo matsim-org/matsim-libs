@@ -108,13 +108,13 @@ public class CommercialTrafficDashboard implements Dashboard {
 				Plotly.DataSet ds = viz.addDataset(
 						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 					.constant("source", "Simulated")
-					.aggregate(List.of("main_mode"), "share_commercialTraffic", Plotly.AggrFunc.SUM);
+					.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
 					ds.mapping()
 						.name("main_mode")
 						.y("source")
-						.x("share_commercialTraffic")
+						.x("share")
 				);
 			})
 			.el(Plotly.class, (viz, data) -> {
@@ -126,13 +126,13 @@ public class CommercialTrafficDashboard implements Dashboard {
 					Plotly.DataSet ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
 						.constant("source", "Simulated")
-						.aggregate(List.of("subpopulation"), "share_commercialTraffic", Plotly.AggrFunc.SUM);
+						.aggregate(List.of("subpopulation"), "share", Plotly.AggrFunc.SUM);
 
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
 						ds.mapping()
 							.name("subpopulation")
 							.y("source")
-							.x("share_commercialTraffic")
+							.x("share")
 					);
 			});
 
@@ -143,10 +143,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name(group).build(),
 						viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", group))
-							.aggregate(List.of("dist_group"), "share_"+group, Plotly.AggrFunc.SUM)
+							.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM)
 							.mapping()
 							.x("dist_group")
-							.y("share_"+group)
+							.y("share")
 					);
 				}
 			})
@@ -162,11 +162,11 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.multiIndex = Map.of("dist_group", "source");
 					var ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
-						.aggregate(List.of("dist_group", "main_mode"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
+						.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
 						.x("dist_group")
-						.y("share_commercialTraffic");
+						.y("share");
 
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
@@ -186,12 +186,11 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.multiIndex = Map.of("dist_group", "source");
 					var ds = viz.addDataset(
 							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
-						.aggregate(List.of("dist_group", "subpopulation"), "share_commercialTraffic", Plotly.AggrFunc.SUM)
+						.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
 						.constant("source", "Sim")
 						.mapping()
 						.x("dist_group")
-						.y("share_commercialTraffic");
-
+						.y("share");
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
 							.orientation(BarTrace.Orientation.VERTICAL)
@@ -204,7 +203,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
 			viz.description = "by main mode, over whole trip (including access & egress); not scaled by sample size";
-			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", "commercialTraffic");
+			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString());
 			viz.showAllRows = true;
 		});
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
