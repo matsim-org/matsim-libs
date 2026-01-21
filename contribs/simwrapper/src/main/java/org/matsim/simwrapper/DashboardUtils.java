@@ -1,6 +1,5 @@
 package org.matsim.simwrapper;
 
-import org.matsim.application.options.SampleOptions;
 import org.matsim.simwrapper.viz.GridMap;
 
 import java.text.DecimalFormat;
