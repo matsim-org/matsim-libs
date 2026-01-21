@@ -3,10 +3,7 @@ package org.matsim.simwrapper.dashboard;
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
@@ -18,7 +15,7 @@ import java.util.List;
  */
 public class OverviewDashboard implements Dashboard {
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Overview";
 		header.description = "General overview of the MATSim run.";

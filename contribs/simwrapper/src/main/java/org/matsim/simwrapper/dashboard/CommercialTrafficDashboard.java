@@ -5,10 +5,7 @@ import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
@@ -67,7 +64,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 		header.title = "Commercial Traffic";
 		header.description = getDescription();
 

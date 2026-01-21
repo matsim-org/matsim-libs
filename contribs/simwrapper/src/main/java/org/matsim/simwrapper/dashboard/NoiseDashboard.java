@@ -27,7 +27,7 @@ public class NoiseDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Noise";
 		header.description = "Shows the noise footprint and spatial distribution.";

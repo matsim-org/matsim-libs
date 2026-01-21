@@ -7,10 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.population.TripAnalysis;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.components.Line;
@@ -180,7 +177,7 @@ public class TripDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup simWrapperConfigGroup) {
 
 		if (groupsOfPersonSubpopulations.isEmpty()) {
 			groupsOfPersonSubpopulations.put(TripAnalysis.ModelType.COMPLETE_MODEL.toString(), new ArrayList<>());
@@ -201,7 +198,7 @@ public class TripDashboard implements Dashboard {
 			args[this.args.length + 1] = groupedRefCsv;
 		}
 		for (String group : groupsOfPersonSubpopulations.keySet()) {
-			createTripsDashboardTab(layout, group, args);
+			createTripsDashboardTab(layout, group, simWrapperConfigGroup, args);
 		}
 
 		if (groupedRefCsv != null) {
@@ -212,7 +209,7 @@ public class TripDashboard implements Dashboard {
 		}
 	}
 
-	private void createTripsDashboardTab(Layout layout, String tab, String[] args) {
+	private void createTripsDashboardTab(Layout layout, String tab, SimWrapperConfigGroup simWrapperConfigGroup, String[] args) {
 		String tabTitle;
 		String rowSuffix = "_" + tab;
 		// we only have one group, which should be shown as total trips
@@ -317,6 +314,14 @@ public class TripDashboard implements Dashboard {
 				);
 			}
 		});
+		if (simWrapperConfigGroup.get("").getShp() != null)
+			first.el(MapPlot.class, (viz, data) -> {
+				viz.title = "Investigation area";
+				viz.description = "The area where the person with home activity are analyzed.";
+				viz.display.fill.fixedColors = new String[]{"#4e79a7"};
+				viz.setShape(data.context().getShp());
+				viz.width = 0.5d;
+			});
 
 		layout.row("second" + rowSuffix, tabTitle).el(Table.class, (viz, data) -> {
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){

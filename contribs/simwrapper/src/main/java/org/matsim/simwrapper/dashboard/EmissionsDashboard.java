@@ -2,10 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.matsim.application.analysis.emissions.AirPollutionAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.DashboardUtils;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.GridMap;
 import org.matsim.simwrapper.viz.MapPlot;
 import org.matsim.simwrapper.viz.Table;
@@ -26,7 +23,7 @@ public class EmissionsDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Air Pollution";
 		header.description = "Shows the air pollution footprint and its spatial distribution. Shown values are already upscaled from simulated sample size.";
