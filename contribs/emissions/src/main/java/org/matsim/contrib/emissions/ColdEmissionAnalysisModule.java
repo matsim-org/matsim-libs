@@ -128,7 +128,8 @@ final class ColdEmissionAnalysisModule {
 	}
 
 	private static int cnt =10;
-	private Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
+	Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
+		// For testing purposes, I made this class package-private, as the WarmEmission equivalent method is also package-private aleks Jan'26.
 
 		final Map<Pollutant, Double> coldEmissionsOfEvent = new EnumMap<>( Pollutant.class );
 
@@ -381,5 +382,7 @@ final class ColdEmissionAnalysisModule {
 		vehAtt.setHbefaEmConcept( hbefaEmConcept );
 		return vehAtt;
 	}
+
+
 
 }
