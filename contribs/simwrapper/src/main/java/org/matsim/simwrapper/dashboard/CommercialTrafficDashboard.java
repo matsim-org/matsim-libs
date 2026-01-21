@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
 import org.matsim.application.analysis.population.TripAnalysis;
@@ -268,6 +269,27 @@ public class CommercialTrafficDashboard implements Dashboard {
 				);
 			}
 		});
+		String[] typesOfTimeDifferentiation = {"departures", "arrivals"};
+		for (String type : typesOfTimeDifferentiation) {
+			layout.row(type, "Trips").el(Plotly.class, (viz, data) -> {
+
+				viz.title = StringUtils.capitalize(type);
+				viz.description = "by hour and purpose";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Hour").build())
+					.yAxis(Axis.builder().title("Share").build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
+					.build();
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					viz.addDataset(
+							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv",
+								TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())).mapping()
+						.name("purpose", ColorScheme.Spectral)
+						.x("h")
+						.y(type)
+				);
+			});
+		}
 		layout.row("distances", "Tours").el(TextBlock.class, (viz, data) -> {
 			viz.backgroundColor = "transparent";
 			viz.content = """
