@@ -143,16 +143,29 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
 
     @Override
     public void startOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
-        if (operationalStop instanceof ShiftChangeOverTask changeover) {
-            endShift(vehicle, changeover.getLink().getId(), changeover.getFacilityId());
-        } else if (operationalStop instanceof ShiftBreakTask shiftBreak) {
-            startBreak(vehicle, shiftBreak.getLink().getId());
-        }
-
         OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(operationalStop.getFacilityId()));
-        facility.register(vehicle.getId());
-        eventsManager.processEvent(new OperationFacilityCheckInEvent(timer.getTimeOfDay(),
-                mode, vehicle.getId(), facility.getId()));
+        boolean registered = facility.register(vehicle.getId());
+
+        Verify.verify(operationalStop.getReservationId().isPresent(), "Vehicle should have a reservation at this point.");
+        Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation = facilityReservationManager
+                .findReservation(facility.getId(), operationalStop.getReservationId().get());
+        Verify.verify(reservation.isPresent(), "Reservation is not know at the resource.");
+
+        if(!registered) {
+            throw new IllegalStateException(String.format("Could not check in vehicle %s at facility %s with reservation %s. " +
+                    "Consider increasing the buffer time for reservations in the operation facility params. ",
+                    vehicle.getId().toString(), facility.getId(), reservation.get().reservationId()));
+        } else {
+
+            if (operationalStop instanceof ShiftChangeOverTask changeover) {
+                endShift(vehicle, changeover.getLink().getId(), changeover.getFacilityId());
+            } else if (operationalStop instanceof ShiftBreakTask shiftBreak) {
+                startBreak(vehicle, shiftBreak.getLink().getId());
+            }
+
+            eventsManager.processEvent(new OperationFacilityCheckInEvent(timer.getTimeOfDay(),
+                    mode, vehicle.getId(), facility.getId()));
+        }
     }
 
     @Override
@@ -165,7 +178,8 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
         if (checkOut) {
             eventsManager.processEvent(new OperationFacilityCheckOutEvent(timer.getTimeOfDay(), mode, vehicle.getId(), facility.getId()));
         } else {
-            logger.warn(String.format("Could not check out vehicle %s from facility %s", vehicle.getId().toString(), facility.getId()));
+            throw new IllegalStateException(String.format("Could not check out vehicle %s from facility %s. " +
+                    "Check if the check-in succeeded.", vehicle.getId().toString(), facility.getId()));
         }
     }
 
