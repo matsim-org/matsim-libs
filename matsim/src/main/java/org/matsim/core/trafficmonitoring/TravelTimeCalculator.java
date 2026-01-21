@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.IdSet;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
@@ -282,6 +283,13 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 	public void handleEvent(final LinkEnterEvent e) {
 		/* if only some modes are analyzed, we check whether the vehicles
 		 * performs a trip with one of those modes. if not, we skip the event. */
+
+		Scenario scenario;
+		var veh = scenario.getVehicles().getVehicles().get(e.getVehicleId());
+		var networkMode = veh.getType().getNetworkMode();
+		if (analyzedModes.contains(networkMode)) {
+
+		}
 		if (filterAnalyzedModes && vehiclesToIgnore.contains(e.getVehicleId())) return;
 
 		LinkEnterEvent oldEvent = this.linkEnterEvents.put(e.getVehicleId(), e);

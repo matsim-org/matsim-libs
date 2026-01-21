@@ -22,13 +22,28 @@
 
 package org.matsim.analysis;
 
+import jakarta.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class VolumesAnalyzerModule extends AbstractModule {
     @Override
     public void install() {
         bind(VolumesAnalyzer.class).asEagerSingleton();
+		bind(PartVolumesAnalyzer.class);
+		addEventHandlerBinding().to(PartVolumesAnalyzer.class);
+		bind(AnalyzerRegistry.class).in(Singleton.class);
     }
 
+	public static class AnalyzerRegistry {
+
+		private final List<PartVolumesAnalyzer> analyzers = new ArrayList<>();
+
+		public void register(PartVolumesAnalyzer analyzer) {
+			analyzers.add(analyzer);
+		}
+	}
 }
