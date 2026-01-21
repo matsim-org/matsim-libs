@@ -79,8 +79,12 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		eventsManager.finishProcessing();
 
 		vttsHandler.computeFinalVTTS();
+		vttsHandler.printCarVTTS("carVtts.tsv");
 		vttsHandler.printVTTS( eventsPath.getParent().resolve( config.controller().getRunId() + ".vtts.tsv" ).toString() );
 		vttsHandler.printAvgVTTSperPerson( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsPerPerson.tsv" ).toString() );
+
+		log.info("Number of persons in VTTS map: {}", vttsHandler.getPersonId2TripNr2VTTSh().size());
+
 
 		return 0;
 	}

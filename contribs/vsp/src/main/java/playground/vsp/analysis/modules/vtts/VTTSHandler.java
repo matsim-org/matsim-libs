@@ -152,7 +152,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-
+		//log.info("Got departure for person {}", event.getPersonId());
 		if (isModeToBeSkipped(event.getRoutingMode()) || this.personIdsToBeIgnored.contains(event.getPersonId())) {
 			// skip
 
@@ -224,9 +224,15 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	 * This method has to be called after parsing the events. Here, the the last / overnight activity is taken into account.
 	 */
 	public void computeFinalVTTS() {
+		log.info("Number of VTTS entries after computation: {}", departedPersonIds.size());
 		for (Id<Person> affectedPersonId : this.departedPersonIds) {
 			computeVTTS(affectedPersonId, Double.NEGATIVE_INFINITY);
 		}
+		log.info(
+			"After computeFinalVTTS: persons={}, trips={}",
+			personId2TripNr2VTTSh.size(),
+			personId2TripNr2VTTSh.values().stream().mapToInt(Map::size).sum()
+		);
 	}
 
 	private void computeVTTS(Id<Person> personId, double activityEndTime){
@@ -365,6 +371,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	public void printVTTS(String fileName, String mode) {
 
 		File file = new File(fileName);
+		log.info("Number of persons with VTTS: {}", personId2TripNr2VTTSh.size());
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
