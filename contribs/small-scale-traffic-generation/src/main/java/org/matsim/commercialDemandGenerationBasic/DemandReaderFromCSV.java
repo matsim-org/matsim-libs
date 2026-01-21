@@ -586,8 +586,10 @@ final class DemandReaderFromCSV {
 										Set<DemandInformationElement> demandInformation, Population population, boolean combineSimilarJobs,
 										CoordinateTransformation crsTransformationNetworkAndShape, DemandGenerationSpecification demandGenerationSpecification) {
 		rnd = new Random(scenario.getConfig().global().getRandomSeed());
-
-		for (DemandInformationElement newDemandInformationElement : demandInformation) {
+		List<DemandInformationElement> carriersInfo = demandInformation.stream()
+			.sorted(Comparator.comparing(DemandInformationElement::getCarrierName))
+			.toList();
+		for (DemandInformationElement newDemandInformationElement : carriersInfo) {
 			log.info("Create demand for carrier {}", newDemandInformationElement.getCarrierName());
 			if (newDemandInformationElement.getTypeOfDemand().equals("service"))
 				createServices(scenario, newDemandInformationElement, indexShape, population,
