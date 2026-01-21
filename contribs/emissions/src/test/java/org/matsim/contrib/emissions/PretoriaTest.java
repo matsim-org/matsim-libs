@@ -151,7 +151,7 @@ public class PretoriaTest {
 	private static EmissionsConfigGroup getEmissionsConfigGroup(PretoriaVehicle vehicle) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
@@ -450,7 +450,10 @@ public class PretoriaTest {
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Double>> tripId2linkId2traversalTime = new ArrayMap<>();
 		Map<Integer, Map<Id<Link>, Map<Pollutant, Tuple<Double, Double>>>> tripId2linkId2pollutant2emissions = new ArrayMap<>();
+		Map<Integer, Map<Pollutant, Double>> tripId2pollutant2coldEmissions = new ArrayMap<>();
 		Map<Integer, Integer> tripId2load = new ArrayMap<>();
+		Map<Integer, Integer> tripId2driver = new ArrayMap<>();
+		Map<Integer, Boolean> tripId2coldStart = new ArrayMap<>();
 
 		// TODO debug only, remove these vars
 		Map<PretoriaGPSEntry, Id<Link>> pretoriaGpsEntry2linkId = new HashMap<>();
@@ -466,6 +469,8 @@ public class PretoriaTest {
 				tripId2linkId2pretoriaGpsEntries.putIfAbsent(tripId, new HashMap<>());
 				tripId2linkId2traversalTime.putIfAbsent(tripId, new HashMap<>());
 				tripId2load.putIfAbsent(tripId, gpsEntry.load);
+				tripId2driver.putIfAbsent(tripId, gpsEntry.driver);
+				tripId2coldStart.putIfAbsent(tripId, gpsEntry.coldStart);
 
 				var linkId = NetworkUtils.getNearestLinkExactly(pretoriaNetwork, gpsEntry.coord).getId();
 				tripId2linkId2pretoriaGpsEntries.get(tripId).putIfAbsent(linkId, new ArrayList<>());
@@ -519,6 +524,22 @@ public class PretoriaTest {
 		for(var tripEntry : tripId2linkId2pretoriaGpsEntries.entrySet()){
 			var tripId = tripEntry.getKey();
 
+			// Calculate cold Emissions (but not for RRV, as RRV has no available HBEFA Cold Table)
+			if(vehicle != PretoriaVehicle.RRV){
+				vehHbefaInfo.getSecond().setHbefaEmConcept("average"); // TODO Try to get better cold emissions table, so that I can access detailed data
+				var coldEmissionsMatsim = module.getColdEmissionAnalysisModule().calculateColdEmissions(
+					Id.createVehicleId("0"),
+					13*3600,
+					vehHbefaInfo,
+					2
+				);
+
+				tripId2pollutant2coldEmissions.putIfAbsent(tripId, new HashMap<>());
+				tripId2pollutant2coldEmissions.get(tripId).put(Pollutant.CO, coldEmissionsMatsim.get(Pollutant.CO));
+				tripId2pollutant2coldEmissions.get(tripId).put(Pollutant.CO2_TOTAL, coldEmissionsMatsim.get(Pollutant.CO2_TOTAL));
+				tripId2pollutant2coldEmissions.get(tripId).put(Pollutant.NOx, coldEmissionsMatsim.get(Pollutant.NOx));
+			}
+
 			for(var linkEntry : tripEntry.getValue().entrySet()){
 				var linkId = linkEntry.getKey();
 				var link = pretoriaNetwork.getLinks().get(linkId);
@@ -533,9 +554,9 @@ public class PretoriaTest {
 					vehicleAttributes.setHbefaSizeClass("RT >32t"); // TODO Seems like no size class matches the PEMS values. Why?
 				}
 
-				// Compute the MATSim emissions
-				// TODO Add cold emissions
-				var emissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
+				// Calculate warm emissions
+				vehHbefaInfo.getSecond().setHbefaEmConcept(vehicle.hbefaEmConcept); // TODO Try to get better cold emissions table, so that I can access detailed data
+				var warmEmissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
 					tripId2linkId2traversalTime.get(tripId).get(linkId),
 					(String) link.getAttributes().getAttribute("hbefa_road_type"),
 					link.getFreespeed(),
@@ -543,9 +564,9 @@ public class PretoriaTest {
 					vehHbefaInfo
 				);
 
-				double CO_matsim = emissionsMatsim.get(Pollutant.CO);
-				double CO2_matsim = emissionsMatsim.get(Pollutant.CO2_TOTAL);
-				double NOx_matsim = emissionsMatsim.get(Pollutant.NOx);
+				double CO_matsim = warmEmissionsMatsim.get(Pollutant.CO);
+				double CO2_matsim = warmEmissionsMatsim.get(Pollutant.CO2_TOTAL);
+				double NOx_matsim = warmEmissionsMatsim.get(Pollutant.NOx);
 
 				tripId2linkId2pollutant2emissions.putIfAbsent(tripId, new HashMap<>());
 				tripId2linkId2pollutant2emissions.get(tripId).putIfAbsent(linkId, new HashMap<>());
@@ -556,6 +577,8 @@ public class PretoriaTest {
 			}
 		}
 
+
+
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
 			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + vehicle + ".csv"),
@@ -564,6 +587,7 @@ public class PretoriaTest {
 			"tripId",
 			"linkId",
 			"load",
+			"driver",
 			"segment",
 			"CO_MATSim",
 			"CO_pems",
@@ -576,6 +600,29 @@ public class PretoriaTest {
 		String segment = "none";
 		for(var tripEntry : tripId2linkId2pollutant2emissions.entrySet()){
 			var tripId = tripEntry.getKey();
+
+			// Print the cold emissions if trip had a cold start
+			if(tripId2coldStart.get(tripId) && vehicle != PretoriaVehicle.RRV){
+				var coldPollutantMap = tripId2pollutant2coldEmissions.get(tripId);
+				try {
+					writer.printRecord(
+						tripId,
+						"cold",
+						tripId2load.get(tripId),
+						tripId2driver.get(tripId),
+						segment,
+						coldPollutantMap.get(Pollutant.CO),
+						coldPollutantMap.get(Pollutant.CO),
+						coldPollutantMap.get(Pollutant.CO2_TOTAL),
+						coldPollutantMap.get(Pollutant.CO2_TOTAL),
+						coldPollutantMap.get(Pollutant.NOx),
+						coldPollutantMap.get(Pollutant.NOx)
+					);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
 			for(var linkEntry : tripEntry.getValue().entrySet()) {
 				var linkId = linkEntry.getKey();
 				var pollutantMap = linkEntry.getValue();
@@ -600,6 +647,7 @@ public class PretoriaTest {
 						tripId,
 						linkId,
 						tripId2load.get(tripId),
+						tripId2driver.get(tripId),
 						segment,
 						pollutantMap.get(Pollutant.CO).getFirst(),
 						pollutantMap.get(Pollutant.CO).getSecond(),
@@ -649,13 +697,12 @@ public class PretoriaTest {
 		/// Toyota Etios 1.5 (1496ccm, 66kW) Sprint hatchback light passenger vehicle with a Euro 6 classification (138g/km) (file: public-etios.csv).
 		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
 
-		// TODO Euro 5 or Euro 6? (contradicting information)
 		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
 		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
 
 		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		RRV("diesel", "HGV D Euro-III", "RT ≤7.5t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 
 		final String hbefaTechnology;
 		final String hbefaEmConcept;
