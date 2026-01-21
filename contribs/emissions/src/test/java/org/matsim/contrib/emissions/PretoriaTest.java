@@ -151,7 +151,7 @@ public class PretoriaTest {
 	private static EmissionsConfigGroup getEmissionsConfigGroup(PretoriaVehicle vehicle) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction );
+		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
@@ -610,7 +610,7 @@ public class PretoriaTest {
 						"cold",
 						tripId2load.get(tripId),
 						tripId2driver.get(tripId),
-						segment,
+						"none",
 						coldPollutantMap.get(Pollutant.CO),
 						coldPollutantMap.get(Pollutant.CO),
 						coldPollutantMap.get(Pollutant.CO2_TOTAL),
