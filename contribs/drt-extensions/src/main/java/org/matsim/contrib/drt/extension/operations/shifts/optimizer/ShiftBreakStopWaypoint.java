@@ -22,14 +22,16 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
     private final double latestDepartureTime;
 
     private final DvrpLoad emptyLoad;
+    private final DvrpLoad outgoingOccupancy;
 
 
-    public ShiftBreakStopWaypoint(ShiftBreakTask shiftBreakTask, DvrpLoadType loadType) {
+    public ShiftBreakStopWaypoint(ShiftBreakTask shiftBreakTask, DvrpLoadType loadType, DvrpLoad outgoingOccupancy) {
         this.shiftBreakTask = shiftBreakTask;
-        this.earliestArrivalTime = calcEarliestArrivalTime();
-        this.latestArrivalTime = calcLatestArrivalTime();
-        this.latestDepartureTime = calcLatestDepartureTime();
+        this.earliestArrivalTime = shiftBreakTask.calcEarliestArrivalTime();
+        this.latestArrivalTime = shiftBreakTask.calcLatestArrivalTime();
+        this.latestDepartureTime = shiftBreakTask.calcLatestDepartureTime();
         this.emptyLoad = loadType.getEmptyLoad();
+        this.outgoingOccupancy = outgoingOccupancy;
     }
 
     @Override
@@ -86,19 +88,6 @@ public class ShiftBreakStopWaypoint implements StopWaypoint {
 
     @Override
     public DvrpLoad getOutgoingOccupancy() {
-        return emptyLoad;
-    }
-
-    private double calcEarliestArrivalTime() {
-        return shiftBreakTask.getShiftBreak().getEarliestBreakStartTime();
-    }
-
-    private double calcLatestArrivalTime() {
-        DrtShiftBreak shiftBreak = shiftBreakTask.getShiftBreak();
-        return shiftBreak.getLatestBreakEndTime() - shiftBreak.getDuration();
-    }
-
-    private double calcLatestDepartureTime() {
-        return shiftBreakTask.getShiftBreak().getLatestBreakEndTime();
+        return outgoingOccupancy;
     }
 }

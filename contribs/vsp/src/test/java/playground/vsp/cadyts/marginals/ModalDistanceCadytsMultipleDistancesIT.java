@@ -1,4 +1,6 @@
 package playground.vsp.cadyts.marginals;
+
+import com.google.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -30,13 +32,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.inject.Inject;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ModalDistanceCadytsMultipleDistancesIT {
 	@RegisterExtension
@@ -81,14 +82,13 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 				final ScoringParameters params = parameters.getScoringParameters(person);
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-						controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
-						config,
-						modalDistanceCadytsContext);
+					config,
+					modalDistanceCadytsContext);
 
 				scoringFunctionMarginals.setWeightOfCadytsCorrection(10);
 				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
@@ -106,17 +106,17 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 			Activity work = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() - 1);
 
 			double distance = CoordUtils.calcEuclideanDistance(
-					scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
-					scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
+				scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
+				scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
 			);
 
 			String mode = person.getSelectedPlan().getPlanElements().stream()
-					.filter(element -> element instanceof Activity)
-					.map(element -> (Activity) element)
-					.filter(activity -> activity.getType().endsWith(" interaction"))
-					.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
-					.findFirst()
-					.orElseThrow(() -> new RuntimeException("no interaction activities"));
+				.filter(element -> element instanceof Activity)
+				.map(element -> (Activity) element)
+				.filter(activity -> activity.getType().endsWith(" interaction"))
+				.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("no interaction activities"));
 
 			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
 		}
@@ -268,8 +268,8 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 
 		//home
 		Activity h = factory
-				.createActivityFromCoord("home",
-						network.getLinks().get(Id.createLinkId("start-link")).getFromNode().getCoord());
+			.createActivityFromCoord("home",
+				network.getLinks().get(Id.createLinkId("start-link")).getFromNode().getCoord());
 		h.setEndTime(6. * 3600. /*+ MatsimRandom.getRandom().nextInt(3600)*/);
 		plan.addActivity(h);
 
@@ -277,8 +277,8 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 
 		//work
 		Activity w = factory
-				.createActivityFromLinkId("work",
-						Id.createLinkId(endLink));
+			.createActivityFromLinkId("work",
+				Id.createLinkId(endLink));
 		w.setEndTime(16. * 3600. + MatsimRandom.getRandom().nextInt(3600));
 		plan.addActivity(w);
 

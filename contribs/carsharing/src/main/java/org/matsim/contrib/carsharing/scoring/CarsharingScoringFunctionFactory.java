@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.scoring;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
@@ -8,13 +9,7 @@ import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContain
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-
-import jakarta.inject.Inject;
+import org.matsim.core.scoring.functions.*;
 
 public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -23,11 +18,12 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	private final DemandHandler demandHandler;
 	private final CostsCalculatorContainer costsCalculatorContainer;
 	private final CarsharingSupplyInterface carsharingSupplyContainer;
+
 	@Inject
-	CarsharingScoringFunctionFactory( final Scenario sc, final DemandHandler demandHandler,
-			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer) {
+	CarsharingScoringFunctionFactory(final Scenario sc, final DemandHandler demandHandler,
+									 final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer) {
 		this.scenario = sc;
-		this.params = new SubpopulationScoringParameters( sc );
+		this.params = new SubpopulationScoringParameters(sc);
 		this.demandHandler = demandHandler;
 		this.costsCalculatorContainer = costsCalculatorContainer;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
@@ -37,28 +33,27 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		SumScoringFunction scoringFunctionSum = new SumScoringFunction();
-	    //this is the main difference, since we need a special scoring for carsharing legs
+		//this is the main difference, since we need a special scoring for carsharing legs
 
 		scoringFunctionSum.addScoringFunction(
-	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
-	    								 this.scenario.getConfig(),
-	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer,
-	    								 this.carsharingSupplyContainer, person));
+			new CarsharingLegScoringFunction(
+				this.scenario.getConfig(),
+				this.demandHandler, this.costsCalculatorContainer,
+				this.carsharingSupplyContainer, person));
 		scoringFunctionSum.addScoringFunction(
-				new CharyparNagelLegScoring(
-						params.getScoringParameters( person ),
-						this.scenario.getNetwork(),
-						this.scenario.getConfig().transit().getTransitModes())
-			    );
+			new CharyparNagelLegScoring(
+				params.getScoringParameters(person),
+				this.scenario.getConfig().transit().getTransitModes())
+		);
 		//the remaining scoring functions can be changed and adapted to the needs of the user
 		scoringFunctionSum.addScoringFunction(
-				new CharyparNagelActivityScoring(
-						params.getScoringParameters(
-								person ) ) );
+			new CharyparNagelActivityScoring(
+				params.getScoringParameters(
+					person)));
 		scoringFunctionSum.addScoringFunction(
-				new CharyparNagelAgentStuckScoring(
-						params.getScoringParameters(
-								person ) ) );
-	    return scoringFunctionSum;
-	  }
+			new CharyparNagelAgentStuckScoring(
+				params.getScoringParameters(
+					person)));
+		return scoringFunctionSum;
+	}
 }

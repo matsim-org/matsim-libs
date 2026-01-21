@@ -1,4 +1,5 @@
-package org.matsim.contrib.drt.optimizer.insertion.parallel;/* *********************************************************************** *
+package org.matsim.contrib.drt.optimizer.insertion.parallel;
+/* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
@@ -16,7 +17,6 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel;/* *****************
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 
 
 import com.google.common.annotations.VisibleForTesting;
@@ -54,10 +54,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
+import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -90,8 +91,8 @@ import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequest
  *
  * @author Steffen Axer
  */
-
-public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, MobsimEngine, MobsimBeforeCleanupListener {
+@NodeSingleton
+public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, DistributedMobsimEngine, MobsimBeforeCleanupListener {
 	private static final Logger LOG = LogManager.getLogger(ParallelUnplannedRequestInserter.class);
 	private Double lastProcessingTime;
 	private static final Comparator<DrtRequest> drtRequestComparator = Comparator.comparingDouble(DrtRequest::getSubmissionTime).thenComparing(req -> req.getId().toString());
@@ -177,7 +178,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		}
 	}
 
-	public static boolean validateUniqueRequests(List<Collection<RequestData>> partitions) {
+	public static void validateUniqueRequests(List<Collection<RequestData>> partitions) {
 		Set<Id<Request>> seen = new HashSet<>();
 		for (Collection<RequestData> partition : partitions) {
 			for (RequestData data : partition) {
@@ -186,7 +187,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 				}
 			}
 		}
-		return true; // All requests are unique per partition
 	}
 
 
@@ -194,8 +194,6 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		List<ForkJoinTask<?>> tasks = new ArrayList<>();
 
 		int requests = this.tmpQueue.size();
-		// Do not create more requestPartitions than available vehicles
-		// e.g. 60 req / 20 req/min --> 3 active partitions but only 2 available veh right now
 		int maxPartitions = Math.max(1, Math.min(this.workers.size(), entries.size())); // at least one partition
 
 		List<Collection<RequestData>> requestsPartitions = requestsPartitioner.partition(this.tmpQueue, maxPartitions, this.collectionPeriod);
@@ -255,6 +253,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 
+	// Ordered map by vehicle id
 	private Map<Id<DvrpVehicle>, VehicleEntry> calculateVehicleEntries(double now, Collection<DvrpVehicle> vehicles) {
 		return Collections.unmodifiableMap(
 			inserterExecutorService.submit(() ->
@@ -263,7 +262,10 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 					.map(v -> vehicleEntryFactory.create(v, now))
 					.filter(Objects::nonNull)
 					.collect(Collectors.toMap(
-						e -> e.vehicle.getId(), e -> e
+						e -> e.vehicle.getId(),
+						e -> e,
+						(e1, e2) -> e1,
+						TreeMap::new
 					))
 			).join()
 		);
@@ -314,21 +316,20 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		return new ResolvedConflicts(noConflicts, conflicts);
 	}
 
-
 	Optional<DvrpVehicle> schedule(RequestData requestData, double now) {
 		var req = requestData.getDrtRequest();
 		var insertion = requestData.getSolution().insertion().get();
 
-		double dropoffDuration = insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime -
-			insertion.detourTimeInfo.dropoffDetourInfo.vehicleArrivalTime;
+		var vehicle = insertion.insertion.vehicleEntry.vehicle;
+		double pickupDuration = stopDurationProvider.calcPickupDuration(vehicle, req);
+		double dropoffDuration = stopDurationProvider.calcDropoffDuration(vehicle, req);
 
 		var acceptedRequest = drtOfferAcceptor.acceptDrtOffer(req,
 			insertion.detourTimeInfo.pickupDetourInfo.requestPickupTime,
 			insertion.detourTimeInfo.dropoffDetourInfo.requestDropoffTime,
-			dropoffDuration);
+			pickupDuration, dropoffDuration);
 
 		if (acceptedRequest.isPresent()) {
-			var vehicle = insertion.insertion.vehicleEntry.vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(acceptedRequest.get(), insertion);
 
 			double expectedPickupTime = pickupDropoffTaskPair.pickupTask.getBeginTime();

@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
-import jakarta.inject.Named;
+import com.google.inject.name.Named;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;

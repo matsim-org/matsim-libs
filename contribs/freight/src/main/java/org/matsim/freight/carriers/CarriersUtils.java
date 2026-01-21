@@ -28,9 +28,15 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.management.InvalidAttributeValueException;
 
 import org.apache.logging.log4j.Level;
@@ -41,15 +47,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.consistency_checkers.CarrierConsistencyCheckers;
-import org.matsim.freight.carriers.jsprit.MatsimJspritFactory;
-import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
-import org.matsim.freight.carriers.jsprit.NetworkRouter;
+import org.matsim.freight.carriers.jsprit.*;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -69,6 +73,9 @@ public class CarriersUtils {
 	private static final String ATTR_SKILLS = "skills";
 	private static final String ATTR_JSPRIT_SCORE = "jspritScore";
 	private static final String ATTR_JSPRIT_Time = "jspritComputationTime";
+	private static final String delimiter = "\t";
+
+	private static final Object CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER = new Object();
 
 	/**
 	 * Enum to decide for which carriers a new solution should be created.
@@ -144,6 +151,13 @@ public class CarriersUtils {
 		return null;
 	}
 
+	/** Clears all plans of a carrier and sets the selected plan to null.
+	 * @param carrier	this carrier
+	 */
+	public static void clearCarrierPlans(Carrier carrier) {
+		carrier.getPlans().clear();
+		carrier.setSelectedPlan(null);
+	}
 
 	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
 		List<ScheduledTour> tours = new ArrayList<>();
@@ -220,8 +234,13 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
-		new CarriersAnalysis(getCarriers(scenario), scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight").runCarrierAnalysis(
+		String analysisOutputFolder = scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight";
+		new CarriersAnalysis(getCarriers(scenario), analysisOutputFolder).runCarrierAnalysis(
 			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
+		Path jspritAnalysisPerCarrierCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats_perCarrier.csv");
+		Path aggegatedJspritAnalysisCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats.csv");
+
+		initJspritAnalysisPerCarrierCsv(jspritAnalysisPerCarrierCSVPath);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
@@ -238,9 +257,7 @@ public class CarriersUtils {
 				.setRoadPricingScheme(roadPricingScheme)
 				.build();
 
-
 		Carriers carriers = getCarriers(scenario);
-
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
@@ -256,7 +273,7 @@ public class CarriersUtils {
 		// This also selects the carriers for which a new solution should be created
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			switch (carriersSolutionType) {
-				case solveForAllCarriersAndOverrideExistingPlans -> carrier.clearPlans();
+				case solveForAllCarriersAndOverrideExistingPlans -> clearCarrierPlans(carrier);
 				case solveOnlyForCarrierWithoutPlans -> {
 					if (!carrier.getPlans().isEmpty()) {
 						continue;
@@ -269,23 +286,22 @@ public class CarriersUtils {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
-
-
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
 
 		int nThreads = Runtime.getRuntime().availableProcessors();
 		log.info("Starting VRP solving for {} carriers in parallel with {} threads.", carrierActivityCounterMap.size(), nThreads);
 
+		BestJspritSolutionCollector bestJspritSolutionCollector = new BestJspritSolutionCollector();
 		List<Future<?>> futures;
 		try (ThreadPoolExecutor executor = new JspritTreadPoolExecutor(new PriorityBlockingQueue<>(), nThreads)) {
 			futures = new ArrayList<>();
 			List<Map.Entry<Id<Carrier>, Integer>> sorted = carrierActivityCounterMap.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue((o1, o2) -> o2 - o1))
+				.sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
 				.toList();
 
 			for (Map.Entry<Id<Carrier>, Integer> entry : sorted) {
 				JspritCarrierTask task = new JspritCarrierTask(entry.getValue(), carriers.getCarriers().get(entry.getKey()), scenario, netBasedCosts,
-					startedVRPCounter, carriers.getCarriers().size());
+					startedVRPCounter, carriers.getCarriers().size(), jspritAnalysisPerCarrierCSVPath, bestJspritSolutionCollector);
 				log.info("Adding task for carrier {} with priority {}", entry.getKey(), entry.getValue());
 				futures.add(executor.submit(task));
 			}
@@ -294,8 +310,8 @@ public class CarriersUtils {
 		for (Future<?> future : futures) {
 			future.get();
 		}
-
-
+		writeCarriers(carriers, scenario.getConfig().controller().getOutputDirectory() + "/jsprit_output_carriers.xml.gz");
+		writeAggregatedResultsForAllRunVRPs(carriers, aggegatedJspritAnalysisCSVPath, bestJspritSolutionCollector.snapshot());
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result2 = CarrierConsistencyCheckers.checkAfterResults(carriers, Level.ERROR);
 		if (result2 == CarrierConsistencyCheckers.CheckResult.CHECK_FAILED) {
@@ -303,8 +319,54 @@ public class CarriersUtils {
 			log.error("Carrier consistency check failed! There are carriers with unhandled jobs or other inconsistencies. " +
 				"Please check the log for details.");
 		}
+	}
+
+	/**
+	 * Writes the aggregated results for all run VRPs to a csv file and creates a related graphic.
+	 *
+	 * @param carriers 					 the carriers
+	 * @param aggegatedJspritAnalysisCSVPath path of the output csv file
+	 * @param bestJspritSolutionCollector    the selected series of all solved VRPs
+	 */
+	public static void writeAggregatedResultsForAllRunVRPs(Carriers carriers, Path aggegatedJspritAnalysisCSVPath,
+														   Map<Id<Carrier>, NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
+		JspritIterationHistogram histogram = new JspritIterationHistogram(carriers, bestJspritSolutionCollector, "VRP aggregated statistics");
+
+		histogram.writeAggregatedCsv(aggegatedJspritAnalysisCSVPath, delimiter);
+		histogram.writeGraphic(aggegatedJspritAnalysisCSVPath);
+	}
 
 
+	/**
+	 * Initializes the jsprit analysis CSV per carrier by creating the file and writing the header.
+	 * The results per carrier will be appended after a VRP run has finished (see {@link CarriersUtils.JspritCarrierTask#writeAnalyzerResultsToCsv(Carrier, JspritStrategyAnalyzer)}).
+	 *
+	 * @param jspritAnalysisPerCarrierCSVPath the path to the CSV file
+	 */
+
+	private static void initJspritAnalysisPerCarrierCsv(Path jspritAnalysisPerCarrierCSVPath) {
+		try {
+			Files.createDirectories(jspritAnalysisPerCarrierCSVPath.getParent());
+
+			try (BufferedWriter writer = IOUtils.getBufferedWriter(jspritAnalysisPerCarrierCSVPath.toString())) {
+
+				// write header
+				writer.write(String.join(delimiter,"carrierId",
+					"jsprit_iteration",
+					"currentBestSolutionCost",
+					"costsOfThisSolution",
+					"strategyOfThisIteration",
+					"iterationComputationTimeInSeconds",
+					"numberOfRoutesOfThisIterationSolution",
+					"removedJobsWhileRuin",
+					"routesAfterRuin"));
+
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			log.error("Could not initialize jsprit analysis CSV at {}", jspritAnalysisPerCarrierCSVPath, e);
+			throw new RuntimeException("Cannot initialize jsprit analysis CSV", e);
+		}
 	}
 
 	/**
@@ -343,6 +405,60 @@ public class CarriersUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Adds a roadPricing scheme (RoadPricingSchemeUsingTollFactor) to the scenario that adds a toll for all vehicles on a link that are not networkMode on this link.
+	 * This is needed to ensure that VRP solutions consider the network modes defined on links.
+	 *
+	 * @param scenario scenario to which the roadPricing scheme is added
+	 */
+	public static void addRoadPricingForVRPToEnsureSolutionsBasedOnNetworkModes(Scenario scenario) {
+
+		Map<Id<Carrier>, Carrier> carries = CarriersUtils.getCarriers(scenario).getCarriers();
+		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = carries.values().stream()
+			.flatMap(carrier -> carrier.getCarrierCapabilities().getCarrierVehicles().values().stream())
+			.collect(Collectors.toMap(CarrierVehicle::getId, cv -> cv, (a, b) -> a, HashMap::new));
+
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createRoadPricingSchemeImpl();
+		List <String> usedModesByCarriers = carrierVehicles.values().stream()
+			.map(cv -> cv.getType().getNetworkMode())
+			.distinct()
+			.toList();
+
+		RoadPricingUtils.setName(scheme, "PricingForVRP");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Adds a toll for all vehicles on a link that are not networkMode on this link.");
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			for (String mode : usedModesByCarriers) {
+				if (!link.getAllowedModes().contains(mode)) {
+					RoadPricingUtils.addLink(scheme, link.getId());
+				}
+			}
+		}
+
+		RoadPricingUtils.createAndAddGeneralCost(scheme,
+			Time.parseTime("00:00:00"),
+			Time.parseTime("72:00:00"),
+			1000); // high value to ensure that by solving a VRP a vehicle which is tolled avoids tolled links (e.g. forbitten zones or restrictions for specific trucks
+
+		TollFactor tollFactor =
+			(personId, vehicleId, linkId, time) -> {
+				if (!scheme.getTolledLinkIds().contains(linkId))
+					return 0;
+				var veh = carrierVehicles.get(vehicleId);
+				if (veh == null) {
+					return 0;
+				}
+				var vehType = veh.getType();
+				Link link = scenario.getNetwork().getLinks().get(linkId);
+				if (!link.getAllowedModes().contains(vehType.getNetworkMode())) {
+					return 1;
+				} else {
+					return 0;
+				} // no toll for allowed vehicles
+			};
+		RoadPricingUtils.addRoadPricingScheme(scenario, new RoadPricingSchemeUsingTollFactor(scheme, tollFactor));
 	}
 
 	/**
@@ -475,8 +591,6 @@ public class CarriersUtils {
 		}
 		return (CarrierVehicleTypes) scenario.getScenarioElement(CARRIER_VEHICLE_TYPES);
 	}
-
-
 
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
@@ -842,6 +956,21 @@ public class CarriersUtils {
 		writeCarriers(getCarriers(scenario), pathFile);
 	}
 
+	/**
+	 * Snapshot collector for the best jsprit solutions found during the VRP solving per carrier.
+	 */
+	static final class BestJspritSolutionCollector {
+		private final ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> map = new ConcurrentHashMap<>();
+
+		void put(Id<Carrier> carrierId, NavigableMap<Integer, Double> series) {
+			map.put(carrierId, new TreeMap<>(series)); // defensive copy
+		}
+
+		ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> snapshot() {
+			return map;
+		}
+	}
+
 	static class JspritCarrierTask implements Runnable {
 		private final int priority;
 		private final Carrier carrier;
@@ -849,15 +978,20 @@ public class CarriersUtils {
 		private final NetworkBasedTransportCosts netBasedCosts;
 		private final AtomicInteger startedVRPCounter;
 		private final int taskCount;
+		private final Path iterationAnalysisPerCarrierPath;
+		private final BestJspritSolutionCollector bestJspritSolutionCollector;
 
 		public JspritCarrierTask(int priority, Carrier carrier, Scenario scenario, NetworkBasedTransportCosts netBasedCosts,
-								 AtomicInteger startedVRPCounter, int taskCount) {
+								 AtomicInteger startedVRPCounter, int taskCount, Path iterationAnalysisPerCarrierPath,
+								 BestJspritSolutionCollector bestJspritSolutionCollector) {
 			this.priority = priority;
 			this.carrier = carrier;
 			this.scenario = scenario;
 			this.netBasedCosts = netBasedCosts;
 			this.startedVRPCounter = startedVRPCounter;
 			this.taskCount = taskCount;
+			this.iterationAnalysisPerCarrierPath = iterationAnalysisPerCarrierPath;
+			this.bestJspritSolutionCollector = bestJspritSolutionCollector;
 		}
 
 		public int getPriority() {
@@ -885,6 +1019,9 @@ public class CarriersUtils {
 				netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			JspritStrategyAnalyzer iterationsAnalyzer = new JspritStrategyAnalyzer(carrier);
+			algorithm.getAlgorithmListeners().addListener(iterationsAnalyzer, VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			algorithm.getSearchStrategyManager().addSearchStrategyModuleListener(iterationsAnalyzer);
 			int jspritIterations = getJspritIterations(carrier);
 			try {
 				if (jspritIterations > 0) {
@@ -904,6 +1041,7 @@ public class CarriersUtils {
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(solution);
 			// yy In principle, the carrier should know the vehicle types that it can deploy.
+			writeAnalyzerResultsToCsv(carrier, iterationsAnalyzer);
 
 			log.info("routing plan for carrier {}", carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
@@ -915,6 +1053,52 @@ public class CarriersUtils {
 			setJspritComputationTime(carrier, timeForPlanningAndRouting);
 			if (!allJobsHandledBySelectedPlan(carrier))
 				log.warn("Not all jobs of carrier {} are handled by the selected plan.", carrier.getId());
+		}
+
+		/**
+		 * Writes the jsprit strategy analyzer results to a CSV file.
+		 *
+		 * @param carrier  the carrier
+		 * @param analyzer the jsprit strategy analyzer
+		 */
+		private void writeAnalyzerResultsToCsv(Carrier carrier, JspritStrategyAnalyzer analyzer) {
+			synchronized (CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER) {
+				try (BufferedWriter writer = IOUtils.getAppendingBufferedWriter(iterationAnalysisPerCarrierPath.toString())) {
+
+					LinkedHashMap <Integer, JspritStrategyAnalyzer.IterationResult> jspritResultsPerIteration = analyzer.getIterationSolutionCosts();
+					NavigableMap<Integer, Double> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
+					bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
+
+					for (var entry : jspritResultsPerIteration.entrySet()) {
+						Integer jspritIteration = entry.getKey();
+						double selectedStrategyCost = entry.getValue().costsOfThisIteration();
+						String strategyOfThisIteration = entry.getValue().strategyId();
+						double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
+						var floor = foundNewBestSolutions.floorEntry(jspritIteration);
+						double bestSoFar = (floor != null) ? floor.getValue() : Double.NaN;
+						int numberOfRoutesOfThisIterationSolution = entry.getValue().numberOfRoutesOfThisIterationSolution();
+						int removedJobsWhileRuin = entry.getValue().removedJobsWhileRuin();
+						int routesAfterRuin = entry.getValue().routesAfterRuin();
+
+						writer.write(carrier.getId().toString());
+						writer.write(delimiter + jspritIteration);
+						writer.write(delimiter + bestSoFar);
+						writer.write(delimiter + selectedStrategyCost);
+						writer.write(delimiter + strategyOfThisIteration);
+						if (iterationComputationTimeInSeconds >= 1)
+							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSS));
+						else
+							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSSDOTSS));
+						writer.write(delimiter + numberOfRoutesOfThisIterationSolution);
+						writer.write(delimiter + removedJobsWhileRuin);
+						writer.write(delimiter + routesAfterRuin);
+						writer.newLine();
+					}
+
+				} catch (IOException e) {
+					log.error("Error writing jsprit analyzer results to CSV for carrier {}", carrier.getId(), e);
+				}
+			}
 		}
 	}
 

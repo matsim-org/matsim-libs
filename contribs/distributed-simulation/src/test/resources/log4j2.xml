@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<!-- Console appender for testing (optional, for seeing some test logs) -->
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<!-- Disable logging the injector in tests -->
+		<Logger name="org.matsim.core.controler.Injector" level="OFF" additivity="false"/>
+
+		<!-- Broadly suppress all Fury and Janino logs if they do eventually hit Log4j -->
+		<Logger name="org.apache.fury" level="WARN" additivity="false">
+			<AppenderRef ref="Console"/>
+		</Logger>
+		<Logger name="org.codehaus.janino" level="WARN" additivity="false">
+			<AppenderRef ref="Console"/>
+		</Logger>
+
+		<!-- Root logger for other logging -->
+		<Root level="${sys:log4j2.level:-INFO}">
+			<AppenderRef ref="Console"/>
+		</Root>
+	</Loggers>
+</Configuration>

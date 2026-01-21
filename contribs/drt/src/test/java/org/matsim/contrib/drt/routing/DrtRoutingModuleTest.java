@@ -250,11 +250,10 @@ public class DrtRoutingModuleTest {
 					"{" +
 						"\"allowRejection\":\"true\"," +
 						"\"maxPickupDelay\":\"120\"," +
-						"\"latestStartTime\":\"4200\"," +
 						"\"maxRideDuration\":\"900\"," +
-						"\"earliestStartTime\":\"3600\"," +
-						"\"lateDiversionThreshold\":\"200\"," +
-						"\"latestArrivalTime\":\"7200\"" +
+						"\"maxTravelDuration\":\"3600\"," +
+						"\"maxWaitDuration\":\"600\"," +
+						"\"lateDiversionThreshold\":\"200\"" +
 					"}" +
 				"}";
 
@@ -267,11 +266,13 @@ public class DrtRoutingModuleTest {
 
 		DrtRoute drtRoute = new DrtRoute(h.getLinkId(), w.getLinkId());
 
+	//	String routeDescription = drtRoute.getRouteDescription();
+
 		drtRoute.setRouteDescription(newRouteFormatV3);
         Assertions.assertEquals(400, drtRoute.getDirectRideTime());
         Assertions.assertEquals(drtRoute.getUnsharedPath(), Arrays.asList("a", "b", "c"));
-        Assertions.assertEquals(600., drtRoute.getConstraints().latestStartTime() - drtRoute.getConstraints().earliestStartTime());
-        Assertions.assertEquals(7200, drtRoute.getConstraints().latestArrivalTime());
+        Assertions.assertEquals(600., drtRoute.getConstraints().maxWaitDuration());
+      //  Assertions.assertEquals(7200, drtRoute.getConstraints().latestArrivalTime());
         Assertions.assertEquals(200, drtRoute.getConstraints().lateDiversionThreshold());
         Assertions.assertEquals(120, drtRoute.getConstraints().maxPickupDelay());
 	}

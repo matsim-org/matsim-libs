@@ -20,10 +20,7 @@
 
 package org.matsim.freight.logistics;
 
-import jakarta.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.inject.Inject;
 import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +41,9 @@ import org.matsim.freight.logistics.consistency_checkers.LogisticsConsistencyChe
 import org.matsim.freight.logistics.io.LSPPlanXmlWriter;
 import org.matsim.freight.logistics.shipment.LspShipment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class LSPControllerListener
 	implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
@@ -52,14 +52,21 @@ class LSPControllerListener
 	private final List<EventHandler> registeredHandlers = new ArrayList<>();
 
 	private static int addListenerCnt = 0;
-	private  static final int maxAddListenerCnt = 1;
+	private static final int maxAddListenerCnt = 1;
 
-	@Inject private EventsManager eventsManager;
-	@Inject private MatsimServices matsimServices;
-	@Inject private LSPScorerFactory lspScoringFunctionFactory;
-	@Inject @Nullable private LSPStrategyManager strategyManager;
-	@Inject private OutputDirectoryHierarchy controlerIO;
-	@Inject private CarrierAgentTracker carrierAgentTracker;
+	@Inject
+	private EventsManager eventsManager;
+	@Inject
+	private MatsimServices matsimServices;
+	@Inject
+	private LSPScorerFactory lspScoringFunctionFactory;
+	@Inject
+	@Nullable
+	private LSPStrategyManager strategyManager;
+	@Inject
+	private OutputDirectoryHierarchy controlerIO;
+	@Inject
+	private CarrierAgentTracker carrierAgentTracker;
 
 
 	@Inject
@@ -72,7 +79,8 @@ class LSPControllerListener
 		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
 		switch (result) {
 			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs before planning was successful.");
-			case CHECK_FAILED -> throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
+			case CHECK_FAILED ->
+				throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
 			default -> throw new IllegalStateException("Unexpected value: " + result);
 		}
 	}
@@ -126,7 +134,7 @@ class LSPControllerListener
 				registeredHandlers.add(simulationTracker);
 				matsimServices.addControllerListener(simulationTracker);
 				simulationTracker.setEventsManager(eventsManager);
-			} else if ( addListenerCnt < maxAddListenerCnt ){
+			} else if (addListenerCnt < maxAddListenerCnt) {
 				log.warn("not adding eventsHandler since already added: {}", simulationTracker);
 				addListenerCnt++;
 				if (addListenerCnt == maxAddListenerCnt) {
@@ -155,10 +163,9 @@ class LSPControllerListener
 		}
 
 		// Update carriers in scenario and CarrierAgentTracker
-		carrierAgentTracker.getCarriers().getCarriers().clear();
+		carrierAgentTracker.clearCarriers();
 		for (Carrier carrier : getCarriersFromLSP().getCarriers().values()) {
-			CarriersUtils.getCarriers(scenario).addCarrier(carrier);
-			carrierAgentTracker.getCarriers().addCarrier(carrier);
+			carrierAgentTracker.addCarrier(carrier);
 		}
 	}
 
@@ -171,7 +178,8 @@ class LSPControllerListener
 	}
 
 	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {}
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	}
 
 	Carriers getCarriersFromLSP() {
 		LSPs lsps = LSPUtils.getLSPs(scenario);
@@ -202,7 +210,8 @@ class LSPControllerListener
 		LogisticsConsistencyChecker.CheckResult result = LogisticsConsistencyChecker.checkBeforePlanning(LSPUtils.getLSPs(scenario), Level.ERROR);
 		switch (result) {
 			case CHECK_SUCCESSFUL -> log.info("Consistency check of LSPs before planning was successful.");
-			case CHECK_FAILED -> throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
+			case CHECK_FAILED ->
+				throw new RuntimeException("Consistency check of LSPs failed. Please see the log file for more information. Aborting now....");
 			default -> throw new IllegalStateException("Unexpected value: " + result);
 		}
 	}
@@ -226,7 +235,7 @@ class LSPControllerListener
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		new LSPPlanXmlWriter(LSPUtils.getLSPs(scenario)).write(controlerIO.getOutputPath() + "/output_lsps.xml.gz");
-		CarriersUtils.writeCarriers(scenario,"output_carriers.xml.gz");
+		CarriersUtils.writeCarriers(scenario, "output_carriers.xml.gz");
 	}
 
 }

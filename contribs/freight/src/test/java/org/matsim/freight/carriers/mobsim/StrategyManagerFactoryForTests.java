@@ -22,7 +22,7 @@
 package org.matsim.freight.carriers.mobsim;
 
 import com.google.inject.Provider;
-import jakarta.inject.Inject;
+import com.google.inject.Inject;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.matsim.api.core.v01.TransportMode;

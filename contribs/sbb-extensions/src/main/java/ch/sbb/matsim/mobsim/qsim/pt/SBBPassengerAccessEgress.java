@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package ch.sbb.matsim.mobsim.qsim.pt;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
@@ -34,10 +32,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 /**
  * This class contains a lot of code from org.matsim.core.mobsim.qsim.pt.PassengerAccessEgressImpl, some methods with small adaptations, other directly copied. The aforementioned class is
@@ -47,103 +46,102 @@ import org.matsim.vehicles.Vehicle;
  */
 public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 
-    private final InternalInterface internalInterface;
-    private final TransitStopAgentTracker agentTracker;
-    private final EventsManager eventsManager;
-    private final boolean isGeneratingDeniedBoardingEvents;
+	private final InternalInterface internalInterface;
+	private final TransitStopAgentTracker agentTracker;
+	private final EventsManager eventsManager;
+	private final boolean isGeneratingDeniedBoardingEvents;
 	private final TransitSchedule transitSchedule;
 	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentRelocating = new LinkedHashMap<>();
 
-    SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
-        this.internalInterface = internalInterface;
-        this.agentTracker = agentTracker;
-        this.eventsManager = eventsManager;
-        this.isGeneratingDeniedBoardingEvents = scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
+	SBBPassengerAccessEgress(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
+		this.internalInterface = internalInterface;
+		this.agentTracker = agentTracker;
+		this.eventsManager = eventsManager;
+		this.isGeneratingDeniedBoardingEvents = scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents();
 		this.transitSchedule = scenario.getTransitSchedule();
-    }
+	}
 
-    /**
-     * Allows passengers to leave and/or board a vehicle according to the vehicle's accessTime, egressTime and doorOperation mode.
-     * <p>
-     * The code is to a large part a copy of PassengerAccessEgressImpl.calculateStopTimeAndTriggerBoarding. It could not be directly used as the class itself is package-protected and not visible in
-     * our package.
-     *
-     * @return 0.0 (no more agents currently to board or leave), or 1.0 (there were passenger actions this time step, need to recheck next time step again)
-     */
-    double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
-        ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
+	/**
+	 * Allows passengers to leave and/or board a vehicle according to the vehicle's accessTime, egressTime and doorOperation mode.
+	 * <p>
+	 * The code is to a large part a copy of PassengerAccessEgressImpl.calculateStopTimeAndTriggerBoarding. It could not be directly used as the class itself is package-protected and not visible in
+	 * our package.
+	 *
+	 * @return 0.0 (no more agents currently to board or leave), or 1.0 (there were passenger actions this time step, need to recheck next time step again)
+	 */
+	double handlePassengersWithPhysicalLimits(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
+		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(vehicle, stop);
 
 		// Relocating passengers are only determined at the very last stop.
 		List<PTPassengerAgent> passengersRelocating = upcomingStops.isEmpty() ? findPassengersRelocating(vehicle, stop) : List.of();
 
-        int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
-        List<PTPassengerAgent> passengersEntering = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
+		int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
 
-        TransitStopHandler stopHandler = vehicle.getStopHandler();
-        double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, passengersRelocating, this, vehicle);
-        if (stopTime == 0.0) { // (de-)boarding is complete when the additional stopTime is 0.0
-            if (this.isGeneratingDeniedBoardingEvents) {
-                List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
-                this.fireBoardingDeniedEvents(vehicle, now, stillWaiting);
-            }
-        }
-        return stopTime;
-    }
+		TransitStopHandler stopHandler = vehicle.getStopHandler();
+		double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, passengersRelocating, this, vehicle);
+		if (stopTime == 0.0) { // (de-)boarding is complete when the additional stopTime is 0.0
+			if (this.isGeneratingDeniedBoardingEvents) {
+				List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
+				this.fireBoardingDeniedEvents(vehicle, now, stillWaiting);
+			}
+		}
+		return stopTime;
+	}
 
-    /**
-     * Allows all passengers wanting to leave the vehicle to do so immediately in the current time step, not taking constraints like number of doors and their passenger capacity into account. Allows
-     * all passengers wanting to board the vehicle to do so immediately, given there is still some free capacity left in the vehicle.
-     */
-    double handleAllPassengersImmediately(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
-        List<PTPassengerAgent> leavingPassengers = findPassengersLeaving(vehicle, stop);
-        for (PTPassengerAgent passenger : leavingPassengers) {
-            handlePassengerLeaving(passenger, vehicle, passenger.getDestinationLinkId(), now);
-        }
+	/**
+	 * Allows all passengers wanting to leave the vehicle to do so immediately in the current time step, not taking constraints like number of doors and their passenger capacity into account. Allows
+	 * all passengers wanting to board the vehicle to do so immediately, given there is still some free capacity left in the vehicle.
+	 */
+	double handleAllPassengersImmediately(TransitStopFacility stop, TransitVehicle vehicle, TransitLine line, TransitRoute route, List<TransitRouteStop> upcomingStops, double now) {
+		List<PTPassengerAgent> leavingPassengers = findPassengersLeaving(vehicle, stop);
+		for (PTPassengerAgent passenger : leavingPassengers) {
+			handlePassengerLeaving(passenger, vehicle, passenger.getDestinationLinkId(), now);
+		}
 
-        int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size();
+		int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size();
 
 
-
-        List<PTPassengerAgent> boardingPassengers = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
-        for (PTPassengerAgent passenger : boardingPassengers) {
-            handlePassengerEntering(passenger, vehicle, passenger.getDesiredAccessStopId(), now);
-        }
-        if (this.isGeneratingDeniedBoardingEvents) {
-            List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
-            this.fireBoardingDeniedEvents(vehicle, now, stillWaiting);
-        }
-        return 0.0;
-    }
-
-    @Override
-    public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
-        boolean removed = vehicle.removePassenger(passenger);
-        if (removed) {
-            this.eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
-            MobsimAgent agent = (MobsimAgent) passenger;
-            agent.notifyArrivalOnLinkByNonNetworkMode(toLinkId);
-            agent.endLegAndComputeNextState(time);
-            this.internalInterface.arrangeNextAgentState(agent);
-        }
-        return removed;
-    }
+		List<PTPassengerAgent> boardingPassengers = findPassengersEntering(route, line, vehicle, stop, upcomingStops, freeCapacity, now);
+		for (PTPassengerAgent passenger : boardingPassengers) {
+			handlePassengerEntering(passenger, vehicle, passenger.getDesiredAccessStopId(), now);
+		}
+		if (this.isGeneratingDeniedBoardingEvents) {
+			List<PTPassengerAgent> stillWaiting = findAllPassengersWaiting(route, line, vehicle, stop, upcomingStops, now);
+			this.fireBoardingDeniedEvents(vehicle, now, stillWaiting);
+		}
+		return 0.0;
+	}
 
 	@Override
-    public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
-        boolean entered = vehicle.addPassenger(passenger);
-        if (entered) {
-            this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
-            Id<Person> agentId = passenger.getId();
-            Id<Link> linkId = passenger.getCurrentLinkId();
-            this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
-            MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-            this.eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
-        }
-        return entered;
-    }
+	public boolean handlePassengerLeaving(PTPassengerAgent passenger, TransitVehicle vehicle, Id<Link> toLinkId, double time) {
+		boolean removed = vehicle.removePassenger(passenger);
+		if (removed) {
+			this.eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
+			MobsimAgent agent = (MobsimAgent) passenger;
+			agent.notifyArrivalOnLinkByNonNetworkMode(toLinkId);
+			agent.endLegAndComputeNextState(time);
+			this.internalInterface.arrangeNextAgentState(agent);
+		}
+		return removed;
+	}
 
 	@Override
-	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
+		boolean entered = vehicle.addPassenger(passenger);
+		if (entered) {
+			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
+			Id<Person> agentId = passenger.getId();
+			Id<Link> linkId = passenger.getCurrentLinkId();
+			this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
+			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
+			this.eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
+		}
+		return entered;
+	}
+
+	@Override
+	public void handlePassengerRelocating(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
 
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
@@ -201,16 +199,16 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 
 	}
 
-    private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
-            final TransitStopFacility stop) {
-        ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
-        for (PassengerAgent passenger : vehicle.getPassengers()) {
-            if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
-                passengersLeaving.add((PTPassengerAgent) passenger);
-            }
-        }
-        return passengersLeaving;
-    }
+	private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
+															  final TransitStopFacility stop) {
+		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
+		for (PassengerAgent passenger : vehicle.getPassengers()) {
+			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
+				passengersLeaving.add((PTPassengerAgent) passenger);
+			}
+		}
+		return passengersLeaving;
+	}
 
 	private List<PTPassengerAgent> findPassengersRelocating(TransitVehicle vehicle, final TransitStopFacility stop) {
 
@@ -224,48 +222,48 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 		return relocatingPassengers;
 	}
 
-    /**
-     * Finds all agents that want to enter the specified line.
-     */
-    private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-            final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
-        List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
-        if (passengers != null) {
-            ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
-            for (PTPassengerAgent agent : passengers) {
-                if (freeCapacity == 0) {
-                    break;
-                }
-                if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
-                    passengersEntering.add(agent);
-                    freeCapacity--;
-                }
-            }
-            return passengersEntering;
-        }
-        return Collections.emptyList();
-    }
+	/**
+	 * Finds all agents that want to enter the specified line.
+	 */
+	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
+														  final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
+		List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
+		if (passengers != null) {
+			ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
+			for (PTPassengerAgent agent : passengers) {
+				if (freeCapacity == 0) {
+					break;
+				}
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+					passengersEntering.add(agent);
+					freeCapacity--;
+				}
+			}
+			return passengersEntering;
+		}
+		return Collections.emptyList();
+	}
 
-    private List<PTPassengerAgent> findAllPassengersWaiting(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-            final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, double now) {
-        List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
-        if (passengers != null) {
-            ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
-            for (PTPassengerAgent agent : passengers) {
-                if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
-                    passengersEntering.add(agent);
-                }
-            }
-            return passengersEntering;
-        }
-        return Collections.emptyList();
-    }
+	private List<PTPassengerAgent> findAllPassengersWaiting(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
+															final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, double now) {
+		List<PTPassengerAgent> passengers = this.agentTracker.getAgentsAtStop().get(stop.getId());
+		if (passengers != null) {
+			ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
+			for (PTPassengerAgent agent : passengers) {
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+					passengersEntering.add(agent);
+				}
+			}
+			return passengersEntering;
+		}
+		return Collections.emptyList();
+	}
 
-    private void fireBoardingDeniedEvents(TransitVehicle vehicle, double now, List<PTPassengerAgent> agents) {
-        Id<Vehicle> vehicleId = vehicle.getId();
-        for (PTPassengerAgent agent : agents) {
-            this.eventsManager.processEvent(new BoardingDeniedEvent(now, agent.getId(), vehicleId));
-        }
-    }
+	private void fireBoardingDeniedEvents(TransitVehicle vehicle, double now, List<PTPassengerAgent> agents) {
+		Id<Vehicle> vehicleId = vehicle.getId();
+		for (PTPassengerAgent agent : agents) {
+			this.eventsManager.processEvent(new BoardingDeniedEvent(now, agent.getId(), vehicleId));
+		}
+	}
 
 }

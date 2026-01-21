@@ -85,9 +85,10 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 			.toLink(toLink)
 			.passengerIds(List.of(Id.createPersonId("personA")))
 			.load(customLoadType.fromArray(1, 0))
+			.earliestDepartureTime(0)
 			.constraints(
 					new DrtRouteConstraints(
-							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
 					)
 			)
@@ -97,9 +98,10 @@ public class InsertionGeneratorWithChangingCapacitiesTest {
 			.toLink(toLink)
 			.passengerIds(List.of(Id.createPersonId("personB")))
 			.load(customLoadType.fromArray(0, 1))
+			.earliestDepartureTime(0)
 			.constraints(
 					new DrtRouteConstraints(
-							0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
 							Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, 0, false
 					)
 			)

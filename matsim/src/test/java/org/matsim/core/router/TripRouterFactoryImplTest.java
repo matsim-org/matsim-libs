@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import jakarta.inject.Provider;
+import com.google.inject.Provider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

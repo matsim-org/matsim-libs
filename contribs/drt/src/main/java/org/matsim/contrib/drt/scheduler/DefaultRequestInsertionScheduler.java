@@ -250,8 +250,8 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 				stopTask = stops.get(pickupIdx - 1).getTask(); // future stop task
 			}
 
-			boolean canMergePickup = stopTask != null && !(stopTask instanceof CapacityChangeTask) && request.getFromLink() == stopTask.getLink()
-				&& stopTask.getEndTime() >= request.getEarliestStartTime();
+boolean canMergePickup = stopTask != null && !(stopTask instanceof CapacityChangeTask) && request.getFromLink() == stopTask.getLink()
+					&& stopTask.calcLatestDepartureTime() >= request.getEarliestStartTime();
 
 			if (canMergePickup) { // no detour; no new stop task
 				// add pickup request to stop task
@@ -323,11 +323,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 			pickupStopTask.getEndTime() : // asap
 			stops.get(pickupIdx).getTask() instanceof CapacityChangeTask capacityChangeTask ?
 				capacityChangeTask.getBeginTime() :
-				stops.get(pickupIdx).getTask().getPickupRequests().values()
-					.stream()
-					.mapToDouble(AcceptedDrtRequest::getEarliestStartTime)
-					.min()
-					.orElse(pickupStopTask.getEndTime());
+				stops.get(pickupIdx).getEarliestArrivalTime();
 
 		if (request.getFromLink() == toLink) {
 			// prebooking case when we are already at the stop location, but next stop task happens in the future
