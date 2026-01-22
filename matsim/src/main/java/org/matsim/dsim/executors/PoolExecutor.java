@@ -54,8 +54,8 @@ public final class PoolExecutor implements LPExecutor {
 	}
 
 	@Override
-	public EventHandlerTask register(EventHandler handler, DistributedEventsManager manager, int part, int totalParts, AtomicInteger counter) {
-		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, manager, serializer, counter);
+	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
+		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
 
 		tasks.add(task);
 		return task;

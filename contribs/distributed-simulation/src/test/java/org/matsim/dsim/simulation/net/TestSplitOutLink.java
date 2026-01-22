@@ -37,7 +37,9 @@ public class TestSplitOutLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 
-		var simLink = SimLink.create(link, node, config, 10, toPart, _ -> {}, _ -> {});
+		var simLink = SimLink.create(link, node, config, 10, toPart, _ -> {
+		}, _ -> {
+		});
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		// simple storage capacity should be 2. With increased capacity it should be 3.4. Push a vehicle with pce=3, which would occupy
 		// the link for a simple storage capacity, but laves some space when kinematicWaves is used
@@ -53,7 +55,9 @@ public class TestSplitOutLink {
 		var link = TestUtils.createSingleLink(0, 42);
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> {}, _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> {
+		}, _ -> {
+		});
 
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		simLink.applyCapacityUpdate(0, 2);
@@ -75,7 +79,8 @@ public class TestSplitOutLink {
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 
 		// the link can take 2 vehicles. Push two and test whether there is space left.
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
@@ -97,7 +102,8 @@ public class TestSplitOutLink {
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 10, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 10, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 
 		// push one vehicle which consumes inflow capacity
 		var now = 0;
@@ -123,7 +129,8 @@ public class TestSplitOutLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 50), SimLink.LinkPosition.QStart, 0);
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 1, 50), SimLink.LinkPosition.QStart, 0);
@@ -136,5 +143,27 @@ public class TestSplitOutLink {
 		// make sure that the consumed capacity was not released
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
 		assertEquals(2, activated.get());
+	}
+
+	@Test
+	public void removeAllVehicles() {
+		var link = TestUtils.createSingleLink(0, 42);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		var node = new SimNode(link.getToNode().getId());
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> {
+		}, _ -> {
+		});
+
+		var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 50);
+		var vehicle2 = TestUtils.createVehicle("vehicle-2", 1, 50);
+
+		simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(vehicle2, SimLink.LinkPosition.QStart, 0);
+
+		var removed = simLink.removeAllVehicles();
+
+		assertEquals(2, removed.size());
+		assertTrue(removed.contains(vehicle1));
+		assertTrue(removed.contains(vehicle2));
 	}
 }

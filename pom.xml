@@ -30,11 +30,11 @@
         <argLine />
 
         <log4j.version>2.25.3</log4j.version>
-        <geotools.version>34.1</geotools.version>
+        <geotools.version>34.2</geotools.version>
 		<osmosis.version>0.49.2</osmosis.version>
         <jts.version>1.20.0</jts.version>
         <guice.version>7.0.0</guice.version>
-        <jackson.version>2.20.1</jackson.version>
+        <jackson.version>2.21.0</jackson.version>
 		<fury.version>0.10.3</fury.version>
         <jogl.version>2.6.0</jogl.version>
 		<junit.version>6.0.2</junit.version>
@@ -400,7 +400,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.3</version>
+				<version>1.18.4</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -515,7 +515,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <phase>validate</phase>

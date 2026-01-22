@@ -9,10 +9,7 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.MessageProcessor;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.EventSource;
-import org.matsim.api.core.v01.events.handler.AggregatingEventHandler;
-import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
-import org.matsim.api.core.v01.events.handler.DistributedMode;
-import org.matsim.api.core.v01.events.handler.EventsFrom;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.AggregateFromAll;
@@ -38,8 +35,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	public EventHandler getHandler() {
 		return handler;
 	}
-
-	protected final DistributedEventsManager manager;
 
 	/**
 	 * Partition number.
@@ -107,9 +102,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	public EventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition, boolean async) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async) {
 		this.handler = handler;
-		this.manager = manager;
 		this.partition = partition;
 		this.async = async;
 	}
@@ -137,7 +131,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	boolean isDirect() {
 		DistributedEventHandler handler = this.handler.getClass().getAnnotation(DistributedEventHandler.class);
 		String d = System.getenv("DISABLE_DIRECT_EVENTS");
-		return handler != null && handler.directProcessing() && !Objects.equals(d, "1");
+		return handler != null && handler.processing().equals(ProcessingMode.DIRECT) && !Objects.equals(d, "1");
 	}
 
 	Consumer<Message> getConsumer(int type) {
@@ -145,11 +139,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	}
 
 	@SuppressWarnings("unchecked")
-	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer) {
+	protected EventMessagingPattern<?> buildConsumers(SerializationProvider serializer, boolean isDistributed) {
 
 		DistributedEventHandler distributed = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		boolean node = distributed != null && distributed.value() == DistributedMode.NODE_SINGLETON;
-		boolean partition = distributed != null && (distributed.value() == DistributedMode.PARTITION_SINGLETON || distributed.value() == DistributedMode.PARTITION);
+		boolean node = distributed != null && distributed.value() == DistributedMode.NODE;
+		boolean partition = distributed != null && (distributed.value() == DistributedMode.NODE_CONCURRENT || distributed.value() == DistributedMode.PARTITION);
 
 		for (Class<?> ifType : handler.getClass().getInterfaces()) {
 			if (MessageProcessor.class.isAssignableFrom(ifType)) {
@@ -190,10 +184,10 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				"Please explicitly implement needed EventHandler").formatted(handler.getClass().getName()));
 		}
 
-		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE_SINGLETON || distributed.value() == DistributedMode.PARTITION_SINGLETON);
+		boolean singleton = distributed != null && (distributed.value() == DistributedMode.NODE || distributed.value() == DistributedMode.NODE_CONCURRENT);
 
 		// Singleton handlers on one jvm don't need to communicate
-		if (singleton && !manager.getComputeNode().isDistributed()) {
+		if (singleton && !isDistributed) {
 			return null;
 		}
 
@@ -244,6 +238,15 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		return time > 0 && time % handler.getProcessInterval() == 0;
 	}
 
+	protected boolean isSyncTime() {
+		return (time > 0 && time % handler.getSyncInterval() == 0);
+	}
+
+	@Override
+	public void resetTask(int iteration) {
+		this.handler.reset(iteration);
+	}
+
 	public final IntSet getSupportedMessages() {
 		return consumers.keySet();
 	}
@@ -288,14 +291,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final void process(Message msg) {
 
-		Consumer<Message> consumer = consumers.get(msg.getType());
+		var consumer = consumers.get(msg.getType());
 		if (consumer == null) {
-			Consumer<Message> any = consumers.get(Event.ANY_TYPE);
-			if (any != null) {
-				any.accept(msg);
-				return;
-			}
-
+			consumer = consumers.get(Event.ANY_TYPE);
+		}
+		if (consumer == null) {
 			throw new IllegalArgumentException("No processor found for message: " + msg);
 		}
 

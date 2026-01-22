@@ -30,15 +30,18 @@ public final class SingleNodeAsyncEventHandlerTask extends EventHandlerTask {
 	 */
 	private final AtomicBoolean running = new AtomicBoolean(false);
 
+	private final DistributedEventsManager manager;
+
 	/**
 	 * Future of the active task.
 	 */
 	private Future<?> active;
 
 	public SingleNodeAsyncEventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition,
-                                           SerializationProvider serializer) {
-		super(handler, manager, partition, true);
-		buildConsumers(serializer);
+										   SerializationProvider serializer) {
+		super(handler, partition, true);
+		buildConsumers(serializer, manager.getComputeNode().isDistributed());
+		this.manager = manager;
 	}
 
 	@Override

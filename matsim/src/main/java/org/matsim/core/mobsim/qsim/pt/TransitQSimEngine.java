@@ -151,6 +151,8 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 				this.qSim.getAgentCounter().incLost();
 			}
 		}
+		// clear all data. This way, we make sure that only one stuck event per person is generated.
+		this.agentTracker.getAgentsAtStop().clear();
 	}
 
 	private void createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
