@@ -128,7 +128,7 @@ public class GeoFileReader implements MatsimSomeReader {
 
 		File file;
 		// Remote files have to be downloaded
-		if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar")) {
+		if (url.getProtocol().startsWith("http") || url.getProtocol().startsWith("jar") || url.getProtocol().startsWith("s3")) {
 
 			String name = FilenameUtils.getBaseName(url.getFile());
 
