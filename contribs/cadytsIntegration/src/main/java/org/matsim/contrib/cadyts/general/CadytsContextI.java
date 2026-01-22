@@ -1,8 +1,15 @@
+/**
+ *
+ */
 package org.matsim.contrib.cadyts.general;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.matsim.api.core.v01.population.Person;
 
+/**
+ * @author nagel
+ *
+ */
 public interface CadytsContextI<T> {
 
 	AnalyticalCalibrator<T> getCalibrator() ;

@@ -26,59 +26,56 @@ import cadyts.supply.SimResults;
 			return 0;
 		}
 
-		// Assuming analyzer bins are consistent with request (usually hourly or matching config)
-		// Usually Cadyts configures bin size to 3600s.
-		int binSize = 3600; // This should ideally match the analyzer's bin size
-		int startBin = startTime_s / binSize;
-		int endBin = (endTime_s - 1) / binSize;
-
-		double sum = 0.0;
-		for (int i = startBin; i <= endBin; i++) {
-			if (i >= 0 && i < values.length) {
-				sum += values[i];
-			}
+		int startHour = startTime_s / 3600;
+		int endHour = (endTime_s-3599)/3600 ;
+		// (The javadoc specifies that endTime_s should be _exclusive_.  However, in practice I find 7199 instead of 7200.  So
+		// we are giving it an extra second, which should not do any damage if it is not used.)
+		if (endHour < startHour) {
+			System.err.println(" startTime_s: " + startTime_s + "; endTime_s: " + endTime_s + "; startHour: " + startHour + "; endHour: " + endHour );
+			throw new RuntimeException("this should not happen; check code") ;
 		}
-
+		double sum = 0. ;
+		for ( int ii=startHour; ii<=endHour; ii++ ) {
+			sum += values[startHour] ;
+		}
 		switch(type){
-			case COUNT_VEH: // Cadyts expects "Count", we provide "PCU Count"
-				return sum * this.countsScaleFactor;
-			case FLOW_VEH_H:
-				return 3600.0 * sum / (endTime_s - startTime_s) * this.countsScaleFactor;
-			default:
-				throw new RuntimeException("count type not implemented");
+		case COUNT_VEH:
+			return sum * this.countsScaleFactor ;
+		case FLOW_VEH_H:
+			return 3600*sum / (endTime_s - startTime_s) * this.countsScaleFactor ;
+		default:
+			throw new RuntimeException("count type not implemented") ;
 		}
+
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
+		final StringBuffer stringBuffer2 = new StringBuffer();
 		final String LINKID = "linkId: ";
 		final String VALUES = "; values:";
 		final char TAB = '\t';
 		final char RETURN = '\n';
 
 		for (Id<Link> linkId : this.pcuVolumesAnalyzer.getLinkIds()) {
-			StringBuilder linkSb = new StringBuilder();
-			linkSb.append(LINKID);
-			linkSb.append(linkId);
-			linkSb.append(VALUES);
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append(LINKID);
+			stringBuffer.append(linkId);
+			stringBuffer.append(VALUES);
 
 			boolean hasValues = false; // only prints links with volumes > 0
 			double[] values = this.pcuVolumesAnalyzer.getPcuVolumesForLink(linkId);
 
-			if (values != null) {
-				for (double value : values) {
-					hasValues = hasValues || (value > 0);
-					linkSb.append(TAB);
-					linkSb.append(value);
-				}
+			for (int ii = 0; ii < values.length; ii++) {
+				hasValues = hasValues || (values[ii] > 0);
+
+				stringBuffer.append(TAB);
+				stringBuffer.append(values[ii]);
 			}
-			linkSb.append(RETURN);
-			if (hasValues) {
-				sb.append(linkSb);
-			}
+			stringBuffer.append(RETURN);
+			if (hasValues) stringBuffer2.append(stringBuffer.toString());
 		}
-		return sb.toString();
+		return stringBuffer2.toString();
 	}
 
 }

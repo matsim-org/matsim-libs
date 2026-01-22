@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CadytsPlanStrategy.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.cadyts.car;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
@@ -20,6 +40,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,9 +52,14 @@ import java.util.TreeSet;
 
 import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.*;
 
+/**
+ * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
+ * select plans that better match to given occupancy counts.
+ */
 public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
 	private final static Logger log = LogManager.getLogger(CadytsContext.class);
+
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 
@@ -59,9 +85,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class);
+		// (also initializes the config group with the values read from the config file)
+
 		cadytsConfig.setWriteAnalysisFile(true);
+		// yyyy not so good to just overwrite config.  kai, feb'20
 
 		if ( cadytsConfig.getCalibratedLinks().isEmpty() ){
+			// found this without the above condition, i.e. it would always set the calibrated links to all links for which there exist counts.
+			// However, the logic for ptCounts is different, and there it would probably make sense to keep the functionality that only some
+			// lines are calibrated.  So, for symmetry, would make sense to also make it functional here.  ????  kai, feb'20
+
 			Set<String> countedLinks = new TreeSet<>();
 			for( Id<Link> id : this.calibrationCounts.getCounts().keySet() ){
 				countedLinks.add( id.toString() );
@@ -104,6 +137,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		// Register demand for this iteration with Cadyts.
+		// Note that planToPlanStep will return null for plans which have never been executed.
+		// This is fine, since the number of these plans will go to zero in normal simulations,
+		// and Cadyts can handle this "noise". Checked this with Gunnar.
+		// mz 2015
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			this.calibrator.addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
 		}
@@ -121,6 +159,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 		this.calibrator.afterNetworkLoading(this.simResults);
 
+		// write some output
 		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 			new CadytsCostOffsetsXMLFileIO<>(new LinkLookUp(scenario), Link.class)
@@ -130,10 +169,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		}
 	}
 
+	/**
+	 * for testing purposes only
+	 */
 	@Override
 	public AnalyticalCalibrator<Link> getCalibrator() {
 		return this.calibrator;
 	}
+
+	// ===========================================================================================================================
+	// private methods & pure delegate methods only below this line
 
 	private static boolean isActiveInThisIteration(final int iter, final Config config) {
 		return (iter > 0 && iter % config.counts().getWriteCountsInterval() == 0);
