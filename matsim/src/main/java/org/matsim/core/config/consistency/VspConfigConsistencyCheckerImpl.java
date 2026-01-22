@@ -353,6 +353,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 	}
 
 	private static boolean checkScoringConfigGroup(Config config, Level lvl, boolean problem) {
+		// added jan'26
+		if ( !config.scoring().isWriteExperiencedPlans() ) {
+			problem = true;
+			log.log( lvl, "You have not switched on writeExperiencedPlans; vsp standard is to have that switched on.");
+			log.log( lvl, "Is in the scoring config module.");
+		}
+
 		// use beta_brain=1 // added as of nov'12
 		if (config.scoring().getBrainExpBeta() != 1.) {
 			problem = true;
@@ -381,7 +388,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				case relative:
 					break;
 				case uniform:
-//				problem = true ;
+				problem = true ;
 					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
 					break;
 				default:

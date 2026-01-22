@@ -33,9 +33,7 @@ import tech.tablesaw.columns.Column;
 
 import java.nio.file.Path;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.analysis.population.HeadersKN.*;
@@ -96,9 +94,9 @@ class AgentWiseComparisonKNUtils{
 		baseReader.readFile( baseEventsFile );
 		events.finishProcessing();
 
-		log.warn("popSize before={}; popSize after={}; ", popSizeBefore, population.getPersons().size() );
+		log.warn("after handling eventsfile: popSize before={}; popSize after={}; ", popSizeBefore, population.getPersons().size() );
 	}
-	static void cleanPopulation( Population basePopulation ){
+	static void removeNonPersons( Population basePopulation ){
 		{
 			long popSizeBefore = basePopulation.getPersons().size();
 			List<Id<Person>> personsToRemove = new ArrayList<>();
@@ -112,6 +110,8 @@ class AgentWiseComparisonKNUtils{
 			}
 			log.warn( "removing non-persons; popSizeBefore={}; popSizeAfter={}", popSizeBefore, basePopulation.getPersons().size() );
 		}
+	}
+	static void removeNonMobilePersons( Population basePopulation ){
 		{
 			long popSizeBefore = basePopulation.getPersons().size();
 			List<Id<Person>> personsToRemove = new ArrayList<>();
@@ -128,37 +128,60 @@ class AgentWiseComparisonKNUtils{
 
 	}
 
-	static void tagPersonsToAnalyse( Population basePopulation, List<PreparedGeometry> geometries, Scenario scenario ){
-		if ( geometries==null || geometries.isEmpty() ) {
-			return;
-		}
-		for( Person person : basePopulation.getPersons().values() ){
-			boolean toAnalyse = false;
-			for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), StagesAsNormalActivities ) ){
-				Coord coord = PopulationUtils.decideOnCoordForActivity( act, scenario );
+		static void tagPersonsToAnalyse( Population pop, List<PreparedGeometry> geometries, Scenario scenario ) {
+			if ( geometries==null || geometries.isEmpty() ) {
+				return;
+			}
+			List<Id<Person>> toRemove = new ArrayList<>();
+			for( Person person : pop.getPersons().values() ) {
+				boolean toAnalyse = false;
+				Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().getFirst();
+				Coord coord = PopulationUtils.decideOnCoordForActivity( firstAct, scenario );
 				Point point = GeometryUtils.createGeotoolsPoint( coord );
 				for( PreparedGeometry geometry : geometries ){
 					if( geometry.contains( point ) ){
 						toAnalyse = true;
 					}
 				}
-			}
-			if ( toAnalyse ){
-				setAnalysisPopulation( person, "true" );
-			} else {
-				setAnalysisPopulation( person, "false" );
+				if ( toAnalyse ){
+					setAnalysisPopulation( person, "true" );
+				} else {
+					setAnalysisPopulation( person, "false" );
+				}
 			}
 		}
-//		Population newPop = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
+
+//	static void tagPersonsToAnalyse( Population basePopulation, List<PreparedGeometry> geometries, Scenario scenario ){
+//		if ( geometries==null || geometries.isEmpty() ) {
+//			return;
+//		}
 //		for( Person person : basePopulation.getPersons().values() ){
-//			if ( "true".equals( getAnalysisPopulation( person ) ) ) {
-//				newPop.addPerson( person );
+//			boolean toAnalyse = false;
+//			for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), StagesAsNormalActivities ) ){
+//				Coord coord = PopulationUtils.decideOnCoordForActivity( act, scenario );
+//				Point point = GeometryUtils.createGeotoolsPoint( coord );
+//				for( PreparedGeometry geometry : geometries ){
+//					if( geometry.contains( point ) ){
+//						toAnalyse = true;
+//					}
+//				}
+//			}
+//			if ( toAnalyse ){
+//				setAnalysisPopulation( person, "true" );
+//			} else {
+//				setAnalysisPopulation( person, "false" );
 //			}
 //		}
-//		PopulationUtils.writePopulation( newPop, "gartenfeld.plans.xml.gz" );
-//		log.warn("exiting here");
-//		System.exit(-1);
-	}
+////		Population newPop = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
+////		for( Person person : basePopulation.getPersons().values() ){
+////			if ( "true".equals( getAnalysisPopulation( person ) ) ) {
+////				newPop.addPerson( person );
+////			}
+////		}
+////		PopulationUtils.writePopulation( newPop, "gartenfeld.plans.xml.gz" );
+////		log.warn("exiting here");
+////		System.exit(-1);
+//	}
 	static void setAnalysisPopulation( Person person, String analysisPopulation ){
 		person.getAttributes().putAttribute( "analysisPopulation", analysisPopulation );
 	}
@@ -402,7 +425,9 @@ class AgentWiseComparisonKNUtils{
 
 		Population basePopulation = PopulationUtils.readPopulation( basePopulationFilename );
 
-		cleanPopulation( basePopulation );
+		removeNonPersons( basePopulation );
+
+		removeNonMobilePersons( basePopulation );
 
 		for (String pattern : eventsFilePatterns) {
 			handleEventsfile( path, pattern, basePopulation );
@@ -445,5 +470,31 @@ class AgentWiseComparisonKNUtils{
 		final double muse_h = (scoreDiffEarly - scoreDiffNormal) * 3600.;
 		AddVttsEtcToActivities.setMUSE_h( act, muse_h );
 		return muse_h;
+	}
+	static void onlyKeepIncomeDecile( Population basePopulation, double decile ){
+		log.warn("only keeping the {}th income decile of the population; popSize before={}", decile, basePopulation.getPersons().size() );
+
+		Gbl.assertIf( decile >= 0 );
+		Gbl.assertIf( decile < 10 );
+
+		List<? extends Person> persons = new ArrayList<>( basePopulation.getPersons().values() );
+		Collections.sort( persons, new Comparator<Person>(){
+			@Override public int compare( Person o1, Person o2 ){
+				return (int) ( PersonUtils.getIncome( o1) - PersonUtils.getIncome( o2 ) * (-1) );
+			}
+		} );
+
+		List<Id<Person>> toRemove = new ArrayList<>();
+		for( Person person : persons.subList( 0, (int) ( decile*persons.size() / 10. ) ) ) {
+			toRemove.add( person.getId() );
+		}
+		for( Person person : persons.subList( (int) ( (decile+1)*persons.size() / 10. ), persons.size() ) ) {
+			toRemove.add( person.getId() );
+		}
+
+		for( Id<Person> personId : toRemove ){
+			basePopulation.removePerson( personId );
+		}
+		log.warn("only keeping the {}th income decile of the population; popSize after={}", decile, basePopulation.getPersons().size() );
 	}
 }

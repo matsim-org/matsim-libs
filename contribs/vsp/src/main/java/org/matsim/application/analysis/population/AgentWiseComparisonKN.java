@@ -2,18 +2,28 @@ package org.matsim.application.analysis.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.ShpOptions;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
@@ -30,14 +40,16 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.matsim.api.core.v01.TransportMode.*;
@@ -64,6 +76,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static int scoreWrnCnt = 0;
 
+	private static final boolean doRoh = false;
+
 	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
 	private Path inputPath;
 
@@ -77,72 +91,89 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	// (--> I think that it allowed, either by design or by accident, EITHER multiple prefixes in the same dir,
 	// OR one different prefix per different directory.  I think that I removed the second functionality some time ago.)
 
+	@CommandLine.Mixin
+	private final ShpOptions shp = new ShpOptions();
+
 	ScoringFunctionFactory scoringFunctionFactory;
 	MutableScenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
 	com.google.inject.Injector injector;
 	com.google.inject.Injector injector2;
-	TripRouter tripRouter1;
-	TripRouter tripRouter2;
+//	TripRouter tripRouter1;
+//	TripRouter tripRouter2;
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
+
+	// yyyy The following string constants should rather be only inside the main dir. kai, jan'25
 
 	// equil:
 //	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 //	private static final String policyDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 
 	// gartenfeld:
-	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
-	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
+//	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
+//	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
+//	private static final String shpFile=null;
 
 	// zez:
-//	private static final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
-//	private static final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
-//	private static final String runId="";
+	private static final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
+	private static final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
+	private static final String shpFile="../berlin.shp";
+	// yyyy consider a 10 or even 1pct sample of the population
 
 	public static void main( String[] args ){
-//		{
-//			args = new String[]{
-//				"--path", baseDir,
-//				//				"--runId", runId
-//			};
-//			new ExperiencedPlansWriter().execute( args );
-//		}
-//		{
-//			String inFileName = baseDir + "/output_events.xml.gz";
-//			String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
-//
-//			Config config = ConfigUtils.createConfig();
-//			EventsManager eventsManager = EventsUtils.createEventsManager( config );
-//			MatsimEventsReader reader = new MatsimEventsReader( eventsManager );
-//			eventsManager.initProcessing();
-//
-//			EventWriterXML eventsWriter = new EventWriterXML( outFileName );
-//			eventsManager.addHandler( new BasicEventHandler(){
-//				@Override public void handleEvent( Event event ){
-//					if ( event instanceof PersonMoneyEvent || event instanceof PersonStuckEvent ) {
-//						eventsWriter.handleEvent( event );
-//					}
-//				}
-//			} );
-//			reader.readFile( inFileName );
-//			eventsManager.finishProcessing();
-//
-//			eventsWriter.closeFile();
-//
-//		}
+		Gbl.assertIf( args==null || args.length==0 );
+//		generateExperiencedPlans();
+//		generateFilteredEventsFile();
 		{
-			args = new String[]{
-				"--prefix=" + onlyMoneyAndStuck,
-				"--base-path=" + baseDir,
-				policyDir
-			};
+			if ( shpFile != null ){
+				args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, "--shp=" + baseDir + "/" + shpFile, policyDir };
+			} else {
+				args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, policyDir };
+			}
 			new AgentWiseComparisonKN().execute( args );
 		}
 	}
+	private static void generateFilteredEventsFile(){
+		String inFileName = baseDir + "/output_events.xml.gz";
+		String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
+
+		Config config = ConfigUtils.createConfig();
+		EventsManager eventsManager = EventsUtils.createEventsManager( config );
+		MatsimEventsReader reader = new MatsimEventsReader( eventsManager );
+		eventsManager.initProcessing();
+
+		EventWriterXML eventsWriter = new EventWriterXML( outFileName );
+		eventsManager.addHandler( new BasicEventHandler(){
+			@Override public void handleEvent( Event event ){
+				if ( event instanceof PersonMoneyEvent || event instanceof PersonStuckEvent ) {
+					eventsWriter.handleEvent( event );
+				}
+			}
+		} );
+		reader.readFile( inFileName );
+		eventsManager.finishProcessing();
+
+		eventsWriter.closeFile();
+	}
+	private static void generateExperiencedPlans(){
+		String[] args;
+		args = new String[]{
+			"--path", baseDir,
+			//				"--runId", runId
+		};
+		new ExperiencedPlansWriter().execute( args );
+	}
 
 	@Override public Integer call() throws Exception{
+		if ( shp!=null && shp.isDefined() ){
+			URL url = Paths.get( shp.getShapeFile() ).toUri().toURL();
+			this.geometries = ShpGeometryUtils.loadPreparedGeometries( url );
+
+			// there is shp.readFeatures(), but I cannot get the Geometries out of the Features :-(.  kai, jan'26
+		}
+
 
 		List<String> eventsFilePatterns = new ArrayList<>();
 
@@ -193,30 +224,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 
-//		log.warn("only keeping the least affluent 10% of the population; popSize before={}", basePopulation.getPersons().size() );
-//
-//		List<? extends Person> persons = new ArrayList<>( basePopulation.getPersons().values() );
-//		Collections.sort( persons, new Comparator<Person>(){
-//			@Override public int compare( Person o1, Person o2 ){
-//				return (int) ( PersonUtils.getIncome( o1) - PersonUtils.getIncome( o2 ) );
-//			}
-//		} );
-//
-//		List<Id<Person>> toRemove = new ArrayList<>();
-//		for( Person person : persons.subList( persons.size() / 10, persons.size() ) ){
-//			toRemove.add( person.getId() );
-//		}
-//
-//		for( Id<Person> personId : toRemove ){
-//			basePopulation.removePerson( personId );
-//		}
-//		log.warn("only keeping the least affluent 10% of the population; popSize before={}", basePopulation.getPersons().size() );
+		onlyKeepIncomeDecile( basePopulation, 9 );
 
 		baseScenario.setPopulation( basePopulation );
-
-//		URL url = Paths.get(
-//			"/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/drt-case-study/output-gartenfeld-v6.4-cutout-10pct-drt/analysis/drt/serviceArea.shp" ).toUri().toURL();
-//		this.geometries = ShpGeometryUtils.loadPreparedGeometries( url );
 
 		{
 			this.injector = new Injector.InjectorBuilder( baseScenario )
@@ -228,8 +238,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 													  } )
 													  .build();
 			this.scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
-			this.tripRouter1 = injector.getInstance( TripRouter.class );
-
 		}
 		{
 			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
@@ -248,18 +256,25 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 													   } )
 													   .build();
 		}
-		this.tripRouter2 = injector2.getInstance( TripRouter.class );
-
 
 		// ===
 
 		// yyyyyy !!!!!! We now have a different avgIncome in the scoring fct than in the general population.  !!!!!!! yyyyyy
 		// --> (presumably) compute the mUoM here instead of in the preproc.
 
-//		tagPersonsToAnalyse( basePopulation, geometries, scenario );
-		for( Person person : basePopulation.getPersons().values() ){
-			setAnalysisPopulation( person, "true" );
-		}
+		tagPersonsToAnalyse( basePopulation, geometries, baseScenario );
+//		for( Person person : basePopulation.getPersons().values() ){
+//			setAnalysisPopulation( person, "true" );
+//		}
+
+		// yyyy Ich frage mich im Moment, ob das mit dem "taggen" wirklich der richtige Weg ist, oder ob es nicht konsequenter ist, die anderen Personen zu entfernen.
+
+		// --> Vorteil von taggen könnte sein, dass man mehrfach taggen und auswerten kann.
+
+		// --> aber z.B. bei incomeDecile macht es einen Unterschied, ob ich das nur in Bln oder im gesamten Szenario bestimme.
+
+
+
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
@@ -511,25 +526,23 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario,
-				  Config baseConfig, Path outputPath ) throws IOException{
+				  Config baseConfig, Path outputPath ) {
 
-		somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
-
+		if ( doRoh ){
+			somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
+		}
 		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
 
-		log.info( "print joined table:" );
+		log.info(""); log.info( "print joined table:" );
 		System.out.println( joinedTable );
 
 //		printSpecificPerson( joinedTable, "960148" );
 
 		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
 
-		joinedTable = joinedTable.where(
-			joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or(
-				joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" )
-																				  ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
+		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
 
 
 		Table deltaTable = Table.create( joinedTable.column( PERSON_ID )
@@ -558,53 +571,59 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
 									   );
 
-		formatTable( deltaTable, 0 );
+		formatTable( deltaTable, 1 );
 
+		log.info("");log.info("print sorted table:");
 		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
 
 		// ===
 
-		Table rohDeltaTable = Table.create( joinedTable.column( PERSON_ID )
-			, joinedTable.column( UTL_OF_MONEY )
+		Table rohDeltaTable = null;
+		if ( doRoh ){
+			rohDeltaTable = Table.create( joinedTable.column( PERSON_ID )
+				, joinedTable.column( UTL_OF_MONEY )
 //			, joinedTable.column( MUSL_h )
-			, joinedTable.column( SCORE )
-			, joinedTable.column( MONEY )
-			, joinedTable.column( TTIME )
-			, joinedTable.column( ASCS )
-			, joinedTable.column( U_TRAV_DIRECT )
-			, joinedTable.column( U_LINESWITCHES )
-			// unweighted deltas:
-			, deltaColumn( joinedTable, TTIME )
-			, deltaColumn( joinedTable, MONEY )
-			// delta computation:
-			, deltaColumn( joinedTable, MATSIM_SCORE )
-			, deltaColumn( joinedTable, SCORE )
-			, deltaColumn( joinedTable, ACTS_SCORE )
-			, deltaColumn( joinedTable, U_TRAV_DIRECT )
-			, deltaColumn( joinedTable, U_LINESWITCHES )
-			, deltaColumn( joinedTable, MONEY_SCORE )
-			, deltaColumn( joinedTable, ASCS )
-			//
-			, joinedTable.column( W1_TTIME_DIFF_REM )
-			, joinedTable.column( W2_TTIME_DIFF_REM )
-			, joinedTable.column( IX_DIFF_REMAINING )
-			, joinedTable.column( W1_TTIME_DIFF_SWI )
-			, joinedTable.column( W2_TTIME_DIFF_SWI )
-			, joinedTable.column( IX_DIFF_SWITCHING )
-			// information:
-			, joinedTable.column( MODE_SEQ )
-			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-									   );
+				, joinedTable.column( SCORE )
+				, joinedTable.column( MONEY )
+				, joinedTable.column( TTIME )
+				, joinedTable.column( ASCS )
+				, joinedTable.column( U_TRAV_DIRECT )
+				, joinedTable.column( U_LINESWITCHES )
+				// unweighted deltas:
+				, deltaColumn( joinedTable, TTIME )
+				, deltaColumn( joinedTable, MONEY )
+				// delta computation:
+				, deltaColumn( joinedTable, MATSIM_SCORE )
+				, deltaColumn( joinedTable, SCORE )
+				, deltaColumn( joinedTable, ACTS_SCORE )
+				, deltaColumn( joinedTable, U_TRAV_DIRECT )
+				, deltaColumn( joinedTable, U_LINESWITCHES )
+				, deltaColumn( joinedTable, MONEY_SCORE )
+				, deltaColumn( joinedTable, ASCS )
+				//
+				, joinedTable.column( W1_TTIME_DIFF_REM )
+				, joinedTable.column( W2_TTIME_DIFF_REM )
+				, joinedTable.column( IX_DIFF_REMAINING )
+				, joinedTable.column( W1_TTIME_DIFF_SWI )
+				, joinedTable.column( W2_TTIME_DIFF_SWI )
+				, joinedTable.column( IX_DIFF_SWITCHING )
+				// information:
+				, joinedTable.column( MODE_SEQ )
+				, joinedTable.column( keyTwoOf( MODE_SEQ ) )
+											  );
 
-		formatTable( deltaTable, 0 );
+			formatTable( deltaTable, 1 );
 
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+		}
 
 		// ===
 
 		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
 
-		writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+		if ( doRoh ){
+			writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+		}
 
 		writeAscTable( baseConfig );
 
@@ -620,8 +639,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
 		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
 
-//		TripRouter tripRouter1 = this.injector.getInstance( TripRouter.class );
-//		TripRouter tripRouter2 = this.injector2.getInstance( TripRouter.class );
+		TripRouter tripRouter1 = this.injector.getInstance( TripRouter.class );
+		TripRouter tripRouter2 = this.injector2.getInstance( TripRouter.class );
 
 		Counter counter = new Counter( "somehowComputeRuleOfHalf; person # " );
 		for( Person policyPerson : policyPopulation.getPersons().values() ){
@@ -670,12 +689,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 									sumPolicyLineSwitches++;
 								}
 							}
-							if ( cnt < 10 ){
+							if ( cnt < 1 ){
 								log.warn( "MUTTS_AV={}", MUTTS_AV );
 								cnt++;
-								if ( cnt==10 ) {
-									log.warn( Gbl.FUTURE_SUPPRESSED );
-								}
+//								if ( cnt==1 ) {
+//									log.warn( Gbl.FUTURE_SUPPRESSED );
+//								}
 							}
 							sumTravTimeDiffsRemainersHom += (sumPolicyTtime - sumBaseTtime) * MUTTS_AV * (-1);
 							sumTravTimeDiffsRemainersHet += (sumPolicyTtime - sumBaseTtime) * musl * (-1);
@@ -685,7 +704,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 							// first need hypothetical base travel time
 							final Result baseResult = routeTrip( baseTrip, policyMainMode, basePerson, tripRouter1 );
 							// then compute hypothetical policy travel time
-							final Result policyResult = routeTrip2( policyTrip, policyMainMode, policyPerson, tripRouter2 );
+							final Result policyResult = routeTrip( policyTrip, policyMainMode, policyPerson, tripRouter2 );
 							// sum up (rule-of-half is done later):
 							sumTravTimeDiffsSwitchersHom += (policyResult.sumTtime() - baseResult.sumTtime()) * MUTTS_AV * (-1);
 							sumTravTimeDiffsSwitchersHet += (policyResult.sumTtime() - baseResult.sumTtime()) * musl * (-1);
@@ -710,28 +729,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
 		final List<? extends PlanElement> planElements = tripRouter.calcRoute( policyMainMode, fromFacility, toFacility,
-			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
-
-		// count the number of line switches:
-		double sumBaseTtime = 0.;
-		double sumBaseLineSwitches = -1;
-		for( Leg leg : TripStructureUtils.getLegs( planElements ) ){
-			sumBaseTtime += leg.getTravelTime().seconds();
-			if( TransportMode.pt.equals( leg.getMode() ) ){
-				sumBaseLineSwitches++;
-			}
-		}
-
-		// return the result:
-		return new Result( sumBaseTtime, sumBaseLineSwitches );
-	}
-
-	// yyyyyy The above and the below are now the same (I think).
-
-	private @NotNull Result routeTrip2( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter2 ){
-		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
-		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
-		final List<? extends PlanElement> planElements = tripRouter2.calcRoute( policyMainMode, fromFacility, toFacility,
 			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
 
 		// count the number of line switches:
