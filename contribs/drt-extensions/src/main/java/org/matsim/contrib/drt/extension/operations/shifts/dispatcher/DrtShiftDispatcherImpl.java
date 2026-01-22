@@ -144,12 +144,13 @@ public class DrtShiftDispatcherImpl implements DrtShiftDispatcher {
     @Override
     public void startOperationalTask(ShiftDvrpVehicle vehicle, OperationalStop operationalStop) {
         OperationFacility facility = Objects.requireNonNull(operationFacilities.getFacilities().get(operationalStop.getFacilityId()));
-        boolean registered = facility.register(vehicle.getId());
 
         Verify.verify(operationalStop.getReservationId().isPresent(), "Vehicle should have a reservation at this point.");
         Optional<ReservationManager.ReservationInfo<OperationFacility, DvrpVehicle>> reservation = facilityReservationManager
                 .findReservation(facility.getId(), operationalStop.getReservationId().get());
         Verify.verify(reservation.isPresent(), "Reservation is not know at the resource.");
+
+        boolean registered = facility.register(vehicle.getId());
 
         if(!registered) {
             throw new IllegalStateException(String.format("Could not check in vehicle %s at facility %s with reservation %s. " +
