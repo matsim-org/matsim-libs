@@ -100,6 +100,7 @@ class MatsimRuntimeModifications {
 				log.error("ERROR --- MATSim unexpectedly terminated. Please check the output or the logfile with warnings and errors for hints.");
 				log.error("ERROR --- results should not be used for further analysis.");
 			}
+			log.info("Learn more about the MATSim Association: https://www.matsim.org/association/");
 			log.info("S H U T D O W N   ---   shutdown completed.");
 			if (unexpectedShutdown.get()) {
 				log.error("ERROR --- This was an unexpected shutdown! See the log file for a possible reason.");
