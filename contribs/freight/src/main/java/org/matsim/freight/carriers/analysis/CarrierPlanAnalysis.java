@@ -247,7 +247,7 @@ import org.matsim.freight.carriers.*;
 				}).sum();
 			NumberFormat nf = NumberFormat.getIntegerInstance(Locale.US);
 			nf.setGroupingUsed(true);
-			bw1.write("Total Jsprit Score of all Carriers" + delimiter + nf.format(new BigDecimal(jspritScore).setScale(0, RoundingMode.HALF_UP)));
+			bw1.write("Total Jsprit Score of all Carriers" + delimiter + nf.format(new BigDecimal(jspritScore).setScale(1, RoundingMode.HALF_UP)));
 			bw1.newLine();
 
 			int numberNotHandledJobs = carriers.getCarriers().values().stream()
