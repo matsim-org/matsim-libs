@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mrieser / Simunto, sponsored by SBB Swiss Federal Railways
+ * @author sebhoerl, IRT SystemX
  */
 public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 
@@ -19,17 +20,13 @@ public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
-		SpeedyGraph graph = this.graphs.get(network);
-		if (graph == null) {
-			graph = SpeedyGraphBuilder.build(network);
-			this.graphs.put(network, graph);
-		}
-		SpeedyALTData landmarks = this.landmarksData.get(graph);
-		if (landmarks == null) {
-			int landmarksCount = Math.min(16, graph.nodeCount);
-			landmarks = new SpeedyALTData(graph, landmarksCount, travelCosts);
-			this.landmarksData.put(graph, landmarks);
-		}
+		SpeedyGraph graph = graphs.computeIfAbsent(network, SpeedyGraphBuilder::build);
+		
+		SpeedyALTData landmarks = landmarksData.computeIfAbsent(graph, g -> {
+			int landmarksCount = Math.min(16, g.nodeCount);
+			return new SpeedyALTData(g, landmarksCount, travelCosts);
+		});
+		
 		return new SpeedyALT(landmarks, travelTimes, travelCosts);
 	}
 
