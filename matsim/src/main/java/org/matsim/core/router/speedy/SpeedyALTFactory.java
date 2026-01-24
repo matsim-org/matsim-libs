@@ -2,6 +2,7 @@ package org.matsim.core.router.speedy;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -20,21 +21,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 	private final int threads;
+	private final int landmarksCount;
 
 	private final Map<Network, SpeedyGraph> graphs = new ConcurrentHashMap<>();
 	private final Map<SpeedyGraph, SpeedyALTData> landmarksData = new ConcurrentHashMap<>();
 
 	@Inject
-	public SpeedyALTFactory(final GlobalConfigGroup globalConfigGroup) {
-		this(globalConfigGroup.getNumberOfThreads());
+	public SpeedyALTFactory(final GlobalConfigGroup globalConfigGroup, RoutingConfigGroup routingConfig) {
+		this(globalConfigGroup.getNumberOfThreads(), routingConfig.getNetworkRoutingLandmarks());
 	}
 
-	public SpeedyALTFactory(int threads) {
+	public SpeedyALTFactory(int threads, int landmarks) {
 		this.threads = threads;
+		this.landmarksCount = landmarks;
 	}
 
 	public SpeedyALTFactory() {
-		this(4);
+		this(4, 16);
 	}
 
 	@Override
@@ -42,8 +45,8 @@ public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 		SpeedyGraph graph = graphs.computeIfAbsent(network, SpeedyGraphBuilder::build);
 		
 		SpeedyALTData landmarks = landmarksData.computeIfAbsent(graph, g -> {
-			int landmarksCount = Math.min(16, g.nodeCount);
-			return new SpeedyALTData(g, landmarksCount, travelCosts, threads);
+			int reducedLandmarksCount = Math.min(landmarksCount, g.nodeCount);
+			return new SpeedyALTData(g, reducedLandmarksCount, travelCosts, threads);
 		});
 		
 		return new SpeedyALT(landmarks, travelTimes, travelCosts);

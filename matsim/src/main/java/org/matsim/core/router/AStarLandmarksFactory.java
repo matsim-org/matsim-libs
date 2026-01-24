@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -45,20 +46,22 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	private final Map<Network, PreProcessLandmarks> cache = new ConcurrentHashMap<>();
 
 	private final int nThreads;
+	private final int landmarks;
 
 	@Inject
-	public AStarLandmarksFactory(final GlobalConfigGroup globalConfigGroup) {
-		this(globalConfigGroup.getNumberOfThreads());
+	public AStarLandmarksFactory(final GlobalConfigGroup globalConfigGroup, RoutingConfigGroup routingConfig) {
+		this(globalConfigGroup.getNumberOfThreads(), routingConfig.getNetworkRoutingLandmarks());
 	}
 
-	public AStarLandmarksFactory(int numberOfThreads) {
+	public AStarLandmarksFactory(int numberOfThreads, int landmarks) {
 		this.nThreads = numberOfThreads;
+		this.landmarks = landmarks;
 	}
 
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessLandmarks preProcessLandmarks = cache.computeIfAbsent(network, n -> {
-			PreProcessLandmarks preprocess = new PreProcessLandmarks(travelCosts);
+			PreProcessLandmarks preprocess = new PreProcessLandmarks(travelCosts, landmarks);
 			preprocess.setNumberOfThreads(nThreads);
 			preprocess.run(n);
 			return preprocess;
