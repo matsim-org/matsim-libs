@@ -22,6 +22,7 @@ package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -36,11 +37,12 @@ import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author dgrether
+ * @author sebhoerl, IRT SystemX
  */
 @Singleton
 public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
-	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
+	private final Map<Network, PreProcessLandmarks> cache = new ConcurrentHashMap<>();
 
 	private final int nThreads;
 
@@ -55,13 +57,12 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
-		if (preProcessLandmarks == null) {
-			preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-			preProcessLandmarks.setNumberOfThreads(nThreads);
-			preProcessLandmarks.run(network);
-			this.preProcessData.put(network, preProcessLandmarks);
-		}
+		PreProcessLandmarks preProcessLandmarks = cache.computeIfAbsent(network, n -> {
+			PreProcessLandmarks preprocess = new PreProcessLandmarks(travelCosts);
+			preprocess.setNumberOfThreads(nThreads);
+			preprocess.run(n);
+			return preprocess;
+		});
 
 		final double overdoFactor = 1.0;
 		return new AStarLandmarks(network, preProcessLandmarks, travelCosts, travelTimes, overdoFactor);
