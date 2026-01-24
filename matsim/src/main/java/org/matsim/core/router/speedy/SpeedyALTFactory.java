@@ -32,7 +32,7 @@ public class SpeedyALTFactory implements LeastCostPathCalculatorFactory {
 	}
 
 	public SpeedyALTFactory(int threads, int landmarks) {
-		this.threads = threads;
+		this.threads = Math.max(1, threads);
 		this.landmarksCount = landmarks;
 	}
 

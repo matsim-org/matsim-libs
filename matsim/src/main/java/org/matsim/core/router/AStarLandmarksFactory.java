@@ -54,7 +54,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	}
 
 	public AStarLandmarksFactory(int numberOfThreads, int landmarks) {
-		this.nThreads = numberOfThreads;
+		this.nThreads = Math.max(1, numberOfThreads);
 		this.landmarks = landmarks;
 	}
 
