@@ -7,7 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +37,8 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PretoriaTest {
 
@@ -148,10 +152,10 @@ public class PretoriaTest {
 		return TRANSFORMATION.transform(coordWGS84);
 	}
 
-	private static EmissionsConfigGroup getEmissionsConfigGroup(PretoriaVehicle vehicle) {
+	private static EmissionsConfigGroup getEmissionsConfigGroup(PretoriaVehicle vehicle, EmissionsConfigGroup.EmissionsComputationMethod method) {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
+		ecg.setEmissionsComputationMethod( method );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
@@ -414,13 +418,23 @@ public class PretoriaTest {
 		}
 	}
 
+	public static Stream<Arguments> pretoriaInputsExpTestParams(){
+		var methods = List.of(
+			EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction,
+			EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction
+		);
+
+		return Stream.of(PretoriaVehicle.values())
+			.flatMap(v -> methods.stream().map(m -> Arguments.of(v, m)));
+	}
+
 	@ParameterizedTest
-	@EnumSource(PretoriaVehicle.class)
-	public void pretoriaInputsExpTest(PretoriaVehicle vehicle) throws IOException {
+	@MethodSource("pretoriaInputsExpTestParams")
+	public void pretoriaInputsExpTest(PretoriaVehicle vehicle, EmissionsConfigGroup.EmissionsComputationMethod method) throws IOException {
 //		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
 
 		// Prepare config
-		EmissionsConfigGroup ecg = getEmissionsConfigGroup(vehicle);
+		EmissionsConfigGroup ecg = getEmissionsConfigGroup(vehicle, method);
 		Config config = ConfigUtils.createConfig(ecg);
 
 		// Define vehicle
@@ -581,7 +595,7 @@ public class PretoriaTest {
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
-			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + vehicle + ".csv"),
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/output_" + vehicle + "_" + method + ".csv"),
 			CSVFormat.DEFAULT);
 		writer.printRecord(
 			"tripId",
@@ -702,7 +716,7 @@ public class PretoriaTest {
 
 		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "HGV D Euro-III", "RT ≤7.5t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 
 		final String hbefaTechnology;
 		final String hbefaEmConcept;
