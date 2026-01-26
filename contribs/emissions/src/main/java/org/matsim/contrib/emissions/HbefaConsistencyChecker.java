@@ -109,14 +109,14 @@ public class HbefaConsistencyChecker {
 			// Test (3)
 			if( lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort &&
 				lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable){
-				if( !emConcepts.contains("average"))
+				if( !emConcepts.isEmpty() && !emConcepts.contains("average"))
 					throw new IllegalArgumentException("""
 					Emission-concept-column of warm detailed table does not contain average as key.\s
 					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
 					"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
 					If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()\s""");
 
-				if( !sizeClass.contains("average"))
+				if( !sizeClass.isEmpty() && !sizeClass.contains("average"))
 					throw new IllegalArgumentException("""
 					size-class-column of warm detailed table does not contain average as key.\s
 					This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
@@ -149,14 +149,14 @@ public class HbefaConsistencyChecker {
 			// Test (3)
 			if( lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort &&
 				lookupBehavior != EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable) {
-				if ( !emConcepts.contains("average"))
+				if ( !emConcepts.isEmpty() && !emConcepts.contains("average"))
 					throw new IllegalArgumentException("""
 						Emission-concept-column of warm detailed table does not contain average as key.\s
 						This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
 						"tryDetailedThenTechnologyAverageThenAverageTable". If you use one of these behaviors, make sure that an average entry exists!\s
 						If you want to proceed without average values, you can deactivate the ConsistencyCheck with EmissionsConfigGroup.setHbefaConsistencyChecker()""");
 
-				if ( !sizeClass.contains("average"))
+				if ( !sizeClass.isEmpty() && !sizeClass.contains("average"))
 					throw new IllegalArgumentException("""
 						size-class-column of warm detailed table does not contain average as key.\s
 						This may cause problems with the lookup-behaviors "tryDetailedThenTechnologyAverageElseAbort" and\s
