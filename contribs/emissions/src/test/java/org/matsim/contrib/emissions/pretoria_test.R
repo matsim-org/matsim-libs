@@ -8,9 +8,10 @@
 
 # ==== General Pretoria Analysis ====
 {
-  vehicle <- "FIGO"
+  vehicle <- "RRV"
+  method <- "StopAndGoFraction"
 
-  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}.csv")) %>%
+  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
     mutate(n = row_number())
 
@@ -58,8 +59,9 @@
   # 3: Matches the profile of a passive driver      (avg.vel.=37.02; avg.pos.acc.=2.17)
 
   vehicle <- "FIGO"
+  method <- "InterpolationFraction"
 
-  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}.csv")) %>%
+  pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
     mutate(n = row_number())
 
@@ -85,8 +87,9 @@
   # C: Steep, suburban (from waterkloof4_waterkloof5 to 37156)
 
   vehicle <- "FIGO"
+  method <- "InterpolationFraction"
 
-  pretoria_output <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/output_{vehicle}.csv")) %>%
+  pretoria_output <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555, segment != "none") %>%
     mutate(n = row_number())
 
@@ -159,4 +162,4 @@
     geom_bar(aes(x=model, y=value, fill=model), stat="identity") +
     facet_wrap(~component, scales="free")
 
-}^
+}
