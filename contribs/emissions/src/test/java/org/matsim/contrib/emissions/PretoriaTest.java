@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +36,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PretoriaTest {
@@ -47,12 +45,16 @@ public class PretoriaTest {
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
 
+	private final static String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
+
 	// TODO Files were changed to local for debugging purposes. Change them back to the svn entries, when fixed hbefa tables are available
 	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";
 	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
+
+	private final static String HBEFA_HOT_TECHAVG = HBEFA_4_1_PATH + "EFA_HOT_Concept_perTechFueltype_all_2020.csv";
 
 	private final static String HBEFA_HGV_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_HGV_Aleks.csv";
 
@@ -156,6 +158,10 @@ public class PretoriaTest {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( method );
+		switch (vehicle){
+			case ETIOS, FIGO, RRV -> ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+			case FIGO_TECHAVG, RRV_TECHAVG -> ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort );
+		}
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
@@ -170,8 +176,9 @@ public class PretoriaTest {
 		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
 
 		switch (vehicle){
-			case PretoriaVehicle.ETIOS, PretoriaVehicle.FIGO -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
-			case PretoriaVehicle.RRV -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HGV_HOT_DET);
+			case ETIOS, FIGO -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
+			case RRV -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HGV_HOT_DET);
+			case FIGO_TECHAVG, RRV_TECHAVG -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_TECHAVG);
 		}
 
 		return ecg;
@@ -188,15 +195,15 @@ public class PretoriaTest {
 			.build();
 
 		Path gps_path = switch (vehicle){
-			case PretoriaVehicle.ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
-			case PretoriaVehicle.FIGO -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
-			case PretoriaVehicle.RRV -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-rrv.csv");
+			case ETIOS -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-etios.csv");
+			case FIGO, FIGO_TECHAVG -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-figo.csv");
+			case RRV, RRV_TECHAVG -> Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-rrv.csv");
 		};
 
 		String referenceDate = switch(vehicle){
-			case PretoriaVehicle.ETIOS -> "2022-11-15T07:34:18.115Z";
-			case PretoriaVehicle.FIGO -> "07/27/2021 10:03:03.131 +0200";
-			case PretoriaVehicle.RRV -> "02/02/2021 10:09:42.773 +0200";
+			case ETIOS -> "2022-11-15T07:34:18.115Z";
+			case FIGO, FIGO_TECHAVG -> "07/27/2021 10:03:03.131 +0200";
+			case RRV, RRV_TECHAVG -> "02/02/2021 10:09:42.773 +0200";
 		};
 
 		try (var reader = Files.newBufferedReader(gps_path); var parser = CSVParser.parse(reader, format)) {
@@ -539,7 +546,7 @@ public class PretoriaTest {
 			var tripId = tripEntry.getKey();
 
 			// Calculate cold Emissions (but not for RRV, as RRV has no available HBEFA Cold Table)
-			if(vehicle != PretoriaVehicle.RRV){
+			if(vehicle.hbefaVehicleCategory != HbefaVehicleCategory.HEAVY_GOODS_VEHICLE){
 				vehHbefaInfo.getSecond().setHbefaEmConcept("average"); // TODO Try to get better cold emissions table, so that I can access detailed data
 				var coldEmissionsMatsim = module.getColdEmissionAnalysisModule().calculateColdEmissions(
 					Id.createVehicleId("0"),
@@ -616,7 +623,7 @@ public class PretoriaTest {
 			var tripId = tripEntry.getKey();
 
 			// Print the cold emissions if trip had a cold start
-			if(tripId2coldStart.get(tripId) && vehicle != PretoriaVehicle.RRV){
+			if(tripId2coldStart.get(tripId) && vehicle.hbefaVehicleCategory != HbefaVehicleCategory.HEAVY_GOODS_VEHICLE){
 				var coldPollutantMap = tripId2pollutant2coldEmissions.get(tripId);
 				try {
 					writer.printRecord(
@@ -713,10 +720,12 @@ public class PretoriaTest {
 
 		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
 		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
+		FIGO_TECHAVG("petrol (4S)", "average", "average", HbefaVehicleCategory.PASSENGER_CAR),
 
 		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE),
+		RRV_TECHAVG("diesel", "average", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 
 		final String hbefaTechnology;
 		final String hbefaEmConcept;
