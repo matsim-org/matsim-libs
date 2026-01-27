@@ -36,7 +36,11 @@ public final class PoolExecutor implements LPExecutor {
 	@Inject
 	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
 		this.serializer = serializer;
-		this.executor = Executors.newFixedThreadPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
+		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
+		//this.executor = Executors.newFixedThreadPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
+		log.info("Creating PoolExecutor with {} threads. Using FixedPool.", size);
+		this.executor = Executors.newFixedThreadPool(size);
+		//this.executor = new BusyThreadpool(size);
 	}
 
 	/**
@@ -96,11 +100,12 @@ public final class PoolExecutor implements LPExecutor {
 
 		for (SimTask task : tasks) {
 			if (task.needsExecution()) {
-				Future<?> ft = executor.submit(task);
-				if (task instanceof EventHandlerTask et && et.isAsync()) {
-					et.setFuture(ft);
-				} else
-					executions.add(ft);
+//				Future<?> ft = executor.submit(task);
+//				if (task instanceof EventHandlerTask et && et.isAsync()) {
+//					et.setFuture(ft);
+//				} else
+//					executions.add(ft);
+				submitTask(task, time);
 			}
 		}
 
@@ -115,6 +120,14 @@ public final class PoolExecutor implements LPExecutor {
 		}
 
 		executions.clear();
+	}
+
+	public void submitTask(SimTask task, double time) {
+		Future<?> ft = executor.submit(task);
+		if (task instanceof EventHandlerTask et && et.isAsync()) {
+			et.setFuture(ft);
+		} else
+			executions.add(ft);
 	}
 
 	@Override
