@@ -336,7 +336,7 @@
 		<dependency>
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
-			<version>3.6.1.Final</version>
+			<version>3.6.2.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.errorprone</groupId>
