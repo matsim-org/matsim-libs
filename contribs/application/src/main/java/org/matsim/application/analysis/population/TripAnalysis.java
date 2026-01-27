@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.application.ApplicationUtils;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.AnalysisUtils;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
@@ -112,16 +113,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		new TripAnalysis().execute(args);
 	}
 
-	private static String cut(long dist, List<Long> distGroups, List<String> labels) {
 
-		int idx = Collections.binarySearch(distGroups, dist);
-
-		if (idx >= 0)
-			return labels.get(idx);
-
-		int ins = -(idx + 1);
-		return labels.get(ins - 1);
-	}
 
 	private static int[] durationToHour(String d) {
 		return Arrays.stream(d.split(":")).mapToInt(Integer::valueOf).toArray();
@@ -351,15 +343,10 @@ public class TripAnalysis implements MATSimAppCommand {
 			modeOrder = new ArrayList<>(joined.stringColumn("main_mode").unique().asList());
 		Collections.sort(modeOrder);
 
-		List<String> labels = new ArrayList<>();
-		for (int i = 0; i < distGroups.size() - 1; i++) {
-			labels.add(String.format("%d - %d", distGroups.get(i), distGroups.get(i + 1)));
-		}
-		labels.add(distGroups.getLast() + "+");
-		distGroups.add(Long.MAX_VALUE);
+		List<String> distanceLabels = AnalysisUtils.createGroupLabels(distGroups);
 
 		StringColumn dist_group = joined.longColumn("traveled_distance")
-			.map(dist -> cut(dist, distGroups, labels), ColumnType.STRING::create).setName("dist_group");
+			.map(dist -> AnalysisUtils.getLabelForValue(dist, distGroups, distanceLabels), ColumnType.STRING::create).setName("dist_group");
 
 		joined.addColumns(dist_group);
 
@@ -368,7 +355,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		// Remove suffix durations like _345
 		purpose.set(Selection.withRange(0, purpose.size()), purpose.replaceAll("_[0-9]{2,}$", ""));
 
-		writeModeShare(joined, labels);
+		writeModeShare(joined, distanceLabels);
 
 		if (sociodemographicGroups != null) {
 			// filters for all subpopulations that are used for person analysis
@@ -377,10 +364,10 @@ public class TripAnalysis implements MATSimAppCommand {
 					joined.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.values().stream()
 						.flatMap(Collection::stream)
 						.collect(Collectors.toSet())));
-				sociodemographicGroups.writeModeShare(filteredForPersons, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+				sociodemographicGroups.writeModeShare(filteredForPersons, distanceLabels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 			}
 			else
-				sociodemographicGroups.writeModeShare(joined, labels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
+				sociodemographicGroups.writeModeShare(joined, distanceLabels, modeOrder, (g) -> output.getPath("mode_share_per_%s.csv", g));
 		}
 
 		if (persons.containsColumn(ATTR_REF_MODES)) {
@@ -428,27 +415,27 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	private void writeModeShare(Table trips, List<String> labels) {
+	private void writeModeShare(Table trips, List<String> distanceLabels) {
 
 		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation", "modelType");
 
 		aggr = setEmptyCombinationsToZero(aggr);
 
 		// Sort by dist_group and mode
-		Comparator<Row> cmp = Comparator.comparingInt(row -> labels.indexOf(row.getString("dist_group")));
+		Comparator<Row> cmp = Comparator.comparingInt(row -> distanceLabels.indexOf(row.getString("dist_group")));
 		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("main_mode")));
 		aggr = aggr.sortOn(cmp.thenComparing(cmp_modes).thenComparing(row -> row.getString("subpopulation")));
 		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
-			subSetAnalysisForModeShares(labels, ModelType.PERSON_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
+			subSetAnalysisForModeShares(distanceLabels, ModelType.PERSON_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
 
 			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-				subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
+				subSetAnalysisForModeShares(distanceLabels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
 			}
 		}
 		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
-			subSetAnalysisForModeShares(labels, ModelType.COMMERCIAL_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
+			subSetAnalysisForModeShares(distanceLabels, ModelType.COMMERCIAL_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				subSetAnalysisForModeShares(labels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
+				subSetAnalysisForModeShares(distanceLabels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
 			}
 		}
 		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share_total");
@@ -458,7 +445,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		aggr.write().csv(output.getPath("mode_share_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
 
 		// Norm each dist_group to 1
-		normDistanceGroups(labels, aggr);
+		normDistanceGroups(distanceLabels, aggr);
 		aggr.removeColumns("Count [trip_id]");
 		//TODO sind die spalten count, subpopulation, modelType hier noch sinnvoll?
 		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
@@ -502,7 +489,7 @@ public class TripAnalysis implements MATSimAppCommand {
 		return aggr;
 	}
 
-	private void subSetAnalysisForModeShares(List<String> labels, String group, Table aggr, Comparator<Row> cmp,
+	private void subSetAnalysisForModeShares(List<String> distanceLabels, String group, Table aggr, Comparator<Row> cmp,
 											 Map<String, List<String>> groupsOfSubpopulationsForAnalysis) {
 		Table subset;
 		if (groupsOfSubpopulationsForAnalysis.isEmpty())
@@ -532,15 +519,15 @@ public class TripAnalysis implements MATSimAppCommand {
 			.sortOn(cmp);
 		subset.write().csv(output.getPath("mode_share_%s.csv", group).toFile());
 
-		normDistanceGroups(labels, subset);
+		normDistanceGroups(distanceLabels, subset);
 
 		subset.write().csv(output.getPath("mode_share_per_dist_%s.csv", group).toFile());
 	}
 
-	private void normDistanceGroups(List<String> labels, Table aggr) {
+	private void normDistanceGroups(List<String> distanceLabels, Table aggr) {
 		List<String> share_Columns = aggr.columnNames().stream().filter(n -> n.toLowerCase().contains("share_") || n.equalsIgnoreCase("share")).toList();
 		for (String shareCol : share_Columns) {
-			for (String label : labels) {
+			for (String label : distanceLabels) {
 				DoubleColumn dist_group = aggr.doubleColumn(shareCol);
 				Selection sel = aggr.stringColumn("dist_group").isEqualTo(label);
 
