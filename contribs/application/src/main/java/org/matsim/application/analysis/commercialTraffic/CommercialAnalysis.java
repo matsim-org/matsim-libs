@@ -406,7 +406,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 							if (groupOfSubpopulation.equals(group)) {
 								printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
 							} else {
-								printer.print("NaN");
+								printer.print(Double.NaN);
 							}
 						}
 						printer.print(labelForValue);
@@ -417,7 +417,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 								printer.print(new BigDecimal(traveledDistanceInMeters / travelDistancesPerGroup.getDouble(groupOfSubpopulation)));
 							} else {
 								printer.print(Double.NaN);
-								printer.print("NaN");
+								printer.print(Double.NaN);
 							}
 						}
 						String maxDistanceWithoutRecharging;
@@ -428,8 +428,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 								Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
 						} else {
 							log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
-							printer.print("NaN");
-							printer.print("NaN");
+							printer.print(Double.NaN);
+							printer.print(Double.NaN);
 						}
 						printer.print(tourDurations.get(Id.createVehicleId(vehicleId)));
 						printer.print(new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
@@ -438,7 +438,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 								printer.print(
 									new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
 							} else {
-								printer.print("NaN");
+								printer.print(Double.NaN);
 							}
 						}
 						printer.println();
