@@ -55,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the #PlanCalcScoreConfigGroup
  */
 public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements ScoringParametersForPerson {
-    Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+	Logger log = LogManager.getLogger(IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
     private final ScoringConfigGroup config;
     private final ScenarioConfigGroup scConfig;
     private final TransitConfigGroup transitConfigGroup;
@@ -102,6 +102,8 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
         if (scoringParametersForThisPerson == null) {
             final String subpopulation = PopulationUtils.getSubpopulation(person) == null ? "default" : PopulationUtils.getSubpopulation(person) ;
             // (weird, but so be it.  kai, apr'22)
+			// --> For the scoring params, the subpop name needs to be a valid string.  So we provide scoring params for a "default"
+			// subpop, and use it for those persons who do not have a subpop arg in the attribs.  kai, nov'25
 
             //the following is a comment that was orinally put into SubpopulationScoringParams, which is the template for this class...
             /* lazy initialization of params. not strictly thread safe, as different threads could
@@ -145,7 +147,10 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
                 // (getIncome returns Double, i.e. "null" is an option.  Not sure what happens if this is now converted to the primitive type.  kai, apr'22)
 
                 if (personalIncome > 0) {
-                    builder.setMarginalUtilityOfMoney(subpopulationScoringParams.getMarginalUtilityOfMoney() * globalAvgIncome / personalIncome);
+					final double marginalUtilityOfMoney = subpopulationScoringParams.getMarginalUtilityOfMoney() * globalAvgIncome / personalIncome;
+					builder.setMarginalUtilityOfMoney( marginalUtilityOfMoney );
+					PersonUtils.setMarginalUtilityOfMoney( person, marginalUtilityOfMoney );
+					// yy not sure if this ends up in the experienced plans
                 } else {
                     // (not sure what this means.  "null" would have been an option, but is made impossible, see above.  An income of 0 may be possible, but with the 1/y that we often use it should be avoided.)
                     log.warn("you have set income to " + personalIncome + " for person " + person + ". This is invalid and gets ignored." +

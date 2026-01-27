@@ -139,7 +139,8 @@ public final class EventsToLegs
 	private final Network network;
 	private TransitSchedule transitSchedule = null;
 
-	@Inject(optional = true)
+		@Inject(optional = true)
+//	@Inject // right now this does not hedge against a null setting
 	public void setTransitSchedule(TransitSchedule transitSchedule) {
 		this.transitSchedule = transitSchedule;
 	}

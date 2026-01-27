@@ -94,6 +94,15 @@ public final class PersonUtils {
 		return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
 	}
 
+	public static final String MARGINAL_UTILITY_OF_MONEY = "marginalUtilityOfMoney";
+	public static Double getMarginalUtilityOfMoney( Person person ) {
+		return (Double) person.getAttributes().getAttribute( MARGINAL_UTILITY_OF_MONEY );
+	}
+	public static void setMarginalUtilityOfMoney( Person person, double marginalUtilityOfMoney ) {
+		person.getAttributes().putAttribute( MARGINAL_UTILITY_OF_MONEY, marginalUtilityOfMoney );
+	}
+
+
 	/**
 	 * convenience method for often used demographic attribute
 	 * There is apparently no way to register a Map(String, Double) at ObjectAttributesConverter since all Maps default
