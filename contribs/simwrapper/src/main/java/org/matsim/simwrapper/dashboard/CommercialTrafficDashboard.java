@@ -305,11 +305,12 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
 						.name(group)
 						.build(),
 					ds.mapping()
-						.x("distanceInKm_" + group)
+						.x("dist_group")
+						.y("distanceShares_" + group)
 				);
 			}
 		});

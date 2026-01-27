@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.application.CommandSpec;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.AnalysisUtils;
 import org.matsim.application.options.InputOptions;
 import org.matsim.application.options.OutputOptions;
 import org.matsim.application.options.ShpOptions;
@@ -75,6 +76,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--groups-of-subpopulations-commercialAnalysis", description = "Define the subpopulations for the analysis of the commercial traffic and defines if the have different groups. If a group is defined by several subpopulations," +
 		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
 	private final Map<String, String> groupsOfSubpopulationsForCommercialAnalysisRaw = new HashMap<>();
+	@CommandLine.Option(names = "--dist-groups-in-KM", split = ",", description = "List of distances for binning", defaultValue = "0,1,2,5,10,20")
+	private List<Long> distGroups;
 
 	static void main(String[] args) {
 		new CommercialAnalysis().execute(args);
@@ -356,7 +359,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId = linkDemandEventHandler.getVehicleIdToPersonId();
 		Object2IntOpenHashMap<Id<Person>> jobsPerPerson = linkDemandEventHandler.getNumberOfJobsPerPerson();
 		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType();
-
+		List<String> distanceLabels = AnalysisUtils.createGroupLabels(distGroups);
+		Object2DoubleOpenHashMap<String> travelDistancesPerGroup = linkDemandEventHandler.getTravelDistancesPerGroup();
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(travelDistancesPerVehicleOutputFile), CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
@@ -367,9 +371,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 				printer.print("jobsPerTour_" + group);
 			}
+			printer.print("dist_group");
 			printer.print("distanceInKm");
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 				printer.print("distanceInKm_" + group);
+				printer.print("distanceShares_" + group);
 			}
 			printer.print("distanceInKmWithDepotCharging");
 			printer.print("shareOfTravelDistanceWithDepotCharging");
@@ -379,55 +385,66 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				printer.print("tourDurationsInHours_" + group);
 			}
 			printer.println();
-			for (String vehicleType : travelDistancesPerVehicle.keySet()) {
-				Object2DoubleOpenHashMap<String> travelDistancesForVehiclesWithThisType = travelDistancesPerVehicle.get(vehicleType);
-				for (String vehicleId : travelDistancesForVehiclesWithThisType.keySet()) {
-					printer.print(vehicleToPersonId.get(Id.createVehicleId(vehicleId)));
-					printer.print(vehicleId);
-					printer.print(vehicleType);
-					String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
-					printer.print(groupOfSubpopulation);
-					printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (groupOfSubpopulation.equals(group)) {
-							printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
+			for (String label : distanceLabels) {
+				for (String vehicleType : travelDistancesPerVehicle.keySet()) {
+					Object2DoubleOpenHashMap<String> travelDistancesForVehiclesWithThisType = travelDistancesPerVehicle.get(vehicleType);
+					for (String vehicleId : travelDistancesForVehiclesWithThisType.keySet()) {
+						double traveledDistanceInMeters = travelDistancesForVehiclesWithThisType.getDouble(vehicleId);
+						double traveledDistanceInKm = Math.round(traveledDistanceInMeters / 10) / 100.0;
+
+						String labelForValue = AnalysisUtils.getLabelForValue((long) traveledDistanceInKm, distGroups, distanceLabels);
+						// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
+						if (!label.equals(labelForValue))
+							continue;
+						printer.print(vehicleToPersonId.get(Id.createVehicleId(vehicleId)));
+						printer.print(vehicleId);
+						printer.print(vehicleType);
+						String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
+						printer.print(groupOfSubpopulation);
+						printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
+						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+							if (groupOfSubpopulation.equals(group)) {
+								printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
+							} else {
+								printer.print("NaN");
+							}
+						}
+						printer.print(labelForValue);
+						printer.print(traveledDistanceInKm);
+						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+							if (groupOfSubpopulation.equals(group)) {
+								printer.print(traveledDistanceInKm);
+								printer.print(new BigDecimal(traveledDistanceInMeters / travelDistancesPerGroup.getDouble(groupOfSubpopulation)));
+							} else {
+								printer.print(Double.NaN);
+								printer.print("NaN");
+							}
+						}
+						String maxDistanceWithoutRecharging;
+						if (maxDistanceWithDepotChargingInKilometers.containsKey(vehicleType)) {
+							maxDistanceWithoutRecharging = String.valueOf(maxDistanceWithDepotChargingInKilometers.get(vehicleType));
+							printer.print(maxDistanceWithoutRecharging);
+							printer.print(String.valueOf(
+								Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
 						} else {
+							log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
+							printer.print("NaN");
 							printer.print("NaN");
 						}
-					}
-					double traveledDistanceInKm = Math.round(travelDistancesForVehiclesWithThisType.getDouble(vehicleId) / 10) / 100.0;
-					printer.print(traveledDistanceInKm);
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (groupOfSubpopulation.equals(group)) {
-							printer.print(traveledDistanceInKm);
-						} else {
-							printer.print("NaN");
+						printer.print(tourDurations.get(Id.createVehicleId(vehicleId)));
+						printer.print(new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
+						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+							if (groupOfSubpopulation.equals(group)) {
+								printer.print(
+									new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
+							} else {
+								printer.print("NaN");
+							}
 						}
+						printer.println();
 					}
-					String maxDistanceWithoutRecharging;
-					if (maxDistanceWithDepotChargingInKilometers.containsKey(vehicleType)) {
-						maxDistanceWithoutRecharging = String.valueOf(maxDistanceWithDepotChargingInKilometers.get(vehicleType));
-						printer.print(maxDistanceWithoutRecharging);
-						printer.print(String.valueOf(
-							Math.round(traveledDistanceInKm / (maxDistanceWithDepotChargingInKilometers.get(vehicleType)) * 100) / 100.0));
-					} else {
-						log.warn("Vehicle type {} not found in maxDistanceWithDepotChargingInKilometers map. Set to NaN", vehicleType);
-						printer.print("NaN");
-						printer.print("NaN");
-					}
-					printer.print(tourDurations.get(Id.createVehicleId(vehicleId)));
-					printer.print(new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (groupOfSubpopulation.equals(group)) {
-							printer.print(new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
-						} else {
-							printer.print("NaN");
-						}
-					}
-					printer.println();
 				}
 			}
-
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
