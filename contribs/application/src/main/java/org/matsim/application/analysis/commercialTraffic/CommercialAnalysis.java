@@ -48,11 +48,8 @@ import static org.matsim.application.ApplicationUtils.globFile;
 	produces = {
 		"commercialTraffic_generalTravelData.csv",
 		"commercialTraffic_link_volume.csv",
-		"commercialTraffic_travelDistancesShares.csv",
-		"commercialTraffic_travelDistancesShares_perMode.csv",
-		"commercialTraffic_travelDistancesShares_perSubpopulation.csv",
-		"commercialTraffic_travelDistancesShares_perGroup.csv",
-		"commercialTraffic_tourAnalysis.csv",
+		"commercialTraffic_travelDistancesShares_%s.csv",
+		"commercialTraffic_tourAnalysis_%s.csv",
 		"commercialTraffic_relations.csv",
 		"commercialTraffic_activities.csv"
 	}
@@ -76,38 +73,26 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--groups-of-subpopulations-commercialAnalysis", description = "Define the subpopulations for the analysis of the commercial traffic and defines if the have different groups. If a group is defined by several subpopulations," +
 		"split them by ','. and different groups are seperated by ';'. The analysis output will be for the given groups.", split = ";")
 	private final Map<String, String> groupsOfSubpopulationsForCommercialAnalysisRaw = new HashMap<>();
-	@CommandLine.Option(names = "--dist-groups-in-KM", split = ",", description = "List of distances for binning", defaultValue = "0,1,2,5,10,20")
+	@CommandLine.Option(names = "--dist-groups-in-KM", split = ",", description = "List of distances for binning", defaultValue = "0,10,20,30,40,50,60,75,90,105,120,150,180,240,300,420,540,660,780,900")
 	private List<Long> distGroups;
+	@CommandLine.Option(names = "--tour-Duration-groups-in-H", split = ",", description = "List of tour durations for binning", defaultValue = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14")
+	private List<Long> tourDurationGroups;
+	@CommandLine.Option(names = "--number-of-jobs-groups", split = ",", description = "List of number of jobs groups for binning", defaultValue = "0,1,2,5,10,20")
+	private List<Long> numberOfJobsGroups;
+	@CommandLine.Option(names = "--activity-duration-groups", split = ",", description = "List of activity duration groups for binning", defaultValue = "0,10,20,30,40,50,60,75,90,105,120,150,180,240,300,420,540,660,780,900")
+	private List<Long> activityDurationGroups;
 
 	static void main(String[] args) {
 		new CommercialAnalysis().execute(args);
 	}
 
 	public Integer call() throws Exception {
-		log.info("++++++++++++++++++ Start Analysis for RVR Freight simulations ++++++++++++++++++++++++++++");
+		log.info("++++++++++++++++++ Start Analysis for Commercial Agents ++++++++++++++++++++++++++++");
 
 		final String eventsFile = globFile(input.getRunDirectory(), "*output_events*").toString();
 
 		if (!groupsOfSubpopulationsForCommercialAnalysisRaw.isEmpty())
 			groupsOfSubpopulationsForCommercialAnalysis = getGroupsOfSubpopulations(groupsOfSubpopulationsForCommercialAnalysisRaw);
-		// for SimWrapper
-		final Path linkDemandOutputFile = output.getPath("commercialTraffic_link_volume.csv");
-		log.info("Writing volume per link to: {}", linkDemandOutputFile);
-
-		final Path travelDistancesPerModeOutputFile = output.getPath("commercialTraffic_travelDistancesShares.csv");
-		log.info("Writing travel distances per mode to: {}", travelDistancesPerModeOutputFile);
-
-		final Path travelDistancesPerVehicleOutputFile = output.getPath("commercialTraffic_tourAnalysis.csv");
-		log.info("Writing travel distances per vehicle to: {}", travelDistancesPerVehicleOutputFile);
-
-		final Path relationsOutputFile = output.getPath("commercialTraffic_relations.csv");
-		log.info("Writing relations to: {}", relationsOutputFile);
-
-		final Path generalTravelDataOutputFile = output.getPath("commercialTraffic_generalTravelData.csv");
-		log.info("Writing general travel data to: {}", generalTravelDataOutputFile);
-
-		final Path commercialActivitiesOutputFile = output.getPath("commercialTraffic_activities.csv");
-		log.info("Writing general activity analysis to: {}", generalTravelDataOutputFile);
 
 		Config config = ConfigUtils.createConfig();
 		config.vehicles().setVehiclesFile(globFile(input.getRunDirectory(), "*output_vehicles*").toString());
@@ -136,12 +121,12 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		new MatsimEventsReader(eventsManager).readFile(eventsFile);
 		log.info("Closing events file...");
 
-		createGeneralTravelDataAnalysis(generalTravelDataOutputFile, linkDemandEventHandler, scenario);
-		createTravelDistancesShares(travelDistancesPerModeOutputFile, linkDemandEventHandler);
-		createLinkVolumeAnalysis(scenario, linkDemandOutputFile, linkDemandEventHandler);
-		createRelationsAnalysis(relationsOutputFile, linkDemandEventHandler);
-		createAnalysisPerVehicle(travelDistancesPerVehicleOutputFile, linkDemandEventHandler);
-		createActivityAnalysis(scenario, commercialActivitiesOutputFile);
+		createGeneralTravelDataAnalysis(linkDemandEventHandler, scenario);
+		createTravelDistancesShares(linkDemandEventHandler);
+		createLinkVolumeAnalysis(scenario, linkDemandEventHandler);
+		createRelationsAnalysis(linkDemandEventHandler);
+		createAnalysisPerVehicle(linkDemandEventHandler);
+		createActivityAnalysis(scenario);
 
 		log.info("Done");
 		log.info("All outputs of commercial analysis written to {}", output.getPath());
@@ -149,53 +134,70 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return 0;
 	}
 
-	private void createActivityAnalysis(Scenario scenario, Path commercialActivitiesOutputFile) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(commercialActivitiesOutputFile), CSVFormat.DEFAULT)) {
-			HashMap<String, List<Double>> activityDurationsPerGroup = new HashMap<>();
+	private void createActivityAnalysis(Scenario scenario) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_activities.csv")), CSVFormat.DEFAULT)) {
+			HashMap <String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
+			List<String> activityDurationLabels = AnalysisUtils.createGroupLabels(activityDurationGroups);
+
 			printer.print("personId");
-			printer.print("activityId");
 			printer.print("groupOfSubpopulation");
 			printer.print("activityType");
-			printer.print("activityCount");
+			printer.print("activityCountPerPerson");
+			printer.print("activityDuration_group");
 			printer.print("activityDurationInSeconds");
 			printer.print("activityDurationInMinutes");
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 				printer.print("activityDurationInMinutes_" + group);
 			}
 			printer.println();
+			Map<String, String> subpopToGroup = new HashMap<>();
+			for (var e : groupsOfSubpopulationsForCommercialAnalysis.entrySet()) {
+				String group = e.getKey();
+				for (String subpop : e.getValue()) {
+					subpopToGroup.put(subpop, group);
+				}
+			}
 
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				String subpop = PopulationUtils.getSubpopulation(person);
-				Optional<String> groupOpt = groupsOfSubpopulationsForCommercialAnalysis.entrySet().stream()
-					.filter(e -> e.getValue().contains(subpop))
-					.map(Map.Entry::getKey)
-					.findFirst();
-				if (groupOpt.isPresent()) {
+				String groupOfPerson = subpopToGroup.get(subpop);
+				if (groupOfPerson != null) {
 					List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(),
 						TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
-
 					// skip first and last activity
 					for (int i = 1; i <= activities.size() - 2; i++) {
-						printer.print(person.getId());
-						printer.print(person.getId() + "_" + i);
-						printer.print(groupOpt.get());
 						Activity activity = activities.get(i);
-						printer.print(activity.getType());
-						printer.print(i);
 						double duration = activity.getMaximumDuration().seconds();
-						printer.print(duration);
 						BigDecimal durationInMinutes = new BigDecimal(duration / 60).setScale(0, RoundingMode.HALF_UP);
-						printer.print(durationInMinutes);
-						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-							if (groupOpt.get().equals(group)) {
-								printer.print(durationInMinutes);
-							} else {
-								printer.print("NaN");
-							}
-						}
-						printer.println();
-						activityDurationsPerGroup.computeIfAbsent(groupOpt.get(), k -> new ArrayList<>()).add(duration);
+						String labelForValue = AnalysisUtils.getLabelForValue(durationInMinutes.longValue(), activityDurationGroups, activityDurationLabels);
+						activityToPersonMap.computeIfAbsent(labelForValue, k -> new ArrayList<>()).add(new ActivityInformation(activity, i, person.getId(), groupOfPerson));
 					}
+				}
+			}
+			for (String label : activityDurationLabels) {
+				if (!activityToPersonMap.containsKey(label)) {
+					continue;
+				}
+				for (ActivityInformation activityInformation : activityToPersonMap.get(label)) {
+					Activity activity = activityInformation.activity;
+					double duration = activity.getMaximumDuration().seconds();
+
+					printer.print(activityInformation.personId);
+					printer.print(activityInformation.groupOfSubpopulation);
+					printer.print(activity.getType());
+					printer.print(activityInformation.countForPerson);
+					printer.print(label);
+					printer.print(duration);
+					BigDecimal durationInMinutes = new BigDecimal(duration / 60).setScale(0, RoundingMode.HALF_UP);
+					printer.print(durationInMinutes);
+					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+						if (activityInformation.groupOfSubpopulation.equals(group)) {
+							printer.print(durationInMinutes);
+						} else {
+							printer.print(Double.NaN);
+						}
+					}
+					printer.println();
 				}
 			}
 		} catch (IOException e) {
@@ -203,7 +205,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	private void createGeneralTravelDataAnalysis(Path generalTravelDataOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
+	private void createGeneralTravelDataAnalysis(LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
 
 		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfRelevantVehicles();
 		Map<String, List<Id<Vehicle>>> vehiclesPerGroup = groupOfVehicles.entrySet().stream()
@@ -223,7 +225,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(generalTravelDataOutputFile), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_generalTravelData.csv")), CSVFormat.DEFAULT)) {
 			// _Intern: internal trips (start and end inside the area)
 			// _Incoming: incoming trips (start outside the area and end inside the area)
 			// _Outgoing: incoming trips (start inside the area and end outside the area)
@@ -352,7 +354,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return filteredList;
 	}
 
-	private void createAnalysisPerVehicle(Path travelDistancesPerVehicleOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createAnalysisPerVehicle(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
 		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfRelevantVehicles();
 		HashMap<Id<Vehicle>, Double> tourDurations = linkDemandEventHandler.getTourDurationPerVehicle();
@@ -360,30 +362,32 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		Object2IntOpenHashMap<Id<Person>> jobsPerPerson = linkDemandEventHandler.getNumberOfJobsPerPerson();
 		Map<String, Integer> maxDistanceWithDepotChargingInKilometers = createBatterieCapacitiesPerVehicleType();
 		List<String> distanceLabels = AnalysisUtils.createGroupLabels(distGroups);
-		Object2DoubleOpenHashMap<String> travelDistancesPerGroup = linkDemandEventHandler.getTravelDistancesPerGroup();
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(travelDistancesPerVehicleOutputFile), CSVFormat.DEFAULT)) {
+		List<String> tourDurationLabels = AnalysisUtils.createGroupLabels(tourDurationGroups);
+		List<String> numberOfJobsLabels = AnalysisUtils.createGroupLabels(numberOfJobsGroups);
+
+		writeAnalysisPerVehicle_distances(distanceLabels, travelDistancesPerVehicle, vehicleToPersonId, vehicleGroupOfSubpopulation,
+			maxDistanceWithDepotChargingInKilometers);
+		writeAnalysisPerVehicle_durations(tourDurationLabels, travelDistancesPerVehicle, tourDurations, vehicleToPersonId,
+			vehicleGroupOfSubpopulation);
+		writeAnalysisPerVehicle_numberOfJobs(numberOfJobsLabels, travelDistancesPerVehicle, vehicleToPersonId, vehicleGroupOfSubpopulation,
+			jobsPerPerson);
+	}
+
+	private void writeAnalysisPerVehicle_distances(List<String> distanceLabels,
+						   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
+						   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation, Map<String, Integer> maxDistanceWithDepotChargingInKilometers) {
+			try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "distances")), CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
 			printer.print("vehicleId");
 			printer.print("vehicleType");
 			printer.print("groupOfSubpopulation");
-			printer.print("jobsPerTour");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				printer.print("jobsPerTour_" + group);
-			}
 			printer.print("dist_group");
 			printer.print("distanceInKm");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet())
 				printer.print("distanceInKm_" + group);
-				printer.print("distanceShares_" + group);
-			}
 			printer.print("distanceInKmWithDepotCharging");
 			printer.print("shareOfTravelDistanceWithDepotCharging");
-			printer.print("tourDurationInSeconds");
-			printer.print("tourDurationsInHours");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				printer.print("tourDurationsInHours_" + group);
-			}
 			printer.println();
 			for (String label : distanceLabels) {
 				for (String vehicleType : travelDistancesPerVehicle.keySet()) {
@@ -401,24 +405,13 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						printer.print(vehicleType);
 						String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
 						printer.print(groupOfSubpopulation);
-						printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
-						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-							if (groupOfSubpopulation.equals(group)) {
-								printer.print(jobsPerPerson.getInt(vehicleToPersonId.get(Id.createVehicleId(vehicleId))));
-							} else {
-								printer.print(Double.NaN);
-							}
-						}
 						printer.print(labelForValue);
 						printer.print(traveledDistanceInKm);
 						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-							if (groupOfSubpopulation.equals(group)) {
+							if (groupOfSubpopulation.equals(group))
 								printer.print(traveledDistanceInKm);
-								printer.print(new BigDecimal(traveledDistanceInMeters / travelDistancesPerGroup.getDouble(groupOfSubpopulation)));
-							} else {
+							else
 								printer.print(Double.NaN);
-								printer.print(Double.NaN);
-							}
 						}
 						String maxDistanceWithoutRecharging;
 						if (maxDistanceWithDepotChargingInKilometers.containsKey(vehicleType)) {
@@ -431,19 +424,131 @@ public class CommercialAnalysis implements MATSimAppCommand {
 							printer.print(Double.NaN);
 							printer.print(Double.NaN);
 						}
-						printer.print(tourDurations.get(Id.createVehicleId(vehicleId)));
-						printer.print(new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
+						printer.println();
+					}
+				}
+			}
+		} catch (IOException e) {
+			log.error("Could not create output file", e);
+		}
+	}
+
+	private void writeAnalysisPerVehicle_durations(List<String> tourDurationLabels,
+												   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle, HashMap<Id<Vehicle>, Double> tourDurations,
+												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "durations")), CSVFormat.DEFAULT)) {
+
+			printer.print("personId");
+			printer.print("vehicleId");
+			printer.print("vehicleType");
+			printer.print("groupOfSubpopulation");
+						printer.print("duration_group");
+			printer.print("tourDurationInSeconds");
+			printer.print("tourDurationsInHours");
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				printer.print("tourDurationsInHours_" + group);
+			}
+			printer.println();
+			for (String label : tourDurationLabels) {
+				for (Id<Vehicle> vehicleId : tourDurations.keySet()) {
+					String vehicleType = null;
+					for (String type : travelDistancesPerVehicle.keySet()) {
+						if (travelDistancesPerVehicle.get(type).containsKey(vehicleId.toString())) {
+							vehicleType = type;
+							break;
+						}
+					}
+					Double tourDurationsInS = tourDurations.get(Id.createVehicleId(vehicleId));
+					BigDecimal tourDurationInH = new BigDecimal(tourDurationsInS / 3600.).setScale(2, RoundingMode.HALF_UP);
+
+					String labelForValue = AnalysisUtils.getLabelForValue(tourDurationInH.longValue(), tourDurationGroups, tourDurationLabels);
+					// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
+					if (!label.equals(labelForValue))
+						continue;
+					printer.print(vehicleToPersonId.get(vehicleId));
+					printer.print(vehicleId.toString());
+					printer.print(vehicleType);
+					String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
+					printer.print(groupOfSubpopulation);
+
+					printer.print(labelForValue);
+					printer.print(tourDurationsInS);
+					printer.print(tourDurationInH);
+					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+						if (groupOfSubpopulation.equals(group)) {
+							printer.print(
+								tourDurationInH);
+						} else {
+							printer.print(Double.NaN);
+						}
+					}
+					printer.println();
+				}
+			}
+		} catch (IOException e) {
+			log.error("Could not create output file", e);
+		}
+	}
+
+	private void writeAnalysisPerVehicle_numberOfJobs(List<String> numberOfJobsLabels,
+													  HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
+													HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
+													  Object2IntOpenHashMap<Id<Person>> jobsPerPerson) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour")), CSVFormat.DEFAULT)) {
+
+			printer.print("personId");
+			printer.print("vehicleId");
+			printer.print("vehicleType");
+			printer.print("groupOfSubpopulation");
+			printer.print("numberOfJobs_group");
+			printer.print("jobsPerTour");
+			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+				printer.print("jobsPerTour_" + group);
+			}
+			printer.println();
+
+			for (String label : numberOfJobsLabels) {
+					for (Id<Person> personId : jobsPerPerson.keySet()) {
+						int jobsPerTour = jobsPerPerson.getInt(personId);
+
+						String labelForValue = AnalysisUtils.getLabelForValue(jobsPerTour, numberOfJobsGroups, numberOfJobsLabels);
+						// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
+						if (!label.equals(labelForValue))
+							continue;
+
+						String vehicleId = null;
+						for (Id<Vehicle> vehicleId1 : vehicleToPersonId.keySet()) {
+							if (vehicleToPersonId.get(vehicleId1).equals(personId)) {
+								vehicleId = vehicleId1.toString();
+								break;
+							}
+						}
+						String vehicleType = null;
+						for (String vehicleType1 : travelDistancesPerVehicle.keySet()) {
+							if (travelDistancesPerVehicle.get(vehicleType1).containsKey(vehicleId)) {
+								vehicleType = vehicleType1;
+								break;
+							}
+						}
+						if (vehicleId == null || vehicleType == null) {
+							continue;
+						}
+						printer.print(personId);
+						printer.print(vehicleId);
+						printer.print(vehicleType);
+						String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
+						printer.print(groupOfSubpopulation);
+						printer.print(labelForValue);
+						printer.print(jobsPerTour);
 						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 							if (groupOfSubpopulation.equals(group)) {
-								printer.print(
-									new BigDecimal(tourDurations.get(Id.createVehicleId(vehicleId)) / 3600.).setScale(2, RoundingMode.HALF_UP));
+								printer.print(jobsPerTour);
 							} else {
 								printer.print(Double.NaN);
 							}
 						}
 						printer.println();
 					}
-				}
 			}
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
@@ -461,8 +566,10 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		maxDistanceWithDepotChargingInKilometers.put("mercedes313_parcel", 440); //https://www.adac.de/rund-ums-fahrzeug/autokatalog/marken-modelle/mercedes-benz/esprinter/
 		maxDistanceWithDepotChargingInKilometers.put("mercedes313", 440);
 		maxDistanceWithDepotChargingInKilometers.put("light8t", 174);
+		maxDistanceWithDepotChargingInKilometers.put("truck8t", 174);
 		maxDistanceWithDepotChargingInKilometers.put("medium18t", 395);
 		maxDistanceWithDepotChargingInKilometers.put("medium18t_parcel", 395);
+		maxDistanceWithDepotChargingInKilometers.put("truck18t", 395);
 		maxDistanceWithDepotChargingInKilometers.put("waste_collection_diesel", 280);
 		maxDistanceWithDepotChargingInKilometers.put("heavy40t", 416);
 		maxDistanceWithDepotChargingInKilometers.put("heavy", 416);
@@ -470,11 +577,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return maxDistanceWithDepotChargingInKilometers;
 	}
 
-	private void createRelationsAnalysis(Path relationsOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createRelationsAnalysis(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 		Map<Integer, Object2DoubleMap<String>> relations = linkDemandEventHandler.getRelations();
 		ArrayList<String> header = getHeaderForRelations(relations);
 		ArrayList<Integer> relationNumbers = new ArrayList<>(relations.keySet());
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(relationsOutputFile), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_relations.csv")), CSVFormat.DEFAULT)) {
 
 			printer.print("relationNumber");
 			for (String h : header) {
@@ -514,23 +621,24 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return header;
 	}
 
-	private void createTravelDistancesShares(Path travelDistancesPerModeOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
-		String newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perMode.csv");
+	private void createTravelDistancesShares(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+		String filename = "commercialTraffic_travelDistancesShares.csv";
+		Path path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perMode");
 		Object2DoubleOpenHashMap<String> travelDistancesPerMode = linkDemandEventHandler.getTravelDistancesPerMode();
-		writeDistanceFiles(travelDistancesPerMode, newFileName);
-		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perGroup.csv");
+		writeDistanceFiles(travelDistancesPerMode, path);
+		path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perGroup");
 		Object2DoubleOpenHashMap<String> travelDistancesPerGroup = linkDemandEventHandler.getTravelDistancesPerGroup();
-		writeDistanceFiles(travelDistancesPerGroup, newFileName);
-		newFileName = travelDistancesPerModeOutputFile.getFileName().toString().replace(".csv", "_perSubpopulation.csv");
+		writeDistanceFiles(travelDistancesPerGroup, path);
+		path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perSubpopulation");
 		Object2DoubleOpenHashMap<String> travelDistancesPerSubpopulation = linkDemandEventHandler.getTravelDistancesPerSubpopulation();
-		writeDistanceFiles(travelDistancesPerSubpopulation, newFileName);
+		writeDistanceFiles(travelDistancesPerSubpopulation, path);
 	}
 
-	private void writeDistanceFiles(Object2DoubleOpenHashMap<String> travelDistancesPerMode, String fileName) {
+	private void writeDistanceFiles(Object2DoubleOpenHashMap<String> travelDistancesPerMode, Path path) {
 		ArrayList<String> headerWithModes = new ArrayList<>(travelDistancesPerMode.keySet());
 		headerWithModes.sort(Comparator.naturalOrder());
 		double sumOfAllDistances = travelDistancesPerMode.values().doubleStream().sum();
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath(fileName)), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(path), CSVFormat.DEFAULT)) {
 
 			for (String h : headerWithModes) {
 				printer.print(h);
@@ -549,7 +657,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	public void createLinkVolumeAnalysis(Scenario scenario, Path linkDemandOutputFile, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	public void createLinkVolumeAnalysis(Scenario scenario, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
 
 //		File file = new File(linkDemandOutputFile);
 		Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = linkDemandEventHandler.getLinkVolumesPerMode();
@@ -558,7 +666,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		scenario.getVehicles().getVehicleTypes().values().forEach(vehicleType -> {
 			if (!headerWithModes.contains(vehicleType.getNetworkMode())) headerWithModes.add(vehicleType.getNetworkMode());
 		});
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(linkDemandOutputFile), CSVFormat.Builder.create().setDelimiter(";").get())) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_link_volume.csv")), CSVFormat.Builder.create().setDelimiter(";").get())) {
 			printer.print("linkId");
 			for (String mode : headerWithModes) {
 				printer.print(mode);
@@ -588,4 +696,5 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 		return groupsOfSubpopulations;
 	}
+	record ActivityInformation(Activity activity, int countForPerson, Id<Person> personId, String groupOfSubpopulation){}
 }
