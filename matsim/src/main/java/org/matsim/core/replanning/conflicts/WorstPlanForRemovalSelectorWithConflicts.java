@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,7 +46,7 @@ import com.google.inject.Inject;
 public class WorstPlanForRemovalSelectorWithConflicts implements PlanSelector<Plan, Person> {
 	public static final String SELECTOR_NAME = "WorstPlanForRemovalSelectorWithConflicts";
 
-	private final Logger logger = Logger.getLogger(WorstPlanForRemovalSelectorWithConflicts.class);
+	private final Logger logger = LogManager.getLogger(WorstPlanForRemovalSelectorWithConflicts.class);
 
 	private final ConflictManager conflictManager;
 
