@@ -52,6 +52,21 @@ public class CarrierViewerDashboardTest {
 		//load carriers according to freight config
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenario);
 
+
+
+		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		group.setSampleSize(0.001);
+
+		// ## MATSim configuration:  ##
+		SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+
+		SimWrapper simWrapper = SimWrapper.create(config);
+		simWrapper.addDashboard(new CarrierDashboard());
+		final Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new CarrierModule());
+		controler.addOverridingModule(new SimWrapperModule(simWrapper));
+		controler.getInjector();
 		// Solving the VRP (generate carrier's tour plans)
 		try {
 			CarriersUtils.runJsprit(scenario);
@@ -59,13 +74,7 @@ public class CarrierViewerDashboardTest {
 			throw new RuntimeException(e);
 		}
 
-		SimWrapperConfigGroup group = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		group.setSampleSize(0.001);
 
-		// ## MATSim configuration:  ##
-		final Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new CarrierModule());
-		controler.addOverridingModule(new SimWrapperModule());
 		controler.run();
 	}
 
