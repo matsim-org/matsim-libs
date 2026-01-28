@@ -95,16 +95,49 @@ public class CommercialTrafficDashboard implements Dashboard {
 				### **Number of Jobs Analysis**
 				""";
 		});
+		layout.row("veh-Activities-hist_total", "Activities").el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Number of Jobs per vehicle (h)";
+				viz.description = "Histogram of jobs per tour for the complete commercial traffic.";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+
+					.constant("source", "Veh");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.build(),
+						ds.mapping()
+							.x("jobsPerTour")
+					);
+			})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Number of Jobs per vehicle (h)";
+				viz.description = "Histogram of jobs per tour for the complete commercial traffic (given bins).";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+
+					.constant("source", "Veh");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.build(),
+						ds.mapping()
+							.x("numberOfJobs_group")
+							.y("jobsPerTour")
+					);
+			});
+
 		layout.row("veh-Activities-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Number of Jobs per vehicle (h)";
-			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.description = "Histogram of jobs per vehicle tour by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Duration [h]").build())
-				.yAxis(Axis.builder().title("Count").build())
 				.showLegend(true)
 				.build();
-
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
@@ -113,25 +146,46 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 						.name(group)
 						.build(),
 					ds.mapping()
 						.x("jobsPerTour_" + group)
 				);
 			}
-		});
+		})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Number of Jobs per vehicle";
+				viz.description = "Histogram of jobs per vehicle tour by group of subpopulation (given bins).";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+
+					.constant("source", "Veh");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("numberOfJobs_group")
+							.y("jobsPerTour_" + group)
+					);
+				}
+			});
 
 		layout.row("veh-Activities-box", "Activities").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Number of Jobs  per vehicle type (h)";
 			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Vehicle type").build())
-				.yAxis(Axis.builder().title("Duration [h]").build())
 				.showLegend(true)
 				.build();
-
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
@@ -190,10 +244,45 @@ public class CommercialTrafficDashboard implements Dashboard {
 				### **Activity Duration Analysis of the tours**
 				""";
 		});
+		layout.row("veh-ActivityDurations-hist_total", "Activities").el(Plotly.class, (viz, data) -> {
+
+				viz.title = "ActivityDurations per vehicle (min)";
+				viz.description = "Histogram of activity durations for the complete commercial traffic.";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+
+					.constant("source", "Act");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.build(),
+						ds.mapping()
+							.x("activityDurationInMinutes")
+					);
+			})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "ActivityDurations per vehicle (min)";
+				viz.description = "Histogram of activity durations for the complete commercial traffic (given bins).";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+
+					.constant("source", "Act");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.build(),
+						ds.mapping()
+							.x("activityDuration_group")
+							.y("activityDurationInMinutes")
+					);
+			});
 		layout.row("veh-ActivityDurations-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "ActivityDurations per vehicle (km)";
-			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.title = "ActivityDurations per vehicle (min)";
+			viz.description = "Histogram of activity durations by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("Distance [km]").build())
 				.yAxis(Axis.builder().title("Count").build())
@@ -208,18 +297,45 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.constant("source", "Act");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 						.name(group)
 						.build(),
 					ds.mapping()
 						.x("activityDurationInMinutes_" + group)
 				);
 			}
-		});
+		})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "ActivityDurations per vehicle (min)";
+				viz.description = "Histogram of activity durations by group of subpopulation (given bins).";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.xAxis(Axis.builder().title("Distance [km]").build())
+					.yAxis(Axis.builder().title("Count").build())
+					.showLegend(true)
+					.build();
+
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+
+					.constant("source", "Act");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("activityDuration_group")
+							.y("activityDurationInMinutes_" + group)
+					);
+				}
+			});
 
 		layout.row("veh-ActivityDurations-box", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "ActivityDurations per activityType (km)";
+			viz.title = "ActivityDurations per activityType (min)";
 			viz.description = "Boxplots per activityType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("activityType").build())
@@ -245,7 +361,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-ActivityDurations-violin", "Activities").	el(Plotly.class, (viz, data) -> {
-				viz.title = "ActivityDurations per vehicle type (km) Violin *" + group + "*";
+				viz.title = "ActivityDurations per vehicle type (min) Violin *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("activityType").build())
@@ -287,20 +403,78 @@ public class CommercialTrafficDashboard implements Dashboard {
 				### **Distance Analysis of the tours**
 				""";
 		});
+
+		layout.row("veh-dist-hist_total", "Tours").el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Distance (km) per vehicle";
+				viz.description = "Histogram of distances per vehicle tour of the complete commercial traffic.";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+
+					.constant("source", "Veh");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.build(),
+						ds.mapping()
+							.x("distanceInKm")
+					);
+
+			})
+			.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Distance (km) per vehicle";
+				viz.description = "Histogram of distances per vehicle tour of the complete commercial traffic (given bins).";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+
+					.constant("source", "Veh");
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.build(),
+						ds.mapping()
+							.x("dist_group")
+							.y("distanceInKm")
+					);
+			});
+
 		layout.row("veh-dist-hist", "Tours").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Distance (km) per vehicle";
 			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Distance [km]").build())
-				.yAxis(Axis.builder().title("Count").build())
 				.showLegend(true)
 				.build();
-
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.compute(CommercialAnalysis.class, "commercialTraffic_tourAnalysis.csv"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+
+				.constant("source", "Veh");
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.x("distanceInKm_" + group)
+				);
+			}
+		})
+		.el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Distance (km) per vehicle";
+			viz.description = "Histogram of distances per vehicle tour by group of subpopulation (given bins).";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.showLegend(true)
+				.build();
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
 
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -382,13 +556,47 @@ public class CommercialTrafficDashboard implements Dashboard {
 				### **Duration Analysis of the tours**
 				""";
 		});
+		layout.row("veh-duration-hist_total", "Tours").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Duration (h) per vehicle";
+			viz.description = "Histogram of durations per vehicle tour for the complete commercial traffic.";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+
+				.constant("source", "Veh");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+						.build(),
+					ds.mapping()
+						.x("tourDurationsInHours")
+				);
+
+		}).el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Duration (h) per vehicle";
+			viz.description = "Histogram of diurations per vehicle tour for the complete commercial traffic (given bins).";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+
+				.constant("source", "Veh");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.build(),
+					ds.mapping()
+						.y("tourDurationsInHours")
+						.x("duration_group")
+				);
+		});
+
 		layout.row("veh-duration-hist", "Tours").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Duration (h) per vehicle";
-			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+			viz.description = "Histogram of durations per vehicle tour by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Duration [h]").build())
-				.yAxis(Axis.builder().title("Count").build())
 				.showLegend(true)
 				.build();
 
@@ -400,22 +608,43 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 						.name(group)
 						.build(),
 					ds.mapping()
 						.x("tourDurationsInHours_" + group)
 				);
 			}
-		});
+		}).el(Plotly.class, (viz, data) -> {
 
+			viz.title = "Duration (h) per vehicle";
+			viz.description = "Histogram of durations per vehicle tour by group of subpopulation (given bins).";
+			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+				.showLegend(true)
+				.build();
+
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+
+				.constant("source", "Veh");
+			for (String group : groupsOfCommercialSubpopulations.keySet()) {
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.name(group)
+						.build(),
+					ds.mapping()
+						.y("tourDurationsInHours_" + group)
+						.x("duration_group")
+				);
+			}
+		});
 		layout.row("veh-duration-box", "Tours").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Duration (h) per vehicle type";
 			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Vehicle type").build())
-				.yAxis(Axis.builder().title("Duration [h]").build())
 				.showLegend(true)
 				.build();
 
@@ -440,8 +669,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.title = "Duration (h) per vehicle type *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Vehicle type").build())
-					.yAxis(Axis.builder().title("Duration [h]").build())
 					.showLegend(false)
 					.build();
 
