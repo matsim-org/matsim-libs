@@ -225,8 +225,11 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 
 		if (group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()))
 			return;
-		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (k) -> event.getTime());
-		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), (k) -> group);
+		String vehicleType = scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
+		travelDistancesPerVehicle.computeIfAbsent(vehicleType, (_) -> new Object2DoubleOpenHashMap<>()).mergeDouble(event.getVehicleId().toString(), 0, Double::sum);
+
+		tourStartPerPerson.computeIfAbsent(event.getVehicleId(), (_) -> event.getTime());
+		groupOfRelevantVehicles.computeIfAbsent(event.getVehicleId(), (_) -> group);
 		vehicleIdToPersonId.put(event.getVehicleId(), event.getPersonId());
 	}
 
