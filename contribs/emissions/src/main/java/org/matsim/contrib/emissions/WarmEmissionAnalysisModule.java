@@ -35,6 +35,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.*;
@@ -51,6 +53,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
+	private final Map<HbefaWarmEmissionFactorKey, List<HbefaWarmEmissionFactorKey>> hbefaRoadVClasses = new HashMap<>(); //TODO Remove if BiLinInt is not useful
 	private final Set<Pollutant> warmPollutants;
 
 	private final EventsManager eventsManager;
@@ -597,6 +600,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		HbefaRoadVehicleCategoryKey hbefaRoadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(efkey);
 		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(hbefaRoadVehicleCategoryKey);
 
+		if(trafficSpeeds.size() != 5){
+			throw new RuntimeException("HbefaTable seems to be incomplete or the version has been changed. " +
+				"Expected 5 trafficSituations (HBEFA4.1 standard), but got " + trafficSpeeds.size() + ": " + trafficSpeeds.keySet());
+		}
+
 		int situation = -1;
 		switch (higher){
 			case FREEFLOW -> situation=5;
@@ -846,27 +854,40 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		// TODO This is a temporary implementation which is inefficient and unstable. The final solutions should not determine the keys using a testing-loop but rather use a table
 		// TODO The keys also should not be determined from scratch each emission event but rather computed once and then get saved
 
-		String[] roadAttributes = efkey.getRoadCategory().split("/");
-		String roadType = roadAttributes[0] + "/" + roadAttributes[1] + "/";
+		HbefaWarmEmissionFactorKey efKeyCopy = new HbefaWarmEmissionFactorKey(efkey);
+		efKeyCopy.setTrafficSituation(FREEFLOW);
 
-		List<HbefaWarmEmissionFactorKey> keys = detailedHbefaWarmTable.keySet().stream().filter(k ->
-			k.getVehicleCategory().equals(efkey.getVehicleCategory()) &&
-			k.getVehicleAttributes().equals(efkey.getVehicleAttributes()) &&
-			k.getComponent().equals(efkey.getComponent()) &&
-			k.getTrafficSituation().equals(FREEFLOW) &&
-			k.getRoadCategory().startsWith(roadType)
-		).sorted(
-			(k1, k2) -> {
-				var k1VClass = Arrays.stream(k1.getRoadCategory().split("/")).toList().getLast();
-				var k2VClass = Arrays.stream(k2.getRoadCategory().split("/")).toList().getLast();
+		Function<String, String> removeVClass = (s) -> s.substring(0, s.lastIndexOf("/"));
+		Function<String, String> getVClass = (s) -> s.substring(s.lastIndexOf("/")+1);
 
-				if(k1VClass.matches("[0-9]+") && k2VClass.matches("[0-9]+") ){
-					return Integer.valueOf(k1VClass).compareTo(Integer.valueOf(k2VClass));
-				} else {
-					return k1.getRoadCategory().compareTo(k2.getRoadCategory());
-				}
-			}
-		).toList();
+		if ( !hbefaRoadVClasses.containsKey(efKeyCopy) ){
+			Set<HbefaWarmEmissionFactorKey> vClasses = detailedHbefaWarmTable.keySet().stream().filter( k ->
+				k.getVehicleCategory().equals(efKeyCopy.getVehicleCategory()) &&
+				k.getVehicleAttributes().equals(efKeyCopy.getVehicleAttributes()) &&
+				k.getComponent().equals(efKeyCopy.getComponent()) &&
+				k.getTrafficSituation().equals(efKeyCopy.getTrafficSituation()) &&
+				k.getRoadCategory().startsWith(removeVClass.apply(efKeyCopy.getRoadCategory()))
+			).collect(Collectors.toSet());
+//			System.out.println(efKeyCopy + ": " + vClasses + "\n\n"); // TODO DEBUG ONLY
+
+			hbefaRoadVClasses.put(
+				efKeyCopy,
+				vClasses.stream().sorted(
+					(k1, k2) -> {
+						var k1VClass = getVClass.apply(k1.getRoadCategory());
+						var k2VClass = getVClass.apply(k2.getRoadCategory());
+
+						if(k1VClass.matches("[0-9]+") && k2VClass.matches("[0-9]+") ){
+							return Integer.valueOf(k1VClass).compareTo(Integer.valueOf(k2VClass));
+						} else {
+							return k1.getRoadCategory().compareTo(k2.getRoadCategory());
+						}
+					}
+				).toList()
+			);
+		}
+
+		var keys = hbefaRoadVClasses.get(efKeyCopy);
 
 		// Round to next higher v-class
 		double lastVValue = Double.POSITIVE_INFINITY;
@@ -896,27 +917,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private HbefaWarmEmissionFactorKey getLowerVClass(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey, double freeFlowSpeed_kmh){
 		// TODO This is a temporary and inefficient implementation. The final solutions should not determine the keys each time but save them
 
-		String[] roadAttributes = efkey.getRoadCategory().split("/");
-		String roadType = roadAttributes[0] + "/" + roadAttributes[1] + "/";
+		HbefaWarmEmissionFactorKey efKeyCopy = new HbefaWarmEmissionFactorKey(efkey);
+		efKeyCopy.setTrafficSituation(FREEFLOW);
 
-		List<HbefaWarmEmissionFactorKey> keys = detailedHbefaWarmTable.keySet().stream().filter(k ->
-			k.getVehicleCategory().equals(efkey.getVehicleCategory()) &&
-				k.getVehicleAttributes().equals(efkey.getVehicleAttributes()) &&
-				k.getComponent().equals(efkey.getComponent()) &&
-				k.getTrafficSituation().equals(FREEFLOW) &&
-				k.getRoadCategory().startsWith(roadType)
-		).sorted(
-			(k1, k2) -> {
-				var k1VClass = Arrays.stream(k1.getRoadCategory().split("/")).toList().getLast();
-				var k2VClass = Arrays.stream(k2.getRoadCategory().split("/")).toList().getLast();
-
-				if(k1VClass.matches("[0-9]+") && k2VClass.matches("[0-9]+") ){
-					return Integer.valueOf(k1VClass).compareTo(Integer.valueOf(k2VClass));
-				} else {
-					return k1.getRoadCategory().compareTo(k2.getRoadCategory());
-				}
-			}
-		).toList().reversed();
+		var keys = hbefaRoadVClasses.get(efKeyCopy).reversed();
 
 		// Round to next higher v-class
 		double lastVValue = Double.NEGATIVE_INFINITY;
