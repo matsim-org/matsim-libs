@@ -133,7 +133,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("veh-Activities-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Number of Jobs per vehicle (h)";
+			viz.title = "Number of Jobs per vehicle";
 			viz.description = "Histogram of jobs per vehicle tour by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.showLegend(true)
@@ -181,7 +181,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("veh-Activities-box", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Number of Jobs  per vehicle type (h)";
+			viz.title = "Number of Jobs  per vehicle type";
 			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.showLegend(true)
@@ -204,11 +204,9 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-Activities-violin", "Activities").	el(Plotly.class, (viz, data) -> {
-				viz.title = "Number of Jobs per vehicle type (h) Violin *" + group + "*";
+				viz.title = "Number of Jobs per vehicle type *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Vehicle type").build())
-					.yAxis(Axis.builder().title("Duration [h]").build())
 					.showLegend(false)
 					.build();
 
@@ -284,8 +282,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "ActivityDurations per vehicle (min)";
 			viz.description = "Histogram of activity durations by group of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Distance [km]").build())
-				.yAxis(Axis.builder().title("Count").build())
 				.showLegend(true)
 				.build();
 
@@ -310,8 +306,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.title = "ActivityDurations per vehicle (min)";
 				viz.description = "Histogram of activity durations by group of subpopulation (given bins).";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("Distance [km]").build())
-					.yAxis(Axis.builder().title("Count").build())
 					.showLegend(true)
 					.build();
 
@@ -338,8 +332,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "ActivityDurations per activityType (min)";
 			viz.description = "Boxplots per activityType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("activityType").build())
-				.yAxis(Axis.builder().title("Distance [km]").build())
 				.showLegend(true)
 				.build();
 
@@ -361,11 +353,9 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-ActivityDurations-violin", "Activities").	el(Plotly.class, (viz, data) -> {
-				viz.title = "ActivityDurations per vehicle type (min) Violin *" + group + "*";
+				viz.title = "ActivityDurations per vehicle type (min) *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.xAxis(Axis.builder().title("activityType").build())
-					.yAxis(Axis.builder().title("Distance [km]").build())
 					.showLegend(false)
 					.build();
 
@@ -494,8 +484,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Distance (km) per vehicle type II";
 			viz.description = "Boxplots per vehicleType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Vehicle type").build())
-				.yAxis(Axis.builder().title("Distance [km]").build())
 				.showLegend(true)
 				.build();
 
@@ -520,8 +508,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Distance (km) per vehicle type in group: *" + group + "*";
 			viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.xAxis(Axis.builder().title("Vehicle type").build())
-				.yAxis(Axis.builder().title("Distance [km]").build())
 				.showLegend(false)
 				.build();
 
