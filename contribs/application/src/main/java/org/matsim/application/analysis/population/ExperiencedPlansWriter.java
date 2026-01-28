@@ -42,7 +42,8 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		if ( args==null || args.length==0 ) {
 			args = new String[] {
 //				"--path", "/Users/kainagel/kairuns/equil/output"
-				"--path", "/Users/kainagel/git/all-matsim/matsim-example-project/scenarios/equil/output"
+				"--path", "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued",
+				"--runId", "true"
 			};
 		}
 		new ExperiencedPlansWriter().execute(args);
@@ -56,16 +57,27 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
+		config.controller().setOutputDirectory(
+			path.resolve("experienced-plans-tmp").toString()
+		);
+		config.controller().setOverwriteFileSetting(
+			OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+		);
+
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
 
 		// yyyyyy there is a runId from args, and a config.controller().getRunId().  there is also "prefix", which hedges against no runId.  Needs to be sorted out!!!!
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
-		Path output = eventsPath.getParent().resolve(config.controller().getRunId() + ".output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		Path output = Path.of(
+			"/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/",
+			Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz"
+		);
+		/*
 		if ( config.controller().getRunId()==null || config.controller().getRunId().length()==0 ) {
 			output = eventsPath.getParent().resolve("output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
-		}
+		} */
 		// (There is functionality for this in the matsim core.)
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)

@@ -84,6 +84,7 @@ class AgentWiseComparisonKNUtils{
 	}
 	static void handleEventsfile( Path path, String pattern, Population population ){
 		String baseEventsFile = globFile( path, pattern ).toString();
+		log.info( baseEventsFile );
 
 		double popSizeBefore = population.getPersons().size();
 
@@ -396,14 +397,16 @@ class AgentWiseComparisonKNUtils{
 			try{
 				basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
 			} catch ( IllegalStateException e2 ) {
-				basePopulationFilename = globFile( path, "*_experienced_plans.xml.gz" ).toString();
+				basePopulationFilename = globFile( path, "*.experienced_plans.xml.gz" ).toString();
 			}
 		}
 
 		Population basePopulation = PopulationUtils.readPopulation( basePopulationFilename );
 
 		cleanPopulation( basePopulation );
+		log.info("Cleaned base population; size={}", basePopulation.getPersons().size() );
 
+		log.info("Reading events files to enrich the base population with money and stuck info");
 		for (String pattern : eventsFilePatterns) {
 			handleEventsfile( path, pattern, basePopulation );
 			// (most of the time, this should be a filtered events file, and we only use money and stuck info)

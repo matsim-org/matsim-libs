@@ -180,6 +180,11 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 	}
 
+	@Override
+	public Population getPopulationWithExperiencedPlans() {
+		return null;
+	}
+
 	/**
 	 * Collects all experienced plans on the head node so that they can be written to disk on that node.
 	 * <p>

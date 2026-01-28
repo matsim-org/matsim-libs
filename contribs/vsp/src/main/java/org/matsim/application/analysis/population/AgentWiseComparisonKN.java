@@ -64,8 +64,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static int scoreWrnCnt = 0;
 
-	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
-	private Path inputPath;
+//	@CommandLine.Parameters(description = "Path to run output directory for which analysis should be performed.")
+//	private Path inputPath;
 
 	@CommandLine.Option(names = "--base-path", description = "Path to run directory of base case.", required = true)
 	private Path baseCasePath;
@@ -86,20 +86,23 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	TripRouter tripRouter1;
 	TripRouter tripRouter2;
 
-	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
+	//private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
 	// equil:
 //	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 //	private static final String policyDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 
 	// gartenfeld:
-	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
-	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
+//	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
+//	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
 
 	// zez:
 //	private static final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
 //	private static final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
 //	private static final String runId="";
+
+
+	private static final String baseDir = "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued";
 
 	public static void main( String[] args ){
 //		{
@@ -134,9 +137,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		}
 		{
 			args = new String[]{
-				"--prefix=" + onlyMoneyAndStuck,
+				"--prefix=",
 				"--base-path=" + baseDir,
-				policyDir
+				//policyDir
 			};
 			new AgentWiseComparisonKN().execute( args );
 		}
@@ -151,7 +154,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				eventsFilePatterns.add( "*" + prefix + "output_events_filtered.xml.gz" );
 			}
 		} else{
-			eventsFilePatterns.add( "*output_events.xml.gz" );
+			eventsFilePatterns.add( ".output_events.xml.gz" );
 		}
 
 
@@ -232,13 +235,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		}
 		{
-			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-			String policyNetworkFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
+			//String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+			//String policyNetworkFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
 			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( baseConfig );
-			new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
+			//new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
 			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
 			scenario2.setPopulation( baseScenario.getPopulation() );
-			new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
+			//new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
 			this.injector2 = new Injector.InjectorBuilder( scenario2 )
 													   .addStandardModules()
 													   .addOverridingModule( new AbstractModule(){
@@ -266,8 +269,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null );
 
 		// ### next cometh the policy data:
-
-		String policyConfigFilename = globFile( inputPath, "*output_config_reduced.xml" ).toString();
+/*
+		//String policyConfigFilename = globFile( inputPath, "*output_config_reduced.xml" ).toString();
 		// (The reduced config has fewer problems with newly introduced config params.)
 
 		Config policyConfig = ConfigUtils.loadConfig( policyConfigFilename );
@@ -281,7 +284,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation );
 
-		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
+		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath ); */
 
 		return 0;
 	}
@@ -604,7 +607,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
 
-		writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+		//writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
 
 		writeAscTable( baseConfig );
 
