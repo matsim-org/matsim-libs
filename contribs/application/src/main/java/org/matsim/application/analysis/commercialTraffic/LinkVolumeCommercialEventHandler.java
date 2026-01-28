@@ -173,8 +173,7 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 			.map(Activity::getType)
 			.collect(Collectors.toSet());
 		// only consider relations of the jobs and not the first and last activity of a commercial tour, when the list of activities is empty, this is an A to B trip, and we consider it as well
-		if (!activitiesTypes.isEmpty() && (!activitiesTypes.contains(event.getActType()) || group.equals(
-			TripAnalysis.ModelType.UNASSIGNED.toString()))) {
+		if (group.equals(TripAnalysis.ModelType.UNASSIGNED.toString()) ||(!activitiesTypes.isEmpty() && !activitiesTypes.contains(event.getActType()))) {
 			return;
 		}
 		numberOfJobsPerPerson.mergeInt(event.getPersonId(), 1, Integer::sum);
