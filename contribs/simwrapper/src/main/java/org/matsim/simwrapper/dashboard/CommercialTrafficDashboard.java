@@ -28,16 +28,18 @@ public class CommercialTrafficDashboard implements Dashboard {
 	/**
 	 * Create a dashboard to show aggregated OD information per mode.
 	 *
-	 * @param crs   Coordinate system for the projection of the map
+	 * @param crs Coordinate system for the projection of the map
 	 */
 	public CommercialTrafficDashboard(String crs) {
 		this.crs = crs;
 		args = new String[0];
 	}
 
-	/** Set the groups of subpopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
+	/**
+	 * Set the groups of subpopulations for the commercial analysis. So it is possible to exclude person agents from this analysis, and also different subpopulations can be analyzed as one group.
 	 * Different groups are separated by ';' and subpopulations within a group by ','. The delimiter between group name and subpopulations is '='.
 	 * See {@link CommercialAnalysis}.
+	 *
 	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
 	 */
 	public CommercialTrafficDashboard setGroupsOfSubpopulationsForCommercialAnalysis(String... groupsOfSubpopulations) {
@@ -53,6 +55,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		}
 		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
 	}
+
 	/**
 	 * Set an argument that will be passed to the analysis script. See {@link CommercialAnalysis}.
 	 */
@@ -77,10 +80,11 @@ public class CommercialTrafficDashboard implements Dashboard {
 	private void createCommercialActivitiesTab(Layout layout) {
 		layout.row("OD_first", "Activities").el(Hexagons.class, (viz, data) -> {
 			viz.title = "Origin-Destination of commercial trips";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The OD can be filtered according to defined groups of commercial subpopulations.", data, false);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling(
+				"The OD can be filtered according to defined groups of commercial subpopulations.", data, false);
 			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				viz.addAggregation(group, "Origin",group+"_start_X",group+"_start_Y","Destination",group+"_act_X",group+"_act_Y");
+				viz.addAggregation(group, "Origin", group + "_start_X", group + "_start_Y", "Destination", group + "_act_X", group + "_act_Y");
 
 			}
 			viz.projection = crs;
@@ -105,12 +109,12 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-							.build(),
-						ds.mapping()
-							.x("jobsPerTour")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+						.build(),
+					ds.mapping()
+						.x("jobsPerTour")
+				);
 			})
 			.el(Plotly.class, (viz, data) -> {
 
@@ -122,38 +126,38 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-							.build(),
-						ds.mapping()
-							.x("numberOfJobs_group")
-							.y("jobsPerTour")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.build(),
+					ds.mapping()
+						.x("numberOfJobs_group")
+						.y("jobsPerTour")
+				);
 			});
 
 		layout.row("veh-Activities-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Number of Jobs per vehicle";
-			viz.description = "Histogram of jobs per vehicle tour by group of subpopulation.";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.showLegend(true)
-				.build();
-			viz.colorRamp = ColorScheme.Viridis;
+				viz.title = "Number of Jobs per vehicle";
+				viz.description = "Histogram of jobs per vehicle tour by group of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
 
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
 
-				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-						.name(group)
-						.build(),
-					ds.mapping()
-						.x("jobsPerTour_" + group)
-				);
-			}
-		})
+					.constant("source", "Veh");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("jobsPerTour_" + group)
+					);
+				}
+			})
 			.el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Number of Jobs per vehicle";
@@ -203,7 +207,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
-			layout.row("veh-Activities-violin", "Activities").	el(Plotly.class, (viz, data) -> {
+			layout.row("veh-Activities-violin", "Activities").el(Plotly.class, (viz, data) -> {
 				viz.title = "Number of Jobs per vehicle type *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
@@ -221,7 +225,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("jobsPerTour_"+group)
+						.y("jobsPerTour_" + group)
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -252,12 +256,12 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
 
 					.constant("source", "Act");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-							.build(),
-						ds.mapping()
-							.x("activityDurationInMinutes")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+						.build(),
+					ds.mapping()
+						.x("activityDurationInMinutes")
+				);
 			})
 			.el(Plotly.class, (viz, data) -> {
 
@@ -269,38 +273,38 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
 
 					.constant("source", "Act");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-							.build(),
-						ds.mapping()
-							.x("activityDuration_group")
-							.y("activityDurationInMinutes")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.build(),
+					ds.mapping()
+						.x("activityDuration_group")
+						.y("activityDurationInMinutes")
+				);
 			});
 		layout.row("veh-ActivityDurations-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "ActivityDurations per vehicle (min)";
-			viz.description = "Histogram of activity durations by group of subpopulation.";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.showLegend(true)
-				.build();
+				viz.title = "ActivityDurations per vehicle (min)";
+				viz.description = "Histogram of activity durations by group of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
 
-			viz.colorRamp = ColorScheme.Viridis;
+				viz.colorRamp = ColorScheme.Viridis;
 
-			Plotly.DataSet ds = viz.addDataset(
-					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
 
-				.constant("source", "Act");
-			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-						.name(group)
-						.build(),
-					ds.mapping()
-						.x("activityDurationInMinutes_" + group)
-				);
-			}
-		})
+					.constant("source", "Act");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("activityDurationInMinutes_" + group)
+					);
+				}
+			})
 			.el(Plotly.class, (viz, data) -> {
 
 				viz.title = "ActivityDurations per vehicle (min)";
@@ -352,7 +356,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
-			layout.row("veh-ActivityDurations-violin", "Activities").	el(Plotly.class, (viz, data) -> {
+			layout.row("veh-ActivityDurations-violin", "Activities").el(Plotly.class, (viz, data) -> {
 				viz.title = "ActivityDurations per vehicle type (min) *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
@@ -370,7 +374,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.build(),
 					ds.mapping()
 						.x("activityType")
-						.y("activityDurationInMinutes_"+group)
+						.y("activityDurationInMinutes_" + group)
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -404,12 +408,12 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-							.build(),
-						ds.mapping()
-							.x("distanceInKm")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+						.build(),
+					ds.mapping()
+						.x("distanceInKm")
+				);
 
 			})
 			.el(Plotly.class, (viz, data) -> {
@@ -422,62 +426,62 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
-					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-							.build(),
-						ds.mapping()
-							.x("dist_group")
-							.y("distanceInKm")
-					);
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.build(),
+					ds.mapping()
+						.x("dist_group")
+						.y("distanceInKm")
+				);
 			});
 
 		layout.row("veh-dist-hist", "Tours").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Distance (km) per vehicle";
-			viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.showLegend(true)
-				.build();
-			viz.colorRamp = ColorScheme.Viridis;
+				viz.title = "Distance (km) per vehicle";
+				viz.description = "Histogram of distances per vehicle tour by group of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
 
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
 
-				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-						.name(group)
-						.build(),
-					ds.mapping()
-						.x("distanceInKm_" + group)
-				);
-			}
-		})
-		.el(Plotly.class, (viz, data) -> {
+					.constant("source", "Veh");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("distanceInKm_" + group)
+					);
+				}
+			})
+			.el(Plotly.class, (viz, data) -> {
 
-			viz.title = "Distance (km) per vehicle";
-			viz.description = "Histogram of distances per vehicle tour by group of subpopulation (given bins).";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.showLegend(true)
-				.build();
-			viz.colorRamp = ColorScheme.Viridis;
+				viz.title = "Distance (km) per vehicle";
+				viz.description = "Histogram of distances per vehicle tour by group of subpopulation (given bins).";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
 
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
 
-				.constant("source", "Veh");
-			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-						.name(group)
-						.build(),
-					ds.mapping()
-						.x("dist_group")
-						.y("distanceInKm_" + group)
-				);
-			}
-		});
+					.constant("source", "Veh");
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					viz.addTrace(
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+							.name(group)
+							.build(),
+						ds.mapping()
+							.x("dist_group")
+							.y("distanceInKm_" + group)
+					);
+				}
+			});
 
 		layout.row("veh-dist-box", "Tours").el(Plotly.class, (viz, data) -> {
 
@@ -504,25 +508,25 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
-			layout.row("veh-dist-violin", "Tours").	el(Plotly.class, (viz, data) -> {
-			viz.title = "Distance (km) per vehicle type in group: *" + group + "*";
-			viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
-			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-				.showLegend(false)
-				.build();
+			layout.row("veh-dist-violin", "Tours").el(Plotly.class, (viz, data) -> {
+				viz.title = "Distance (km) per vehicle type in group: *" + group + "*";
+				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(false)
+					.build();
 
-			viz.colorRamp = ColorScheme.Viridis;
+				viz.colorRamp = ColorScheme.Viridis;
 
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
-				.constant("source", "Veh");
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+					.constant("source", "Veh");
 
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("distanceInKm_"+group)
+						.y("distanceInKm_" + group)
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -552,12 +556,12 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
-						.build(),
-					ds.mapping()
-						.x("tourDurationsInHours")
-				);
+			viz.addTrace(
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
+					.build(),
+				ds.mapping()
+					.x("tourDurationsInHours")
+			);
 
 		}).el(Plotly.class, (viz, data) -> {
 
@@ -569,13 +573,13 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
-				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-						.build(),
-					ds.mapping()
-						.y("tourDurationsInHours")
-						.x("duration_group")
-				);
+			viz.addTrace(
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					.build(),
+				ds.mapping()
+					.y("tourDurationsInHours")
+					.x("duration_group")
+			);
 		});
 
 		layout.row("veh-duration-hist", "Tours").el(Plotly.class, (viz, data) -> {
@@ -651,7 +655,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
-			layout.row("veh-duration-violin", "Tours").	el(Plotly.class, (viz, data) -> {
+			layout.row("veh-duration-violin", "Tours").el(Plotly.class, (viz, data) -> {
 				viz.title = "Duration (h) per vehicle type *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
@@ -669,7 +673,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("tourDurationsInHours_"+group)
+						.y("tourDurationsInHours_" + group)
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -686,23 +690,25 @@ public class CommercialTrafficDashboard implements Dashboard {
 	}
 
 	private void createCommercialOverviewTab(Layout layout) {
-		layout.row("General_first","General").el(PieChart.class, (viz, data) -> {
+		layout.row("General_first", "General").el(PieChart.class, (viz, data) -> {
 				double sampleSize = data.config().getSampleSize();
 				setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perMode",  args);
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perMode", args);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.description = "at final iteration";
 				viz.useLastRow = true;
 			})
 			.el(PieChart.class, (viz, data) -> {
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perSubpopulation", args);
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv",
+					"perSubpopulation", args);
 				viz.title = "Travel Distance Shares by subpopulation";
 				viz.useLastRow = true;
 				viz.description = "at final iteration";
 
 			})
 			.el(PieChart.class, (viz, data) -> {
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perGroup", args);
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perGroup",
+					args);
 				viz.title = "Travel Distance Shares by model type";
 				viz.useLastRow = true;
 				viz.description = "at final iteration";
@@ -712,7 +718,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Link volumes of the commercial traffic";
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("The volumes are scaled to 100% sample size.", data, true);
 			viz.datasets.csvFile = data.compute(CommercialAnalysis.class, "commercialTraffic_link_volume.csv", args);
-			viz.network = data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
+			viz.network = data.compute(CreateAvroNetwork.class, "network.avro",
+				"--with-properties"); //, "--match-id", "linkId", "--mode-filter", "none"
 			viz.description = "The volumes can be filtered according to different types of traffic and vehicle types.";
 			viz.height = 12.;
 		});
@@ -743,17 +750,17 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
-					Plotly.DataSet ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
-						.constant("source", "Simulated")
-						.aggregate(List.of("subpopulation"), "share", Plotly.AggrFunc.SUM);
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
+					.constant("source", "Simulated")
+					.aggregate(List.of("subpopulation"), "share", Plotly.AggrFunc.SUM);
 
-					viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
-						ds.mapping()
-							.name("subpopulation")
-							.y("source")
-							.x("share")
-					);
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).orientation(BarTrace.Orientation.HORIZONTAL).build(),
+					ds.mapping()
+						.name("subpopulation")
+						.y("source")
+						.x("share")
+				);
 			});
 
 		layout.row("trips_second", "Trips").el(Plotly.class, (viz, data) -> {
@@ -780,56 +787,59 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 
 				viz.multiIndex = Map.of("dist_group", "source");
-					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
-						.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
-						.constant("source", "Sim")
-						.mapping()
-						.x("dist_group")
-						.y("share");
+				var ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
+					.aggregate(List.of("dist_group", "main_mode"), "share", Plotly.AggrFunc.SUM)
+					.constant("source", "Sim")
+					.mapping()
+					.x("dist_group")
+					.y("share");
 
-					viz.addTrace(
-						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.orientation(BarTrace.Orientation.VERTICAL)
-							.name("$dataset.main_mode")
-							.build(), ds
-					);
+				viz.addTrace(
+					BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.orientation(BarTrace.Orientation.VERTICAL)
+						.name("$dataset.main_mode")
+						.build(), ds
+				);
 			})
 			.el(Plotly.class, (viz, data) -> {
 				viz.title = "Trip distance distribution by subpopulation";
 				viz.colorRamp = ColorScheme.Viridis;
 
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
-					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK).xAxis(Axis.builder().categoryOrder(Axis.CategoryOrder.TRACE).build())
+					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK).xAxis(
+						Axis.builder().categoryOrder(Axis.CategoryOrder.TRACE).build())
 					.build();
 
 				viz.multiIndex = Map.of("dist_group", "source");
-					var ds = viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
-						.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
-						.constant("source", "Sim")
-						.mapping()
-						.x("dist_group")
-						.y("share");
-					viz.addTrace(
-						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
-							.orientation(BarTrace.Orientation.VERTICAL)
-							.name("$dataset.subpopulation")
-							.build(),
-						ds
-					);
+				var ds = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()))
+					.aggregate(List.of("dist_group", "subpopulation"), "share", Plotly.AggrFunc.SUM)
+					.constant("source", "Sim")
+					.mapping()
+					.x("dist_group")
+					.y("share");
+				viz.addTrace(
+					BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT)
+						.orientation(BarTrace.Orientation.VERTICAL)
+						.name("$dataset.subpopulation")
+						.build(),
+					ds
+				);
 			});
 
 		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data, false);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data,
+				false);
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString());
 			viz.showAllRows = true;
 		});
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("trips_fourthB", "Trips").el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics of group: *" + group + "*";
-				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data, false);
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data,
+					false);
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
 				viz.showAllRows = true;
 			});
@@ -846,20 +856,20 @@ public class CommercialTrafficDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 //				viz.layout.barmode = "group";
-			viz.title = "Mode usage by subpopulation";
+				viz.title = "Mode usage by subpopulation";
 
-			for (String group : groupsOfCommercialSubpopulations.keySet()) {
-				Plotly.DataSet dsSub = viz.addDataset(
-					data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", group));
-				viz.addTrace(
-					BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					dsSub.mapping()
-						.x("main_mode")
-						.y("user")
-						.name("group")
-				);
-			}
-		});
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					Plotly.DataSet dsSub = viz.addDataset(
+						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", group));
+					viz.addTrace(
+						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+						dsSub.mapping()
+							.x("main_mode")
+							.y("user")
+							.name("group")
+					);
+				}
+			});
 		layout.row("dist-dist", "Trips").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Detailed mode share distance distribution";
@@ -911,7 +921,9 @@ public class CommercialTrafficDashboard implements Dashboard {
 		}
 	}
 
-	/** Adds the description depending on if groups are set or not.
+	/**
+	 * Adds the description depending on if groups are set or not.
+	 *
 	 * @return description string
 	 */
 	private @NonNull String getDescription() {

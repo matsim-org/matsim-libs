@@ -109,7 +109,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// link events handler
-		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, sampleSize, shp, groupsOfSubpopulationsForCommercialAnalysis);
+		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, sampleSize, shp,
+			groupsOfSubpopulationsForCommercialAnalysis);
 		eventsManager.addHandler(linkDemandEventHandler);
 
 		eventsManager.initProcessing();
@@ -136,7 +137,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	private void createActivityAnalysis(Scenario scenario) {
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_activities.csv")), CSVFormat.DEFAULT)) {
-			HashMap <String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
+			HashMap<String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
 			List<String> activityDurationLabels = AnalysisUtils.createGroupLabels(activityDurationGroups);
 
 			printer.print("personId");
@@ -169,8 +170,10 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						Activity activity = activities.get(i);
 						double duration = activity.getMaximumDuration().seconds();
 						BigDecimal durationInMinutes = new BigDecimal(duration / 60).setScale(0, RoundingMode.HALF_UP);
-						String labelForValue = AnalysisUtils.getLabelForValue(durationInMinutes.longValue(), activityDurationGroups, activityDurationLabels);
-						activityToPersonMap.computeIfAbsent(labelForValue, k -> new ArrayList<>()).add(new ActivityInformation(activity, i, person.getId(), groupOfPerson));
+						String labelForValue = AnalysisUtils.getLabelForValue(durationInMinutes.longValue(), activityDurationGroups,
+							activityDurationLabels);
+						activityToPersonMap.computeIfAbsent(labelForValue, k -> new ArrayList<>()).add(
+							new ActivityInformation(activity, i, person.getId(), groupOfPerson));
 					}
 				}
 			}
@@ -225,7 +228,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_generalTravelData.csv")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_generalTravelData.csv")),
+			CSVFormat.DEFAULT)) {
 			// _Intern: internal trips (start and end inside the area)
 			// _Incoming: incoming trips (start outside the area and end inside the area)
 			// _Outgoing: incoming trips (start inside the area and end outside the area)
@@ -266,22 +270,32 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("averageDistancePerTrip_all");
 			printer.println();
 
-			for (String group : vehiclesPerGroup.keySet()){
+			for (String group : vehiclesPerGroup.keySet()) {
 				printer.print(group);
 				int numberOfAgentsInSubpopulation = vehiclesPerGroup.get(group).size();
 				printer.print(numberOfAgentsInSubpopulation);
 
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_internal, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_incoming, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_outgoing, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_transit, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_all, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_internal, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_incoming, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_outgoing, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_transit, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_all, group, scenario);
 
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_internal_inInvestigationArea, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_incoming_inInvestigationArea, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_outgoing_inInvestigationArea, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_transit_inInvestigationArea, group, scenario);
-				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation = filterByPopulationGroup(distancesPerTrip_perPerson_all_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_internal_inInvestigationArea_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_internal_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_incoming_inInvestigationArea_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_incoming_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_outgoing_inInvestigationArea_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_outgoing_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_transit_inInvestigationArea, group, scenario);
+				HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation = filterByPopulationGroup(
+					distancesPerTrip_perPerson_all_inInvestigationArea, group, scenario);
 
 				int numberOfTrips_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().mapToInt(List::size).sum();
 				int numberOfTrips_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().mapToInt(List::size).sum();
@@ -297,11 +311,16 @@ public class CommercialAnalysis implements MATSimAppCommand {
 				}
 				printer.print(numberOfTrips_all);
 
-				double traveledDistance_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
-				double traveledDistance_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
-				double traveledDistance_outgoing = distancesPerTrip_perPerson_outgoing_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
-				double traveledDistance_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
-				double traveledDistance_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum();
+				double traveledDistance_internal = distancesPerTrip_perPerson_internal_perSubpopulation.values().stream().flatMapToDouble(
+					list -> list.stream().mapToDouble(Double::doubleValue)).sum();
+				double traveledDistance_incoming = distancesPerTrip_perPerson_incoming_perSubpopulation.values().stream().flatMapToDouble(
+					list -> list.stream().mapToDouble(Double::doubleValue)).sum();
+				double traveledDistance_outgoing = distancesPerTrip_perPerson_outgoing_perSubpopulation.values().stream().flatMapToDouble(
+					list -> list.stream().mapToDouble(Double::doubleValue)).sum();
+				double traveledDistance_transit = distancesPerTrip_perPerson_transit_perSubpopulation.values().stream().flatMapToDouble(
+					list -> list.stream().mapToDouble(Double::doubleValue)).sum();
+				double traveledDistance_all = distancesPerTrip_perPerson_all_perSubpopulation.values().stream().flatMapToDouble(
+					list -> list.stream().mapToDouble(Double::doubleValue)).sum();
 
 				if (shp.isDefined()) {
 					printer.print(traveledDistance_internal);
@@ -319,7 +338,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
 					printer.print(distancesPerTrip_perPerson_transit_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
 						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
-					printer.print(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(list -> list.stream().mapToDouble(Double::doubleValue)).sum());
+					printer.print(distancesPerTrip_perPerson_all_inInvestigationArea_perSubpopulation.values().stream().flatMapToDouble(
+						list -> list.stream().mapToDouble(Double::doubleValue)).sum());
 
 				}
 				printer.print(numberOfTrips_all == 0 ? "0" : (double) numberOfTrips_all / numberOfAgentsInSubpopulation);
@@ -336,14 +356,14 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			}
 
 
-
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
 		}
 
 	}
 
-	private HashMap<Id<Person>, List<Double>> filterByPopulationGroup(HashMap<Id<Person>, List<Double>> distancesPerTripPerPerson, String populationGroup, Scenario scenario) {
+	private HashMap<Id<Person>, List<Double>> filterByPopulationGroup(HashMap<Id<Person>, List<Double>> distancesPerTripPerPerson,
+																	  String populationGroup, Scenario scenario) {
 		HashMap<Id<Person>, List<Double>> filteredList = new HashMap<>();
 		distancesPerTripPerPerson.keySet().stream().filter(personId -> {
 			Person person = scenario.getPopulation().getPersons().get(personId);
@@ -374,9 +394,12 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	}
 
 	private void writeAnalysisPerVehicle_distances(List<String> distanceLabels,
-						   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
-						   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation, Map<String, Integer> maxDistanceWithDepotChargingInKilometers) {
-			try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "distances")), CSVFormat.DEFAULT)) {
+												   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
+												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
+												   HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
+												   Map<String, Integer> maxDistanceWithDepotChargingInKilometers) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "distances")),
+			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
 			printer.print("vehicleId");
@@ -434,15 +457,18 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	}
 
 	private void writeAnalysisPerVehicle_durations(List<String> tourDurationLabels,
-												   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle, HashMap<Id<Vehicle>, Double> tourDurations,
-												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "durations")), CSVFormat.DEFAULT)) {
+												   HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
+												   HashMap<Id<Vehicle>, Double> tourDurations,
+												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
+												   HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "durations")),
+			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
 			printer.print("vehicleId");
 			printer.print("vehicleType");
 			printer.print("groupOfSubpopulation");
-						printer.print("duration_group");
+			printer.print("duration_group");
 			printer.print("tourDurationInSeconds");
 			printer.print("tourDurationsInHours");
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
@@ -492,9 +518,11 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 	private void writeAnalysisPerVehicle_numberOfJobs(List<String> numberOfJobsLabels,
 													  HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle,
-													HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId, HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
+													  HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
+													  HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
 													  Object2IntOpenHashMap<Id<Person>> jobsPerPerson) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour")),
+			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
 			printer.print("vehicleId");
@@ -508,47 +536,47 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.println();
 
 			for (String label : numberOfJobsLabels) {
-					for (Id<Person> personId : jobsPerPerson.keySet()) {
-						int jobsPerTour = jobsPerPerson.getInt(personId);
+				for (Id<Person> personId : jobsPerPerson.keySet()) {
+					int jobsPerTour = jobsPerPerson.getInt(personId);
 
-						String labelForValue = AnalysisUtils.getLabelForValue(jobsPerTour, numberOfJobsGroups, numberOfJobsLabels);
-						// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
-						if (!label.equals(labelForValue))
-							continue;
+					String labelForValue = AnalysisUtils.getLabelForValue(jobsPerTour, numberOfJobsGroups, numberOfJobsLabels);
+					// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
+					if (!label.equals(labelForValue))
+						continue;
 
-						String vehicleId = null;
-						for (Id<Vehicle> vehicleId1 : vehicleToPersonId.keySet()) {
-							if (vehicleToPersonId.get(vehicleId1).equals(personId)) {
-								vehicleId = vehicleId1.toString();
-								break;
-							}
+					String vehicleId = null;
+					for (Id<Vehicle> vehicleId1 : vehicleToPersonId.keySet()) {
+						if (vehicleToPersonId.get(vehicleId1).equals(personId)) {
+							vehicleId = vehicleId1.toString();
+							break;
 						}
-						String vehicleType = null;
-						for (String vehicleType1 : travelDistancesPerVehicle.keySet()) {
-							if (travelDistancesPerVehicle.get(vehicleType1).containsKey(vehicleId)) {
-								vehicleType = vehicleType1;
-								break;
-							}
-						}
-						if (vehicleId == null || vehicleType == null) {
-							continue;
-						}
-						printer.print(personId);
-						printer.print(vehicleId);
-						printer.print(vehicleType);
-						String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
-						printer.print(groupOfSubpopulation);
-						printer.print(labelForValue);
-						printer.print(jobsPerTour);
-						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-							if (groupOfSubpopulation.equals(group)) {
-								printer.print(jobsPerTour);
-							} else {
-								printer.print(Double.NaN);
-							}
-						}
-						printer.println();
 					}
+					String vehicleType = null;
+					for (String vehicleType1 : travelDistancesPerVehicle.keySet()) {
+						if (travelDistancesPerVehicle.get(vehicleType1).containsKey(vehicleId)) {
+							vehicleType = vehicleType1;
+							break;
+						}
+					}
+					if (vehicleId == null || vehicleType == null) {
+						continue;
+					}
+					printer.print(personId);
+					printer.print(vehicleId);
+					printer.print(vehicleType);
+					String groupOfSubpopulation = vehicleGroupOfSubpopulation.get(Id.createVehicleId(vehicleId));
+					printer.print(groupOfSubpopulation);
+					printer.print(labelForValue);
+					printer.print(jobsPerTour);
+					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
+						if (groupOfSubpopulation.equals(group)) {
+							printer.print(jobsPerTour);
+						} else {
+							printer.print(Double.NaN);
+						}
+					}
+					printer.println();
+				}
 			}
 		} catch (IOException e) {
 			log.error("Could not create output file", e);
@@ -563,7 +591,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		maxDistanceWithDepotChargingInKilometers.put("golf1.4", 200);
 		maxDistanceWithDepotChargingInKilometers.put("car", 200);
 		maxDistanceWithDepotChargingInKilometers.put("vwCaddy", 120); // https://www.vw-nutzfahrzeuge.at/caddy/caddy/ehybrid
-		maxDistanceWithDepotChargingInKilometers.put("mercedes313_parcel", 440); //https://www.adac.de/rund-ums-fahrzeug/autokatalog/marken-modelle/mercedes-benz/esprinter/
+		maxDistanceWithDepotChargingInKilometers.put("mercedes313_parcel",
+			440); //https://www.adac.de/rund-ums-fahrzeug/autokatalog/marken-modelle/mercedes-benz/esprinter/
 		maxDistanceWithDepotChargingInKilometers.put("mercedes313", 440);
 		maxDistanceWithDepotChargingInKilometers.put("light8t", 174);
 		maxDistanceWithDepotChargingInKilometers.put("truck8t", 174);
@@ -666,7 +695,8 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		scenario.getVehicles().getVehicleTypes().values().forEach(vehicleType -> {
 			if (!headerWithModes.contains(vehicleType.getNetworkMode())) headerWithModes.add(vehicleType.getNetworkMode());
 		});
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_link_volume.csv")), CSVFormat.Builder.create().setDelimiter(";").get())) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_link_volume.csv")),
+			CSVFormat.Builder.create().setDelimiter(";").get())) {
 			printer.print("linkId");
 			for (String mode : headerWithModes) {
 				printer.print(mode);
@@ -696,5 +726,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 		return groupsOfSubpopulations;
 	}
-	record ActivityInformation(Activity activity, int countForPerson, Id<Person> personId, String groupOfSubpopulation){}
+
+	record ActivityInformation(Activity activity, int countForPerson, Id<Person> personId, String groupOfSubpopulation) {
+	}
 }
