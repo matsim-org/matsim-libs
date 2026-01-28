@@ -428,7 +428,8 @@ public class PretoriaTest {
 	public static Stream<Arguments> pretoriaInputsExpTestParams(){
 		var methods = List.of(
 			EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction,
-			EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction
+			EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction,
+			EmissionsConfigGroup.EmissionsComputationMethod.BilinearInterpolationFraction
 		);
 
 		return Stream.of(PretoriaVehicle.values())
@@ -547,7 +548,7 @@ public class PretoriaTest {
 
 			// Calculate cold Emissions (but not for RRV, as RRV has no available HBEFA Cold Table)
 			if(vehicle.hbefaVehicleCategory != HbefaVehicleCategory.HEAVY_GOODS_VEHICLE){
-				vehHbefaInfo.getSecond().setHbefaEmConcept("average"); // TODO Try to get better cold emissions table, so that I can access detailed data
+				vehHbefaInfo.getSecond().setHbefaEmConcept("average");
 				var coldEmissionsMatsim = module.getColdEmissionAnalysisModule().calculateColdEmissions(
 					Id.createVehicleId("0"),
 					13*3600,
@@ -576,7 +577,7 @@ public class PretoriaTest {
 				}
 
 				// Calculate warm emissions
-				vehHbefaInfo.getSecond().setHbefaEmConcept(vehicle.hbefaEmConcept); // TODO Try to get better cold emissions table, so that I can access detailed data
+				vehHbefaInfo.getSecond().setHbefaEmConcept(vehicle.hbefaEmConcept);
 				var warmEmissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
 					tripId2linkId2traversalTime.get(tripId).get(linkId),
 					(String) link.getAttributes().getAttribute("hbefa_road_type"),
