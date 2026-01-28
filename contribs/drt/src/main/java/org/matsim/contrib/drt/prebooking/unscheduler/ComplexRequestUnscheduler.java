@@ -3,7 +3,6 @@ package org.matsim.contrib.drt.prebooking.unscheduler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -27,11 +26,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.base.Verify;
-import org.matsim.vehicles.Vehicle;
-
 import java.util.List;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 
 /**
@@ -39,7 +35,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
  * removes the request from the relevant stop tasks. Furthermore, the stops are
  * removed if they don't carry any other pickups or dropoffs. Accordingly, the
  * schedule will also be rerouted.
- * 
+ *
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
 public class ComplexRequestUnscheduler implements RequestUnscheduler {
@@ -76,9 +72,21 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 
-		for (int i = schedule.getCurrentTask().getTaskIdx(); i < tasks.size(); i++) {
+		Verify.verify(
+				schedule.getStatus() != Schedule.ScheduleStatus.UNPLANNED
+						&& schedule.getStatus() != Schedule.ScheduleStatus.COMPLETED,
+				"Unexpected DVRP schedule status when unscheduling prebooked request: %s (vehicle %s)",
+				schedule.getStatus(), vehicle.getId());
+
+		// Start searching from first task if schedule is planned but not yet started
+		int startIndex = 0;
+		if (schedule.getStatus() == Schedule.ScheduleStatus.STARTED) {
+			startIndex = schedule.getCurrentTask().getTaskIdx();
+		}
+
+		for (int i = startIndex; i < tasks.size(); i++) {
 			Task task = tasks.get(i);
-			if(task instanceof DrtStopTask stopTask) {
+			if (task instanceof DrtStopTask stopTask) {
 				if (stopTask.getPickupRequests().containsKey(requestId)) {
 					Verify.verify(pickupStopTask == null);
 					pickupStopTask = stopTask;
@@ -108,7 +116,7 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 		boolean removeDropoff = dropoffStopTask.getPickupRequests().isEmpty()
 				&& dropoffStopTask.getDropoffRequests().isEmpty();
 
-		Replacement pickupReplacement = removePickup ? findReplacement(vehicle,  pickupStopTask) : null;
+		Replacement pickupReplacement = removePickup ? findReplacement(vehicle, pickupStopTask) : null;
 		Replacement dropoffReplacement = removeDropoff ? findReplacement(vehicle, dropoffStopTask) : null;
 
 		if (pickupReplacement != null && dropoffReplacement != null) {
@@ -132,13 +140,14 @@ public class ComplexRequestUnscheduler implements RequestUnscheduler {
 	private Replacement findReplacement(DvrpVehicle vehicle, DrtStopTask stopTask) {
 		// replace from current or previous task
 		Task startTask = vehicle.getSchedule().getCurrentTask();
-		for (Task task : Schedules.getTasksBetween(startTask.getTaskIdx(), stopTask.getTaskIdx(), vehicle.getSchedule())) {
+		for (Task task : Schedules.getTasksBetween(startTask.getTaskIdx(), stopTask.getTaskIdx(),
+				vehicle.getSchedule())) {
 			if (STOP.isBaseTypeOf(task)) {
 				startTask = task;
 			}
 		}
 
-		if(vehicle.getSchedule().getTaskCount() > startTask.getTaskIdx() + 1) {
+		if (vehicle.getSchedule().getTaskCount() > startTask.getTaskIdx() + 1) {
 			for (Task task : Schedules.getTasksUntilLast(stopTask.getTaskIdx() + 1, vehicle.getSchedule())) {
 				if (STOP.isBaseTypeOf(task)) {
 					return new Replacement(startTask, task, vehicle.getSchedule());
