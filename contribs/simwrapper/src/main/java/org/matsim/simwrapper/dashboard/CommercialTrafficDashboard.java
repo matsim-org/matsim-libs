@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.matsim.application.analysis.commercialTraffic.CommercialAnalysis;
@@ -25,13 +26,29 @@ public class CommercialTrafficDashboard implements Dashboard {
 	private final String crs;
 	private String[] args;
 
+	@Nullable
+	private final String commercialTourDurationsRefCsv;
+	@Nullable
+	private final String commercialTourDistanceRefCsv;
+	@Nullable
+	private final String commercialActivityDurationsRefCsv;
+
+
+	public CommercialTrafficDashboard(String crs, @Nullable String commercialTourDurationsRefCsv, @Nullable String commercialTourDistanceRefCsv, @Nullable String commercialActivityDurationsRefCsv) {
+		this.crs = crs;
+		this.commercialTourDurationsRefCsv = commercialTourDurationsRefCsv;
+		this.commercialTourDistanceRefCsv = commercialTourDistanceRefCsv;
+		this.commercialActivityDurationsRefCsv = commercialActivityDurationsRefCsv;
+		args = new String[0];
+	}
+
 	/**
 	 * Create a dashboard to show aggregated OD information per mode.
 	 *
 	 * @param crs Coordinate system for the projection of the map
 	 */
 	public CommercialTrafficDashboard(String crs) {
-		this.crs = crs;
+		this(crs, null, null, null);
 		args = new String[0];
 	}
 
@@ -75,6 +92,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 		createCommercialTripsTab(layout);
 		createCommercialToursTab(layout);
 		createCommercialActivitiesTab(layout);
+
+		if (commercialTourDurationsRefCsv != null) {
+			addDurationRefDataComparison(layout);
+		}
+		if (commercialTourDistanceRefCsv != null) {
+			addDistanceRefDataComparison(layout);
+		}
+		if (commercialActivityDurationsRefCsv != null) {
+			addActivityDurationRefDataComparison(layout);
+		}
 	}
 
 	private void createCommercialActivitiesTab(Layout layout) {
@@ -916,6 +943,185 @@ public class CommercialTrafficDashboard implements Dashboard {
 						.name("purpose", ColorScheme.Spectral)
 						.x("h")
 						.y(type)
+				);
+			});
+		}
+	}
+
+	private void addActivityDurationRefDataComparison(Layout layout) {
+		layout.row("veh-Activities-hist_ref_total", "Calibration").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "ActivityDurations per vehicle (min)";
+			viz.description = "Histogram of activity durations for the complete commercial traffic (given bins).";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+				.constant("source", "Simulated");
+			viz.addTrace(
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					.name("source")
+					.build(),
+				ds.mapping()
+					.x("activityDuration_group")
+					.y("activityDurationInMinutes")
+			);
+			Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialActivityDurationsRefCsv))
+				.constant("source", "Reference");
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				dsRef.mapping()
+					.name("source")
+					.y("share")
+					.x("activityDuration_group")
+			);
+		});
+		Layout.Row row = layout.row("veh-Activities-hist_ref_group", "Calibration");
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
+			row.el(Plotly.class, (viz, data) -> {
+				viz.title = "ActivityDurations per vehicle (min)";
+				viz.description = "Histogram of activity durations by group of subpopulation (given bins).";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+					.constant("source", "Simulated");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.name("source")
+						.build(),
+					ds.mapping()
+						.x("activityDuration_group")
+						.y("activityDurationInMinutes_" + group)
+				);
+				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialActivityDurationsRefCsv))
+					.constant("source", "Reference");
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					dsRef.mapping()
+						.name("source")
+						.y("share_" + group)
+						.x("activityDuration_group")
+				);
+			});
+
+		}
+	}
+
+	private void addDistanceRefDataComparison(Layout layout) {
+		layout.row("veh-distance-hist_ref_total", "Calibration").el(Plotly.class, (viz, data) -> {
+			viz.title = "Distance (km) per vehicle";
+			viz.description = "Histogram of distances per vehicle tour of the complete commercial traffic (given bins).";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+				.constant("source", "Simulated");
+			viz.addTrace(
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					.name("source")
+					.build(),
+				ds.mapping()
+					.x("dist_group")
+					.y("distanceInKm")
+			);
+			Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDistanceRefCsv))
+				.constant("source", "Reference");
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				dsRef.mapping()
+					.name("source")
+					.y("share")
+					.x("dist_group")
+			);
+		});
+
+		Layout.Row row = layout.row("veh-distances-hist_ref_group", "Calibration");
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
+			row.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Duration (h) per vehicle in group ** " + group + "**";
+				viz.description = "Histogram of durations per vehicle tour (given bins).";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+					.constant("source", "Simulated");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.name("source")
+						.build(),
+					ds.mapping()
+						.y("distanceInKm_" + group)
+						.x("dist_group")
+				);
+				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDistanceRefCsv))
+					.constant("source", "Reference");
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					dsRef.mapping()
+						.name("source")
+						.y("share_" + group)
+						.x("dist_group")
+				);
+			});
+		}
+	}
+
+	private void addDurationRefDataComparison(Layout layout) {
+		layout.row("veh-duration-hist_ref_total", "Calibration").el(Plotly.class, (viz, data) -> {
+
+			viz.title = "Duration (h) per vehicle";
+			viz.description = "Histogram of durations per vehicle tour for the complete commercial traffic (given bins).";
+			viz.colorRamp = ColorScheme.Viridis;
+
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+
+				.constant("source", "Simulated");
+			viz.addTrace(
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					.name("source")
+					.build(),
+				ds.mapping().name("source")
+					.y("tourDurationsInHours")
+					.x("duration_group")
+			);
+			Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDurationsRefCsv))
+				.constant("source", "Reference");
+			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				dsRef.mapping()
+					.name("source")
+					.y("share")
+					.x("duration_group")
+			);
+		});
+
+		Layout.Row row = layout.row("veh-duration-hist_ref_group", "Calibration");
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
+			row.el(Plotly.class, (viz, data) -> {
+
+				viz.title = "Duration (h) per vehicle in group ** " + group + "**";
+				viz.description = "Histogram of durations per vehicle tour (given bins).";
+				viz.colorRamp = ColorScheme.Viridis;
+
+				Plotly.DataSet ds = viz.addDataset(
+						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					.constant("source", "Simulated");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						.name("source")
+						.build(),
+					ds.mapping()
+						.y("tourDurationsInHours_" + group)
+						.x("duration_group")
+				);
+				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDurationsRefCsv))
+					.constant("source", "Reference");
+				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+					dsRef.mapping()
+						.name("source")
+						.y("share_" + group)
+						.x("duration_group")
 				);
 			});
 		}

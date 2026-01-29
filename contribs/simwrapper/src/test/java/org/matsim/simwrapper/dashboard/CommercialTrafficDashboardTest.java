@@ -1,6 +1,7 @@
 package org.matsim.simwrapper.dashboard;
 
 import com.google.common.collect.Sets;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.locationtech.jts.geom.Geometry;
@@ -38,9 +39,63 @@ public class CommercialTrafficDashboardTest {
 
 	@Test
 	void testCommercialViewer() {
+		Scenario scenario = setUpScenario(utils);
+		final Controler controler = new Controler(scenario);
+
+		ShpOptions shpOptions = new ShpOptions(utils.getInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
+		Geometry geometry = shpOptions.getGeometry().getCentroid();
+		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
+		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
+		String center = coord.getX() + "," + coord.getY();
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
+		sw.getConfigGroup().setSampleSize(0.1);
+		sw.getConfigGroup().defaultParams().setMapCenter(center);
+		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
+				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
+			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+
+		controler.addOverridingModule(new SimWrapperModule(sw));
+
+		controler.run();
+	}
+
+	@Test
+	void testCommercialViewerWithRef() {
 
 
-		Config config = utils.createConfigWithTestInputFilePathAsContext();
+		Scenario scenario = setUpScenario(utils);
+		final Controler controler = new Controler(scenario);
+
+		ShpOptions shpOptions = new ShpOptions(utils.getClassInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
+		Geometry geometry = shpOptions.getGeometry().getCentroid();
+		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
+		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
+		String center = coord.getX() + "," + coord.getY();
+		SimWrapper sw = SimWrapper.create(scenario.getConfig());
+		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
+		sw.getConfigGroup().setSampleSize(0.1);
+		sw.getConfigGroup().defaultParams().setMapCenter(center);
+		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		sw.addDashboard(
+			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
+				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+		sw.addDashboard(new CommercialTrafficDashboard(scenario.getConfig().global().getCoordinateSystem(), "commercialTourDurations_ref.csv", "commercialTourDistances_ref.csv", "commercialActivityDurations_ref.csv").setGroupsOfSubpopulationsForCommercialAnalysis(
+			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
+
+		controler.addOverridingModule(new SimWrapperModule(sw));
+
+		controler.run();
+	}
+
+
+	private @NonNull Scenario setUpScenario(MatsimTestUtils utils) {
+		Config config = this.utils.createConfigWithTestInputFilePathAsContext();
 
 		config.global().setCoordinateSystem(null);
 		config.network().setInputFile("output_network.xml.gz");
@@ -132,27 +187,6 @@ public class CommercialTrafficDashboardTest {
 				scenario.getPopulation().addPerson(commercialPerson);
 			 }
 		}
-		final Controler controler = new Controler(scenario);
-
-		ShpOptions shpOptions = new ShpOptions(utils.getInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
-		Geometry geometry = shpOptions.getGeometry().getCentroid();
-		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
-		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
-		String center = coord.getX() + "," + coord.getY();
-		SimWrapper sw = SimWrapper.create(config);
-		sw.getConfigGroup().defaultParams().setShp("shp/testRegions.shp");
-		sw.getConfigGroup().setSampleSize(0.1);
-		sw.getConfigGroup().defaultParams().setMapCenter(center);
-		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
-		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-		sw.addDashboard(
-			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
-				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
-		sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis(
-			"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
-
-		controler.addOverridingModule(new SimWrapperModule(sw));
-
-		controler.run();
+		return scenario;
 	}
 }
