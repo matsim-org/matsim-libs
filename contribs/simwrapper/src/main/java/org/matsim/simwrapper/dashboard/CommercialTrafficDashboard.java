@@ -270,7 +270,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 		layout.row("ActivityDurations", "Activities").el(TextBlock.class, (viz, data) -> {
 			viz.backgroundColor = "transparent";
 			viz.content = """
-				### **Activity Duration Analysis of the tours**
+				### **Activity Duration Analysis*
+				Analyzing the duration of each activity (job) within a tour of vehicle.
 				""";
 		});
 		layout.row("veh-ActivityDurations-hist_total", "Activities").el(Plotly.class, (viz, data) -> {
@@ -422,6 +423,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.backgroundColor = "transparent";
 			viz.content = """
 				### **Distance Analysis of the tours**
+				In this analysis the sum of all trip distances within a tour is calculated.
 				""";
 		});
 
@@ -571,6 +573,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.backgroundColor = "transparent";
 			viz.content = """
 				### **Duration Analysis of the tours**
+				In this analysis the duration between the first trip start and the last trip end of a tour is calculated.
 				""";
 		});
 		layout.row("veh-duration-hist_total", "Tours").el(Plotly.class, (viz, data) -> {
@@ -593,7 +596,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		}).el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Duration (h) per vehicle";
-			viz.description = "Histogram of diurations per vehicle tour for the complete commercial traffic (given bins).";
+			viz.description = "Histogram of durations per vehicle tour for the complete commercial traffic (given bins).";
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
@@ -857,7 +860,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("trips_fourthA", "Trips").el(Table.class, (viz, data) -> {
 			viz.title = "Mode Statistics of the complete: *commercialTraffic*";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data,
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress).", data,
 				false);
 			viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString());
 			viz.showAllRows = true;
@@ -865,7 +868,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("trips_fourthB", "Trips").el(Table.class, (viz, data) -> {
 				viz.title = "Mode Statistics of group: *" + group + "*";
-				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress)", data,
+				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode, over whole trip (including access & egress).", data,
 					false);
 				viz.dataset = data.computeWithPlaceholder(TripAnalysis.class, "trip_stats_%s.csv", group);
 				viz.showAllRows = true;
