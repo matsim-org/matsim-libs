@@ -319,7 +319,7 @@ public class TripDashboard implements Dashboard {
 				viz.title = "Investigation area";
 				viz.description = "The area where the person with home activity are analyzed.";
 				viz.display.fill.fixedColors = new String[]{"#4e79a7"};
-				viz.setShape(data.context().getShp());
+				viz.setShape(data.resource(data.context().getShp()));
 				viz.width = 0.5d;
 			});
 

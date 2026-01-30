@@ -42,7 +42,7 @@ public class CommercialTrafficDashboardTest {
 		Scenario scenario = setUpScenario(utils);
 		final Controler controler = new Controler(scenario);
 
-		ShpOptions shpOptions = new ShpOptions(utils.getInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
+		ShpOptions shpOptions = new ShpOptions(utils.getClassInputDirectory() + "shp/testRegions.shp", TransformationFactory.ATLANTIS, null);
 		Geometry geometry = shpOptions.getGeometry().getCentroid();
 		CoordinateTransformation ts = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
 		Coord coord = ts.transform(MGC.coordinate2Coord(geometry.getCoordinate()));
