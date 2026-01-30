@@ -24,7 +24,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	Random rnd;
 	private final GenerateSmallScaleCommercialTrafficDemand generator;
 
-	DefaultUnhandledServicesSolution(GenerateSmallScaleCommercialTrafficDemand generator){
+	DefaultUnhandledServicesSolution(GenerateSmallScaleCommercialTrafficDemand generator) {
 		rnd = MatsimRandom.getRandom();
 		this.generator = generator;
 	}
@@ -32,7 +32,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 	/**
 	 * Redraws the service-durations of all {@link CarrierService}s of the given {@link Carrier}.
 	 */
-	private void redrawAllServiceDurations(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
+	private void redrawAllServiceDurations(Carrier carrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes,
+										   int additionalTravelBufferPerIterationInMinutes) {
 		for (CarrierService service : carrier.getServices().values()) {
 			double newServiceDuration = generator.getServiceTimePerStop(carrier, carrierAttributes, additionalTravelBufferPerIterationInMinutes);
 			CarrierService.Builder builder = CarrierService.Builder.newInstance(service.getId(), service.getServiceLinkId(), 0)
@@ -49,8 +50,9 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 
 		// get the needed attributes from the carrier without this data (perhaps an existing carrier file was read)
 		for (Carrier carrier : nonCompleteSolvedCarriers) {
-			if(generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
-				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(carrier.getAttributes().getAttribute("purpose").toString());
+			if (generator.getCarrierId2carrierAttributes().get(carrier.getId()) == null) {
+				int purpose = carrier.getAttributes().getAttribute("purpose") == null ? 0 : Integer.parseInt(
+					carrier.getAttributes().getAttribute("purpose").toString());
 				String carierId = carrier.getId().toString();
 				GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType;
 				String modeORvehType;
@@ -61,20 +63,22 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					smallScaleCommercialTrafficType = GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic;
 					String[] split = carierId.split("_");
 					modeORvehType = split[split.length - 1];
-				}
-				else {
+				} else {
 					log.warn("Carrier {} has no valid subpopulation. Skipping.", carrier.getId());
 					continue;
 				}
 
-				VehicleSelection.OdMatrixEntryInformation odMatrixEntry = generator.vehicleSelection.getOdMatrixEntryInformation(purpose, modeORvehType, smallScaleCommercialTrafficType);
-				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute("tourStartArea").toString();
-				String selectedStartCategory = generator.getSelectedStartCategory(startZone,odMatrixEntry);
-				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
+				VehicleSelection.OdMatrixEntryInformation odMatrixEntry = generator.vehicleSelection.getOdMatrixEntryInformation(purpose,
+					modeORvehType, smallScaleCommercialTrafficType);
+				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
+					"tourStartArea").toString();
+				String selectedStartCategory = generator.getSelectedStartCategory(startZone, odMatrixEntry);
+				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
+					purpose, startZone, selectedStartCategory, modeORvehType,
 					smallScaleCommercialTrafficType, null, odMatrixEntry);
 				generator.getCarrierId2carrierAttributes().putIfAbsent(carrier.getId(), carrierAttributes);
 			}
-			}
+		}
 		Path outputPath = Path.of(scenario.getConfig().controller().getOutputDirectory(),
 			"analysis/freight/Carriers_SolvingLoop_stats.tsv");
 
@@ -118,7 +122,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				writer.newLine();
 				writer.flush();  // Ensure it's written immediately
 
-				log.info("End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
+				log.info(
+					"End of carrier-replanning loop iteration: {}. From the {} carriers with unhandled jobs ({} already solved), {} were solved in this iteration with an additionalBuffer of {} minutes.",
 					i, startNumberOfCarriersWithUnhandledJobs, startNumberOfCarriersWithUnhandledJobs - numberOfCarriersWithUnhandledJobs,
 					numberOfCarriersWithUnhandledJobs - nonCompleteSolvedCarriers.size(),
 					(i + 1) * generator.getAdditionalTravelBufferPerIterationInMinutes());
@@ -163,17 +168,20 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 										GenerateSmallScaleCommercialTrafficDemand.ServiceDurationPerCategoryKey key,
 										int additionalTravelBufferPerIterationInMinutes) {
 
-		double maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
+		double maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(
+			vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
 		int usedTravelTimeBufferInSeconds = additionalTravelBufferPerIterationInMinutes * 60; // buffer for the driving time; for unsolved carriers the buffer will be increased over time
 		CarrierVehicle newCarrierVehicle = null;
 		for (int j = 0; j < 200; j++) {
 			if (generator.getServiceDurationTimeSelector().get(key) == null) {
 				System.out.println("key: " + key);
 				System.out.println(generator.getServiceDurationTimeSelector().keySet());
-				throw new RuntimeException("No service duration found for employee category '" + carrierAttributes.selectedStartCategory() + "' and mode '"
-					+ carrierAttributes.modeORvehType() + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType() + "'");
+				throw new RuntimeException(
+					"No service duration found for employee category '" + carrierAttributes.selectedStartCategory() + "' and mode '"
+						+ carrierAttributes.modeORvehType() + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType() + "'");
 			}
-			GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = generator.getServiceDurationTimeSelector().get(key).sample();
+			GenerateSmallScaleCommercialTrafficDemand.DurationsBounds serviceDurationBounds = generator.getServiceDurationTimeSelector().get(
+				key).sample();
 
 			for (int i = 0; i < 10; i++) {
 				int serviceDurationLowerBound = serviceDurationBounds.minDuration();
@@ -182,19 +190,23 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				// checks if the service duration will not exceed the vehicle availability including the buffer
 				if (possibleValue + usedTravelTimeBufferInSeconds <= maxVehicleAvailability) {
 					if (newCarrierVehicle != null)
-						log.info("New maxVehicleAvailability of vehicle '{}' of carrier '{}': {}", newCarrierVehicle.getId(), carrier.getId(), maxVehicleAvailability);
+						log.info("New maxVehicleAvailability of vehicle '{}' of carrier '{}': {}", newCarrierVehicle.getId(), carrier.getId(),
+							maxVehicleAvailability);
 					else
-						log.info("Changed service duration for carrier '{}' to fit vehicle duration with usedTravelTimeBufferInMinutes {}.", carrier.getId(), additionalTravelBufferPerIterationInMinutes);
+						log.info("Changed service duration for carrier '{}' to fit vehicle duration with usedTravelTimeBufferInMinutes {}.",
+							carrier.getId(), additionalTravelBufferPerIterationInMinutes);
 					return possibleValue;
 				}
 			}
-			if (j > 100){
-				CarrierVehicle carrierVehicleToChange = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().sorted(Comparator.comparingDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime())).toList().getFirst();
+			if (j > 100) {
+				CarrierVehicle carrierVehicleToChange = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().sorted(
+					Comparator.comparingDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime())).toList().getFirst();
 				int tourDuration = 0;
 				int vehicleStartTime = 0;
 				int vehicleEndTime = 0;
 				while (tourDuration < maxVehicleAvailability) {
-					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = generator.getTourDistribution().get(carrierAttributes.smallScaleCommercialTrafficType()).sample();
+					GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = generator.getTourDistribution().get(
+						carrierAttributes.smallScaleCommercialTrafficType()).sample();
 					vehicleStartTime = t.getVehicleStartTime(rnd);
 					tourDuration = t.getVehicleTourDuration(rnd);
 					vehicleEndTime = vehicleStartTime + tourDuration;
@@ -203,11 +215,13 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					carrierVehicleToChange.getType()).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
 				carrier.getCarrierCapabilities().getCarrierVehicles().remove(carrierVehicleToChange.getId());
 				carrier.getCarrierCapabilities().getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
-				maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
+				maxVehicleAvailability = carrier.getCarrierCapabilities().getCarrierVehicles().values().stream().mapToDouble(
+					vehicle -> vehicle.getLatestEndTime() - vehicle.getEarliestStartTime()).max().orElse(0);
 			}
 		}
 
-		throw new RuntimeException("No possible service duration found for employee category '" + carrierAttributes.selectedStartCategory() + "' and mode '"
-			+ carrierAttributes.modeORvehType() + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType() + "'");
+		throw new RuntimeException(
+			"No possible service duration found for employee category '" + carrierAttributes.selectedStartCategory() + "' and mode '"
+				+ carrierAttributes.modeORvehType() + "' in traffic type '" + carrierAttributes.smallScaleCommercialTrafficType() + "'");
 	}
 }
