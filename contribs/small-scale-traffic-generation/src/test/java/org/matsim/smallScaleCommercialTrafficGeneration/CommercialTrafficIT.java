@@ -60,7 +60,7 @@ import java.util.Objects;
  * @author Ricardo Ewert
  *
  */
-public class RunGenerateSmallScaleCommercialTrafficTest {
+public class CommercialTrafficIT {
 
 	@RegisterExtension
 	private final MatsimTestUtils utils = new MatsimTestUtils();
