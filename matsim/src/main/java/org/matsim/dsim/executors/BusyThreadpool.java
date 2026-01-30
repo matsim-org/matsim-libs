@@ -78,56 +78,69 @@ class BusyThreadpool {
 			return queue.offer(task);
 		}
 
-		Runnable pollLocal() {
-			return queue.poll();
-		}
-
-		Runnable stealFrom(Worker victim) {
-			return victim.queue.poll();
-		}
-
 		@Override
 		public void run() {
 
 			while (true) {
 
-				// check if we have to shutdown or pause
-				if (executionMode == ExecutionMode.PAUSED) {
-					park();
-				} else if (executionMode == ExecutionMode.SHUTDOWN) {
-					return;
-				}
-
-				// 1) Prefer local work
-				Runnable task = pollLocal();
-				if (task != null) {
-					runTask(task);
+				// fetch work from our queue or from someone else
+				if (doWork() || stealWork()) {
 					idleStrategy.reset();
 					continue;
 				}
 
-				// 2) Try stealing
-				final int n = workers.length;
-				int start = rnd.nextInt(n);
-				int stride = rnd.nextInt(n - 1);
-				int stealAttempts = Math.max(4, n);
-
-				// only attempt a few times to steal from others before we try our own queue again.
-				for (var i = 0; i < stealAttempts; i++) {
-					int victimIdx = (start + stride * i) % n;
-					if (victimIdx == workerId) continue;
-
-					task = stealFrom(workers[victimIdx]);
-					if (task != null) {
-						runTask(task);
-						idleStrategy.reset();
-						break;
-					}
+				// if we didn't have any work to do check for shutdown or pause.
+				if (executionMode == ExecutionMode.SHUTDOWN) {
+					scanForWorkOnShutdown();
+					return;
+				} else if (executionMode == ExecutionMode.PAUSED) {
+					park();
+					continue;
 				}
+				// no work and not shutdown or pause? idle!
+				idleStrategy.idle();
+			}
+		}
 
-				// 3) Nothing found: busy spin
-				if (task == null) {
-					idleStrategy.idle();
+		private boolean doWork() {
+			Runnable task = queue.poll();
+			if (task != null) {
+				runTask(task);
+				return true;
+			}
+			return false;
+		}
+
+		private boolean stealWork() {
+			final int n = workers.length;
+			if (n == 1) return false;
+
+			int start = rnd.nextInt(n);
+			int stride = 1 + rnd.nextInt(n - 1);
+			int stealAttempts = Math.min(4, n);
+
+			// only attempt a few times to steal from others before we try our own queue again.
+			for (var i = 0; i < stealAttempts; i++) {
+				int victimIdx = (start + stride * i) % n;
+				if (victimIdx == workerId) continue;
+
+				var task = workers[victimIdx].queue.poll();
+				if (task != null) {
+					runTask(task);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void scanForWorkOnShutdown() {
+			final int n = workers.length;
+
+			for (var i = 0; i < n; i++) {
+				var task = workers[i].queue.poll();
+				if (task != null) {
+					runTask(task);
+					i = -1; // rescan from the beginning (the loop will set i to 0).
 				}
 			}
 		}
@@ -143,9 +156,7 @@ class BusyThreadpool {
 		private void park() {
 			while (true) {
 				switch (executionMode) {
-					case PAUSED -> {
-						LockSupport.park(thread);
-					}
+					case PAUSED -> LockSupport.park(this);
 					case BOOST, SHUTDOWN -> {
 						return;
 					}
@@ -184,7 +195,7 @@ class BusyThreadpool {
 	}
 
 	public Future<?> submitAll(final Collection<? extends Runnable> tasks) {
-		if (executionMode == ExecutionMode.SHUTDOWN) {
+		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown");
 		}
 		if (tasks.isEmpty()) {
@@ -215,7 +226,7 @@ class BusyThreadpool {
 	}
 
 	public Future<?> submit(Runnable task) {
-		if (executionMode == ExecutionMode.SHUTDOWN) {
+		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown");
 		}
 
