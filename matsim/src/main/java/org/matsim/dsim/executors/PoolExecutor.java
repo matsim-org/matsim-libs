@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.*;
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -22,7 +21,8 @@ public final class PoolExecutor implements LPExecutor {
 
 	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
-	private final ExecutorService executor;
+	//private final ExecutorService executor;
+	private final BusyThreadpool executor;
 	private final SerializationProvider serializer;
 
 	/**
@@ -30,7 +30,9 @@ public final class PoolExecutor implements LPExecutor {
 	 */
 	private final List<Future<?>> executions = new LinkedList<>();
 
-	private final List<SimTask> tasks = new ArrayList<>();
+	private final List<EventHandlerTask> eventHandlerTasks = new ArrayList<>();
+	private final List<LPTask> lpTasks = new ArrayList<>();
+	private final List<SimTask> allTasks = new ArrayList<>();
 	private int step;
 
 	@Inject
@@ -38,9 +40,9 @@ public final class PoolExecutor implements LPExecutor {
 		this.serializer = serializer;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
 		//this.executor = Executors.newFixedThreadPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
-		log.info("Creating PoolExecutor with {} threads. Using FixedPool.", size);
-		this.executor = Executors.newFixedThreadPool(size);
-		//this.executor = new BusyThreadpool(size);
+		log.info("Creating PoolExecutor with {} threads. Using BusyPool.", size);
+		//this.executor = Executors.newFixedThreadPool(size);
+		this.executor = new BusyThreadpool(size);
 	}
 
 	/**
@@ -53,26 +55,32 @@ public final class PoolExecutor implements LPExecutor {
 	@Override
 	public LPTask register(LP lp, DistributedEventsManager manager, int part) {
 		LPTask task = new LPTask(lp, part, manager, serializer);
-		tasks.add(task);
+		lpTasks.add(task);
+		allTasks.add(task);
 		return task;
 	}
 
 	@Override
 	public EventHandlerTask register(EventHandler handler, DistributedEventsManager em, int part, int totalParts, AtomicInteger counter) {
 		EventHandlerTask task = new DefaultEventHandlerTask(handler, part, totalParts, em, serializer, counter);
-
-		tasks.add(task);
+		eventHandlerTasks.add(task);
+		allTasks.add(task);
 		return task;
 	}
 
 	@Override
 	public void deregister(SimTask task) {
-		tasks.remove(task);
+		if (task instanceof LPTask lpt) {
+			lpTasks.remove(lpt);
+		} else if (task instanceof EventHandlerTask et) {
+			eventHandlerTasks.remove(et);
+		}
+		allTasks.remove(task);
 	}
 
 	@Override
 	public void processRuntimes(Consumer<SimTask.Info> f) {
-		for (SimTask task : tasks) {
+		for (var task : allTasks) {
 			f.accept(new SimTask.Info(task.getName(), task.getPartition(), task.getRuntime()));
 		}
 	}
@@ -87,10 +95,10 @@ public final class PoolExecutor implements LPExecutor {
 
 		// Sort by descending runtime for better load distribution
 		if (mod128(step++) == 0)
-			tasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
+			lpTasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
 
 		// Prepare all tasks before executing them
-		for (SimTask task : tasks) {
+		for (SimTask task : allTasks) {
 			task.setTime(time);
 			if (task.needsExecution()) {
 				waitForTask(task, false);
@@ -98,14 +106,13 @@ public final class PoolExecutor implements LPExecutor {
 			}
 		}
 
-		for (SimTask task : tasks) {
+		// submit lp tasks in bulk
+		var lpFuture = executor.submitAll(lpTasks);
+		executions.add(lpFuture);
+
+		for (EventHandlerTask task : eventHandlerTasks) {
 			if (task.needsExecution()) {
-//				Future<?> ft = executor.submit(task);
-//				if (task instanceof EventHandlerTask et && et.isAsync()) {
-//					et.setFuture(ft);
-//				} else
-//					executions.add(ft);
-				submitTask(task, time);
+				submitEventHandlerTask(task, time);
 			}
 		}
 
@@ -122,10 +129,10 @@ public final class PoolExecutor implements LPExecutor {
 		executions.clear();
 	}
 
-	public void submitTask(SimTask task, double time) {
+	public void submitEventHandlerTask(EventHandlerTask task, double time) {
 		Future<?> ft = executor.submit(task);
-		if (task instanceof EventHandlerTask et && et.isAsync()) {
-			et.setFuture(ft);
+		if (task.isAsync()) {
+			task.setFuture(ft);
 		} else
 			executions.add(ft);
 	}
@@ -133,25 +140,20 @@ public final class PoolExecutor implements LPExecutor {
 	@Override
 	public void afterSim() {
 		// Execute sequentially
-		tasks.forEach(SimTask::cleanup);
+		allTasks.forEach(SimTask::cleanup);
 	}
 
 	@Override
 	public void runEventHandler() {
-		for (SimTask task : tasks) {
-
-			if (task instanceof EventHandlerTask) {
-				waitForTask(task, true);
-				task.beforeExecution();
-			}
+		for (var task : eventHandlerTasks) {
+			waitForTask(task, true);
+			task.beforeExecution();
 		}
 
 		// These need to be two loops because of concurrency
 
-		for (SimTask task : tasks) {
-			if (task instanceof EventHandlerTask) {
-				executions.add(executor.submit(task));
-			}
+		for (var task : eventHandlerTasks) {
+			executions.add(executor.submit(task));
 		}
 
 		for (Future<?> execution : executions) {
@@ -169,14 +171,13 @@ public final class PoolExecutor implements LPExecutor {
 
 	private void waitForTask(SimTask task, boolean lastStep) {
 		// Wait for async event handlers
-		if (task instanceof EventHandlerTask et) {
-			try {
+		try {
+			if (task instanceof EventHandlerTask et)
 				et.waitAsync(lastStep);
-			} catch (InterruptedException | ExecutionException e) {
-				log.error("Error while executing async event task", e);
-				executor.shutdown();
-				throw new RuntimeException(e.getCause());
-			}
+		} catch (InterruptedException | ExecutionException e) {
+			log.error("Error while executing async event task", e);
+			executor.shutdown();
+			throw new RuntimeException(e.getCause());
 		}
 	}
 }

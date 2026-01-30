@@ -10,92 +10,101 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BusyThreadpool implements ExecutorService {
 
 	private static final Logger log = LogManager.getLogger(BusyThreadpool.class);
-	private final ManyToManyConcurrentArrayQueue<Runnable> tasks;
+
 	private final Worker[] workers;
-	private final IdleWorkerStack idleWorkerStack;
+	private final AtomicInteger submitIndex = new AtomicInteger(0);
+	private final IdleStrategy submitIdleStrategy = new BusySpinIdleStrategy();
 
 	private volatile boolean shutdown;
 
 	public BusyThreadpool(int size) {
+		this(size, size * 128);
+	}
 
-		log.info("Initializing BusyThreadpool with " + size + " workers");
-		this.tasks = new ManyToManyConcurrentArrayQueue<>(size * 2);
+	public BusyThreadpool(int size, int perWorkerQueueCapacity) {
+		log.info("Initializing BusyThreadpool with {} workers; per-worker queue capacity={}", size, perWorkerQueueCapacity);
+
 		this.workers = new Worker[size];
-		this.idleWorkerStack = new IdleWorkerStack(size);
-
 		for (int i = 0; i < size; i++) {
-			workers[i] = new Worker("busy-threadpool-" + i, i);
-			workers[i].start();
+			workers[i] = new Worker("busy-threadpool-" + i, i, perWorkerQueueCapacity);
+		}
+		for (Worker w : workers) {
+			w.start();
 		}
 	}
 
 	private final class Worker implements Runnable {
 		private final Thread thread;
-		private final IdleStrategy idleStrategy = new BusySpinIdleStrategy();
 		private final int workerId;
+		private final IdleStrategy idleStrategy = new BusySpinIdleStrategy();
 
-		private final AtomicReference<Runnable> currentTask = new AtomicReference<>(null);
-		private boolean isInIdleStack = false;
+		/**
+		 * Per-worker task queue.
+		 * Owned by this worker, but other workers may "steal" via poll().
+		 */
+		private final ManyToManyConcurrentArrayQueue<Runnable> queue;
 
-		private Worker(String name, int workerId) {
+		private Worker(String name, int workerId, int queueCapacity) {
 			this.thread = new Thread(this, name);
 			this.workerId = workerId;
-			this.thread.setDaemon(true); // optional: choose based on your application lifecycle expectations
+			this.thread.setDaemon(true); // optional
+			this.queue = new ManyToManyConcurrentArrayQueue<>(queueCapacity);
 		}
 
 		void start() {
 			thread.start();
 		}
 
-		int id() {
-			return workerId;
+		boolean offer(Runnable task) {
+			return queue.offer(task);
 		}
 
-		boolean runDirect(Runnable task) {
-			return currentTask.compareAndSet(null, task);
+		Runnable pollLocal() {
+			return queue.poll();
+		}
+
+		Runnable stealFrom(Worker victim) {
+			return victim.queue.poll();
 		}
 
 		@Override
 		public void run() {
+			final int n = workers.length;
+
 			while (!shutdown) {
-
-				// directly try to run the direct task with out polling from the queue
-				if (currentTask.get() != null) {
-					runCurrentTask();
+				// 1) Prefer local work
+				Runnable task = pollLocal();
+				if (task != null) {
+					runTask(task);
 					idleStrategy.reset();
 					continue;
 				}
 
-				// try the queue next
-				var queueTask = tasks.poll();
-				if (queueTask != null) {
-//					runTask(queueTask);
-//					idleStrategy.reset();
-//					continue;
-					// we try to set the queue task as the current task. If someone else has set the current task directly,
-					// we resubmit the task to the queue.
-					if (!currentTask.compareAndSet(null, queueTask)) {
-						resubmitTask(queueTask);
+				// 2) Try stealing (randomized start reduces herding)
+				int start = ThreadLocalRandom.current().nextInt(n);
+				for (int k = 0; k < n; k++) {
+					int victimIdx = (start + k) % n;
+					if (victimIdx == workerId) continue;
+
+					task = stealFrom(workers[victimIdx]);
+					if (task != null) {
+						runTask(task);
+						idleStrategy.reset();
+						break;
 					}
-					// in any case we have a current task set and we can execute it.
-					runCurrentTask();
-					idleStrategy.reset();
-					continue;
 				}
 
-				// no direct task and no task in the queue. Idle and then try again.
-				if (!isInIdleStack) {
-					idleWorkerStack.pushIdle(workerId);
-					isInIdleStack = true;
+				// 3) Nothing found: busy spin
+				if (task == null) {
+					idleStrategy.idle();
 				}
-				idleStrategy.idle();
 			}
 		}
 
@@ -103,93 +112,10 @@ public class BusyThreadpool implements ExecutorService {
 			try {
 				task.run();
 			} catch (Throwable t) {
-				log.error("Error while executing task. This error should be caught by the future in the threadpool?", t);
+				log.error("Error while executing task", t);
 			}
-		}
-
-		private void runCurrentTask() {
-			try {
-				isInIdleStack = false;
-				currentTask.get().run();
-			} catch (Throwable t) {
-				log.error("Error while executing task. This error should be caught by the future in the threadpool?", t);
-			} finally {
-				// clear the current task in any case, signaling, that the worker is open for work again.
-				currentTask.set(null);
-			}
-		}
-
-		private void resubmitTask(Runnable task) {
-			// reuse idle strategy, but restart it.
-			idleStrategy.reset();
-			while (!tasks.offer(task)) {
-				this.idleStrategy.idle();
-			}
-			// and reset it again, before we go back into the 'fetch task loop'
-			idleStrategy.reset();
 		}
 	}
-
-	/**
-	 * Many producers (workers) push their workerId when they become idle.
-	 * Single consumer (submitter thread) pops a workerId to try direct handoff.
-	 * <p>
-	 * This is an "opportunity list": entries can be stale. Validate by runDirect(CAS).
-	 * <p>
-	 * Suggested by GPT 5.2
-	 */
-	public static final class IdleWorkerStack {
-		public static final int NONE = -1;
-
-		private final AtomicInteger head = new AtomicInteger(NONE);
-		private final int[] next;                     // next[workerId] = next workerId in stack
-		private final AtomicIntegerArray inStack;     // 0/1 guard: prevents duplicate push of same workerId
-
-		public IdleWorkerStack(int workerCount) {
-			this.next = new int[workerCount];
-			this.inStack = new AtomicIntegerArray(workerCount);
-			for (int i = 0; i < workerCount; i++) {
-				next[i] = NONE;
-			}
-		}
-
-		/**
-		 * Called by worker thread when it transitions to idle (about to back off / park).
-		 * Safe to call multiple times; duplicates are ignored.
-		 */
-		public void pushIdle(int workerId) {
-			if (!inStack.compareAndSet(workerId, 0, 1)) {
-				return; // already advertised
-			}
-
-			int h;
-			do {
-				h = head.get();
-				next[workerId] = h;
-			} while (!head.compareAndSet(h, workerId));
-		}
-
-		/**
-		 * Called by the single submitter thread.
-		 *
-		 * @return a workerId candidate or NONE if empty.
-		 */
-		public int popIdleCandidate() {
-			int h;
-			int nh;
-			do {
-				h = head.get();
-				if (h == NONE) return NONE;
-				nh = next[h];
-			} while (!head.compareAndSet(h, nh));
-
-			// allow this worker to advertise again later
-			inStack.set(h, 0);
-			next[h] = NONE; // optional hygiene
-			return h;
-		}
-	}
-
 
 	@Override
 	public void shutdown() {
@@ -198,7 +124,7 @@ public class BusyThreadpool implements ExecutorService {
 
 	@Override
 	public List<Runnable> shutdownNow() {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("shutdownNow not supported yet");
 	}
 
 	@Override
@@ -208,22 +134,75 @@ public class BusyThreadpool implements ExecutorService {
 
 	@Override
 	public boolean isTerminated() {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("isTerminated not supported yet");
 	}
 
 	@Override
 	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("awaitTermination not supported yet");
 	}
 
 	@Override
 	public <T> Future<T> submit(Callable<T> task) {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("submit(Callable) not supported yet");
 	}
 
 	@Override
 	public <T> Future<T> submit(Runnable task, T result) {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("submit(Runnable,T) not supported yet");
+	}
+
+	public Future<?> submitAll(final Collection<? extends Runnable> tasks) {
+		if (shutdown) {
+			throw new RejectedExecutionException("BusyThreadpool is shutdown");
+		}
+		if (tasks.isEmpty()) {
+			return CompletableFuture.completedFuture(null);
+		}
+
+		var result = new CompletableFuture<>();
+		var remainingTasks = new AtomicInteger(tasks.size());
+		var firstError = new AtomicReference<Throwable>(null);
+
+		for (var task : tasks) {
+			Runnable wrapped = () -> {
+				try {
+					task.run();
+				} catch (Throwable t) {
+					firstError.compareAndSet(null, t);
+				} finally {
+					if (remainingTasks.decrementAndGet() == 0) {
+						Throwable err = firstError.get();
+						if (err == null) result.complete(null);
+						else result.completeExceptionally(err);
+					}
+				}
+			};
+			enqueue(wrapped);
+		}
+		return result;
+	}
+
+	private void enqueue(Runnable wrapped) {
+
+		// Select a random worker to submit a task to.
+		int start = submitIndex.getAndIncrement();
+
+		do {
+			if (shutdown) {
+				throw new RejectedExecutionException("BusyThreadpool is shutdown");
+			}
+
+			// if we cannot submit to the first worker directly, try all others.
+			for (var i = start; i < workers.length; i++) {
+				if (workers[i].offer(wrapped)) {
+					return;
+				}
+			}
+			// if we haven't submitted to any worker, start from the first one next time.
+			start = 0;
+			submitIdleStrategy.idle();
+		} while (true);
 	}
 
 	@Override
@@ -232,6 +211,7 @@ public class BusyThreadpool implements ExecutorService {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown");
 		}
 
+		//var future = new FutureTask<Void>(task, null);
 		CompletableFuture<Void> future = new CompletableFuture<>();
 
 		Runnable wrapped = () -> {
@@ -243,49 +223,33 @@ public class BusyThreadpool implements ExecutorService {
 			}
 		};
 
-		// Busy-wait until the bounded queue accepts the task
-		final var idleStrategy = new BackoffIdleStrategy();
-
-		// try handing off the task directly.
-		int workerIndex;
-		while ((workerIndex = idleWorkerStack.popIdleCandidate()) != IdleWorkerStack.NONE) {
-			if (workers[workerIndex].runDirect(wrapped)) {
-				return future;
-			}
-		}
-		// if we don't succeed, put it in the tasks queue to be executed later.
-		while (!tasks.offer(wrapped)) {
-			if (shutdown) {
-				throw new RejectedExecutionException("BusyThreadpool is shutdown");
-			}
-			idleStrategy.idle(0);
-		}
-
+		enqueue(wrapped);
 		return future;
 	}
 
 	@Override
 	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("invokeAll not supported yet");
 	}
 
 	@Override
 	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("invokeAll not supported yet");
 	}
 
 	@Override
 	public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("invokeAny not supported yet");
 	}
 
 	@Override
 	public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-		throw new RuntimeException("not supported yet");
+		throw new UnsupportedOperationException("invokeAny not supported yet");
 	}
 
 	@Override
 	public void execute(Runnable command) {
-		throw new RuntimeException("not supported yet");
+		// Keep a simple implementation for callers expecting Executor semantics
+		submit(command);
 	}
 }
