@@ -14,13 +14,28 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
+/**
+ * A thread pool implementation that uses busy-waiting for worker threads to process tasks. This threadpool is optimized for the workload of
+ * {@link PoolExecutor} which drives the DSim.
+ * <p>
+ * The threadpool spawns `size` threads on creation. The threads immediately go into park. Before the pool can be used {@link #resume()} must be
+ * called which wakes up all worker threads of the pool. Ater {@link #resume()} has been called, worker threads busy spin for new tasks which will
+ * saturate the CPU if sufficient tasks are requested. The busy spinning can be paused by calling {@link #pause()}. When paused, the pool does NOT
+ * accept new tasks. It will continue to finish all submitted tasks, before worker threads are parked.
+ * <p>
+ * NOTE: This pool is optimized for one coordinator thread which submits new tasks. I have not tested how it behaves with multiple threads submitting
+ * tasks. I guess it will work 🙃
+ * <p>
+ * NOTE: This pool busy spins until tasks are submitted. This will fry your CPU and block other threads. Use {@link #pause()} and {@link #resume()} to
+ * free CPU ressources
+ */
 class BusyThreadpool {
 
 	private static final Logger log = LogManager.getLogger(BusyThreadpool.class);
 
-	public enum ExecutionMode {
+	private enum ExecutionMode {
 		PAUSED,
-		BOOST,
+		BUSY,
 		SHUTDOWN
 	}
 
@@ -31,6 +46,7 @@ class BusyThreadpool {
 	private volatile ExecutionMode executionMode = ExecutionMode.PAUSED;
 
 	BusyThreadpool(int size) {
+		// use 128 tasks per default. Usually, we have less than 10 tasks per sim step.
 		this(size, 128);
 	}
 
@@ -154,10 +170,12 @@ class BusyThreadpool {
 		}
 
 		private void park() {
+			// this needs to be in a loop, as threads might wake up from park sporadically
+			// in that case we check the pool status and decide what to do.
 			while (true) {
 				switch (executionMode) {
 					case PAUSED -> LockSupport.park(this);
-					case BOOST, SHUTDOWN -> {
+					case BUSY, SHUTDOWN -> {
 						return;
 					}
 				}
@@ -165,20 +183,30 @@ class BusyThreadpool {
 		}
 	}
 
+	/**
+	 * Pause the pool. The pool will finish all submitted tasks. When all tasks are finished, all
+	 * worker threads are parked.
+	 * <p>
+	 * When the pool is paused, no new tasks are accepted.
+	 */
 	public void pause() {
 		executionMode = ExecutionMode.PAUSED;
 	}
 
 	/**
-	 * Transition the pool into BOOST mode and unpark all workers.
+	 * Unparks all workers. The pool eagerly awaits tasks after this. Internally,
+	 * it uses busy spin to wait for new tasks, which will cause a lot of CPU usage.
 	 */
 	public void resume() {
-		executionMode = ExecutionMode.BOOST;
+		executionMode = ExecutionMode.BUSY;
 		for (Worker w : workers) {
 			w.unpark();
 		}
 	}
 
+	/**
+	 * Shuts down the pool. The pool will try to finish all submitted tasks before shutting down.
+	 */
 	public void shutdown() {
 		executionMode = ExecutionMode.SHUTDOWN;
 		for (Worker w : workers) {
@@ -186,17 +214,31 @@ class BusyThreadpool {
 		}
 	}
 
+	/**
+	 * Indicates whether the pool is paused.
+	 */
 	public boolean isPaused() {
 		return executionMode == ExecutionMode.PAUSED;
 	}
 
+	/**
+	 * Indicates whether the pool is shutdown.
+	 */
 	public boolean isShutdown() {
 		return executionMode == ExecutionMode.SHUTDOWN;
 	}
 
+	/**
+	 * Submit multiple tasks to the pool. The pool will execute all tasks as soon as there is a free worker thread.
+	 * This method is equivalent to calling {@link #submit(Runnable)} for each task but it only produces a single future.
+	 * This saves a tiny bit of allocation for tasks, such as the SimProcess, which need to be submitted and awaited
+	 * together often.
+	 *
+	 * @return One future to await them all
+	 */
 	public Future<?> submitAll(final Collection<? extends Runnable> tasks) {
 		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
-			throw new RejectedExecutionException("BusyThreadpool is shutdown");
+			throw new RejectedExecutionException("BusyThreadpool is shutdown or paused");
 		}
 		if (tasks.isEmpty()) {
 			return CompletableFuture.completedFuture(null);
@@ -225,9 +267,14 @@ class BusyThreadpool {
 		return result;
 	}
 
+	/**
+	 * Submits a task to the pool. The pool will execute this task as soon as there is a free worker thread.
+	 *
+	 * @return A future which completes when the task has been executed.
+	 */
 	public Future<?> submit(Runnable task) {
 		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
-			throw new RejectedExecutionException("BusyThreadpool is shutdown");
+			throw new RejectedExecutionException("BusyThreadpool is shutdown or paused.");
 		}
 
 		//var future = new FutureTask<Void>(task, null);
