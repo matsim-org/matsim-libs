@@ -467,8 +467,8 @@ public class TripDashboard implements Dashboard {
 		for (String type : typesOfTimeDifferentiation) {
 			layout.row(type + rowSuffix, tabTitle).el(Plotly.class, (viz, data) -> {
 
-				viz.title = StringUtils.capitalize(type);
-				viz.description = "by hour and purpose";
+				viz.title = StringUtils.capitalize(type) + "of the Trips";
+				viz.description = "by hour and the activity type at the destination.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Hour").build())
 					.yAxis(Axis.builder().title("Share").build())
