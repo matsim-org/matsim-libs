@@ -1,6 +1,5 @@
 package org.matsim.dsim.executors;
 
-import org.agrona.concurrent.BackoffIdleStrategy;
 import org.agrona.concurrent.BusySpinIdleStrategy;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.ManyToManyConcurrentArrayQueue;
@@ -8,27 +7,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.LockSupport;
 
-public class BusyThreadpool implements ExecutorService {
+class BusyThreadpool {
 
 	private static final Logger log = LogManager.getLogger(BusyThreadpool.class);
 
-	private final Worker[] workers;
-	private final AtomicInteger submitIndex = new AtomicInteger(0);
-	private final IdleStrategy submitIdleStrategy = new BusySpinIdleStrategy();
-
-	private volatile boolean shutdown;
-
-	public BusyThreadpool(int size) {
-		this(size, size * 128);
+	public enum ExecutionMode {
+		PAUSED,
+		BOOST,
+		SHUTDOWN
 	}
 
-	public BusyThreadpool(int size, int perWorkerQueueCapacity) {
+	private final Worker[] workers;
+	private final AtomicLong submitIndex = new AtomicLong(0);
+	private final IdleStrategy submitIdleStrategy = new BusySpinIdleStrategy();
+
+	private volatile ExecutionMode executionMode = ExecutionMode.PAUSED;
+
+	BusyThreadpool(int size) {
+		this(size, 128);
+	}
+
+	BusyThreadpool(int size, int perWorkerQueueCapacity) {
 		log.info("Initializing BusyThreadpool with {} workers; per-worker queue capacity={}", size, perWorkerQueueCapacity);
 
 		this.workers = new Worker[size];
@@ -43,6 +49,7 @@ public class BusyThreadpool implements ExecutorService {
 	private final class Worker implements Runnable {
 		private final Thread thread;
 		private final int workerId;
+		private final Random rnd;
 		private final IdleStrategy idleStrategy = new BusySpinIdleStrategy();
 
 		/**
@@ -56,10 +63,15 @@ public class BusyThreadpool implements ExecutorService {
 			this.workerId = workerId;
 			this.thread.setDaemon(true); // optional
 			this.queue = new ManyToManyConcurrentArrayQueue<>(queueCapacity);
+			this.rnd = new Random(workerId);
 		}
 
 		void start() {
 			thread.start();
+		}
+
+		void unpark() {
+			LockSupport.unpark(thread);
 		}
 
 		boolean offer(Runnable task) {
@@ -76,9 +88,16 @@ public class BusyThreadpool implements ExecutorService {
 
 		@Override
 		public void run() {
-			final int n = workers.length;
 
-			while (!shutdown) {
+			while (true) {
+
+				// check if we have to shutdown or pause
+				if (executionMode == ExecutionMode.PAUSED) {
+					park();
+				} else if (executionMode == ExecutionMode.SHUTDOWN) {
+					return;
+				}
+
 				// 1) Prefer local work
 				Runnable task = pollLocal();
 				if (task != null) {
@@ -87,10 +106,15 @@ public class BusyThreadpool implements ExecutorService {
 					continue;
 				}
 
-				// 2) Try stealing (randomized start reduces herding)
-				int start = ThreadLocalRandom.current().nextInt(n);
-				for (int k = 0; k < n; k++) {
-					int victimIdx = (start + k) % n;
+				// 2) Try stealing
+				final int n = workers.length;
+				int start = rnd.nextInt(n);
+				int stride = rnd.nextInt(n - 1);
+				int stealAttempts = Math.max(4, n);
+
+				// only attempt a few times to steal from others before we try our own queue again.
+				for (var i = 0; i < stealAttempts; i++) {
+					int victimIdx = (start + stride * i) % n;
 					if (victimIdx == workerId) continue;
 
 					task = stealFrom(workers[victimIdx]);
@@ -115,45 +139,52 @@ public class BusyThreadpool implements ExecutorService {
 				log.error("Error while executing task", t);
 			}
 		}
+
+		private void park() {
+			while (true) {
+				switch (executionMode) {
+					case PAUSED -> {
+						LockSupport.park(thread);
+					}
+					case BOOST, SHUTDOWN -> {
+						return;
+					}
+				}
+			}
+		}
 	}
 
-	@Override
+	public void pause() {
+		executionMode = ExecutionMode.PAUSED;
+	}
+
+	/**
+	 * Transition the pool into BOOST mode and unpark all workers.
+	 */
+	public void resume() {
+		executionMode = ExecutionMode.BOOST;
+		for (Worker w : workers) {
+			w.unpark();
+		}
+	}
+
 	public void shutdown() {
-		shutdown = true;
+		executionMode = ExecutionMode.SHUTDOWN;
+		for (Worker w : workers) {
+			w.unpark();
+		}
 	}
 
-	@Override
-	public List<Runnable> shutdownNow() {
-		throw new UnsupportedOperationException("shutdownNow not supported yet");
+	public boolean isPaused() {
+		return executionMode == ExecutionMode.PAUSED;
 	}
 
-	@Override
 	public boolean isShutdown() {
-		return shutdown;
-	}
-
-	@Override
-	public boolean isTerminated() {
-		throw new UnsupportedOperationException("isTerminated not supported yet");
-	}
-
-	@Override
-	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
-		throw new UnsupportedOperationException("awaitTermination not supported yet");
-	}
-
-	@Override
-	public <T> Future<T> submit(Callable<T> task) {
-		throw new UnsupportedOperationException("submit(Callable) not supported yet");
-	}
-
-	@Override
-	public <T> Future<T> submit(Runnable task, T result) {
-		throw new UnsupportedOperationException("submit(Runnable,T) not supported yet");
+		return executionMode == ExecutionMode.SHUTDOWN;
 	}
 
 	public Future<?> submitAll(final Collection<? extends Runnable> tasks) {
-		if (shutdown) {
+		if (executionMode == ExecutionMode.SHUTDOWN) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown");
 		}
 		if (tasks.isEmpty()) {
@@ -183,31 +214,8 @@ public class BusyThreadpool implements ExecutorService {
 		return result;
 	}
 
-	private void enqueue(Runnable wrapped) {
-
-		// Select a random worker to submit a task to.
-		int start = submitIndex.getAndIncrement();
-
-		do {
-			if (shutdown) {
-				throw new RejectedExecutionException("BusyThreadpool is shutdown");
-			}
-
-			// if we cannot submit to the first worker directly, try all others.
-			for (var i = start; i < workers.length; i++) {
-				if (workers[i].offer(wrapped)) {
-					return;
-				}
-			}
-			// if we haven't submitted to any worker, start from the first one next time.
-			start = 0;
-			submitIdleStrategy.idle();
-		} while (true);
-	}
-
-	@Override
 	public Future<?> submit(Runnable task) {
-		if (shutdown) {
+		if (executionMode == ExecutionMode.SHUTDOWN) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown");
 		}
 
@@ -227,29 +235,27 @@ public class BusyThreadpool implements ExecutorService {
 		return future;
 	}
 
-	@Override
-	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-		throw new UnsupportedOperationException("invokeAll not supported yet");
-	}
+	private void enqueue(Runnable wrapped) {
 
-	@Override
-	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-		throw new UnsupportedOperationException("invokeAll not supported yet");
-	}
+		// Select a random worker to submit a task to.
+		var start = submitIndex.getAndIncrement();
 
-	@Override
-	public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-		throw new UnsupportedOperationException("invokeAny not supported yet");
-	}
+		do {
+			if (executionMode == ExecutionMode.SHUTDOWN) {
+				throw new RejectedExecutionException("BusyThreadpool is shutdown");
+			}
 
-	@Override
-	public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-		throw new UnsupportedOperationException("invokeAny not supported yet");
-	}
-
-	@Override
-	public void execute(Runnable command) {
-		// Keep a simple implementation for callers expecting Executor semantics
-		submit(command);
+			// if we cannot submit to the first worker directly, try all others.
+			for (var attempts = 0; attempts < workers.length; attempts++) {
+				int workerIdx = (int) ((start + attempts) % workers.length);
+				if (workers[workerIdx].offer(wrapped)) {
+					submitIdleStrategy.reset();
+					return;
+				}
+			}
+			// if we haven't submitted to any worker, try again next time, starting with another one.
+			start++;
+			submitIdleStrategy.idle();
+		} while (true);
 	}
 }

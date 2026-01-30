@@ -4,13 +4,11 @@ import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.LP;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -28,7 +26,7 @@ public final class PoolExecutor implements LPExecutor {
 	/**
 	 * Executions from the current sim step.
 	 */
-	private final List<Future<?>> executions = new LinkedList<>();
+	private final List<Future<?>> executions = new ArrayList<>();
 
 	private final List<EventHandlerTask> eventHandlerTasks = new ArrayList<>();
 	private final List<LPTask> lpTasks = new ArrayList<>();
@@ -93,6 +91,11 @@ public final class PoolExecutor implements LPExecutor {
 	@Override
 	public void doSimStep(double time) {
 
+		// signal to the threadpool, that we want max performance now.
+		if (executor.isPaused()) {
+			executor.resume();
+		}
+
 		// Sort by descending runtime for better load distribution
 		if (mod128(step++) == 0)
 			lpTasks.sort((o1, o2) -> -Float.compare(o1.getAvgRuntime(), o2.getAvgRuntime()));
@@ -141,6 +144,11 @@ public final class PoolExecutor implements LPExecutor {
 	public void afterSim() {
 		// Execute sequentially
 		allTasks.forEach(SimTask::cleanup);
+	}
+
+	@Override
+	public void pause() {
+		executor.pause();
 	}
 
 	@Override
