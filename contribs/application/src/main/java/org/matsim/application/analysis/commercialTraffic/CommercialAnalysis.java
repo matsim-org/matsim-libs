@@ -46,12 +46,12 @@ import static org.matsim.application.ApplicationUtils.globFile;
 )
 @CommandSpec(requireRunDirectory = true,
 	produces = {
-		"commercialTraffic_generalTravelData.csv",
+		"generalTravelData.csv",
 		"commercialTraffic_link_volume.csv",
-		"commercialTraffic_travelDistancesShares_%s.csv",
-		"commercialTraffic_tourAnalysis_%s.csv",
-		"commercialTraffic_relations.csv",
-		"commercialTraffic_activities.csv"
+		"travelDistancesShares_%s.csv",
+		"tourAnalysis_%s.csv",
+		"relations.csv",
+		"activities.csv"
 	}
 )
 public class CommercialAnalysis implements MATSimAppCommand {
@@ -136,7 +136,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	}
 
 	private void createActivityAnalysis(Scenario scenario) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_activities.csv")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("activities.csv")), CSVFormat.DEFAULT)) {
 			HashMap<String, List<ActivityInformation>> activityToPersonMap = new HashMap<>();
 			List<String> activityDurationLabels = AnalysisUtils.createGroupLabels(activityDurationGroups);
 
@@ -228,7 +228,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_transit_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_transit_inInvestigationArea();
 		HashMap<Id<Person>, List<Double>> distancesPerTrip_perPerson_all_inInvestigationArea = linkDemandEventHandler.getDistancesPerTrip_perPerson_all_inInvestigationArea();
 
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_generalTravelData.csv")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("generalTravelData.csv")),
 			CSVFormat.DEFAULT)) {
 			// _Intern: internal trips (start and end inside the area)
 			// _Incoming: incoming trips (start outside the area and end inside the area)
@@ -398,7 +398,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
 												   HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
 												   Map<String, Integer> maxDistanceWithDepotChargingInKilometers) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "distances")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("tourAnalysis_%s.csv", "distances")),
 			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
@@ -461,7 +461,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 												   HashMap<Id<Vehicle>, Double> tourDurations,
 												   HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
 												   HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "durations")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("tourAnalysis_%s.csv", "durations")),
 			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
@@ -521,7 +521,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 													  HashMap<Id<Vehicle>, Id<Person>> vehicleToPersonId,
 													  HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation,
 													  Object2IntOpenHashMap<Id<Person>> jobsPerPerson) {
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour")),
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("tourAnalysis_%s.csv", "jobsPerTour")),
 			CSVFormat.DEFAULT)) {
 
 			printer.print("personId");
@@ -610,7 +610,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		Map<Integer, Object2DoubleMap<String>> relations = linkDemandEventHandler.getRelations();
 		ArrayList<String> header = getHeaderForRelations(relations);
 		ArrayList<Integer> relationNumbers = new ArrayList<>(relations.keySet());
-		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("commercialTraffic_relations.csv")), CSVFormat.DEFAULT)) {
+		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("relations.csv")), CSVFormat.DEFAULT)) {
 
 			printer.print("relationNumber");
 			for (String h : header) {
@@ -651,14 +651,14 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	}
 
 	private void createTravelDistancesShares(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
-		String filename = "commercialTraffic_travelDistancesShares.csv";
-		Path path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perMode");
+		String filename = "travelDistancesShares.csv";
+		Path path = output.getPath("travelDistancesShares_%s.csv", "perMode");
 		Object2DoubleOpenHashMap<String> travelDistancesPerMode = linkDemandEventHandler.getTravelDistancesPerMode();
 		writeDistanceFiles(travelDistancesPerMode, path);
-		path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perGroup");
+		path = output.getPath("travelDistancesShares_%s.csv", "perGroup");
 		Object2DoubleOpenHashMap<String> travelDistancesPerGroup = linkDemandEventHandler.getTravelDistancesPerGroup();
 		writeDistanceFiles(travelDistancesPerGroup, path);
-		path = output.getPath("commercialTraffic_travelDistancesShares_%s.csv", "perSubpopulation");
+		path = output.getPath("travelDistancesShares_%s.csv", "perSubpopulation");
 		Object2DoubleOpenHashMap<String> travelDistancesPerSubpopulation = linkDemandEventHandler.getTravelDistancesPerSubpopulation();
 		writeDistanceFiles(travelDistancesPerSubpopulation, path);
 	}

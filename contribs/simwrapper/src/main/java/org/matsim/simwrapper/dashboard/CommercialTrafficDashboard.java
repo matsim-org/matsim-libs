@@ -109,7 +109,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.title = "Origin-Destination of commercial trips";
 			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling(
 				"The OD can be filtered according to defined groups of commercial subpopulations.", data, false);
-			viz.file = data.compute(CommercialAnalysis.class, "commercialTraffic_relations.csv", args);
+			viz.file = data.compute(CommercialAnalysis.class, "relations.csv", args);
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
 				viz.addAggregation(group, "Origin", group + "_start_X", group + "_start_Y", "Destination", group + "_act_X", group + "_act_Y");
 
@@ -133,7 +133,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
 				viz.addTrace(
@@ -150,7 +150,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
 				viz.addTrace(
@@ -172,7 +172,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -195,7 +195,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 
 					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -220,7 +220,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 				.constant("source", "Veh");
 
 			viz.addTrace(
@@ -244,7 +244,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "jobsPerTour"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
 					.constant("source", "Veh");
 
 				viz.addTrace(
@@ -281,7 +281,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 
 					.constant("source", "Act");
 				viz.addTrace(
@@ -298,7 +298,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 
 					.constant("source", "Act");
 				viz.addTrace(
@@ -320,7 +320,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 
 					.constant("source", "Act");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -344,7 +344,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 
 					.constant("source", "Act");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -370,7 +370,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+					data.compute(CommercialAnalysis.class, "activities.csv"))
 				.constant("source", "Act");
 
 			viz.addTrace(
@@ -394,7 +394,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 					.constant("source", "Act");
 
 				viz.addTrace(
@@ -434,7 +434,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
 				viz.addTrace(
@@ -452,7 +452,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
 				viz.addTrace(
@@ -474,7 +474,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -497,7 +497,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 
 					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -523,7 +523,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 				.constant("source", "Veh");
 
 			viz.addTrace(
@@ -547,7 +547,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 					.constant("source", "Veh");
 
 				viz.addTrace(
@@ -583,7 +583,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
 			viz.addTrace(
@@ -600,7 +600,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
 			viz.addTrace(
@@ -623,7 +623,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -646,7 +646,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
@@ -671,7 +671,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 				.constant("source", "Veh");
 
 			viz.addTrace(
@@ -695,7 +695,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 					.constant("source", "Veh");
 
 				viz.addTrace(
@@ -723,13 +723,13 @@ public class CommercialTrafficDashboard implements Dashboard {
 		layout.row("General_first", "General").el(PieChart.class, (viz, data) -> {
 				double sampleSize = data.config().getSampleSize();
 				setAnalysisArgs("--sampleSize", String.valueOf(sampleSize));
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perMode", args);
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perMode", args);
 				viz.title = "Travel Distance Shares by Mode";
 				viz.description = "at final iteration";
 				viz.useLastRow = true;
 			})
 			.el(PieChart.class, (viz, data) -> {
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv",
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv",
 					"perSubpopulation", args);
 				viz.title = "Travel Distance Shares by subpopulation";
 				viz.useLastRow = true;
@@ -737,7 +737,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 			})
 			.el(PieChart.class, (viz, data) -> {
-				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_travelDistancesShares_%s.csv", "perGroup",
+				viz.dataset = data.computeWithPlaceholder(CommercialAnalysis.class, "travelDistancesShares_%s.csv", "perGroup",
 					args);
 				viz.title = "Travel Distance Shares by model type";
 				viz.useLastRow = true;
@@ -959,7 +959,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+					data.compute(CommercialAnalysis.class, "activities.csv"))
 				.constant("source", "Simulated");
 			viz.addTrace(
 				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
@@ -989,7 +989,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "commercialTraffic_activities.csv"))
+						data.compute(CommercialAnalysis.class, "activities.csv"))
 					.constant("source", "Simulated");
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
@@ -1019,7 +1019,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 				.constant("source", "Simulated");
 			viz.addTrace(
 				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
@@ -1048,7 +1048,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "distances"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 					.constant("source", "Simulated");
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
@@ -1078,7 +1078,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			viz.colorRamp = ColorScheme.Viridis;
 
 			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 
 				.constant("source", "Simulated");
 			viz.addTrace(
@@ -1108,7 +1108,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "commercialTraffic_tourAnalysis_%s.csv", "durations"))
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
 					.constant("source", "Simulated");
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
