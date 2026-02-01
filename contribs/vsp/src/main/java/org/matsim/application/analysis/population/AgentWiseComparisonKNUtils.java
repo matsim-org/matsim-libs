@@ -82,8 +82,8 @@ class AgentWiseComparisonKNUtils{
 	static DoubleColumn deltaColumn( Table joinedTable, String key ){
 		return joinedTable.doubleColumn( keyTwoOf( key ) ).subtract( joinedTable.doubleColumn( key ) ).setName( deltaOf( key ) );
 	}
-	static void handleEventsfile( Path path, String pattern, Population population ){
-		String baseEventsFile = globFile( path, pattern ).toString();
+	static void handleEventsfile( Path path, Population population ){
+		String baseEventsFile = globFile( path, "*true.output_events.xml.gz" ).toString();
 		log.info( baseEventsFile );
 
 		double popSizeBefore = population.getPersons().size();
@@ -390,8 +390,8 @@ class AgentWiseComparisonKNUtils{
 		System.out.println( System.lineSeparator() + summaryTable + System.lineSeparator() );
 	}
 	static @NotNull Population readAndCleanPopulation( Path path, List<String> eventsFilePatterns ){
-		String basePopulationFilename;
-		try {
+		String basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
+	/*	try {
 			basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
 		} catch ( IllegalStateException ee ) {
 			try{
@@ -399,7 +399,7 @@ class AgentWiseComparisonKNUtils{
 			} catch ( IllegalStateException e2 ) {
 				basePopulationFilename = globFile( path, "*.experienced_plans.xml.gz" ).toString();
 			}
-		}
+		} */
 
 		Population basePopulation = PopulationUtils.readPopulation( basePopulationFilename );
 
@@ -407,10 +407,9 @@ class AgentWiseComparisonKNUtils{
 		log.info("Cleaned base population; size={}", basePopulation.getPersons().size() );
 
 		log.info("Reading events files to enrich the base population with money and stuck info");
-		for (String pattern : eventsFilePatterns) {
-			handleEventsfile( path, pattern, basePopulation );
+
+		handleEventsfile( path, basePopulation );
 			// (most of the time, this should be a filtered events file, and we only use money and stuck info)
-		}
 
 		return basePopulation;
 	}

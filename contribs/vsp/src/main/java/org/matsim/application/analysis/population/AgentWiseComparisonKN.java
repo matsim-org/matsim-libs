@@ -170,6 +170,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// yy whey do we need the above?
 
 		baseConfig.counts().setInputFile( null );
+		baseConfig.controller().setOutputDirectory("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/experienced-plans-tmp");
+
 
 //		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
 
@@ -264,7 +266,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			setAnalysisPopulation( person, "true" );
 		}
 
-//		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
+		//Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null );
 
@@ -285,6 +287,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation );
 
 		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath ); */
+
+
+		System.out.println(baseTablePersons);
+		baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-persons.csv");
+
 
 		return 0;
 	}
@@ -601,7 +608,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		formatTable( deltaTable, 0 );
 
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+		System.out.println( personsTableBase.sortOn( deltaOf( SCORE ) ) );
+		writeMatsimScoresSummaryTable(baseCasePath, baseConfig, deltaTable);
 
 		// ===
 
