@@ -19,7 +19,6 @@ public final class PoolExecutor implements LPExecutor {
 
 	private static final Logger log = LogManager.getLogger(PoolExecutor.class);
 
-	//private final ExecutorService executor;
 	private final BusyThreadpool executor;
 	private final SerializationProvider serializer;
 
@@ -28,6 +27,9 @@ public final class PoolExecutor implements LPExecutor {
 	 */
 	private final List<Future<?>> executions = new ArrayList<>();
 
+	// we maintain separate lists of lpTasks (Simulation Tasks) and event handler tasks because lp tasks
+	// can be submitted to the executor in a bulk operation, which seems to yield a little bit of performance
+	// for higher process counts.
 	private final List<EventHandlerTask> eventHandlerTasks = new ArrayList<>();
 	private final List<LPTask> lpTasks = new ArrayList<>();
 	private final List<SimTask> allTasks = new ArrayList<>();
@@ -37,9 +39,6 @@ public final class PoolExecutor implements LPExecutor {
 	public PoolExecutor(SerializationProvider serializer, DSimConfigGroup config) {
 		this.serializer = serializer;
 		var size = config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads();
-		//this.executor = Executors.newFixedThreadPool(config.getThreads() == 0 ? Runtime.getRuntime().availableProcessors() : config.getThreads());
-		log.info("Creating PoolExecutor with {} threads. Using BusyPool.", size);
-		//this.executor = Executors.newFixedThreadPool(size);
 		this.executor = new BusyThreadpool(size);
 	}
 
@@ -113,9 +112,12 @@ public final class PoolExecutor implements LPExecutor {
 		var lpFuture = executor.submitAll(lpTasks);
 		executions.add(lpFuture);
 
+		// A possible optimization could be to bulk submit event handler tasks as well. We would have to figure out
+		// the next timestep event handlers need to be awaited. Then, we can submit all tasks together and await one
+		// future instead of multiple ones.
 		for (EventHandlerTask task : eventHandlerTasks) {
 			if (task.needsExecution()) {
-				submitEventHandlerTask(task, time);
+				submitEventHandlerTask(task);
 			}
 		}
 
@@ -132,7 +134,7 @@ public final class PoolExecutor implements LPExecutor {
 		executions.clear();
 	}
 
-	public void submitEventHandlerTask(EventHandlerTask task, double time) {
+	public void submitEventHandlerTask(EventHandlerTask task) {
 		Future<?> ft = executor.submit(task);
 		if (task.isAsync()) {
 			task.setFuture(ft);

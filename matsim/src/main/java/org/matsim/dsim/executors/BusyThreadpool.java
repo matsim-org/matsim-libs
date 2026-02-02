@@ -55,7 +55,7 @@ class BusyThreadpool {
 
 		this.workers = new Worker[size];
 		for (int i = 0; i < size; i++) {
-			workers[i] = new Worker("busy-threadpool-" + i, i, perWorkerQueueCapacity);
+			workers[i] = new Worker(i, perWorkerQueueCapacity);
 		}
 		for (Worker w : workers) {
 			w.start();
@@ -74,8 +74,8 @@ class BusyThreadpool {
 		 */
 		private final ManyToManyConcurrentArrayQueue<Runnable> queue;
 
-		private Worker(String name, int workerId, int queueCapacity) {
-			this.thread = new Thread(this, name);
+		private Worker(int workerId, int queueCapacity) {
+			this.thread = new Thread(this, "DSim-Worker-" + workerId);
 			this.workerId = workerId;
 			this.thread.setDaemon(true); // optional
 			this.queue = new ManyToManyConcurrentArrayQueue<>(queueCapacity);
@@ -165,7 +165,7 @@ class BusyThreadpool {
 			try {
 				task.run();
 			} catch (Throwable t) {
-				log.error("Error while executing task", t);
+				log.error("Error while executing task. This error should bubble to the caller via its future.", t);
 			}
 		}
 
@@ -237,7 +237,7 @@ class BusyThreadpool {
 	 * @return One future to await them all
 	 */
 	public Future<?> submitAll(final Collection<? extends Runnable> tasks) {
-		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
+		if (isShutdown() || isPaused()) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown or paused");
 		}
 		if (tasks.isEmpty()) {
@@ -273,36 +273,26 @@ class BusyThreadpool {
 	 * @return A future which completes when the task has been executed.
 	 */
 	public Future<?> submit(Runnable task) {
-		if (executionMode == ExecutionMode.SHUTDOWN || executionMode == ExecutionMode.PAUSED) {
+		if (isShutdown() || isPaused()) {
 			throw new RejectedExecutionException("BusyThreadpool is shutdown or paused.");
 		}
 
-		//var future = new FutureTask<Void>(task, null);
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
-		Runnable wrapped = () -> {
-			try {
-				task.run();
-				future.complete(null);
-			} catch (Throwable t) {
-				future.completeExceptionally(t);
-			}
-		};
-
-		enqueue(wrapped);
+		var future = new FutureTask<Void>(task, null);
+		enqueue(future);
 		return future;
 	}
 
+	/**
+	 * Internal mechanism to submit a task to the workers. A random worker queue is selected and we try to submit
+	 * to its queue. If we fail to do so, we try all other workers. If this fails too, we start another round,
+	 * starting from the worker next to the one we tried the very first.
+	 */
 	private void enqueue(Runnable wrapped) {
 
 		// Select a random worker to submit a task to.
 		var start = submitIndex.getAndIncrement();
 
 		do {
-			if (executionMode == ExecutionMode.SHUTDOWN) {
-				throw new RejectedExecutionException("BusyThreadpool is shutdown");
-			}
-
 			// if we cannot submit to the first worker directly, try all others.
 			for (var attempts = 0; attempts < workers.length; attempts++) {
 				int workerIdx = (int) ((start + attempts) % workers.length);
