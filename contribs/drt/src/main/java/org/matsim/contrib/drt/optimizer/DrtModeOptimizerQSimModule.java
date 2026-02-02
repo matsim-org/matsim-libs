@@ -130,6 +130,16 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleEntry.EntryFactory.class).to(modalKey(VehicleDataEntryFactoryImpl.class)).in(Singleton.class);
 
 		bindModal(CostCalculationStrategy.class).to(CostCalculationStrategy.DefaultCostCalculationStrategy.class).asEagerSingleton();
+		bindModal( CostCalculationStrategy.SoftConstraintPenalties.class ).toInstance(
+				new CostCalculationStrategy.SoftConstraintPenalties(
+						10.,
+						100.,
+						100.,
+						100)
+		);
+		// The above parameters were originally hardcoded as 1, 10, 10, 10 in DefaultCostCalculationStrategy.  Those parameters are, however, too low.
+		//  We did not want to just replace them in the original class but make them somewhat accessible, so they are now here.  The binding can be
+		//  overridden in principle, but the hope is that this will be never needed.  Chengqi & Kai, sep'25
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
