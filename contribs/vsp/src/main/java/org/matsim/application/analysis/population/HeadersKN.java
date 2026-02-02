@@ -3,6 +3,7 @@ package org.matsim.application.analysis.population;
 // These are "excel" column headers so we use: (1) no spaces; (2) underscores instead of camel case.
 class HeadersKN{
 	public static final String ACTS_SCORE = "acts_score";
+	public static final String INCOME_DECILE = "income_decile";
 	public static final String IX_DIFF_REMAINING = "ixDiffRem";
 	public static final String IX_DIFF_SWITCHING = "ixDiffSwi";
 	public static final String MONEY_SCORE = "money_score";

@@ -2,7 +2,6 @@ package org.matsim.application.analysis.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Scenario;
@@ -44,7 +43,7 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
-import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
 
 import java.net.URL;
@@ -105,39 +104,54 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
-	// yyyy The following string constants should rather be only inside the main dir. kai, jan'25
+	public static void main( String[] args ){
+		Gbl.assertIf( args==null || args.length==0 );
 
-	// equil:
+		// equil:
 //	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 //	private static final String policyDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 
-	// gartenfeld:
-//	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
-//	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
-//	private static final String shpFile=null;
+		// gartenfeld:
+//		final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
+//		final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
+//		final String shpFile=null;
 
-	// zez:
-	private static final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
-	private static final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
-	private static final String shpFile="../berlin.shp";
-	// yyyy consider a 10 or even 1pct sample of the population
+		// zez:
+		final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
+		final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
+		final String shpFile="../berlin.shp";
+		// yyyy consider a 10 or even 1pct sample of the population
 
-	public static void main( String[] args ){
-		Gbl.assertIf( args==null || args.length==0 );
-//		generateExperiencedPlans();
-//		generateFilteredEventsFile();
-		{
-			if ( shpFile != null ){
-				args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, "--shp=" + baseDir + "/" + shpFile, policyDir };
-			} else {
-				args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, policyDir };
-			}
-			new AgentWiseComparisonKN().execute( args );
-		}
+		// meckel:
+//		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run8_NF_500it_10pct/output/";
+//		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run14_U0_500it_10pct/output/";
+//		final String shpFile = null;
+
+		// ===
+
+//		generateExperiencedPlans( baseDir );
+//		generateExperiencedPlans( policyDir );
+//		generateFilteredEventsFile( baseDir );
+//		generateFilteredEventsFile( policyDir );
+		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
-	private static void generateFilteredEventsFile(){
-		String inFileName = baseDir + "/output_events.xml.gz";
+
+	// ---
+
+	// the following methods stay here despite being static since they essentially belong to "main".
+	private static void agentWiseComparison( String baseDir, String policyDir, String shpFile ){
+		String[] args;
+		if ( shpFile != null ){
+			args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, "--shp=" + baseDir + "/" + shpFile, policyDir };
+		} else {
+			args = new String[]{"--prefix=" + onlyMoneyAndStuck, "--base-path=" + baseDir, policyDir };
+		}
+		new AgentWiseComparisonKN().execute( args );
+	}
+	private static void generateFilteredEventsFile( String baseDir ){
+		String inFileName = globFile( Path.of( baseDir ),  "*output_" + Controler.DefaultFiles.events.getFilename() + ".gz" ).toString();
 		String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
+		// (yy Das lässt die runId weg.)
 
 		Config config = ConfigUtils.createConfig();
 		EventsManager eventsManager = EventsUtils.createEventsManager( config );
@@ -157,7 +171,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		eventsWriter.closeFile();
 	}
-	private static void generateExperiencedPlans(){
+	private static void generateExperiencedPlans( String baseDir ){
 		String[] args;
 		args = new String[]{
 			"--path", baseDir,
@@ -166,14 +180,16 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		new ExperiencedPlansWriter().execute( args );
 	}
 
+	// ===
+
 	@Override public Integer call() throws Exception{
 		if ( shp!=null && shp.isDefined() ){
 			URL url = Paths.get( shp.getShapeFile() ).toUri().toURL();
 			this.geometries = ShpGeometryUtils.loadPreparedGeometries( url );
 
 			// there is shp.readFeatures(), but I cannot get the Geometries out of the Features :-(.  kai, jan'26
+			// --> yy but other people are able to do this ...
 		}
-
 
 		List<String> eventsFilePatterns = new ArrayList<>();
 
@@ -184,7 +200,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		} else{
 			eventsFilePatterns.add( "*output_events.xml.gz" );
 		}
-
 
 		Config baseConfig = ConfigUtils.loadConfig( globFile( baseCasePath, "*output_config_reduced.xml" ).toString() );
 		// (The reduced config has fewer problems with newly introduced config params.)
@@ -221,11 +236,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
 
 		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
-
 		computeAndSetMarginalUtilitiesOfMoney( basePopulation );
-
-		onlyKeepIncomeDecile( basePopulation, 9 );
-
+		computeAndSetIncomeDeciles( basePopulation );
 		baseScenario.setPopulation( basePopulation );
 
 		{
@@ -240,6 +252,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			this.scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 		}
 		{
+			// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
 			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
 			String policyNetworkFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
 			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( baseConfig );
@@ -250,9 +263,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			this.injector2 = new Injector.InjectorBuilder( scenario2 )
 													   .addStandardModules()
 													   .addOverridingModule( new AbstractModule(){
-														   @Override public void install(){
-															   bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class );
-														   }
+														   @Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }
 													   } )
 													   .build();
 		}
@@ -263,15 +274,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// --> (presumably) compute the mUoM here instead of in the preproc.
 
 		tagPersonsToAnalyse( basePopulation, geometries, baseScenario );
-//		for( Person person : basePopulation.getPersons().values() ){
-//			setAnalysisPopulation( person, "true" );
-//		}
 
 		// yyyy Ich frage mich im Moment, ob das mit dem "taggen" wirklich der richtige Weg ist, oder ob es nicht konsequenter ist, die anderen Personen zu entfernen.
+		// --> Vorteil von taggen: man kann mehrfach taggen und auswerten.  Z.B. "all", "lowest decile", "highest decile" in one go.
 
-		// --> Vorteil von taggen könnte sein, dass man mehrfach taggen und auswerten kann.
-
-		// --> aber z.B. bei incomeDecile macht es einen Unterschied, ob ich das nur in Bln oder im gesamten Szenario bestimme.
+		// --> und z.B. bei incomeDecile macht es einen Unterschied, ob ich das nur in Bln oder im gesamten Szenario bestimme.
 
 
 
@@ -302,24 +309,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 	@NotNull Table generatePersonTableFromPopulation( Population population, Config config, Population basePopulation ){
+		final boolean isBaseTable = (basePopulation == null);
 
-		Table table = Table.create( StringColumn.create( PERSON_ID )
-			, DoubleColumn.create( MATSIM_SCORE )
-			, DoubleColumn.create( SCORE )
-			, DoubleColumn.create( MONEY )
-			, DoubleColumn.create( MONEY_SCORE )
-			, DoubleColumn.create( TTIME )
-			, DoubleColumn.create( ASCS )
-			, DoubleColumn.create( U_TRAV_DIRECT )
-			, DoubleColumn.create( U_LINESWITCHES )
-			, DoubleColumn.create( ACTS_SCORE )
-			, StringColumn.create( MODE_SEQ )
-			, StringColumn.create( ACT_SEQ )
-			, StringColumn.create( ANALYSIS_POPULATION )
-								  );
+		Table table = createPopulationTable();
 
-		if( basePopulation == null ){
-			table.addColumns( DoubleColumn.create( UTL_OF_MONEY ), DoubleColumn.create( MUSE_h ) );
+		if( isBaseTable ){
+			table.addColumns( DoubleColumn.create( UTL_OF_MONEY ), DoubleColumn.create( MUSE_h ), IntColumn.create( INCOME_DECILE ) );
 		}
 
 		MainModeIdentifier mainModeIdentifier = new DefaultAnalysisMainModeIdentifier();
@@ -337,8 +332,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			final Double scoreFromMatsim = person.getSelectedPlan().getScore();
 			table.doubleColumn( MATSIM_SCORE ).append( scoreFromMatsim );
 
-			table.stringColumn( ANALYSIS_POPULATION ).append( getAnalysisPopulation( person ) );
-			processMUoM( basePopulation == null, person, table );
+			table.stringColumn( ANALYSIS_POPULATION ).append( getIsInShp( person ) );
+
+			processMUoM( isBaseTable, person, table );
+
+			if ( isBaseTable ){
+				table.intColumn( INCOME_DECILE ).append( getIncomeDecileBetween0And9( person ) );
+			}
 
 			double computedPersonScore = 0.;
 			{
@@ -351,7 +351,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				double cntMuse_h = 0.;
 				for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), ExcludeStageActivities ) ){
 					sf.handleActivity( act );
-					if( basePopulation == null ){
+					if( isBaseTable ){
 						if( act.getStartTime().isDefined() && act.getEndTime().isDefined() ){
 							// Ihab-style MarginalSumScoringFct computation but w/o leg:
 							double scoreNormalBefore = sfNormal.getScore();
@@ -380,7 +380,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				table.doubleColumn( HeadersKN.ACTS_SCORE ).append( sf.getScore() );
 				computedPersonScore += sf.getScore();
 
-				if( basePopulation == null ){
+				if( isBaseTable ){
 					AddVttsEtcToActivities.setMUSE_h( person.getSelectedPlan(), sumMuse_h / cntMuse_h );
 				}
 			}
@@ -412,7 +412,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				modeSeq.add( shortenModeString( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
 				actSeq.add( trip.getDestinationActivity().getType().substring( 0, 4 ) );
 
-				if( basePopulation == null ){
+				if( isBaseTable ){
 					Double musl_h = getMUSE_h( trip.getDestinationActivity() );
 					if( musl_h != null && musl_h > 0 && musl_h < 16.30 ){
 						sumMuse_h += musl_h;
@@ -454,6 +454,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			table.doubleColumn( TTIME ).append( sumTtimes / 3600. );
 			// (dies erzeugt keinen weiteren score!)
 
+			// yyyy put the results of the utl computation first into person attributes, and convert to table separately
+
 			{
 				table.doubleColumn( ASCS ).append( sumAscs );
 				computedPersonScore += sumAscs;
@@ -464,7 +466,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 				table.doubleColumn( U_LINESWITCHES ).append( lineSwitchesScore );
 				computedPersonScore += lineSwitchesScore;
 			}
-			if( basePopulation == null ){
+			if( isBaseTable ){
 				double muse_h = sumMuse_h / cntMuse_h;
 				// note that cntMuse_h can be 0 (because if "weird" activities) and then muse_h becomes NaN.
 				table.doubleColumn( MUSE_h ).append( muse_h );
@@ -518,116 +520,14 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 			// ... end person loop:
 		}
-		if( basePopulation == null ){
+		if( isBaseTable ){
 			MUTTS_AV = popSumMuse_h / popCntMuse_h;
 			log.warn( "MUTTS_AV={}; popSumMuse_h={}; popCntMuse_h={}", MUTTS_AV, popSumMuse_h, popCntMuse_h );
 		}
+		printTable( table, "print person table:" );
 		return table;
 	}
 
-	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario,
-				  Config baseConfig, Path outputPath ) {
-
-		if ( doRoh ){
-			somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
-		}
-		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
-
-		log.info(""); log.info( "print joined table:" );
-		System.out.println( joinedTable );
-
-//		printSpecificPerson( joinedTable, "960148" );
-
-		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
-
-		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
-//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-//		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
-
-
-		Table deltaTable = Table.create( joinedTable.column( PERSON_ID )
-			, joinedTable.column( UTL_OF_MONEY )
-//			, joinedTable.column( MUSL_h )
-			, joinedTable.column( SCORE )
-			, joinedTable.column( MONEY )
-			, joinedTable.column( TTIME )
-			, joinedTable.column( ASCS )
-			, joinedTable.column( U_TRAV_DIRECT )
-			, joinedTable.column( U_LINESWITCHES )
-			// unweighted deltas:
-			, deltaColumn( joinedTable, TTIME )
-			, deltaColumn( joinedTable, MONEY )
-			// delta computation:
-			, deltaColumn( joinedTable, MATSIM_SCORE )
-			, deltaColumn( joinedTable, SCORE )
-			, deltaColumn( joinedTable, ACTS_SCORE )
-			, deltaColumn( joinedTable, U_TRAV_DIRECT )
-			, deltaColumn( joinedTable, U_LINESWITCHES )
-			, deltaColumn( joinedTable, MONEY_SCORE )
-			, deltaColumn( joinedTable, ASCS )
-			//
-			// information:
-			, joinedTable.column( MODE_SEQ )
-			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-									   );
-
-		formatTable( deltaTable, 1 );
-
-		log.info("");log.info("print sorted table:");
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
-
-		// ===
-
-		Table rohDeltaTable = null;
-		if ( doRoh ){
-			rohDeltaTable = Table.create( joinedTable.column( PERSON_ID )
-				, joinedTable.column( UTL_OF_MONEY )
-//			, joinedTable.column( MUSL_h )
-				, joinedTable.column( SCORE )
-				, joinedTable.column( MONEY )
-				, joinedTable.column( TTIME )
-				, joinedTable.column( ASCS )
-				, joinedTable.column( U_TRAV_DIRECT )
-				, joinedTable.column( U_LINESWITCHES )
-				// unweighted deltas:
-				, deltaColumn( joinedTable, TTIME )
-				, deltaColumn( joinedTable, MONEY )
-				// delta computation:
-				, deltaColumn( joinedTable, MATSIM_SCORE )
-				, deltaColumn( joinedTable, SCORE )
-				, deltaColumn( joinedTable, ACTS_SCORE )
-				, deltaColumn( joinedTable, U_TRAV_DIRECT )
-				, deltaColumn( joinedTable, U_LINESWITCHES )
-				, deltaColumn( joinedTable, MONEY_SCORE )
-				, deltaColumn( joinedTable, ASCS )
-				//
-				, joinedTable.column( W1_TTIME_DIFF_REM )
-				, joinedTable.column( W2_TTIME_DIFF_REM )
-				, joinedTable.column( IX_DIFF_REMAINING )
-				, joinedTable.column( W1_TTIME_DIFF_SWI )
-				, joinedTable.column( W2_TTIME_DIFF_SWI )
-				, joinedTable.column( IX_DIFF_SWITCHING )
-				// information:
-				, joinedTable.column( MODE_SEQ )
-				, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-											  );
-
-			formatTable( deltaTable, 1 );
-
-			System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
-		}
-
-		// ===
-
-		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
-
-		if ( doRoh ){
-			writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
-		}
-
-		writeAscTable( baseConfig );
-
-	}
 
 	private static int cnt = 0;
 
@@ -725,6 +625,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		System.out.println( personsTablePolicy );
 	}
 
+
 	private @NotNull Result routeTrip( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter ){
 		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
@@ -747,5 +648,59 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	private record Result(double sumTtime, double sumLineSwitches){
 	}
+
+	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario,
+				  Config baseConfig, Path outputPath ) {
+
+		if ( doRoh ){
+			somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
+		}
+		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
+
+		log.info(""); log.info( "print joined table:" );
+		System.out.println( joinedTable );
+
+//		printSpecificPerson( joinedTable, "960148" );
+
+		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
+
+		joinedTable = joinedTable.where( joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or( joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" ) ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
+//		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).containsString( "pt" ).or( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) ) );
+
+
+		Table deltaTable = createDeltaTable( joinedTable );
+
+		formatTable( deltaTable, 1 );
+
+		log.info("");log.info("print sorted table:");
+		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
+
+		// ===
+
+		Table rohDeltaTable = null;
+		if ( doRoh ){
+			rohDeltaTable = createRohDeltaTable( joinedTable );
+
+			formatTable( rohDeltaTable, 1 );
+
+			System.out.println( rohDeltaTable.sortOn( deltaOf( SCORE ) ) );
+		}
+
+		// ===
+
+		writeMatsimScoresSummaryTables( "all:", outputPath, baseConfig, deltaTable );
+		writeMatsimScoresSummaryTables( "0th decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 0 ) ) );
+		writeMatsimScoresSummaryTables( "last decile:", outputPath, baseConfig, deltaTable.where( deltaTable.intColumn( HeadersKN.INCOME_DECILE ).isEqualTo( 9 ) ) );
+
+		if ( doRoh ){
+			writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
+		}
+
+		writeAscTable( baseConfig );
+
+	}
+
 
 }

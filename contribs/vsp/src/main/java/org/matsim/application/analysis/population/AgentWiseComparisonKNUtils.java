@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.mapdb.Atomic;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +37,6 @@ import java.util.*;
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
-import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 class AgentWiseComparisonKNUtils{
 	private static Logger log = LogManager.getLogger( AgentWiseComparisonKNUtils.class );
@@ -129,24 +127,28 @@ class AgentWiseComparisonKNUtils{
 	}
 
 		static void tagPersonsToAnalyse( Population pop, List<PreparedGeometry> geometries, Scenario scenario ) {
+			// one could consider to label by area, e.g. "area1", "area2" etc.  And then to evaluate by area.  This would be automatic for the output side.  But not for the input side (the "shp" argument).
 			if ( geometries==null || geometries.isEmpty() ) {
-				return;
-			}
-			List<Id<Person>> toRemove = new ArrayList<>();
-			for( Person person : pop.getPersons().values() ) {
-				boolean toAnalyse = false;
-				Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().getFirst();
-				Coord coord = PopulationUtils.decideOnCoordForActivity( firstAct, scenario );
-				Point point = GeometryUtils.createGeotoolsPoint( coord );
-				for( PreparedGeometry geometry : geometries ){
-					if( geometry.contains( point ) ){
-						toAnalyse = true;
-					}
+				for( Person person : pop.getPersons().values() ){
+					setIsInShp( person, "true" );
+					// vllt weglassen (default)?
 				}
-				if ( toAnalyse ){
-					setAnalysisPopulation( person, "true" );
-				} else {
-					setAnalysisPopulation( person, "false" );
+			} else{
+				for( Person person : pop.getPersons().values() ){
+					boolean toAnalyse = false;
+					Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().getFirst();
+					Coord coord = PopulationUtils.decideOnCoordForActivity( firstAct, scenario );
+					Point point = GeometryUtils.createGeotoolsPoint( coord );
+					for( PreparedGeometry geometry : geometries ){
+						if( geometry.contains( point ) ){
+							toAnalyse = true;
+						}
+					}
+					if( toAnalyse ){
+						setIsInShp( person, "true" );
+					} else{
+						setIsInShp( person, "false" );
+					}
 				}
 			}
 		}
@@ -182,11 +184,11 @@ class AgentWiseComparisonKNUtils{
 ////		log.warn("exiting here");
 ////		System.exit(-1);
 //	}
-	static void setAnalysisPopulation( Person person, String analysisPopulation ){
-		person.getAttributes().putAttribute( "analysisPopulation", analysisPopulation );
+	static void setIsInShp( Person person, String analysisPopulation ){
+		person.getAttributes().putAttribute( "isInShp", analysisPopulation );
 	}
-	static String getAnalysisPopulation( Person person ) {
-		return (String) person.getAttributes().getAttribute( "analysisPopulation" );
+	static String getIsInShp( Person person ) {
+		return (String) person.getAttributes().getAttribute( "isInShp" );
 	}
 
 	static void processMUoM( boolean isBaseTable, Person person, Table table ){
@@ -331,7 +333,7 @@ class AgentWiseComparisonKNUtils{
 	static void alignLeft( StringBuilder weighted_ttime_cmt, int maxLen ){
 		weighted_ttime_cmt.append( " ".repeat( maxLen - weighted_ttime_cmt.length() ) );
 	}
-	static void writeMatsimScoresSummaryTable( Path inputPath, Config config, Table deltaTable ){
+	static void writeMatsimScoresSummaryTables( String msg, Path inputPath, Config config, Table deltaTable ){
 		final double factor = 1./ config.qsim().getFlowCapFactor();
 		final double matsim_score_sum = deltaTable.doubleColumn( deltaOf( MATSIM_SCORE) ).sum() * factor;
 		final double score_sum = deltaTable.doubleColumn( deltaOf( SCORE ) ).sum() * factor;
@@ -340,6 +342,7 @@ class AgentWiseComparisonKNUtils{
 		final double u_trav_score = deltaTable.doubleColumn( deltaOf( U_TRAV_DIRECT ) ).sum() * factor;
 		final double line_switch_score = deltaTable.doubleColumn( deltaOf( U_LINESWITCHES ) ).sum() * factor;
 		final double acts_score = deltaTable.doubleColumn( deltaOf( ACTS_SCORE ) ).sum() * factor;
+		final double non_monetary = ascs_sum + u_trav_score + line_switch_score + acts_score;
 
 		final StringBuilder score_cmt = new StringBuilder( "is the overall benefit (potentially negative) in score space. This has the following contributions:" );
 		final StringBuilder weighted_ttime_cmt = new StringBuilder( "... is the travel time benefit." );
@@ -350,7 +353,8 @@ class AgentWiseComparisonKNUtils{
 		final StringBuilder sum_cmt = new StringBuilder( "is the sum of these contributions." );
 		final StringBuilder acts_score_cmt = new StringBuilder( "... are the activities score (= pure travel time) benefits." );
 		final StringBuilder alt_sum_cmt = new StringBuilder("is the sum of these contributions.") ;
-		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score from the output population");
+		final StringBuilder matsim_score_cmt = new StringBuilder("is the matsim score diff from the output population");
+		final StringBuilder non_monetary_cmt = new StringBuilder("... are the non-monetary benefits.");
 
 		final int maxLen = score_cmt.length();
 		alignLeft( weighted_ttime_cmt, maxLen );
@@ -362,6 +366,7 @@ class AgentWiseComparisonKNUtils{
 		alignLeft( acts_score_cmt, maxLen );
 		alignLeft( alt_sum_cmt, maxLen );
 		alignLeft( matsim_score_cmt, maxLen );
+		alignLeft( non_monetary_cmt, maxLen );
 
 		// ---
 
@@ -369,6 +374,15 @@ class AgentWiseComparisonKNUtils{
 
 		summaryTable.doubleColumn( "value" ).append( score_sum );
 		summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( non_monetary );
+		summaryTable.stringColumn( "comment" ).append( non_monetary_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( money_score );
+		summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
+
+		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
+		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( acts_score );
 		summaryTable.stringColumn( "comment" ).append( acts_score_cmt.toString() );
@@ -379,14 +393,8 @@ class AgentWiseComparisonKNUtils{
 		summaryTable.doubleColumn( "value" ).append( line_switch_score );
 		summaryTable.stringColumn( "comment" ).append( u_lineswitches_cmt.toString() );
 
-		summaryTable.doubleColumn( "value" ).append( money_score );
-		summaryTable.stringColumn( "comment" ).append( weighted_money_cmt.toString() );
-
 		summaryTable.doubleColumn( "value" ).append( ascs_sum );
 		summaryTable.stringColumn( "comment" ).append( asc_cmt.toString() );
-
-		summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
-		summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
 
 		summaryTable.doubleColumn( "value" ).append( matsim_score_sum );
 		summaryTable.stringColumn( "comment" ).append( matsim_score_cmt.toString() );
@@ -394,6 +402,7 @@ class AgentWiseComparisonKNUtils{
 		formatTable( summaryTable, 0 );
 
 		System.out.println();
+		log.info( msg );
 		log.info( inputPath );
 		log.info( "Popsize={} rescaled to 100% by multiplying with {}.", deltaTable.rowCount(), factor );
 		System.out.println( summaryTable + System.lineSeparator() );
@@ -471,30 +480,122 @@ class AgentWiseComparisonKNUtils{
 		AddVttsEtcToActivities.setMUSE_h( act, muse_h );
 		return muse_h;
 	}
-	static void onlyKeepIncomeDecile( Population basePopulation, double decile ){
-		log.warn("only keeping the {}th income decile of the population; popSize before={}", decile, basePopulation.getPersons().size() );
-
-		Gbl.assertIf( decile >= 0 );
-		Gbl.assertIf( decile < 10 );
-
+	public static void setIncomeDecileBetween0And9( Person person, int decile ) {
+		person.getAttributes().putAttribute( "incomeDecile", decile );
+	}
+	public static int getIncomeDecileBetween0And9( Person person ) {
+		return (int) person.getAttributes().getAttribute( "incomeDecile" );
+	}
+	static void computeAndSetIncomeDeciles( Population basePopulation ){
 		List<? extends Person> persons = new ArrayList<>( basePopulation.getPersons().values() );
-		Collections.sort( persons, new Comparator<Person>(){
+		persons.sort( new Comparator<Person>(){
 			@Override public int compare( Person o1, Person o2 ){
-				return (int) ( PersonUtils.getIncome( o1) - PersonUtils.getIncome( o2 ) * (-1) );
+				return (int) (PersonUtils.getIncome( o1 ) - PersonUtils.getIncome( o2 ) );
 			}
 		} );
-
-		List<Id<Person>> toRemove = new ArrayList<>();
-		for( Person person : persons.subList( 0, (int) ( decile*persons.size() / 10. ) ) ) {
-			toRemove.add( person.getId() );
+		for( int decile = 0 ; decile < 10 ; decile++ ){
+			int from = decile * persons.size() / 10;
+			int to = (decile + 1) * persons.size() / 10;
+			log.warn( "deciles: from={}; to={}", from, to );
+			for( Person person : persons.subList( from, to ) ){
+				setIncomeDecileBetween0And9( person, decile );
+			}
 		}
-		for( Person person : persons.subList( (int) ( (decile+1)*persons.size() / 10. ), persons.size() ) ) {
-			toRemove.add( person.getId() );
+	}
+	private static void printIncomeTable( Collection<? extends Person> persons, String message ){
+		StringColumn idColumn = StringColumn.create( "id" );
+		DoubleColumn incomeColumn = DoubleColumn.create( "income" );
+		for( Person person : persons ){
+			idColumn.append( person.getId().toString() );
+			incomeColumn.append( PersonUtils.getIncome( person ) );
 		}
-
-		for( Id<Person> personId : toRemove ){
-			basePopulation.removePerson( personId );
-		}
-		log.warn("only keeping the {}th income decile of the population; popSize after={}", decile, basePopulation.getPersons().size() );
+		log.info( "" );
+		log.info( message );
+		System.out.println( Table.create( idColumn, incomeColumn ) );
+		log.info( "average income={}", incomeColumn.mean() );
+	}
+	static @NotNull Table createDeltaTable( Table joinedTable ){
+		return Table.create( joinedTable.column( PERSON_ID )
+			, joinedTable.column( UTL_OF_MONEY )
+//			, joinedTable.column( MUSL_h )
+			, joinedTable.column( SCORE )
+			, joinedTable.column( MONEY )
+			, joinedTable.column( TTIME )
+			, joinedTable.column( ASCS )
+			, joinedTable.column( U_TRAV_DIRECT )
+			, joinedTable.column( U_LINESWITCHES )
+			// unweighted deltas:
+			, deltaColumn( joinedTable, TTIME )
+			, deltaColumn( joinedTable, MONEY )
+			// delta computation:
+			, deltaColumn( joinedTable, MATSIM_SCORE )
+			, deltaColumn( joinedTable, SCORE )
+			, deltaColumn( joinedTable, ACTS_SCORE )
+			, deltaColumn( joinedTable, U_TRAV_DIRECT )
+			, deltaColumn( joinedTable, U_LINESWITCHES )
+			, deltaColumn( joinedTable, MONEY_SCORE )
+			, deltaColumn( joinedTable, ASCS )
+			//
+			// information:
+			, joinedTable.column( MODE_SEQ )
+			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
+			// tags:
+			, joinedTable.column( INCOME_DECILE )
+						   );
+	}
+	static @NotNull Table createRohDeltaTable( Table joinedTable ){
+		return Table.create( joinedTable.column( PERSON_ID )
+			, joinedTable.column( UTL_OF_MONEY )
+//			, joinedTable.column( MUSL_h )
+			, joinedTable.column( SCORE )
+			, joinedTable.column( MONEY )
+			, joinedTable.column( TTIME )
+			, joinedTable.column( ASCS )
+			, joinedTable.column( U_TRAV_DIRECT )
+			, joinedTable.column( U_LINESWITCHES )
+			// unweighted deltas:
+			, deltaColumn( joinedTable, TTIME )
+			, deltaColumn( joinedTable, MONEY )
+			// delta computation:
+			, deltaColumn( joinedTable, MATSIM_SCORE )
+			, deltaColumn( joinedTable, SCORE )
+			, deltaColumn( joinedTable, ACTS_SCORE )
+			, deltaColumn( joinedTable, U_TRAV_DIRECT )
+			, deltaColumn( joinedTable, U_LINESWITCHES )
+			, deltaColumn( joinedTable, MONEY_SCORE )
+			, deltaColumn( joinedTable, ASCS )
+			//
+			, joinedTable.column( W1_TTIME_DIFF_REM )
+			, joinedTable.column( W2_TTIME_DIFF_REM )
+			, joinedTable.column( IX_DIFF_REMAINING )
+			, joinedTable.column( W1_TTIME_DIFF_SWI )
+			, joinedTable.column( W2_TTIME_DIFF_SWI )
+			, joinedTable.column( IX_DIFF_SWITCHING )
+			// information:
+			, joinedTable.column( MODE_SEQ )
+			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
+						   );
+	}
+	static @NotNull Table createPopulationTable(){
+		return Table.create( StringColumn.create( PERSON_ID )
+			, DoubleColumn.create( MATSIM_SCORE )
+			, DoubleColumn.create( SCORE )
+			, DoubleColumn.create( MONEY )
+			, DoubleColumn.create( MONEY_SCORE )
+			, DoubleColumn.create( TTIME )
+			, DoubleColumn.create( ASCS )
+			, DoubleColumn.create( U_TRAV_DIRECT )
+			, DoubleColumn.create( U_LINESWITCHES )
+			, DoubleColumn.create( ACTS_SCORE )
+			, StringColumn.create( MODE_SEQ )
+			, StringColumn.create( ACT_SEQ )
+			, StringColumn.create( ANALYSIS_POPULATION )
+						   );
+	}
+	static void printTable( Table table, String msg ){
+		log.info("" );
+		log.info( msg );
+		System.out.println( table );
+		log.info("" );
 	}
 }

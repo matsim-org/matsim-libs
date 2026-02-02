@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.setAnalysisPopulation;
+import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.setIsInShp;
 
 class AgentWiseComparisonKNExample{
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKNExample.class );
@@ -78,7 +78,7 @@ class AgentWiseComparisonKNExample{
 
 			insertHWHPlan( plan, pf, TransportMode.pt, 7200, link11, link22 );
 
-			setAnalysisPopulation( person, "true");
+			setIsInShp( person, "true" );
 		}
 		AgentWiseComparisonKNUtils.computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 

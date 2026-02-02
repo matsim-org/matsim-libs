@@ -3,6 +3,7 @@ package org.matsim.application.analysis.population;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -52,21 +53,21 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 	public Integer call() throws Exception {
 		// yyyy the output_config has the input files as as files. :-(
 
-		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
-		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
+		Path configPath = ApplicationUtils.globFile( path, "*output_" + Controler.DefaultFiles.config.getFilename() );
+
+//		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
+//		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
 
 		// yyyyyy there is a runId from args, and a config.controller().getRunId().  there is also "prefix", which hedges against no runId.  Needs to be sorted out!!!!
+		runId = config.controller().getRunId();
+		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
 
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
-		Path output = eventsPath.getParent().resolve(config.controller().getRunId() + ".output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
-		if ( config.controller().getRunId()==null || config.controller().getRunId().length()==0 ) {
-			output = eventsPath.getParent().resolve("output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
-		}
-		// (There is functionality for this in the matsim core.)
+		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
 			.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
@@ -99,8 +100,8 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		// already 2 hrs to get to this point here. kai, nov'25
 		eventsToActivities.finish();
 
-		log.info("Writing experienced plans to file: {}", output);
-		experiencedPlansService.writeExperiencedPlans(output.toString());
+		log.info("Writing experienced plans to file: {}", experiencedPlansPath);
+		experiencedPlansService.writeExperiencedPlans(experiencedPlansPath.toString());
 
 		return 0;
 	}
