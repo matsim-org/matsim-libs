@@ -350,94 +350,6 @@ public class PretoriaTest {
 		return cleanedEntries;
 	}
 
-
-	/// Returns the links in between two links using BFS. TODO Check/Test
-	private List<Link> retrieveInBetweenLinks(Link startLink, Link endLink){
-		if(startLink.getId().equals(endLink.getId()))
-			return new ArrayList<>(List.of(startLink));
-
-		Map<Link, Link> parent = new HashMap<>();
-		Queue<Link> queue = new ArrayDeque<>();
-		Set<Link> visited = new HashSet<>();
-
-		queue.add(startLink);
-		visited.add(startLink);
-
-		while (!queue.isEmpty()) {
-			Link current = queue.poll();
-
-			if (current.equals(endLink)) {
-				break;
-			}
-
-			NetworkUtils.getIncidentLinks(current).forEach((id, next) -> {
-				if (!visited.contains(next)) {
-					visited.add(next);
-					parent.put(next, current);
-					queue.add(next);
-				}
-			});
-		}
-
-		if (!parent.containsKey(endLink)) {
-			throw new RuntimeException("No path found");
-		}
-
-		List<Link> path = new LinkedList<>();
-		for (Link cur = endLink; cur != null; cur = parent.get(cur)) {
-			path.addFirst(cur);
-			if (cur.equals(startLink)) break;
-		}
-
-		return path;
-	}
-
-
-	private List<Link> getLinkOrder(List<PretoriaGPSEntry> gpsEntries, Network network){
-		List<Link> linkOrder = new ArrayList<>(gpsEntries.size());
-
-		for(var e : gpsEntries){
-			Link nearestLink = NetworkUtils.getNearestLinkExactly(network, e.coord);
-			if(linkOrder.isEmpty() || !linkOrder.getLast().equals(nearestLink)){
-				List<Link> inBetweenLinks = linkOrder.isEmpty() ? List.of(nearestLink, nearestLink) : retrieveInBetweenLinks(linkOrder.getLast(), nearestLink);
-				linkOrder.addAll(inBetweenLinks.subList(1, inBetweenLinks.size()));
-			}
-		}
-
-		return linkOrder;
-	}
-
-	private Node getSharedNode(Link a, Link b){
-		// Get the node, that is shared by both links
-		Node sharedNode = null;
-		if (a.getFromNode().equals(b.getFromNode()) || a.getFromNode().equals(b.getToNode())) {
-			sharedNode = a.getFromNode();
-		} else if (a.getToNode().equals(b.getFromNode()) || a.getToNode().equals(b.getToNode())) {
-			sharedNode = a.getToNode();
-		} else {
-			logger.error("The given links ({}, {}) are not incident!", a.getId(), b.getId());
-			return null;
-		}
-		return sharedNode;
-	}
-
-	private List<Double> getProjectedAccumulatedDistances(List<PretoriaGPSEntry> gpsEntries, List<Link> linkOrder, Network network){
-		List<Double> projectedAccumulatedDistances = new ArrayList<>(gpsEntries.size());
-
-		for (PretoriaGPSEntry e : gpsEntries) {
-			Link l = NetworkUtils.getNearestLinkExactly(network, e.coord);
-			List<Link> previousLinks = linkOrder.subList(0, linkOrder.indexOf(l));
-			double prevLen = previousLinks.stream().mapToDouble(Link::getLength).sum();
-
-			Coord p = CoordUtils.orthogonalProjectionOnLineSegment(l.getFromNode().getCoord(), l.getToNode().getCoord(), e.coord);
-			Node sharedNode = previousLinks.isEmpty() ? l.getFromNode() : getSharedNode(l, previousLinks.getLast());
-			double projectedLen = CoordUtils.length(CoordUtils.minus(sharedNode.getCoord(), p));
-
-			projectedAccumulatedDistances.add(prevLen + projectedLen);
-		}
-		return projectedAccumulatedDistances;
-	}
-
 	///  Returns a list of interpolated points, interpolation happens every meter
 	private List<PretoriaGPSEntry> interpolateGpsEntries(List<PretoriaGPSEntry> gpsEntries){
 		List<PretoriaGPSEntry> interpolatedEntries = new LinkedList<>();
@@ -895,6 +807,7 @@ public class PretoriaTest {
 	private static class KalmanFilter{
 		// Needed for computation
 		Network route;
+		List<PretoriaGPSEntry> gpsEntries;
 		List<Link> linkOrder;
 		List<Double> projectedAccumulatedDistances;
 
@@ -902,14 +815,102 @@ public class PretoriaTest {
 		List<Double> accumulatedDistances;
 		List<Double> NAIVEaccumulatedDistance;
 
-		public KalmanFilter(Network route, List<Link> linkOrder, List<Double> projectedAccumulatedDistances) {
+		public KalmanFilter(Network route, List<PretoriaGPSEntry> gpsEntries) {
 			this.route = route;
-			this.linkOrder = linkOrder;
-			this.projectedAccumulatedDistances = projectedAccumulatedDistances;
+			this.gpsEntries = gpsEntries;
+
+			this.linkOrder = getLinkOrder();
+			this.projectedAccumulatedDistances = getProjectedAccumulatedDistances();
+		}
+
+		/// Returns the links in between two links using BFS. TODO Check/Test
+		private List<Link> retrieveInBetweenLinks(Link startLink, Link endLink){
+			if(startLink.getId().equals(endLink.getId()))
+				return new ArrayList<>(List.of(startLink));
+
+			Map<Link, Link> parent = new HashMap<>();
+			Queue<Link> queue = new ArrayDeque<>();
+			Set<Link> visited = new HashSet<>();
+
+			queue.add(startLink);
+			visited.add(startLink);
+
+			while (!queue.isEmpty()) {
+				Link current = queue.poll();
+
+				if (current.equals(endLink)) {
+					break;
+				}
+
+				NetworkUtils.getIncidentLinks(current).forEach((id, next) -> {
+					if (!visited.contains(next)) {
+						visited.add(next);
+						parent.put(next, current);
+						queue.add(next);
+					}
+				});
+			}
+
+			if (!parent.containsKey(endLink)) {
+				throw new RuntimeException("No path found");
+			}
+
+			List<Link> path = new LinkedList<>();
+			for (Link cur = endLink; cur != null; cur = parent.get(cur)) {
+				path.addFirst(cur);
+				if (cur.equals(startLink)) break;
+			}
+
+			return path;
+		}
+
+		private List<Link> getLinkOrder(){
+			List<Link> linkOrder = new ArrayList<>(gpsEntries.size());
+
+			for(var e : gpsEntries){
+				Link nearestLink = NetworkUtils.getNearestLinkExactly(route, e.coord);
+				if(linkOrder.isEmpty() || !linkOrder.getLast().equals(nearestLink)){
+					List<Link> inBetweenLinks = linkOrder.isEmpty() ? List.of(nearestLink, nearestLink) : retrieveInBetweenLinks(linkOrder.getLast(), nearestLink);
+					linkOrder.addAll(inBetweenLinks.subList(1, inBetweenLinks.size()));
+				}
+			}
+
+			return linkOrder;
+		}
+
+		private Node getSharedNode(Link a, Link b){
+			// Get the node, that is shared by both links
+			Node sharedNode = null;
+			if (a.getFromNode().equals(b.getFromNode()) || a.getFromNode().equals(b.getToNode())) {
+				sharedNode = a.getFromNode();
+			} else if (a.getToNode().equals(b.getFromNode()) || a.getToNode().equals(b.getToNode())) {
+				sharedNode = a.getToNode();
+			} else {
+				logger.error("The given links ({}, {}) are not incident!", a.getId(), b.getId());
+				return null;
+			}
+			return sharedNode;
+		}
+
+		private List<Double> getProjectedAccumulatedDistances(){
+			List<Double> projectedAccumulatedDistances = new ArrayList<>(gpsEntries.size());
+
+			for (PretoriaGPSEntry e : gpsEntries) {
+				Link l = NetworkUtils.getNearestLinkExactly(route, e.coord);
+				List<Link> previousLinks = linkOrder.subList(0, linkOrder.indexOf(l));
+				double prevLen = previousLinks.stream().mapToDouble(Link::getLength).sum();
+
+				Coord p = CoordUtils.orthogonalProjectionOnLineSegment(l.getFromNode().getCoord(), l.getToNode().getCoord(), e.coord);
+				Node sharedNode = previousLinks.isEmpty() ? l.getFromNode() : getSharedNode(l, previousLinks.getLast());
+				double projectedLen = CoordUtils.length(CoordUtils.minus(sharedNode.getCoord(), p));
+
+				projectedAccumulatedDistances.add(prevLen + projectedLen);
+			}
+			return projectedAccumulatedDistances;
 		}
 
 		// TODO Check why the kalmanFilter overshoots
-		private List<Double> kalmanFilter(List<PretoriaGPSEntry> gpsEntries) {
+		private List<Double> kalmanFilter() {
 			List<Double> accumulatedDistances = new ArrayList<>(gpsEntries.size());
 			accumulatedDistances.add(0.);
 			List<Double> NAIVEaccumulatedDistance = new ArrayList<>(gpsEntries.size());
@@ -1018,7 +1019,7 @@ public class PretoriaTest {
 		}
 
 		// TODO Temporary solution
-		private List<Double> naiveFilter(List<PretoriaGPSEntry> gpsEntries){
+		private List<Double> naiveFilter(){
 			NAIVEaccumulatedDistance = new ArrayList<>(gpsEntries.size());
 
 			for (int i = 1; i < gpsEntries.size(); i++){
@@ -1027,6 +1028,11 @@ public class PretoriaTest {
 			}
 
 			return NAIVEaccumulatedDistance;
+		}
+
+		private Map<Id<Link>, Map<Pollutant, Double>> computePollutantMap(){
+			// TODO
+			return null;
 		}
 
 		private void printCsv(List<PretoriaGPSEntry> gpsEntries, String path) throws IOException {
