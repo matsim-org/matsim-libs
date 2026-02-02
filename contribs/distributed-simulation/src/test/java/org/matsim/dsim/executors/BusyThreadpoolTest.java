@@ -185,8 +185,6 @@ public class BusyThreadpoolTest {
 		// BusyThreadpool.enqueue uses submitIndex to pick a starting worker.
 
 		pool.resume();
-		int numWorkers = 4;
-		int tasksPerWorker = 20;
 		AtomicInteger count = new AtomicInteger(0);
 
 		// We use a large number of tasks to increase chance of work stealing if some workers are slower.
