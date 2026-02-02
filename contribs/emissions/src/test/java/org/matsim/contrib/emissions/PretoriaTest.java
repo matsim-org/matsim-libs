@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -238,9 +239,21 @@ public class PretoriaTest {
 		return tripId2pretoriaGPSEntries;
 	}
 
+	private List<PretoriaGPSEntry> filterUnwantedLinkEntries(List<PretoriaGPSEntry> gpsEntries, Set<Id<Link>> unwantedLinks, Network network){
+		List<PretoriaGPSEntry> filteredGpsEntries = new ArrayList<>(gpsEntries.size());
+
+		for(var e : gpsEntries){
+			Link l = NetworkUtils.getNearestLinkExactly(network, e.coord);
+			if(!unwantedLinks.contains(l.getId()))
+				filteredGpsEntries.add(e);
+		}
+
+		return filteredGpsEntries;
+	}
+
 	/// Removes clusters, that happen due to standing times TODO Check if correct
 	private List<PretoriaGPSEntry> clusterStandingGpsEntries(List<PretoriaGPSEntry> gpsEntries){
-		List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
+		/*List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
 
 		int i = 2;
 		while(i < cleanedEntries.size()){
@@ -295,7 +308,134 @@ public class PretoriaTest {
 		assert gpsEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() -
 			cleanedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() < 1e-6;
 
+		return cleanedEntries;*/
+
+		List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
+
+		int i = 0;
+		while(i < cleanedEntries.size()-1){
+			PretoriaGPSEntry e = cleanedEntries.get(i);
+
+			// Check if the angle is larger than (or eq.) 90 degree OR if veh speed is less than 1 km/h
+			if (e.vehVel < 1){
+				double CO = cleanedEntries.get(i).CO;
+				double CO2 = cleanedEntries.get(i).CO2;
+				double NOx = cleanedEntries.get(i).NOx;
+
+				// Create updated entry i+1
+				var updatedEntry = new PretoriaGPSEntry(
+					cleanedEntries.get(i+1).time,
+					cleanedEntries.get(i+1).trip,
+					cleanedEntries.get(i+1).driver,
+					cleanedEntries.get(i+1).route,
+					cleanedEntries.get(i+1).load,
+					cleanedEntries.get(i+1).coldStart,
+					cleanedEntries.get(i+1).coord,
+					cleanedEntries.get(i+1).gpsAlt,
+					cleanedEntries.get(i+1).gpsVel,
+					cleanedEntries.get(i+1).vehVel,
+					cleanedEntries.get(i+1).CO + CO,
+					cleanedEntries.get(i+1).CO2 + CO2,
+					cleanedEntries.get(i+1).NOx + NOx
+				);
+
+				// Update the list
+				cleanedEntries.set(i+1, updatedEntry);
+				cleanedEntries.remove(i);
+			} else {
+				i++;
+			}
+		}
+
 		return cleanedEntries;
+	}
+
+
+	/// Returns the links in between two links using BFS. TODO Check/Test
+	private List<Link> retrieveInBetweenLinks(Link startLink, Link endLink){
+		if(startLink.getId().equals(endLink.getId()))
+			return new ArrayList<>(List.of(startLink));
+
+		Map<Link, Link> parent = new HashMap<>();
+		Queue<Link> queue = new ArrayDeque<>();
+		Set<Link> visited = new HashSet<>();
+
+		queue.add(startLink);
+		visited.add(startLink);
+
+		while (!queue.isEmpty()) {
+			Link current = queue.poll();
+
+			if (current.equals(endLink)) {
+				break;
+			}
+
+			NetworkUtils.getIncidentLinks(current).forEach((id, next) -> {
+				if (!visited.contains(next)) {
+					visited.add(next);
+					parent.put(next, current);
+					queue.add(next);
+				}
+			});
+		}
+
+		if (!parent.containsKey(endLink)) {
+			throw new RuntimeException("No path found");
+		}
+
+		List<Link> path = new LinkedList<>();
+		for (Link cur = endLink; cur != null; cur = parent.get(cur)) {
+			path.addFirst(cur);
+			if (cur.equals(startLink)) break;
+		}
+
+		return path;
+	}
+
+
+	private List<Link> getLinkOrder(List<PretoriaGPSEntry> gpsEntries, Network network){
+		List<Link> linkOrder = new ArrayList<>(gpsEntries.size());
+
+		for(var e : gpsEntries){
+			Link nearestLink = NetworkUtils.getNearestLinkExactly(network, e.coord);
+			if(linkOrder.isEmpty() || !linkOrder.getLast().equals(nearestLink)){
+				List<Link> inBetweenLinks = linkOrder.isEmpty() ? List.of(nearestLink, nearestLink) : retrieveInBetweenLinks(linkOrder.getLast(), nearestLink);
+				linkOrder.addAll(inBetweenLinks.subList(1, inBetweenLinks.size()));
+			}
+		}
+
+		return linkOrder;
+	}
+
+	private Node getSharedNode(Link a, Link b){
+		// Get the node, that is shared by both links
+		Node sharedNode = null;
+		if (a.getFromNode().equals(b.getFromNode()) || a.getFromNode().equals(b.getToNode())) {
+			sharedNode = a.getFromNode();
+		} else if (a.getToNode().equals(b.getFromNode()) || a.getToNode().equals(b.getToNode())) {
+			sharedNode = a.getToNode();
+		} else {
+			logger.error("The given links ({}, {}) are not incident!", a.getId(), b.getId());
+			return null;
+		}
+		return sharedNode;
+	}
+
+	private List<Double> getProjectedAccumulatedDistances(List<PretoriaGPSEntry> gpsEntries, List<Link> linkOrder, Network network){
+		List<Double> projectedAccumulatedDistances = new ArrayList<>(gpsEntries.size());
+
+		for (PretoriaGPSEntry e : gpsEntries) {
+			Link l = NetworkUtils.getNearestLinkExactly(network, e.coord);
+			List<Link> previousLinks = linkOrder.subList(0, linkOrder.indexOf(l));
+			double prevLen = previousLinks.stream().mapToDouble(Link::getLength).sum();
+
+			Coord p = CoordUtils.orthogonalProjectionOnLineSegment(l.getFromNode().getCoord(), l.getToNode().getCoord(), e.coord);
+			Node sharedNode = previousLinks.isEmpty() ? l.getFromNode() : getSharedNode(l, previousLinks.getLast());
+			double projectedLen = CoordUtils.length(CoordUtils.minus(sharedNode.getCoord(), p));
+
+			projectedAccumulatedDistances.add(prevLen + projectedLen);
+		}
+		return projectedAccumulatedDistances;
 	}
 
 	///  Returns a list of interpolated points, interpolation happens every meter
@@ -464,9 +604,20 @@ public class PretoriaTest {
 		EventsManager manager = EventsUtils.createEventsManager(config);
 
 		// Read in the csv with Pretoria GPS/PEMS data for C-route
+		Set<Id<Link>> unwantedLinks = Set.of(Id.createLinkId("6555"));
+
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
+		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, filterUnwantedLinkEntries(entries, unwantedLinks, pretoriaNetwork)));
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
 //		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries))); // TODO Makes results worse
+
+		// TODO
+
+		var linkOrder = getLinkOrder(tripId2pretoriaGpsEntries.get(1), pretoriaNetwork);
+		var projectedAccumulatedDistances = getProjectedAccumulatedDistances(tripId2pretoriaGpsEntries.get(1), linkOrder, pretoriaNetwork);
+		var kalmanFilter = new KalmanFilter(pretoriaNetwork, linkOrder, projectedAccumulatedDistances);
+		List<Double> accumulatedDistances = kalmanFilter.naiveFilter(tripId2pretoriaGpsEntries.get(1));
+		kalmanFilter.printCsv(tripId2pretoriaGpsEntries.get(1), "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/kalman/out.csv");
 
 		// Attach gps-information to the matsim links TODO Extract into seperate method
 		Map<Integer, Map<Id<Link>, List<PretoriaGPSEntry>>> tripId2linkId2pretoriaGpsEntries = new ArrayMap<>();
@@ -741,4 +892,166 @@ public class PretoriaTest {
 		}
 	}
 
+	private static class KalmanFilter{
+		// Needed for computation
+		Network route;
+		List<Link> linkOrder;
+		List<Double> projectedAccumulatedDistances;
+
+		//Outputs
+		List<Double> accumulatedDistances;
+		List<Double> NAIVEaccumulatedDistance;
+
+		public KalmanFilter(Network route, List<Link> linkOrder, List<Double> projectedAccumulatedDistances) {
+			this.route = route;
+			this.linkOrder = linkOrder;
+			this.projectedAccumulatedDistances = projectedAccumulatedDistances;
+		}
+
+		// TODO Check why the kalmanFilter overshoots
+		private List<Double> kalmanFilter(List<PretoriaGPSEntry> gpsEntries) {
+			List<Double> accumulatedDistances = new ArrayList<>(gpsEntries.size());
+			accumulatedDistances.add(0.);
+			List<Double> NAIVEaccumulatedDistance = new ArrayList<>(gpsEntries.size());
+			NAIVEaccumulatedDistance.add(0.);
+
+			// Init the state variables
+			double S = 0;
+			double V = gpsEntries.getFirst().vehVel;
+
+			// Init the process noise covariance matrix
+			double p00 = 25; // stderr=5m/s
+			double p01 = 0;
+			double p11 = 4; // stderr=2m/s^2
+
+			// uncertainties TODO Compute them from dataset instead of setting them arbitrarily
+			double sigma_a = 2.0;
+			double sigma_v = 0.2;
+			double sigma_gps = 6;
+
+			double z_S;
+			double z_V = 0;
+			for (int i = 1; i < gpsEntries.size(); i++) {
+				// Step 1: Prediction
+				double dt = gpsEntries.get(i).time - gpsEntries.get(i-1).time;
+				double dz = projectedAccumulatedDistances.get(i) - projectedAccumulatedDistances.get(i-1);
+
+				// State transition by applying movement equation
+				S = S + V*dt;
+
+				// Create observation noise covariance matrix
+				final double q00 = 0.25 * dt*dt*dt*dt * sigma_a*sigma_a;
+				final double q01 = 0.5 * dt*dt*dt * sigma_a*sigma_a;
+				final double q11 = dt*dt * sigma_a*sigma_a;
+
+				// Update process noise covariance matrix
+				double p00_new = p00 + dt*2*p01 + dt*dt*p11 + q00;
+				double p01_new = p01 + dt*p11 + q01;
+				double p11_new = p11 + q11;
+
+				p00 = p00_new;
+				p01 = p01_new;
+				p11 = p11_new;
+
+				// Step 2: Correction ( Distance )
+				z_S = projectedAccumulatedDistances.get(i);
+
+				// TODO lateral error
+				double sigma_s = sigma_gps; // + e_lateral;
+				double R = sigma_s*sigma_s;
+
+				double y = z_S - S;
+
+				double S_cov = p00 + R;
+
+				double K0 = p00 / S_cov;
+				double K1 = p01 / S_cov;
+
+				// Update state
+				S = S + K0 * y;
+
+				double p00_old = p00;
+				double p01_old = p01;
+				double p11_old = p11;
+
+				// Update covariance
+				p00 = p00_old - K0 * p00_old;
+				p01 = p01_old - K0 * p01_old;
+				p11 = p11_old - K1 * p01_old;
+
+				// Step 3: Correction ( Velocity )
+				z_V = gpsEntries.get(i).vehVel;
+
+				R = sigma_v * sigma_v;
+
+				y = z_V - V;
+
+				S_cov = p11 + R;
+
+				K0 = p01 / S_cov;
+				K1 = p11 / S_cov;
+
+				V = V + K1 * y;
+
+				p00_old = p00;
+				p01_old = p01;
+				p11_old = p11;
+
+				p00 = p00_old - K0 * p01_old;
+				p01 = p01_old - K0 * p11_old;
+				p11 = p11_old - K1 * p11_old;
+
+				// Step 4 Save the distance in a map
+				accumulatedDistances.add(S);
+
+				if(V < 0 ) V = 0;
+
+				// TODO DEBUG Only
+				double naiveLen = CoordUtils.length(CoordUtils.minus(gpsEntries.get(i).coord, gpsEntries.get(i-1).coord));
+				NAIVEaccumulatedDistance.add(NAIVEaccumulatedDistance.getLast() + naiveLen);
+			}
+
+			this.accumulatedDistances = accumulatedDistances;
+			this.NAIVEaccumulatedDistance = NAIVEaccumulatedDistance;
+
+			return accumulatedDistances;
+		}
+
+		// TODO Temporary solution
+		private List<Double> naiveFilter(List<PretoriaGPSEntry> gpsEntries){
+			NAIVEaccumulatedDistance = new ArrayList<>(gpsEntries.size());
+
+			for (int i = 1; i < gpsEntries.size(); i++){
+				double naiveLen = CoordUtils.length(CoordUtils.minus(gpsEntries.get(i).coord, gpsEntries.get(i-1).coord));
+				NAIVEaccumulatedDistance.add(NAIVEaccumulatedDistance.getLast() + naiveLen);
+			}
+
+			return NAIVEaccumulatedDistance;
+		}
+
+		private void printCsv(List<PretoriaGPSEntry> gpsEntries, String path) throws IOException {
+			CSVPrinter writer = new CSVPrinter(
+				IOUtils.getBufferedWriter(path),
+				CSVFormat.DEFAULT);
+			writer.printRecord(
+				"time",
+				"accDist",
+				"naiveAccDist",
+				"projectedAccDist"
+			);
+
+			for(int i = 0; i < gpsEntries.size(); i++){
+				writer.printRecord(
+					gpsEntries.get(i).time,
+					accumulatedDistances.get(i),
+					NAIVEaccumulatedDistance.get(i),
+					projectedAccumulatedDistances.get(i)
+				);
+			}
+
+			writer.flush();
+			writer.close();
+		}
+
+	}
 }
