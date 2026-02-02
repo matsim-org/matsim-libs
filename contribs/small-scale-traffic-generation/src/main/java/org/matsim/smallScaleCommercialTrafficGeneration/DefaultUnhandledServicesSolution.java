@@ -3,10 +3,13 @@ package org.matsim.smallScaleCommercialTrafficGeneration;
 import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -101,9 +104,11 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes =
 						generator.getCarrierId2carrierAttributes().get(nonCompleteSolvedCarrier.getId());
 
+					addAdditionalVehicles(nonCompleteSolvedCarrier, carrierAttributes);
+
 					// Generate new services
-					redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes,
-						(i) * generator.getAdditionalTravelBufferPerIterationInMinutes());
+//					redrawAllServiceDurations(nonCompleteSolvedCarrier, carrierAttributes,
+//						(i) * generator.getAdditionalTravelBufferPerIterationInMinutes());
 				}
 
 				try {
@@ -152,6 +157,45 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void addAdditionalVehicles(Carrier nonCompleteSolvedCarrier, GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes) {
+		CarrierCapabilities carrierCapabilities = nonCompleteSolvedCarrier.getCarrierCapabilities();
+		log.info("Number of vehicles before adding new vehicles for carrier '{}': {}", nonCompleteSolvedCarrier.getId(),
+			carrierCapabilities.getCarrierVehicles().size());
+
+		int planedJobs = nonCompleteSolvedCarrier.getServices().size();
+		int handledJobs;
+		if (nonCompleteSolvedCarrier.getSelectedPlan() == null) {
+			handledJobs = 0;
+		} else
+			handledJobs	= nonCompleteSolvedCarrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+			tour -> (int) tour.getTour().getTourElements().stream().filter(element -> element instanceof Tour.ServiceActivity).count()).sum();
+		int nonHandledJobs = planedJobs - handledJobs;
+		int vehiclesToAdd = Math.max(1,	(int) Math.ceil(nonHandledJobs * generator.getFactorForNumberOfVehicles()));
+		log.info("Adding {} vehicles to carrier '{}' to handle {} non-handled jobs ({} planned, {} handled).",
+			vehiclesToAdd, nonCompleteSolvedCarrier.getId(), nonHandledJobs, planedJobs, handledJobs);
+		int runningIndex = carrierCapabilities.getCarrierVehicles().size();
+
+		for (int v = 0; v < vehiclesToAdd; v++) {
+			GenerateSmallScaleCommercialTrafficDemand.TourStartAndDuration t = generator.getTourDistribution().get(
+				carrierAttributes.smallScaleCommercialTrafficType()).sample();
+			int vehicleStartTime = t.getVehicleStartTime(this.rnd);
+			int tourDuration = t.getVehicleTourDuration(this.rnd);
+			int vehicleEndTime = vehicleStartTime + tourDuration;
+			String depot = carrierAttributes.vehicleDepots().get(this.rnd.nextInt(carrierAttributes.vehicleDepots().size()));
+			for (VehicleType thisVehicleType : carrierCapabilities.getVehicleTypes()) { //TODO Flottenzusammensetzung anpassen. Momentan pro Depot alle Fahrzeugtypen 1x erzeugen
+				runningIndex++;
+				Id<Vehicle> vehcileId = Id.create(nonCompleteSolvedCarrier.getId().toString() + "_" + runningIndex, Vehicle.class);
+				CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(vehcileId, Id.createLinkId(depot),
+					thisVehicleType).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
+				carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
+				log.info("Added new vehicle '{}' to carrier '{}'", newCarrierVehicle.getId(), nonCompleteSolvedCarrier.getId());
+			}
+		}
+		nonCompleteSolvedCarrier.setCarrierCapabilities(carrierCapabilities);
+		log.info("Number of vehicles after adding new vehicles for carrier '{}': {}", nonCompleteSolvedCarrier.getId(),
+			carrierCapabilities.getCarrierVehicles().size());
 	}
 
 	/**
