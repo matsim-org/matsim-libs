@@ -22,7 +22,7 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 	private static final Logger log = LogManager.getLogger(JspritStrategyAnalyzer.class);
 	private int iterationsCounter;
 	private final LinkedHashMap<Integer, IterationResult> iterationSolutionCosts;
-	private final NavigableMap<Integer, Double> foundNewBestSolutions;
+	private final NavigableMap<Integer, VehicleRoutingProblemSolution> foundNewBestSolutions;
 
 	private double iterationStartTime;
 	private double algorithmStartTime;
@@ -63,10 +63,11 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 		if (i == 1) {
 			double initialSolutionComputationTime = (System.currentTimeMillis() - algorithmStartTime) / 1000.0;
 			double initialSolutionCosts = solutions.iterator().next().getCost();
+			VehicleRoutingProblemSolution initialSolution = solutions.iterator().next();
 			iterationSolutionCosts.put(0, new IterationResult(initialSolutionCosts, "initialSolution", initialSolutionComputationTime,
-				solutions.iterator().next().getRoutes().size(), 0, 0));
+				initialSolution.getRoutes().size(), 0, 0));
 			iterationStartTime = System.currentTimeMillis();
-			foundNewBestSolutions.put(0, initialSolutionCosts);
+			foundNewBestSolutions.put(0, initialSolution);
 		}
 	}
 
@@ -90,12 +91,12 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 		if (i != iterationsCounter) {
 			log.error("Inconsistent iteration number: {} vs {}", i, iterationsCounter);
 		}
-		double best = Double.MAX_VALUE;
+		VehicleRoutingProblemSolution best = foundNewBestSolutions.lastEntry().getValue();
 		for (VehicleRoutingProblemSolution sol : solutions) {
-			if (sol.getCost() < best)
-				best = sol.getCost();
+			if (sol.getCost() < best.getCost())
+				best = sol;
 		}
-		if (foundNewBestSolutions.lastEntry().getValue() > best) {
+		if (foundNewBestSolutions.lastEntry().getValue().getCost() > best.getCost()) {
 			foundNewBestSolutions.put(i, best);
 		}
 	}
@@ -104,7 +105,7 @@ public class JspritStrategyAnalyzer implements StrategySelectedListener, Iterati
 		return iterationSolutionCosts;
 	}
 
-	public NavigableMap<Integer, Double> getFoundNewBestSolutions() {
+	public NavigableMap<Integer, VehicleRoutingProblemSolution> getFoundNewBestSolutions() {
 		return foundNewBestSolutions;
 	}
 
