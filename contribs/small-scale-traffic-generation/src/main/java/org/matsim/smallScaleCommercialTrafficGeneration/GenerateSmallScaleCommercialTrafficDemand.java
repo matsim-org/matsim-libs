@@ -60,6 +60,13 @@ import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
 import org.matsim.freight.carriers.controller.*;
 import org.matsim.freight.carriers.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
+import org.matsim.simwrapper.SimWrapper;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
+import org.matsim.simwrapper.SimWrapperModule;
+import org.matsim.simwrapper.dashboard.CarrierDashboard;
+import org.matsim.simwrapper.dashboard.CommercialTrafficDashboard;
+import org.matsim.simwrapper.dashboard.OverviewDashboard;
+import org.matsim.simwrapper.dashboard.TripDashboard;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.CommercialTourSpecifications;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.DefaultTourSpecificationsByUsingKID2002;
 import org.matsim.vehicles.CostInformation;
@@ -377,20 +384,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			Set<String> networkModes = new HashSet<>(config.routing().getNetworkModes());
 			config.routing().setNetworkModes(Sets.union(networkModes, modes));
 
-//			sw.getConfigGroup().defaultParams().setShp(null);
-//			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
-//			sw.addDashboard(new OverviewDashboard());
-//			sw.addDashboard(new CarrierDashboard());
+			SimWrapper sw = SimWrapper.create();
+			sw.getConfigGroup().defaultParams().setShp(null);
+			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+			sw.addDashboard(new OverviewDashboard());
+			sw.addDashboard(new CarrierDashboard());
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
 //			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
-//			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
-// 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
+			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
+ 			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic"));
 			Controller controller = prepareController(scenario);
 
 			if (!RoadPricingUtils.addOrGetRoadPricingScheme(scenario).getTolledLinkIds().isEmpty()) {
 				controller.addOverridingModule( new RoadPricingModule(RoadPricingUtils.addOrGetRoadPricingScheme(scenario)) );
 			}
-//			controller.addOverridingModule(new SimWrapperModule(sw));
+			controller.addOverridingModule(new SimWrapperModule(sw));
 
 			// Creating inject always adds check for unmaterialized config groups.
 			controller.getInjector();
@@ -711,7 +719,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
-		controller.getInjector();
 		return controller;
 	}
 
