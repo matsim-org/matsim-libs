@@ -20,11 +20,8 @@
 
 package org.matsim.core.router;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -33,11 +30,14 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 @Singleton
 public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	private final boolean usePreProcessData;
-	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
+	private final Map<Network, PreProcessDijkstra> cache = new ConcurrentHashMap<>();
 
 	@Inject
 	public DijkstraFactory() {
@@ -56,13 +56,12 @@ public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if (this.usePreProcessData) {
-			PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
-			if (preProcessDijkstra == null) {
-				preProcessDijkstra = new PreProcessDijkstra();
-				preProcessDijkstra.run(network);
-				this.preProcessData.put(network, preProcessDijkstra);
-			}
-			return new Dijkstra(network, travelCosts, travelTimes, preProcessDijkstra);
+			PreProcessDijkstra data = cache.computeIfAbsent(network, n -> {
+				PreProcessDijkstra preprocess = new PreProcessDijkstra();
+				preprocess.run(network);
+				return preprocess;
+			});
+			return new Dijkstra(network, travelCosts, travelTimes, data);
 		}
 		return new Dijkstra(network, travelCosts, travelTimes);
 	}
