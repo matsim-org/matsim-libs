@@ -103,7 +103,8 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 	private final ScoringParametersForPerson scoringParametersForPerson;
 
 
-	@Inject VTTSHandler( Scenario scenario, ScoringParametersForPerson scoringParametersForPerson ) {
+	@Inject
+	public VTTSHandler(Scenario scenario, ScoringParametersForPerson scoringParametersForPerson) {
 		// yyyy it would (presumably) be much better to pull the scoring function from injection.  Rather than self-constructing the
 		// scoring function here, where we need to rely on having the same ("default") scoring function in the model implementation.
 		// Which we almost surely do not have (e.g. bicycle scoring addition, bus penalty addition, ...).  Also see a similar comment further
@@ -172,7 +173,7 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 			TripData tripData = new TripData();
 			simData.trips.add( tripData );
 			tripData.departureTime = event.getTime();
-			tripData.mode = event.getRoutingMode();
+			tripData.mode = event.getLegMode();
 		}
 	}
 	private boolean isToBeIgnored( Id<Person> personId ){
@@ -224,7 +225,6 @@ public final class VTTSHandler implements ActivityStartEventHandler, ActivityEnd
 
 			// ... now process the events thrown during the trip to the activity which has just ended, ...
 			computeVTTS( personId, OptionalTime.defined( event.getTime() ) );
-
 			simData.currentActivityType = null;
 			simData.currentActivityStartTime = Double.NaN;
 

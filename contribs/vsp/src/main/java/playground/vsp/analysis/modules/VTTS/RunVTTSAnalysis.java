@@ -51,6 +51,7 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
+		config.controller().setOutputDirectory("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts");
 
 		EventsManager eventsManager = EventsUtils.createEventsManager(config);
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
@@ -68,19 +69,18 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		Injector injector = ControllerUtils.createAdhocInjector( scenario );
 		ScoringParametersForPerson scoringParametersForPerson = injector.getInstance( ScoringParametersForPerson.class );
 
-		if ( true ) {
-			throw new RuntimeException("vtts handler needs to come out of injection");
-		}
+		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
+		eventsManager.addHandler( vttsHandler );
 
-//		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
-//		eventsManager.addHandler( vttsHandler );
-//
 //		log.info("Reading events from file: {}", eventsPath);
-//		eventsManager.initProcessing();
-//		EventsUtils.readEvents(eventsManager, eventsPath.toString());
-//		eventsManager.finishProcessing();
+		eventsManager.initProcessing();
+		EventsUtils.readEvents(eventsManager, eventsPath.toString());
+		eventsManager.finishProcessing();
 //
-//		vttsHandler.computeFinalVTTS();
+		vttsHandler.computeFinalVTTS();
+		vttsHandler.getTablesawTripsTable().write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/vttsTripsTable.csv");
+		log.info("VTTS analysis completed.");
+
 //		vttsHandler.printVTTS( eventsPath.getParent().resolve( config.controller().getRunId() + ".vtts.tsv" ).toString() );
 //		vttsHandler.printAvgVTTSperPerson( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsPerPerson.tsv" ).toString() );
 
