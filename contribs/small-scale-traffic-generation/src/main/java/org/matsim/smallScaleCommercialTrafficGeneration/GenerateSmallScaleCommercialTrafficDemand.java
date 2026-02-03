@@ -470,25 +470,36 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 						int numberOfNewCarrier = (int) Math
 							.ceil((double) carrier.getServices().size() / (double) maxServicesPerCarrier);
-						int numberOfServicesPerNewCarrier = Math
-							.round((float) carrier.getServices().size() / numberOfNewCarrier);
+						int numberOfServicesPerNewCarrier = (int) Math
+							.floor((double)carrier.getServices().size() / numberOfNewCarrier);
 
-						int j = 0;
-						while (j < numberOfNewCarrier) {
+						int totalVehicles = carrier.getCarrierCapabilities().getCarrierVehicles().size();
+						int numberOfVehiclesPerNewCarrier = totalVehicles / numberOfNewCarrier;
+						int numberOfVehiclesRemainder = totalVehicles % numberOfNewCarrier;
+
+						List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
+							carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
+						vehiclesForNewCarrier.sort(Comparator.comparing(Id::toString));
+						List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
+							carrier.getServices().keySet());
+						servicesForNewCarrier.sort(Comparator.comparing(Id::toString));
+
+						for (int j = 0; j < numberOfNewCarrier; j++) {
 
 							int numberOfServicesForNewCarrier = numberOfServicesPerNewCarrier;
-							int numberOfVehiclesForNewCarrier = numberOfServicesPerNewCarrier;
-							if (j + 1 == numberOfNewCarrier) {
+							if (j + 1 == numberOfNewCarrier)
 								numberOfServicesForNewCarrier = carrier.getServices().size() - countedServices;
-								numberOfVehiclesForNewCarrier = carrier.getCarrierCapabilities().getCarrierVehicles()
-									.size() - countedVehicles;
-							}
+
+							int numberOfVehiclesForNewCarrier = numberOfVehiclesPerNewCarrier;
+							if (j < numberOfVehiclesRemainder)
+								numberOfVehiclesForNewCarrier++;
+
 							Carrier newCarrier = CarriersUtils.createCarrier(
 								Id.create(carrier.getId().toString() + "_part_" + (j + 1), Carrier.class));
 							CarrierCapabilities newCarrierCapabilities = CarrierCapabilities.Builder.newInstance()
 								.setFleetSize(carrier.getCarrierCapabilities().getFleetSize()).build();
-							newCarrierCapabilities.getCarrierVehicles()
-								.putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
+							newCarrierCapabilities.getVehicleTypes().addAll(carrier.getCarrierCapabilities().getVehicleTypes());
+							newCarrierCapabilities.getCarrierVehicles().putAll(carrier.getCarrierCapabilities().getCarrierVehicles());
 							newCarrier.setCarrierCapabilities(newCarrierCapabilities);
 							newCarrier.getServices().putAll(carrier.getServices());
 							CarriersUtils.setJspritIterations(newCarrier, CarriersUtils.getJspritIterations(carrier));
@@ -498,17 +509,22 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							carrierId2subCarrierIds.putIfAbsent(carrier.getId(), new LinkedList<>());
 							carrierId2subCarrierIds.get(carrier.getId()).add(newCarrier.getId());
 
-							List<Id<Vehicle>> vehiclesForNewCarrier = new ArrayList<>(
-								carrier.getCarrierCapabilities().getCarrierVehicles().keySet());
-							List<Id<CarrierService>> servicesForNewCarrier = new ArrayList<>(
-								carrier.getServices().keySet());
+							int fromIndexVehicles = Math.min(countedVehicles, vehiclesForNewCarrier.size());
+							int fromIndexServices = Math.min(countedServices, servicesForNewCarrier.size());
 
-							List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(
-								j * numberOfServicesPerNewCarrier,
-								j * numberOfServicesPerNewCarrier + numberOfVehiclesForNewCarrier);
-							List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(
-								j * numberOfServicesPerNewCarrier,
-								j * numberOfServicesPerNewCarrier + numberOfServicesForNewCarrier);
+							int toIndexVehicles = fromIndexVehicles + numberOfVehiclesForNewCarrier;
+							int toIndexServices = fromIndexServices + numberOfServicesForNewCarrier;
+
+							// just to be sure that the index is not out of bounds
+							toIndexVehicles = Math.min(toIndexVehicles, vehiclesForNewCarrier.size());
+							toIndexServices = Math.min(toIndexServices, servicesForNewCarrier.size());
+
+							if (fromIndexVehicles == toIndexVehicles && fromIndexServices == toIndexServices) {
+								throw new IllegalStateException("No remaining vehicles/services but still splitting: " + carrier.getId());
+							}
+
+							List<Id<Vehicle>> subListVehicles = vehiclesForNewCarrier.subList(fromIndexVehicles, toIndexVehicles);
+							List<Id<CarrierService>> subListServices = servicesForNewCarrier.subList(fromIndexServices, toIndexServices);
 
 							newCarrier.getCarrierCapabilities().getCarrierVehicles().keySet()
 								.retainAll(subListVehicles);
@@ -518,7 +534,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							countedServices += newCarrier.getServices().size();
 
 							subCarriersToAdd.put(newCarrier.getId(), newCarrier);
-							j++;
 						}
 						keyListCarrierToRemove.add(carrier.getId());
 						if (countedVehicles != carrier.getCarrierCapabilities().getCarrierVehicles().size())
