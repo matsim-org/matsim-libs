@@ -15,7 +15,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.DefaultAnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
@@ -29,7 +28,6 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
@@ -49,8 +47,15 @@ import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
+/**
+ * @author nagel, gregorr
+ * This is my proposal for the VTTS handler.
+ */
+
+
+
 @CommandLine.Command(name = "monetary-utility", description = "List and compare fare, dailyRefund and utility values for agents in base and policy case.")
-public class AgentWiseComparisonKN implements MATSimAppCommand{
+public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 	// I need a simpler way to organize this workflow.  Use case ZEZ (where I need to start from the basic matsim files).
 
 	// The main problem for me is that I repeatedly need to put the file paths into the IntelliJ run configurations.  I would like to do this at most once.
@@ -59,8 +64,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	// Alternatively (or even at the same time) I could put args into main methods and call from there.
 
-	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKN.class );
-	public static final String KN_MONEY = "knMoney";
+	private static final Logger log = LogManager.getLogger( VttsCalculationBasedOnKn.class );
+	//public static final String KN_MONEY = "knMoney";
 
 	private static int scoreWrnCnt = 0;
 
@@ -70,9 +75,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	@CommandLine.Option(names = "--base-path", description = "Path to run directory of base case.", required = true)
 	private Path baseCasePath;
 
-	@CommandLine.Option(names = "--prefix", description = "Prefix for filtered events output file, optional. This can be a list of multiple prefixes.", split = ",")
-	private List<String> prefixList = new ArrayList<>();
-	// (yy not clear to me how this works.  Different prefixes for different input paths? kai, nov'25)
 
 	// (--> I think that it allowed, either by design or by accident, EITHER multiple prefixes in the same dir,
 	// OR one different prefix per different directory.  I think that I removed the second functionality some time ago.)
@@ -86,83 +88,19 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	TripRouter tripRouter1;
 	TripRouter tripRouter2;
 
-	//private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
-	// equil:
-//	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
-//	private static final String policyDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
-
-	// gartenfeld:
-//	private static final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
-//	private static final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
-
-	// zez:
-//	private static final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
-//	private static final String policyDir="/Users/kainagel/shared-svn/projects/zez/c_w_zez/";
-//	private static final String runId="";
-
-
-	private static final String baseDir = "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued";
+	//private static final String baseDir = "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued";
 
 	public static void main( String[] args ){
-//		{
-//			args = new String[]{
-//				"--path", baseDir,
-//				//				"--runId", runId
-//			};
-//			new ExperiencedPlansWriter().execute( args );
-//		}
-//		{
-//			String inFileName = baseDir + "/output_events.xml.gz";
-//			String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
-//
-//			Config config = ConfigUtils.createConfig();
-//			EventsManager eventsManager = EventsUtils.createEventsManager( config );
-//			MatsimEventsReader reader = new MatsimEventsReader( eventsManager );
-//			eventsManager.initProcessing();
-//
-//			EventWriterXML eventsWriter = new EventWriterXML( outFileName );
-//			eventsManager.addHandler( new BasicEventHandler(){
-//				@Override public void handleEvent( Event event ){
-//					if ( event instanceof PersonMoneyEvent || event instanceof PersonStuckEvent ) {
-//						eventsWriter.handleEvent( event );
-//					}
-//				}
-//			} );
-//			reader.readFile( inFileName );
-//			eventsManager.finishProcessing();
-//
-//			eventsWriter.closeFile();
-//
-//		}
-		{
-			args = new String[]{
-				"--prefix=",
-				"--base-path=" + baseDir,
-				//policyDir
-			};
-			new AgentWiseComparisonKN().execute( args );
-		}
+		new VttsCalculationBasedOnKn().execute( args );
 	}
 
 	@Override public Integer call() throws Exception{
-
-		List<String> eventsFilePatterns = new ArrayList<>();
-
-		if( !prefixList.isEmpty() ){
-			for( String prefix : prefixList ){
-				eventsFilePatterns.add( "*" + prefix + "output_events_filtered.xml.gz" );
-			}
-		} else{
-			eventsFilePatterns.add( ".output_events.xml.gz" );
-		}
-
 
 		Config baseConfig = ConfigUtils.loadConfig( globFile( baseCasePath, "*output_config_reduced.xml" ).toString() );
 		// (The reduced config has fewer problems with newly introduced config params.)
 
 		baseConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
@@ -198,30 +136,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 
-//		log.warn("only keeping the least affluent 10% of the population; popSize before={}", basePopulation.getPersons().size() );
-//
-//		List<? extends Person> persons = new ArrayList<>( basePopulation.getPersons().values() );
-//		Collections.sort( persons, new Comparator<Person>(){
-//			@Override public int compare( Person o1, Person o2 ){
-//				return (int) ( PersonUtils.getIncome( o1) - PersonUtils.getIncome( o2 ) );
-//			}
-//		} );
-//
-//		List<Id<Person>> toRemove = new ArrayList<>();
-//		for( Person person : persons.subList( persons.size() / 10, persons.size() ) ){
-//			toRemove.add( person.getId() );
-//		}
-//
-//		for( Id<Person> personId : toRemove ){
-//			basePopulation.removePerson( personId );
-//		}
-//		log.warn("only keeping the least affluent 10% of the population; popSize before={}", basePopulation.getPersons().size() );
-
 		baseScenario.setPopulation( basePopulation );
-
-//		URL url = Paths.get(
-//			"/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/drt-case-study/output-gartenfeld-v6.4-cutout-10pct-drt/analysis/drt/serviceArea.shp" ).toUri().toURL();
-//		this.geometries = ShpGeometryUtils.loadPreparedGeometries( url );
 
 		{
 			this.injector = new Injector.InjectorBuilder( baseScenario )
@@ -239,12 +154,12 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		{
 			//String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
 			//String policyNetworkFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
-			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( baseConfig );
-			//new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
-			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
-			scenario2.setPopulation( baseScenario.getPopulation() );
-			//new TransitScheduleReader( scenario2 ).readFile( policyTransitScheduleFilename );
-			this.injector2 = new Injector.InjectorBuilder( scenario2 )
+			MutableScenario scenario = ScenarioUtils.createMutableScenario( baseConfig );
+			//new MatsimNetworkReader( scenario.getNetwork() ).readFile( policyNetworkFilename );
+			scenario.setActivityFacilities( baseScenario.getActivityFacilities() );
+			scenario.setPopulation( baseScenario.getPopulation() );
+			//new TransitScheduleReader( scenario ).readFile( policyTransitScheduleFilename );
+			this.injector2 = new Injector.InjectorBuilder( scenario )
 													   .addStandardModules()
 													   .addOverridingModule( new AbstractModule(){
 														   @Override public void install(){
@@ -256,40 +171,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		this.tripRouter2 = injector2.getInstance( TripRouter.class );
 
 
-		// ===
 
-		// yyyyyy !!!!!! We now have a different avgIncome in the scoring fct than in the general population.  !!!!!!! yyyyyy
-		// --> (presumably) compute the mUoM here instead of in the preproc.
-
-//		tagPersonsToAnalyse( basePopulation, geometries, scenario );
-		for( Person person : basePopulation.getPersons().values() ){
-			setAnalysisPopulation( person, "true" );
-		}
-
-		//Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
-		Table baseTableTrips = null;
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null );
 
-		// ### next cometh the policy data:
-/*
-		//String policyConfigFilename = globFile( inputPath, "*output_config_reduced.xml" ).toString();
-		// (The reduced config has fewer problems with newly introduced config params.)
-
-		Config policyConfig = ConfigUtils.loadConfig( policyConfigFilename );
-
-		MutableScenario policyScenario = ScenarioUtils.createMutableScenario( policyConfig );
-		policyScenario.setNetwork( this.baseScenario.getNetwork() );
-		policyScenario.setTransitSchedule( this.baseScenario.getTransitSchedule() );
-
-		Population policyPopulation = readAndCleanPopulation( inputPath, eventsFilePatterns );
-		policyScenario.setPopulation( policyPopulation );
-
-		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation );
-
-		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath ); */
 
 
-		System.out.println(baseTablePersons);
 		baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-persons.csv");
 
 

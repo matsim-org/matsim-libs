@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.mapdb.Atomic;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,11 +56,11 @@ class AgentWiseComparisonKNUtils{
 		}
 		@Override public void handleEvent( PersonMoneyEvent event ){
 			Person person = population.getPersons().get( event.getPersonId() );
-			Double moneyAttrib = (Double) person.getAttributes().getAttribute( AgentWiseComparisonKN.KN_MONEY );
+			Double moneyAttrib = (Double) person.getAttributes().getAttribute( VttsCalculationBasedOnKn.KN_MONEY );
 			if ( moneyAttrib == null ) {
-				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY, event.getAmount() );
+				person.getAttributes().putAttribute( VttsCalculationBasedOnKn.KN_MONEY, event.getAmount() );
 			} else {
-				person.getAttributes().putAttribute( AgentWiseComparisonKN.KN_MONEY, moneyAttrib + event.getAmount() );
+				person.getAttributes().putAttribute( VttsCalculationBasedOnKn.KN_MONEY, moneyAttrib + event.getAmount() );
 			}
 		}
 	}

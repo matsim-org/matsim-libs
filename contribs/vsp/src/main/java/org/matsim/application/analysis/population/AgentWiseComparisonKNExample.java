@@ -82,7 +82,7 @@ class AgentWiseComparisonKNExample{
 		}
 		AgentWiseComparisonKNUtils.computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 
-		AgentWiseComparisonKN ccc = new AgentWiseComparisonKN();
+		VttsCalculationBasedOnKn ccc = new VttsCalculationBasedOnKn();
 		ccc.baseScenario = scenario;
 
 		{

@@ -26,7 +26,7 @@ import static org.matsim.application.analysis.population.AddVttsEtcToActivities.
 import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.formatTable;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 
-class AgentWiseComparisonKNDeprecated extends AgentWiseComparisonKN{
+class AgentWiseComparisonKNDeprecated extends VttsCalculationBasedOnKn {
 	private static final Logger log = LogManager.getLogger( AgentWiseComparisonKNDeprecated.class );
 
 	@NotNull private Table generateTripsTableFromPopulation( Population population, Config config, boolean isBaseTable ){
