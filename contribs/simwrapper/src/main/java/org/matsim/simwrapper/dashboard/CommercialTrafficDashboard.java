@@ -981,7 +981,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		Layout.Row row = layout.row("veh-Activities-hist_ref_group", "Calibration");
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			row.el(Plotly.class, (viz, data) -> {
-				viz.title = "ActivityDurations per vehicle (min)";
+				viz.title = "ActivityDurations per vehicle (min) in group ** " + group + "**";
 				viz.description = "Histogram of activity durations by group of subpopulation (given bins).";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.showLegend(true)
@@ -1043,8 +1043,8 @@ public class CommercialTrafficDashboard implements Dashboard {
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			row.el(Plotly.class, (viz, data) -> {
 
-				viz.title = "Duration (h) per vehicle in group ** " + group + "**";
-				viz.description = "Histogram of durations per vehicle tour (given bins).";
+				viz.title = "Distance (km) per vehicle in group ** " + group + "**";
+				viz.description = "Histogram of distances per vehicle tour for the given group (given bins).";
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
@@ -1104,7 +1104,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			row.el(Plotly.class, (viz, data) -> {
 
 				viz.title = "Duration (h) per vehicle in group ** " + group + "**";
-				viz.description = "Histogram of durations per vehicle tour (given bins).";
+				viz.description = "Histogram of durations per vehicle tour of the given group (given bins).";
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
