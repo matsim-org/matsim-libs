@@ -65,7 +65,7 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 	// Alternatively (or even at the same time) I could put args into main methods and call from there.
 
 	private static final Logger log = LogManager.getLogger( VttsCalculationBasedOnKn.class );
-	//public static final String KN_MONEY = "knMoney";
+	public static final String KN_MONEY = "knMoney";
 
 	private static int scoreWrnCnt = 0;
 
@@ -132,7 +132,7 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 
 		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
 
-		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
+		final Population basePopulation = readAndCleanPopulation( baseCasePath );
 
 		computeAndSetMarginalUtilitiesOfMoney( basePopulation );
 
@@ -290,7 +290,7 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 					firstTrip = false;
 					actSeq.add( trip.getOriginActivity().getType().substring( 0, 4 ) );
 				}
-				modeSeq.add( shortenModeString( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
+				modeSeq.add( ( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
 				actSeq.add( trip.getDestinationActivity().getType().substring( 0, 4 ) );
 
 				if( basePopulation == null ){
@@ -406,246 +406,12 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 		return table;
 	}
 
-	void compare( Scenario policyScenario, Table personsTablePolicy, Table tripsTableBase, Table personsTableBase, Scenario baseScenario,
-				  Config baseConfig, Path outputPath ) throws IOException{
-
-		somehowComputeRuleOfHalf( baseScenario.getPopulation(), policyScenario.getPopulation(), personsTablePolicy );
-
-		Table joinedTable = personsTableBase.joinOn( PERSON_ID ).inner( true, personsTablePolicy );
-
-		log.info( "print joined table:" );
-		System.out.println( joinedTable );
-
-//		printSpecificPerson( joinedTable, "960148" );
-
-		joinedTable.addColumns( deltaColumn( joinedTable, TTIME ), deltaColumn( joinedTable, MONEY ) );
-
-		joinedTable = joinedTable.where(
-			joinedTable.stringColumn( ANALYSIS_POPULATION ).isEqualTo( "true" ).or(
-				joinedTable.stringColumn( keyTwoOf( ANALYSIS_POPULATION ) ).isEqualTo( "true" )
-																				  ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( MODE_SEQ ).isEqualTo( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ) ) );
-		joinedTable = joinedTable.where( joinedTable.stringColumn( keyTwoOf( MODE_SEQ ) ).containsString( "pt" ) );
-
-
-		Table deltaTable = Table.create( joinedTable.column( PERSON_ID )
-			, joinedTable.column( UTL_OF_MONEY )
-//			, joinedTable.column( MUSL_h )
-			, joinedTable.column( SCORE )
-			, joinedTable.column( MONEY )
-			, joinedTable.column( TTIME )
-			, joinedTable.column( ASCS )
-			, joinedTable.column( U_TRAV_DIRECT )
-			, joinedTable.column( U_LINESWITCHES )
-			// unweighted deltas:
-			, deltaColumn( joinedTable, TTIME )
-			, deltaColumn( joinedTable, MONEY )
-			// delta computation:
-			, deltaColumn( joinedTable, MATSIM_SCORE )
-			, deltaColumn( joinedTable, SCORE )
-			, deltaColumn( joinedTable, ACTS_SCORE )
-			, deltaColumn( joinedTable, U_TRAV_DIRECT )
-			, deltaColumn( joinedTable, U_LINESWITCHES )
-			, deltaColumn( joinedTable, MONEY_SCORE )
-			, deltaColumn( joinedTable, ASCS )
-			//
-			// information:
-			, joinedTable.column( MODE_SEQ )
-			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-									   );
-
-		formatTable( deltaTable, 0 );
-
-		System.out.println( deltaTable.sortOn( deltaOf( SCORE ) ) );
-
-		// ===
-
-		Table rohDeltaTable = Table.create( joinedTable.column( PERSON_ID )
-			, joinedTable.column( UTL_OF_MONEY )
-//			, joinedTable.column( MUSL_h )
-			, joinedTable.column( SCORE )
-			, joinedTable.column( MONEY )
-			, joinedTable.column( TTIME )
-			, joinedTable.column( ASCS )
-			, joinedTable.column( U_TRAV_DIRECT )
-			, joinedTable.column( U_LINESWITCHES )
-			// unweighted deltas:
-			, deltaColumn( joinedTable, TTIME )
-			, deltaColumn( joinedTable, MONEY )
-			// delta computation:
-			, deltaColumn( joinedTable, MATSIM_SCORE )
-			, deltaColumn( joinedTable, SCORE )
-			, deltaColumn( joinedTable, ACTS_SCORE )
-			, deltaColumn( joinedTable, U_TRAV_DIRECT )
-			, deltaColumn( joinedTable, U_LINESWITCHES )
-			, deltaColumn( joinedTable, MONEY_SCORE )
-			, deltaColumn( joinedTable, ASCS )
-			//
-			, joinedTable.column( W1_TTIME_DIFF_REM )
-			, joinedTable.column( W2_TTIME_DIFF_REM )
-			, joinedTable.column( IX_DIFF_REMAINING )
-			, joinedTable.column( W1_TTIME_DIFF_SWI )
-			, joinedTable.column( W2_TTIME_DIFF_SWI )
-			, joinedTable.column( IX_DIFF_SWITCHING )
-			// information:
-			, joinedTable.column( MODE_SEQ )
-			, joinedTable.column( keyTwoOf( MODE_SEQ ) )
-									   );
-
-		formatTable( deltaTable, 0 );
-
-		System.out.println( personsTableBase.sortOn( deltaOf( SCORE ) ) );
-		writeMatsimScoresSummaryTable(baseCasePath, baseConfig, deltaTable);
-
-		// ===
-
-		writeMatsimScoresSummaryTable( outputPath, baseConfig, deltaTable );
-
-		//writeRuleOfHalfSummaryTable( inputPath, baseConfig, rohDeltaTable );
-
-		writeAscTable( baseConfig );
-
-	}
-
 	private static int cnt = 0;
 
-	private void somehowComputeRuleOfHalf( Population basePopulation, Population policyPopulation, Table personsTablePolicy ){
-		var ttimeRemHom = DoubleColumn.create( W1_TTIME_DIFF_REM );
-		var ttimeRemHet = DoubleColumn.create( W2_TTIME_DIFF_REM );
-		var ixRem = DoubleColumn.create( IX_DIFF_REMAINING );
-		var ttimeSwiHom = DoubleColumn.create( W1_TTIME_DIFF_SWI );
-		var ttimeSwiHet = DoubleColumn.create( W2_TTIME_DIFF_SWI );
-		var ixSwi = DoubleColumn.create( IX_DIFF_SWITCHING );
 
-//		TripRouter tripRouter1 = this.injector.getInstance( TripRouter.class );
-//		TripRouter tripRouter2 = this.injector2.getInstance( TripRouter.class );
 
-		Counter counter = new Counter( "somehowComputeRuleOfHalf; person # " );
-		for( Person policyPerson : policyPopulation.getPersons().values() ){
-			counter.incCounter();
 
-			double sumTravTimeDiffsRemainersHom = 0.;
-			double sumTravTimeDiffsRemainersHet = 0.;
-			double sumTravTimeDiffsSwitchersHom = 0.;
-			double sumTravTimeDiffsSwitchersHet = 0.;
 
-			double sumIchangesDiffsRemainers = 0;
-			double sumIchangesDiffsSwitchers = 0.;
 
-			Person basePerson = basePopulation.getPersons().get( policyPerson.getId() );
-
-			if( basePerson != null ){
-				Double musl = (Double) getMUSE_h( basePerson.getSelectedPlan() );
-				if( musl == null ){
-					log.warn( "muse is null; I do not know why; personId={}", basePerson.getId() );
-					musl = MUTTS_AV;
-				}
-				List<TripStructureUtils.Trip> baseTrips = TripStructureUtils.getTrips( basePerson.getSelectedPlan() );
-				List<TripStructureUtils.Trip> policyTrips = TripStructureUtils.getTrips( policyPerson.getSelectedPlan() );
-				Gbl.assertIf( baseTrips.size() == policyTrips.size() );
-				for( int ii = 0 ; ii < baseTrips.size() ; ii++ ){
-					final TripStructureUtils.Trip policyTrip = policyTrips.get( ii );
-					final String policyMainMode = TripStructureUtils.identifyMainMode( policyTrip.getTripElements() );
-					if( TransportMode.pt.equals( policyMainMode ) ){
-						TripStructureUtils.Trip baseTrip = baseTrips.get( ii );
-						if( TransportMode.pt.equals( TripStructureUtils.identifyMainMode( baseTrip.getTripElements() ) ) ){
-							// Altnutzer; compute base ttime etc. from actual trip:
-							double sumBaseTtime = 0.;
-							double sumBaseLineSwitches = -1;
-							for( Leg leg : baseTrip.getLegsOnly() ){
-								sumBaseTtime += leg.getTravelTime().seconds();
-								if( TransportMode.pt.equals( leg.getMode() ) ){
-									sumBaseLineSwitches++;
-								}
-							}
-							// compute policy ttime from actual trip:
-							double sumPolicyTtime = 0.;
-							double sumPolicyLineSwitches = -1.;
-							for( Leg leg : policyTrip.getLegsOnly() ){
-								sumPolicyTtime += leg.getTravelTime().seconds();
-								if( TransportMode.pt.equals( leg.getMode() ) ){
-									sumPolicyLineSwitches++;
-								}
-							}
-							if ( cnt < 10 ){
-								log.warn( "MUTTS_AV={}", MUTTS_AV );
-								cnt++;
-								if ( cnt==10 ) {
-									log.warn( Gbl.FUTURE_SUPPRESSED );
-								}
-							}
-							sumTravTimeDiffsRemainersHom += (sumPolicyTtime - sumBaseTtime) * MUTTS_AV * (-1);
-							sumTravTimeDiffsRemainersHet += (sumPolicyTtime - sumBaseTtime) * musl * (-1);
-							sumIchangesDiffsRemainers += (sumPolicyLineSwitches - sumBaseLineSwitches);
-						} else{
-							// Neunutzer; rule-of-half
-							// first need hypothetical base travel time
-							final Result baseResult = routeTrip( baseTrip, policyMainMode, basePerson, tripRouter1 );
-							// then compute hypothetical policy travel time
-							final Result policyResult = routeTrip2( policyTrip, policyMainMode, policyPerson, tripRouter2 );
-							// sum up (rule-of-half is done later):
-							sumTravTimeDiffsSwitchersHom += (policyResult.sumTtime() - baseResult.sumTtime()) * MUTTS_AV * (-1);
-							sumTravTimeDiffsSwitchersHet += (policyResult.sumTtime() - baseResult.sumTtime()) * musl * (-1);
-							sumIchangesDiffsSwitchers += (policyResult.sumLineSwitches() - baseResult.sumLineSwitches());
-						}
-					}
-				}
-			}
-			ttimeRemHom.append( sumTravTimeDiffsRemainersHom / 3600. );
-			ttimeRemHet.append( sumTravTimeDiffsRemainersHet / 3600. );
-			ttimeSwiHom.append( sumTravTimeDiffsSwitchersHom / 3600. );
-			ttimeSwiHet.append( sumTravTimeDiffsSwitchersHet / 3600. );
-			ixRem.append( sumIchangesDiffsRemainers );
-			ixSwi.append( sumIchangesDiffsSwitchers );
-		}
-		personsTablePolicy.addColumns( ttimeRemHom, ttimeRemHet, ixRem, ttimeSwiHom, ttimeSwiHet, ixSwi );
-		log.info( "persons table policy after adding RoH entries:" );
-		System.out.println( personsTablePolicy );
-	}
-
-	private @NotNull Result routeTrip( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter ){
-		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
-		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
-		final List<? extends PlanElement> planElements = tripRouter.calcRoute( policyMainMode, fromFacility, toFacility,
-			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
-
-		// count the number of line switches:
-		double sumBaseTtime = 0.;
-		double sumBaseLineSwitches = -1;
-		for( Leg leg : TripStructureUtils.getLegs( planElements ) ){
-			sumBaseTtime += leg.getTravelTime().seconds();
-			if( TransportMode.pt.equals( leg.getMode() ) ){
-				sumBaseLineSwitches++;
-			}
-		}
-
-		// return the result:
-		return new Result( sumBaseTtime, sumBaseLineSwitches );
-	}
-
-	// yyyyyy The above and the below are now the same (I think).
-
-	private @NotNull Result routeTrip2( TripStructureUtils.Trip baseTrip, String policyMainMode, Person basePerson, TripRouter tripRouter2 ){
-		Facility fromFacility = FacilitiesUtils.toFacility( baseTrip.getOriginActivity(), baseScenario.getActivityFacilities() );
-		Facility toFacility = FacilitiesUtils.toFacility( baseTrip.getDestinationActivity(), baseScenario.getActivityFacilities() );
-		final List<? extends PlanElement> planElements = tripRouter2.calcRoute( policyMainMode, fromFacility, toFacility,
-			baseTrip.getOriginActivity().getEndTime().seconds(), basePerson, null );
-
-		// count the number of line switches:
-		double sumBaseTtime = 0.;
-		double sumBaseLineSwitches = -1;
-		for( Leg leg : TripStructureUtils.getLegs( planElements ) ){
-			sumBaseTtime += leg.getTravelTime().seconds();
-			if( TransportMode.pt.equals( leg.getMode() ) ){
-				sumBaseLineSwitches++;
-			}
-		}
-
-		// return the result:
-		return new Result( sumBaseTtime, sumBaseLineSwitches );
-	}
-
-	private record Result(double sumTtime, double sumLineSwitches){
-	}
 
 }

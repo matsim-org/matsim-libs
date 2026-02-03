@@ -3,12 +3,7 @@ package org.matsim.application.analysis.population;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -24,7 +19,6 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.geometry.GeometryUtils;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
@@ -39,7 +33,6 @@ import java.util.Locale;
 import static org.matsim.application.ApplicationUtils.globFile;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
-import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 class AgentWiseComparisonKNUtils{
 	private static Logger log = LogManager.getLogger( AgentWiseComparisonKNUtils.class );
@@ -75,14 +68,11 @@ class AgentWiseComparisonKNUtils{
 		}
 	}
 
-	static String shortenModeString( String string ) {
-		return string.replace( "electric_car", "eCar" ).replace( "electric_ride", "eRide" );
-	}
 	static DoubleColumn deltaColumn( Table joinedTable, String key ){
 		return joinedTable.doubleColumn( keyTwoOf( key ) ).subtract( joinedTable.doubleColumn( key ) ).setName( deltaOf( key ) );
 	}
 	static void handleEventsfile( Path path, Population population ){
-		String baseEventsFile = globFile( path, "*true.output_events.xml.gz" ).toString();
+		String baseEventsFile = globFile( path, "*.output_events.xml.gz" ).toString();
 		log.info( baseEventsFile );
 
 		double popSizeBefore = population.getPersons().size();
@@ -128,37 +118,7 @@ class AgentWiseComparisonKNUtils{
 
 	}
 
-	static void tagPersonsToAnalyse( Population basePopulation, List<PreparedGeometry> geometries, Scenario scenario ){
-		if ( geometries==null || geometries.isEmpty() ) {
-			return;
-		}
-		for( Person person : basePopulation.getPersons().values() ){
-			boolean toAnalyse = false;
-			for( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), StagesAsNormalActivities ) ){
-				Coord coord = PopulationUtils.decideOnCoordForActivity( act, scenario );
-				Point point = GeometryUtils.createGeotoolsPoint( coord );
-				for( PreparedGeometry geometry : geometries ){
-					if( geometry.contains( point ) ){
-						toAnalyse = true;
-					}
-				}
-			}
-			if ( toAnalyse ){
-				setAnalysisPopulation( person, "true" );
-			} else {
-				setAnalysisPopulation( person, "false" );
-			}
-		}
-//		Population newPop = PopulationUtils.createPopulation( ConfigUtils.createConfig() );
-//		for( Person person : basePopulation.getPersons().values() ){
-//			if ( "true".equals( getAnalysisPopulation( person ) ) ) {
-//				newPop.addPerson( person );
-//			}
-//		}
-//		PopulationUtils.writePopulation( newPop, "gartenfeld.plans.xml.gz" );
-//		log.warn("exiting here");
-//		System.exit(-1);
-	}
+
 	static void setAnalysisPopulation( Person person, String analysisPopulation ){
 		person.getAttributes().putAttribute( "analysisPopulation", analysisPopulation );
 	}
@@ -209,101 +169,6 @@ class AgentWiseComparisonKNUtils{
 					-> true;
 			default -> false;
 		};
-	}
-	static void writeSpecialPopulationForVia( Path inputPath, Population policyPopulation ){
-		List<Person> personsToRemove = new ArrayList<>();
-		for( Person person : policyPopulation.getPersons().values() ){
-			boolean toRemove = true;
-			for( Leg leg : TripStructureUtils.getLegs( person.getSelectedPlan() ) ){
-				if ( TransportMode.drt.equals( leg.getMode() ) ) {
-					toRemove = false;
-				}
-			}
-			if ( toRemove ) {
-				personsToRemove.add( person );
-			}
-		}
-		for( Person person : personsToRemove ){
-			policyPopulation.removePerson( person.getId() );
-		}
-		PopulationUtils.writePopulation( policyPopulation, inputPath + "/output_plans_with_drt.xml.gz" );
-	}
-	static void printSpecificPerson( Table table, String personId ){
-		final Table filteredTable = table.where( table.stringColumn( PERSON_ID ).isEqualTo( personId ) );
-		formatTable( filteredTable, 2 );
-		log.info( "print table for specific person:" );
-		System.out.println( filteredTable );
-	}
-	static void writeRuleOfHalfSummaryTable( Path inputPath, Config config, Table deltaTable ){
-		final double factor = 1./ config.qsim().getFlowCapFactor();
-
-		double homTtimeBenefitRemainers = deltaTable.doubleColumn( W1_TTIME_DIFF_REM ).sum() * factor ;
-		double hetTtimeBenefitRemainers = deltaTable.doubleColumn( W2_TTIME_DIFF_REM ).sum() * factor ;
-
-		double homTtimeBenfitSwitchers = deltaTable.doubleColumn( W1_TTIME_DIFF_SWI ).sum() * factor / 2 ;
-		double hetTtimeBenfitSwitchers = deltaTable.doubleColumn( W2_TTIME_DIFF_SWI ).sum() * factor / 2 ;
-
-		double ixBenefitRemainers = deltaTable.doubleColumn( IX_DIFF_REMAINING ).sum() * factor * (-1);
-		double ixBenefitSwitchers = deltaTable.doubleColumn( IX_DIFF_SWITCHING ).sum() * factor / 2 * (-1);
-
-		double roh = homTtimeBenefitRemainers + ixBenefitRemainers + homTtimeBenfitSwitchers + ixBenefitSwitchers;
-
-//		double ttimeBenefitRemainersUniformMutts = deltaTable.doubleColumn( deltaOf( TTIME)  ).sum() * factor * (-9.16) ; // 9.16 = mean mUTTS bln
-		// yy das geht so nicht, weil es nicht zwischen remainers und switchers unterscheidet
-
-		final StringBuilder score_cmt = new StringBuilder( "are the overall (hom.) \"anglo\" benefits (potentially negative). This has the following contributions:" );
-
-		final StringBuilder hom_ttime_uniform_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (hom. mUTTS)." );
-		final StringBuilder het_ttime_rem_cmt = new StringBuilder( "... are the travel time benefits trips-w-same-mode (het. mUTTS)." );
-
-		final StringBuilder hom_ttime_swi_cmt = new StringBuilder( "... are the roh travel time benefits trips-w-other-mode (hom. mUTTS)." );
-		final StringBuilder het_ttime_swi_cmt = new StringBuilder( "... are the roh travel time benefits trips-w-other-mode (het. mUTTS)." );
-
-		final StringBuilder u_lineswitches_rem_cmt = new StringBuilder("... are the iX benefits trips-w-same-mode.");
-		final StringBuilder u_lineswitches_swi_cmt = new StringBuilder("... are the roh iX benefits trips-w-other-mode.");
-
-		final int maxLen = score_cmt.length();alignLeft( het_ttime_rem_cmt, maxLen );alignLeft( u_lineswitches_rem_cmt, maxLen );
-		alignLeft( hom_ttime_swi_cmt, maxLen ); alignLeft( het_ttime_swi_cmt, maxLen ); alignLeft( u_lineswitches_swi_cmt, maxLen );
-		alignLeft( hom_ttime_uniform_rem_cmt, maxLen );
-
-		// ---
-
-		Table summaryTable = Table.create( DoubleColumn.create( "value" ), StringColumn.create( "comment" ) );
-
-		summaryTable.doubleColumn( "value" ).append( roh );
-		summaryTable.stringColumn( "comment" ).append( score_cmt.toString() );
-
-//		summaryTable.doubleColumn( "value" ).append( hetTtimeBenefitRemainers );
-//		summaryTable.stringColumn( "comment" ).append( het_ttime_rem_cmt.toString() );
-
-		summaryTable.doubleColumn( "value" ).append( homTtimeBenefitRemainers );
-		summaryTable.stringColumn( "comment" ).append( hom_ttime_uniform_rem_cmt.toString() );
-
-		summaryTable.doubleColumn( "value" ).append( ixBenefitRemainers );
-		summaryTable.stringColumn( "comment" ).append( u_lineswitches_rem_cmt.toString() );
-
-		summaryTable.doubleColumn( "value" ).append( homTtimeBenfitSwitchers );
-		summaryTable.stringColumn( "comment" ).append( hom_ttime_swi_cmt.toString() );
-
-//		summaryTable.doubleColumn( "value" ).append( hetTtimeBenfitSwitchers );
-//		summaryTable.stringColumn( "comment" ).append( het_ttime_swi_cmt.toString() );
-
-		summaryTable.doubleColumn( "value" ).append( ixBenefitSwitchers );
-		summaryTable.stringColumn( "comment" ).append( u_lineswitches_swi_cmt.toString() );
-
-//			summaryTable.doubleColumn( "value" ).append( ascs_sum );
-//			summaryTable.stringColumn( "comment" ).append( asc_cmt.toString() );
-//
-//			summaryTable.doubleColumn( "value" ).append( acts_score + u_trav_score + ascs_sum + line_switch_score + money_score );
-//			summaryTable.stringColumn( "comment" ).append( alt_sum_cmt.toString() );
-
-		formatTable( summaryTable, 0 );
-
-		System.out.println();
-		log.info( inputPath );
-		log.info( "Popsize={} rescaled to 100% by multiplying with {}.", deltaTable.rowCount(), factor );
-		System.out.println( summaryTable + System.lineSeparator() );
-		System.out.println();
 	}
 	static void alignLeft( StringBuilder weighted_ttime_cmt, int maxLen ){
 		weighted_ttime_cmt.append( " ".repeat( maxLen - weighted_ttime_cmt.length() ) );
@@ -388,17 +253,8 @@ class AgentWiseComparisonKNUtils{
 
 		System.out.println( System.lineSeparator() + summaryTable + System.lineSeparator() );
 	}
-	static @NotNull Population readAndCleanPopulation( Path path, List<String> eventsFilePatterns ){
+	static @NotNull Population readAndCleanPopulation( Path path ){
 		String basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
-	/*	try {
-			basePopulationFilename = globFile( path, "*vtts_experienced_plans.xml.gz" ).toString();
-		} catch ( IllegalStateException ee ) {
-			try{
-				basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
-			} catch ( IllegalStateException e2 ) {
-				basePopulationFilename = globFile( path, "*.experienced_plans.xml.gz" ).toString();
-			}
-		} */
 
 		Population basePopulation = PopulationUtils.readPopulation( basePopulationFilename );
 
@@ -408,7 +264,6 @@ class AgentWiseComparisonKNUtils{
 		log.info("Reading events files to enrich the base population with money and stuck info");
 
 		handleEventsfile( path, basePopulation );
-			// (most of the time, this should be a filtered events file, and we only use money and stuck info)
 
 		return basePopulation;
 	}

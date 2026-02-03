@@ -75,7 +75,7 @@ class AgentWiseComparisonKNDeprecated extends VttsCalculationBasedOnKn {
 
 				// per trip:
 				table.intColumn( TRIP_IDX ).append( trips.indexOf( trip ) );
-				table.stringColumn( MODE ).append( AgentWiseComparisonKNUtils.shortenModeString( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
+				table.stringColumn( MODE ).append( ( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) );
 				table.stringColumn( ACT_AT_END ).append( trip.getDestinationActivity().getType() );
 				if ( isBaseTable ){
 					Double mutts_h = getMUTTS_h( trip.getDestinationActivity() );
