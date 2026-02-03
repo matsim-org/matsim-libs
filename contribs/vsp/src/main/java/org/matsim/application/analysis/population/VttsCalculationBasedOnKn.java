@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
@@ -26,15 +25,12 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -53,16 +49,8 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
  */
 
 
-
-@CommandLine.Command(name = "monetary-utility", description = "List and compare fare, dailyRefund and utility values for agents in base and policy case.")
 public class VttsCalculationBasedOnKn implements MATSimAppCommand{
-	// I need a simpler way to organize this workflow.  Use case ZEZ (where I need to start from the basic matsim files).
 
-	// The main problem for me is that I repeatedly need to put the file paths into the IntelliJ run configurations.  I would like to do this at most once.
-
-	// My current intuition would be to build an umbrella class that implements the MATSimAppCommand and call the respective methods by one-liners.
-
-	// Alternatively (or even at the same time) I could put args into main methods and call from there.
 
 	private static final Logger log = LogManager.getLogger( VttsCalculationBasedOnKn.class );
 	public static final String KN_MONEY = "knMoney";
@@ -81,7 +69,6 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 
 	ScoringFunctionFactory scoringFunctionFactory;
 	MutableScenario baseScenario;
-	private List<PreparedGeometry> geometries;
 
 	com.google.inject.Injector injector;
 	com.google.inject.Injector injector2;
@@ -173,7 +160,6 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 
 
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null );
-
 
 
 		baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-persons.csv");
@@ -405,13 +391,6 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand{
 		}
 		return table;
 	}
-
-	private static int cnt = 0;
-
-
-
-
-
 
 
 }

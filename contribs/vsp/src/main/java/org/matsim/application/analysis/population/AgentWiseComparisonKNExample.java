@@ -146,7 +146,6 @@ class AgentWiseComparisonKNExample{
 
 		Path path = Paths.get("outputFromAgentWiseComparisonExample" );
 
-		ccc.compare( policyScenario, policyTable, null, baseTable, scenario, config, path );
 
 
 	}
