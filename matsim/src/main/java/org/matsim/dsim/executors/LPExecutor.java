@@ -49,4 +49,6 @@ public interface LPExecutor extends Steppable {
 
 
 	void shutdown();
+
+	void pause();
 }

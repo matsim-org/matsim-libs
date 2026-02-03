@@ -189,6 +189,8 @@ public final class DSim implements Mobsim {
 		executor.runEventHandler();
 		// notify the events manager to trigger events processing, as well as syncing.
 		manager.finishProcessing();
+		// notify the executor that we are done with this simulation step
+		executor.pause();
 
 		double mu = histogram.getMean() / 1000;
 
