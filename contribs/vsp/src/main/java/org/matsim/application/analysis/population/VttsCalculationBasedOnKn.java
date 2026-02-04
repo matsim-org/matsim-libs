@@ -126,15 +126,12 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 		baseScenario.setPopulation(basePopulation);
 
 		{
-			this.injector = new Injector.InjectorBuilder(baseScenario)
-				.addStandardModules()
-				.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
-					}
-				})
-				.build();
+			this.injector = new Injector.InjectorBuilder(baseScenario).addStandardModules().addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+				}
+			}).build();
 			this.scoringFunctionFactory = injector.getInstance(ScoringFunctionFactory.class);
 			this.tripRouter1 = injector.getInstance(TripRouter.class);
 
@@ -147,15 +144,12 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 			scenario.setActivityFacilities(baseScenario.getActivityFacilities());
 			scenario.setPopulation(baseScenario.getPopulation());
 			//new TransitScheduleReader( scenario ).readFile( policyTransitScheduleFilename );
-			this.injector2 = new Injector.InjectorBuilder(scenario)
-				.addStandardModules()
-				.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
-					}
-				})
-				.build();
+			this.injector2 = new Injector.InjectorBuilder(scenario).addStandardModules().addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(ScoringParametersForPerson.class).to(IncomeDependentUtilityOfMoneyPersonScoringParameters.class);
+				}
+			}).build();
 		}
 		this.tripRouter2 = injector2.getInstance(TripRouter.class);
 
@@ -171,20 +165,7 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 
 	@NotNull Table generatePersonTableFromPopulation(Population population, Config config, Population basePopulation) {
 
-		Table table = Table.create(StringColumn.create(PERSON_ID)
-			, DoubleColumn.create(MATSIM_SCORE)
-			, DoubleColumn.create(SCORE)
-			, DoubleColumn.create(MONEY)
-			, DoubleColumn.create(MONEY_SCORE)
-			, DoubleColumn.create(TTIME)
-			, DoubleColumn.create(ASCS)
-			, DoubleColumn.create(U_TRAV_DIRECT)
-			, DoubleColumn.create(U_LINESWITCHES)
-			, DoubleColumn.create(ACTS_SCORE)
-			, StringColumn.create(MODE_SEQ)
-			, StringColumn.create(ACT_SEQ)
-			, StringColumn.create(ANALYSIS_POPULATION)
-		);
+		Table table = Table.create(StringColumn.create(PERSON_ID), DoubleColumn.create(MATSIM_SCORE), DoubleColumn.create(SCORE), DoubleColumn.create(MONEY), DoubleColumn.create(MONEY_SCORE), DoubleColumn.create(TTIME), DoubleColumn.create(ASCS), DoubleColumn.create(U_TRAV_DIRECT), DoubleColumn.create(U_LINESWITCHES), DoubleColumn.create(ACTS_SCORE), StringColumn.create(MODE_SEQ), StringColumn.create(ACT_SEQ), StringColumn.create(ANALYSIS_POPULATION));
 
 		if (basePopulation == null) {
 			table.addColumns(DoubleColumn.create(UTL_OF_MONEY), DoubleColumn.create(MUSE_h));
@@ -390,6 +371,19 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 			MUTTS_AV = popSumMuse_h / popCntMuse_h;
 			log.warn("MUTTS_AV={}; popSumMuse_h={}; popCntMuse_h={}", MUTTS_AV, popSumMuse_h, popCntMuse_h);
 		}
+
+		// Add a new column for travel disutility per person
+		DoubleColumn travelDisutility_h = DoubleColumn.create("travelDisutility_h");
+
+		// Loop over the table rows
+		for (int i = 0; i < table.rowCount(); i++) {
+			double travelDisutility = table.doubleColumn(U_TRAV_DIRECT).get(i);
+			travelDisutility_h.append(travelDisutility);
+		}
+
+// Add the new column to the table
+		table.addColumns(travelDisutility_h);
+
 		return table;
 	}
 
