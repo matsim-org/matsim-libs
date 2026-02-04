@@ -157,8 +157,11 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.qsim().getStorageCapFactor(), relativeTolerance ) ) {
 			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
 		}
-		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.counts().getCountsScaleFactor(), relativeTolerance ) ) {
-			throw new RuntimeException("your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
+		if ( config.counts().getCountsFileName()!=null && !config.counts().getCountsFileName().isEmpty() ){
+			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.counts().getCountsScaleFactor(), relativeTolerance ) ){
+				throw new RuntimeException(
+					"your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
+			}
 		}
 	}
 }
