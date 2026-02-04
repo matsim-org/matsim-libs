@@ -1,5 +1,6 @@
 package org.matsim.simwrapper;
 
+import org.apache.commons.math3.util.Precision;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -95,6 +96,14 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		if (!getInclude().isEmpty() && !getExclude().isEmpty()) {
 			throw new IllegalStateException("Include and exclude option can't be set both.");
 		}
+
+		// check the (available) scale factors:
+		final double flowCapFactor = config.qsim().getFlowCapFactor();
+		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
+		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
+			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
+		}
+
 	}
 
 	public Mode getDefaultDashboards() {
@@ -234,5 +243,6 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 			return this;
 		}
 	}
+
 
 }
