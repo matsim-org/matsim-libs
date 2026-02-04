@@ -101,7 +101,8 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		final double flowCapFactor = config.qsim().getFlowCapFactor();
 		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
-			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
+			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+			+ ". Relative tolerance can be set in the global config group.");
 		}
 
 	}
