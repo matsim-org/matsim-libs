@@ -1374,8 +1374,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
+		///  There is also a {@link PersonNetworkLinkCheck}
 	}
 	public static void cleanPopulation( Scenario scenario ) {
 		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
+		///  There is also a {@link PersonNetworkLinkCheck}
 	}
 }

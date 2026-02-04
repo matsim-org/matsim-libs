@@ -202,32 +202,36 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 			return context;
 		}
 
-		public void setContext(String context) {
+		public ContextParams setContext(String context) {
 			this.context = context;
+			return this;
 		}
 
 		public String getShp() {
 			return shp;
 		}
 
-		public void setShp(String shp) {
+		public ContextParams setShp(String shp) {
 			this.shp = shp;
+			return this;
 		}
 
 		public String getMapCenter() {
 			return mapCenter;
 		}
 
-		public void setMapCenter(String mapCenter) {
+		public ContextParams setMapCenter(String mapCenter) {
 			this.mapCenter = mapCenter;
+			return this;
 		}
 
 		public Double getMapZoomLevel() {
 			return mapZoomLevel;
 		}
 
-		public void setMapZoomLevel(Double mapZoomLevel) {
+		public ContextParams setMapZoomLevel(Double mapZoomLevel) {
 			this.mapZoomLevel = mapZoomLevel;
+			return this;
 		}
 	}
 
