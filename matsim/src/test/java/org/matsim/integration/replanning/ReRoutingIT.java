@@ -51,6 +51,7 @@ public class ReRoutingIT {
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
+		// (this is a local config!  It then recruits some files from the test scenarios.)
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
 		config.qsim().setTimeStepSize(10.0);
@@ -67,6 +68,9 @@ public class ReRoutingIT {
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+
+		config.global().setRelativeToleranceForSampleSizeFactors( 10. );
+		// (the config has flow cap 0.1 but storage cap 1.0.  I did not want to try if this is instrumental for the results.  kai, feb'26)
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
