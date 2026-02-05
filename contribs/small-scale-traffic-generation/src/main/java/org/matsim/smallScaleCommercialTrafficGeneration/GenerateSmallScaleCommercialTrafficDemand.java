@@ -978,20 +978,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				if (fixedNumberOfVehiclePerTypeAndLocation == 0)
 					fixedNumberOfVehiclePerTypeAndLocation = 1;
 				for (int i = 0; i < fixedNumberOfVehiclePerTypeAndLocation; i++) {
-					CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder
-						.newInstance(
-							Id.create(
-								thisCarrier.getId().toString() + "_"
-									+ (carrierCapabilities.getCarrierVehicles().size() + 1),
-								Vehicle.class),
-							Id.createLinkId(singleDepot), thisType)
-						.setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
+					CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(
+						Id.create(thisCarrier.getId().toString() + "_" + (carrierCapabilities.getCarrierVehicles().size() + 1), Vehicle.class),
+						Id.createLinkId(singleDepot), thisType).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
 					carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
-					if (!carrierCapabilities.getVehicleTypes().contains(thisType))
-						carrierCapabilities.getVehicleTypes().add(thisType);
+					if (!carrierCapabilities.getVehicleTypes().contains(thisType)) carrierCapabilities.getVehicleTypes().add(thisType);
 				}
 			}
-
 			thisCarrier.setCarrierCapabilities(carrierCapabilities);
 		}
 	}
