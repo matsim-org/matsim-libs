@@ -109,7 +109,7 @@ public class CommercialTrafficIT {
 		String carriersWOSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_noPlans.xml.gz";
 		String carriersWSolutionFileLocation = utils.getOutputDirectory() + "test.output_carriers_withPlans.xml.gz";
 		FreightCarriersConfigGroup freightCarriersConfigGroup = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
-		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_allVehicles.xml.gz");
+		freightCarriersConfigGroup.setCarriersVehicleTypesFile(utils.getOutputDirectory() + "test.output_vehicles.xml.gz");
 
 		freightCarriersConfigGroup.setCarriersFile(carriersWOSolutionFileLocation);
 		CarriersUtils.loadCarriersAccordingToFreightConfig(scenarioWOSolution);
