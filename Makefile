@@ -8,6 +8,7 @@ QUICK=-Dmaven.test.skip -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssemb
 hs: hybridsim
 
 hybridsim:
+	cd matsim-examples ; mvn clean install -DskipTests
 	cd matsim ; mvn clean install -DskipTests
 	cd contribs/protobuf  ; mvn clean eclipse:clean eclipse:eclipse install
 	cd contribs/hybridsim ; mvn clean eclipse:clean eclipse:eclipse install

@@ -116,6 +116,8 @@ public interface Communicator extends AutoCloseable {
 			bb.putInt(toRank);
 			bb.put(msgBytes);
 			send(toRank, msgData, 0, msgData.byteSize());
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
 		}
 	}
 

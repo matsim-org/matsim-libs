@@ -31,6 +31,8 @@
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
 		<param name="snapshotStyle" value="queue"/>
 		<param name="flowCapacityFactor" value="100.0"/>
+<!--		I do not know why the above is 100; setting the stor cap fact to the same value after intro of the scales consistency check-->
+		<param name="storageCapacityFactor" value="100.0"/>
 	</module>
 
 	<module name="controller">

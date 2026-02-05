@@ -111,7 +111,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * Path to the default scenario config, if applicable.
 	 */
 	@Nullable
-	private final String defaultScenario;
+	private final String configFilename;
 
 	/**
 	 * Contains loaded config file.
@@ -123,7 +123,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * Constructor for an application without a default scenario path.
 	 */
 	public MATSimApplication() {
-		defaultScenario = null;
+		configFilename = null;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * @param defaultConfigPath path to the default scenario config
 	 */
 	public MATSimApplication(@Nullable String defaultConfigPath) {
-		this.defaultScenario = defaultConfigPath;
+		this.configFilename = defaultConfigPath;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	public MATSimApplication(@Nullable Config config) {
 		this.config = config;
-		this.defaultScenario = "<config from code>";
+		this.configFilename = "<config from code>";
 	}
 
 	/**
@@ -220,8 +220,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	@Nullable
-	String getDefaultScenario() {
-		return defaultScenario;
+	String getConfigFilename() {
+		return configFilename;
 	}
 
 	/**
@@ -318,7 +318,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		if (obj instanceof Field field) {
 			// Make sure default config path is propagated to the field
 			if (field.getName().equals("configPath") && field.getDeclaringClass().equals(MATSimApplication.class)) {
-				return defaultScenario;
+				return configFilename;
 			}
 		}
 

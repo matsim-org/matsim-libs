@@ -21,10 +21,13 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.apache.commons.math3.util.Precision;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -95,9 +98,10 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	 * @param numberOfThreads -- {@link #NUMBER_OF_THREADS_CMT}
 	 */
 	@StringSetter( NUMBER_OF_THREADS )
-	public void setNumberOfThreads(final int numberOfThreads) {
+	public GlobalConfigGroup setNumberOfThreads(final int numberOfThreads) {
 		log.info("setting number of threads to: " + numberOfThreads ) ; // might not be so bad to do this everywhere?  benjamin/kai, oct'10
 		this.numberOfThreads = numberOfThreads;
+		return this;
 	}
 	// ---
 	private String coordinateSystem = "Atlantis" ;
@@ -108,8 +112,9 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this.coordinateSystem;
 	}
 	@StringSetter( COORDINATE_SYSTEM )
-	public void setCoordinateSystem(final String coordinateSystem) {
+	public GlobalConfigGroup setCoordinateSystem(final String coordinateSystem) {
 		this.coordinateSystem = coordinateSystem;
+		return this;
 	}
 	// ---
 	private boolean insistingOnDeprecatedConfigVersion = true ;
@@ -118,17 +123,47 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
 	public final boolean isInsistingOnDeprecatedConfigVersion() { return this.insistingOnDeprecatedConfigVersion ; }
 	@StringSetter( INSITING_ON_DEPRECATED_CONFIG_VERSION )
-	public final void setInsistingOnDeprecatedConfigVersion( boolean val ) {
+	public final GlobalConfigGroup setInsistingOnDeprecatedConfigVersion( boolean val ) {
 		this.insistingOnDeprecatedConfigVersion = val ;
+		return this;
 	}
-
+	// ---
     @StringGetter(DEFAULT_DELIMITER)
     public String getDefaultDelimiter() {
         return defaultDelimiter;
     }
-
     @StringSetter(DEFAULT_DELIMITER)
-    public void setDefaultDelimiter(String defaultDelimiter) {
+    public GlobalConfigGroup setDefaultDelimiter(String defaultDelimiter) {
         this.defaultDelimiter = defaultDelimiter;
+		return this;
     }
+	// ---
+	private double relativeToleranceForSampleSizeFactors = 0.;
+//	@StringSetter( "relativeScalesTolerance" )
+	public GlobalConfigGroup setRelativeToleranceForSampleSizeFactors( double val ) {
+		this.relativeToleranceForSampleSizeFactors = val;
+		return this;
+	}
+	public double getRelativeToleranceForSampleSizeFactor() {
+		return this.relativeToleranceForSampleSizeFactors + Double.MAX_VALUE; // makd this very slightly larger than zero
+	}
+	// ===
+	@Override protected void checkConsistency( Config config ){
+		super.checkConsistency( config );
+
+		// check the (available) scale factors:
+		final double flowCapFactor = config.qsim().getFlowCapFactor();
+		final double relativeTolerance = this.relativeToleranceForSampleSizeFactors;
+		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.qsim().getStorageCapFactor(), relativeTolerance ) ) {
+			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+										   + ". (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)  Relative tolerance can be set in the global config group." );
+		}
+		if ( config.counts().getCountsFileName()!=null && !config.counts().getCountsFileName().isEmpty() ){
+			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.counts().getCountsScaleFactor(), relativeTolerance ) ){
+				throw new RuntimeException(
+					"your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+				+ ". Relative tolerance can be set in the global config group.");
+			}
+		}
+	}
 }

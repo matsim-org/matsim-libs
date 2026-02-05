@@ -353,6 +353,12 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 	}
 
 	private static boolean checkScoringConfigGroup(Config config, Level lvl, boolean problem) {
+		// added jan'26
+		if ( config.scoring().getScoringParameters( null ) != null || config.scoring().getScoringParameters( ScoringConfigGroup.DEFAULT_SUBPOPULATION ) != null ) {
+			System.out.flush();
+			log.log( lvl, "you have values set for the default scoring fct; we should only set values for explicit subpopulations");
+		}
+
 		// use beta_brain=1 // added as of nov'12
 		if (config.scoring().getBrainExpBeta() != 1.) {
 			problem = true;
