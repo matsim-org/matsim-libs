@@ -69,7 +69,7 @@ public final class BicycleModule extends AbstractModule {
 
 		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
 		// (this computes the value of the per-link scoring event.  yyyy Very unfortunately, it is a re-implementation of the BicycleTravelDisutility (mentioned above).)
-
+		// Outcome of a discussion today: we can not avoid this, because BicycleTravelDisutility adds some randomness to the computation // DR20260205  
 
 //		here, different values for surface types and infrastructure factors can be defined.
 //		by default, the default values in BicycleParamsDefaultImpl are bound
@@ -97,9 +97,9 @@ public final class BicycleModule extends AbstractModule {
 				LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types. "
 						     + "Can't check the consistency of the maximum velocity in the bicycle vehicle type and the bicycle config group. "
 						     + "Should at least be approximately the same and randomization should be enabled.");
+				// Maybe we should throw an exception if no type is defined ?! // DR20260205
 			} else {
-
-				double mobsimSpeed = scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity();
+//				double mobsimSpeed = scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity();
 //				if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeedForRouting()) > 0.1) {
 //					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
 //							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
