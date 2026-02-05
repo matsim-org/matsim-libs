@@ -870,12 +870,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				continue;
 			// find a category for the tour stop with existing employees in this zone
 			String selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
-			while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-				selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 			for (int i = 0; i < numberOfJobs; i++) {
 				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
 				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
-
+				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+					selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow);
 			}
