@@ -20,7 +20,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Whether default dashboards are created.")
-	private Mode defaultDashboards = Mode.enabled;
+	private DefaultDashboardsMode defaultDashboards = DefaultDashboardsMode.enabled;
 
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
@@ -107,11 +107,11 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	}
 
-	public Mode getDefaultDashboards() {
+	public DefaultDashboardsMode getDefaultDashboards() {
 		return defaultDashboards;
 	}
 
-	public void setDefaultDashboards(Mode defaultDashboards) {
+	public void setDefaultDashboards( DefaultDashboardsMode defaultDashboards ) {
 		this.defaultDashboards = defaultDashboards;
 	}
 
@@ -150,7 +150,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * Mode how default dashboards are loaded.
 	 */
-	public enum Mode {
+	public enum DefaultDashboardsMode{
 		enabled,
 		disabled
 	}

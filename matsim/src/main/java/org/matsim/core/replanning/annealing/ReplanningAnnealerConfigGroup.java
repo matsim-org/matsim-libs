@@ -151,8 +151,9 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(START_VALUE)
-        public void setStartValue(Double startValue) {
+        public AnnealingVariable setStartValue(Double startValue) {
             this.startValue = startValue;
+			return this;
         }
 
         @StringGetter(END_VALUE)
@@ -161,8 +162,9 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(END_VALUE)
-        public void setEndValue(double endValue) {
+        public AnnealingVariable setEndValue(double endValue) {
             this.endValue = endValue;
+			return this;
         }
 
         @StringGetter(ANNEAL_TYPE)
@@ -171,12 +173,14 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(ANNEAL_TYPE)
-        public void setAnnealType(String annealType) {
+        public AnnealingVariable setAnnealType(String annealType) {
             this.annealType = AnnealOption.valueOf(annealType);
+			return this;
         }
 
-        public void setAnnealType(AnnealOption annealType) {
+        public AnnealingVariable setAnnealType(AnnealOption annealType) {
             this.annealType = annealType;
+			return this;
         }
 
         @StringGetter(SUBPOPULATION)
@@ -185,8 +189,9 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(SUBPOPULATION)
-        public void setDefaultSubpopulation(String defaultSubpop) {
+        public AnnealingVariable setDefaultSubpopulation(String defaultSubpop) {
             this.subpopulation = defaultSubpop;
+			return this;
         }
 
         @StringGetter(ANNEAL_PARAM)
@@ -195,12 +200,14 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(ANNEAL_PARAM)
-        public void setAnnealParameter(String annealParameter) {
+        public AnnealingVariable setAnnealParameter(String annealParameter) {
             this.annealParameter = AnnealParameterOption.valueOf(annealParameter);
+			return this;
         }
 
-        public void setAnnealParameter(AnnealParameterOption annealParameter) {
+        public AnnealingVariable setAnnealParameter(AnnealParameterOption annealParameter) {
             this.annealParameter = annealParameter;
+			return this;
         }
 
         @StringGetter(HALFLIFE)
@@ -209,8 +216,9 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(HALFLIFE)
-        public void setHalfLife(double halfLife) {
+        public AnnealingVariable setHalfLife(double halfLife) {
             this.halfLife = halfLife;
+			return this;
         }
 
         @StringGetter(SHAPE_FACTOR)
@@ -219,8 +227,9 @@ public class ReplanningAnnealerConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(SHAPE_FACTOR)
-        public void setShapeFactor(double shapeFactor) {
+        public AnnealingVariable setShapeFactor(double shapeFactor) {
             this.shapeFactor = shapeFactor;
+			return this;
         }
 
         @Override

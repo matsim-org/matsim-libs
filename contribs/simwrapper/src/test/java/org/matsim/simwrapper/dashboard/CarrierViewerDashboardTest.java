@@ -14,14 +14,12 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.controller.CarrierModule;
-import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
@@ -59,7 +57,7 @@ public class CarrierViewerDashboardTest {
 
 		// ## MATSim configuration:  ##
 		SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 		SimWrapper simWrapper = SimWrapper.create(config);
 		simWrapper.addDashboard(new CarrierDashboard());

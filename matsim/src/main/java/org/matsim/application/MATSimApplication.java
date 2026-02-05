@@ -153,7 +153,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull( configPath, "No default scenario location given" );
+			String path = Objects.requireNonNull( configPath, "No config given; use --config=<path-to-config.xml>" );
 			List<ConfigGroup> customModules = getCustomModules();
 
 			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
