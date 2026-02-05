@@ -927,7 +927,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow) {
 
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
-		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + rnd.nextInt(10000),
+		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
 
 		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId,0)
