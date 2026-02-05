@@ -875,8 +875,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
 				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
-				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window, so that late tours can handle it
-				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow);
+				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
+				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, numberOfJobs);
 			}
 		}
 	}
@@ -924,20 +924,17 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Adds a service with the given attributes to the carrier.
 	 */
 	private void createService(Carrier newCarrier, ArrayList<String> noPossibleLinks, String selectedStopCategory, String stopZone,
-							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow) {
-
+							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
 			CarrierService.class);
 
-		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId,0)
+		CarrierService thisService = CarrierService.Builder.newInstance(idNewService, linkId, 0)
 			.setServiceDuration(serviceTimePerStop)
 			.setServiceStartingTimeWindow(serviceTimeWindow)
 			.build();
 		CarriersUtils.addService(newCarrier, thisService);
 	}
-
-
 
 	/**
 	 * Creates the carrier and the related vehicles.
