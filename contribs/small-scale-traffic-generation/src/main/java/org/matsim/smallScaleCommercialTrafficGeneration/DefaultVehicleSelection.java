@@ -73,7 +73,7 @@ public class DefaultVehicleSelection implements VehicleSelection{
 				case "vehTyp3", "vehTyp4" ->
 					information.possibleVehicleTypes = new String[]{"light8t", "truck8t", "light8t_electro", "truck8t_electro"};
 				case "vehTyp5" ->
-					information.possibleVehicleTypes = new String[]{"medium18t", "medium18t_electro", "truck18t", "truck18t_electro", "heavy40t", "heavy40t_electro", "truck40t", "truck40t_electro"};
+					information.possibleVehicleTypes = new String[]{"medium18t", "medium18t_electro", "truck18t", "truck18t_electro"};
 			}
 		}
 
