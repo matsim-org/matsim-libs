@@ -79,7 +79,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 	private List<Long> tourDurationGroups;
 	@CommandLine.Option(names = "--number-of-jobs-groups", split = ",", description = "List of number of jobs groups for binning", defaultValue = "0,1,2,5,10,20")
 	private List<Long> numberOfJobsGroups;
-	@CommandLine.Option(names = "--activity-duration-groups", split = ",", description = "List of activity duration groups for binning", defaultValue = "0,10,20,30,40,50,60,75,90,105,120,150,180,240,300,420,540,660,780,900")
+	@CommandLine.Option(names = "--activity-duration-groups", split = ",", description = "List of activity duration groups for binning", defaultValue = "0,30,60,90,120,180,240,300,360,420,480,540,600,720,840")
 	private List<Long> activityDurationGroups;
 
 	static void main(String[] args) {
