@@ -276,7 +276,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		});
 		layout.row("veh-ActivityDurations-hist_total", "Activities").el(Plotly.class, (viz, data) -> {
 
-				viz.title = "ActivityDurations per vehicle (min)";
+				viz.title = "Activity Durations of the activities within the tours (min)";
 				viz.description = "Histogram of activity durations for the complete commercial traffic.";
 				viz.colorRamp = ColorScheme.Viridis;
 
@@ -293,7 +293,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 
-				viz.title = "ActivityDurations per vehicle (min)";
+				viz.title = "Activity Durations of the activities within the tours (min)";
 				viz.description = "Histogram of activity durations for the complete commercial traffic (given bins).";
 				viz.colorRamp = ColorScheme.Viridis;
 
@@ -311,7 +311,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			});
 		layout.row("veh-ActivityDurations-hist", "Activities").el(Plotly.class, (viz, data) -> {
 
-				viz.title = "ActivityDurations per vehicle (min)";
+				viz.title = "Activity Durations of the activities within the tours (min)";
 				viz.description = "Histogram of activity durations by group of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.showLegend(true)
@@ -335,7 +335,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 			})
 			.el(Plotly.class, (viz, data) -> {
 
-				viz.title = "ActivityDurations per vehicle (min)";
+				viz.title = "Activity Durations of the activities within the tours (min)";
 				viz.description = "Histogram of activity durations by group of subpopulation (given bins).";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.showLegend(true)
@@ -361,7 +361,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		layout.row("veh-ActivityDurations-box", "Activities").el(Plotly.class, (viz, data) -> {
 
-			viz.title = "ActivityDurations per activityType (min)";
+			viz.title = "Activity Durations of the activities within the tours (min)";
 			viz.description = "Boxplots per activityType, split by groups of subpopulation.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.showLegend(true)
@@ -385,7 +385,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 			layout.row("veh-ActivityDurations-violin", "Activities").el(Plotly.class, (viz, data) -> {
-				viz.title = "ActivityDurations per vehicle type (min) *" + group + "*";
+				viz.title = "Activity Durations of the activities within the tours (min) *" + group + "*";
 				viz.description = "Violin blot per vehicleType, split by groups of subpopulation.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.showLegend(false)
