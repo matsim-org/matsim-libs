@@ -27,6 +27,7 @@ import org.matsim.core.utils.misc.Counter;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 
@@ -155,6 +156,8 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 
 
 		Table baseTablePersons = generatePersonTableFromPopulation(basePopulation, baseConfig, null);
+		Table baseTableTrips = generateTripVTTSWithActivityDelay(basePopulation, baseConfig);
+		baseTableTrips.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-trips.csv");
 
 
 		baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-persons.csv");
@@ -384,6 +387,109 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 // Add the new column to the table
 		table.addColumns(travelDisutility_h);
 
+		return table;
+	}
+
+
+	@NotNull
+	Table generateTripVTTSWithActivityDelay(
+		Population population,
+		Config config) {
+
+		Table table = Table.create(
+			StringColumn.create(PERSON_ID),
+			IntColumn.create("tripIdx"),
+			StringColumn.create("mainMode"),
+			DoubleColumn.create("travelDisutility_h"),
+			DoubleColumn.create("activityDelayDisutility_h"),
+			DoubleColumn.create("mUTTS_[u/h]"),
+			DoubleColumn.create(UTL_OF_MONEY),
+			DoubleColumn.create("VTTS_[EUR/h]")
+		);
+
+		MainModeIdentifier mainModeIdentifier =
+			new DefaultAnalysisMainModeIdentifier();
+
+		PopulationFactory pf = population.getFactory();
+
+		for (Person person : population.getPersons().values()) {
+
+			final String personId = person.getId().toString();
+			final double uom = getMarginalUtilityOfMoney(person);
+
+			ScoringFunction sfNormal =
+				scoringFunctionFactory.createNewScoringFunction(person);
+			ScoringFunction sfEarly =
+				scoringFunctionFactory.createNewScoringFunction(person);
+
+			int tripIdx = 0;
+
+			List<TripStructureUtils.Trip> trips =
+				TripStructureUtils.getTrips(person.getSelectedPlan());
+
+			for (TripStructureUtils.Trip trip : trips) {
+
+				double travelDisutility = 0.0;
+
+				String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+
+				// --- travel disutility ---
+				for (Leg leg : trip.getLegsOnly()) {
+
+					ScoringParameterSet params =
+						config.scoring().getScoringParameters(
+							PopulationUtils.getSubpopulation(person));
+
+					ModeParams modeParams =
+						params.getModes().get(leg.getMode());
+
+					double tt_h = leg.getTravelTime().seconds() / 3600.0;
+					travelDisutility +=
+						tt_h * modeParams.getMarginalUtilityOfTraveling();
+				}
+
+				// --- activity delay disutility (destination activity) ---
+				Activity destAct = trip.getDestinationActivity();
+
+				double activityDelayDisutility = 0.0;
+
+				if (destAct.getStartTime().isDefined()
+					&& destAct.getEndTime().isDefined()) {
+
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore = sfEarly.getScore();
+
+					activityDelayDisutility =
+						computeMUSE_h(
+							destAct,
+							sfNormal,
+							pf,
+							sfEarly,
+							scoreNormalBefore,
+							scoreEarlyBefore);
+				}
+
+				double mUTTS_h =
+					(travelDisutility + activityDelayDisutility);
+
+				double vtts_eur_h =
+					uom > 0 ? mUTTS_h / uom : Double.NaN;
+
+				// ---- append row ----
+				table.stringColumn(PERSON_ID).append(personId);
+				table.intColumn("tripIdx").append(tripIdx);
+				table.stringColumn("mainMode").append(mainMode);
+				table.doubleColumn("travelDisutility_h").append(travelDisutility);
+				table.doubleColumn("activityDelayDisutility_h").append(activityDelayDisutility);
+				table.doubleColumn("mUTTS_[u/h]").append(mUTTS_h);
+				table.doubleColumn(UTL_OF_MONEY).append(uom);
+				table.doubleColumn("VTTS_[EUR/h]").append(vtts_eur_h);
+
+				tripIdx++;
+			}
+		}
+
+		formatTable(table, 2);
 		return table;
 	}
 
