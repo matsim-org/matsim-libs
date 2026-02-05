@@ -21,7 +21,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -64,7 +63,7 @@ import java.util.concurrent.atomic.AtomicReference;
 	abbreviateSynopsis = true,
 	subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
 )
-public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
+public abstract class MATSimApplication implements Callable<Integer> {
 
 	private static final Logger log = LogManager.getLogger(MATSimApplication.class);
 
@@ -108,31 +107,15 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	private List<String> remainingArgs;
 
 	/**
-	 * Path to the default scenario config, if applicable.
-	 */
-	@Nullable
-	private final String configFilename;
-
-	/**
 	 * Contains loaded config file.
 	 */
 	@Nullable
 	private Config config;
 
 	/**
-	 * Constructor for an application without a default scenario path.
+	 * Default constructor. Needs to be there, otherwise PicoCli cannot instantiate the class.
 	 */
 	public MATSimApplication() {
-		configFilename = null;
-	}
-
-	/**
-	 * Constructor
-	 *
-	 * @param defaultConfigPath path to the default scenario config
-	 */
-	public MATSimApplication(@Nullable String defaultConfigPath) {
-		this.configFilename = defaultConfigPath;
 	}
 
 	/**
@@ -140,7 +123,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	public MATSimApplication(@Nullable Config config) {
 		this.config = config;
-		this.configFilename = "<config from code>";
 	}
 
 	/**
@@ -153,7 +135,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull( configPath, "No default scenario location given" );
+			String path = Objects.requireNonNull(configPath, "No config path given. Set via --config command line parameter.");
 			List<ConfigGroup> customModules = getCustomModules();
 
 			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
@@ -217,11 +199,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 	String getConfigPath() {
 		return configPath;
-	}
-
-	@Nullable
-	String getConfigFilename() {
-		return configFilename;
 	}
 
 	/**
@@ -310,19 +287,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected final void addRunOption(Config config, String option) {
 		addRunOption(config, option, "");
-	}
-
-	@Override
-	public String defaultValue(CommandLine.Model.ArgSpec argSpec) throws Exception {
-		Object obj = argSpec.userObject();
-		if (obj instanceof Field field) {
-			// Make sure default config path is propagated to the field
-			if (field.getName().equals("configPath") && field.getDeclaringClass().equals(MATSimApplication.class)) {
-				return configFilename;
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -627,8 +591,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		if (header.length == 1) {
 			spec.usageMessage().header(COLOR + " " + header[0].trim() + "|@%n");
 		}
-
-		spec.defaultValueProvider(app);
 	}
 
 	/**
