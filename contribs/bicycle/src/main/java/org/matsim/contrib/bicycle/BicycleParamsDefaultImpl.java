@@ -22,6 +22,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 
 		if (surface == null) return 1.0;
 
+		// TODO concret vs concrete:lanes
 		return switch (surface) {
 			case "paved", "asphalt" -> 1.0;
 			case "concrete:lanes" -> .95;
@@ -54,6 +55,9 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 				case "primary", "primary_link" -> 0.1;
 				case "secondary", "secondary_link" -> 0.3;
 				case "tertiary", "tertiary_link" -> 0.4;
+//				case "primary", "primary_link" -> 0.00001;
+//				case "secondary", "secondary_link" -> 0.00001;
+//				case "tertiary", "tertiary_link" -> 0.00001;
 				case "unclassified" -> 0.9;
 				default -> 0.95;
 			};

@@ -51,9 +51,9 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
-		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
-		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
+		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype"); //TODO: update these comments, whats does it?
+		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype"); //TODO: update these comments, whats does it?
+		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient"); //TODO: update these comments, whats does it?
 		return map;
 	}
 	/**
