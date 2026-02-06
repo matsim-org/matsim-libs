@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Measurements.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.contrib.cadyts.measurement;
 
 import java.util.Comparator;
@@ -14,7 +33,7 @@ import org.matsim.counts.Count;
 
 public final class Measurements implements LookUpItemFromId<Measurement> {
 	private static final Logger log = LogManager.getLogger( Measurements.class );
-	
+
 	private final Map< Id<Measurement>,Measurement > map = new TreeMap<>() ;
 
 	private final SortedSet<Measurement> set = new TreeSet<>( new Comparator<Measurement>(){
@@ -29,18 +48,18 @@ public final class Measurements implements LookUpItemFromId<Measurement> {
 			}
 		}
 	} ) ;
-	
+
 	public void add( Count<Measurement> cnt, double lowerBound ) {
 		Measurement mea = new Measurement( cnt.getId(), lowerBound ) ;
 		map.put( mea.getId(), mea ) ;
 		set.add( mea ) ;
 	}
-	
-	@Override 
+
+	@Override
 	public Measurement getItem(Id<Measurement> id) {
 		return map.get( id ) ;
 	}
-	
+
 	Measurement getMeasurementFromTTimeInSeconds( double ttime ) {
 		return map.get(getMeasurementIdFromTTimeInSeconds(ttime)) ;
 	}
@@ -62,6 +81,6 @@ public final class Measurements implements LookUpItemFromId<Measurement> {
 		}
 		return prev.getId() ;
 	}
-	
+
 
 }
