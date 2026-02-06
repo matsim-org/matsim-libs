@@ -82,7 +82,7 @@ final class CreateSingleSimWrapperDashboard implements MATSimAppCommand {
 			}
 
 			//skip default dashboards
-			simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+			simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 			//add dashboard
 			switch (dashboardType) {

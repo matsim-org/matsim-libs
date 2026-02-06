@@ -135,7 +135,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull(configPath, "No config path given. Set via --config command line parameter.");
+			String path = Objects.requireNonNull( configPath, "No config given; use --config=<path-to-config.xml>" );
 			List<ConfigGroup> customModules = getCustomModules();
 
 			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
