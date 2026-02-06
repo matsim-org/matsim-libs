@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
@@ -60,7 +60,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 
     private final SBBTransitConfigGroup config;
     private final TransitConfigGroup ptConfig;
-    private final QSim qSim;
+    private final Netsim netsim;
     private final ReplanningContext context;
     private final TransitStopAgentTracker agentTracker;
     private final TransitSchedule schedule;
@@ -74,17 +74,17 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
     private boolean createLinkEvents = false;
 
     @Inject
-    SBBTransitQSimEngine(QSim qSim, ReplanningContext context, TransitStopAgentTracker agentTracker, TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
+    SBBTransitQSimEngine(Netsim netsim, ReplanningContext context, TransitStopAgentTracker agentTracker, TimeInterpretation timeInterpretation, TransitDriverAgentFactory networkDriverFactory) {
         // ( https://github.com/google/guice/wiki/KeepConstructorsHidden )
 
-        super(qSim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(qSim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
+        super(netsim, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(netsim.getScenario()), agentTracker, timeInterpretation, networkDriverFactory);
         // (it feels a bit odd to inject TransitStopHandlerFactory, but to put the simple version here as an argument.  kai, feb '25)
 
-        this.qSim = qSim;
+        this.netsim = netsim;
         this.context = context;
-        this.config = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
-        this.ptConfig = qSim.getScenario().getConfig().transit();
-        this.schedule = qSim.getScenario().getTransitSchedule();
+        this.config = ConfigUtils.addOrGetModule(netsim.getScenario().getConfig(), SBBTransitConfigGroup.GROUP_NAME, SBBTransitConfigGroup.class);
+        this.ptConfig = netsim.getScenario().getConfig().transit();
+        this.schedule = netsim.getScenario().getTransitSchedule();
         this.agentTracker = agentTracker;
         if (this.config.getCreateLinkEventsInterval() > 0) {
             this.linkEventQueue = new PriorityQueue<>();
@@ -151,8 +151,8 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			LinkEvent linkEvent = this.linkEventQueue.peek();
 			while (linkEvent != null && linkEvent.time <= time) {
 				this.linkEventQueue.poll();
-				this.qSim.getEventsManager().processEvent(new LinkLeaveEvent(time, linkEvent.vehicleId, linkEvent.fromLinkId));
-				this.qSim.getEventsManager().processEvent(new LinkEnterEvent(time, linkEvent.vehicleId, linkEvent.toLinkId));
+				this.netsim.getEventsManager().processEvent(new LinkLeaveEvent(time, linkEvent.vehicleId, linkEvent.fromLinkId));
+				this.netsim.getEventsManager().processEvent(new LinkEnterEvent(time, linkEvent.vehicleId, linkEvent.toLinkId));
 				linkEvent = this.linkEventQueue.peek();
 			}
 		}
@@ -167,13 +167,13 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	@Override
 	public void afterSim() {
 		// check that all agents have arrived, generate stuck events otherwise
-		double now = this.qSim.getSimTimer().getTimeOfDay();
+		double now = this.netsim.getSimTimer().getTimeOfDay();
 		for (Map.Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
+				this.netsim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
+				this.netsim.getAgentCounter().decLiving();
+				this.netsim.getAgentCounter().incLost();
 			}
 		}
 
@@ -182,15 +182,15 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 		while ((event = this.eventQueue.poll()) != null) {
 			Id<Link> nextStopLinkId = event.context.nextStop.getStopFacility().getLinkId();
 			for (PassengerAgent agent : event.context.driver.getVehicle().getPassengers()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), nextStopLinkId, agent.getMode()));
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
+				this.netsim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), nextStopLinkId, agent.getMode()));
+				this.netsim.getAgentCounter().decLiving();
+				this.netsim.getAgentCounter().incLost();
 			}
 		}
 	}
 
 	private void createVehiclesAndDrivers() {
-		Scenario scenario = this.qSim.getScenario();
+		Scenario scenario = this.netsim.getScenario();
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		Set<String> deterministicModes = this.config.getDeterministicServiceModes();
@@ -201,7 +201,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			throw new RuntimeException(
 				"There are modes configured to be pt passenger modes as well as deterministic service modes. This will not work! common modes = " + CollectionUtils.setToString(commonModes));
 		}
-		Set<String> mainModes = new HashSet<>(this.qSim.getScenario().getConfig().qsim().getMainModes());
+		Set<String> mainModes = new HashSet<>(this.netsim.getScenario().getConfig().qsim().getMainModes());
 		mainModes.retainAll(deterministicModes);
 		if (!mainModes.isEmpty()) {
 			throw new RuntimeException(
@@ -236,9 +236,9 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		if (!isDeterministic) {
 			Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
-			this.qSim.addParkedVehicle(qVeh, startLinkId);
+			this.netsim.addParkedVehicle(qVeh, startLinkId);
 		}
-		this.qSim.insertAgentIntoMobsim(driver);
+		this.netsim.insertAgentIntoMobsim(driver);
 	}
 
 	private Umlauf createUmlauf(TransitLine line, TransitRoute route, Departure departure) {
@@ -257,13 +257,13 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
 			log.error("pt-agent doesn't know to what transit stop to go to. Removing agent from simulation. Agent " + passenger.getId().toString());
-			this.qSim.getAgentCounter().decLiving();
-			this.qSim.getAgentCounter().incLost();
+			this.netsim.getAgentCounter().decLiving();
+			this.netsim.getAgentCounter().incLost();
 			return;
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			double now = this.qSim.getSimTimer().getTimeOfDay();
+			double now = this.netsim.getSimTimer().getTimeOfDay();
 			this.agentTracker.addAgentToStop(now, passenger, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(agent);
 		} else {
@@ -274,13 +274,13 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 	private void handleDeterministicDriverDeparture(MobsimAgent agent, double now) {
 		SBBTransitDriverAgent driver = (SBBTransitDriverAgent) agent;
 		TransitRoute trRoute = driver.getTransitRoute();
-		List<Link[]> links = this.createLinkEvents ? this.linksCache.computeIfAbsent(trRoute, r -> getLinksPerStopAlongRoute(r, this.qSim.getScenario().getNetwork())) : null;
+		List<Link[]> links = this.createLinkEvents ? this.linksCache.computeIfAbsent(trRoute, r -> getLinksPerStopAlongRoute(r, this.netsim.getScenario().getNetwork())) : null;
 		TransitContext context = new TransitContext(driver, links);
-		this.qSim.getEventsManager().processEvent(new PersonEntersVehicleEvent(now, driver.getId(), driver.getVehicle().getId()));
+		this.netsim.getEventsManager().processEvent(new PersonEntersVehicleEvent(now, driver.getId(), driver.getVehicle().getId()));
 		if (this.createLinkEvents) {
 			Id<Link> linkId = driver.getCurrentLinkId();
 			String mode = driver.getMode();
-			this.qSim.getEventsManager().processEvent(new VehicleEntersTrafficEvent(now, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
+			this.netsim.getEventsManager().processEvent(new VehicleEntersTrafficEvent(now, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
 		}
 		TransitEvent event = new TransitEvent(now, TransitEventType.ArrivalAtStop, context);
 		this.eventQueue.add(event);
@@ -344,9 +344,9 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			if (this.createLinkEvents) {
 				Id<Link> linkId = driver.getDestinationLinkId();
 				String mode = driver.getMode();
-				this.qSim.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(event.time, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
+				this.netsim.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(event.time, driver.getId(), linkId, driver.getVehicle().getId(), mode, 1.0));
 			}
-			this.qSim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(event.time, driver.getId(), driver.getVehicle().getId()));
+			this.netsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(event.time, driver.getId(), driver.getVehicle().getId()));
 			driver.endLegAndComputeNextState(event.time);
 			this.internalInterface.arrangeNextAgentState(driver);
 		}
@@ -374,8 +374,8 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 					double time = depTime + travelledLength * secondsPerMeter;
 					if (travelTime == 0) {
 						// create the events right now, so they stay in correct order before next arrival
-						this.qSim.getEventsManager().processEvent(new LinkLeaveEvent(time, vehicle.getId(), fromLink.getId()));
-						this.qSim.getEventsManager().processEvent(new LinkEnterEvent(time, vehicle.getId(), toLink.getId()));
+						this.netsim.getEventsManager().processEvent(new LinkLeaveEvent(time, vehicle.getId(), fromLink.getId()));
+						this.netsim.getEventsManager().processEvent(new LinkEnterEvent(time, vehicle.getId(), toLink.getId()));
 					} else {
 						this.linkEventQueue.add(new LinkEvent(time, fromLink.getId(), toLink.getId(), vehicle.getId()));
 					}
@@ -438,7 +438,7 @@ public class SBBTransitQSimEngine extends TransitQSimEngine /*implements Departu
 			}
 		}
 		// add any potential links after the last stop
-		result.add(links.toArray(new Link[links.size()]));
+		result.add(links.toArray(new Link[0]));
 		return result;
 	}
 
