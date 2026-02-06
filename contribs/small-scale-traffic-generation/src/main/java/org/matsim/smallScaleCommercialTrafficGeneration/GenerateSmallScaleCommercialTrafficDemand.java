@@ -183,7 +183,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Random rnd;
 	private RandomGenerator rng;
-	private final Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
+	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
 
@@ -420,8 +420,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param facilitiesPerZoneWithProbabilities 	Map with facilities per zone
 	 */
 	private void filterFacilitiesForZones(Scenario scenario,
-										  Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities) {
-		Map<String, Map<String, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
+										  Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities) {
+		Map<String, Map<StructuralAttribute, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
 
 		scenario.getActivityFacilities().getFacilities().values().forEach(facility -> {
 			Object zoneObj = facility.getAttributes().getAttribute("zone");
@@ -438,14 +438,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 			facility.getActivityOptions().values().forEach(opt -> {
 				String activityType = opt.getType();
-				pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent(activityType, t -> new ArrayList<>()).add(
+				// if the structural attribute is an employee, add the facility to employee and the detailed element
+				if (activityType.contains(StructuralAttribute.EMPLOYEE.getLabel()))
+					pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent(StructuralAttribute.EMPLOYEE, t -> new ArrayList<>()).add(
+						Pair.create(facility, weight));
+				pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent(StructuralAttribute.fromLabel(activityType).get(), t -> new ArrayList<>()).add(
 					Pair.create(facility, weight));
 			});
 		});
-
-		// Jetzt die Distributions bauen
 		pairsPerZone.forEach((zone, byType) -> {
-			Map<String, EnumeratedDistribution<ActivityFacility>> distByType = facilitiesPerZoneWithProbabilities.computeIfAbsent(zone, z -> new HashMap<>());
+			Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>> distByType = facilitiesPerZoneWithProbabilities.computeIfAbsent(zone, z -> new HashMap<>());
 
 			byType.forEach((activityType, pairs) -> {
 				if (!pairs.isEmpty()) {
@@ -864,26 +866,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @return the selected start category
 	 */
 	protected StructuralAttribute getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
-		Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd); //TODO hier vielleicht wkt einfügen, basieredn auf generation rate
-		StructuralAttribute selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
-		// Find a (random) start category with existing employees in this zone
+		// Find a start category with existing employees in this zone
+		StructuralAttribute selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
 		// Otherwise, we have to find another category.
 		for (int count = 1; resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) == 0; count++) {
-			if (count < odMatrixEntry.possibleStartCategories.size())
-				selectedStartCategory = odMatrixEntry.possibleStartCategories.get(count);
+			if (count < 4)
+				selectedStartCategory = odMatrixEntry.startCategoryDistribution.sample();
 			else {
 				// if no possible start category with employees is found, take a random category of the stop categories,
 				// the reason that no start category with employees is found is that traffic volume for employees in general is created,
 				// so that it is possible that we have traffic, although we have no employees in the given start category.
 				// That's why we exclude Inhabitants as a possible start category.
-				selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+				selectedStartCategory = odMatrixEntry.stopCategoryDistribution.sample();
 				if (selectedStartCategory.equals(StructuralAttribute.INHABITANTS))
-					selectedStartCategory = odMatrixEntry.possibleStopCategories.get(rnd.nextInt(odMatrixEntry.possibleStopCategories.size()));
+					selectedStartCategory = odMatrixEntry.stopCategoryDistribution.sample();
 				if (resultingDataPerZone.get(startZone).getDouble(selectedStartCategory) > 0)
 					log.warn(
 						"No possible start category with employees found for zone {}. Take a random category of the stop categories: {}. The possible start categories are: {}",
-						startZone, selectedStartCategory, odMatrixEntry.possibleStartCategories);
+						startZone, selectedStartCategory, odMatrixEntry.startCategoryDistribution.getPmf().toString());
 			}
 		}
 		return selectedStartCategory;
@@ -900,13 +901,13 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			int numberOfJobs = (int) Math.ceil(trafficVolumeForOD / carrierAttributes.odMatrixEntry.occupancyRate);
 			if (numberOfJobs == 0)
 				continue;
-			// find a category for the tour stop with existing employees in this zone
-			StructuralAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 			for (int i = 0; i < numberOfJobs; i++) {
+				// find a category for the tour stop with existing employees in this zone
+				StructuralAttribute selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
+				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
+					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
 				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
-				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
-					selectedStopCategory = carrierAttributes.odMatrixEntry.possibleStopCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry.possibleStopCategories.size()));
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, numberOfJobs);
 			}
@@ -921,20 +922,18 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param additionalTravelBufferPerIterationInMinutes Additional travel buffer per recalculation iteration for a carrier in minutes
 	 * @return The service time in seconds
 	 */
-	public Integer getServiceTimePerStop(Carrier carrier, CarrierAttributes carrierAttributes,
-										 int additionalTravelBufferPerIterationInMinutes) {
+	public Integer getServiceTimePerStop(Carrier carrier, CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
 		ServiceDurationPerCategoryKey key;
 		// we use the start category for the service time selection because the start category represents the employees
-		if (carrierAttributes.smallScaleCommercialTrafficType().equals(
-			SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
-			if (!carrierAttributes.odMatrixEntry().possibleStartCategories.contains(carrierAttributes.selectedStartCategory()))
-				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry().possibleStartCategories.get(rnd.nextInt(carrierAttributes.odMatrixEntry().possibleStartCategories.size())), null, carrierAttributes.smallScaleCommercialTrafficType());
+		if (carrierAttributes.smallScaleCommercialTrafficType().equals(SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
+			if (carrierAttributes.odMatrixEntry().startCategoryDistribution.getPmf().stream()
+				.noneMatch(p -> p.getKey().equals(carrierAttributes.selectedStartCategory())))
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.odMatrixEntry.startCategoryDistribution.sample(), null, carrierAttributes.smallScaleCommercialTrafficType());
 			else
-				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(), null,
+				key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory, null,
 					carrierAttributes.smallScaleCommercialTrafficType());
 		}
-		else if (carrierAttributes.smallScaleCommercialTrafficType().equals(
-			SmallScaleCommercialTrafficType.goodsTraffic)) {
+		else if (carrierAttributes.smallScaleCommercialTrafficType().equals(SmallScaleCommercialTrafficType.goodsTraffic)) {
 			key = GenerateSmallScaleCommercialTrafficDemand.makeServiceDurationPerCategoryKey(carrierAttributes.selectedStartCategory(),
 				carrierAttributes.modeORvehType(), carrierAttributes.smallScaleCommercialTrafficType());
 		} else {
@@ -955,7 +954,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Adds a service with the given attributes to the carrier.
 	 */
-	private void createService(Carrier newCarrier, ArrayList<String> noPossibleLinks, String selectedStopCategory, String stopZone,
+	private void createService(Carrier newCarrier, ArrayList<String> noPossibleLinks, StructuralAttribute selectedStopCategory, String stopZone,
 							   Integer serviceTimePerStop, TimeWindow serviceTimeWindow, int i) {
 		Id<Link> linkId = findPossibleLink(stopZone, selectedStopCategory, noPossibleLinks);
 		Id<CarrierService> idNewService = Id.create(newCarrier.getId().toString() + "_" + linkId + "_" + (i + 1),
@@ -995,7 +994,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriers.addCarrier(thisCarrier);
 
 		while (carrierAttributes.vehicleDepots.size() < numberOfDepots) {
-			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory.getLabel(), null); //TODO hier die Wkt für die Auswahl anpassen
+			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null); //TODO hier die Wkt für die Auswahl anpassen
 			carrierAttributes.vehicleDepots.add(linkId.toString());
 		}
 
@@ -1024,7 +1023,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds a possible link for a service or the vehicle location.
 	 */
-	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks) {
+	private Id<Link> findPossibleLink(String zone, StructuralAttribute selectedCategory, List<String> noPossibleLinks) {
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory).getPmf().size() * 2; a++) {
 
@@ -1038,7 +1037,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				centroidPointOfBuildingPolygon, numberOfPossibleLinks);
 		}
 		if (newLink == null)
-			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
+			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory.getLabel() + "' in zone '"
 				+ zone + "' found. buildings in category: " + facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory)
 				+ "; possibleLinks in zone: " + linksPerZone.get(zone).size());
 		return newLink;
@@ -1048,7 +1047,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-																Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
+																Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 																String shapeFileZoneNameColumn) {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -1080,7 +1079,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> linksPerZone,
 															Index shpZones,
-															Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
+															Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 															String shapeFileZoneNameColumn) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute(shapeFileZoneNameColumn);

@@ -56,7 +56,7 @@ public class SmallScaleCommercialTrafficUtilsTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
+		Map<String, Map<SmallScaleCommercialTrafficUtils.StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 		String shapeFileZoneNameColumn = "name";
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand.filterLinksForZones(scenario,
