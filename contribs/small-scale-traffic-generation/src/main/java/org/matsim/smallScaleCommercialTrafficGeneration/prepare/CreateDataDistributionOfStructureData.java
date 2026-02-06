@@ -184,7 +184,7 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	private void addShareOfAreaOfBuildingToAttributes(String zone, StructuralAttribute assignedDataType, SimpleFeature singleBuilding, ActivityFacility facility) {
 		String[] buildingTypes = ((String) singleBuilding.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 		// calculates the area of one raw building type
-		int calculatedAreaPerOSMBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes);
+		double calculatedAreaPerOSMBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes);
 
 		// counts the number of raw building types for this assignedDataType
 		int numberOfBuildingCategoriesInThisDataType;
@@ -201,17 +201,14 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 				buildingType -> landuseCategoriesAndDataConnection.get(assignedDataType).contains(buildingType)).toArray().length;
 
 		// calculates the area of this assignedDataType
-		int areaForLanduseCategoriesOfThisDataType = calculatedAreaPerOSMBuildingCategory * numberOfBuildingCategoriesInThisDataType;
+		double areaForLanduseCategoriesOfThisDataType = calculatedAreaPerOSMBuildingCategory * numberOfBuildingCategoriesInThisDataType;
 
 		// if a building is commercial and the assignedDataType contains commercial buildings, the area of the commercial part is halved, because the commercial type is represented in two data types
-		int calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType;
+		double calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType;
 		if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE) && landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(
 			buildingTypes).contains("commercial"))
 			calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType - calculatedAreaPerOSMBuildingCategory / 2;
-		double shareOfTheBuildingAreaOfTheRelatedAreaOfTheZone = getShareOfTheBuildingAreaOfTheRelatedAreaOfTheZone(zone,
-			calculatedAreaPerBuildingCategory, assignedDataType);
-		facility.getAttributes().putAttribute("shareOfZone_" + assignedDataType.getLabel(),
-			shareOfTheBuildingAreaOfTheRelatedAreaOfTheZone);
+		facility.getAttributes().putAttribute("areaPerBuildingCategory", calculatedAreaPerBuildingCategory);
 		facility.getAttributes().putAttribute("zone", zone);
 	}
 }

@@ -222,7 +222,7 @@ public class LanduseBuildingAnalysis {
 						for (SimpleFeature building : buildingsPerZone.get(zone).get(category)) {
 							String[] buildingTypes = ((String) building.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 							for (String singleCategoryOfBuilding : buildingTypes) {
-								int area = calculateAreaPerBuildingCategory(building, buildingTypes);
+								double area = calculateAreaPerBuildingCategory(building, buildingTypes);
 								if (landuseCategoriesPerZone.get(zone) != null)
 									landuseCategoriesPerZone.get(zone).mergeDouble(singleCategoryOfBuilding, area,
 										Double::sum);
@@ -259,7 +259,7 @@ public class LanduseBuildingAnalysis {
 	 * @param buildingTypes the types of the building
 	 * @return the area of the building for each category
 	 */
-	public static int calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
+	public static double calculateAreaPerBuildingCategory(SimpleFeature building, String[] buildingTypes) {
 		double buildingLevels;
 		double buildingLevelsPerType;
 		if (building.getAttribute("levels") == null || String.valueOf(building.getAttribute("levels")).isEmpty())
@@ -281,8 +281,7 @@ public class LanduseBuildingAnalysis {
 			groundArea = (int) (long) building.getAttribute("area");
 		else
 			groundArea = ((Geometry) building.getDefaultGeometry()).getArea();
-		double area = groundArea * buildingLevelsPerType;
-		return (int) Math.round(area);
+		return groundArea * buildingLevelsPerType;
 	}
 
 	/**

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
+import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,11 +32,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,7 +56,7 @@ public class SmallScaleCommercialTrafficUtilsTest {
 		config.network().setInputFile(networkPath);
 		config.network().setInputCRS("EPSG:4326");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
+		Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 		String shapeFileZoneNameColumn = "name";
 
 		Map<String, Map<Id<Link>, Link>> regionLinksMap = GenerateSmallScaleCommercialTrafficDemand.filterLinksForZones(scenario,

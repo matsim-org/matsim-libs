@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.apache.commons.math3.util.Pair;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -182,7 +183,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Random rnd;
 	private RandomGenerator rng;
-	private final Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
+	private final Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
 
@@ -309,7 +310,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
-				filterFacilitiesForZones(scenario, facilitiesPerZone);
+				filterFacilitiesForZones(scenario, facilitiesPerZoneWithProbabilities);
 
 				switch (usedSmallScaleCommercialTrafficType) {
 					case commercialPersonTraffic, goodsTraffic -> createCarriersAndDemand(output, scenario,
@@ -416,13 +417,42 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates a map with the different facility types per building.
 	 * @param scenario 				complete Scenario
-	 * @param facilitiesPerZone 	Map with facilities per zone
+	 * @param facilitiesPerZoneWithProbabilities 	Map with facilities per zone
 	 */
-	private void filterFacilitiesForZones(Scenario scenario, Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone) {
-		scenario.getActivityFacilities().getFacilities().values().forEach((activityFacility -> {
-			activityFacility.getActivityOptions().values().forEach(activityOption -> facilitiesPerZone.computeIfAbsent((String) activityFacility.getAttributes().getAttribute("zone"), k -> new HashMap<>())
-				.computeIfAbsent(activityOption.getType(), k -> new ArrayList<>()).add(activityFacility));
-		}));
+	private void filterFacilitiesForZones(Scenario scenario,
+										  Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities) {
+		Map<String, Map<String, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
+
+		scenario.getActivityFacilities().getFacilities().values().forEach(facility -> {
+			Object zoneObj = facility.getAttributes().getAttribute("zone");
+			if (!(zoneObj instanceof String zone) || zone.isBlank())
+				return;
+
+			Object wObj = facility.getAttributes().getAttribute("areaPerBuildingCategory");
+			if (!(wObj instanceof Number wNum))
+				throw new RuntimeException("The attribute 'areaPerBuildingCategory' is expected to be set for each facility and to be a number. Facility: " + facility.getId());
+
+			double weight = wNum.doubleValue();
+			if (!(weight > 0.0) || Double.isInfinite(weight))
+				return;
+
+			facility.getActivityOptions().values().forEach(opt -> {
+				String activityType = opt.getType();
+				pairsPerZone.computeIfAbsent(zone, z -> new HashMap<>()).computeIfAbsent(activityType, t -> new ArrayList<>()).add(
+					Pair.create(facility, weight));
+			});
+		});
+
+		// Jetzt die Distributions bauen
+		pairsPerZone.forEach((zone, byType) -> {
+			Map<String, EnumeratedDistribution<ActivityFacility>> distByType = facilitiesPerZoneWithProbabilities.computeIfAbsent(zone, z -> new HashMap<>());
+
+			byType.forEach((activityType, pairs) -> {
+				if (!pairs.isEmpty()) {
+					distByType.put(activityType, new EnumeratedDistribution<>(rng, pairs));
+				}
+			});
+		});
 	}
 
 	/**
@@ -626,9 +656,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 
 		prepareConfigForResultingModes(scenario);
-		NetworkUtils.cleanNetwork(scenario.getNetwork(), (Set<String>) scenario.getConfig().qsim().getMainModes());
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), scenario.getConfig().qsim().getMainModes());
 		if (linksPerZone == null)
-			linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
+			linksPerZone = filterLinksForZones(scenario, this.indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
 
 		odMatrix = createTripDistribution(trafficVolumePerTypeAndZone_start,
 			trafficVolumePerTypeAndZone_stop, smallScaleCommercialTrafficType, scenario, output);
@@ -833,8 +863,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * @param odMatrixEntry odMatrixEntry
 	 * @return the selected start category
 	 */
-		Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd);
 	protected StructuralAttribute getSelectedStartCategory(String startZone, VehicleSelection.OdMatrixEntryInformation odMatrixEntry) {
+		Collections.shuffle(odMatrixEntry.possibleStartCategories, rnd); //TODO hier vielleicht wkt einfügen, basieredn auf generation rate
 		StructuralAttribute selectedStartCategory = odMatrixEntry.possibleStartCategories.getFirst();
 		// Find a (random) start category with existing employees in this zone
 		// we start with count = 1 because the first category is already selected, and if this category has employees, we can use it.
@@ -996,10 +1026,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private Id<Link> findPossibleLink(String zone, String selectedCategory, List<String> noPossibleLinks) {
 		Id<Link> newLink = null;
-		for (int a = 0; newLink == null && a < facilitiesPerZone.get(zone).get(selectedCategory).size() * 2; a++) {
+		for (int a = 0; newLink == null && a < facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory).getPmf().size() * 2; a++) {
 
-			ActivityFacility possibleBuilding = facilitiesPerZone.get(zone).get(selectedCategory)
-				.get(rnd.nextInt(facilitiesPerZone.get(zone).get(selectedCategory).size())); //TODO Wkt für die Auswahl anpassen
+			ActivityFacility possibleBuilding = facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory).sample();
 			Coord centroidPointOfBuildingPolygon = possibleBuilding.getCoord();
 
 			int numberOfPossibleLinks = linksPerZone.get(zone).size();
@@ -1010,7 +1039,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		}
 		if (newLink == null)
 			throw new RuntimeException("No possible link for buildings with type '" + selectedCategory + "' in zone '"
-				+ zone + "' found. buildings in category: " + facilitiesPerZone.get(zone).get(selectedCategory)
+				+ zone + "' found. buildings in category: " + facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory)
 				+ "; possibleLinks in zone: " + linksPerZone.get(zone).size());
 		return newLink;
 	}
@@ -1019,7 +1048,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Filters links by used mode "car" and creates Map with all links in each zone
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
-																Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
+																Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 																String shapeFileZoneNameColumn) {
 		Map<String, Map<Id<Link>, Link>> linksPerZone = new HashMap<>();
 		log.info("Filtering and assign links to zones. This take some time...");
@@ -1041,7 +1070,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())
 			.put(l.getId(), l));
 		if (linksPerZone.size() != indexZones.size())
-			findNearestLinkForZonesWithoutLinks(filteredNetwork, linksPerZone, indexZones, facilitiesPerZone, shapeFileZoneNameColumn);
+			findNearestLinkForZonesWithoutLinks(filteredNetwork, linksPerZone, indexZones, facilitiesPerZoneWithProbabilities, shapeFileZoneNameColumn);
 
 		return linksPerZone;
 	}
@@ -1051,14 +1080,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private static void findNearestLinkForZonesWithoutLinks(Network networkToChange, Map<String, Map<Id<Link>, Link>> linksPerZone,
 															Index shpZones,
-															Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone,
+															Map<String, Map<String, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
 															String shapeFileZoneNameColumn) {
 		for (SimpleFeature singleArea : shpZones.getAllFeatures()) {
 			String zoneID = (String) singleArea.getAttribute(shapeFileZoneNameColumn);
-			if (!linksPerZone.containsKey(zoneID) && facilitiesPerZone.get(zoneID) != null) {
-				for (List<ActivityFacility> buildingList : facilitiesPerZone.get(zoneID).values()) {
-					for (ActivityFacility building : buildingList) {
-						Link l = NetworkUtils.getNearestLinkExactly(networkToChange, building.getCoord());
+			if (!linksPerZone.containsKey(zoneID) && facilitiesPerZoneWithProbabilities.get(zoneID) != null) {
+				for (EnumeratedDistribution<ActivityFacility> buildingPairsList : facilitiesPerZoneWithProbabilities.get(zoneID).values()) {
+					for (Pair<ActivityFacility, Double> buildingPair : buildingPairsList.getPmf()) {
+						Link l = NetworkUtils.getNearestLinkExactly(networkToChange, buildingPair.getKey().getCoord());
 						assert l != null;
 						linksPerZone
 							.computeIfAbsent(zoneID, (k) -> new HashMap<>())
@@ -1126,6 +1155,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	public int getAdditionalTravelBufferPerIterationInMinutes(){
 		return additionalTravelBufferPerIterationInMinutes;
+	}
+	public double getFactorForNumberOfVehicles(){
+		return factorForNumberOfVehicles;
 	}
 	public record ServiceDurationPerCategoryKey(StructuralAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {}
 
