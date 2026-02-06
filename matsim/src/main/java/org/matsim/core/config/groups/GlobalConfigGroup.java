@@ -138,14 +138,16 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this;
     }
 	// ---
+	private static final String RELATIVE_TOLERANCE_FOR_SAMPLE_SIZE_FACTORS = "relativeToleranceForSampleSizeFactors";
 	private double relativeToleranceForSampleSizeFactors = 0.;
-//	@StringSetter( "relativeScalesTolerance" )
+	@StringSetter( RELATIVE_TOLERANCE_FOR_SAMPLE_SIZE_FACTORS )
 	public GlobalConfigGroup setRelativeToleranceForSampleSizeFactors( double val ) {
 		this.relativeToleranceForSampleSizeFactors = val;
 		return this;
 	}
-	public double getRelativeToleranceForSampleSizeFactor() {
-		return this.relativeToleranceForSampleSizeFactors + Double.MAX_VALUE; // makd this very slightly larger than zero
+	@StringGetter( RELATIVE_TOLERANCE_FOR_SAMPLE_SIZE_FACTORS )
+	public double getRelativeToleranceForSampleSizeFactors() {
+		return this.relativeToleranceForSampleSizeFactors;
 	}
 	// ===
 	@Override protected void checkConsistency( Config config ){
@@ -155,15 +157,21 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		final double flowCapFactor = config.qsim().getFlowCapFactor();
 		final double relativeTolerance = this.relativeToleranceForSampleSizeFactors;
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.qsim().getStorageCapFactor(), relativeTolerance ) ) {
-			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
-										   + ". (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)  Relative tolerance can be set in the global config group." );
+			logScaleFactorWarning("storageCapFactor", config.qsim().getStorageCapFactor(), flowCapFactor, relativeTolerance,
+					" (The old approach of setting the stor cap fact larger than the flow cap fact is no longer needed since the qsim became a lot more deterministic.)");
 		}
 		if ( config.counts().getCountsFileName()!=null && !config.counts().getCountsFileName().isEmpty() ){
 			if( !Precision.equalsWithRelativeTolerance( flowCapFactor, config.counts().getCountsScaleFactor(), relativeTolerance ) ){
-				throw new RuntimeException(
-					"your countsScaleFactor=" + config.counts().getCountsScaleFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
-				+ ". Relative tolerance can be set in the global config group.");
+				logScaleFactorWarning("countsScaleFactor", config.counts().getCountsScaleFactor(), flowCapFactor, relativeTolerance, "");
 			}
 		}
+	}
+
+	public static void logScaleFactorWarning(String factorName, double factorValue, double flowCapFactor, double relativeTolerance, String additionalInfo) {
+		String separator = "=".repeat(80);
+		log.warn(separator);
+		log.warn("WARNING: your {}={} is more than the relativeTolerance={} different from the flowCapFactor={}.{} Relative tolerance can be set in the global config group.",
+				factorName, factorValue, relativeTolerance, flowCapFactor, additionalInfo);
+		log.warn(separator);
 	}
 }
