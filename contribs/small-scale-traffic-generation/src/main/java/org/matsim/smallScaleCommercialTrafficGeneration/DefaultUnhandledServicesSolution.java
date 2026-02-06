@@ -72,7 +72,7 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 					modeORvehType, smallScaleCommercialTrafficType);
 				String startZone = carrier.getAttributes().getAttribute("tourStartArea") == null ? "" : carrier.getAttributes().getAttribute(
 					"tourStartArea").toString();
-				String selectedStartCategory = generator.getSelectedStartCategory(startZone, odMatrixEntry);
+				SmallScaleCommercialTrafficUtils.StructuralAttribute selectedStartCategory = generator.getSelectedStartCategory(startZone, odMatrixEntry);
 				GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes carrierAttributes = new GenerateSmallScaleCommercialTrafficDemand.CarrierAttributes(
 					purpose, startZone, selectedStartCategory, modeORvehType,
 					smallScaleCommercialTrafficType, null, odMatrixEntry);

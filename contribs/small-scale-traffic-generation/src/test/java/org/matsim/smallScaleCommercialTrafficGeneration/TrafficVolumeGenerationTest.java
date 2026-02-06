@@ -33,6 +33,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarrierCapabilities.FleetSize;
 import org.matsim.freight.carriers.CarriersUtils;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseBuildingAnalysis;
 import org.matsim.smallScaleCommercialTrafficGeneration.prepare.LanduseDataConnectionCreator;
@@ -56,7 +57,7 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationCommercialPersonTraffic() throws IOException {
 
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -66,9 +67,9 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
@@ -187,7 +188,7 @@ public class TrafficVolumeGenerationTest {
 	@Test
 	void testTrafficVolumeGenerationGoodsTraffic() throws IOException {
 
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -197,9 +198,9 @@ public class TrafficVolumeGenerationTest {
 		String shapeFileBuildingTypeColumn = "type";
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
@@ -497,7 +498,7 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_goods() throws Exception {
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -511,7 +512,7 @@ public class TrafficVolumeGenerationTest {
 		Path pathToInvestigationAreaData = Path.of(utils.getPackageInputDirectory()).resolve("investigationAreaData.csv");
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
@@ -526,7 +527,7 @@ public class TrafficVolumeGenerationTest {
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 		Map<String, Map<String, List<ActivityFacility>>> facilitiesPerZone = new HashMap<>();
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),
@@ -659,7 +660,7 @@ public class TrafficVolumeGenerationTest {
 
 	@Test
 	void testReducingDemandAfterAddingExistingScenarios_commercialPersonTraffic() throws Exception {
-		Map<String, Map<String, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
+		Map<String, Map<StructuralAttribute, List<SimpleFeature>>> buildingsPerZone = new HashMap<>();
 
 		Path outputDataDistributionFile = Path.of(utils.getOutputDirectory()).resolve("dataDistributionPerZone.csv");
 		assert(new File(outputDataDistributionFile.getParent().resolve("calculatedData").toString()).mkdir());
@@ -683,11 +684,11 @@ public class TrafficVolumeGenerationTest {
 		TrafficVolumeGeneration.setInputParameters(usedTrafficType);
 
 		LanduseDataConnectionCreator landuseDataConnectionCreator = new LanduseDataConnectionCreatorForOSM_Data();
-		Map<String, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
+		Map<StructuralAttribute, List<String>> landuseCategoriesAndDataConnection = landuseDataConnectionCreator.createLanduseDataConnection();
 
 		IntegrateExistingTrafficToSmallScaleCommercial integratedExistingModels = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = LanduseBuildingAnalysis
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = LanduseBuildingAnalysis
 				.createInputDataDistribution(outputDataDistributionFile, landuseCategoriesAndDataConnection,
 					usedLanduseConfiguration,
 					SCTUtils.getIndexLanduse(inputDataDirectory), SCTUtils.getZoneIndex(inputDataDirectory), SCTUtils.getIndexBuildings(inputDataDirectory),

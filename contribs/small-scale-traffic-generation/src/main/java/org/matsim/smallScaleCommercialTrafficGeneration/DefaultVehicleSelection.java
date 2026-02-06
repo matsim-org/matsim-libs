@@ -1,20 +1,22 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultVehicleSelection implements VehicleSelection{
 	@Override
-	public List<String> getAllCategories() {
-		ArrayList<String> categories = new ArrayList<>(7);
-		categories.add("Employee Primary Sector");
-		categories.add("Employee Construction");
-		categories.add("Employee Secondary Sector Rest");
-		categories.add("Employee Retail");
-		categories.add("Employee Traffic/Parcels");
-		categories.add("Employee Tertiary Sector Rest");
-		categories.add("Inhabitants");
-		return categories;
+	public List<StructuralAttribute> getAllCategories() {
+		return List.of(
+			StructuralAttribute.EMPLOYEE_PRIMARY,
+			StructuralAttribute.EMPLOYEE_CONSTRUCTION,
+			StructuralAttribute.EMPLOYEE_SECONDARY,
+			StructuralAttribute.EMPLOYEE_RETAIL,
+			StructuralAttribute.EMPLOYEE_TRAFFIC,
+			StructuralAttribute.EMPLOYEE_TERTIARY,
+			StructuralAttribute.INHABITANTS
+		);
 	}
 
 
@@ -31,36 +33,36 @@ public class DefaultVehicleSelection implements VehicleSelection{
 				information.possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
 				information.occupancyRate = 1.5;
 			}
-			information.possibleStartCategories.add("Employee Secondary Sector Rest");
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_SECONDARY);
 			information.possibleStopCategories.clear();
-			information.possibleStopCategories.add("Employee Secondary Sector Rest");
+			information.possibleStopCategories.add(StructuralAttribute.EMPLOYEE_SECONDARY);
 		} else if (purpose == 2) {
 			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"vwCaddy", "e_SpaceTourer"};
 				information.occupancyRate = 1.6;
 			}
-			information.possibleStartCategories.add("Employee Secondary Sector Rest");
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_SECONDARY);
 		} else if (purpose == 3) {
 			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
 				information.occupancyRate = 1.2;
 			}
-			information.possibleStartCategories.add("Employee Retail");
-			information.possibleStartCategories.add("Employee Tertiary Sector Rest");
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_RETAIL);
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_TERTIARY);
 		} else if (purpose == 4) {
 			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"golf1.4", "c_zero"};
 				information.occupancyRate = 1.2;
 			}
-			information.possibleStartCategories.add("Employee Traffic/Parcels");
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_TRAFFIC);
 		} else if (purpose == 5) {
 			if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
 				information.possibleVehicleTypes = new String[]{"mercedes313", "e_SpaceTourer"};
 				information.occupancyRate = 1.7;
 			}
-			information.possibleStartCategories.add("Employee Construction");
+			information.possibleStartCategories.add(StructuralAttribute.EMPLOYEE_CONSTRUCTION);
 		} else if (purpose == 6) {
-			information.possibleStartCategories.add("Inhabitants");
+			information.possibleStartCategories.add(StructuralAttribute.INHABITANTS);
 		}
 
 		if (smallScaleCommercialTrafficType.equals(GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType.goodsTraffic)) {

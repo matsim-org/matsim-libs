@@ -1,5 +1,7 @@
 package org.matsim.smallScaleCommercialTrafficGeneration;
 
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
+
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -12,14 +14,14 @@ public interface VehicleSelection{
 	class OdMatrixEntryInformation {
 		double occupancyRate;
 		String[] possibleVehicleTypes;
-		List<String> possibleStartCategories = new ArrayList<>();
-		List<String> possibleStopCategories = new ArrayList<>();
+		List<StructuralAttribute> possibleStartCategories = new ArrayList<>();
+		List<StructuralAttribute> possibleStopCategories = new ArrayList<>();
 	}
 
 	/**
 	 * @return all possible stop/start-categories.
 	 */
-	List<String> getAllCategories();
+	List<StructuralAttribute> getAllCategories();
 
 	/**
 	 * @param purpose entry from {@link TripDistributionMatrix#getListOfPurposes()}
