@@ -76,6 +76,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		}
 	}
 
+	// is this the on-street cycleway?
 	private static void setCycleWay(Link link, Map<String, String> tags) {
 		if (tags.containsKey(OsmTags.CYCLEWAY))
 			link.getAttributes().putAttribute(OsmTags.CYCLEWAY, tags.get(OsmTags.CYCLEWAY));
