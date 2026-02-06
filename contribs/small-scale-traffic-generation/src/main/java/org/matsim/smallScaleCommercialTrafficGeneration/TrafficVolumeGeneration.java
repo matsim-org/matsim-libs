@@ -138,13 +138,19 @@ public class TrafficVolumeGeneration {
 						trafficValuesPerPurpose.merge(purpose, 0., Double::sum);
 					else
 						for (String category : resultingDataPerZone.get(zoneId).keySet()) {
+							if (!generationRates.get(purpose).containsKey(category))
+								continue;
 							double commitmentFactor;
 							if (modeORvehType.equals("total"))
 								commitmentFactor = 1;
-							else
-								commitmentFactor = commitmentRates
+							else {
+								if (!commitmentRates.get(purpose + "_" + modeORvehType.substring(modeORvehType.length() - 1)).containsKey(category))
+									commitmentFactor = 0;
+								else
+									commitmentFactor = commitmentRates
 										.get(purpose + "_" + modeORvehType.substring(modeORvehType.length() - 1))
 										.get(category);
+							}
 							double generationFactor = generationRates.get(purpose).get(category);
 							double newValue = resultingDataPerZone.get(zoneId).getDouble(category) * generationFactor
 									* commitmentFactor;
