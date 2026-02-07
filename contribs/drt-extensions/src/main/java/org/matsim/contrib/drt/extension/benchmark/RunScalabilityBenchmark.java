@@ -2,12 +2,14 @@
  * project: org.matsim.*
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.benchmark;
+package org.matsim.contrib.drt.extension.benchmark;
 
+import org.matsim.contrib.drt.extension.benchmark.scenario.SyntheticBenchmarkScenario;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.DrtSpatialRequestFleetFilterParams;
+import org.matsim.contrib.drt.extension.insertion.spatialFilter.SpatialFilterInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.DrtParallelInserterParams;
 import org.matsim.contrib.drt.optimizer.insertion.parallel.ParallelRequestInserterModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.benchmark.scenario.SyntheticBenchmarkScenario;
 import org.matsim.core.controler.Controler;
 
 import java.nio.file.Path;
@@ -16,7 +18,7 @@ import java.util.List;
 /**
  * DRT Scalability Benchmark: Tests performance with 10k, 20k, 50k, 100k agents.
  * <p>
- * Run: {@code java -cp matsim.jar org.matsim.contrib.drt.run.benchmark.RunScalabilityBenchmark}
+ * Run: {@code java -cp matsim.jar org.matsim.contrib.drt.extension.benchmark.RunScalabilityBenchmark}
  *
  * @author Steffen Axer
  */
@@ -56,7 +58,11 @@ public class RunScalabilityBenchmark {
 				params.setMaxIterations(3);
 				params.setCollectionPeriod(120);
 				drtCfg.addParameterSet(params);
+
+				DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams = new DrtSpatialRequestFleetFilterParams();
+				drtCfg.addParameterSet(drtSpatialRequestFleetFilterParams);
 				c.addOverridingQSimModule(new ParallelRequestInserterModule(drtCfg));
+				c.addOverridingQSimModule(new SpatialFilterInsertionSearchQSimModule(drtCfg));
 
 				c.run();
 			});

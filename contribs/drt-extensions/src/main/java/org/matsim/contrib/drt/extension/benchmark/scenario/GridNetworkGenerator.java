@@ -2,7 +2,7 @@
  * project: org.matsim.*
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.benchmark.scenario;
+package org.matsim.contrib.drt.extension.benchmark.scenario;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

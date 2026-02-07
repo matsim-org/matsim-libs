@@ -2,7 +2,7 @@
  * project: org.matsim.*
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run.benchmark;
+package org.matsim.contrib.drt.extension.benchmark;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
