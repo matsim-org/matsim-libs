@@ -68,18 +68,20 @@ public class RunBicycleExample {
 			config.addModule(new BicycleConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
 
+			// simple example
 			config.network().setInputFile("bicycle_example/network_lane_bike_car.xml"); // Modify this
 			config.plans().setInputFile("bicycle_example/population_10_bike_car.xml");
 
 			//Neukoelln bicycle network
 			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
-			//	config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_slim.xml.gz"); // Modify this
+			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_slim.xml.gz"); // Modify this
+
 
 			//Berlin bicycle network
 			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_berlin_bike_rules.xml.gz"); // Modify this
 
 			//Random plans nord-Neukoelln
-			//	config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_500.xml");
+			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_500.xml");
 		} else {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
 				+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
@@ -88,7 +90,7 @@ public class RunBicycleExample {
 
 		//custom output folder
 		config.controller().setOutputDirectory(
-			"C:/Users/metz_so/Workspace/data/matsim-output/equil_motorized"
+			"C:/Users/metz_so/Workspace/data/matsim-output/nk_motorized"
 		);
 
 
@@ -171,9 +173,17 @@ public class RunBicycleExample {
 		// Cleaner: macht kaputte/inkonsistente Netze wieder routingfähig (pro Modus, mit Turn Restrictions).
 		// Simplifier: macht große Netze kleiner/übersichtlicher (und muss dabei Restriktionen beachten).
 
+		NetworkUtils.simplifyNetwork(scenario.getNetwork());
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, TransportMode.bike));
+
+//		NetworkUtils.restrictModesAndCleanNetwork(
+//			scenario.getNetwork(),
+//			linkId -> scenario.getNetwork().getLinks().get(linkId).getAllowedModes()
+//		);
+
 		//NetworkUtils.simplifyNetwork(scenario.getNetwork());
-		//NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car,TransportMode.bike));
+		//NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, TransportMode.bike));
+
 
 		// set config such that the mode vehicles come from vehicles data:
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -204,6 +214,9 @@ public class RunBicycleExample {
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		NetworkUtils.simplifyNetwork(scenario.getNetwork());
+		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, TransportMode.bike));
 
 		// set config such that the mode vehicles come from vehicles data:
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -236,7 +249,9 @@ public class RunBicycleExample {
 
 		@Override
 		public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode) {
-			double result = (double) link.getAttributes().getAttribute("carFreeStatus");  // from zero to one
+			//double result = (double) link.getAttributes().getAttribute("carFreeStatus");  // from zero to one
+			Object v = link.getAttributes().getAttribute("carFreeStatus");
+			double result = (v instanceof Number) ? ((Number) v).doubleValue() : 0.0;
 
 			double amount = delegate.computeLinkBasedScore(link, vehicleId, bicycleMode);
 

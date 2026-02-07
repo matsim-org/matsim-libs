@@ -261,36 +261,52 @@ class BicycleScoreEventsCreator implements
 
 		final double enterTime = enterInfo.enterTime;
 
-		// Only cars contribute to "finished cars" store
+		FinishedCarStore store = TransportMode.car.equals(mode)
+			? finishedCarsByLink.computeIfAbsent(linkId, k -> new FinishedCarStore())
+			: finishedCarsByLink.get(linkId);
+
+		if (store == null) {
+			currentLinkEnter.remove(vehicleId);
+			return;
+		}
+
+		// HARD PRUNE (choose conservative horizon)
+		store.pruneCarsThatLeftBefore(time - computeOvertakeHorizonSeconds(linkId));
+
 		if (TransportMode.car.equals(mode)) {
-			FinishedCarStore store = finishedCarsByLink.computeIfAbsent(linkId, k -> new FinishedCarStore());
 			store.addFinishedCarTraversal(enterTime, time);
 		}
 
-		// Only bikes are "victims" that get overtaking counted
 		if (bicycleMode.equals(mode)) {
-			FinishedCarStore store = finishedCarsByLink.get(linkId);
-			if (store != null) {
-				// prune cars that left before bike entered (cannot overtake this bike)
-				store.pruneCarsThatLeftBefore(enterTime);
+			store.pruneCarsThatLeftBefore(enterTime);
 
-				// count cars that entered after bike entered
-				int overtakes = store.countCarsWithEnterAfter(enterTime);
-
-				if (overtakes > 0) {
-					// score
-					final Id<Person> driver = vehicle2driver.getDriverOfVehicle(vehicleId);
-					if (driver != null) {
-						double amount = marginalUtilityPerOvertake * overtakes;
-						eventsManager.processEvent(new PersonScoreEvent(time, driver, amount, "bicycleOvertakeScore"));
-					}
+			int overtakes = store.countCarsWithEnterAfter(enterTime);
+			if (overtakes > 0) {
+				final Id<Person> driver = vehicle2driver.getDriverOfVehicle(vehicleId);
+				if (driver != null) {
+					eventsManager.processEvent(
+						new PersonScoreEvent(time, driver, marginalUtilityPerOvertake * overtakes, "bicycleOvertakeScore"));
 				}
 			}
 		}
 
-		// remove enter info for this vehicle (it will be overwritten on next enter anyway)
+		if (store.size() == 0) {
+			finishedCarsByLink.remove(linkId);
+		}
+
 		currentLinkEnter.remove(vehicleId);
+
+
 	}
+
+	private double computeOvertakeHorizonSeconds(Id<Link> linkId) {
+		Link l = network.getLinks().get(linkId);
+		if (l == null) return 300.0;
+		double free = l.getLength() / Math.max(0.1, l.getFreespeed());
+		//return Math.min(600.0, Math.max(60.0, 5.0 * free));
+		return Math.max(600.0, 20.0 * free); // TODO: needs to be adjusted, but the equil we need less prune
+	}
+
 
 	private static final class LinkEnterInfo {
 		final Id<Link> linkId;
@@ -319,37 +335,143 @@ class BicycleScoreEventsCreator implements
 	 * Used to count "cars that entered after bike entered and left before bike left".
 	 */
 	private static final class FinishedCarStore {
-		// multiset keyed by enterTime
-		private final NavigableMap<Double, Integer> finishedCarsByEnterTime = new TreeMap<>();
-		// queue by leaveTime for pruning
+		private final TreapMultiset enters = new TreapMultiset();
 		private final ArrayDeque<CarTraversal> finishedCarsByLeaveTime = new ArrayDeque<>();
 
 		void addFinishedCarTraversal(double carEnter, double carLeave) {
-			finishedCarsByEnterTime.merge(carEnter, 1, Integer::sum);
+			enters.add(carEnter);
 			finishedCarsByLeaveTime.addLast(new CarTraversal(carLeave, carEnter));
 		}
 
-		void pruneCarsThatLeftBefore(double bikeEnterTime) {
-			// remove all cars with leaveTime < bikeEnterTime (too early)
-			while (!finishedCarsByLeaveTime.isEmpty() && finishedCarsByLeaveTime.peekFirst().leaveTime < bikeEnterTime) {
+		void pruneCarsThatLeftBefore(double thresholdTime) {
+			while (!finishedCarsByLeaveTime.isEmpty()
+				&& finishedCarsByLeaveTime.peekFirst().leaveTime < thresholdTime) {
 				CarTraversal old = finishedCarsByLeaveTime.removeFirst();
-				decrementEnterTime(old.enterTime);
+				enters.remove(old.enterTime);
 			}
 		}
 
 		int countCarsWithEnterAfter(double bikeEnterTime) {
-			int sum = 0;
-			for (Map.Entry<Double, Integer> e : finishedCarsByEnterTime.tailMap(bikeEnterTime, false).entrySet()) {
-				sum += e.getValue();
-			}
-			return sum;
+			return enters.countGreaterThan(bikeEnterTime);
 		}
 
-		private void decrementEnterTime(double enterTime) {
-			Integer cnt = finishedCarsByEnterTime.get(enterTime);
-			if (cnt == null) return;
-			if (cnt <= 1) finishedCarsByEnterTime.remove(enterTime);
-			else finishedCarsByEnterTime.put(enterTime, cnt - 1);
+		int size() {
+			return enters.size();
 		}
 	}
+
+	private static final class TreapMultiset {
+		private static final class Node {
+			final double key;
+			final int prio;
+			int cnt;
+			int size;
+			Node left, right;
+
+			Node(double key, int prio) {
+				this.key = key;
+				this.prio = prio;
+				this.cnt = 1;
+				this.size = 1;
+			}
+		}
+
+		private final Random rnd = new Random(1);
+		private Node root;
+
+		int size() {
+			return size(root);
+		}
+
+		void add(double key) {
+			root = insert(root, key);
+		}
+
+		void remove(double key) {
+			root = erase(root, key);
+		}
+
+		int countGreaterThan(double key) {
+			return size(root) - countLessEqual(root, key);
+		}
+
+		private static int size(Node n) {
+			return n == null ? 0 : n.size;
+		}
+
+		private static void pull(Node n) {
+			if (n != null) n.size = n.cnt + size(n.left) + size(n.right);
+		}
+
+		private static Node rotateRight(Node y) {
+			Node x = y.left;
+			y.left = x.right;
+			x.right = y;
+			pull(y);
+			pull(x);
+			return x;
+		}
+
+		private static Node rotateLeft(Node x) {
+			Node y = x.right;
+			x.right = y.left;
+			y.left = x;
+			pull(x);
+			pull(y);
+			return y;
+		}
+
+		private Node insert(Node n, double key) {
+			if (n == null) return new Node(key, rnd.nextInt());
+			if (key == n.key) {
+				n.cnt++;
+			} else if (key < n.key) {
+				n.left = insert(n.left, key);
+				if (n.left.prio > n.prio) n = rotateRight(n);
+			} else {
+				n.right = insert(n.right, key);
+				if (n.right.prio > n.prio) n = rotateLeft(n);
+			}
+			pull(n);
+			return n;
+		}
+
+		private Node erase(Node n, double key) {
+			if (n == null) return null;
+
+			if (key == n.key) {
+				if (n.cnt > 1) {
+					n.cnt--;
+				} else {
+					if (n.left == null) return n.right;
+					if (n.right == null) return n.left;
+
+					if (n.left.prio > n.right.prio) {
+						n = rotateRight(n);
+						n.right = erase(n.right, key);
+					} else {
+						n = rotateLeft(n);
+						n.left = erase(n.left, key);
+					}
+				}
+			} else if (key < n.key) {
+				n.left = erase(n.left, key);
+			} else {
+				n.right = erase(n.right, key);
+			}
+
+			pull(n);
+			return n;
+		}
+
+		private int countLessEqual(Node n, double key) {
+			if (n == null) return 0;
+			if (key < n.key) {
+				return countLessEqual(n.left, key);
+			} else {
+				return size(n.left) + n.cnt + countLessEqual(n.right, key);
+			}
+		}
+	}
+
 }
