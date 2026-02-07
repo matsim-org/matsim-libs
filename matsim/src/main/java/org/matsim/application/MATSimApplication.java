@@ -419,6 +419,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 */
 	public static int execute(Class<? extends MATSimApplication> clazz, Config config, String... args) {
 		MATSimApplication app = newInstance(clazz, config);
+		// (this calls the constructor of clazz via reflection.  If config != null, then it first tries the
 
 		prepareArgs(args);
 
@@ -546,11 +547,13 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		// Try constructor with config first
 		// if that fails try default constructor
+		// --> I just changed that behavior ... if a constructor with config is available but does not exist, then it aborts. kai, feb'26
+		// (matsim developer agreement is "reduce automagic")
 		if (config != null) {
 			try {
 				return clazz.getDeclaredConstructor(Config.class).newInstance(config);
 			} catch (NoSuchMethodException e) {
-				// Continue
+				throw new RuntimeException( "Requested constructor not available", e );
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException("Could not instantiate the application class", e);
 			}
