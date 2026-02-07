@@ -23,10 +23,10 @@ import java.util.List;
 public class RunScalabilityBenchmark {
 
 	public static void main(String[] args) {
-		List<Integer> demandLevels = List.of(50_000, 100_000, 400_000);
+		List<Integer> demandLevels = List.of(100_000);
 
 		DrtBenchmarkRunner runner = DrtBenchmarkRunner.create()
-			.warmupRuns(1)
+			.warmupRuns(0)
 			.measuredRuns(3)
 			.reportTo(Path.of("output/benchmark/scalability_results.csv"));
 
