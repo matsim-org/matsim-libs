@@ -44,16 +44,15 @@ import java.util.*;
 
 /**
  * Adds link-based bicycle score events and (optionally) "true overtaking" interaction score events.
- *
+ * <p>
  * True overtaking definition on a link L:
- *   enter_car > enter_bike  AND  leave_car < leave_bike
+ * enter_car > enter_bike  AND  leave_car < leave_bike
  */
 class BicycleScoreEventsCreator implements
 	VehicleEntersTrafficEventHandler,
 	LinkEnterEventHandler,
 	LinkLeaveEventHandler,
-	VehicleLeavesTrafficEventHandler
-{
+	VehicleLeavesTrafficEventHandler {
 	private static final Logger log = LogManager.getLogger(BicycleScoreEventsCreator.class);
 
 	private final Network network;
@@ -73,10 +72,14 @@ class BicycleScoreEventsCreator implements
 
 	// === TRUE OVERTAKING bookkeeping ===
 
-	/** per vehicle -> (link -> enterTime) for currently occupied link. We only need current link, but store by link for safety. */
+	/**
+	 * per vehicle -> (link -> enterTime) for currently occupied link. We only need current link, but store by link for safety.
+	 */
 	private final Map<Id<Vehicle>, LinkEnterInfo> currentLinkEnter = new LinkedHashMap<>();
 
-	/** per link: finished car traversals for counting overtakes */
+	/**
+	 * per link: finished car traversals for counting overtakes
+	 */
 	private final Map<Id<Link>, FinishedCarStore> finishedCarsByLink = new LinkedHashMap<>();
 
 	/**
@@ -137,8 +140,8 @@ class BicycleScoreEventsCreator implements
 			registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 		} else {
 			// even if motorizedInteraction is off, you might still want overtakes
-			// -> but in your current setup overtakes are conceptually "motorized interaction".
-			// If you want overtakes ALWAYS, remove this if-else and always call registerEnter using modeFromVehicle.
+			// -> but in the current setup overtakes are conceptually "motorized interaction".
+			// If overtakes ALWAYS wanted, remove this if-else and always call registerEnter using modeFromVehicle.
 		}
 	}
 
