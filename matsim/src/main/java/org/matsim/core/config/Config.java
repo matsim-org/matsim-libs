@@ -101,6 +101,7 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
+		// yy IMO this should become package-protected so that user code would only use the ConfigUtils methods. kai, feb'26
 		try {
 			URL currentDir = Paths.get("").toUri().toURL();
 			setContext(currentDir);
@@ -115,6 +116,8 @@ public final class Config implements MatsimExtensionPoint {
 	 * configuration from file.
 	 */
 	public void addCoreModules() {
+		// yy IMO this should become package-protected.
+
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
 
 		this.modules.put(ControllerConfigGroup.GROUP_NAME, new ControllerConfigGroup());
@@ -206,6 +209,8 @@ public final class Config implements MatsimExtensionPoint {
 	 *             if a config-group with the specified name already exists.
 	 */
 	public final ConfigGroup createModule(final String name) {
+		// yy should be named createAndAdd ... we said that we would not want creational methods that do the registration as a side effect.  kai, feb'26
+
 		if (this.modules.containsKey(name)) {
 			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
@@ -478,4 +483,5 @@ public final class Config implements MatsimExtensionPoint {
 	public URL getContext() {
 		return context;
 	}
+
 }
