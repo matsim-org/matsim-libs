@@ -20,18 +20,9 @@ package org.matsim.contrib.drt.optimizer.insertion.parallel;
 
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Verify;
 import com.google.inject.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jfree.chart.ChartUtils;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CombinedDomainXYPlot;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.drt.optimizer.DrtRequestInsertionRetryQueue;
@@ -49,7 +40,6 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.stops.PassengerStopDurationProvider;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -59,11 +49,6 @@ import org.matsim.core.mobsim.dsim.NodeSingleton;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -95,7 +80,6 @@ import static org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequest
 public class ParallelUnplannedRequestInserter implements UnplannedRequestInserter, DistributedMobsimEngine, MobsimBeforeCleanupListener {
 	private static final Logger LOG = LogManager.getLogger(ParallelUnplannedRequestInserter.class);
 	private Double lastProcessingTime;
-	private static final Comparator<DrtRequest> drtRequestComparator = Comparator.comparingDouble(DrtRequest::getSubmissionTime).thenComparing(req -> req.getId().toString());
 	private final double collectionPeriod;
 	private final String mode;
 	private final Fleet fleet;
@@ -110,17 +94,12 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	private final ForkJoinPool inserterExecutorService;
 	private final int maxIter;
 	private final Map<Id<DvrpVehicle>, SortedSet<RequestData>> solutions = new ConcurrentHashMap<>();
-	private final SortedSet<DrtRequest> noSolutions = new ConcurrentSkipListSet<>(drtRequestComparator);
+	private final SortedSet<DrtRequest> noSolutions = new ConcurrentSkipListSet<>(ConflictResolver.DRT_REQUEST_COMPARATOR);
 	private final Queue<DrtRequest> tmpQueue = new ConcurrentLinkedQueue<>();
-	private final VehicleEntryPartitioner vehicleEntryPartitioner;
-	private final RequestsPartitioner requestsPartitioner;
+	private final PartitionStrategy partitionStrategy;
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
-	private final List<DataRecord> dataRecordsLog = new ArrayList<>();
-	private final DrtParallelInserterParams drtParallelInserterParams;
-	private final MatsimServices matsimServices;
-
-	public long nConflicting = 0;
-	public long nNonConflicting = 0;
+	private final PartitionActivityLogger activityLogger;
+	private final ConflictResolver conflictResolver;
 
 	public ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, DrtConfigGroup drtCfg, Fleet fleet,
 											EventsManager eventsManager, Provider<RequestInsertionScheduler> insertionSchedulerProvider,
@@ -136,10 +115,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, String mode, Fleet fleet, EventsManager eventsManager,
 									 Provider<RequestInsertionScheduler> insertionSchedulerProvider, VehicleEntry.EntryFactory vehicleEntryFactory, Provider<DrtInsertionSearch> insertionSearch,
 									 DrtOfferAcceptor drtOfferAcceptor, PassengerStopDurationProvider stopDurationProvider, RequestFleetFilter requestFleetFilter, DrtRequestInsertionRetryQueue insertionRetryQueue) {
-		this.requestsPartitioner = requestsPartitioner;
-		this.vehicleEntryPartitioner = vehicleEntryPartitioner;
 		this.collectionPeriod = drtParallelInserterParams.getCollectionPeriod();
-		this.drtParallelInserterParams = drtParallelInserterParams;
 		this.mode = mode;
 		this.fleet = fleet;
 		this.eventsManager = eventsManager;
@@ -150,23 +126,25 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		this.stopDurationProvider = stopDurationProvider;
 		this.requestFleetFilter = requestFleetFilter;
 		this.inserterExecutorService = new ForkJoinPool(drtParallelInserterParams.getMaxPartitions());
-		this.workers = getRequestInsertWorker(drtParallelInserterParams.getMaxPartitions());
+		this.workers = createWorkers(drtParallelInserterParams.getMaxPartitions());
 		this.maxIter = drtParallelInserterParams.getMaxIterations();
 		this.insertionRetryQueue = insertionRetryQueue;
-		this.matsimServices = matsimServices;
+		this.partitionStrategy = new PartitionStrategy(
+			requestsPartitioner,
+			vehicleEntryPartitioner,
+			drtParallelInserterParams.getMaxPartitions(),
+			drtParallelInserterParams.getCollectionPeriod()
+		);
+		this.activityLogger = new PartitionActivityLogger(matsimServices, mode, drtParallelInserterParams);
+		this.conflictResolver = new ConflictResolver();
 	}
 
-	List<RequestInsertWorker> getRequestInsertWorker(int n) {
-		List<RequestInsertWorker> workers = new ArrayList<>();
+	private List<RequestInsertWorker> createWorkers(int n) {
+		List<RequestInsertWorker> workerList = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
-			RequestInsertWorker requestInsertWorker = new RequestInsertWorker(
-				requestFleetFilter,
-				insertionSearch.get(),
-				solutions,
-				noSolutions);
-			workers.add(requestInsertWorker);
+			workerList.add(new RequestInsertWorker(requestFleetFilter, insertionSearch.get(), solutions, noSolutions));
 		}
-		return workers;
+		return workerList;
 	}
 
 	@Override
@@ -178,51 +156,27 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		}
 	}
 
-	public static void validateUniqueRequests(List<Collection<RequestData>> partitions) {
-		Set<Id<Request>> seen = new HashSet<>();
-		for (Collection<RequestData> partition : partitions) {
-			for (RequestData data : partition) {
-				if (!seen.add(data.getDrtRequest().getId())) {
-					throw new IllegalStateException("Duplicate DrtRequest found across partitions: " + data.getDrtRequest().getId());
-				}
-			}
+	private void solve(double now, Map<Id<DvrpVehicle>, VehicleEntry> entries) {
+		PartitionContext partitions = partitionStrategy.createPartitions(tmpQueue, entries);
+
+		activityLogger.record(now, partitions.originalRequestCount(), collectionPeriod, partitions.activePartitionCount());
+
+		if (partitions.isEmpty()) {
+			return;
 		}
+
+		submitWorkersForPartitions(now, partitions);
 	}
 
-
-	private void solve(double now, Map<Id<DvrpVehicle>, VehicleEntry> entries, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner partitioner) {
+	private void submitWorkersForPartitions(double now, PartitionContext partitions) {
 		List<ForkJoinTask<?>> tasks = new ArrayList<>();
 
-		int requests = this.tmpQueue.size();
-		int maxPartitions = Math.max(1, Math.min(this.workers.size(), entries.size())); // at least one partition
-
-		List<Collection<RequestData>> requestsPartitions = requestsPartitioner.partition(this.tmpQueue, maxPartitions, this.collectionPeriod);
-		if (drtParallelInserterParams.isLogThreadActivity()) {
-			int activePartitions = (int) requestsPartitions.stream()
-				.filter(partition -> partition != null && !partition.isEmpty())
-				.count();
-			this.dataRecordsLog.add(new DataRecord(now, (int) (requests / this.collectionPeriod * 60), activePartitions));
-		}
-
-		// The number of request partitions indicate the number of required vehicle partitions
-		List<Map<Id<DvrpVehicle>, VehicleEntry>> vehiclePartitions = partitioner.partition(entries, requestsPartitions);
-
-		Verify.verify(
-			vehiclePartitions.size() == requestsPartitions.size(),
-			"Mismatch between number of vehicle entry vehiclePartitions (%s) and requestsPartitions (%s)",
-			vehiclePartitions.size(), requestsPartitions.size()
-		);
-
-		validateUniqueRequests(requestsPartitions);
-
-		// We only could use the number of maxPartitions
-		for (int i = 0; i < maxPartitions; i++) {
+		for (int i = 0; i < partitions.size(); i++) {
 			var worker = this.workers.get(i);
-			Collection<RequestData> requestDataPartition = requestsPartitions.get(i);
-			Map<Id<DvrpVehicle>, VehicleEntry> vehiclePartition = vehiclePartitions.get(i);
-			tasks.add(inserterExecutorService.submit(() -> worker.process(now, requestDataPartition, vehiclePartition)));
+			var requestPartition = partitions.getRequestPartition(i);
+			var vehiclePartition = partitions.getVehiclePartition(i);
+			tasks.add(inserterExecutorService.submit(() -> worker.process(now, requestPartition, vehiclePartition)));
 		}
-
 
 		tasks.forEach(ForkJoinTask::join);
 	}
@@ -271,49 +225,10 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		);
 	}
 
-	record ConsolidationResult(List<RequestData> toBeScheduled, Collection<DrtRequest> toBeRejected) {
-	}
-
-	ConsolidationResult consolidate() {
-
-		Set<DrtRequest> allRejection = this.noSolutions;
-		ResolvedConflicts resolvedConflicts = resolve(this.solutions);
-
-		this.nConflicting += resolvedConflicts.conflicts.size();
-		this.nNonConflicting += resolvedConflicts.noConflicts.size();
-
-		// Remaining conflicts, add up into allRejection
-		allRejection.addAll(
-			resolvedConflicts.conflicts.stream()
-				.map(RequestData::getDrtRequest)
-				.toList()
-		);
-
-
+	ConflictResolver.ConsolidationResult consolidate() {
+		ConflictResolver.ConsolidationResult result = conflictResolver.consolidate(this.solutions, this.noSolutions);
 		this.workers.forEach(RequestInsertWorker::clean);
-		return new ConsolidationResult(resolvedConflicts.noConflicts, allRejection);
-	}
-
-	record ResolvedConflicts(List<RequestData> noConflicts, List<RequestData> conflicts) {
-	}
-
-	ResolvedConflicts resolve(Map<Id<DvrpVehicle>, SortedSet<RequestData>> data) {
-		List<RequestData> noConflicts = new ArrayList<>();
-		List<RequestData> conflicts = new ArrayList<>();
-
-		for (var requestDataList : data.values()) {
-			if (requestDataList.isEmpty()) continue;
-
-			var iterator = requestDataList.iterator();
-			var bestSolution = iterator.next();
-			noConflicts.add(bestSolution);
-
-			while (iterator.hasNext()) {
-				conflicts.add(iterator.next());
-			}
-		}
-
-		return new ResolvedConflicts(noConflicts, conflicts);
+		return result;
 	}
 
 	Optional<DvrpVehicle> schedule(RequestData requestData, double now) {
@@ -379,151 +294,97 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 
 	@Override
 	public void doSimStep(double time) {
+		if (!shouldProcess(time)) {
+			return;
+		}
+		processRequests(time);
+	}
 
+	private boolean shouldProcess(double time) {
 		if (this.lastProcessingTime == null) {
 			this.lastProcessingTime = time;
 		}
-
-		if ((time - lastProcessingTime) >= collectionPeriod) {
-			handleInsertionRetryQueue(time); // Add now also elements from the insertionRetryQueue
-
-			// Solve requests the first time
-			// At this point, we need to generate vehicleEntries for all vehicles
-			Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries = calculateVehicleEntries(time, this.fleet.getVehicles().values());
-
-
-			lastProcessingTime = time;
-
-			SortedSet<DrtRequest> toBeRejected = new TreeSet<>(drtRequestComparator); // ensure time order
-			// Retry conflicts
-			Integer lastUnsolvedConflicts = null;
-			int scheduled = 0;
-			for (int i = 0; i < this.maxIter; i++) {
-				solve(time, vehicleEntries, this.requestsPartitioner, this.vehicleEntryPartitioner);
-				ConsolidationResult consolidationResult = consolidate();
-
-				// Schedule and clear
-				List<RequestData> toBeScheduled = consolidationResult.toBeScheduled;
-				Set<DvrpVehicle> scheduledVehicles = toBeScheduled.stream()
-					.map(r -> schedule(r, time))
-					.flatMap(Optional::stream)
-					.collect(Collectors.toSet());
-				this.solutions.clear(); // Clean after having them scheduled!
-				scheduled += toBeScheduled.size();
-
-				// Prepare for next round
-				toBeRejected.addAll(consolidationResult.toBeRejected);
-				this.noSolutions.clear(); // Clean after having them added for next iterations!
-
-				if (toBeRejected.isEmpty()
-					|| (lastUnsolvedConflicts != null && toBeRejected.size() == lastUnsolvedConflicts) // not getting better
-					|| i == this.maxIter - 1) { // reached iter limit
-					LOG.debug("Stopped with rejections #{} ", toBeRejected.size());
-					break;
-				}
-
-				// Update vehicle entries for next round
-				vehicleEntries = updateVehicleEntries(time, vehicleEntries, scheduledVehicles);
-				lastUnsolvedConflicts = toBeRejected.size();
-				this.scheduleUnplannedRequests(toBeRejected);
-			}
-			// Clean workers ultimately
-			toBeRejected.forEach(s -> retryOrReject(s, time, NO_INSERTION_FOUND_CAUSE));
-			LOG.debug("Scheduled requests #{} ", scheduled);
-
-			this.workers.forEach(RequestInsertWorker::clean);
+		if ((time - lastProcessingTime) < collectionPeriod) {
+			return false;
 		}
+		lastProcessingTime = time;
+		return true;
 	}
+
+	private void processRequests(double time) {
+		handleInsertionRetryQueue(time);
+
+		Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries = calculateVehicleEntries(time, this.fleet.getVehicles().values());
+
+		InsertionRoundResult result = runInsertionRounds(time, vehicleEntries);
+
+		result.rejected().forEach(req -> retryOrReject(req, time, NO_INSERTION_FOUND_CAUSE));
+		LOG.debug("Scheduled requests #{} ", result.scheduledCount());
+
+		this.workers.forEach(RequestInsertWorker::clean);
+	}
+
+	/**
+	 * Result of the insertion rounds.
+	 *
+	 * @param scheduledCount Total number of successfully scheduled requests
+	 * @param rejected       Requests that could not be scheduled after all iterations
+	 */
+	record InsertionRoundResult(int scheduledCount, SortedSet<DrtRequest> rejected) {
+	}
+
+	private InsertionRoundResult runInsertionRounds(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+		SortedSet<DrtRequest> finalRejections = new TreeSet<>(ConflictResolver.DRT_REQUEST_COMPARATOR);
+		Integer lastUnsolvedConflicts = null;
+		int scheduled = 0;
+
+		for (int i = 0; i < this.maxIter; i++) {
+			solve(time, vehicleEntries);
+			ConflictResolver.ConsolidationResult consolidationResult = consolidate();
+
+			// Schedule successful insertions
+			List<RequestData> toBeScheduled = consolidationResult.toBeScheduled();
+			Set<DvrpVehicle> scheduledVehicles = scheduleRequests(toBeScheduled, time);
+			this.solutions.clear();
+			scheduled += toBeScheduled.size();
+
+			// Collect rejections for this iteration
+			Collection<DrtRequest> iterationRejections = consolidationResult.toBeRejected();
+			this.noSolutions.clear();
+
+			// Check termination conditions
+			if (iterationRejections.isEmpty()
+				|| (lastUnsolvedConflicts != null && iterationRejections.size() == lastUnsolvedConflicts)
+				|| i == this.maxIter - 1) {
+				LOG.debug("Stopped with rejections #{} ", iterationRejections.size());
+				finalRejections.addAll(iterationRejections);
+				break;
+			}
+
+			// Prepare next iteration - put rejections back into queue for retry
+			vehicleEntries = updateVehicleEntries(time, vehicleEntries, scheduledVehicles);
+			lastUnsolvedConflicts = iterationRejections.size();
+			this.scheduleUnplannedRequests(iterationRejections);
+		}
+
+		return new InsertionRoundResult(scheduled, finalRejections);
+	}
+
+	private Set<DvrpVehicle> scheduleRequests(List<RequestData> toBeScheduled, double time) {
+		return toBeScheduled.stream()
+			.map(r -> schedule(r, time))
+			.flatMap(Optional::stream)
+			.collect(Collectors.toSet());
+	}
+
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		plotDataRecordLogWithDualAxis();
-		dumpDataRecordLog();
+		activityLogger.writeOutputs();
 		inserterExecutorService.shutdown();
-		LOG.info("Avg. conflict share {} ", nConflicting / (double) (nConflicting + nNonConflicting));
+		LOG.info("Avg. conflict share {} ", conflictResolver.getAverageConflictShare());
 	}
 
-	public void plotDataRecordLogWithDualAxis() {
-		if (!this.drtParallelInserterParams.isLogThreadActivity()) return;
-
-
-		XYSeries densitySeries = new XYSeries("Requests Density");
-
-		XYSeries partitionsSeries = new XYSeries("Active Partitions");
-
-		for (DataRecord record : dataRecordsLog) {
-			densitySeries.add(record.time, record.requestsDensityPerMinute);
-			partitionsSeries.add(record.time, record.activePartitions);
-		}
-
-		XYSeriesCollection densityDataset = new XYSeriesCollection(densitySeries);
-		NumberAxis densityAxis = new NumberAxis("Requests Density [req/min]");
-		XYPlot densityPlot = new XYPlot(densityDataset, null, densityAxis, null);
-		XYLineAndShapeRenderer densityRenderer = new XYLineAndShapeRenderer(true, false); // Linien ohne Punkte
-		densityPlot.setRenderer(densityRenderer);
-
-
-		XYSeriesCollection partitionsDataset = new XYSeriesCollection(partitionsSeries);
-
-		NumberAxis partitionsAxis = new NumberAxis("Active Partitions");
-		partitionsAxis.setAutoRangeIncludesZero(false);
-		partitionsAxis.setLowerBound(1);
-		partitionsAxis.setUpperBound(this.drtParallelInserterParams.getMaxPartitions() + 1);
-
-		XYPlot partitionsPlot = new XYPlot(partitionsDataset, null, partitionsAxis, null);
-		XYLineAndShapeRenderer partitionsRenderer = new XYLineAndShapeRenderer(true, false);
-		partitionsPlot.setRenderer(partitionsRenderer);
-
-
-		NumberAxis timeAxis = new NumberAxis("Time [s]");
-		CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(timeAxis);
-		combinedPlot.add(densityPlot, 1);
-		combinedPlot.add(partitionsPlot, 1);
-
-		var chart = new JFreeChart("Active Partitions Over Time", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
-
-
-		String filename = matsimServices.getControllerIO().getIterationFilename(
-			matsimServices.getIterationNumber(), mode + "_partitionActivity.png"
-		);
-
-		try {
-			ChartUtils.saveChartAsPNG(new File(filename), chart, 900, 600);
-		} catch (IOException e) {
-			LOG.error("Failed to write chart image", e);
-		}
-	}
-
-	void dumpDataRecordLog() {
-		if (!this.drtParallelInserterParams.isLogThreadActivity()) return;
-
-		String sep = matsimServices.getConfig().global().getDefaultDelimiter();
-		String header = String.join(sep, "time", "requestsDensityPerMinute", "activePartitions");
-		String filename = matsimServices.getControllerIO().getIterationFilename(
-			matsimServices.getIterationNumber(), mode + "_dataRecordsLog.csv.gz"
-		);
-
-		try (BufferedWriter writer = IOUtils.getBufferedWriter(filename)) {
-			writer.write(header);
-			writer.newLine();
-
-			for (DataRecord record : dataRecordsLog) {
-				writer.write(String.join(sep,
-					String.valueOf(record.time),
-					String.valueOf(record.requestsDensityPerMinute),
-					String.valueOf(record.activePartitions)
-				));
-				writer.newLine();
-			}
-
-		} catch (IOException ex) {
-			LOG.error("Failed to write dataRecordsLog", ex);
-		}
-	}
-
-
-	record DataRecord(double time, int requestsDensityPerMinute, int activePartitions) {
-	}
 
 
 }
