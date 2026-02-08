@@ -100,6 +100,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 	private final PartitionActivityLogger activityLogger;
 	private final ConflictResolver conflictResolver;
+	private final PerformanceLogger performanceLogger;
 
 	public ParallelUnplannedRequestInserter(MatsimServices matsimServices, RequestsPartitioner requestsPartitioner, VehicleEntryPartitioner vehicleEntryPartitioner, DrtParallelInserterParams drtParallelInserterParams, DrtConfigGroup drtCfg, Fleet fleet,
 											EventsManager eventsManager, Provider<RequestInsertionScheduler> insertionSchedulerProvider,
@@ -137,6 +138,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 		);
 		this.activityLogger = new PartitionActivityLogger(matsimServices, mode, drtParallelInserterParams);
 		this.conflictResolver = new ConflictResolver();
+		this.performanceLogger = new PerformanceLogger(matsimServices, mode, drtParallelInserterParams);
 	}
 
 	private List<RequestInsertWorker> createWorkers(int n) {
@@ -226,9 +228,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	}
 
 	ConflictResolver.ConsolidationResult consolidate() {
-		ConflictResolver.ConsolidationResult result = conflictResolver.consolidate(this.solutions, this.noSolutions);
-		this.workers.forEach(RequestInsertWorker::clean);
-		return result;
+		return conflictResolver.consolidate(this.solutions, this.noSolutions);
 	}
 
 	Optional<DvrpVehicle> schedule(RequestData requestData, double now) {
@@ -314,14 +314,36 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	private void processRequests(double time) {
 		handleInsertionRetryQueue(time);
 
+		int totalRequests = tmpQueue.size();
+
+		// Only create builders if performance logging is enabled
+		PerformanceLogger.CycleRecordBuilder cycleBuilder = performanceLogger.isEnabled()
+			? new PerformanceLogger.CycleRecordBuilder().simTime(time).maxPartitions(workers.size()).startCycle()
+			: null;
+
+		if (cycleBuilder != null) {
+			cycleBuilder.startVehicleEntryCalc();
+		}
+
 		Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries = calculateVehicleEntries(time, this.fleet.getVehicles().values());
 
-		InsertionRoundResult result = runInsertionRounds(time, vehicleEntries);
+		if (cycleBuilder != null) {
+			cycleBuilder.endVehicleEntryCalc()
+				.totalRequests(totalRequests)
+				.totalVehicles(vehicleEntries.size());
+		}
+
+		InsertionRoundResult result = runInsertionRounds(time, vehicleEntries, cycleBuilder);
 
 		result.rejected().forEach(req -> retryOrReject(req, time, NO_INSERTION_FOUND_CAUSE));
 		LOG.debug("Scheduled requests #{} ", result.scheduledCount());
 
-		this.workers.forEach(RequestInsertWorker::clean);
+		if (cycleBuilder != null) {
+			cycleBuilder.totalScheduled(result.scheduledCount())
+				.totalRejected(result.rejected().size())
+				.endCycle();
+			performanceLogger.recordCycle(cycleBuilder.build());
+		}
 	}
 
 	/**
@@ -333,24 +355,83 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	record InsertionRoundResult(int scheduledCount, SortedSet<DrtRequest> rejected) {
 	}
 
-	private InsertionRoundResult runInsertionRounds(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+	private InsertionRoundResult runInsertionRounds(double time, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
+												   PerformanceLogger.CycleRecordBuilder cycleBuilder) {
 		SortedSet<DrtRequest> finalRejections = new TreeSet<>(ConflictResolver.DRT_REQUEST_COMPARATOR);
 		Integer lastUnsolvedConflicts = null;
 		int scheduled = 0;
 
 		for (int i = 0; i < this.maxIter; i++) {
-			solve(time, vehicleEntries);
-			ConflictResolver.ConsolidationResult consolidationResult = consolidate();
+			PerformanceLogger.IterationRecordBuilder iterBuilder = cycleBuilder != null
+				? new PerformanceLogger.IterationRecordBuilder().iterationNumber(i)
+				: null;
 
-			// Schedule successful insertions
+			// Solve phase
+			if (iterBuilder != null) {
+				iterBuilder.startSolve();
+			}
+			solve(time, vehicleEntries);
+			if (iterBuilder != null) {
+				iterBuilder.endSolve();
+
+				// Capture worker statistics after solve
+				int[] requestsPerWorker = new int[workers.size()];
+				int[] vehiclesPerWorker = new int[workers.size()];
+				long[] workerTimes = new long[workers.size()];
+				int activePartitions = 0;
+				for (int w = 0; w < workers.size(); w++) {
+					requestsPerWorker[w] = workers.get(w).getLastRequestCount();
+					vehiclesPerWorker[w] = workers.get(w).getLastVehicleCount();
+					workerTimes[w] = workers.get(w).getLastProcessingTimeNanos();
+					if (requestsPerWorker[w] > 0) {
+						activePartitions++;
+					}
+				}
+				iterBuilder.requestsPerWorker(requestsPerWorker)
+					.vehiclesPerWorker(vehiclesPerWorker)
+					.workerProcessingTimes(workerTimes);
+
+				// Set active partitions on first iteration
+				if (i == 0) {
+					cycleBuilder.activePartitions(activePartitions);
+				}
+			}
+
+			// Conflict resolution phase
+			if (iterBuilder != null) {
+				iterBuilder.startConflictResolution();
+			}
+			ConflictResolver.ConsolidationResult consolidationResult = consolidate();
+			if (iterBuilder != null) {
+				iterBuilder.endConflictResolution();
+			}
+
+			// Clean workers after conflict resolution (not part of timing)
+			this.workers.forEach(RequestInsertWorker::clean);
+
+			// Scheduling phase
+			if (iterBuilder != null) {
+				iterBuilder.startScheduling();
+			}
 			List<RequestData> toBeScheduled = consolidationResult.toBeScheduled();
 			Set<DvrpVehicle> scheduledVehicles = scheduleRequests(toBeScheduled, time);
+			if (iterBuilder != null) {
+				iterBuilder.endScheduling();
+			}
+
 			this.solutions.clear();
 			scheduled += toBeScheduled.size();
 
 			// Collect rejections for this iteration
 			Collection<DrtRequest> iterationRejections = consolidationResult.toBeRejected();
 			this.noSolutions.clear();
+
+			if (iterBuilder != null) {
+				iterBuilder.conflicts(consolidationResult.conflictCount())
+					.noSolutions(consolidationResult.noSolutionCount())
+					.scheduled(toBeScheduled.size());
+				cycleBuilder.addIteration(iterBuilder.build());
+			}
 
 			// Check termination conditions
 			if (iterationRejections.isEmpty()
@@ -381,6 +462,7 @@ public class ParallelUnplannedRequestInserter implements UnplannedRequestInserte
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		activityLogger.writeOutputs();
+		performanceLogger.writeOutputs();
 		inserterExecutorService.shutdown();
 		LOG.info("Avg. conflict share {} ", conflictResolver.getAverageConflictShare());
 	}

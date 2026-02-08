@@ -60,8 +60,11 @@ public class ConflictResolver {
 	 *
 	 * @param toBeScheduled Requests that have no conflicts and can be scheduled
 	 * @param toBeRejected  Requests that either had conflicts or no solution was found
+	 * @param conflictCount Number of conflicts resolved in this consolidation (requests that lost to a better solution)
+	 * @param noSolutionCount Number of requests that had no solution found
 	 */
-	public record ConsolidationResult(List<RequestData> toBeScheduled, Collection<DrtRequest> toBeRejected) {
+	public record ConsolidationResult(List<RequestData> toBeScheduled, Collection<DrtRequest> toBeRejected,
+									  int conflictCount, int noSolutionCount) {
 	}
 
 	/**
@@ -102,7 +105,8 @@ public class ConflictResolver {
 				.toList()
 		);
 
-		return new ConsolidationResult(resolvedConflicts.noConflicts, allRejection);
+		return new ConsolidationResult(resolvedConflicts.noConflicts, allRejection,
+			resolvedConflicts.conflicts.size(), noSolutions.size());
 	}
 
 	/**

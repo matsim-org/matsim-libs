@@ -44,6 +44,11 @@ public class RequestInsertWorker {
 	private final Map<Id<DvrpVehicle>, SortedSet<RequestData>> solutions;
 	private final SortedSet<DrtRequest> noSolutions;
 
+	// Performance tracking
+	private volatile long lastProcessingTimeNanos = 0;
+	private volatile int lastRequestCount = 0;
+	private volatile int lastVehicleCount = 0;
+
 	public RequestInsertWorker(
 		RequestFleetFilter requestFleetFilter,
 		DrtInsertionSearch insertionSearch,
@@ -76,16 +81,45 @@ public class RequestInsertWorker {
 
 
 	void process(double now, Collection<RequestData> requestDataPartition, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries) {
+		long startTime = System.nanoTime();
+		this.lastRequestCount = requestDataPartition.size();
+		this.lastVehicleCount = vehicleEntries.size();
+
 		this.unplannedRequests.addAll(requestDataPartition);
 
 		while (!unplannedRequests.isEmpty()) {
 			findInsertion(unplannedRequests.poll(), vehicleEntries, now);
 		}
 
+		this.lastProcessingTimeNanos = System.nanoTime() - startTime;
+	}
+
+	/**
+	 * @return Processing time of the last process() call in nanoseconds
+	 */
+	public long getLastProcessingTimeNanos() {
+		return lastProcessingTimeNanos;
+	}
+
+	/**
+	 * @return Number of requests processed in the last process() call
+	 */
+	public int getLastRequestCount() {
+		return lastRequestCount;
+	}
+
+	/**
+	 * @return Number of vehicles available in the last process() call
+	 */
+	public int getLastVehicleCount() {
+		return lastVehicleCount;
 	}
 
 
 	public void clean() {
 		this.unplannedRequests.clear();
+		this.lastProcessingTimeNanos = 0;
+		this.lastRequestCount = 0;
+		this.lastVehicleCount = 0;
 	}
 }
