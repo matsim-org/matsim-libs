@@ -29,7 +29,7 @@ public class RunScalabilityBenchmark {
 
 		DrtBenchmarkRunner runner = DrtBenchmarkRunner.create()
 			.warmupRuns(0)
-			.measuredRuns(3)
+			.measuredRuns(1)
 			.reportTo(Path.of("output/benchmark/scalability_results.csv"));
 
 		for (int agents : demandLevels) {
@@ -56,7 +56,7 @@ public class RunScalabilityBenchmark {
 				DrtParallelInserterParams params = new DrtParallelInserterParams();
 				params.setMaxPartitions(8);
 				params.setMaxIterations(3);
-				params.setCollectionPeriod(120);
+				params.setCollectionPeriod(30);
 				drtCfg.addParameterSet(params);
 
 				DrtSpatialRequestFleetFilterParams drtSpatialRequestFleetFilterParams = new DrtSpatialRequestFleetFilterParams();
