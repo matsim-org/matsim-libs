@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.zones.systems.grid.square.SquareGridZoneSystemParams;
+import org.matsim.contrib.drt.extension.DrtWithExtensionsConfigGroup;
 import org.matsim.contrib.drt.optimizer.insertion.selective.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -95,7 +96,7 @@ public class SyntheticBenchmarkScenario {
 					.createParameterSet(SquareGridZoneSystemParams.SET_NAME));
 
 			MultiModeDrtConfigGroup multiModeDrtConfig = new MultiModeDrtConfigGroup();
-			DrtConfigGroup drtConfig = new DrtConfigGroup();
+			DrtConfigGroup drtConfig = new DrtWithExtensionsConfigGroup();
 			drtConfig.setMode("drt");
 			drtConfig.setStopDuration(60.0);
 
@@ -103,7 +104,7 @@ public class SyntheticBenchmarkScenario {
 				.addOrGetDefaultDrtOptimizationConstraintsSet();
 			constraints.setMaxWaitTime(900);
 			constraints.setMaxTravelTimeAlpha(1.5);
-			constraints.setMaxTravelTimeBeta(300);
+			constraints.setMaxTravelTimeBeta(900);
 			constraints.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 
 			// Set insertion search params
