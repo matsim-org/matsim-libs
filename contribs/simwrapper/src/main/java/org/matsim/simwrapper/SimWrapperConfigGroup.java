@@ -4,6 +4,7 @@ import org.apache.commons.math3.util.Precision;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 
 import java.util.*;
 
@@ -99,10 +100,9 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 		// check the (available) scale factors:
 		final double flowCapFactor = config.qsim().getFlowCapFactor();
-		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
+		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactors();
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
-			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
-			+ ". Relative tolerance can be set in the global config group.");
+			GlobalConfigGroup.logScaleFactorWarning("sampleSize", this.sampleSize, flowCapFactor, relativeTolerance, "");
 		}
 
 	}
