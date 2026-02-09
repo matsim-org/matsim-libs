@@ -161,9 +161,6 @@ public abstract class HbefaTables {
 							The current record: {}
 							""", key, record);
 						case aggregateByFleetComposition ->
-							// We need to aggregate multiple HbefaEmissionFactors. However, we do not have direct access to the constructor since we
-							// are working with generics. Thus, we will reuse the createValue lambda function by creating a temporary CSVRecord with
-							// the new value. This temporary CSVRecord is made using an inner class.
 							result.put(key, aggregateHbefaEmissionFactors.apply(result.get(key), value, (fleetCompositionWeight/(totalEntryWeight.get(key) + fleetCompositionWeight)) ));
 					}
 				}
