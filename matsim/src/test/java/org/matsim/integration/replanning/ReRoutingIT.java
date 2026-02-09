@@ -61,6 +61,7 @@ public class ReRoutingIT {
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controller().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controller().setLastIteration(1);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
 		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2

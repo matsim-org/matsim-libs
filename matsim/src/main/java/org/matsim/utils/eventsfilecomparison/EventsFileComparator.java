@@ -77,11 +77,6 @@ public final class EventsFileComparator {
 		Worker w2 = new Worker(filename2, doComparison, allWorkersAlive, ignoringCoordinates );
 		comparator.setWorkers(w1, w2);
 		w1.start();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
 		w2.start();
 
 		try {
