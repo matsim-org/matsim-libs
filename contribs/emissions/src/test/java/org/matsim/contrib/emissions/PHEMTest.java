@@ -44,9 +44,11 @@ import static org.apache.commons.lang3.math.IEEE754rUtils.min;
  *  (2)	Values lie between SUMO and HBEFAv4.1. This test may fail when setting up a new HBEFA-version. Affected values should be checked <br>
  *  (3) Average-deviance is better than for HBEFAv4.1. This test should never fail, even when setting up a new HBEFA-version. <br>
  *  If you need to adjust this test for future HBEFA versions, you can use the diff_{fuel}_out.csv output and change and use it as new reference file.
- *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update. TODO Update to PLv5
+ *  The sumo_{fuel}_output.csv does not need to be changed, unless the PHEMLight engine got an update.
  */
 public class PHEMTest {
+
+	// TODO #090226 contains the settings which emulate the old emission model, remove when paper is finished
 
 	@RegisterExtension
 	MatsimTestUtils utils = new MatsimTestUtils();
@@ -171,6 +173,7 @@ public class PHEMTest {
 		drivingSegments.add(currentList);
 
 		// Now build the list of Cycle Link attributes
+		// #090226: HbefaRoadTypeMapping mapping = new VspHbefaRoadTypeMapping();
 		PHEMTestHbefaRoadTypeMapping mapping = new PHEMTestHbefaRoadTypeMapping();
 
 		// Variables needed for the mapping
@@ -364,8 +367,10 @@ public class PHEMTest {
 	private static Config configureTest(EmissionsConfigGroup.DuplicateSubsegments duplicateSubsegments){
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		// #090226: ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed );
 		ecg.setEmissionsComputationMethod( EmissionsConfigGroup.EmissionsComputationMethod.InterpolationFraction );
 		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+		// #090226: ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.overwriteOldDuplicates );
 		ecg.setDuplicateSubsegments( duplicateSubsegments );
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
@@ -705,6 +710,7 @@ public class PHEMTest {
 		List<CycleLinkComparison> comparison = compare(cycleLinkAttributes, link_pollutant2grams, sumoSegments);
 
 		// Print out the results as csv TODO Change path back to test-output folder
+		// #090226: String path = "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/ExplorativeAnalysis/OldModelAVGResults/";
 		String path = "/Users/aleksander/Documents/VSP/PHEMTest/diff/" + cycle + "/";
 		String diff_name = "diff_" + cycle + "_" + fuel + "_output_" + duplicateSubsegments + "_" + cutSetting + "_" + cutSetting.getAttr() + ".csv";
 		writeDiffFile(path + diff_name, comparison);
