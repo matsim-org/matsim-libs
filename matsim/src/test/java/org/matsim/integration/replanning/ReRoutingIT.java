@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -54,6 +55,7 @@ public class ReRoutingIT {
 		// (this is a local config!  It then recruits some files from the test scenarios.)
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
