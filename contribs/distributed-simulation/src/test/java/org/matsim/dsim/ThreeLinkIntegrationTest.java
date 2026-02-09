@@ -199,7 +199,7 @@ public class ThreeLinkIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				var result = f.get(2, TimeUnit.MINUTES);
+				var result = f.get(1, TimeUnit.MINUTES);
 				assertEquals(1, result.getSecond().getPopulation().getPersons().size());
 				var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
 				// make sure that the score is sent back to the person.
@@ -235,8 +235,7 @@ public class ThreeLinkIntegrationTest {
 
 		config.controller().setOutputDirectory(utils.getOutputDirectory() + "output");
 		config.network().setInputFile(netPath);
-		var controller = new DistributedController(new NullCommunicator(), config, 1);
+		var controller = new DistributedController(new NullCommunicator(), config, 3);
 		controller.run();
-
 	}
 }
