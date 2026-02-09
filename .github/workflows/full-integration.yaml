@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ ubuntu-latest, windows-latest ]
         #os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -35,8 +35,17 @@ jobs:
       # Run unit and integration tests
       - name: Run verify - release profile
         # arguments containing dots (.) need to be quoted ('') so that PowerShell (Windows) does not parse them
-        run: mvn verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
+        run: mvn -pl contribs/distributed-simulation -am verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
 
+      - name: Upload Maven test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-test-reports-${{ matrix.os }}
+          path: |
+            **/target/surefire-reports/**
+            **/target/failsafe-reports/**
+            **/target/*-reports/**
+          if-no-files-found: warn
     env:
       MAVEN_OPTS: -Xmx2g
 
