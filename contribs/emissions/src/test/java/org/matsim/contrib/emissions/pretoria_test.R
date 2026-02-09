@@ -163,3 +163,15 @@
     facet_wrap(~component, scales="free")
 
 }
+
+# ==== Kalman Filter Diagram ====
+{
+  a <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/kalman/outFIGO.csv")
+
+  a_f <- a %>% filter(time > 800, time < 1000)
+
+  ggplot(a_f) +
+    geom_line(aes(x=time, y=accDist), color="red") +
+    geom_line(aes(x=time, y=naiveAccDist), color="blue") +
+    geom_line(aes(x=time, y=projectedAccDist), color="green")
+}
