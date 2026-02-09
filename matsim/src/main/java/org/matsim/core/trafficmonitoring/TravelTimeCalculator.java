@@ -93,7 +93,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 	/**
 	 * These have been received from other partitions and will not be sent out,
 	 */
-	private final IdSet<Link> receivedIds = new IdSet(Link.class);
+	private final IdSet<Link> receivedIds = new IdSet<>(Link.class);
 
 	@Inject
 	private QSimConfigGroup qsimConfig;
@@ -170,8 +170,6 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 				msg.travelTimes.put(entry.getKey().index(), dataArray.getData());
 			}
 		}
-
-		log.info("Send TravelTimeSyncMessage {} with {} entries", msg.getType(), msg.travelTimes.size());
 		return msg;
 	}
 
@@ -181,7 +179,7 @@ public final class TravelTimeCalculator implements AggregatingEventHandler<Trave
 			for (Int2ObjectMap.Entry<long[]> e : msg.travelTimes.int2ObjectEntrySet()) {
 
 				Id<Link> linkId = Id.get(e.getIntKey(), Link.class);
-				TravelTimeDataArray dataArray = linkData.computeIfAbsent(linkId, k -> createTravelTimeData(linkId));
+				TravelTimeDataArray dataArray = linkData.computeIfAbsent(linkId, _ -> createTravelTimeData(linkId));
 
 				dataArray.setData(e.getValue());
 				receivedIds.add(linkId);

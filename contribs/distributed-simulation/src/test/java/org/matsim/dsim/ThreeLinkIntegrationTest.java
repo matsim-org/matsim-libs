@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled("gets stuck and then leads to timeout on CI")
 public class ThreeLinkIntegrationTest {
 
 	@RegisterExtension
