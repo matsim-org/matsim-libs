@@ -56,6 +56,7 @@ import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.freight.carriers.*;
 import org.matsim.freight.carriers.analysis.CarriersAnalysis;
@@ -196,42 +197,53 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Index indexZones;
 
+	private final String[] args;
+
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
-		log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
-		this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
-		log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
-		this.vehicleSelection = new DefaultVehicleSelection();
-		log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
-		this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
-		log.info("Using default {} for tour unhandled-services-solution!", DefaultUnhandledServicesSolution.class.getSimpleName());
+		this(new String[0], null, null, null, null);
 	}
 
-	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial, CommercialTourSpecifications getCommercialTourSpecifications, VehicleSelection vehicleSelection, UnhandledServicesSolution unhandledServicesSolution) {
-		if (integrateExistingTrafficToSmallScaleCommercial == null){
+	public GenerateSmallScaleCommercialTrafficDemand(String[] args) {
+		this(args, null, null, null, null);
+	}
+
+	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
+													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
+													 UnhandledServicesSolution unhandledServicesSolution) {
+		this(new String[0], integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
+			unhandledServicesSolution);
+	}
+	public GenerateSmallScaleCommercialTrafficDemand(String[] args,
+													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
+													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
+													 UnhandledServicesSolution unhandledServicesSolution) {
+
+		this.args = (args == null) ? new String[0] : args;
+
+		if (integrateExistingTrafficToSmallScaleCommercial == null) {
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
 			log.info("Using default {} if existing models are integrated!", DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl.class.getSimpleName());
 		} else {
 			this.integrateExistingTrafficToSmallScaleCommercial = integrateExistingTrafficToSmallScaleCommercial;
 			log.info("Using {} if existing models are integrated!", integrateExistingTrafficToSmallScaleCommercial.getClass().getSimpleName());
 		}
-		if (getCommercialTourSpecifications == null){
+		if (commercialTourSpecifications == null) {
 			this.commercialTourSpecifications = new DefaultTourSpecificationsByUsingKID2002();
 			log.info("Using default {} for tour specifications!", DefaultTourSpecificationsByUsingKID2002.class.getSimpleName());
 		} else {
-			this.commercialTourSpecifications = getCommercialTourSpecifications;
-			log.info("Using {} for tour specifications!", getCommercialTourSpecifications.getClass().getSimpleName());
+			this.commercialTourSpecifications = commercialTourSpecifications;
+			log.info("Using {} for tour specifications!", commercialTourSpecifications.getClass().getSimpleName());
 		}
-		if (vehicleSelection == null){
+		if (vehicleSelection == null) {
 			this.vehicleSelection = new DefaultVehicleSelection();
 			log.info("Using default {} for tour vehicle-selection!", DefaultVehicleSelection.class.getSimpleName());
 		} else {
 			this.vehicleSelection = vehicleSelection;
 			log.info("Using {} for tour vehicle-selection!", vehicleSelection.getClass().getSimpleName());
 		}
-		if (unhandledServicesSolution == null){
+		if (unhandledServicesSolution == null) {
 			this.unhandledServicesSolution = new DefaultUnhandledServicesSolution(this);
-			log.info("Using default {} for unhandled-services-solution", DefaultUnhandledServicesSolution.class.getSimpleName());
+			log.info("Using default {} for unhandled-services-solution!", DefaultUnhandledServicesSolution.class.getSimpleName());
 		} else {
 			this.unhandledServicesSolution = unhandledServicesSolution;
 			log.info("Using {} for unhandled-services-solution!", unhandledServicesSolution.getClass().getSimpleName());
@@ -239,7 +251,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	public static void main(String[] args) {
-		System.exit(new CommandLine(new GenerateSmallScaleCommercialTrafficDemand()).execute(args));
+		new GenerateSmallScaleCommercialTrafficDemand(args).execute(args);
 	}
 
 	@Override
@@ -250,7 +262,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
-		Config config = readAndCheckConfig(configPath, modelName, sampleName, output);
+		Config config = readAndCheckConfig(args, configPath, modelName, sampleName, output);
 
 		output = Path.of(config.controller().getOutputDirectory());
 
@@ -692,8 +704,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Reads and checks config if all necessary parameters are set.
 	 */
-	private Config readAndCheckConfig(Path configPath, String modelName, String sampleName, Path output) throws Exception {
-		Config config = ConfigUtils.loadConfig(configPath.toString());
+	private Config readAndCheckConfig(String[] args, Path configPath, String modelName, String sampleName, Path output) throws Exception {
+		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), args);
 		if (output == null || output.toString().isEmpty())
 			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
@@ -718,7 +730,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		if (network != null)
 			config.network().setInputFile(network);
 
-		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
