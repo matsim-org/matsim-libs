@@ -86,6 +86,7 @@ public class TerminationTest {
 
 		config.controller().setWriteEventsInterval(interval);
 		config.controller().setLastIteration(criterion);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		return new Controler(config);
 	}

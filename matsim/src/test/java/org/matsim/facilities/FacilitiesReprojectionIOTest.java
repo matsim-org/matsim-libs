@@ -97,7 +97,6 @@ public class FacilitiesReprojectionIOTest {
 		final Config config = ConfigUtils.createConfig();
 		config.facilities().setInputFile(utils.getOutputDirectory()+"/facilities.xml");
 		config.global().setCoordinateSystem( TARGET_CRS );
-		 config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -119,6 +118,7 @@ public class FacilitiesReprojectionIOTest {
 		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controller().setOutputDirectory( outputDirectory );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
@@ -162,7 +162,6 @@ public class FacilitiesReprojectionIOTest {
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
 		config.global().setCoordinateSystem( TARGET_CRS );
-		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -185,6 +184,7 @@ public class FacilitiesReprojectionIOTest {
 		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controller().setOutputDirectory( outputDirectory );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		final Controler controler = new Controler( scenario );
 		controler.run();
 

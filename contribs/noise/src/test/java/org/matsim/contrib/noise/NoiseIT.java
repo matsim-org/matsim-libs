@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
@@ -157,6 +158,7 @@ public class NoiseIT {
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		runTest2a( config ) ;
 	}
 
@@ -168,6 +170,7 @@ public class NoiseIT {
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controller().setOutputDirectory(testUtils.getOutputDirectory());
 		config.routing().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 //		{
 //			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
 //			params.setTeleportedModeSpeed( 2.0 );
@@ -977,6 +980,7 @@ public class NoiseIT {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controller().setOutputDirectory(runDirectory);
 		config.controller().setLastIteration(lastIteration);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
@@ -1067,6 +1071,7 @@ public class NoiseIT {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controller().setOutputDirectory(runDirectory);
 		config.controller().setLastIteration(controler.getConfig().controller().getLastIteration());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);

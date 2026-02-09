@@ -106,6 +106,7 @@ public class PlanInheritanceTest {
 			Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 			config.controller().setLastIteration(1);
 			config.controller().setOutputDirectory(outputDirectory);
+			config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			Controler c = new Controler(config);
 
 			c.run();
