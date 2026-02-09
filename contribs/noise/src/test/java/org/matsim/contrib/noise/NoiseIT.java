@@ -963,6 +963,7 @@ public class NoiseIT {
 			// start a simple MATSim run with a single iteration
 			String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
+			runConfig.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 			runConfig.controller().setOutputDirectory(testUtils.getOutputDirectory());
 
 			Controler controler = new Controler(runConfig);
@@ -1060,6 +1061,7 @@ public class NoiseIT {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controller().setOutputDirectory(testUtils.getOutputDirectory());
 		controler.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.getConfig().controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		controler.run();
 
 		// run the noise analysis for the final iteration (offline)
