@@ -907,6 +907,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private void createServices(Carrier newCarrier, CarrierAttributes carrierAttributes) {
 		log.info("Create services for carrier: {}", newCarrier.getId());
+		int countedServices = 0;
 		for (String stopZone : odMatrix.getListOfZones()) {
 			int trafficVolumeForOD = Math.round((float)odMatrix.getTripDistributionValue(carrierAttributes.startZone,
 				stopZone, carrierAttributes.modeORvehType, carrierAttributes.purpose, carrierAttributes.smallScaleCommercialTrafficType));
@@ -921,7 +922,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
 				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
-				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, numberOfJobs);
+				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
+				countedServices++;
 			}
 		}
 	}
