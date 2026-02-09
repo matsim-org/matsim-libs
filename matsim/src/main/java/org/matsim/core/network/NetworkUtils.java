@@ -564,6 +564,14 @@ public final class NetworkUtils {
 		return links;
 	}
 
+	public static Map<Id<Link>, ? extends Link> getIncidentLinks(Link link) {
+		Map<Id<Link>, Link> links = new TreeMap<>(link.getFromNode().getInLinks());
+		links.putAll(link.getFromNode().getInLinks());
+		links.putAll(link.getToNode().getOutLinks());
+		links.putAll(link.getToNode().getOutLinks());
+		return links;
+	}
+
 
 	public static Map<Id<Node>, ? extends Node> getInNodes(Node node) {
 		Map<Id<Node>, Node> nodes = new TreeMap<>();
