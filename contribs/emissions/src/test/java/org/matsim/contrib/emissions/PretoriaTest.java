@@ -410,7 +410,9 @@ public class PretoriaTest {
 		Set<Id<Link>> unwantedLinks = Set.of(Id.createLinkId("6555"));
 
 		Map<Integer, List<PretoriaGPSEntry>> tripId2pretoriaGpsEntries = readGpsEntries(vehicle);
-		Map<Integer, PretoriaGPSEntry, Id<Link>> tripId2gpsEntry2linkId =
+//		Map<Integer, Map<PretoriaGPSEntry, Link>> tripId2gpsEntry2link = new ArrayMap<>();
+//		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2gpsEntry2link.put(tripId, mapEntriesToNetwork(entries, pretoriaNetwork)));
+
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, filterUnwantedLinkEntries(entries, unwantedLinks, pretoriaNetwork)));
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
 //		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries))); // TODO Makes results worse
@@ -433,7 +435,7 @@ public class PretoriaTest {
 			tripId2coldStart.putIfAbsent(tripId, gpsEntries.getFirst().coldStart);
 
 			// Calculate cold Emissions (but not for RRV, as RRV has no available HBEFA Cold Table)
-			if(vehicle != PretoriaVehicle.RRV){
+			if(vehicle != PretoriaVehicle.RRV && vehicle != PretoriaVehicle.RRV_TECHAVG){
 				vehHbefaInfo.getSecond().setHbefaEmConcept("average"); // TODO Try to get better cold emissions table, so that I can access detailed data
 				var coldEmissionsMatsim = module.getColdEmissionAnalysisModule().calculateColdEmissions(
 					Id.createVehicleId("0"),
@@ -618,6 +620,7 @@ public class PretoriaTest {
 		}
 	}
 
+	// TODO Very slow, optimize
 	private static class KalmanFilter{
 		// Needed for computation
 		Network route;
@@ -728,11 +731,11 @@ public class PretoriaTest {
 
 			for (PretoriaGPSEntry e : gpsEntries) {
 				Link l = NetworkUtils.getNearestLinkExactly(route, e.coord);
-				List<Link> previousLinks = linkOrder.subList(0, linkOrder.indexOf(l));
-				double prevLen = previousLinks.stream().mapToDouble(Link::getLength).sum();
+				int index = linkOrder.indexOf(l);
+				double prevLen = index == 0 ? 0 : accumulatedLinkLengths4links.get(index-1);
 
 				Coord p = CoordUtils.orthogonalProjectionOnLineSegment(l.getFromNode().getCoord(), l.getToNode().getCoord(), e.coord);
-				Node sharedNode = previousLinks.isEmpty() ? l.getFromNode() : getSharedNode(l, previousLinks.getLast());
+				Node sharedNode = index == 0 ? l.getFromNode() : getSharedNode(l, linkOrder.get(index-1));
 				double projectedLen = CoordUtils.length(CoordUtils.minus(sharedNode.getCoord(), p));
 
 				projectedAccumulatedDistances.add(prevLen + projectedLen);
