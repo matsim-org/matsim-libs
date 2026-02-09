@@ -63,8 +63,8 @@ public class CharyparNagelLegScoringTest {
 
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
 		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
-		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan.xml.gz").toAbsolutePath();
-		config.plans().setInputFile(plansPath.toString());
+		var plansPath = utils.getClassInputDirectory() + "one-routed-pt-plan.xml.gz";
+		config.plans().setInputFile(plansPath);
 		var scenario = ScenarioUtils.loadScenario(config);
 		assertEquals(1, config.transit().getTransitModes().size());
 		var transitMode = config.transit().getTransitModes().iterator().next();
@@ -90,8 +90,8 @@ public class CharyparNagelLegScoringTest {
 	void scoreMultiplePtTripsWithLineSwitch() {
 		var scenarioUrl = ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch").toString();
 		var config = ConfigUtils.loadConfig(scenarioUrl + "config.xml");
-		var plansPath = Paths.get(utils.getClassInputDirectory()).resolve("one-routed-pt-plan-line-switch.xml.gz").toAbsolutePath();
-		config.plans().setInputFile(plansPath.toString());
+		var plansPath = utils.getClassInputDirectory() + "one-routed-pt-plan-line-switch.xml.gz";
+		config.plans().setInputFile(plansPath);
 		var scenario = ScenarioUtils.loadScenario(config);
 		assertEquals(1, config.transit().getTransitModes().size());
 		var transitMode = config.transit().getTransitModes().iterator().next();

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -96,6 +97,7 @@ public class FacilitiesReprojectionIOTest {
 		final Config config = ConfigUtils.createConfig();
 		config.facilities().setInputFile(utils.getOutputDirectory()+"/facilities.xml");
 		config.global().setCoordinateSystem( TARGET_CRS );
+		 config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -160,6 +162,7 @@ public class FacilitiesReprojectionIOTest {
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
 		config.global().setCoordinateSystem( TARGET_CRS );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
