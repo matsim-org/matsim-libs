@@ -1056,7 +1056,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	/**
-	 * Filters links by used mode "car" and creates Map with all links in each zone
+	 * Filters links by used modes and creates Map with all links in each zone
 	 */
 	static Map<String, Map<Id<Link>, Link>> filterLinksForZones(Scenario scenario, Index indexZones,
 																Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities,
@@ -1070,12 +1070,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		filter.filter(filteredNetwork, modes);
 
 		CoordinateTransformation ct = indexZones.getShp().createTransformation(ProjectionUtils.getCRS(scenario.getNetwork()));
-		//TODO possible check if newCoord attribute is really needed (find better way)
+		NetworkTransform nT = new NetworkTransform(ct);
+		nT.run(filteredNetwork);
 		List<Link> links = new ArrayList<>(filteredNetwork.getLinks().values());
-		links.forEach(l -> l.getAttributes().putAttribute("newCoord",
-			CoordUtils.round(ct.transform(l.getCoord()))));
-		links.forEach(l -> l.getAttributes().putAttribute("zone",
-			indexZones.query((Coord) l.getAttributes().getAttribute("newCoord"))));
+		links.forEach(l -> l.getAttributes().putAttribute("zone", indexZones.query(l.getCoord())));
 		links = links.stream().filter(l -> l.getAttributes().getAttribute("zone") != null).toList();
 		links.forEach(l -> linksPerZone
 			.computeIfAbsent((String) l.getAttributes().getAttribute("zone"), (k) -> new HashMap<>())

@@ -154,8 +154,7 @@ public class SmallScaleCommercialTrafficUtils {
 						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
 						continue searchLink;
 				}
-			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 			if (distance < minDistance) {
 				newLink = possibleLink.getId();
 				minDistance = distance;
@@ -163,8 +162,7 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
 			for (Link possibleLink : linksPerZone.get(zone).values()) {
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 				if (distance < minDistance) {
 					newLink = possibleLink.getId();
 					minDistance = distance;
