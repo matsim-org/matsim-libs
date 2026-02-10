@@ -50,8 +50,6 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	private Id<Link> endLinkId = null;
 
 	public AbstractRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		Gbl.assertNotNull( startLinkId );
-		Gbl.assertNotNull( endLinkId );
 		this.startLinkId = startLinkId;
 		this.endLinkId = endLinkId;
 	}
