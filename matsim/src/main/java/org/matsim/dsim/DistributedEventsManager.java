@@ -428,7 +428,6 @@ public final class DistributedEventsManager implements EventsManager {
 		double time = lastSync + remoteSyncStep;
 
 		afterSimStep(time);
-		//broker.beforeSimStep(time);
 		broker.syncTimestep(time, true);
 
 		beforeSimStep(time + 1);

@@ -133,9 +133,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>${test.jvm.aeron} ${argLine}</argLine>
-					<!--<systemPropertyVariables>
-						<log4j2.level>TRACE</log4j2.level>
-					</systemPropertyVariables> -->
 				</configuration>
 			</plugin>
 

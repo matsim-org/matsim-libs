@@ -135,14 +135,6 @@ public class SimProcess implements Steppable, LP, SimStepMessageProcessor, Netsi
 			engine.doSimStep(time);
 		}
 
-//		// delay the last timestep of integration test a little bit to re-create unordered messages.
-//		if (time == 1799 && partition.getIndex() == 0) {
-//			try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
 		messaging.sendMessages(time);
 
 		listenerManager.fireQueueSimulationAfterSimStepEvent(time);

@@ -27,7 +27,6 @@ import org.matsim.core.communication.MessageConsumer;
 import org.matsim.core.communication.MessageReceiver;
 import org.matsim.core.serialization.FuryBufferParser;
 import org.matsim.core.serialization.SerializationProvider;
-import org.matsim.core.trafficmonitoring.TravelTimeSyncMessage;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -550,10 +549,6 @@ public final class MessageBroker implements MessageConsumer, MessageReceiver {
 			FuryBufferParser parser = serialization.getFuryParser(type);
 			Message msg = parser.parse(in);
 			log.trace("#{} received from {}: {}", receiver, sender, msg);
-
-//			if (msg instanceof TravelTimeSyncMessage && tag == 180900) {
-//				log.trace("break here");
-//			}
 
 			if (partition == NODE_MESSAGE) {
 				nodesMessages.computeIfAbsent(type, _ -> new ManyToOneConcurrentLinkedQueue<>()).add(msg);
