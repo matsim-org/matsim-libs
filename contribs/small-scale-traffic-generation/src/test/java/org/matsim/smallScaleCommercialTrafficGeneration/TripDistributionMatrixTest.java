@@ -135,7 +135,7 @@ public class TripDistributionMatrixTest {
 							usedTrafficType);
 					sumStopServices += generatedVolume;
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
-							usedTrafficType);
+							usedTrafficType, 1);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
 					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}
@@ -232,7 +232,7 @@ public class TripDistributionMatrixTest {
 							usedTrafficType);
 					sumStopServices += generatedVolume;
 					sumStartServices += odMatrix.getSumOfServicesForStartZone(zone, modeORvehType, purpose,
-							usedTrafficType);
+							usedTrafficType, 1);
 					double planedVolume = trafficVolumePerTypeAndZone_stop.get(key).getDouble(purpose);
 					Assertions.assertEquals(planedVolume, generatedVolume, MatsimTestUtils.EPSILON);
 				}

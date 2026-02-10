@@ -838,17 +838,15 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
 						} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
-						int numberOfDepots = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,
-							smallScaleCommercialTrafficType);
+						int numberOfServicesForStartZone = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose, smallScaleCommercialTrafficType, odMatrixEntry.occupancyRate);
+						int numberOfDepots = Math.max(1, (int) Math.ceil(numberOfServicesForStartZone));
+						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots, numberOfServicesForStartZone);
 
 						// Create the Carrier
 						CarrierCapabilities.FleetSize fleetSize = CarrierCapabilities.FleetSize.FINITE;
 						ArrayList<String> vehicleDepots = new ArrayList<>();
 						createdCarrier++;
 						log.info("Create carrier number {} of a maximum Number of {} carriers.", createdCarrier, maxNumberOfCarrier);
-						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots,
-							(int) Math.ceil(odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType,
-								purpose, smallScaleCommercialTrafficType) / odMatrixEntry.occupancyRate));
 
 						CarrierAttributes carrierAttributes = new CarrierAttributes(purpose, startZone, selectedStartCategory, modeORvehType,
 							smallScaleCommercialTrafficType, vehicleDepots, odMatrixEntry);
@@ -1008,7 +1006,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		carriers.addCarrier(thisCarrier);
 
 		while (carrierAttributes.vehicleDepots.size() < numberOfDepots) {
-			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null); //TODO hier die Wkt für die Auswahl anpassen
+			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null);
 			carrierAttributes.vehicleDepots.add(linkId.toString());
 		}
 
