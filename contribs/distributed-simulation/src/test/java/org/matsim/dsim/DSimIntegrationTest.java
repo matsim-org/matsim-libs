@@ -89,8 +89,8 @@ public class DSimIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
-				//f.get();
+				//f.get(1, TimeUnit.MINUTES);
+				f.get();
 			}
 		}
 
@@ -124,7 +124,7 @@ public class DSimIntegrationTest {
 		config.dsim().setPartitioning(DSimConfigGroup.Partitioning.bisect);
 		// rely on flow capacity factor until we introduce global scaling factor
 		config.qsim().setFlowCapFactor(1.);
-		config.qsim().setStorageCapFactor( 1. );
+		config.qsim().setStorageCapFactor(1.);
 
 		// Randomness will lead to different results from the baseline
 		config.routing().setRoutingRandomness(0);
