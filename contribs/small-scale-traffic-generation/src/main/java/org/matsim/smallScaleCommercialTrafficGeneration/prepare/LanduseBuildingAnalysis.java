@@ -401,7 +401,7 @@ public class LanduseBuildingAnalysis {
 				row.add(zoneIdRegionConnection.get(zone));
 				for (String category : header) {
 					if (!category.equals("zoneID") && !category.equals("region"))
-						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(StructuralAttribute.fromLabel(category)))));
+						row.add(String.valueOf((int) Math.round(resultingDataPerZone.get(zone).getDouble(StructuralAttribute.fromLabel(category).get()))));
 				}
 				JOIN.appendTo(writer, row);
 				writer.write("\n");
