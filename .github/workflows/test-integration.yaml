@@ -3,6 +3,7 @@ on: push
 
 jobs:
   run-integration:
+    timeout-minutes: 10
     name: test integration
 
     runs-on: ${{ matrix.os }}
