@@ -46,7 +46,15 @@ import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.Ex
 /**
  * @author nagel, gregorr
  * This is my proposal for the VTTS handler.
+
+ * This class calculates VTTS (Value of Travel Time Savings) based on
+ * individual travel disutility from MATSim runs.
+ *
+ * It reads a base-case MATSim output, computes person-level travel disutility,
+ * activity delay disutility, and VTTS values in EUR/h.
+ * Author: nagel, gregorr
  */
+
 
 
 public class VttsCalculationBasedOnKn implements MATSimAppCommand {
@@ -96,7 +104,7 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 		// yy whey do we need the above?
 
 		baseConfig.counts().setInputFile(null);
-		baseConfig.controller().setOutputDirectory("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/experienced-plans-tmp");
+		baseConfig.controller().setOutputDirectory("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/");
 
 
 //		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
@@ -122,9 +130,14 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 
 		final Population basePopulation = readAndCleanPopulation(baseCasePath);
 
+		// Compute marginal utilities of money for each person
 		computeAndSetMarginalUtilitiesOfMoney(basePopulation);
 
 		baseScenario.setPopulation(basePopulation);
+
+		// -------------------------
+		// Create injectors for scoring/trip routing
+		// -------------------------
 
 		{
 			this.injector = new Injector.InjectorBuilder(baseScenario).addStandardModules().addOverridingModule(new AbstractModule() {
@@ -157,9 +170,9 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 
 		Table baseTablePersons = generatePersonTableFromPopulation(basePopulation, baseConfig, null);
 		Table baseTableTrips = generateTripVTTSWithActivityDelay(basePopulation, baseConfig);
+
+		//write the tables:
 		baseTableTrips.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-trips.csv");
-
-
 		baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/agentWiseComparisonKN-persons.csv");
 
 
@@ -492,6 +505,5 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 		formatTable(table, 2);
 		return table;
 	}
-
 
 }
