@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -261,6 +262,7 @@ public class ModeRestrictionTest {
 		config.routing().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.bike ) );
 		config.routing().removeTeleportedModeParams("bike");
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		config.controller().setLastIteration(0);
 		return config;
