@@ -128,6 +128,7 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
+	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -168,6 +169,7 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
+	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	void oneAgentThreeNodesTwoIterations() throws ExecutionException, InterruptedException, TimeoutException {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
@@ -200,7 +202,7 @@ public class ThreeLinkIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				var result = f.get(2, TimeUnit.MINUTES);
+				var result = f.get(1, TimeUnit.MINUTES);
 				assertEquals(1, result.getSecond().getPopulation().getPersons().size());
 				var person = result.getSecond().getPopulation().getPersons().values().iterator().next();
 				// make sure that the score is sent back to the person.
@@ -215,6 +217,7 @@ public class ThreeLinkIntegrationTest {
 
 	@Test
 	@Order(2)
+	@Timeout(value = 2, unit = TimeUnit.MINUTES)
 	void storageCapacityThreeNodes() throws URISyntaxException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
