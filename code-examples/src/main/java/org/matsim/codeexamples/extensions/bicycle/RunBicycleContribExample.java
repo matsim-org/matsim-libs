@@ -6,17 +6,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.bicycle.BicycleConfigGroup;
-import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.bicycle.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -55,7 +55,7 @@ public final class RunBicycleContribExample{
 			config.scoring().addModeParams( new ModeParams( BICYCLE ).setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(0. ).setMonetaryDistanceRate(0. ) );
 
 			config.global().setNumberOfThreads(1 );
-			config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 			config.controller().setLastIteration(0);
 		}
@@ -64,10 +64,7 @@ public final class RunBicycleContribExample{
 		bicycleConfigGroup.setBicycleMode( BICYCLE );
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
-
-		bicycleConfigGroup.setMaxBicycleSpeedForRouting( BICYCLE_SPEED );
-		// (technically, this has been superseded by using the correct mode vehicle type, see below.  But there is still a faulty consistency check :-( .)
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.02);
 
 		config.routing().setRoutingRandomness( 0. );
 
@@ -87,7 +84,8 @@ public final class RunBicycleContribExample{
 			// now put hte mode vehicles into the vehicles data:
 			final VehiclesFactory vf = VehicleUtils.getFactory();
 			scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.createVehicleTypeId( TransportMode.car ) ).setNetworkMode( TransportMode.car ) );
-			scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.createVehicleTypeId( BICYCLE ) ).setNetworkMode( BICYCLE ).setMaximumVelocity( BICYCLE_SPEED ).setPcuEquivalents( 0.25 ) );
+			scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.createVehicleTypeId( BICYCLE ) ).setNetworkMode( BICYCLE )
+													 .setMaximumVelocity( BICYCLE_SPEED ).setPcuEquivalents( 0.25 ) );
 		}
 //		{
 //			Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( 2 ) );
@@ -101,8 +99,8 @@ public final class RunBicycleContribExample{
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule() );
-		controler.addOverridingModule( new OTFVisLiveModule() );
 
+		controler.addOverridingModule( new OTFVisLiveModule() );
 		controler.run();
 	}
 
