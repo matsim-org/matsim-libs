@@ -182,6 +182,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
+	@CommandLine.Option(names = "--factorForNumberOfVehicles", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxReplanningIterations > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
+	private double factorForNumberOfVehicles;
+
 	private Random rnd;
 	private RandomGenerator rng;
 	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
@@ -838,8 +841,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
 						} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
-						int numberOfServicesForStartZone = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose, smallScaleCommercialTrafficType, odMatrixEntry.occupancyRate);
-						int numberOfDepots = Math.max(1, (int) Math.ceil(numberOfServicesForStartZone));
+						int numberOfServicesForStartZone = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,	smallScaleCommercialTrafficType, odMatrixEntry.occupancyRate);
+						int numberOfDepots = Math.max(1, (int) Math.ceil(factorForNumberOfVehicles * numberOfServicesForStartZone));
 						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots, numberOfServicesForStartZone);
 
 						// Create the Carrier

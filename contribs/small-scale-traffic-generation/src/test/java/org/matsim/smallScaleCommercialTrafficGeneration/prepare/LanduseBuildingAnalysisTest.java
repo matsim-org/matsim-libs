@@ -96,57 +96,57 @@ public class LanduseBuildingAnalysisTest {
 
             switch (zone) {
                 case "area1" -> {
-                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                    Assertions.assertEquals(400, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                    Assertions.assertEquals(350, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
                             MatsimTestUtils.EPSILON);
                     Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
                             MatsimTestUtils.EPSILON);
                 }
                 case "area2" -> {
-                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                    Assertions.assertEquals(400, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
-                            MatsimTestUtils.EPSILON);
-                }
-                case "area3" -> {
-                    Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                    Assertions.assertEquals(650, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
                             MatsimTestUtils.EPSILON);
                     Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area3" -> {
+                    Assertions.assertEquals(80, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(5, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(20, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(10, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(15, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(20, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(30, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
                             MatsimTestUtils.EPSILON);
                 }
 				default -> Assertions.fail("Zone not found");
@@ -290,57 +290,57 @@ public class LanduseBuildingAnalysisTest {
 
             switch (zone) {
                 case "area1" -> {
-                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                    Assertions.assertEquals(400, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(3500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                    Assertions.assertEquals(350, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
                             MatsimTestUtils.EPSILON);
                     Assertions.assertEquals(0, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
                             MatsimTestUtils.EPSILON);
                 }
                 case "area2" -> {
-                    Assertions.assertEquals(4000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                    Assertions.assertEquals(400, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(6500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1500, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(2000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
-                            MatsimTestUtils.EPSILON);
-                }
-                case "area3" -> {
-                    Assertions.assertEquals(800, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
-                            MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(1000, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                    Assertions.assertEquals(650, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
                             MatsimTestUtils.EPSILON);
                     Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                    Assertions.assertEquals(50, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                    Assertions.assertEquals(150, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
                             MatsimTestUtils.EPSILON);
-                    Assertions.assertEquals(300, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                    Assertions.assertEquals(200, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
+                            MatsimTestUtils.EPSILON);
+                }
+                case "area3" -> {
+                    Assertions.assertEquals(80, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.INHABITANTS),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(100, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(5, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_PRIMARY),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(20, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_CONSTRUCTION),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(10, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_SECONDARY),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(15, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_RETAIL),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(20, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TRAFFIC),
+                            MatsimTestUtils.EPSILON);
+                    Assertions.assertEquals(30, resultingDataPerZone.get(zone).getDouble(StructuralAttribute.EMPLOYEE_TERTIARY),
                             MatsimTestUtils.EPSILON);
                 }
 				default -> Assertions.fail("Zone not found");
