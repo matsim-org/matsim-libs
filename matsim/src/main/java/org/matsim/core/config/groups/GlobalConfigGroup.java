@@ -141,11 +141,11 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private double relativeToleranceForSampleSizeFactors = 0.;
 //	@StringSetter( "relativeScalesTolerance" )
 	public GlobalConfigGroup setRelativeToleranceForSampleSizeFactors( double val ) {
-		this.relativeToleranceForSampleSizeFactors = val;
+		this.relativeToleranceForSampleSizeFactors = val + Double.MIN_VALUE; // make this very slightly larger
 		return this;
 	}
 	public double getRelativeToleranceForSampleSizeFactor() {
-		return this.relativeToleranceForSampleSizeFactors + Double.MIN_VALUE; // makd this very slightly larger than zero
+		return this.relativeToleranceForSampleSizeFactors;
 	}
 	// ===
 	@Override protected void checkConsistency( Config config ){
