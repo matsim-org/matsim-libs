@@ -145,7 +145,7 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 		return this;
 	}
 	public double getRelativeToleranceForSampleSizeFactor() {
-		return this.relativeToleranceForSampleSizeFactors + Double.MAX_VALUE; // makd this very slightly larger than zero
+		return this.relativeToleranceForSampleSizeFactors + Double.MIN_VALUE; // makd this very slightly larger than zero
 	}
 	// ===
 	@Override protected void checkConsistency( Config config ){
