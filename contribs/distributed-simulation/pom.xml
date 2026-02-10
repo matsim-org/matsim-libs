@@ -21,7 +21,7 @@
 		<!-- Use -DskipShaded=false to build a executable jar. -->
 		<skipShaded>true</skipShaded>
 
-			
+
 		<!-- Required by Aeron 1.47+, see https://github.com/aeron-io/aeron/wiki/Change-Log#1470-2025-01-17 -->
 		<test.jvm.aeron>
 			--add-opens java.base/jdk.internal.misc=ALL-UNNAMED
@@ -127,12 +127,15 @@
 				</executions>
 			</plugin>
 
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>${test.jvm.aeron} ${argLine}</argLine>
+					<systemPropertyVariables>
+						<log4j2.level>TRACE</log4j2.level>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 
