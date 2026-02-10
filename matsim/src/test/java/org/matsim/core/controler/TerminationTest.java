@@ -86,6 +86,7 @@ public class TerminationTest {
 
 		config.controller().setWriteEventsInterval(interval);
 		config.controller().setLastIteration(criterion);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		return new Controler(config);
 	}
@@ -134,6 +135,7 @@ public class TerminationTest {
 		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setCleanItersAtEnd(ControllerConfigGroup.CleanIterations.keep);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		{ // Set up mode choice
 			config.changeMode().setModes(new String[] { "car", "walk" });

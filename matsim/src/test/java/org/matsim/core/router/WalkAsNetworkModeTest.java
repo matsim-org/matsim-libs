@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -94,7 +95,7 @@ public class WalkAsNetworkModeTest {
 		}
 	}
 
-	// Deliberately not using @ParameterizedTest. See above. 
+	// Deliberately not using @ParameterizedTest. See above.
 	@Test
 	void test_walkConstantTimeToLink_ok() {
 		test_walkConstantTimeToLink(false);
@@ -143,6 +144,7 @@ public class WalkAsNetworkModeTest {
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controller().setLastIteration(1);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		config.qsim().setMainModes(Set.of(TransportMode.car, TransportMode.walk));
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
