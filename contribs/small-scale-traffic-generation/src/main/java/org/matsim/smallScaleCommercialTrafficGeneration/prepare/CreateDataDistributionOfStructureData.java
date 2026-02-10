@@ -17,7 +17,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +149,6 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 	private void calculateAreaSharesOfTheFacilities(ActivityFacilities facilities, ActivityFacilitiesFactory facilitiesFactory) {
 		for (String zone : buildingsPerZone.keySet()) {
 			for (StructuralAttribute assignedDataType : buildingsPerZone.get(zone).keySet()) {
-
 				buildingsPerZone.get(zone).get(assignedDataType).forEach(singleBuilding -> {
 					ActivityFacility facility;
 					Id<ActivityFacility> id = Id.create(singleBuilding.getID(), ActivityFacility.class);
@@ -158,57 +156,36 @@ public class CreateDataDistributionOfStructureData implements MATSimAppCommand {
 						facility = facilities.getFacilities().get(id);
 						if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE))
 							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType.getLabel()));
-						addShareOfAreaOfBuildingToAttributes(zone, assignedDataType, singleBuilding, facility);
 					} else {
 						Coord coord = MGC.point2Coord(((Geometry) singleBuilding.getDefaultGeometry()).getCentroid());
 						facility = facilitiesFactory.createActivityFacility(id, coord);
 						if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE))
 							facility.addActivityOption(facilitiesFactory.createActivityOption(assignedDataType.getLabel()));
-						addShareOfAreaOfBuildingToAttributes(zone, assignedDataType, singleBuilding, facility);
+						addAttributes(zone, singleBuilding, facility);
 						facilities.addActivityFacility(facility);
 					}
 				});
-
 			}
 		}
+		facilities.getFacilities().values().forEach(facility -> {
+			double calculatedAreaPerOSMBuildingCategory = (double) facility.getAttributes().getAttribute("areaOfBuilding");
+			int numberOfActivityOptions = facility.getActivityOptions().size();
+			facility.getAttributes().putAttribute("areaPerBuildingCategory", calculatedAreaPerOSMBuildingCategory/numberOfActivityOptions);
+		});
 	}
 
 	/**
-	 * Add the share of the area of the building compared to the area of the buildings of this category in this zone to the attributes of the facility
+	 * Add the area and the zone as attributes to the facility.
 	 *
 	 * @param zone             The zone of the building
-	 * @param assignedDataType The category of the building
 	 * @param singleBuilding   The building
 	 * @param facility         The new facility
 	 */
-	private void addShareOfAreaOfBuildingToAttributes(String zone, StructuralAttribute assignedDataType, SimpleFeature singleBuilding, ActivityFacility facility) {
+	private void addAttributes(String zone, SimpleFeature singleBuilding, ActivityFacility facility) {
 		String[] buildingTypes = ((String) singleBuilding.getAttribute(shapeFileBuildingTypeColumn)).split(";");
 		// calculates the area of one raw building type
-		double calculatedAreaPerOSMBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes);
-
-		// counts the number of raw building types for this assignedDataType
-		int numberOfBuildingCategoriesInThisDataType;
-		if (assignedDataType.equals(StructuralAttribute.EMPLOYEE)) {
-			numberOfBuildingCategoriesInThisDataType = Arrays.stream(buildingTypes).filter(
-				buildingType -> landuseCategoriesAndDataConnection.keySet().stream().filter(
-					key -> key.getLabel().contains(StructuralAttribute.EMPLOYEE.getLabel()) && landuseCategoriesAndDataConnection.get(key).contains(
-						buildingType)).toArray().length > 0).toArray().length;
-			// because commercial is in two categories
-			if (Arrays.asList(buildingTypes).contains("commercial"))
-				numberOfBuildingCategoriesInThisDataType -= 1;
-		} else
-			numberOfBuildingCategoriesInThisDataType = Arrays.stream(buildingTypes).filter(
-				buildingType -> landuseCategoriesAndDataConnection.get(assignedDataType).contains(buildingType)).toArray().length;
-
-		// calculates the area of this assignedDataType
-		double areaForLanduseCategoriesOfThisDataType = calculatedAreaPerOSMBuildingCategory * numberOfBuildingCategoriesInThisDataType;
-
-		// if a building is commercial and the assignedDataType contains commercial buildings, the area of the commercial part is halved, because the commercial type is represented in two data types
-		double calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType;
-		if (!assignedDataType.equals(StructuralAttribute.EMPLOYEE) && landuseCategoriesAndDataConnection.get(assignedDataType).contains("commercial") && Arrays.asList(
-			buildingTypes).contains("commercial"))
-			calculatedAreaPerBuildingCategory = areaForLanduseCategoriesOfThisDataType - calculatedAreaPerOSMBuildingCategory / 2;
-		facility.getAttributes().putAttribute("areaPerBuildingCategory", calculatedAreaPerBuildingCategory);
+		double calculatedAreaPerOSMBuildingCategory = calculateAreaPerBuildingCategory(singleBuilding, buildingTypes)  * buildingTypes.length;
+		facility.getAttributes().putAttribute("areaOfBuilding", calculatedAreaPerOSMBuildingCategory);
 		facility.getAttributes().putAttribute("zone", zone);
 	}
 }
