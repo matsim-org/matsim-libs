@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ProjectionUtils;
@@ -117,6 +118,7 @@ public class FacilitiesReprojectionIOTest {
 		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controller().setOutputDirectory( outputDirectory );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		final Controler controler = new Controler( scenario );
 		controler.run();
 
@@ -182,6 +184,7 @@ public class FacilitiesReprojectionIOTest {
 		config.controller().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controller().setOutputDirectory( outputDirectory );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		final Controler controler = new Controler( scenario );
 		controler.run();
 

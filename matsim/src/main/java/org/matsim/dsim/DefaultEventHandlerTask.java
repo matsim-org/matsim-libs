@@ -159,8 +159,11 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 			if (shouldThisTaskSend() && (isSyncTime() || cleanupState == CleanupState.LAST_SYNC)) {
 				// sometimes send messages to other handlers
 				pattern.communicate(broker, handler);
-				// only send messages once on cleanup
-				cleanupState = CleanupState.LAST_RECEIVE;
+
+				if (cleanupState == CleanupState.LAST_SYNC) {
+					// only send messages once on cleanup
+					cleanupState = CleanupState.LAST_RECEIVE;
+				}
 			}
 		}
 

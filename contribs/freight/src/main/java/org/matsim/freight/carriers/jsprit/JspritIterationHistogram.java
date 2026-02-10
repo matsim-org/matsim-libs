@@ -1,5 +1,6 @@
 package org.matsim.freight.carriers.jsprit;
 
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -38,7 +39,7 @@ public class JspritIterationHistogram {
 	 * @param carriers                    the carriers
 	 * @param bestJspritSolutionCollector Map: CarrierId -> (Iteration -> selectedCost)
 	 */
-	public JspritIterationHistogram(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector,
+	public JspritIterationHistogram(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector,
 									String title) {
 		this.title = title;
 		aggregate(carriers, bestJspritSolutionCollector);
@@ -50,7 +51,7 @@ public class JspritIterationHistogram {
 	 * @param carriers                    the carriers
 	 * @param bestJspritSolutionCollector results of all solved VRPs
 	 */
-	private void aggregate(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
+	private void aggregate(Carriers carriers, Map<Id<Carrier>, ? extends NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector) {
 		// get global max iterations for jsprit
 		int globalMaxIteration = carriers.getCarriers().values().stream()
 			.mapToInt(CarriersUtils::getJspritIterations)
@@ -61,12 +62,12 @@ public class JspritIterationHistogram {
 			int runCount = 0;
 
 			for (Id<Carrier> carrierId : bestJspritSolutionCollector.keySet()) {
-				NavigableMap<Integer, Double> series = bestJspritSolutionCollector.get(carrierId);
+				NavigableMap<Integer, VehicleRoutingProblemSolution> series = bestJspritSolutionCollector.get(carrierId);
 				if (series.isEmpty()) continue;
 
-				Map.Entry<Integer, Double> floor = series.floorEntry(iter);
+				Map.Entry<Integer, VehicleRoutingProblemSolution> floor = series.floorEntry(iter);
 				// Sum: last known selected cost
-				sum += floor.getValue();
+				sum += floor.getValue().getCost();
 
 				// count carriers that are still running at iteration iter
 				if (CarriersUtils.getJspritIterations(carriers.getCarriers().get(carrierId)) >= iter) {

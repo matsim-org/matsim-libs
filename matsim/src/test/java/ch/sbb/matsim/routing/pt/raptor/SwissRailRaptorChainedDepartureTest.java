@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
@@ -45,6 +46,7 @@ public class SwissRailRaptorChainedDepartureTest {
 		String input = utils.getPackageInputDirectory();
 
 		Config config = ConfigUtils.createConfig();
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		scenario = ScenarioUtils.createScenario(config);
 
 		new TransitScheduleReader(scenario).readFile(input + "schedule.xml");

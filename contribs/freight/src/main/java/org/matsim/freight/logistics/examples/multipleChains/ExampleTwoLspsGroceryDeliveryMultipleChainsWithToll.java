@@ -33,6 +33,7 @@ import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -339,6 +340,7 @@ final class ExampleTwoLspsGroceryDeliveryMultipleChainsWithToll {
 		config.global().setCoordinateSystem("EPSG:31468");
 		config.global().setRandomSeed(4177);
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling(FreightCarriersConfigGroup.TimeWindowHandling.ignore);

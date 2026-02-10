@@ -329,7 +329,7 @@ public class CarriersUtils {
 	 * @param bestJspritSolutionCollector    the selected series of all solved VRPs
 	 */
 	public static void writeAggregatedResultsForAllRunVRPs(Carriers carriers, Path aggegatedJspritAnalysisCSVPath,
-														   Map<Id<Carrier>, NavigableMap<Integer, Double>> bestJspritSolutionCollector) {
+														   Map<Id<Carrier>, NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector) {
 		JspritIterationHistogram histogram = new JspritIterationHistogram(carriers, bestJspritSolutionCollector, "VRP aggregated statistics");
 
 		histogram.writeAggregatedCsv(aggegatedJspritAnalysisCSVPath, delimiter);
@@ -354,6 +354,7 @@ public class CarriersUtils {
 				writer.write(String.join(delimiter,"carrierId",
 					"jsprit_iteration",
 					"currentBestSolutionCost",
+					"currentBestSolutionNumberOfVehicles",
 					"costsOfThisSolution",
 					"strategyOfThisIteration",
 					"iterationComputationTimeInSeconds",
@@ -960,13 +961,13 @@ public class CarriersUtils {
 	 * Snapshot collector for the best jsprit solutions found during the VRP solving per carrier.
 	 */
 	static final class BestJspritSolutionCollector {
-		private final ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> map = new ConcurrentHashMap<>();
+		private final ConcurrentMap<Id<Carrier>, NavigableMap<Integer, VehicleRoutingProblemSolution>> map = new ConcurrentHashMap<>();
 
-		void put(Id<Carrier> carrierId, NavigableMap<Integer, Double> series) {
-			map.put(carrierId, new TreeMap<>(series)); // defensive copy
+		void put(Id<Carrier> carrierId, NavigableMap<Integer, VehicleRoutingProblemSolution> series) {
+			map.put(carrierId, new TreeMap<>(series));
 		}
 
-		ConcurrentMap<Id<Carrier>, NavigableMap<Integer, Double>> snapshot() {
+		ConcurrentMap<Id<Carrier>, NavigableMap<Integer, VehicleRoutingProblemSolution>> snapshot() {
 			return map;
 		}
 	}
@@ -1066,7 +1067,7 @@ public class CarriersUtils {
 				try (BufferedWriter writer = IOUtils.getAppendingBufferedWriter(iterationAnalysisPerCarrierPath.toString())) {
 
 					LinkedHashMap <Integer, JspritStrategyAnalyzer.IterationResult> jspritResultsPerIteration = analyzer.getIterationSolutionCosts();
-					NavigableMap<Integer, Double> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
+					NavigableMap<Integer, VehicleRoutingProblemSolution> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
 					bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
 
 					for (var entry : jspritResultsPerIteration.entrySet()) {
@@ -1075,7 +1076,8 @@ public class CarriersUtils {
 						String strategyOfThisIteration = entry.getValue().strategyId();
 						double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
 						var floor = foundNewBestSolutions.floorEntry(jspritIteration);
-						double bestSoFar = (floor != null) ? floor.getValue() : Double.NaN;
+						double bestSoFar = (floor != null) ? floor.getValue().getCost() : Double.NaN;
+						int bestSoFar_vehiclesUsed = (floor != null) ? floor.getValue().getRoutes().size() : 0;
 						int numberOfRoutesOfThisIterationSolution = entry.getValue().numberOfRoutesOfThisIterationSolution();
 						int removedJobsWhileRuin = entry.getValue().removedJobsWhileRuin();
 						int routesAfterRuin = entry.getValue().routesAfterRuin();
@@ -1083,6 +1085,7 @@ public class CarriersUtils {
 						writer.write(carrier.getId().toString());
 						writer.write(delimiter + jspritIteration);
 						writer.write(delimiter + bestSoFar);
+						writer.write(delimiter + bestSoFar_vehiclesUsed);
 						writer.write(delimiter + selectedStrategyCost);
 						writer.write(delimiter + strategyOfThisIteration);
 						if (iterationComputationTimeInSeconds >= 1)

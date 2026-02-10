@@ -20,7 +20,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Whether default dashboards are created.")
-	private Mode defaultDashboards = Mode.enabled;
+	private DefaultDashboardsMode defaultDashboards = DefaultDashboardsMode.enabled;
 
 	@Parameter
 	@Comment("Set of packages to scan for dashboard provider classes.")
@@ -101,16 +101,17 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 		final double flowCapFactor = config.qsim().getFlowCapFactor();
 		final double relativeTolerance = config.global().getRelativeToleranceForSampleSizeFactor();
 		if ( !Precision.equalsWithRelativeTolerance( flowCapFactor, this.sampleSize, relativeTolerance ) ) {
-			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor );
+			throw new RuntimeException("your storageCapFactor=" + config.qsim().getStorageCapFactor() + " is more than the relativeTolerance=" + relativeTolerance + " different from the flowCapFactor=" + flowCapFactor
+			+ ". Relative tolerance can be set in the global config group.");
 		}
 
 	}
 
-	public Mode getDefaultDashboards() {
+	public DefaultDashboardsMode getDefaultDashboards() {
 		return defaultDashboards;
 	}
 
-	public void setDefaultDashboards(Mode defaultDashboards) {
+	public void setDefaultDashboards( DefaultDashboardsMode defaultDashboards ) {
 		this.defaultDashboards = defaultDashboards;
 	}
 
@@ -149,7 +150,7 @@ public class SimWrapperConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * Mode how default dashboards are loaded.
 	 */
-	public enum Mode {
+	public enum DefaultDashboardsMode{
 		enabled,
 		disabled
 	}
