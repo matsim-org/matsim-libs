@@ -83,7 +83,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	private static final Logger log = LogManager.getLogger(TransitQSimEngine.class);
 
-	private final Netsim qSim;
+	private final Netsim netsim;
 
 	private final TransitSchedule schedule;
 
@@ -118,7 +118,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 							 TransitDriverAgentFactory transitDriverFactory) {
 		// This should be package-private.  See https://github.com/google/guice/wiki/KeepConstructorsHidden .
 
-		this.qSim = queueSimulation;
+		this.netsim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
 		this.umlaufBuilder = umlaufBuilder;
 		this.agentTracker = tracker;
@@ -142,13 +142,13 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public void afterSim() {
-		double now = this.qSim.getSimTimer().getTimeOfDay();
+		double now = this.netsim.getSimTimer().getTimeOfDay();
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
+				this.netsim.getEventsManager().processEvent(new PersonStuckEvent(now, agent.getId(), stop.getLinkId(), agent.getMode()));
+				this.netsim.getAgentCounter().decLiving();
+				this.netsim.getAgentCounter().incLost();
 			}
 		}
 		// clear all data. This way, we make sure that only one stuck event per person is generated.
@@ -156,7 +156,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	}
 
 	private void createVehiclesAndDriversWithUmlaeufe(NetworkPartition partition, InsertableMobsim mobsim) {
-		Scenario scenario = this.qSim.getScenario();
+		Scenario scenario = this.netsim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		UmlaufCache umlaufCache = getOrCreateUmlaufe();
 
@@ -207,13 +207,13 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
 			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent {}", planAgent.getId().toString());
-			this.qSim.getAgentCounter().decLiving();
-			this.qSim.getAgentCounter().incLost();
+			this.netsim.getAgentCounter().decLiving();
+			this.netsim.getAgentCounter().incLost();
 			return;
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			double now = this.qSim.getSimTimer().getTimeOfDay();
+			double now = this.netsim.getSimTimer().getTimeOfDay();
 			this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(planAgent);
 		} else {
@@ -224,7 +224,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		String requestedMode = agent.getMode();
-		if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
+		if (netsim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
 			handleAgentPTDeparture(agent, linkId);
 			return true;
 		}
@@ -243,7 +243,7 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		createVehiclesAndDriversWithUmlaeufe(NetworkPartition.SINGLE_INSTANCE, qSim);
+		createVehiclesAndDriversWithUmlaeufe(NetworkPartition.SINGLE_INSTANCE, netsim);
 	}
 
 	@Override
@@ -259,9 +259,9 @@ public class TransitQSimEngine implements DepartureHandler, MobsimEngine, AgentS
 	@Override
 	public DistributedMobsimAgent agentFromMessage(Class<? extends DistributedMobsimAgent> type, Message message) {
 		if (type == TransitAgent.class) {
-			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, qSim.getScenario(),
-				qSim.getEventsManager(), qSim.getSimTimer(), timeInterpretation);
-			return TransitAgent.createTransitAgent(delegate, qSim.getScenario());
+			BasicPlanAgentImpl delegate = new BasicPlanAgentImpl((BasicPlanAgentImpl.BasicPlanAgentMessage) message, netsim.getScenario(),
+				netsim.getEventsManager(), netsim.getSimTimer(), timeInterpretation);
+			return TransitAgent.createTransitAgent(delegate, netsim.getScenario());
 		} else if (type == TransitDriverAgentImpl.class) {
 			TransitDriverAgentImpl.TransitDriverMessage driverMessage = (TransitDriverAgentImpl.TransitDriverMessage) message;
 			Umlauf umlauf = umlaeufe.getUmlauf(driverMessage.umlaufId());

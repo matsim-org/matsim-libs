@@ -43,6 +43,7 @@ import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -75,16 +76,16 @@ public class DriveDischargingHandler
 	private final EventsManager eventsManager;
 	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	
+
 	private final Queue<VehicleEntersTrafficEvent> trafficEnterEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<LinkLeaveEvent> linkLeaveEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<VehicleLeavesTrafficEvent> trafficLeaveEvents = new ConcurrentLinkedQueue<>();
-	
-	private final QSim qsim;
+
+	private final Netsim netsim;
 
 	@Inject
-	DriveDischargingHandler(QSim qsim, ElectricFleet data, Network network, EventsManager eventsManager) {
-		this.qsim = qsim;
+	DriveDischargingHandler(Netsim netsim, ElectricFleet data, Network network, EventsManager eventsManager) {
+		this.netsim = netsim;
 		this.network = network;
 		this.eventsManager = eventsManager;
 		eVehicles = data.getElectricVehicles();
@@ -126,7 +127,7 @@ public class DriveDischargingHandler
 	@Override
 	public void afterSim() {
 		// process remaining events
-		doSimStep(this.qsim.getSimTimer().getTimeOfDay());
+		doSimStep(this.netsim.getSimTimer().getTimeOfDay());
 	}
 
 	@Override
