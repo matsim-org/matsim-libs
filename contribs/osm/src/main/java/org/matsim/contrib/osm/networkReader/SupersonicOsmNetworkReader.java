@@ -112,10 +112,33 @@ public class SupersonicOsmNetworkReader {
 
     private void convert() {
 
-        ways.values().parallelStream()
+		List<Link> links = ways.values().parallelStream()
                 .flatMap(way -> this.createWaySegments(way).stream())
                 .flatMap(segment -> this.createLinks(segment).stream())
-                .forEach(this::addLinkToNetwork);
+				.toList();
+
+		// only create unmodifiableMaps once
+		Map<Id<Node>, ? extends Node> nodesMap = network.getNodes();
+		Map<Id<Link>, ? extends Link> linksMap = network.getLinks();
+		for (Link link : links) {
+			// we have to test for presence
+			if (!nodesMap.containsKey(link.getFromNode().getId())) {
+				network.addNode(link.getFromNode());
+			}
+
+			if (!nodesMap.containsKey(link.getToNode().getId())) {
+				network.addNode(link.getToNode());
+			}
+
+			if (!linksMap.containsKey(link.getId())) {
+				network.addLink(link);
+			} else {
+				log.error("Link id: " + link.getId() + " was already present. This should not happen");
+				log.error("The link associated with this id: " + link);
+				throw new RuntimeException("Link id: " + link.getId() + " was already present!");
+			}
+		}
+
     }
 
     private ProcessedOsmNode getNodeFromWay(ProcessedOsmWay way, int index) {
@@ -367,26 +390,6 @@ public class SupersonicOsmNetworkReader {
         }
 
         return stringBuilder.toString();
-    }
-
-    private synchronized void addLinkToNetwork(Link link) {
-
-        //we have to test for presence
-        if (!network.getNodes().containsKey(link.getFromNode().getId())) {
-            network.addNode(link.getFromNode());
-        }
-
-        if (!network.getNodes().containsKey(link.getToNode().getId())) {
-            network.addNode(link.getToNode());
-        }
-
-        if (!network.getLinks().containsKey(link.getId())) {
-            network.addLink(link);
-        } else {
-            log.error("Link id: " + link.getId() + " was already present. This should not happen");
-            log.error("The link associated with this id: " + link);
-            throw new RuntimeException("Link id: " + link.getId() + " was already present!");
-        }
     }
 
     public enum Direction {Forward, Reverse}
