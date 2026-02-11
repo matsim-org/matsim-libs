@@ -28,6 +28,7 @@ import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -245,6 +246,7 @@ public class BasicCommercialDemandGeneration implements MATSimAppCommand {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.controller().setOutputDirectory(outputLocation.toString());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.scoring().setFractionOfIterationsToStartScoreMSA(0.8);
 		config.replanning().setFractionOfIterationsToDisableInnovation(0.8);
 		ReplanningConfigGroup.StrategySettings stratSets = new ReplanningConfigGroup.StrategySettings();

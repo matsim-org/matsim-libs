@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -14,14 +15,12 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.CarriersUtils;
 import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.freight.carriers.controller.CarrierModule;
-import org.matsim.simwrapper.Dashboard;
 import org.matsim.simwrapper.SimWrapper;
 import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
@@ -39,6 +38,7 @@ public class CarrierViewerDashboardTest {
 		config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9"), "config.xml"));
 		config.plans().setInputFile(null); // remove passenger input
 		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);  // no iterations; for iterations see RunFreightWithIterationsExample.  kai, jan'23
 
@@ -59,7 +59,7 @@ public class CarrierViewerDashboardTest {
 
 		// ## MATSim configuration:  ##
 		SimWrapperConfigGroup simwrapperCfg = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simwrapperCfg.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		simwrapperCfg.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 		SimWrapper simWrapper = SimWrapper.create(config);
 		simWrapper.addDashboard(new CarrierDashboard());

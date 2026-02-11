@@ -43,6 +43,7 @@ import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -720,6 +721,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
