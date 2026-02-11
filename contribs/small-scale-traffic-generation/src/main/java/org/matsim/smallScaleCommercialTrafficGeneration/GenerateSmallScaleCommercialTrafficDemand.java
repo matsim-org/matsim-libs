@@ -187,7 +187,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Random rnd;
 	private RandomGenerator rng;
-	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
+	private static final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
 
@@ -196,7 +196,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private TripDistributionMatrix odMatrix;
 	private Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone;
-	private Map<String, Map<Id<Link>, Link>> linksPerZone;
+	private static Map<String, Map<Id<Link>, Link>> linksPerZone;
 
 	private Index indexZones;
 
@@ -325,7 +325,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				}
 				indexZones = SmallScaleCommercialTrafficUtils.getIndexZones(shapeFileZonePath, shapeCRS, shapeFileZoneNameColumn);
 
-				filterFacilitiesForZones(scenario, facilitiesPerZoneWithProbabilities);
+				filterFacilitiesForZones(scenario);
 				prepareConfigForResultingModes(scenario);
 
 				switch (usedSmallScaleCommercialTrafficType) {
@@ -433,11 +433,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	/**
 	 * Creates a map with the different facility types per building.
-	 * @param scenario 				complete Scenario
-	 * @param facilitiesPerZoneWithProbabilities 	Map with facilities per zone
+	 *
+	 * @param scenario complete Scenario
 	 */
-	private void filterFacilitiesForZones(Scenario scenario,
-										  Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities) {
+	private void filterFacilitiesForZones(Scenario scenario) {
 		Map<String, Map<StructuralAttribute, List<Pair<ActivityFacility, Double>>>> pairsPerZone = new HashMap<>();
 
 		scenario.getActivityFacilities().getFacilities().values().forEach(facility -> {
