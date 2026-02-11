@@ -14,6 +14,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEm
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -46,6 +47,7 @@ public class RunPSimTest {
 	@Test
 	void testA() {
 		config.controller().setCreateGraphs(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
@@ -120,6 +122,7 @@ public class RunPSimTest {
 		config.controller().setLastIteration(2);
 		config.controller().setCreateGraphs(false);
 		config.controller().setDumpDataAtEnd(false);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.routing().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);

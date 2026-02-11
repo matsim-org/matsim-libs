@@ -8,9 +8,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -77,11 +74,15 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		" | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
 		" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
 
+	// I (kn) personally prefer to name the Config object as config, the filename
+	// to the config as configFilename, and to use path only if I have
+	// a Path object.  Otherwise, one always needs to look up the type.
+
 	@CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
 	protected String configPath;
 
 	@CommandLine.Option(names = "--yaml", description = "Path to yaml file with config params to overwrite.", required = false)
-	protected String specs;
+	protected String yamlFilename;
 
 	@CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
 	protected int iterations;
@@ -119,7 +120,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	}
 
 	/**
-	 * Constructor for given config, that can be used from code.
+	 * Constructor for given config, which can be used from code.
 	 */
 	public MATSimApplication(@Nullable Config config) {
 		this.config = config;
@@ -135,14 +136,22 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		// load config if not present yet.
 		if (config == null) {
+			// yy Something like
+			//			   Config config = ConfigUtils.createConfig( context );
+			//			   ConfigUtils.loadConfig( config, ...)
+			// would, in my understanding, set the context separately from the config path name.
+			//  But I am not sure how this would execute in everything that follows.  kai, feb'26
+
 			String path = Objects.requireNonNull( configPath, "No config given; use --config=<path-to-config.xml>" );
-			List<ConfigGroup> customModules = getCustomModules();
 
-			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
-			Config prepared = prepareConfig( config1 );
+			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path));
+			Config preparedConfig = prepareConfig( config1 );
 
-			config = prepared != null ? prepared : config1;
-			// (The above lines of code come from inlining so maybe it happened there: I cannot see how prepared could be null but config1 not except if user code returns null which I would consider a bug.  kai, aug'24)
+			config = preparedConfig != null ? preparedConfig : config1;
+			// (The above lines of code come from inlining so maybe it happened there: I cannot see how "preparedConfig" could
+			// be null but "config1" not except if user code returns null which I would consider a bug.  kai, aug'24)
+			// (--> see comments in prepareConfig(...).)
+
 		} else {
 			Config tmp = prepareConfig(config);
 			config = tmp != null ? tmp : config;
@@ -150,8 +159,8 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		Objects.requireNonNull(config);
 
-		if (specs != null)
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(specs));
+		if ( yamlFilename != null)
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource( yamlFilename ) );
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -160,6 +169,7 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		if (iterations > -1)
 			config.controller().setLastIteration(iterations);
+		// yy means that "iterations" is indeed
 
 		if (output != null)
 			config.controller().setOutputDirectory(output.toString());
@@ -201,25 +211,31 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		return configPath;
 	}
 
-	/**
-	 * Custom module configs that will be added to the {@link Config} object.
-	 *
-	 * @return {@link ConfigGroup} to add
-	 */
-	protected List<ConfigGroup> getCustomModules() {
-		return Lists.newArrayList();
-	}
+//	/**
+//	 * Custom module configs that will be added to the {@link Config} object.
+//	 *
+//	 * @return {@link ConfigGroup} to add
+//	 */
+//	protected List<ConfigGroup> getCustomModules() {
+//		return Lists.newArrayList();
+//	}
+	// (no longer used IMO.  kai, feb'26)
+	// (I think that this was meant to add "configurable modules".  However, modules are configurable via the sebhoerl
+	// command line syntax anyways.  I can't say if they possibly behave in a different way re non-default
+	// modules but am relatively sure that, because the corresponding
+	// command was commented out below, it would not have worked anyways with the current setup.)
 
-	/**
-	 * Modules that are configurable via command line arguments.
-	 */
-	protected List<ConfigGroup> getConfigurableModules() {
-		return Lists.newArrayList(
-			new ControllerConfigGroup(),
-			new GlobalConfigGroup(),
-			new QSimConfigGroup()
-		);
-	}
+//	/**
+//	 * Modules that are configurable via command line arguments.
+//	 */
+//	protected List<ConfigGroup> getConfigurableModules() {
+//		return Lists.newArrayList(
+//			new ControllerConfigGroup(),
+//			new GlobalConfigGroup(),
+//			new QSimConfigGroup()
+//		);
+//	}
+	// (never used IMO.  kai, feb'26)
 
 	/**
 	 * Preparation step for the config.
@@ -228,6 +244,9 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 * @return prepared {@link Config}
 	 */
 	protected Config prepareConfig(Config config) {
+		// yyyy We are passing an object into the method, so no need to return it.  That is also the
+		// convention for prepareScenario and prepareControler.  I can't see what we gain by returning the object.
+
 		return config;
 	}
 
@@ -419,10 +438,14 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	 */
 	public static int execute(Class<? extends MATSimApplication> clazz, Config config, String... args) {
 		MATSimApplication app = newInstance(clazz, config);
+		// (this calls the constructor of clazz via reflection)
 
 		prepareArgs(args);
+		// (this moves the run argument, if it is first and not last, to the very end)
 
 		CommandLine cli = prepare(app);
+
+
 		AtomicReference<Exception> exc = new AtomicReference<>();
 		cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
 			exc.set(ex);
@@ -471,8 +494,8 @@ public abstract class MATSimApplication implements Callable<Integer> {
 		Config tmp = app.prepareConfig(config);
 		config = tmp != null ? tmp : config;
 
-		if (app.specs != null) {
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.specs));
+		if (app.yamlFilename != null) {
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.yamlFilename ) );
 		}
 
 		if (app.remainingArgs != null) {
@@ -546,11 +569,13 @@ public abstract class MATSimApplication implements Callable<Integer> {
 
 		// Try constructor with config first
 		// if that fails try default constructor
+		// --> I just changed that behavior ... if a constructor with config is available but does not exist, then it aborts. kai, feb'26
+		// (matsim developer agreement is "reduce automagic")
 		if (config != null) {
 			try {
 				return clazz.getDeclaredConstructor(Config.class).newInstance(config);
 			} catch (NoSuchMethodException e) {
-				// Continue
+				throw new RuntimeException( "Requested constructor not available", e );
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException("Could not instantiate the application class", e);
 			}
@@ -569,17 +594,29 @@ public abstract class MATSimApplication implements Callable<Integer> {
 	private static CommandLine prepare(MATSimApplication app) {
 		CommandLine cli = new CommandLine(app);
 
-		if (cli.getCommandName().equals(DEFAULT_NAME))
-			cli.setCommandName(app.getClass().getSimpleName());
+		if (cli.getCommandName().equals(DEFAULT_NAME)){
+			cli.setCommandName( app.getClass().getSimpleName() );
+		}
+		// (commandName is what is displayed in the command line help text.  It seems that, with inheritance,
+		// piccoli sets this to the base class, but we want to have it set to the outermost class. kai,)
 
 		setupOptions(cli, app);
-		setupSubcommands(cli, app);
+		// (this reformats something in the help output)
 
-		List<ConfigGroup> modules = Lists.newArrayList();
-		modules.addAll(app.getConfigurableModules());
-		modules.addAll(app.getCustomModules());
+		setupSubcommands(cli, app);
+		// (this extracts the "Prepare" and "Analysis" subcommands.  yy Note
+		// that additional subcommand namespaces need to be programmed here.)
+
+
+//		List<ConfigGroup> modules = Lists.newArrayList();
+//		modules.addAll(app.getConfigurableModules());
+//		modules.addAll(app.getCustomModules());
+		// I found the following with setupConfig( cli, modules ) commented out.  I am not touching the line to leave git annotate intact ...
+		// ... from here ...
 
 		// setupConfig(cli, modules);
+		// ... to here.
+
 		return cli;
 	}
 
