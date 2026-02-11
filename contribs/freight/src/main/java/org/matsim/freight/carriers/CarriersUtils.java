@@ -234,6 +234,31 @@ public class CarriersUtils {
 	 */
 	public static void runJsprit(Scenario scenario, CarrierSelectionForSolution carriersSolutionType) throws ExecutionException, InterruptedException {
 
+		Carriers carriers = getCarriers(scenario);
+
+		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
+
+		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
+		// This also selects the carriers for which a new solution should be created
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			switch (carriersSolutionType) {
+				case solveForAllCarriersAndOverrideExistingPlans -> clearCarrierPlans(carrier);
+				case solveOnlyForCarrierWithoutPlans -> {
+					if (!carrier.getPlans().isEmpty()) {
+						continue;
+					}
+				}
+				case solveForAllCarriersAndAddPLans -> carrier.setSelectedPlan(null); // Keep existing plan(s), but make them not selected.
+				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
+			}
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
+		}
+
+		if (carrierActivityCounterMap.isEmpty()) {
+			log.warn("No carriers with VRP solution needed. Will not run jsprit.");
+			return;
+		}
 		String analysisOutputFolder = scenario.getConfig().controller().getOutputDirectory() + "/analysis/freight";
 		new CarriersAnalysis(getCarriers(scenario), analysisOutputFolder).runCarrierAnalysis(
 			CarriersAnalysis.CarrierAnalysisType.carriersPlans_unPlanned);
@@ -254,10 +279,8 @@ public class CarriersUtils {
 		}
 
 		final NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), getOrAddCarrierVehicleTypes(scenario).getVehicleTypes().values())
-				.setRoadPricingScheme(roadPricingScheme)
-				.build();
-
-		Carriers carriers = getCarriers(scenario);
+			.setRoadPricingScheme(roadPricingScheme)
+			.build();
 
 		//Check if the inputs of the carrier(s) are consistent before starting the planning
 		var result = CarrierConsistencyCheckers.checkBeforePlanning(carriers, Level.ERROR);
@@ -265,25 +288,6 @@ public class CarriersUtils {
 			//I will start with ERROR level. This may be changed later to throwing a RuntimeException. KMT Jun'25
 			log.error("Carrier consistency check failed! There will be carriers with unhandled jobs or other inconsistencies. " +
 				"Please check the log for details. To avoid this, please check your input files before running jsprit.");
-		}
-
-		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
-
-		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
-		// This also selects the carriers for which a new solution should be created
-		for (Carrier carrier : carriers.getCarriers().values()) {
-			switch (carriersSolutionType) {
-				case solveForAllCarriersAndOverrideExistingPlans -> clearCarrierPlans(carrier);
-				case solveOnlyForCarrierWithoutPlans -> {
-					if (!carrier.getPlans().isEmpty()) {
-						continue;
-					}
-				}
-				case solveForAllCarriersAndAddPLans -> carrier.setSelectedPlan(null); // Keep existing plan(s), but make them not selected.
-				default -> throw new IllegalStateException("Unexpected value: " + carriersSolutionType);
-			}
-			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
-			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + 2 * carrier.getShipments().size());
 		}
 
 		AtomicInteger startedVRPCounter = new AtomicInteger(0);
