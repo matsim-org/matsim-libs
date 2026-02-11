@@ -109,7 +109,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		// link events handler
-		LinkVolumeCommercialEventHandler linkDemandEventHandler = new LinkVolumeCommercialEventHandler(scenario, sampleSize, shp,
+		CommercialTrafficAnalysisEventHandler linkDemandEventHandler = new CommercialTrafficAnalysisEventHandler(scenario, sampleSize, shp,
 			groupsOfSubpopulationsForCommercialAnalysis);
 		eventsManager.addHandler(linkDemandEventHandler);
 
@@ -208,7 +208,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	private void createGeneralTravelDataAnalysis(LinkVolumeCommercialEventHandler linkDemandEventHandler, Scenario scenario) {
+	private void createGeneralTravelDataAnalysis(CommercialTrafficAnalysisEventHandler linkDemandEventHandler, Scenario scenario) {
 
 		HashMap<Id<Vehicle>, String> groupOfVehicles = linkDemandEventHandler.getGroupOfRelevantVehicles();
 		Map<String, List<Id<Vehicle>>> vehiclesPerGroup = groupOfVehicles.entrySet().stream()
@@ -374,7 +374,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return filteredList;
 	}
 
-	private void createAnalysisPerVehicle(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createAnalysisPerVehicle(CommercialTrafficAnalysisEventHandler linkDemandEventHandler) {
 		HashMap<String, Object2DoubleOpenHashMap<String>> travelDistancesPerVehicle = linkDemandEventHandler.getTravelDistancesPerVehicle();
 		HashMap<Id<Vehicle>, String> vehicleGroupOfSubpopulation = linkDemandEventHandler.getGroupOfRelevantVehicles();
 		HashMap<Id<Vehicle>, Double> tourDurations = linkDemandEventHandler.getTourDurationPerVehicle();
@@ -606,7 +606,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return maxDistanceWithDepotChargingInKilometers;
 	}
 
-	private void createRelationsAnalysis(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createRelationsAnalysis(CommercialTrafficAnalysisEventHandler linkDemandEventHandler) {
 		Map<Integer, Object2DoubleMap<String>> relations = linkDemandEventHandler.getRelations();
 		ArrayList<String> header = getHeaderForRelations(relations);
 		ArrayList<Integer> relationNumbers = new ArrayList<>(relations.keySet());
@@ -650,7 +650,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return header;
 	}
 
-	private void createTravelDistancesShares(LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	private void createTravelDistancesShares(CommercialTrafficAnalysisEventHandler linkDemandEventHandler) {
 		String filename = "travelDistancesShares.csv";
 		Path path = output.getPath("travelDistancesShares_%s.csv", "perMode");
 		Object2DoubleOpenHashMap<String> travelDistancesPerMode = linkDemandEventHandler.getTravelDistancesPerMode();
@@ -686,7 +686,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	public void createLinkVolumeAnalysis(Scenario scenario, LinkVolumeCommercialEventHandler linkDemandEventHandler) {
+	public void createLinkVolumeAnalysis(Scenario scenario, CommercialTrafficAnalysisEventHandler linkDemandEventHandler) {
 
 //		File file = new File(linkDemandOutputFile);
 		Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = linkDemandEventHandler.getLinkVolumesPerMode();

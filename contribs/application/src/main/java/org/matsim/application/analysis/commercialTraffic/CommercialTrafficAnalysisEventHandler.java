@@ -25,9 +25,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ActivityEndEventHandler {
+public class CommercialTrafficAnalysisEventHandler implements LinkLeaveEventHandler, ActivityStartEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ActivityEndEventHandler {
 
-	private static final Logger log = LogManager.getLogger(LinkVolumeCommercialEventHandler.class);
+	private static final Logger log = LogManager.getLogger(CommercialTrafficAnalysisEventHandler.class);
 
 	private final Map<Id<Link>, Object2DoubleOpenHashMap<String>> linkVolumesPerMode = new HashMap<>();
 	private final Object2DoubleOpenHashMap<String> travelDistancesPerMode = new Object2DoubleOpenHashMap<>();
@@ -67,8 +67,8 @@ public class LinkVolumeCommercialEventHandler implements LinkLeaveEventHandler, 
 	private final double sampleSize;
 	private final Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis;
 
-	public LinkVolumeCommercialEventHandler(Scenario scenario, double sampleSize, ShpOptions shpInvestigationArea,
-											Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis) {
+	public CommercialTrafficAnalysisEventHandler(Scenario scenario, double sampleSize, ShpOptions shpInvestigationArea,
+												 Map<String, List<String>> groupsOfSubpopulationsForCommercialAnalysis) {
 		if (shpInvestigationArea.getShapeFile() != null)
 			this.geometryInvestigationArea = shpInvestigationArea.getGeometry();
 		else

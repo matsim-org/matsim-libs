@@ -364,11 +364,11 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					scenario.getVehicles().addVehicleType(vehicleType);
 			});
 			Set<String> activityTypes = new HashSet<>(
-			    scenario.getPopulation().getPersons().values().stream()
-				.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
-					TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
-			        .map(Activity::getType)
-			        .toList()
+				scenario.getPopulation().getPersons().values().stream()
+					.flatMap(person -> PopulationUtils.getActivities(person.getSelectedPlan(),
+						TripStructureUtils.StageActivityHandling.ExcludeStageActivities).stream())
+					.map(Activity::getType)
+					.toList()
 			);
 			for (String activityType : activityTypes) {
 				config.scoring().addActivityParams(new ScoringConfigGroup.ActivityParams(activityType).setTypicalDuration(30 * 60));
@@ -797,6 +797,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			VehicleUtils.setCostsPerSecondInService(costInformation, costInformation.getCostsPerSecond());
 			VehicleUtils.setCostsPerSecondWaiting(costInformation, costInformation.getCostsPerSecond());
 		}
+		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
 
 		for (Integer purpose : odMatrix.getListOfPurposes()) {
 			for (String startZone : odMatrix.getListOfZones()) {
@@ -855,13 +856,16 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
 							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
-						createNewCarrierAndAddVehicleTypes(scenario, carrierName, carrierAttributes, vehicleTypes, numberOfDepots, fleetSize,
-							fixedNumberOfVehiclePerTypeAndLocation);
 
+						Carrier newCarrier = CarriersUtils.createCarrier(Id.create(carrierName, Carrier.class));
 						// Now Create services for this carrier
-						Carrier newCarrier = CarriersUtils.getCarriers(scenario).getCarriers().get(Id.create(carrierName, Carrier.class));
-
 						createServices(newCarrier, carrierAttributes);
+
+						createNewCarrierAndAddVehicleTypes(carrierVehicleTypes, newCarrier, carrierAttributes, vehicleTypes, fleetSize,
+							fixedNumberOfVehiclePerTypeAndLocation);
+						log.info("New: Carrier: {}; vehicles: {}; services: {}; services exact {}", carrierName, newCarrier.getCarrierCapabilities().getCarrierVehicles().size(), numberOfServicesForStartZone, newCarrier.getServices().size());
+
+						carriers.addCarrier(newCarrier);
 					}
 				}
 			}
