@@ -844,9 +844,6 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 							carrierName = "Carrier_Goods_" + startZone + "_purpose_" + purpose + "_" + modeORvehType;
 						} else if (smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic))
 							carrierName = "Carrier_Business_" + startZone + "_purpose_" + purpose;
-						int numberOfServicesForStartZone = odMatrix.getSumOfServicesForStartZone(startZone, modeORvehType, purpose,	smallScaleCommercialTrafficType, odMatrixEntry.occupancyRate);
-						int numberOfDepots = Math.max(1, (int) Math.ceil(factorForNumberOfVehicles * numberOfServicesForStartZone));
-						log.info("Carrier: {}; depots: {}; services: {}", carrierName, numberOfDepots, numberOfServicesForStartZone);
 
 						// Create the Carrier
 						CarrierCapabilities.FleetSize fleetSize = CarrierCapabilities.FleetSize.FINITE;
@@ -859,14 +856,14 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 						if(carrierId2carrierAttributes.putIfAbsent(Id.create(carrierName, Carrier.class), carrierAttributes) != null)
 							throw new RuntimeException("CarrierAttributes already exist for the carrier " + carrierName);
 
-
 						Carrier newCarrier = CarriersUtils.createCarrier(Id.create(carrierName, Carrier.class));
 						// Now Create services for this carrier
 						createServices(newCarrier, carrierAttributes);
+						log.info("Carrier: {}; created services: {}", carrierName, newCarrier.getServices().size());
 
 						createNewCarrierAndAddVehicleTypes(carrierVehicleTypes, newCarrier, carrierAttributes, vehicleTypes, fleetSize,
 							fixedNumberOfVehiclePerTypeAndLocation);
-						log.info("New: Carrier: {}; vehicles: {}; services: {}; services exact {}", carrierName, newCarrier.getCarrierCapabilities().getCarrierVehicles().size(), numberOfServicesForStartZone, newCarrier.getServices().size());
+						log.info("New: Carrier: {}; vehicles: {}; services: {}", carrierName, newCarrier.getCarrierCapabilities().getCarrierVehicles().size(), newCarrier.getServices().size());
 
 						carriers.addCarrier(newCarrier);
 					}
@@ -991,16 +988,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Creates the carrier and the related vehicles.
 	 */
-	private void createNewCarrierAndAddVehicleTypes(Scenario scenario, String carrierName, CarrierAttributes carrierAttributes,
-													List<String> vehicleTypes, int numberOfDepots, CarrierCapabilities.FleetSize fleetSize,
+	private void createNewCarrierAndAddVehicleTypes(CarrierVehicleTypes carrierVehicleTypes, Carrier thisCarrier, CarrierAttributes carrierAttributes,
+													List<String> vehicleTypes, CarrierCapabilities.FleetSize fleetSize,
 													int fixedNumberOfVehiclePerTypeAndLocation) {
 
-		Carriers carriers = CarriersUtils.addOrGetCarriers(scenario);
-		CarrierVehicleTypes carrierVehicleTypes = CarriersUtils.getOrAddCarrierVehicleTypes(scenario);
-
-		CarrierCapabilities carrierCapabilities;
-
-		Carrier thisCarrier = CarriersUtils.createCarrier(Id.create(carrierName, Carrier.class));
 		if (carrierAttributes.smallScaleCommercialTrafficType.equals(SmallScaleCommercialTrafficType.commercialPersonTraffic) && carrierAttributes.purpose == 3)
 			thisCarrier.getAttributes().putAttribute("subpopulation", carrierAttributes.smallScaleCommercialTrafficType + "_service");
 		else
@@ -1010,7 +1001,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		thisCarrier.getAttributes().putAttribute("tourStartArea", carrierAttributes.startZone);
 		if (jspritIterations > 0)
 			CarriersUtils.setJspritIterations(thisCarrier, jspritIterations);
-		carrierCapabilities = CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build();
+		CarrierCapabilities carrierCapabilities = CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build();
 
 		carriers.addCarrier(thisCarrier);
 
