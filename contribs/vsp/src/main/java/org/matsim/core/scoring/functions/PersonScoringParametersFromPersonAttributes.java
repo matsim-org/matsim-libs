@@ -172,7 +172,7 @@ public class PersonScoringParametersFromPersonAttributes implements ScoringParam
                     }
 
                     // copy other params from subpopulation config
-                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling());
+                    modeUtilityParamsBuilder.setMarginalUtilityOfTraveling_s(subpopulationModeParams.getMarginalUtilityOfTraveling() / 3600);
                     modeUtilityParamsBuilder.setMarginalUtilityOfDistance_m(subpopulationModeParams.getMarginalUtilityOfDistance());
                     modeUtilityParamsBuilder.setMonetaryDistanceRate(subpopulationModeParams.getMonetaryDistanceRate());
                     modeUtilityParamsBuilder.setDailyMoneyConstant(subpopulationModeParams.getDailyMonetaryConstant());
