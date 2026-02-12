@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
@@ -73,6 +74,7 @@ public class LinkStatsControllerListenerTest {
 		Config config = this.util.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controller().setLastIteration(10);
 		config.controller().setOutputDirectory(outputDirectory);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		ScoringConfigGroup.ModeParams walkParams = new ScoringConfigGroup.ModeParams("walk");
 		walkParams.setMarginalUtilityOfTraveling(0);
@@ -339,6 +341,7 @@ public class LinkStatsControllerListenerTest {
 		config.controller().setMobsim("dummy");
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(7);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		controler.getConfig().controller().setCreateGraphs(false);
 		controler.getConfig().controller().setDumpDataAtEnd(false);
@@ -363,6 +366,7 @@ public class LinkStatsControllerListenerTest {
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(7);
 		config.controller().setWritePlansInterval(0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 
