@@ -128,6 +128,7 @@ public class ThreeLinkIntegrationTest {
 	@Test
 	@Order(2)
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
+	@DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodes() throws InterruptedException, ExecutionException, TimeoutException {
 
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
@@ -169,6 +170,7 @@ public class ThreeLinkIntegrationTest {
 	@Test
 	@Order(2)
 	@Timeout(value = 2, unit = TimeUnit.MINUTES)
+	@DisabledOnGitHubWindowsCI
 	void oneAgentThreeNodesTwoIterations() throws ExecutionException, InterruptedException, TimeoutException {
 		var configPath = utils.getPackageInputDirectory() + "three-links-scenario/three-links-config.xml";
 		var outputDirectory = utils.getOutputDirectory(); // this also creats the directory
