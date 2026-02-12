@@ -23,6 +23,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
 import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.modechoice.InformedModeChoiceConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
@@ -93,6 +94,8 @@ public class DrtTestScenario extends MATSimApplication {
 		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
 
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+
+		ConfigUtils.addOrGetModule( config, SimWrapperConfigGroup.class ).setSampleSize( config.qsim().getFlowCapFactor() );
 
 		prepareConfig.accept(config);
 
