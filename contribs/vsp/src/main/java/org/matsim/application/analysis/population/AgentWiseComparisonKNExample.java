@@ -85,12 +85,13 @@ class AgentWiseComparisonKNExample{
 		AgentWiseComparisonKN ccc = new AgentWiseComparisonKN();
 		ccc.baseScenario = scenario;
 
+		ScoringFunctionFactory baseScoringFunctionFactory;
 		{
 			com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario )
 													  .addStandardModules()
 													  .addOverridingModule( new AbstractModule(){@Override public void install(){ bind( ScoringParametersForPerson.class ).to( IncomeDependentUtilityOfMoneyPersonScoringParameters.class ); }} )
 													  .build();
-			ccc.scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
+			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 
 /*
 //			ccc.tripRouter = injector.getInstance( TripRouter.class );
@@ -103,7 +104,7 @@ class AgentWiseComparisonKNExample{
 */
 		}
 
-		@NotNull Table baseTable = ccc.generatePersonTableFromPopulation( basePopulation, config, null );
+		@NotNull Table baseTable = ccc.generatePersonTableFromPopulation( basePopulation, config, null, baseScoringFunctionFactory );
 
 		System.out.println( baseTable );
 
@@ -142,7 +143,8 @@ class AgentWiseComparisonKNExample{
 */
 
 
-		Table policyTable = ccc.generatePersonTableFromPopulation( policyPopulation, config, basePopulation );
+		Table policyTable = ccc.generatePersonTableFromPopulation( policyPopulation, config, basePopulation, baseScoringFunctionFactory );
+		// yyyyyy habe hier jetzt die baseScoringFunctionFactory eingesetzt!!!!
 
 		Path path = Paths.get("outputFromAgentWiseComparisonExample" );
 

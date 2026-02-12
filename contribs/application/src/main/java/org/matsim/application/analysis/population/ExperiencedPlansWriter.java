@@ -79,7 +79,7 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		}
 
 		config.counts().setInputFile( null );
-
+		config.controller().setOutputDirectory( "output1" );
 		com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario ).addStandardModules().build();
 
 		EventsManager eventsManager = injector.getInstance( EventsManager.class );

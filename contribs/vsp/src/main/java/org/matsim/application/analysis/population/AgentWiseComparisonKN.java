@@ -16,7 +16,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -46,7 +45,6 @@ import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -57,6 +55,7 @@ import static org.matsim.application.analysis.population.AddVttsEtcToActivities.
 import static org.matsim.application.analysis.population.AgentWiseComparisonKNUtils.*;
 import static org.matsim.application.analysis.population.HeadersKN.*;
 import static org.matsim.core.config.groups.ScoringConfigGroup.*;
+import static org.matsim.core.controler.Controler.*;
 import static org.matsim.core.population.PersonUtils.getMarginalUtilityOfMoney;
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
@@ -93,7 +92,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	@CommandLine.Mixin
 	private final ShpOptions shp = new ShpOptions();
 
-	ScoringFunctionFactory scoringFunctionFactory;
+//	ScoringFunctionFactory scoringFunctionFactory;
 	MutableScenario baseScenario;
 	private List<PreparedGeometry> geometries;
 
@@ -123,14 +122,19 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		 yyyy consider a 10 or even 1pct sample of the population
 
 		// meckel:
-		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run8_NF_500it_10pct/output/";
-		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run14_U0_500it_10pct/output/";
-		final String shpFile = null;
+//		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run8_NF_500it_10pct/output/";
+//		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run14_U0_500it_10pct/output/";
+//		final String shpFile = null;
 
 		// Eduardo Lima:
 //		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Eduardo_Lima_Siemensbahn/output_final/output-Base_Case-10pct-nach-3900it-S21Jungfernheide/";
 //		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Eduardo_Lima_Siemensbahn/output_final/output-SiBa-10pct-nach-3900it-S21Jungfernheide/";
 //		final String shpFile = null;
+
+		// matsim-dresden wrap-around experiment:
+		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-none-it3000-20260209/";
+		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
+		final String shpFile = null;
 
 		// ===
 
@@ -154,7 +158,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		new AgentWiseComparisonKN().execute( args );
 	}
 	private static void generateFilteredEventsFile( String baseDir ){
-		String inFileName = globFile( Path.of( baseDir ),  "*output_" + Controler.DefaultFiles.events.getFilename() + ".gz" ).toString();
+		String inFileName = globFile( Path.of( baseDir ),  "*output_" + DefaultFiles.events.getFilename() + ".gz" ).toString();
 		String outFileName = baseDir + "/" + onlyMoneyAndStuck+"output_events_filtered.xml.gz";
 		// (yy Das lässt die runId weg.)
 
@@ -189,15 +193,10 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	@Override public Integer call() throws Exception{
 		if ( shp!=null && shp.isDefined() ){
-			URL url = Paths.get( shp.getShapeFile() ).toUri().toURL();
-			this.geometries = ShpGeometryUtils.loadPreparedGeometries( url );
-
-			// there is shp.readFeatures(), but I cannot get the Geometries out of the Features :-(.  kai, jan'26
-			// --> yy but other people are able to do this ...
+			this.geometries = ShpGeometryUtils.loadPreparedGeometries( Paths.get( shp.getShapeFile() ).toUri().toURL() );
 		}
 
 		List<String> eventsFilePatterns = new ArrayList<>();
-
 		if( !prefixList.isEmpty() ){
 			for( String prefix : prefixList ){
 				eventsFilePatterns.add( "*" + prefix + "output_events_filtered.xml.gz" );
@@ -215,28 +214,25 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-		// yy whey do we need the above?
-
-		baseConfig.counts().setInputFile( null );
+		// yy whey do we need the above? --> yes.  Not sure why.
 
 //		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
 
-		String baseFacilitiesFilename = globFile( baseCasePath, "*output_" + Controler.DefaultFiles.facilities.getFilename() + ".gz" ).toString();
-		baseConfig.facilities().setInputFile( baseFacilitiesFilename );
+		baseConfig.facilities().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.facilities.getFilename() + ".gz" ).toString() );
 
 		String baseTransitScheduleFilename = null;
 		if ( baseConfig.transit().isUseTransit() ){
-			baseTransitScheduleFilename = globFile( baseCasePath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+			baseTransitScheduleFilename = globFile( baseCasePath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
 		}
 		baseConfig.transit().setTransitScheduleFile( baseTransitScheduleFilename );
 
-		String baseNetworkFilename = globFile( baseCasePath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
-		baseConfig.network().setInputFile( baseNetworkFilename );
+		baseConfig.network().setInputFile( globFile( baseCasePath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString() );
 
 		baseConfig.plans().setInputFile( null );
 		baseConfig.network().setChangeEventsInputFile( null );
 		baseConfig.transit().setVehiclesFile( null );
 		baseConfig.vehicles().setVehiclesFile( null );
+		baseConfig.counts().setInputFile( null );
 
 		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
 
@@ -245,7 +241,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		computeAndSetIncomeDeciles( basePopulation );
 		baseScenario.setPopulation( basePopulation );
 
+		ScoringFunctionFactory baseScoringFunctionFactory;
 		{
+			baseScenario.getConfig().controller().setOutputDirectory( "output2" );
 			this.injector = new Injector.InjectorBuilder( baseScenario )
 													  .addStandardModules()
 													  .addOverridingModule( new AbstractModule(){
@@ -254,13 +252,22 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 														  }
 													  } )
 													  .build();
-			this.scoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
+			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 		}
 		{
+			Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
+			// (The reduced config has fewer problems with newly introduced config params.)
+			policyConfig.controller().setOutputDirectory( "output3" );
+			policyConfig.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( car ) ).setScoringThisActivityAtAll( false ) );
+			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike) ).setScoringThisActivityAtAll( false ) );
+			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
+			policyConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
+
 			// Here, we do not want to use ScenarioUtils.loadScenario, because we might be able to rescue files from the base scenario.  (Not totally clear.)
-			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
-			String policyNetworkFilename = globFile( inputPath, "*output_" + Controler.DefaultFiles.network.getFilename() + ".gz" ).toString();
-			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( baseConfig );
+			String policyTransitScheduleFilename = globFile( inputPath, "*output_" + DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString();
+			String policyNetworkFilename = globFile( inputPath, "*output_" + DefaultFiles.network.getFilename() + ".gz" ).toString();
+			MutableScenario scenario2 = ScenarioUtils.createMutableScenario( policyConfig );
 			new MatsimNetworkReader( scenario2.getNetwork() ).readFile( policyNetworkFilename );
 			scenario2.setActivityFacilities( baseScenario.getActivityFacilities() );
 			scenario2.setPopulation( baseScenario.getPopulation() );
@@ -290,7 +297,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
-		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null );
+		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
 
 		// ### next cometh the policy data:
 
@@ -306,14 +313,16 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		Population policyPopulation = readAndCleanPopulation( inputPath, eventsFilePatterns );
 		policyScenario.setPopulation( policyPopulation );
 
-		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation );
+		ScoringFunctionFactory policyScoringFunctionFactory = this.injector2.getInstance( ScoringFunctionFactory.class );
+		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation, policyScoringFunctionFactory );
 
 		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
 
 		return 0;
 	}
 
-	@NotNull Table generatePersonTableFromPopulation( Population population, Config config, Population basePopulation ){
+	@NotNull Table generatePersonTableFromPopulation( Population population, Config config, Population basePopulation,
+													  ScoringFunctionFactory scoringFunctionFactory ){
 		final boolean isBaseTable = (basePopulation == null);
 
 		Table table = createPopulationTable();
@@ -348,9 +357,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			double computedPersonScore = 0.;
 			{
 				// activity times:
-				ScoringFunction sf = this.scoringFunctionFactory.createNewScoringFunction( person );
-				ScoringFunction sfNormal = this.scoringFunctionFactory.createNewScoringFunction( person );
-				ScoringFunction sfEarly = this.scoringFunctionFactory.createNewScoringFunction( person );
+				ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction( person );
+				ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction( person );
+				ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction( person );
 				Activity firstActivity = null;
 				double sumMuse_h = 0.;
 				double cntMuse_h = 0.;
