@@ -83,6 +83,12 @@ public class PersonScoringParametersFromPersonAttributesTest {
 		freightParams.setMarginalUtilityOfMoney(444);
 		freightParams.setMarginalUtlOfWaitingPt_utils_hr(1d * 3600);
 
+		ScoringConfigGroup.ScoringParameterSet defaultSubpopulationParams = scoringConfigGroup.getOrCreateScoringParameters(null);
+		defaultSubpopulationParams.setMarginalUtilityOfMoney(1);
+		defaultSubpopulationParams.setMarginalUtlOfWaitingPt_utils_hr(0.5 * 3600);
+		defaultSubpopulationParams.addModeParams(modeParamsCar);
+		defaultSubpopulationParams.addModeParams(modeParamsBike);
+
 		population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		PopulationFactory factory = population.getFactory();
 
@@ -123,6 +129,15 @@ public class PersonScoringParametersFromPersonAttributesTest {
 			mediumIncomeHighCarAscModeConstants.put(TransportMode.bike, "-50.0");
 			PersonUtils.setModeConstants(mediumIncomeHighCarAsc, mediumIncomeHighCarAscModeConstants);
 			population.addPerson(mediumIncomeHighCarAsc);
+
+			Person mediumIncomeHighCarAscNoSubpopulation = factory.createPerson(Id.createPersonId("mediumIncomeHighCarAscNoSubpopulation"));
+			// deliberately not setting a subpopulation
+			PersonUtils.setIncome(mediumIncomeHighCarAscNoSubpopulation, 1d);
+			Map<String, String> mediumIncomeHighCarAscNoSubpopulationModeConstants = new HashMap<>();
+			mediumIncomeHighCarAscNoSubpopulationModeConstants.put(TransportMode.car, "-2.1");
+			mediumIncomeHighCarAscNoSubpopulationModeConstants.put(TransportMode.bike, "-50.0");
+			PersonUtils.setModeConstants(mediumIncomeHighCarAscNoSubpopulation, mediumIncomeHighCarAscNoSubpopulationModeConstants);
+			population.addPerson(mediumIncomeHighCarAscNoSubpopulation);
 
 			Person highIncomeLowCarAsc = factory.createPerson(Id.createPersonId("highIncomeLowCarAsc"));
 			PopulationUtils.putSubpopulation(highIncomeLowCarAsc, "person");
@@ -199,6 +214,17 @@ public class PersonScoringParametersFromPersonAttributesTest {
 	@Test
 	void testPersonWithMediumIncomeHighCarAsc() {
 		Id<Person> id = Id.createPersonId("mediumIncomeHighCarAsc");
+		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
+		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
+		Assertions.assertEquals(-1.0d - 2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.55d - 50.0d, params.modeParams.get(TransportMode.bike).constant, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.1d / 3600, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-3.0d / 3600, params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+	}
+
+	@Test
+	void testPersonWithMediumIncomeHighCarAscNoSubpopulation() {
+		Id<Person> id = Id.createPersonId("mediumIncomeHighCarAscNoSubpopulation");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
 		Assertions.assertEquals(-1.0d - 2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
