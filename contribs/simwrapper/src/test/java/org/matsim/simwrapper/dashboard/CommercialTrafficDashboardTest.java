@@ -52,7 +52,7 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().setSampleSize(0.1);
 		sw.getConfigGroup().defaultParams().setMapCenter(center);
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
-		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 		sw.addDashboard(
 			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
 				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
@@ -81,7 +81,7 @@ public class CommercialTrafficDashboardTest {
 		sw.getConfigGroup().setSampleSize(0.1);
 		sw.getConfigGroup().defaultParams().setMapCenter(center);
 		sw.getConfigGroup().defaultParams().setMapZoomLevel(10.);
-		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.DefaultDashboardsMode.disabled);
 		sw.addDashboard(
 			new TripDashboard().setGroupsOfSubpopulationsForPersonAnalysis("personGroupOdd=person_odd;personGroupEven=person_even").setGroupsOfSubpopulationsForCommercialAnalysis(
 				"commercialPersonTrafficGroup=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic;longDistanceFreight=longDistanceFreight"));
