@@ -482,6 +482,12 @@ public class VttsCalculationBasedOnKn implements MATSimAppCommand {
 							scoreEarlyBefore);
 				}
 
+
+				// ---- filter schedule-delay component ----
+				if (activityDelayDisutility <= 0 || activityDelayDisutility >= 16.30) {
+					continue;  // skip this trip
+				}
+
 				double mUTTS_h =
 					(travelDisutility + activityDelayDisutility);
 
