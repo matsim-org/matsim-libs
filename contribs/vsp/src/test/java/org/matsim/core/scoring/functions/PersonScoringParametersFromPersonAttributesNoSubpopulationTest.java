@@ -142,7 +142,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 0.5d, 0.5d);
 		Assertions.assertEquals(-1.0d -0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d / 3600, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1.5d, 0.5d);
 		Assertions.assertEquals(-1.0d -0.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d / 3600, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -161,7 +161,7 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 		makeAssertMarginalUtilityOfMoneyAndPtWait(params, 1d, 0.5d);
 		Assertions.assertEquals(-1.0d -2.1d, params.modeParams.get(TransportMode.car).constant, MatsimTestUtils.EPSILON);
 		Assertions.assertEquals(-0.55d -50.0d, params.modeParams.get(TransportMode.bike).constant, MatsimTestUtils.EPSILON);
-		Assertions.assertEquals(-0.001d, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
+		Assertions.assertEquals(-0.001d / 3600, params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s, MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -186,12 +186,12 @@ public class PersonScoringParametersFromPersonAttributesNoSubpopulationTest {
 		Leg carLegZeroDistanceTenSeconds = createLeg(TransportMode.car,  0.0d, 10.0d );
 
 		legScoringRichCarLeg.handleLeg(carLegZeroDistanceTenSeconds);
-		Assertions.assertEquals(-1.0d -0.1d -0.001d * 10 -7.5*1./1.5 -0.3, legScoringRichCarLeg.getScore(), MatsimTestUtils.EPSILON, "for the rich person with low car asc, a 0 meter and 10s car trip should be equal to a score of ");
+		Assertions.assertEquals(-1.0d -0.1d -0.001d * 10 / 3600 -7.5*1./1.5 -0.3, legScoringRichCarLeg.getScore(), MatsimTestUtils.EPSILON, "for the rich person with low car asc, a 0 meter and 10s car trip should be equal to a score of ");
 
 		ScoringParameters paramsMediumIncomeHighCarAsc = personScoringParams.getScoringParameters(population.getPersons().get(Id.createPersonId("mediumIncomeHighCarAsc")));
 		CharyparNagelLegScoring legScoringMediumIncomeHighCarAsc = new CharyparNagelLegScoring(paramsMediumIncomeHighCarAsc, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
 		legScoringMediumIncomeHighCarAsc.handleLeg(carLegZeroDistanceTenSeconds);
-		Assertions.assertEquals(-1.0d -2.1d -0.001d * 10 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), MatsimTestUtils.EPSILON, "for the medium person with high car asc, a 0 meter and 10s car trip should be equal to a score of ");
+		Assertions.assertEquals(-1.0d -2.1d -0.001d * 10 / 3600 -7.5*1./1.0 -0.3, legScoringMediumIncomeHighCarAsc.getScore(), MatsimTestUtils.EPSILON, "for the medium person with high car asc, a 0 meter and 10s car trip should be equal to a score of ");
 
 		// bike has no person specific asc for high income person and is not affected
 		CharyparNagelLegScoring legScoringRichBikeLeg = new CharyparNagelLegScoring(paramsRich, NetworkUtils.createNetwork(), Set.of(TransportMode.pt));
