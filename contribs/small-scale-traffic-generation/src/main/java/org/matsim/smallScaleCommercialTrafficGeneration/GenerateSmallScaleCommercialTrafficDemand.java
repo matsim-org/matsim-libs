@@ -201,28 +201,28 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Index indexZones;
 
-	private final String[] args;
+	private final String[] configArgs;
 
 	public GenerateSmallScaleCommercialTrafficDemand() {
-		this(new String[0], null, null, null, null);
+		this(null, null, null, null, null);
 	}
 
-	public GenerateSmallScaleCommercialTrafficDemand(String[] args) {
-		this(args, null, null, null, null);
+	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs) {
+		this(configArgs, null, null, null, null);
 	}
 
 	public GenerateSmallScaleCommercialTrafficDemand(IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
 													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
 													 UnhandledServicesSolution unhandledServicesSolution) {
-		this(new String[0], integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
+		this(null, integrateExistingTrafficToSmallScaleCommercial, commercialTourSpecifications, vehicleSelection,
 			unhandledServicesSolution);
 	}
-	public GenerateSmallScaleCommercialTrafficDemand(String[] args,
+	public GenerateSmallScaleCommercialTrafficDemand(String[] configArgs,
 													 IntegrateExistingTrafficToSmallScaleCommercial integrateExistingTrafficToSmallScaleCommercial,
 													 CommercialTourSpecifications commercialTourSpecifications, VehicleSelection vehicleSelection,
 													 UnhandledServicesSolution unhandledServicesSolution) {
 
-		this.args = (args == null) ? new String[0] : args;
+		this.configArgs = (configArgs == null) ? new String[0] : configArgs;
 
 		if (integrateExistingTrafficToSmallScaleCommercial == null) {
 			this.integrateExistingTrafficToSmallScaleCommercial = new DefaultIntegrateExistingTrafficToSmallScaleCommercialImpl();
@@ -255,7 +255,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	}
 
 	public static void main(String[] args) {
-		new GenerateSmallScaleCommercialTrafficDemand(args).execute(args);
+		new GenerateSmallScaleCommercialTrafficDemand().execute(args);
 	}
 
 	@Override
@@ -266,7 +266,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		String sampleName = SmallScaleCommercialTrafficUtils.getSampleNameOfOutputFolder(sample);
 
-		Config config = readAndCheckConfig(args, configPath, modelName, sampleName, output);
+		Config config = readAndCheckConfig(configArgs, configPath, modelName, sampleName, output);
 
 		output = Path.of(config.controller().getOutputDirectory());
 
@@ -708,8 +708,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Reads and checks config if all necessary parameters are set.
 	 */
-	private Config readAndCheckConfig(String[] args, Path configPath, String modelName, String sampleName, Path output) throws Exception {
-		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), args);
+	private Config readAndCheckConfig(String[] configArgs, Path configPath, String modelName, String sampleName, Path output) throws Exception {
+
+		Config config = ConfigUtils.loadConfig(IOUtils.getFileUrl(configPath.toString()), configArgs);
 		if (output == null || output.toString().isEmpty())
 			config.controller().setOutputDirectory(Path.of(config.controller().getOutputDirectory()).resolve(modelName)
 				.resolve(usedSmallScaleCommercialTrafficType.toString() + "_" + sampleName + "pct" + "_"
