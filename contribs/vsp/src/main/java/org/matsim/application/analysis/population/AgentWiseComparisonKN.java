@@ -214,7 +214,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-		// yy whey do we need the above? --> yes.  Not sure why.
+		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the
+		// reduced config specifies them in an incomplete way, but I am not sure if that is the problem.
 
 //		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
 

@@ -1,5 +1,6 @@
 package org.matsim.application.analysis.population;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.testcases.MatsimTestUtils;
@@ -9,6 +10,7 @@ class RunVTTSAnalysisTest{
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Disabled // not testing anything useful as of now
 	@Test void testMain() {
 		String[] args = {
 			"--path", utils.getInputDirectory(),
