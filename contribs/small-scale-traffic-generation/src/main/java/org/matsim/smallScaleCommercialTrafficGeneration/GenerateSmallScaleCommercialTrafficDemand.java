@@ -409,7 +409,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			sw.getConfigGroup().setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
 			sw.getConfigGroup().setSampleSize(sample);
 			sw.addDashboard(new OverviewDashboard());
-			sw.addDashboard(new CarrierDashboard());
+			sw.addDashboard(new CarrierDashboard("(*.)?output_carriers_withPlans.xml.gz"));
 //			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
 //			sw.addDashboard(new CommercialTrafficDashboard(config.global().getCoordinateSystem()).setGroupsOfSubpopulationsForCommercialAnalysis("smallScaleGoodsTraffic=goodsTraffic"));
 			sw.addDashboard(new TripDashboard().setGroupsOfSubpopulationsForCommercialAnalysis("commercialPersonTraffic=commercialPersonTraffic,commercialPersonTraffic_service;smallScaleGoodsTraffic=goodsTraffic").setAnalysisArgs("--shp-filter", "none"));
