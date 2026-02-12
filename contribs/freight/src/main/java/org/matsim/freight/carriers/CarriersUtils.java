@@ -265,7 +265,10 @@ public class CarriersUtils {
 		Path jspritAnalysisPerCarrierCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats_perCarrier.csv");
 		Path aggegatedJspritAnalysisCSVPath = Path.of(analysisOutputFolder).resolve("VRP_Solution_Stats.csv");
 
-		initJspritAnalysisPerCarrierCsv(jspritAnalysisPerCarrierCSVPath);
+		if (!Files.exists(jspritAnalysisPerCarrierCSVPath))
+			initJspritAnalysisPerCarrierCsv(jspritAnalysisPerCarrierCSVPath);
+		else
+			log.warn("Jsprit analysis per carrier CSV file already exists at {}. Will append results to this file. If you want to start with a new file, please delete or move the existing file.", jspritAnalysisPerCarrierCSVPath);
 		// necessary to create FreightCarriersConfigGroup before submitting to ThreadPoolExecutor
 		ConfigUtils.addOrGetModule(scenario.getConfig(), FreightCarriersConfigGroup.class);
 
