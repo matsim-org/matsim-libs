@@ -18,7 +18,7 @@ public class TrafficDashboard implements Dashboard {
 	private final Set<String> modes;
 
 	public TrafficDashboard() {
-		this(Set.of(TransportMode.car, "freight"));
+		this(Set.of(TransportMode.car));
 	}
 
 	public TrafficDashboard(Set<String> modes) {
@@ -68,7 +68,7 @@ public class TrafficDashboard implements Dashboard {
 		layout.row("map").el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Traffic statistics";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("", data, true);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("Volume for the modes " + modes + ".", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 

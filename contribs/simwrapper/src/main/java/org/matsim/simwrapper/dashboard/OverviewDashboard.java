@@ -1,5 +1,6 @@
 package org.matsim.simwrapper.dashboard;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.application.analysis.LogFileAnalysis;
 import org.matsim.application.analysis.traffic.TrafficAnalysis;
 import org.matsim.application.prepare.network.CreateAvroNetwork;
@@ -9,13 +10,26 @@ import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Dashboard with general overview.
  */
 public class OverviewDashboard implements Dashboard {
+
+	private final Set<String> modes;
+
+	public OverviewDashboard() {
+		this(Set.of(TransportMode.car));
+	}
+
+	public OverviewDashboard(Set<String> modes) {
+		this.modes = modes;
+	}
 	@Override
 	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
+
+		String[] argsForTrafficAnalysis = new String[]{"--transport-modes", String.join(",", this.modes)};
 
 		header.title = "Overview";
 		header.description = "General overview of the MATSim run.";
@@ -28,14 +42,14 @@ public class OverviewDashboard implements Dashboard {
 		}).el(MapPlot.class, (viz, data) -> {
 
 			viz.title = "Simulated traffic volume";
-			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("", data, true);
+			viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("Volume for the modes " + modes + ".", data, true);
 			viz.center = data.context().getCenter();
 			viz.zoom = data.context().getMapZoomLevel();
 			viz.height = 7.5;
 			viz.width = 2.0;
 
 			viz.setShape(data.compute(CreateAvroNetwork.class, "network.avro", "--with-properties"), "linkId");
-			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv"));
+			viz.addDataset("traffic", data.compute(TrafficAnalysis.class, "traffic_stats_by_link_daily.csv", argsForTrafficAnalysis));
 
 			viz.display.lineColor.dataset = "traffic";
 			viz.display.lineColor.columnName = "simulated_traffic_volume";

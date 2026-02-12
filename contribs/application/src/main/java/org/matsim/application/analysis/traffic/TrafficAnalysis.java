@@ -49,7 +49,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 	@CommandLine.Mixin
 	private ShpOptions shp;
 
-	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", defaultValue = "", split = ",")
+	@CommandLine.Option(names = "--transport-modes", description = "transport modes to analyze", split = ",")
 	private Set<String> modes;
 
 	public static void main(String[] args) {
