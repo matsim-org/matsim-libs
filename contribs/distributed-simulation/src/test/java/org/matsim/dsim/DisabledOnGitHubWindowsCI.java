@@ -22,10 +22,10 @@ public @interface DisabledOnGitHubWindowsCI {
 	class Condition implements ExecutionCondition {
 		@Override
 		public @NonNull ConditionEvaluationResult evaluateExecutionCondition(@NonNull ExtensionContext context) {
-			boolean isGitHubActions = "true".equals(System.getenv("GITHUB_ACTIONS"));
+			boolean isCI = "true".equals(System.getenv("CI"));
 			boolean isWindows = "Windows".equals(System.getenv("RUNNER_OS"));
 
-			if (isGitHubActions && isWindows) {
+			if (isCI && isWindows) {
 				return ConditionEvaluationResult.disabled("Disabled on GitHub Actions Windows CI");
 			}
 			return ConditionEvaluationResult.enabled("Not running on GitHub Actions Windows CI");
