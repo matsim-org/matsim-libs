@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest ]
+        os: [ ubuntu-latest windows-latest ]
 
     steps:
       - name: Prepare git
@@ -29,12 +29,12 @@ jobs:
           cache: 'maven'
 
       - name: Build reactor
-        run: mvn -pl contribs/distributed-simulation -am install -P release --batch-mode -DskipTests
+        run: mvn -pl contribs/distributed-simulation,contribs/small-scale-traffic-generation -am install -P release --batch-mode -DskipTests
 
       # Run unit and integration tests
       - name: Run verify - release profile
         # arguments containing dots (.) need to be quoted ('') so that PowerShell (Windows) does not parse them]
-        run: mvn -pl contribs/distributed-simulation test -P release --batch-mode --fail-at-end -D'matsim.preferLocalDtds=true'
+        run: mvn -pl contribs/distributed-simulation,,contribs/small-scale-traffic-generation test -P release --batch-mode --fail-at-end -D'matsim.preferLocalDtds=true'
 
       - name: Upload Maven test reports
         uses: actions/upload-artifact@v4
