@@ -141,8 +141,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--additionalTravelBufferPerIterationInMinutes", description = "This buffer/driving time is used for service-route-planning. If set too low, carriers may not serve all their services.", defaultValue = "30")
 	private int additionalTravelBufferPerIterationInMinutes;
 
-	@CommandLine.Option(names = "--maxReplanningIterations", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
-	private int maxReplanningIterations;
+	@CommandLine.Option(names = "--maxNumberOfLoopsForVRPSolving", description = "Limit of carrier replanning iterations, where carriers with unhandled services get new plans. If your carrier-plans are still not fully served, increase this limit.", defaultValue = "100")
+	private int maxNumberOfLoopsForVRPSolving;
 
 	@CommandLine.Option(names = "--creationOption", description = "Set option of mode differentiation:  useExistingCarrierFileWithSolution, createNewCarrierFile, useExistingCarrierFileWithoutSolution")
 	private CreationOption usedCreationOption;
@@ -478,7 +478,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * Solves the generated carrier-plans and puts them into the Scenario.
 	 * If a carrier has unhandled services, a carrier-replanning loop deletes the old plans and generates new plans.
 	 * The new plans will then be solved and checked again.
-	 * This is repeated until the carrier-plans are solved or the {@code maxReplanningIterations} are reached.
+	 * This is repeated until the carrier-plans are solved or the {@code maxNumberOfLoopsForVRPSolving} are reached.
 	 * @param originalScenario complete Scenario
 	 */
 	private void solveSeparatedVRPs(Scenario originalScenario) throws Exception {
@@ -624,7 +624,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				subCarriers.size());
 			CarriersUtils.runJsprit(originalScenario, CarriersUtils.CarrierSelectionForSolution.solveOnlyForCarrierWithoutPlans);
 			List<Carrier> nonCompleteSolvedCarriers = CarriersUtils.createListOfCarrierWithUnhandledJobs(CarriersUtils.getCarriers(originalScenario));
-			if (!nonCompleteSolvedCarriers.isEmpty() && maxReplanningIterations > 0) {
+			if (!nonCompleteSolvedCarriers.isEmpty() && maxNumberOfLoopsForVRPSolving > 0) {
 				CarriersUtils.writeCarriers(CarriersUtils.getCarriers(originalScenario), originalScenario.getConfig().controller().getOutputDirectory() + "/" + originalScenario.getConfig().controller().getRunId() + ".output_carriers_notCompletelySolved.xml.gz");
 				unhandledServicesSolution.tryToSolveAllCarriersCompletely(originalScenario, nonCompleteSolvedCarriers);
 			}
@@ -1158,8 +1158,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		return carrierId2carrierAttributes;
 	}
 
-	public int getMaxReplanningIterations(){
-		return maxReplanningIterations;
+	public int getMaxNumberOfLoopsForVRPSolving(){
+		return maxNumberOfLoopsForVRPSolving;
 	}
 
 	public int getAdditionalTravelBufferPerIterationInMinutes(){

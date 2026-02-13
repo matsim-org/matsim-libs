@@ -91,8 +91,8 @@ public class DefaultUnhandledServicesSolution implements UnhandledServicesSoluti
 				writer.newLine();
 			}
 
-			for (int i = 1; i <= generator.getMaxReplanningIterations(); i++) {
 				log.info("carrier-replanning loop iteration: {}", i);
+			for (int i = 1; i <= generator.getMaxNumberOfLoopsForVRPSolving(); i++) {
 				int numberOfCarriersWithUnhandledJobs = nonCompleteSolvedCarriers.size();
 
 				for (Carrier nonCompleteSolvedCarrier : nonCompleteSolvedCarriers) {
