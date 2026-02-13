@@ -29,16 +29,22 @@ import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.management.InvalidAttributeValueException;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1071,47 +1077,64 @@ public class CarriersUtils {
 		 */
 		private void writeAnalyzerResultsToCsv(Carrier carrier, JspritStrategyAnalyzer analyzer) {
 			synchronized (CSV_LOCK_FOR_WRITING_OUTPUT_PER_CARRIER) {
-				try (BufferedWriter writer = IOUtils.getAppendingBufferedWriter(iterationAnalysisPerCarrierPath.toString())) {
 
-					LinkedHashMap <Integer, JspritStrategyAnalyzer.IterationResult> jspritResultsPerIteration = analyzer.getIterationSolutionCosts();
-					NavigableMap<Integer, VehicleRoutingProblemSolution> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
-					bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
+				// if we have an existing file, we check if the carrier already has entries in the file. If yes, we remove the old entries and add the new ones (with the same iteration numbers but updated costs and strategies) at the end of the file. If no, we just add the new entries at the end of the file.
+				Path tempPath = iterationAnalysisPerCarrierPath.resolveSibling(
+					iterationAnalysisPerCarrierPath.getFileName().toString() + ".tmp");
+				try (BufferedReader reader = IOUtils.getBufferedReader(iterationAnalysisPerCarrierPath.toString())) {
+					CSVParser parser = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(delimiter).setHeader()
+						.setSkipHeaderRecord(true).get().parse(reader);
+					String[] header = parser.getHeaderMap().entrySet().stream()
+						.sorted(Map.Entry.comparingByValue())
+						.map(Map.Entry::getKey)
+						.toArray(String[]::new);
+					try (BufferedWriter writer = IOUtils.getBufferedWriter(tempPath.toString())) {
+						CSVPrinter printer = new CSVPrinter(writer,
+							CSVFormat.Builder.create(CSVFormat.DEFAULT)
+								.setDelimiter(delimiter)
+								.setHeader(header).get());
+						for (CSVRecord record : parser) {
+							if (!record.get("carrierId").equals(carrier.getId().toString()))
+								printer.printRecord(record);
+						}
 
-					for (var entry : jspritResultsPerIteration.entrySet()) {
-						Integer jspritIteration = entry.getKey();
-						double selectedStrategyCost = entry.getValue().costsOfThisIteration();
-						String strategyOfThisIteration = entry.getValue().strategyId();
-						double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
-						var floor = foundNewBestSolutions.floorEntry(jspritIteration);
-						double bestSoFar = (floor != null) ? floor.getValue().getCost() : Double.NaN;
-						int bestSoFar_vehiclesUsed = (floor != null) ? floor.getValue().getRoutes().size() : 0;
-						int numberOfRoutesOfThisIterationSolution = entry.getValue().numberOfRoutesOfThisIterationSolution();
-						int removedJobsWhileRuin = entry.getValue().removedJobsWhileRuin();
-						int routesAfterRuin = entry.getValue().routesAfterRuin();
+						LinkedHashMap<Integer, JspritStrategyAnalyzer.IterationResult> jspritResultsPerIteration = analyzer.getIterationSolutionCosts();
+						NavigableMap<Integer, VehicleRoutingProblemSolution> foundNewBestSolutions = analyzer.getFoundNewBestSolutions();
+						bestJspritSolutionCollector.put(carrier.getId(), foundNewBestSolutions);
 
-						writer.write(carrier.getId().toString());
-						writer.write(delimiter + jspritIteration);
-						writer.write(delimiter + bestSoFar);
-						writer.write(delimiter + bestSoFar_vehiclesUsed);
-						writer.write(delimiter + selectedStrategyCost);
-						writer.write(delimiter + strategyOfThisIteration);
-						if (iterationComputationTimeInSeconds >= 1)
-							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSS));
-						else
-							writer.write(delimiter + Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSSDOTSS));
-						writer.write(delimiter + numberOfRoutesOfThisIterationSolution);
-						writer.write(delimiter + removedJobsWhileRuin);
-						writer.write(delimiter + routesAfterRuin);
-						writer.newLine();
+						for (var entry : jspritResultsPerIteration.entrySet()) {
+							Integer jspritIteration = entry.getKey();
+							double selectedStrategyCost = entry.getValue().costsOfThisIteration();
+							String strategyOfThisIteration = entry.getValue().strategyId();
+							double iterationComputationTimeInSeconds = entry.getValue().iterationComputationTimeInSeconds();
+							var floor = foundNewBestSolutions.floorEntry(jspritIteration);
+							double bestSoFar = (floor != null) ? floor.getValue().getCost() : Double.NaN;
+							int bestSoFar_vehiclesUsed = (floor != null) ? floor.getValue().getRoutes().size() : 0;
+							int numberOfRoutesOfThisIterationSolution = entry.getValue().numberOfRoutesOfThisIterationSolution();
+							int removedJobsWhileRuin = entry.getValue().removedJobsWhileRuin();
+							int routesAfterRuin = entry.getValue().routesAfterRuin();
+
+							String timeStr = (iterationComputationTimeInSeconds >= 1) ? Time.writeTime(iterationComputationTimeInSeconds,
+								Time.TIMEFORMAT_HHMMSS) : Time.writeTime(iterationComputationTimeInSeconds, Time.TIMEFORMAT_HHMMSSDOTSS);
+
+							printer.printRecord(carrier.getId().toString(), jspritIteration, bestSoFar, bestSoFar_vehiclesUsed,
+								selectedStrategyCost, strategyOfThisIteration, timeStr, numberOfRoutesOfThisIterationSolution,
+								removedJobsWhileRuin, routesAfterRuin);
+						}
+						printer.flush();
 					}
 
 				} catch (IOException e) {
-					log.error("Error writing jsprit analyzer results to CSV for carrier {}", carrier.getId(), e);
+					throw new RuntimeException(e);
+				}
+				try {
+					Files.move(tempPath, iterationAnalysisPerCarrierPath, StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException ex) {
+					log.error("Error replacing old CSV with new CSV for carrier {}", carrier.getId(), ex);
 				}
 			}
 		}
 	}
-
 	// we need this class because otherwise there is a runtime error in the PriorityBlockingQueue
 	// https://jvmaware.com/priority-queue-and-threadpool/
 	private static class JspritTreadPoolExecutor extends ThreadPoolExecutor {
