@@ -12,7 +12,7 @@ class GenerateExperiencedPlansWithVTTSTest{
 
 	@RegisterExtension private MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Disabled // I think that this combined functionality no longer exists. 
+	@Disabled // I think that this combined functionality no longer exists.
 	@Test void testMain() {
 		String[] args = {
 			"--path", utils.getInputDirectory(),
