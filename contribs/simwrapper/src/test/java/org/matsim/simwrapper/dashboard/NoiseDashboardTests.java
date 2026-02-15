@@ -35,6 +35,7 @@ public class NoiseDashboardTests {
 		config.global().setCoordinateSystem("EPSG:25832");
 
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
+		simWrapperConfigGroup.setSampleSize( config.qsim().getFlowCapFactor() );
 
 		URL kelheim = ExamplesUtils.getTestScenarioURL("kelheim");
 
