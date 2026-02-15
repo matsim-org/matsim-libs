@@ -53,7 +53,7 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 	public Integer call() throws Exception {
 		// yyyy the output_config has the input files as as files. :-(
 
-		Path configPath = ApplicationUtils.globFile( path, "*output_" + Controler.DefaultFiles.config.getFilename() );
+		Path configPath = ApplicationUtils.globFile( path, "*output_" + Controler.DefaultFiles.configReduced.getFilename() );
 
 //		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
 //		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );

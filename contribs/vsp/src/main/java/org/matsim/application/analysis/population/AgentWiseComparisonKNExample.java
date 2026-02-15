@@ -80,7 +80,7 @@ class AgentWiseComparisonKNExample{
 
 			setIsInShp( person, "true" );
 		}
-		AgentWiseComparisonKNUtils.computeAndSetMarginalUtilitiesOfMoney( basePopulation );
+		AgentWiseComparisonKNUtils.computeAndSetMarginalUtilitiesOfMoney( scenario );
 
 		AgentWiseComparisonKN ccc = new AgentWiseComparisonKN();
 		ccc.baseScenario = scenario;

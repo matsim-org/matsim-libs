@@ -428,7 +428,7 @@ class AgentWiseComparisonKNUtils{
 			try{
 				basePopulationFilename = globFile( path, "*postproc_experienced_plans.xml.gz" ).toString();
 			} catch ( IllegalStateException e2 ) {
-				basePopulationFilename = globFile( path, "*_experienced_plans.xml.gz" ).toString();
+				basePopulationFilename = globFile( path, "*experienced_plans.xml.gz" ).toString();
 			}
 		}
 
@@ -445,7 +445,8 @@ class AgentWiseComparisonKNUtils{
 
 		return basePopulation;
 	}
-	static void computeAndSetMarginalUtilitiesOfMoney( Population basePopulation ){
+	static void computeAndSetMarginalUtilitiesOfMoney( Scenario scenario ){
+		Population basePopulation = scenario.getPopulation();
 		double sumIncome = 0.;
 		double incomeCnt = 0.;
 		for( Person person : basePopulation.getPersons().values() ){
@@ -457,11 +458,14 @@ class AgentWiseComparisonKNUtils{
 		}
 		final double avIncome = sumIncome / incomeCnt;
 		for( Person person : basePopulation.getPersons().values() ){
+			String subPop = PopulationUtils.getSubpopulation( person );
+			final double marginalUtilityOfMoney = scenario.getConfig().scoring().getScoringParameters( subPop ).getMarginalUtilityOfMoney();
 			Double income = PersonUtils.getIncome( person );
+			// this should consider the subpop!!
 			if ( income != null ) {
-				PersonUtils.setMarginalUtilityOfMoney( person, avIncome / income );
+				PersonUtils.setMarginalUtilityOfMoney( person, avIncome / income * marginalUtilityOfMoney );
 			} else {
-				PersonUtils.setMarginalUtilityOfMoney( person, 1. );
+				PersonUtils.setMarginalUtilityOfMoney( person, marginalUtilityOfMoney );
 			}
 		}
 	}

@@ -39,11 +39,15 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
+import org.matsim.utils.tablesaw.TablesawUtils;
 import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
+import tech.tablesaw.plotly.components.Figure;
+import tech.tablesaw.plotly.components.Layout;
+import tech.tablesaw.plotly.traces.HistogramTrace;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -132,8 +136,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String shpFile = null;
 
 		// matsim-dresden wrap-around experiment:
-		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-none-it3000-20260209/";
-		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
+//		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-none-it3000-20260209/";
+//		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
+//		final String shpFile = null;
+
+		// iatbr glamobi:
+		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
+		final String policyDir = "/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
 		final String shpFile = null;
 
 		// ===
@@ -192,7 +201,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	// ===
 
 	@Override public Integer call() throws Exception{
-		if ( shp!=null && shp.isDefined() ){
+		if ( shp.isDefined() ){
 			this.geometries = ShpGeometryUtils.loadPreparedGeometries( Paths.get( shp.getShapeFile() ).toUri().toURL() );
 		}
 
@@ -214,8 +223,9 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( bike ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( walk ) ).setScoringThisActivityAtAll( false ) );
 		baseConfig.scoring().addActivityParams( new ActivityParams( TripStructureUtils.createStageActivityType( pt ) ).setScoringThisActivityAtAll( false ) );
-		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the
-		// reduced config specifies them in an incomplete way, but I am not sure if that is the problem.
+		// yy whey do we need the above? --> yes.  Not sure why.  There might be the problem that the reduced config specifies them in an incomplete
+		// way, but I am not sure if that is the problem. --> that probably is indeed the problem.  In general, they are created automatically,
+		// but if they already exist in some other way (i.e., in this case coming from the reduced config), then those are not over-written.
 
 //		baseConfig.routing().setNetworkModes( Collections.singletonList( TransportMode.car ) );  // the rail raptor tries to go to the links which are connected to facilities
 
@@ -238,9 +248,11 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		baseScenario = (MutableScenario) ScenarioUtils.loadScenario( baseConfig );
 
 		final Population basePopulation = readAndCleanPopulation( baseCasePath, eventsFilePatterns );
-		computeAndSetMarginalUtilitiesOfMoney( basePopulation );
-		computeAndSetIncomeDeciles( basePopulation );
 		baseScenario.setPopulation( basePopulation );
+		// yy could/should read the population in loadScenario, and then only clean it here.
+
+		computeAndSetMarginalUtilitiesOfMoney( baseScenario );
+		computeAndSetIncomeDeciles( basePopulation );
 
 		ScoringFunctionFactory baseScoringFunctionFactory;
 		{
@@ -256,6 +268,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 			baseScoringFunctionFactory = injector.getInstance( ScoringFunctionFactory.class );
 		}
 		{
+			// The following comes too early?!
+
 			Config policyConfig = ConfigUtils.loadConfig( globFile( inputPath, "*output_config_reduced.xml" ).toString() );
 			// (The reduced config has fewer problems with newly introduced config params.)
 			policyConfig.controller().setOutputDirectory( "output3" );
@@ -283,22 +297,36 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 		// ===
 
-		// yyyyyy !!!!!! We now have a different avgIncome in the scoring fct than in the general population.  !!!!!!! yyyyyy
-		// --> (presumably) compute the mUoM here instead of in the preproc.
-
 		tagPersonsToAnalyse( basePopulation, geometries, baseScenario );
-
-		// yyyy Ich frage mich im Moment, ob das mit dem "taggen" wirklich der richtige Weg ist, oder ob es nicht konsequenter ist, die anderen Personen zu entfernen.
-		// --> Vorteil von taggen: man kann mehrfach taggen und auswerten.  Z.B. "all", "lowest decile", "highest decile" in one go.
-
-		// --> und z.B. bei incomeDecile macht es einen Unterschied, ob ich das nur in Bln oder im gesamten Szenario bestimme.
-
-
-
+		// (tagging is better than removing since (1) one can have multiple tags in one go, and (2) the average income becomes different once we start removing people)
 
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
+
+		{
+			HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
+			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
+			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+
+			Path htmlPath = inputPath.resolve( "muse.html" );
+			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
+		}
+		{
+			DoubleColumn column = baseTablePersons.doubleColumn( MUSE_h ).divide( baseTablePersons.doubleColumn( UTL_OF_MONEY ) ).setName( "VSE[Eu/h]");
+			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
+			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
+			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
+
+			Path htmlPath = inputPath.resolve( "vse50.html" );
+			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
+
+			log.warn("vse mean value=" + column.mean() );
+
+		}
+
+		log.fatal("ending here iatbr vtts computation");
+		System.exit(-1);
 
 		// ### next cometh the policy data:
 
