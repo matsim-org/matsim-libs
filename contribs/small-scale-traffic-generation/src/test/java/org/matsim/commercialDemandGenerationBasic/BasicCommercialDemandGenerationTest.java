@@ -9,6 +9,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -16,6 +18,7 @@ import org.matsim.freight.carriers.FreightCarriersConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.ComparisonResult;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -37,7 +40,12 @@ public class BasicCommercialDemandGenerationTest{
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV.csv");
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+
+//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
+			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
+			String network = result.toString();
+
 			String shapeCategory = "Ortsteil";
 			new BasicCommercialDemandGeneration().execute(
 					"--output", output.toString(),
@@ -110,7 +118,12 @@ public class BasicCommercialDemandGenerationTest{
 			Path demandCSVLocation = Path.of(utils.getPackageInputDirectory() + "testDemandCSV_parcels.csv");
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
-			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+
+//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
+			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
+			String network = result.toString();
+
 			String shapeCategory = "Ortsteil";
 			new BasicCommercialDemandGeneration(demandGenerationSpecificationForParcelDelivery).execute(
 				"--output", output.toString(),
