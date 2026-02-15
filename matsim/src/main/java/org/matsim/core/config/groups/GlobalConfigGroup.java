@@ -139,11 +139,17 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
     }
 	// ---
 	private double relativeToleranceForSampleSizeFactors = 0.;
-//	@StringSetter( "relativeScalesTolerance" )
+	// The following design attempts to have the getter so that the value will be in the config dump,
+	// but make the string setter throw a runtime exception so that this cannot be set from xml.
+	@StringSetter( "relativeScalesTolerance" )
+	public void setRelativeToleranceForSampleSizeFactors( String str){
+		throw new RuntimeException("for the time being, it is not allowed to set relativeScalesTolerance from xml; you can only use this from code.");
+	}
 	public GlobalConfigGroup setRelativeToleranceForSampleSizeFactors( double val ) {
 		this.relativeToleranceForSampleSizeFactors = val + Double.MIN_VALUE; // make this very slightly larger
 		return this;
 	}
+	@StringGetter( "relativeScalesTolerance" )
 	public double getRelativeToleranceForSampleSizeFactor() {
 		return this.relativeToleranceForSampleSizeFactors;
 	}
