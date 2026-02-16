@@ -331,19 +331,22 @@ public class CarrierConsistencyCheckers {
 			Map<Id<? extends CarrierJob>, Integer> serviceCount = new HashMap<>();
 			Map<String, Integer> shipmentCount = new HashMap<>();
 
-			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
-				for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
-					//carrier only has one job-type: services or shipments
-					//service is saved as an Id
-					if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
-						serviceInTour.add(serviceActivity.getService().getId());
-					}
-					//shipment is saved as a string: jobId + activity type
-					if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
-						shipmentInTour.add(shipmentBasedActivity.getShipment().getId() + " | " + shipmentBasedActivity.getActivityType());
+			if (carrier.getSelectedPlan() == null) {
+				log.log(level,"Carrier '{}': No selected plan found!", carrier.getId());
+			} else
+				for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+					for (Tour.TourElement tourElement : tour.getTour().getTourElements()) {
+						//carrier only has one job-type: services or shipments
+						//service is saved as an Id
+						if (tourElement instanceof Tour.ServiceActivity serviceActivity) {
+							serviceInTour.add(serviceActivity.getService().getId());
+						}
+						//shipment is saved as a string: jobId + activity type
+						if (tourElement instanceof Tour.ShipmentBasedActivity shipmentBasedActivity) {
+							shipmentInTour.add(shipmentBasedActivity.getShipment().getId() + " | " + shipmentBasedActivity.getActivityType());
+						}
 					}
 				}
-			}
 
 			//save all jobs the current carrier should do
 			//shipments have to be picked up and delivered. To allow shipmentInTour being properly matched to shipmentList, shipments are saved with suffix CarrierConstants.PICKUP /.DELIVERY

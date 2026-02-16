@@ -87,6 +87,26 @@ public class WaitForShiftTask extends DefaultStayTask implements DrtStopTask, Op
     }
 
     @Override
+    public double calcLatestArrivalTime() {
+        return Double.MAX_VALUE;
+    }
+
+    @Override
+    public double calcEarliestArrivalTime() {
+        return 0;
+    }
+
+    @Override
+    public double calcEarliestDepartureTime() {
+        return 0;
+    }
+
+    @Override
+    public double calcLatestDepartureTime() {
+        return Double.MAX_VALUE;
+    }
+
+    @Override
     public Id<OperationFacility> getFacilityId() {
         return facilityId;
     }

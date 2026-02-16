@@ -1,6 +1,13 @@
 package org.matsim.contrib.ev.strategic.scoring;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup.Parameter;
+
+import picocli.CommandLine.Command;
 
 /**
  * This parameter set represents the weights that are used in charging plan
@@ -56,6 +63,10 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 	@Parameter
 	@Comment("applied every time an agent planned to do a reservation but it was unsuccessful")
 	private double failedReservation = -100.0;
+
+	@Parameter
+	@Comment("applied to the absolute delta between the end-of-day soc and the per-person target soc")
+	private double targetSoc = 0.0;
 
 	public double getCost() {
 		return cost;
@@ -135,5 +146,65 @@ public class ChargingPlanScoringParameters extends ReflectiveConfigGroup {
 
 	public void setFailedReservation(double failedReservation) {
 		this.failedReservation = failedReservation;
+	}
+
+	public double getTargetSoc() {
+		return targetSoc;
+	}
+
+	public void setTargetSoc(double targetSoc) {
+		this.targetSoc = targetSoc;
+	}
+
+	static public class ChargerTypeParams extends ReflectiveConfigGroup {
+		static public final String SET_NAME = "chargerType";
+
+		@Parameter
+		private String chargerType;
+
+		@Parameter
+		private double constant = 0.0;
+
+		public ChargerTypeParams() {
+			super(SET_NAME);
+		}
+
+		public String getChargerType() {
+			return chargerType;
+		}
+
+		public void setChargerType(String val) {
+			this.chargerType = val;
+		}
+
+		public double getConstant() {
+			return constant;
+		}
+
+		public void setConstant(double val) {
+			this.constant = val;
+		}
+	}
+
+	public Collection<ChargerTypeParams> getChargerTypeParams() {
+		return getParameterSets(ChargerTypeParams.SET_NAME).stream().map(ChargerTypeParams.class::cast)
+				.collect(Collectors.toSet());
+	}
+
+	public void removeChargerTypeParms(ChargerTypeParams params) {
+		removeParameterSet(params);
+	}
+
+	public void clearChargerTypeParams() {
+		clearParameterSetsForType(ChargerTypeParams.SET_NAME);
+	}
+
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		if (type.equals(ChargerTypeParams.SET_NAME)) {
+			return new ChargerTypeParams();
+		}
+
+		return super.createParameterSet(type);
 	}
 }

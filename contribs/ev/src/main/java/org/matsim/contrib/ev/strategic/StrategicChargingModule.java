@@ -16,6 +16,7 @@ import org.matsim.contrib.ev.strategic.access.ChargerAccess;
 import org.matsim.contrib.ev.strategic.access.SubscriptionRegistry;
 import org.matsim.contrib.ev.strategic.analysis.ChargerTypeAnalysisListener;
 import org.matsim.contrib.ev.strategic.analysis.ChargingPlanScoringListener;
+import org.matsim.contrib.ev.strategic.analysis.PersonSocWriter;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.costs.ChargingCostModule;
 import org.matsim.contrib.ev.strategic.infrastructure.ChargerProvider;
@@ -25,6 +26,7 @@ import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningAlgorithm;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingInnovationParameters;
+import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingPlanCalculatorFactory;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.ConstrainedChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.replanning.innovator.EmptyChargingPlanInnovator;
@@ -44,6 +46,8 @@ import org.matsim.contrib.ev.withinday.ChargingSlotFinder;
 import org.matsim.contrib.ev.withinday.WithinDayEvConfigGroup;
 import org.matsim.contrib.ev.withinday.analysis.WithinDayChargingAnalysisHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControllerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.util.TravelTime;
@@ -52,6 +56,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.timing.TimeInterpretation;
 import org.matsim.vehicles.Vehicles;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -140,6 +145,8 @@ public class StrategicChargingModule extends AbstractModule {
 
 		install(new ChargerReservationModule(
 				chargingConfig.getOnlineSearchStrategy().equals(AlternativeSearchStrategy.ReservationBased)));
+
+		addControllerListenerBinding().to(PersonSocWriter.class);
 	}
 
 	@Provides
@@ -152,9 +159,11 @@ public class StrategicChargingModule extends AbstractModule {
 	@Singleton
 	ChargingPlanScoring provideChargingPlanScoring(EventsManager eventsManager, Population population, Network network,
 			TimeInterpretation timeInterpretation, ElectricFleetSpecification fleet,
+			ChargingInfrastructureSpecification infrastructure,
 			ChargingCostCalculator costCalculator,
 			StrategicChargingConfigGroup scConfig, WithinDayEvConfigGroup withinConfig, ScoringTracker tracker) {
-		return new ChargingPlanScoring(eventsManager, population, network, timeInterpretation, fleet, costCalculator,
+		return new ChargingPlanScoring(eventsManager, population, network, timeInterpretation, fleet, infrastructure,
+				costCalculator,
 				scConfig.getScoringParameters(),
 				withinConfig.getCarMode(), tracker);
 	}
@@ -203,27 +212,42 @@ public class StrategicChargingModule extends AbstractModule {
 	RandomChargingPlanInnovator provideRandomChargingPlanCreator(ChargerProvider chargerProvider,
 			Scenario scenario, StrategicChargingConfigGroup config, WithinDayEvConfigGroup withinConfig,
 			TimeInterpretation timeInterpretation, ChargerSelector.Factory selectorFactory,
-			ChargerReservability chargerReservability) {
+			ChargerReservability chargerReservability, ChargingInfrastructureSpecification infrastructure,
+			ChargerAccess chargerAccess) {
 		ChargingSlotFinder candidateFinder = new ChargingSlotFinder(scenario, withinConfig.getCarMode());
 		return new RandomChargingPlanInnovator(chargerProvider, candidateFinder, timeInterpretation, config,
 				(RandomChargingPlanInnovator.Parameters) config.getInnovationParameters(), selectorFactory,
-				chargerReservability);
+				chargerReservability, infrastructure, chargerAccess);
 	}
 
 	@Provides
 	ConstrainedChargingPlanInnovator provideConstrainedChargingPlanInnovator(
-			ChargingPlanInnovator delegate,
-			TimeInterpretation timeInterpretation,
-			@Named(MODE_BINDING) TravelTime travelTime, Network network, Vehicles vehicles,
-			ElectricFleetSpecification electricFleet,
-			ChargingInfrastructureSpecification infrastructure, StrategicChargingConfigGroup config,
-			WithinDayEvConfigGroup wevcConfig, ChargingPower.Factory chargingPowerFactory,
-			DriveEnergyConsumption.Factory driveEnergyConsumptionFactory) {
-		ChargingInnovationParameters parameters = config
+			ChargingPlanInnovator innovator,
+			ElectricFleetSpecification electricFleetSpecification, ChargingPlanCalculatorFactory calculatorFactory,
+			StrategicChargingConfigGroup sevcConfig,
+			WithinDayEvConfigGroup wevcConfig) {
+		ChargingInnovationParameters parameters = sevcConfig
 				.getInnovationParameters();
-		return new ConstrainedChargingPlanInnovator(delegate, timeInterpretation, travelTime, network, vehicles,
-				electricFleet, infrastructure, wevcConfig.getCarMode(), parameters.getConstraintIterations(),
-				parameters.getConstraintErrorMode(), chargingPowerFactory, driveEnergyConsumptionFactory);
+		return new ConstrainedChargingPlanInnovator(innovator,
+				electricFleetSpecification, calculatorFactory,
+				parameters.getConstraintIterations(), wevcConfig.getCarMode(), parameters.getConstraintErrorMode(),
+				parameters.getConstraintFallbackBehavior());
+	}
+
+	@Provides
+	@Singleton
+	ChargingPlanCalculatorFactory provideChargingPlanCalculatorFactory(TimeInterpretation timeInterpretation,
+			Network network, @Named(MODE_BINDING) TravelTime travelTime,
+			ElectricFleetSpecification electricFleetSpecification,
+			ChargingInfrastructureSpecification chargingInfrastructureSpecification,
+			DriveEnergyConsumption.Factory driveEnergyConsumptionFactory, ChargingPower.Factory chargingPowerFactory,
+			QSimConfigGroup qsimConfig, WithinDayEvConfigGroup wevcConfig) {
+		Preconditions.checkState(qsimConfig.getEndTime().isDefined(),
+				"QSim end time must be defined when using constrained charging innovation");
+
+		return new ChargingPlanCalculatorFactory(timeInterpretation, network, travelTime, electricFleetSpecification,
+				chargingInfrastructureSpecification, driveEnergyConsumptionFactory, chargingPowerFactory,
+				1.0, qsimConfig.getEndTime().seconds(), wevcConfig.getCarMode());
 	}
 
 	@Provides
@@ -286,5 +310,12 @@ public class StrategicChargingModule extends AbstractModule {
 		EnergyHelper.Factory energyFactory = new EnergyHelper.Factory(timeInterpretation, travelTime, network,
 				driveFactory, chargingFactory, vehicles, fleet, config.getCarMode());
 		return new MinimalCostChargerSelector.Factory(costCalculator, energyFactory);
+	}
+
+	@Provides
+	@Singleton
+	PersonSocWriter providPersonSocWriter(Population population, OutputDirectoryHierarchy outputDirectoryHierarchy,
+			ControllerConfigGroup controllerConfig) {
+		return new PersonSocWriter(population, outputDirectoryHierarchy, controllerConfig.getCompressionType());
 	}
 }

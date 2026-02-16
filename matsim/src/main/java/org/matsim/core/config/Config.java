@@ -57,6 +57,7 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.mobsim.hermes.HermesConfigGroup;
 import org.matsim.core.replanning.annealing.ReplanningAnnealerConfigGroup;
+import org.matsim.dsim.DSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
@@ -100,6 +101,7 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	public Config() {
+		// yy IMO this should become package-protected so that user code would only use the ConfigUtils methods. kai, feb'26
 		try {
 			URL currentDir = Paths.get("").toUri().toURL();
 			setContext(currentDir);
@@ -114,6 +116,8 @@ public final class Config implements MatsimExtensionPoint {
 	 * configuration from file.
 	 */
 	public void addCoreModules() {
+		// yy IMO this should become package-protected.
+
 		this.modules.put(GlobalConfigGroup.GROUP_NAME, new GlobalConfigGroup());
 
 		this.modules.put(ControllerConfigGroup.GROUP_NAME, new ControllerConfigGroup());
@@ -159,6 +163,8 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.modules.put(HermesConfigGroup.NAME, new HermesConfigGroup());
 
+		this.modules.put(DSimConfigGroup.CONFIG_MODULE_NAME, new DSimConfigGroup());
+
 		this.modules.put(ReplanningAnnealerConfigGroup.GROUP_NAME, new ReplanningAnnealerConfigGroup());
 
 		this.modules.put(PlanInheritanceConfigGroup.GROUP_NAME, new PlanInheritanceConfigGroup());
@@ -203,6 +209,8 @@ public final class Config implements MatsimExtensionPoint {
 	 *             if a config-group with the specified name already exists.
 	 */
 	public final ConfigGroup createModule(final String name) {
+		// yy should be named createAndAdd ... we said that we would not want creational methods that do the registration as a side effect.  kai, feb'26
+
 		if (this.modules.containsKey(name)) {
 			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
@@ -398,6 +406,10 @@ public final class Config implements MatsimExtensionPoint {
 		return (HermesConfigGroup) this.getModule(HermesConfigGroup.NAME);
 	}
 
+	public DSimConfigGroup dsim() {
+		return (DSimConfigGroup) this.getModule(DSimConfigGroup.CONFIG_MODULE_NAME);
+	}
+
 	public ReplanningAnnealerConfigGroup replanningAnnealer() {
 		return (ReplanningAnnealerConfigGroup) this.getModule(ReplanningAnnealerConfigGroup.GROUP_NAME);
 	}
@@ -471,4 +483,5 @@ public final class Config implements MatsimExtensionPoint {
 	public URL getContext() {
 		return context;
 	}
+
 }

@@ -1,27 +1,23 @@
 package org.matsim.application;
 
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControllerConfigGroup;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
-import jakarta.annotation.Nullable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -49,22 +45,22 @@ import java.util.concurrent.atomic.AtomicReference;
  * @see Analysis
  */
 @CommandLine.Command(
-		name = MATSimApplication.DEFAULT_NAME,
-		description = {"", "Use the \"run\" command to execute the scenario, or any of the other available commands."},
-		headerHeading = MATSimApplication.HEADER,
-		parameterListHeading = "%n@|bold,underline Parameters:|@%n",
-		optionListHeading = "%n@|bold,underline Options:|@%n",
-		commandListHeading = "%n@|bold,underline Commands:|@%n",
-		footerHeading = "\n",
-		footer = "@|cyan If you would like to contribute or report an issue please go to https://github.com/matsim-org.|@",
-		usageHelpWidth = 120,
-		usageHelpAutoWidth = true,
-		showDefaultValues = true,
-		mixinStandardHelpOptions = true,
-		abbreviateSynopsis = true,
-		subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
+	name = MATSimApplication.DEFAULT_NAME,
+	description = {"", "Use the \"run\" command to execute the scenario, or any of the other available commands."},
+	headerHeading = MATSimApplication.HEADER,
+	parameterListHeading = "%n@|bold,underline Parameters:|@%n",
+	optionListHeading = "%n@|bold,underline Options:|@%n",
+	commandListHeading = "%n@|bold,underline Commands:|@%n",
+	footerHeading = "\n",
+	footer = "@|cyan If you would like to contribute or report an issue please go to https://github.com/matsim-org.|@",
+	usageHelpWidth = 120,
+	usageHelpAutoWidth = true,
+	showDefaultValues = true,
+	mixinStandardHelpOptions = true,
+	abbreviateSynopsis = true,
+	subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
 )
-public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
+public abstract class MATSimApplication implements Callable<Integer> {
 
 	private static final Logger log = LogManager.getLogger(MATSimApplication.class);
 
@@ -73,16 +69,20 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	public static final String COLOR = "@|bold,fg(81) ";
 	static final String DEFAULT_NAME = "MATSimApplication";
 	static final String HEADER = COLOR +
-			"  __  __   _ _____ ___ _       \n" +
-			" |  \\/  | /_\\_   _/ __(_)_ __  \n" +
-			" | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
-			" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
+		"  __  __   _ _____ ___ _       \n" +
+		" |  \\/  | /_\\_   _/ __(_)_ __  \n" +
+		" | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
+		" |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
+
+	// I (kn) personally prefer to name the Config object as config, the filename
+	// to the config as configFilename, and to use path only if I have
+	// a Path object.  Otherwise, one always needs to look up the type.
 
 	@CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
 	protected String configPath;
 
 	@CommandLine.Option(names = "--yaml", description = "Path to yaml file with config params to overwrite.", required = false)
-	protected String specs;
+	protected String yamlFilename;
 
 	@CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
 	protected int iterations;
@@ -108,39 +108,22 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	private List<String> remainingArgs;
 
 	/**
-	 * Path to the default scenario config, if applicable.
-	 */
-	@Nullable
-	private final String defaultScenario;
-
-	/**
 	 * Contains loaded config file.
 	 */
 	@Nullable
 	private Config config;
 
 	/**
-	 * Constructor for an application without a default scenario path.
+	 * Default constructor. Needs to be there, otherwise PicoCli cannot instantiate the class.
 	 */
 	public MATSimApplication() {
-		defaultScenario = null;
 	}
 
 	/**
-	 * Constructor
-	 *
-	 * @param defaultConfigPath path to the default scenario config
-	 */
-	public MATSimApplication(@Nullable String defaultConfigPath) {
-		this.defaultScenario = defaultConfigPath;
-	}
-
-	/**
-	 * Constructor for given config, that can be used from code.
+	 * Constructor for given config, which can be used from code.
 	 */
 	public MATSimApplication(@Nullable Config config) {
 		this.config = config;
-		this.defaultScenario = "<config from code>";
 	}
 
 	/**
@@ -153,14 +136,22 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// load config if not present yet.
 		if (config == null) {
-			String path = Objects.requireNonNull( configPath, "No default scenario location given" );
-			List<ConfigGroup> customModules = getCustomModules();
+			// yy Something like
+			//			   Config config = ConfigUtils.createConfig( context );
+			//			   ConfigUtils.loadConfig( config, ...)
+			// would, in my understanding, set the context separately from the config path name.
+			//  But I am not sure how this would execute in everything that follows.  kai, feb'26
 
-			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path), customModules.toArray(new ConfigGroup[0] ) );
-			Config prepared = prepareConfig( config1 );
+			String path = Objects.requireNonNull( configPath, "No config given; use --config=<path-to-config.xml>" );
 
-			config = prepared != null ? prepared : config1;
-			// (The above lines of code come from inlining so maybe it happened there: I cannot see how prepared could be null but config1 not except if user code returns null which I would consider a bug.  kai, aug'24)
+			final Config config1 = ConfigUtils.loadConfig(IOUtils.resolveFileOrResource(path));
+			Config preparedConfig = prepareConfig( config1 );
+
+			config = preparedConfig != null ? preparedConfig : config1;
+			// (The above lines of code come from inlining so maybe it happened there: I cannot see how "preparedConfig" could
+			// be null but "config1" not except if user code returns null which I would consider a bug.  kai, aug'24)
+			// (--> see comments in prepareConfig(...).)
+
 		} else {
 			Config tmp = prepareConfig(config);
 			config = tmp != null ? tmp : config;
@@ -168,8 +159,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		Objects.requireNonNull(config);
 
-		if (specs != null)
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(specs));
+		if ( yamlFilename != null)
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource( yamlFilename ) );
 
 		if (remainingArgs != null) {
 			String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
@@ -178,6 +169,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		if (iterations > -1)
 			config.controller().setLastIteration(iterations);
+		// yy means that "iterations" is indeed
 
 		if (output != null)
 			config.controller().setOutputDirectory(output.toString());
@@ -189,8 +181,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
-
+		Controler controler = new Controler(scenario);
 		prepareControler(controler);
 
 		// Check if simulation needs to be run
@@ -220,30 +211,31 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		return configPath;
 	}
 
-	@Nullable
-	String getDefaultScenario() {
-		return defaultScenario;
-	}
+//	/**
+//	 * Custom module configs that will be added to the {@link Config} object.
+//	 *
+//	 * @return {@link ConfigGroup} to add
+//	 */
+//	protected List<ConfigGroup> getCustomModules() {
+//		return Lists.newArrayList();
+//	}
+	// (no longer used IMO.  kai, feb'26)
+	// (I think that this was meant to add "configurable modules".  However, modules are configurable via the sebhoerl
+	// command line syntax anyways.  I can't say if they possibly behave in a different way re non-default
+	// modules but am relatively sure that, because the corresponding
+	// command was commented out below, it would not have worked anyways with the current setup.)
 
-	/**
-	 * Custom module configs that will be added to the {@link Config} object.
-	 *
-	 * @return {@link ConfigGroup} to add
-	 */
-	protected List<ConfigGroup> getCustomModules() {
-		return Lists.newArrayList();
-	}
-
-	/**
-	 * Modules that are configurable via command line arguments.
-	 */
-	protected List<ConfigGroup> getConfigurableModules() {
-		return Lists.newArrayList(
-				new ControllerConfigGroup(),
-				new GlobalConfigGroup(),
-				new QSimConfigGroup()
-		);
-	}
+//	/**
+//	 * Modules that are configurable via command line arguments.
+//	 */
+//	protected List<ConfigGroup> getConfigurableModules() {
+//		return Lists.newArrayList(
+//			new ControllerConfigGroup(),
+//			new GlobalConfigGroup(),
+//			new QSimConfigGroup()
+//		);
+//	}
+	// (never used IMO.  kai, feb'26)
 
 	/**
 	 * Preparation step for the config.
@@ -252,6 +244,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * @return prepared {@link Config}
 	 */
 	protected Config prepareConfig(Config config) {
+		// yyyy We are passing an object into the method, so no need to return it.  That is also the
+		// convention for prepareScenario and prepareControler.  I can't see what we gain by returning the object.
+
 		return config;
 	}
 
@@ -311,19 +306,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	protected final void addRunOption(Config config, String option) {
 		addRunOption(config, option, "");
-	}
-
-	@Override
-	public String defaultValue(CommandLine.Model.ArgSpec argSpec) throws Exception {
-		Object obj = argSpec.userObject();
-		if (obj instanceof Field field) {
-			// Make sure default config path is propagated to the field
-			if (field.getName().equals("configPath") && field.getDeclaringClass().equals(MATSimApplication.class)) {
-				return defaultScenario;
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -405,8 +387,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 * 	</ul>
 	 * 	</p>
 	 *
-	 * @param clazz class of the scenario to run
-	 * @param args pass arguments from the main method
+	 * @param clazz       class of the scenario to run
+	 * @param args        pass arguments from the main method
 	 * @param defaultArgs predefined default arguments that will always be present
 	 */
 	public static void runWithDefaults(Class<? extends MATSimApplication> clazz, String[] args, String... defaultArgs) {
@@ -427,7 +409,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 			// run if no other command is present
 			if (args.length > 0) {
 				// valid command is present
-				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui") ){
+				if (args[0].equals("run") || args[0].equals("prepare") || args[0].equals("analysis") || args[0].equals("gui")) {
 					// If this is a run command, the default args can be applied
 					if (args[0].equals("run"))
 						args = ApplicationUtils.mergeArgs(args, defaultArgs);
@@ -456,10 +438,14 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	 */
 	public static int execute(Class<? extends MATSimApplication> clazz, Config config, String... args) {
 		MATSimApplication app = newInstance(clazz, config);
+		// (this calls the constructor of clazz via reflection)
 
 		prepareArgs(args);
+		// (this moves the run argument, if it is first and not last, to the very end)
 
 		CommandLine cli = prepare(app);
+
+
 		AtomicReference<Exception> exc = new AtomicReference<>();
 		cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
 			exc.set(ex);
@@ -508,8 +494,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		Config tmp = app.prepareConfig(config);
 		config = tmp != null ? tmp : config;
 
-		if (app.specs != null) {
-			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.specs));
+		if (app.yamlFilename != null) {
+			ApplicationUtils.applyConfigUpdate(config, IOUtils.resolveFileOrResource(app.yamlFilename ) );
 		}
 
 		if (app.remainingArgs != null) {
@@ -520,7 +506,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		final Scenario scenario = app.createScenario(config);
 		app.prepareScenario(scenario);
 
-		final Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 		app.prepareControler(controler);
 
 		return controler;
@@ -583,11 +569,13 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
 		// Try constructor with config first
 		// if that fails try default constructor
+		// --> I just changed that behavior ... if a constructor with config is available but does not exist, then it aborts. kai, feb'26
+		// (matsim developer agreement is "reduce automagic")
 		if (config != null) {
 			try {
 				return clazz.getDeclaredConstructor(Config.class).newInstance(config);
 			} catch (NoSuchMethodException e) {
-				// Continue
+				throw new RuntimeException( "Requested constructor not available", e );
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException("Could not instantiate the application class", e);
 			}
@@ -606,17 +594,29 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	private static CommandLine prepare(MATSimApplication app) {
 		CommandLine cli = new CommandLine(app);
 
-		if (cli.getCommandName().equals(DEFAULT_NAME))
-			cli.setCommandName(app.getClass().getSimpleName());
+		if (cli.getCommandName().equals(DEFAULT_NAME)){
+			cli.setCommandName( app.getClass().getSimpleName() );
+		}
+		// (commandName is what is displayed in the command line help text.  It seems that, with inheritance,
+		// piccoli sets this to the base class, but we want to have it set to the outermost class. kai,)
 
 		setupOptions(cli, app);
-		setupSubcommands(cli, app);
+		// (this reformats something in the help output)
 
-		List<ConfigGroup> modules = Lists.newArrayList();
-		modules.addAll(app.getConfigurableModules());
-		modules.addAll(app.getCustomModules());
+		setupSubcommands(cli, app);
+		// (this extracts the "Prepare" and "Analysis" subcommands.  yy Note
+		// that additional subcommand namespaces need to be programmed here.)
+
+
+//		List<ConfigGroup> modules = Lists.newArrayList();
+//		modules.addAll(app.getConfigurableModules());
+//		modules.addAll(app.getCustomModules());
+		// I found the following with setupConfig( cli, modules ) commented out.  I am not touching the line to leave git annotate intact ...
+		// ... from here ...
 
 		// setupConfig(cli, modules);
+		// ... to here.
+
 		return cli;
 	}
 
@@ -628,8 +628,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		if (header.length == 1) {
 			spec.usageMessage().header(COLOR + " " + header[0].trim() + "|@%n");
 		}
-
-		spec.defaultValueProvider(app);
 	}
 
 	/**
@@ -668,8 +666,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 		for (ConfigGroup module : modules) {
 
 			CommandLine.Model.ArgGroupSpec.Builder group = CommandLine.Model.ArgGroupSpec.builder()
-					.headingKey(module.getName())
-					.heading(module.getName() + "\n");
+				.headingKey(module.getName())
+				.heading(module.getName() + "\n");
 
 			for (Map.Entry<String, String> param : module.getParams().entrySet()) {
 
@@ -679,11 +677,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 					desc = desc.replace("%", "%%");
 
 				group.addArg(CommandLine.Model.OptionSpec.builder("--" + module.getName() + "-" + param.getKey())
-						.hideParamSyntax(true)
-						.hidden(false)
-						.description((desc != null ? desc + " " : "") + "Default: ${DEFAULT-VALUE}")
-						.defaultValue(param.getValue())
-						.build());
+					.hideParamSyntax(true)
+					.hidden(false)
+					.description((desc != null ? desc + " " : "") + "Default: ${DEFAULT-VALUE}")
+					.defaultValue(param.getValue())
+					.build());
 
 			}
 
@@ -692,10 +690,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	@CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See prepare help; \n" +
-									     "  needs to be ... \"prepare\", \"help\" ) if run from Java.)",
-			// (This used to be "help prepare", which works as well.  However, "prepare help <subcommand>" then also works while "help
-			// prepare <subcommand>" does not.  So I think that "prepare help" saves some time in understanding help options.  kai, nov'22)
-			subcommands = CommandLine.HelpCommand.class)
+		"  needs to be ... \"prepare\", \"help\" ) if run from Java.)",
+		// (This used to be "help prepare", which works as well.  However, "prepare help <subcommand>" then also works while "help
+		// prepare <subcommand>" does not.  So I think that "prepare help" saves some time in understanding help options.  kai, nov'22)
+		subcommands = CommandLine.HelpCommand.class)
 	public static class PrepareCommand implements Callable<Integer> {
 
 		@CommandLine.Spec
@@ -709,7 +707,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 	}
 
 	@CommandLine.Command(name = "analysis", description = "Contains all commands for analysing the scenario. (See help analysis)",
-			subcommands = CommandLine.HelpCommand.class)
+		subcommands = CommandLine.HelpCommand.class)
 	public static class AnalysisCommand implements Callable<Integer> {
 
 		@CommandLine.Spec

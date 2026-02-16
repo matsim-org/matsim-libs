@@ -137,7 +137,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	private List<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
-															  final TransitStopFacility stop) {
+														 final TransitStopFacility stop) {
 		List<PTPassengerAgent> passengersLeaving = new ArrayList<>();
 		for (PassengerAgent passenger : vehicle.getPassengers()) {
 			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
@@ -160,7 +160,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, double time) {
 		boolean handled = vehicle.addPassenger(passenger);
 		if (handled) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
@@ -178,7 +178,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
+	public boolean handlePassengerLeaving(PTPassengerAgent passenger, TransitVehicle vehicle, Id<Link> toLinkId, double time) {
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
 			passenger.setVehicle(null);
@@ -197,7 +197,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public void handlePassengerRelocating(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
+	public void handlePassengerRelocating(PTPassengerAgent passenger, TransitVehicle vehicle, Id<TransitStopFacility> stopFacilityId, double time) {
 
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {

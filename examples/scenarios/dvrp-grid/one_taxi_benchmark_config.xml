@@ -35,6 +35,8 @@
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
 		<param name="snapshotStyle" value="queue"/>
 		<param name="flowCapacityFactor" value="100.0"/>
+		<!--		no idea why the above is needed; I am retrofitting the stor cap factor so that the new consistency checker is happy. kai, feb'26-->
+		<param name="storageCapacityFactor" value="100.0"/>
 	</module>
 
 	<module name="controller">

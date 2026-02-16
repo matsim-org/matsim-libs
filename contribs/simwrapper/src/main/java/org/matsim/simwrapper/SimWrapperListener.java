@@ -84,7 +84,7 @@ public class SimWrapperListener implements StartupListener, ShutdownListener {
 
 		for (DashboardProvider dashboardProvider : loader) {
 			// Skip default providers if disabled
-			if (config.getDefaultDashboards() == SimWrapperConfigGroup.Mode.disabled && dashboardProvider.isDefault()) {
+			if (config.getDefaultDashboards() == SimWrapperConfigGroup.DefaultDashboardsMode.disabled && dashboardProvider.isDefault()) {
 				continue;
 			}
 			p.add(dashboardProvider);

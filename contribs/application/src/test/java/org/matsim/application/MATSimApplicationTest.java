@@ -1,5 +1,6 @@
 package org.matsim.application;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -105,7 +106,9 @@ public class MATSimApplicationTest {
 			"--name", "test",
 			"--population", input.resolve("persons.xml").toString(),
 			"--attributes", input.resolve("attributes.xml").toString(),
-			"--output", output.toString()
+			"--output", output.toString(),
+			"--max-typical-duration", "86400" // means that it will run the "split" part.  Which, however, is deprecated.
+			// The test should probably be adopted to no longer use those deprecated methods.  kai, nov'26
 		);
 
 		Path plans = output.resolve("test-100pct.plans.xml.gz");
@@ -178,6 +181,11 @@ public class MATSimApplicationTest {
 
 	}
 
+	@Test
+	void run_noConfig() {
+		Assertions.assertThrows(NullPointerException.class, () -> MATSimApplication.execute(TestScenario.class));
+	}
+
 	@MATSimApplication.Prepare({
 		TrajectoryToPlans.class, GenerateShortDistanceTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
 	})
@@ -190,7 +198,6 @@ public class MATSimApplicationTest {
 			super(config);
 		}
 
-		// Public constructor is required to run the class
 		public TestScenario() {
 		}
 

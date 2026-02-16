@@ -39,6 +39,40 @@ public final class BicycleModule extends AbstractModule {
 	@Inject private BicycleConfigGroup bicycleConfigGroup;
 
 	@Override public void install() {
+		// This defines general infrastructure needed later:
+
+		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
+		// (override this binding if you want a different speed calculation on links)
+
+		bind(BicycleParams.class).to(BicycleParamsDefaultImpl.class);
+		// (override this binding if you want a different translation of link properties into scoring params)
+
+		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
+		// (override this binding if you do not only want to change the params, but the whole computation.  Note that this needs to be consistent with the travel disutility!)
+
+
+		// The following modifies the mobsim.  It uses a different link speed calculator for bicycles:
+		this.installOverridingQSimModule( new AbstractQSimModule(){
+			@Override protected void configureQSim(){
+				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
+			}
+		} );
+
+
+		// The following modifies the scoring:
+		this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
+		// (this uses the AdditionalBicycleLinkScore to compute and throw corresponding scoring events)
+		// (it also computes and throws the motorized interaction events, if they are switched on)
+
+
+		// this gives the typical things to the router:
+		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
+		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
+		// (the BicycleTravelTime uses the BicycleLinkSpeed Calculator bound above)
+		// (the bicycle disutility needs to be consistent with the AdditionalBicycleLinkScore above)
+
+
+		// something that may be important:
 //		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule( this.getConfig(), BicycleConfigGroup.class );
 //		this.bind( BicycleConfigGroup.class ).toInstance( bicycleConfigGroup );
 		// the above feels odd.  But it seems to work.  I actually have no idea where the config groups are bound, neither for the core config
@@ -48,41 +82,6 @@ public final class BicycleModule extends AbstractModule {
 		// It actually does not work in general.  The ExplodedConfigModule injects all config groups that are materialized by then.  Which
 		// means that it needs to be materialized "quite early", and in particular before this install method is called.  For the time being,
 		// a run script using the contrib thus needs to materialize the config group.  kai, jul'24
-
-
-		// The idea here is the following:
-		// * scores are just added as score events.  no scoring function is replaced.
-
-		// * link speeds are computed via a plugin handler to the DefaultLinkSpeedCalculator.  If the plugin handler returns a speed, it is
-		// used, otherwise the default speed is used. This has the advantage that multiple plugins can register such special link speed calculators.
-
-		// this gives the typical things to the router:
-		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
-		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
-		// (the BicycleTravelTime uses the BicycleLinkSpeed Calculator bound below)
-		// (the BicycleDisutility uses a BicycleTravelDisutility)
-
-		// compute and throw the additional score events:
-		this.addEventHandlerBinding().to( BicycleScoreEventsCreator.class );
-		// (this uses the AdditionalBicycleLinkScore to compute and throw corresponding scoring events)
-		// (it also computes and throws the motorized interaction events, if they are switched on)
-
-		this.bind( AdditionalBicycleLinkScore.class ).to( AdditionalBicycleLinkScoreDefaultImpl.class );
-		// (this computes the value of the per-link scoring event.  yyyy Very unfortunately, it is a re-implementation of the BicycleTravelDisutility (mentioned above).)
-
-
-//		here, different values for surface types and infrastructure factors can be defined.
-//		by default, the default values in BicycleParamsDefaultImpl are bound
-		this.bind(BicycleParams.class).to(BicycleParamsDefaultImpl.class);
-
-		this.installOverridingQSimModule( new AbstractQSimModule(){
-			@Override protected void configureQSim(){
-				this.addLinkSpeedCalculatorBinding().to( BicycleLinkSpeedCalculator.class );
-			}
-		} );
-
-		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
-		// (both the router and the mobsim need this)
 
 		addControllerListenerBinding().to(ConsistencyCheck.class);
 	}
@@ -97,23 +96,12 @@ public final class BicycleModule extends AbstractModule {
 				LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types. "
 						     + "Can't check the consistency of the maximum velocity in the bicycle vehicle type and the bicycle config group. "
 						     + "Should at least be approximately the same and randomization should be enabled.");
-			} else {
-
-				double mobsimSpeed = scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity();
-//				if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeedForRouting()) > 0.1) {
-//					LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
-//							     + " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
-//							     + " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
-//					if (scenario.getConfig().routing().getRoutingRandomness() == 0.) {
-//						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
-//					}
-//				}
 			}
 
 			if (!scenario.getConfig().qsim().getMainModes().contains(bicycleConfigGroup.getBicycleMode())) {
 				LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
 			}
-			// (yy should move into the config consistency checker)
+			// (yy This second item should move into the config consistency checker)
 
 		}
 	}

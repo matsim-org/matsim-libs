@@ -2,13 +2,17 @@ package org.matsim.contrib.ev.strategic;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
@@ -21,6 +25,8 @@ import org.matsim.contrib.ev.strategic.costs.TariffBasedChargingCostCalculator;
 import org.matsim.contrib.ev.strategic.infrastructure.FacilityChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PersonChargerProvider;
 import org.matsim.contrib.ev.strategic.infrastructure.PublicChargerProvider;
+import org.matsim.contrib.ev.strategic.plan.ChargingPlans;
+import org.matsim.contrib.ev.strategic.plan.ChargingPlansConverter;
 import org.matsim.contrib.ev.strategic.replanning.StrategicChargingReplanningStrategy;
 import org.matsim.contrib.ev.strategic.replanning.innovator.RandomChargingPlanInnovator;
 import org.matsim.contrib.ev.strategic.reservation.StrategicChargingReservationEngine;
@@ -34,7 +40,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.Vehicle;
 
@@ -171,6 +179,21 @@ public class StrategicChargingUtils {
      */
     static public Double getMinimumEndSoc(Person person) {
         return ChargingPlanScoring.getMinimumEndSoc(person);
+    }
+
+    /**
+     * Sets the target SoC that the person wants to achieve at the end of the day.
+     */
+    static public void setTargetSoc(Person person, double targetSoc) {
+        ChargingPlanScoring.setTargetSoc(person, targetSoc);
+    }
+
+    /**
+     * Returns the target SoC that the person wants to achieve at the end of the
+     * day.
+     */
+    static public Double getTargetSoc(Person person) {
+        return ChargingPlanScoring.getTargetSoc(person);
     }
 
     /**
@@ -403,5 +426,45 @@ public class StrategicChargingUtils {
      */
     static public Double getReservationSlack(Person person) {
         return StrategicChargingReservationEngine.getReservationSlack(person);
+    }
+
+    /**
+     * Helper to obtain a map of attribute converters
+     */
+    static public Map<Class<?>, AttributeConverter<?>> getAttributeConverters() {
+        return Collections.singletonMap(ChargingPlans.class, new ChargingPlansConverter());
+    }
+
+    /**
+     * Helper that wraps around ScenarioUtils.loadScenario
+     */
+    static public Scenario loadScenario(Config config, Map<Class<?>, AttributeConverter<?>> converters) {
+        Map<Class<?>, AttributeConverter<?>> extendedConverters = new HashMap<>();
+        extendedConverters.putAll(getAttributeConverters());
+        extendedConverters.putAll(converters);
+
+        return ScenarioUtils.loadScenario(config, extendedConverters);
+    }
+
+    /**
+     * Helper that wraps around ScenarioUtils.loadScenario
+     */
+    static public Scenario loadScenario(Scenario scenario, Map<Class<?>, AttributeConverter<?>> converters) {
+        return ScenarioUtils.loadScenario(scenario.getConfig(),
+                Collections.singletonMap(ChargingPlans.class, new ChargingPlansConverter()));
+    }
+
+    /**
+     * Helper that wraps around ScenarioUtils.loadScenario
+     */
+    static public Scenario loadScenario(Config config) {
+        return loadScenario(config, Collections.emptyMap());
+    }
+
+    /**
+     * Helper that wraps around ScenarioUtils.loadScenario
+     */
+    static public Scenario loadScenario(Scenario scenario) {
+        return loadScenario(scenario, Collections.emptyMap());
     }
 }

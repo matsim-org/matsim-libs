@@ -2,12 +2,21 @@ package org.matsim.simwrapper.viz;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * The Tile plug-in creates an overview of important key figures.
  */
-public class GridMap extends Viz {
+public class GridMap extends VizMap<GridMap> {
+
+	/**
+	 * Defines the time selector types
+	 */
+	public enum TimeSelector {
+		discrete,
+		slider
+	}
 
 	/**
 	 * The unit of the values.
@@ -68,6 +77,16 @@ public class GridMap extends Viz {
 	@JsonProperty(required = false)
 	public String valueColumn;
 
+	/**
+	 * The secondValueColumn defines the column to compare with valueColumn for difference plot.
+	 */
+	public String secondValueColumn;
+
+	/**
+	 * If true, the map will show the difference plot between valueColumn and secondValueColumn.
+	 */
+	public boolean diff;
+
 	private Map<String, Object> colorRamp;
 
 	public GridMap() {
@@ -78,20 +97,38 @@ public class GridMap extends Viz {
 	 * Set the color ramp name.
 	 */
 	public GridMap setColorRamp(String ramp) {
-		colorRamp = Map.of("ramp", ramp);
+		colorRamp = new HashMap<>(Map.of("ramp", ramp));
 		return this;
 	}
+
+	/**
+	 * Defines which type of time selector to use.
+	 * Possible values are `discrete` and `slider`.
+	 */
+	@JsonProperty(required = false)
+	public TimeSelector timeSelector;
 
 	/**
 	 * Sets the full color ramps settings.
 	 */
 	public GridMap setColorRamp(double[] breakpoints, String[] colors) {
-		colorRamp = Map.of("breakpoints", breakpoints, "fixedColors", colors);
+		colorRamp = new HashMap<>(Map.of("breakpoints", breakpoints, "fixedColors", colors));
 		return this;
 	}
 
 	public GridMap setColorRamp(String ramp, int steps, boolean reverse) {
-		colorRamp = Map.of("ramp", ramp, "reverse", reverse, "steps", steps);
+		colorRamp = new HashMap<>(Map.of("ramp", ramp, "reverse", reverse, "steps", steps));
+		return this;
+	}
+
+	public GridMap setColorRampBounds(boolean boundsEnabled, double lowerBound, double upperBound) {
+		if (colorRamp == null || colorRamp.isEmpty()) {
+			throw new IllegalStateException("Color ramp must be set before setting bounds.");
+		}
+
+		colorRamp.put("boundsEnabled", boundsEnabled);
+		colorRamp.put("lowerBound", lowerBound);
+		colorRamp.put("upperBound", upperBound);
 		return this;
 	}
 

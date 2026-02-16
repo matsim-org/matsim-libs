@@ -71,6 +71,36 @@ public abstract class MatsimRandom {
 	}
 
 	/**
+	 * Returns an instance of an RNG, which can be used in concurrent setups. In contrast to {@link #getLocalInstance()}, the caller is responsible
+	 * to supply distinct random seeds. The supplied seed is combined with the global seed. Since the global seed is changed each iteration, the
+	 * random number sequence of the returned RNG varies between MATSim iterations.
+	 */
+	public static Random getLocalInstance(final long seed) {
+		var random = new Random(lastUsedSeed + seed * 23L);
+		prepareRNG(random);
+		return random;
+	}
+
+	/**
+	 * Returns a deterministic Random instance based on the global seed and a process identifier.
+	 * <p>
+	 * This method solves the problem where multiple independent processes need their own
+	 * reproducible random sequences without depending on the order of calls.
+	 * <p>
+	 * Calling this method multiple times with the same processId will always return
+	 * Random instances that produce the same sequence of numbers (given the same global seed).
+	 *
+	 * @param processId a unique identifier for the process (e.g., "drt1:vehicleAssignment")
+	 * @return a new Random instance with a deterministic seed
+	 */
+	public static Random getLocalInstance(final String processId) {
+		long seed = lastUsedSeed * 31L + (processId != null ? processId.hashCode() : 0);
+		var random = new Random(seed);
+		prepareRNG(random);
+		return random;
+	}
+
+	/**
 	 * Draw some random numbers to better initialize the pseudo-random number generator.
 	 *
 	 * @param rng the random number generator to initialize.

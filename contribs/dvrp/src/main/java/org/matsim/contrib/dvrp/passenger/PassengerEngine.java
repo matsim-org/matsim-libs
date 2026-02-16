@@ -20,8 +20,8 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.core.events.MobsimScopeEventHandler;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.dsim.DistributedDepartureHandler;
+import org.matsim.core.mobsim.dsim.DistributedMobsimEngine;
 
-public interface PassengerEngine extends MobsimEngine, DepartureHandler, PassengerHandler, MobsimScopeEventHandler {
+public interface PassengerEngine extends DistributedMobsimEngine, DistributedDepartureHandler, PassengerHandler, MobsimScopeEventHandler {
 }
