@@ -51,9 +51,9 @@ public class PretoriaTest {
 
 	// TODO Files were changed to local for debugging purposes. Change them back to the svn entries, when fixed hbefa tables are available
 	private final static String HBEFA_4_1_PATH = "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/";
-	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Vehcat_2020_Average.csv";
+	private final static String HBEFA_HOT_AVG = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_Average_V1.1.csv";
 	private final static String HBEFA_COLD_AVG = HBEFA_4_1_PATH + "EFA_ColdStart_Vehcat_2020_Average.csv";
-	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv";
+	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_V1.1.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
 	private final static String HBEFA_HOT_TECHAVG = HBEFA_4_1_PATH + "EFA_HOT_Concept_perTechFueltype_all_2020.csv";
@@ -141,9 +141,42 @@ public class PretoriaTest {
 
 		cRoute.getLinks().get(Id.createLinkId("cRouteLink")).getAttributes().putAttribute("hbefa_road_type", "URB/Distr/60");
 
+		// Add height information (no fancy algorithm, just take the elevation of the nearest GPS point)
+		var format = CSVFormat.DEFAULT.builder()
+			.setDelimiter(",")
+			.setSkipHeaderRecord(true)
+			.setHeader()
+			.build();
+
+		List<Tuple<Coord, Double>> coordHeights = new ArrayList<>();
+		try (var reader = Files.newBufferedReader(Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-ETIOS.csv")); var parser = CSVParser.parse(reader, format)) {
+			for(var record : parser){
+				coordHeights.add(
+					new Tuple<Coord, Double> (
+						convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
+						Double.parseDouble(record.get("gps_alt"))
+					)
+				);
+			}
+		} catch(IOException e){
+			throw new RuntimeException(e);
+		}
+
+		// TODO Some parts of the coord mapping assume 2d coords, maybe add as attribute instead
+		for(var node : cRoute.getNodes().values()){
+			double alt = coordHeights.parallelStream()
+				.map(t -> new Tuple<>(CoordUtils.length(CoordUtils.minus(node.getCoord(), t.getFirst())), t.getSecond()))
+				.min(Comparator.comparingDouble(Tuple::getFirst))
+				.get().getSecond();
+
+//			node.setCoord(new Coord(node.getCoord().getX(), node.getCoord().getY(), alt));
+			node.getAttributes().putAttribute("alt", alt);
+		}
+
 		/*for(var node : cRoute.getNodes().values()){
 			node.setCoord(new Coord(-node.getCoord().getX(), -node.getCoord().getY()));
 		}*/
+
 		NetworkUtils.writeNetwork(cRoute, "/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
 	}
 
@@ -151,7 +184,7 @@ public class PretoriaTest {
 	private final static GeotoolsTransformation TRANSFORMATION = new GeotoolsTransformation("EPSG:4326", "SA_Lo29");
 
 	/// Returns coord in SA_Lo29 format, that the GPS coordinates maps to.
-	private Coord convertWGS84toLo29(double gpsLat, double gpsLon){
+	private static Coord convertWGS84toLo29(double gpsLat, double gpsLon){
 		Coord coordWGS84 = new Coord(gpsLon, gpsLat);
 		return TRANSFORMATION.transform(coordWGS84);
 	}
@@ -161,10 +194,9 @@ public class PretoriaTest {
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( method );
 		switch (vehicle){
-			case ETIOS, FIGO, RRV -> ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+			case FIGO, ETIOS, RRV -> ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			case FIGO_TECHAVG, RRV_TECHAVG -> ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort );
 		}
-		ecg.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		ecg.setDuplicateSubsegments( EmissionsConfigGroup.DuplicateSubsegments.useFirstDuplicate );
 		ecg.setHbefaTableConsistencyCheckingLevel(EmissionsConfigGroup.HbefaTableConsistencyCheckingLevel.none);
 		ecg.setHandlesHighAverageSpeeds(true);
@@ -174,14 +206,9 @@ public class PretoriaTest {
 //		ecg.setDetailedColdEmissionFactorsFile(SVN + "54adsdas478ss457erhzj5415476dsrtzu.enc");
 
 		ecg.setAverageWarmEmissionFactorsFile(HBEFA_HOT_AVG);
+		ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
 		ecg.setAverageColdEmissionFactorsFile(HBEFA_COLD_AVG);
 		ecg.setDetailedColdEmissionFactorsFile(HBEFA_COLD_DET);
-
-		switch (vehicle){
-			case ETIOS, FIGO -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_DET);
-			case RRV -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HGV_HOT_DET);
-			case FIGO_TECHAVG, RRV_TECHAVG -> ecg.setDetailedWarmEmissionFactorsFile(HBEFA_HOT_TECHAVG);
-		}
 
 		return ecg;
 	}
@@ -481,12 +508,14 @@ public class PretoriaTest {
 			// Compute MATSim Emissions
 			kalmanFilter.linkId2time.forEach((linkId, time) -> {
 				var link = pretoriaNetwork.getLinks().get(linkId);
+				double alt = (Double) link.getToNode().getAttributes().getAttribute("alt") - (Double) link.getFromNode().getAttributes().getAttribute("alt");
 
 				var warmEmissionsMatsim = module.getWarmEmissionAnalysisModule().calculateWarmEmissions(
 					time,
 					(String) link.getAttributes().getAttribute("hbefa_road_type"),
 					link.getFreespeed(),
 					link.getLength(),
+					alt,
 					vehHbefaInfo
 				);
 

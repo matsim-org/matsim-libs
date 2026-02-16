@@ -175,3 +175,26 @@
     geom_line(aes(x=time, y=naiveAccDist), color="blue") +
     geom_line(aes(x=time, y=projectedAccDist), color="green")
 }
+
+# ==== Fix HBEFA V1 ====
+{
+  hbefa <- read_csv2("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Concept_Aleks_V1.csv") %>%
+    filter(grepl("PC|HGV", EmConcept)) %>%
+    mutate(Technology = word(EmConcept, 2)) %>%
+    filter(Technology == "D" | Technology == "P") %>%
+    mutate(Technology = ifelse(Technology == "D", "diesel", Technology)) %>%
+    mutate(Technology = ifelse(Technology == "P", "petrol (4S)", Technology)) %>%
+    mutate(SizeClasse = "average")
+
+  hbefa.tavg <- hbefa %>%
+    mutate(w = `%OfEmConcept`) %>%
+    group_by(Case, VehCat, Year, TrafficScenario, Component, RoadCat, TrafficSit, Gradient, Technology) %>%
+    summarize(EmConcept = "average", SizeClasse = "average", V = weighted.mean(V, w), EFA = weighted.mean(EFA, w))
+
+  hbefa <- hbefa %>%
+    select(Case, VehCat, Year, TrafficScenario, Component, RoadCat, TrafficSit, Gradient, Technology, EmConcept, SizeClasse, V, EFA )
+
+  hbefa <- rbind(hbefa, hbefa.tavg)
+
+  write_delim(hbefa, "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Concept_Aleks_V1.1.csv", delim = ";")
+}
