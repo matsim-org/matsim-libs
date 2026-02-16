@@ -37,7 +37,7 @@
         <jackson.version>2.21.0</jackson.version>
 		<fury.version>0.10.3</fury.version>
         <jogl.version>2.6.0</jogl.version>
-		<junit.version>6.0.2</junit.version>
+		<junit.version>6.0.3</junit.version>
 		<fastutil.version>8.5.18</fastutil.version>
     </properties>
 
@@ -220,7 +220,7 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
-                <version>2.46.0</version>
+                <version>2.47.0</version>
             </dependency>
 
             <dependency>
@@ -400,7 +400,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.4</version>
+				<version>1.18.5</version>
 				<scope>test</scope>
 			</dependency>
 

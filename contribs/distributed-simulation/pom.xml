@@ -15,13 +15,13 @@
 	<description>Provides communication implementations for distributed simulations on multiple jvms.</description>
 
 	<properties>
-		<aeron.version>1.50.0</aeron.version>
+		<aeron.version>1.50.1</aeron.version>
 		<hazelcast.version>5.6.0</hazelcast.version>
 
 		<!-- Use -DskipShaded=false to build a executable jar. -->
 		<skipShaded>true</skipShaded>
 
-			
+
 		<!-- Required by Aeron 1.47+, see https://github.com/aeron-io/aeron/wiki/Change-Log#1470-2025-01-17 -->
 		<test.jvm.aeron>
 			--add-opens java.base/jdk.internal.misc=ALL-UNNAMED
@@ -127,7 +127,7 @@
 				</executions>
 			</plugin>
 
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

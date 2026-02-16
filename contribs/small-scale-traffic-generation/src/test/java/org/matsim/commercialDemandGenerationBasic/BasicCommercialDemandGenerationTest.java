@@ -24,10 +24,10 @@ import java.nio.file.Path;
 
 /**
  * @author Ricardo Ewert Easy test if the FreightDemandGeneration runs without
- *         exceptions.
+ * exceptions.
  *
  */
-public class BasicCommercialDemandGenerationTest{
+public class BasicCommercialDemandGenerationTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -51,29 +51,29 @@ public class BasicCommercialDemandGenerationTest{
 
 			String shapeCategory = "Ortsteil";
 			new BasicCommercialDemandGeneration().execute(
-					"--output", output.toString(),
-					"--carrierOption", "createCarriersFromCSV",
-					"--demandOption", "createDemandFromCSVAndUsePopulation",
-					"--populationOption", "usePopulationInShape",
-					"--populationSamplingOption", "createMoreLocations",
-					"--VRPSolutionsOption", "runJspritAndMATSim",
-					"--combineSimilarJobs", "false",
-					"--carrierFileLocation", "",
-					"--carrierVehicleFileLocation", vehicleFilePath.toString(),
-					"--shapeFileLocation", shapeFilePath.toString(),
-					"--shapeCRS", "WGS84",
-					"--populationFileLocation", populationLocation,
-					"--populationCRS", "WGS84",
-					"--network", network,
-					"--networkCRS", "WGS84",
-					"--networkChangeEvents", "",
-					"--shapeCategory", shapeCategory,
-					"--inputCarrierCSV", carrierCSVLocation.toString(),
-					"--inputDemandCSV", demandCSVLocation.toString(),
-					"--populationSample", "0.5",
-					"--populationSamplingTo", "1.0",
-					"--defaultJspritIterations", "3"
-								     );
+				"--output", output.toString(),
+				"--carrierOption", "createCarriersFromCSV",
+				"--demandOption", "createDemandFromCSVAndUsePopulation",
+				"--populationOption", "usePopulationInShape",
+				"--populationSamplingOption", "createMoreLocations",
+				"--VRPSolutionsOption", "runJspritAndMATSim",
+				"--combineSimilarJobs", "false",
+				"--carrierFileLocation", "",
+				"--carrierVehicleFileLocation", vehicleFilePath.toString(),
+				"--shapeFileLocation", shapeFilePath.toString(),
+				"--shapeCRS", "WGS84",
+				"--populationFileLocation", populationLocation,
+				"--populationCRS", "WGS84",
+				"--network", network,
+				"--networkCRS", "WGS84",
+				"--networkChangeEvents", "",
+				"--shapeCategory", shapeCategory,
+				"--inputCarrierCSV", carrierCSVLocation.toString(),
+				"--inputDemandCSV", demandCSVLocation.toString(),
+				"--populationSample", "0.5",
+				"--populationSamplingTo", "1.0",
+				"--defaultJspritIterations", "3"
+			);
 		} catch (Exception e) {
 			LogManager.getLogger(this.getClass()).error("An error occurred while processing run the test: {}", e.getMessage(), e);
 			// if one catches an exception, then one needs to explicitly fail the test:
@@ -97,7 +97,7 @@ public class BasicCommercialDemandGenerationTest{
 		Carriers carriersSolution = CarriersUtils.getCarriers(scenarioSolution);
 		Carriers carriersToCompare = CarriersUtils.getCarriers(scenarioToCompare);
 
-		for (Carrier thisCarrier : carriersSolution.getCarriers().values()){
+		for (Carrier thisCarrier : carriersSolution.getCarriers().values()) {
 			Assertions.assertTrue(carriersToCompare.getCarriers().containsKey(thisCarrier.getId()));
 			Carrier inputCarrier = carriersToCompare.getCarriers().get(thisCarrier.getId());
 			Assertions.assertEquals(inputCarrier.getSelectedPlan().getScore(), thisCarrier.getSelectedPlan().getScore());
@@ -106,9 +106,9 @@ public class BasicCommercialDemandGenerationTest{
 
 		// compare events
 		String expected = utils.getPackageInputDirectory() + "output_events.xml.gz";
-		String actual = utils.getOutputDirectory() + "output_events.xml.gz" ;
-		ComparisonResult result = EventsUtils.compareEventsFiles( expected, actual );
-		Assertions.assertEquals( ComparisonResult.FILES_ARE_EQUAL, result );
+		String actual = utils.getOutputDirectory() + "output_events.xml.gz";
+		ComparisonResult result = EventsUtils.compareEventsFiles(expected, actual);
+		Assertions.assertEquals(ComparisonResult.FILES_ARE_EQUAL, result);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class BasicCommercialDemandGenerationTest{
 				"--populationSample", "1.0",
 				"--populationSamplingTo", "1.0",
 				"--defaultJspritIterations", "3"
-														   );
+			);
 		} catch (Exception e) {
 			LogManager.getLogger(this.getClass()).error("An error occurred while processing run the test: {}", e.getMessage(), e);
 			Assertions.fail();
