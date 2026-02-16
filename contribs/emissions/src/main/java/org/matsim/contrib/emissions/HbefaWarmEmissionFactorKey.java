@@ -25,6 +25,7 @@ package org.matsim.contrib.emissions;
 class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 
 	private String roadCategory;
+	private HbefaRoadGradient roadGradient;
 	private HbefaTrafficSituation trafficSituation;
 
 	/*package-private*/ HbefaWarmEmissionFactorKey() {
@@ -33,6 +34,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 	public HbefaWarmEmissionFactorKey(HbefaWarmEmissionFactorKey key) {
 		super(key);
 		this.roadCategory = key.roadCategory;
+		this.roadGradient = key.roadGradient;
 		this.trafficSituation = key.trafficSituation;
 	}
 
@@ -52,6 +54,14 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		this.trafficSituation = trafficSituation;
 	}
 
+	/*package-private*/ public HbefaRoadGradient getRoadGradient() {
+		return roadGradient;
+	}
+
+	/*package-private*/ public void setRoadGradient(HbefaRoadGradient roadGradient) {
+		this.roadGradient = roadGradient;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -61,6 +71,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 		var that = (HbefaWarmEmissionFactorKey) o;
 
 		if (trafficSituation != that.trafficSituation) return false;
+		if (roadGradient != that.roadGradient) return false;
 		return roadCategory.equals(that.roadCategory);
 	}
 
@@ -68,7 +79,8 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 	public int hashCode() {
 		int result = super.hashCode();
 		result = 31 * result + trafficSituation.hashCode();
-		result = 31 * result + roadCategory.hashCode();
+		result = 37 * result + roadGradient.hashCode();
+		result = 41 * result + roadCategory.hashCode();
 		return result;
 	}
 
@@ -79,6 +91,7 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 				getVehicleCategory() + "; "
 						+ getComponent() + "; "
 						+ roadCategory + "; "
+						+ roadGradient + "; "
 						+ trafficSituation + "; "
 						+ getVehicleAttributes();
 	}

@@ -227,11 +227,21 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
+		double deltaHeight = link.getToNode().getCoord().getZ() - link.getFromNode().getCoord().getZ();
+
+		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), deltaHeight, vehicleInformationTuple);
+	}
+
+	// TODO Check if calls to this method can be updated to use slopes
+	@Deprecated
+	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
+												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple){
+		return calculateWarmEmissions(travelTime_sec, roadType, freeVelocity_ms, linkLength_m, 0, vehicleInformationTuple);
 	}
 
 	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
-												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
+												  double linkLength_m, double deltaHeight_m,
+												  Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>(Pollutant.class);
 
@@ -255,6 +265,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		// translate vehicle information type into factor key.  yyyy maybe combine these two? kai, jan'20
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 		efkey.setVehicleCategory(vehicleInformationTuple.getFirst());
+		efkey.setRoadGradient(getHbefaRoadGradientFromSlope(deltaHeight_m/linkLength_m));
 		efkey.setRoadCategory(roadType);
 		if (this.detailedHbefaWarmTable != null) {
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -468,6 +479,21 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		return warmEmissionsOfEvent;
+	}
+
+	private HbefaRoadGradient getHbefaRoadGradientFromSlope(double slope_percent) {
+		// TODO +/- values are currently not implemented
+		slope_percent *= 100;
+
+		if (slope_percent < -5) return HbefaRoadGradient.MINUS_6;
+		if (slope_percent < -3) return HbefaRoadGradient.MINUS_4;
+		if (slope_percent < -1) return HbefaRoadGradient.MINUS_2;
+		if (slope_percent < 1) return HbefaRoadGradient.ZERO;
+		if (slope_percent < 3) return HbefaRoadGradient.PLUS_2;
+		if (slope_percent < 5) return HbefaRoadGradient.PLUS_4;
+		if (slope_percent >= 5) return HbefaRoadGradient.PLUS_6;
+
+		throw new IllegalArgumentException("Unexpected slope: " + slope_percent);
 	}
 
 	// TODO Replace list by a fixed sized structure

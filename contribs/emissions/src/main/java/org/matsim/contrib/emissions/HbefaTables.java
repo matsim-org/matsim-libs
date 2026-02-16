@@ -192,12 +192,13 @@ public abstract class HbefaTables {
         setCommonParametersOnKey(key, record);
         var trafficSit = record.get("TrafficSit");
         key.setRoadCategory(trafficSit.substring(0, trafficSit.lastIndexOf('/')));
+        key.setRoadGradient(mapString2HbefaRoadGradient(record.get("Gradient")));
         key.setTrafficSituation(mapString2HbefaTrafficSituation(trafficSit));
         key.setVehicleAttributes(new HbefaVehicleAttributes());
         return key;
     }
 
-    static HbefaColdEmissionFactorKey createColdKey(CSVRecord record) {
+	static HbefaColdEmissionFactorKey createColdKey(CSVRecord record) {
         var key = new HbefaColdEmissionFactorKey();
         setCommonParametersOnKey(key, record);
         key.setParkingTime(mapAmbientCondPattern2ParkingTime(record.get("AmbientCondPattern")));
@@ -230,6 +231,26 @@ public abstract class HbefaTables {
             throw new RuntimeException();
         }
     }
+
+	private static HbefaRoadGradient mapString2HbefaRoadGradient(String string) {
+		return switch (string){
+			case "-6%" -> HbefaRoadGradient.MINUS_6;
+			case "-4%" -> HbefaRoadGradient.MINUS_4;
+			case "-2%" -> HbefaRoadGradient.MINUS_2;
+			case "0%" -> HbefaRoadGradient.ZERO;
+			case "+2%" -> HbefaRoadGradient.PLUS_2;
+			case "+4%" -> HbefaRoadGradient.PLUS_4;
+			case "+6%" -> HbefaRoadGradient.PLUS_6;
+			case "+/-2%" -> HbefaRoadGradient.PLUS_MINUS_2;
+			case "+/-4%" -> HbefaRoadGradient.PLUS_MINUS_4;
+			case "+/-6%" -> HbefaRoadGradient.PLUS_MINUS_6;
+
+			default -> {
+				logger.warn("Could not map String {} to any HbefaRoadGradient; please check syntax in hbefa input file.", string);
+				throw new IllegalArgumentException("Unknown road gradient identifier while parsing HBEFA table: " + string);
+			}
+		};
+	}
 
     private static int mapAmbientCondPattern2Distance(String string) {
         String distanceString = string.split(",")[2];
