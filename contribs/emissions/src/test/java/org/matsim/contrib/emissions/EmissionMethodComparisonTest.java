@@ -4,9 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.jupiter.params.provider.Arguments;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -19,7 +17,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class EmissionMethodComparisonTest {
 
@@ -86,12 +83,12 @@ public class EmissionMethodComparisonTest {
 
 	@TestFactory
 	Collection<DynamicTest> curveFactory(){
-		List<String> roadTypes = List.of(
-			"URB/Local/50",
-			"URB/Local/60",
-			"RUR/MW/100",
-			"RUR/MW/130",
-			"RUR/MW/>130"
+		List<Tuple<String, Double>> roadTypes = List.of(
+			new Tuple<>("URB/Local/60", 60.),
+			new Tuple<>("URB/Local/50", 50.),
+			new Tuple<>("RUR/MW/100", 100.),
+			new Tuple<>("RUR/MW/130", 130.),
+			new Tuple<>("RUR/MW/>130", 140.)
 		);
 
 		List<Tuple<HbefaVehicleCategory, HbefaVehicleAttributes>> vehHbefaInfo = List.of(
@@ -103,11 +100,11 @@ public class EmissionMethodComparisonTest {
 
 		return roadTypes.stream().flatMap(r ->
 			vehHbefaInfo.stream().map(v ->
-				DynamicTest.dynamicTest(r + "; " + v, () -> curves(r, v))
+				DynamicTest.dynamicTest(r + "; " + v, () -> curves(r.getFirst(), r.getSecond(), v))
 		)).toList();
 	}
 
-	void curves(String roadType, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo) throws IOException {
+	void curves(String roadType, double freeVelocity, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehHbefaInfo) throws IOException {
 		String filename = roadType.replace("/", "_") + "_" + vehHbefaInfo.getSecond().getHbefaEmConcept().replace(" ", "_");
 		CSVPrinter writer = new CSVPrinter(IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/InterpolationCurves/" + filename + ".csv"), CSVFormat.DEFAULT);
 
@@ -121,13 +118,13 @@ public class EmissionMethodComparisonTest {
 
 		writer.println();
 
-		for(double v = 0.05; v < 140; v += 0.05){
+		for(double v = 0.05; v < freeVelocity; v += 0.05){
 			writer.print(v);
 			for (var method : EmissionsConfigGroup.EmissionsComputationMethod.values()) {
 				var values = modulePack.getModule(method).getWarmEmissionAnalysisModule().calculateWarmEmissions(
 					3600 / v,
 					roadType,
-					140,
+					freeVelocity,
 					1000,
 					vehHbefaInfo
 				);
