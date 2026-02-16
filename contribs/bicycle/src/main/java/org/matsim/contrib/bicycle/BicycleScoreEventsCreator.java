@@ -63,19 +63,10 @@ class BicycleScoreEventsCreator implements
 
 	private final Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 
-	// existing state
-	private final Map<Id<Vehicle>, Id<Link>> firstLinkIdMap = new LinkedHashMap<>();
-	private final Map<Id<Vehicle>, String> modeFromVehicle = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, VehicleState> vehicleStates = new LinkedHashMap<>();
 
 	// === "primitive" car-count interaction (kept as-is) ===
-	private final Map<String, Map<Id<Link>, Double>> numberOfVehiclesOnLinkByMode = new LinkedHashMap<>();
-
-	// === TRUE OVERTAKING bookkeeping ===
-
-	/**
-	 * per vehicle -> (link -> enterTime) for currently occupied link. We only need current link, but store by link for safety.
-	 */
-	private final Map<Id<Vehicle>, LinkEnterInfo> currentLinkEnter = new LinkedHashMap<>();
+	private final Map<String, Map<Id<Link>, Integer>> numberOfVehiclesOnLinkByMode = new LinkedHashMap<>();
 
 	/**
 	 * per link: finished car traversals for counting overtakes
@@ -101,41 +92,44 @@ class BicycleScoreEventsCreator implements
 	public void reset(int iteration) {
 		vehicle2driver.reset(iteration);
 
-		firstLinkIdMap.clear();
-		modeFromVehicle.clear();
+		vehicleStates.clear();
 		numberOfVehiclesOnLinkByMode.clear();
-
-		currentLinkEnter.clear();
 		finishedCarsByLink.clear();
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		vehicle2driver.handleEvent(event);
-		this.firstLinkIdMap.put(event.getVehicleId(), event.getLinkId());
+
+		VehicleState state = vehicleStates.computeIfAbsent(event.getVehicleId(), ignored -> new VehicleState());
+		state.mode = event.getNetworkMode();
+		state.firstLinkId = event.getLinkId();
 
 		if (this.bicycleConfig.isMotorizedInteraction()) {
-			modeFromVehicle.put(event.getVehicleId(), event.getNetworkMode());
-
 			// primitive counts:
 			numberOfVehiclesOnLinkByMode.putIfAbsent(event.getNetworkMode(), new LinkedHashMap<>());
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(event.getNetworkMode());
-			map.merge(event.getLinkId(), 1., Double::sum);
+			Map<Id<Link>, Integer> map = numberOfVehiclesOnLinkByMode.get(event.getNetworkMode());
+			map.merge(event.getLinkId(), 1, Integer::sum);
 		}
 
 		// Treat "enters traffic" as being on the first link from this time.
 		// This is important, otherwise the very first link would miss enterTime.
-		registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), event.getNetworkMode());
+		registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), state.mode);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.bicycleConfig.isMotorizedInteraction()) {
+			VehicleState state = vehicleStates.get(event.getVehicleId());
+			if (state == null || state.mode == null) {
+				return;
+			}
+
 			// primitive counts:
-			String mode = this.modeFromVehicle.get(event.getVehicleId());
+			String mode = state.mode;
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
-			map.merge(event.getLinkId(), 1., Double::sum);
+			Map<Id<Link>, Integer> map = numberOfVehiclesOnLinkByMode.get(mode);
+			map.merge(event.getLinkId(), 1, Integer::sum);
 
 			registerEnter(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 		} else {
@@ -148,11 +142,16 @@ class BicycleScoreEventsCreator implements
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.bicycleConfig.isMotorizedInteraction()) {
+			VehicleState state = vehicleStates.get(event.getVehicleId());
+			if (state == null || state.mode == null) {
+				return;
+			}
+
 			// primitive counts:
-			String mode = this.modeFromVehicle.get(event.getVehicleId());
+			String mode = state.mode;
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
-			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0);
+			Map<Id<Link>, Integer> map = numberOfVehiclesOnLinkByMode.get(mode);
+			Gbl.assertIf(map.merge(event.getLinkId(), -1, Integer::sum) >= 0);
 
 			registerLeave(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
 		}
@@ -174,7 +173,7 @@ class BicycleScoreEventsCreator implements
 					// KEEP old behaviour (optional):
 					var carCounts = this.numberOfVehiclesOnLinkByMode.get(TransportMode.car);
 					if (carCounts != null) {
-						amount -= 0.004 * carCounts.getOrDefault(event.getLinkId(), 0.);
+						amount -= 0.004 * carCounts.getOrDefault(event.getLinkId(), 0);
 					}
 				}
 
@@ -192,11 +191,16 @@ class BicycleScoreEventsCreator implements
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if (this.bicycleConfig.isMotorizedInteraction()) {
+			VehicleState state = vehicleStates.get(event.getVehicleId());
+			if (state == null || state.mode == null) {
+				return;
+			}
+
 			// primitive counts:
-			String mode = this.modeFromVehicle.get(event.getVehicleId());
+			String mode = state.mode;
 			numberOfVehiclesOnLinkByMode.putIfAbsent(mode, new LinkedHashMap<>());
-			Map<Id<Link>, Double> map = numberOfVehiclesOnLinkByMode.get(mode);
-			Gbl.assertIf(map.merge(event.getLinkId(), -1., Double::sum) >= 0.);
+			Map<Id<Link>, Integer> map = numberOfVehiclesOnLinkByMode.get(mode);
+			Gbl.assertIf(map.merge(event.getLinkId(), -1, Integer::sum) >= 0);
 
 			// treat leaves-traffic as leaving the current link
 			registerLeave(event.getVehicleId(), event.getLinkId(), event.getTime(), mode);
@@ -204,7 +208,8 @@ class BicycleScoreEventsCreator implements
 
 		// existing end-of-leg link-based bicycle additional score (unchanged)
 		if (vehicle2driver.getDriverOfVehicle(event.getVehicleId()) != null) {
-			if (!Objects.equals(this.firstLinkIdMap.get(event.getVehicleId()), event.getLinkId())) {
+			VehicleState state = vehicleStates.get(event.getVehicleId());
+			if (state != null && !Objects.equals(state.firstLinkId, event.getLinkId())) {
 				double amount = additionalBicycleLinkScore.computeLinkBasedScore(
 					network.getLinks().get(event.getLinkId()),
 					event.getVehicleId(),
@@ -230,9 +235,7 @@ class BicycleScoreEventsCreator implements
 		// Needs to be called last, because it will remove driver information
 		vehicle2driver.handleEvent(event);
 
-		// cleanup mode mapping to avoid growth
-		modeFromVehicle.remove(event.getVehicleId());
-		currentLinkEnter.remove(event.getVehicleId());
+		vehicleStates.remove(event.getVehicleId());
 	}
 
 	// ======================================================================
@@ -241,15 +244,19 @@ class BicycleScoreEventsCreator implements
 
 	private void registerEnter(Id<Vehicle> vehicleId, Id<Link> linkId, double time, String mode) {
 		if (mode == null) return;
+		VehicleState state = vehicleStates.computeIfAbsent(vehicleId, ignored -> new VehicleState());
 
 		// store enter time for current link
-		currentLinkEnter.put(vehicleId, new LinkEnterInfo(linkId, time, mode));
+		state.currentLinkEnter = new LinkEnterInfo(linkId, time, mode);
 	}
 
 	private void registerLeave(Id<Vehicle> vehicleId, Id<Link> linkId, double time, String mode) {
 		if (mode == null) return;
 
-		LinkEnterInfo enterInfo = currentLinkEnter.get(vehicleId);
+		VehicleState state = vehicleStates.get(vehicleId);
+		if (state == null) return;
+
+		LinkEnterInfo enterInfo = state.currentLinkEnter;
 		if (enterInfo == null) {
 			// can happen if something is inconsistent; skip
 			return;
@@ -266,7 +273,7 @@ class BicycleScoreEventsCreator implements
 			: finishedCarsByLink.get(linkId);
 
 		if (store == null) {
-			currentLinkEnter.remove(vehicleId);
+			state.currentLinkEnter = null;
 			return;
 		}
 
@@ -294,7 +301,7 @@ class BicycleScoreEventsCreator implements
 			finishedCarsByLink.remove(linkId);
 		}
 
-		currentLinkEnter.remove(vehicleId);
+		state.currentLinkEnter = null;
 
 
 	}
@@ -320,6 +327,12 @@ class BicycleScoreEventsCreator implements
 		}
 	}
 
+	private static final class VehicleState {
+		String mode;
+		Id<Link> firstLinkId;
+		LinkEnterInfo currentLinkEnter;
+	}
+
 	private static final class CarTraversal {
 		final double leaveTime;
 		final double enterTime;
@@ -335,11 +348,13 @@ class BicycleScoreEventsCreator implements
 	 * Used to count "cars that entered after bike entered and left before bike left".
 	 */
 	private static final class FinishedCarStore {
-		private final TreapMultiset enters = new TreapMultiset();
+		private final TreeMap<Double, Integer> enterCounts = new TreeMap<>();
+		private int totalCount = 0;
 		private final ArrayDeque<CarTraversal> finishedCarsByLeaveTime = new ArrayDeque<>();
 
 		void addFinishedCarTraversal(double carEnter, double carLeave) {
-			enters.add(carEnter);
+			enterCounts.merge(carEnter, 1, Integer::sum);
+			totalCount++;
 			finishedCarsByLeaveTime.addLast(new CarTraversal(carLeave, carEnter));
 		}
 
@@ -347,130 +362,28 @@ class BicycleScoreEventsCreator implements
 			while (!finishedCarsByLeaveTime.isEmpty()
 				&& finishedCarsByLeaveTime.peekFirst().leaveTime < thresholdTime) {
 				CarTraversal old = finishedCarsByLeaveTime.removeFirst();
-				enters.remove(old.enterTime);
+				Integer count = enterCounts.get(old.enterTime);
+				if (count != null) {
+					if (count <= 1) {
+						enterCounts.remove(old.enterTime);
+					} else {
+						enterCounts.put(old.enterTime, count - 1);
+					}
+					totalCount--;
+				}
 			}
 		}
 
 		int countCarsWithEnterAfter(double bikeEnterTime) {
-			return enters.countGreaterThan(bikeEnterTime);
+			int lessOrEqual = 0;
+			for (int count : enterCounts.headMap(bikeEnterTime, true).values()) {
+				lessOrEqual += count;
+			}
+			return totalCount - lessOrEqual;
 		}
 
 		int size() {
-			return enters.size();
-		}
-	}
-
-	private static final class TreapMultiset {
-		private static final class Node {
-			final double key;
-			final int prio;
-			int cnt;
-			int size;
-			Node left, right;
-
-			Node(double key, int prio) {
-				this.key = key;
-				this.prio = prio;
-				this.cnt = 1;
-				this.size = 1;
-			}
-		}
-
-		private final Random rnd = new Random(1);
-		private Node root;
-
-		int size() {
-			return size(root);
-		}
-
-		void add(double key) {
-			root = insert(root, key);
-		}
-
-		void remove(double key) {
-			root = erase(root, key);
-		}
-
-		int countGreaterThan(double key) {
-			return size(root) - countLessEqual(root, key);
-		}
-
-		private static int size(Node n) {
-			return n == null ? 0 : n.size;
-		}
-
-		private static void pull(Node n) {
-			if (n != null) n.size = n.cnt + size(n.left) + size(n.right);
-		}
-
-		private static Node rotateRight(Node y) {
-			Node x = y.left;
-			y.left = x.right;
-			x.right = y;
-			pull(y);
-			pull(x);
-			return x;
-		}
-
-		private static Node rotateLeft(Node x) {
-			Node y = x.right;
-			x.right = y.left;
-			y.left = x;
-			pull(x);
-			pull(y);
-			return y;
-		}
-
-		private Node insert(Node n, double key) {
-			if (n == null) return new Node(key, rnd.nextInt());
-			if (key == n.key) {
-				n.cnt++;
-			} else if (key < n.key) {
-				n.left = insert(n.left, key);
-				if (n.left.prio > n.prio) n = rotateRight(n);
-			} else {
-				n.right = insert(n.right, key);
-				if (n.right.prio > n.prio) n = rotateLeft(n);
-			}
-			pull(n);
-			return n;
-		}
-
-		private Node erase(Node n, double key) {
-			if (n == null) return null;
-
-			if (key == n.key) {
-				if (n.cnt > 1) {
-					n.cnt--;
-				} else {
-					if (n.left == null) return n.right;
-					if (n.right == null) return n.left;
-
-					if (n.left.prio > n.right.prio) {
-						n = rotateRight(n);
-						n.right = erase(n.right, key);
-					} else {
-						n = rotateLeft(n);
-						n.left = erase(n.left, key);
-					}
-				}
-			} else if (key < n.key) {
-				n.left = erase(n.left, key);
-			} else {
-				n.right = erase(n.right, key);
-			}
-
-			pull(n);
-			return n;
-		}
-
-		private int countLessEqual(Node n, double key) {
-			if (n == null) return 0;
-			if (key < n.key) {
-				return countLessEqual(n.left, key);
-			} else {
-				return size(n.left) + n.cnt + countLessEqual(n.right, key);
-			}
+			return totalCount;
 		}
 	}
 
