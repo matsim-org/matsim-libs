@@ -126,6 +126,7 @@ public class DistributedIntegrationTest {
 	 */
 	@Test
 	@Order(3)
+	@DisabledOnGitHubWindowsCI
 	void runDistributed() throws ExecutionException, InterruptedException, TimeoutException, IOException {
 
 		int size = 2;
