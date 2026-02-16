@@ -110,6 +110,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	public static void main( String[] args ){
 		Gbl.assertIf( args==null || args.length==0 );
 
+		String shpFile = null;
+
 		// equil:
 //	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
 //	private static final String policyDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
@@ -117,7 +119,6 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// gartenfeld:
 //		final String baseDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/base-case-ctd/output-gartenfeld-v6.4-cutout-10pct-base-case-ctd/";
 //		final String policyDir="/Users/kainagel/runs-svn/gartenfeld/caseStudies/v6.4-cutout/siemensbahn-case-study/output-gartenfeld-v6.4-cutout-10pct-siemensbahn/";
-//		final String shpFile=null;
 
 //		 zez:
 //		final String baseDir="/Users/kainagel/shared-svn/projects/zez/b_wo_zez/";
@@ -128,28 +129,25 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		// meckel:
 //		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run8_NF_500it_10pct/output/";
 //		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Niklas.Meckel.U0/meckel/run14_U0_500it_10pct/output/";
-//		final String shpFile = null;
 
 		// Eduardo Lima:
 //		final String baseDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Eduardo_Lima_Siemensbahn/output_final/output-Base_Case-10pct-nach-3900it-S21Jungfernheide/";
 //		final String policyDir="/Users/kainagel/runs-svn/Abschlussarbeiten/2025/Eduardo_Lima_Siemensbahn/output_final/output-SiBa-10pct-nach-3900it-S21Jungfernheide/";
-//		final String shpFile = null;
 
 		// matsim-dresden wrap-around experiment:
 //		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-none-it3000-20260209/";
-//		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
-//		final String shpFile = null;
+		final String baseDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-it3000-20260209/";
+		final String policyDir="/Users/kainagel/runs-svn/tramola-moritz/matsim-dresden/experiments/wrap-around-handling-splitAndRemoveOpeningTimes-Caba-it3000-20260213";
 
 		// iatbr glamobi:
-		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
-		final String policyDir = "/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
-		final String shpFile = null;
+//		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
+//		final String policyDir = "/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
 
 		// ===
 
-//		generateExperiencedPlans( baseDir );
+		generateExperiencedPlans( baseDir );
 //		generateExperiencedPlans( policyDir );
-//		generateFilteredEventsFile( baseDir );
+		generateFilteredEventsFile( baseDir );
 //		generateFilteredEventsFile( policyDir );
 		agentWiseComparison( baseDir, policyDir, shpFile );
 	}
@@ -314,19 +312,21 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		}
 		{
 			DoubleColumn column = baseTablePersons.doubleColumn( MUSE_h ).divide( baseTablePersons.doubleColumn( UTL_OF_MONEY ) ).setName( "VSE[Eu/h]");
-			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
+//			HistogramTrace histogramTrace = HistogramTrace.builder( column ).nBinsX( 50 ).build();
+			HistogramTrace histogramTrace = HistogramTrace.builder( column ).build();
 			final Layout.LayoutBuilder layoutBuilder = Layout.builder().width( 1000 );
 			Figure figure = new Figure( layoutBuilder.build(), histogramTrace );
 
-			Path htmlPath = inputPath.resolve( "vse50.html" );
+//			Path htmlPath = inputPath.resolve( "vse50.html" );
+			Path htmlPath = inputPath.resolve( "vse.html" );
 			TablesawUtils.writeFigureToHtmlFile( htmlPath.toString(), figure );
 
 			log.warn("vse mean value=" + column.mean() );
 
 		}
 
-		log.fatal("ending here iatbr vtts computation");
-		System.exit(-1);
+//		log.fatal("ending here because of iatbr vtts computation");
+//		System.exit(-1);
 
 		// ### next cometh the policy data:
 
