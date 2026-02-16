@@ -235,9 +235,10 @@
 }
 
 # Plot interpolation curves for methods
-{
-  trafficSit <- "RUR/MW/100"
-  emConcept <- "PC P Euro-4"
+curves <- function(
+  trafficSit = "RUR/MW/>130",
+  emConcept = "PC P Euro-4",
+  curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction")){
   trafficSit.u <- gsub( "/", "_", trafficSit)
   emConcept.u <- gsub( " ", "_", emConcept)
 
@@ -254,13 +255,26 @@
       "CO_InterpolationFraction", "CO2_InterpolationFraction", "NOx_InterpolationFraction",
       "CO_BilinearInterpolationFraction", "CO2_BilinearInterpolationFraction", "NOx_BilinearInterpolationFraction"),
            names_to = "method", values_to = "value") %>%
-    separate("method", c("component", "method"), "_")
+    separate("method", c("component", "method"), "_") %>%
+    filter(method %in% curves)
 
   ggplot() +
     geom_line(data=curves, aes(x=vel, y=value, color=method)) +
     geom_point(data=hbefa_det, aes(x=V, y=EFA)) +
     facet_wrap(~component, scales = "free") +
-    ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
     theme_minimal() +
-    theme(text = element_text(size=12))
+    ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
+    theme(text = element_text(size=12)) +
+    xlab("Average velocity (km/h)") +
+    ylab("Emissions (g/km)")
+
+  ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/{trafficSit.u}_{emConcept.u}.png"),
+         width = 11,
+         height = 10,
+         dpi = 300)
+}
+
+# Curve plots
+{
+  curves(curves = c("AverageSpeed", "StopAndGoFraction"))
 }
