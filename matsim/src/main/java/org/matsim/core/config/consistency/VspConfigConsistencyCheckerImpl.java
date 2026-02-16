@@ -387,7 +387,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				case relative:
 					break;
 				case uniform:
-//				problem = true ;
+				problem = true ;
 					log.log(lvl, "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ");
 					break;
 				default:
@@ -522,6 +522,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			problem = true;
 			System.out.flush();
 			log.log(lvl, "found writePlansInterval==0.  vsp default is to write plans at least once (for simwrapper).");
+			// Aren't they written in the last iteration anyways?  Or does this need plans in iteration 0?  kai, nov'25
 		}
 
 		if (config.controller().getWriteTripsInterval() <= 0) {

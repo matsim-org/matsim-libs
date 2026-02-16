@@ -241,13 +241,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		this.inputCRS = inputCRS;
 	}
 
-	/**
-	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
-	 */
-	@Deprecated
-	public String getSubpopulationAttributeName(){
-		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
-	}
+//	/**
+//	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
+//	 */
+//	@Deprecated
+//	public String getSubpopulationAttributeName(){
+//		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
+//	}
 
 
 }

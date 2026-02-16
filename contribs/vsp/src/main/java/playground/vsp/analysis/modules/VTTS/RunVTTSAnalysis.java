@@ -5,21 +5,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.analysis.population.VTTSHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.EventsToActivities;
-import org.matsim.core.scoring.EventsToLegs;
-import org.matsim.core.scoring.ExperiencedPlansService;
-import org.matsim.core.scoring.ExperiencedPlansServiceFactory;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
@@ -72,17 +68,21 @@ public class RunVTTSAnalysis implements MATSimAppCommand {
 		Injector injector = ControllerUtils.createAdhocInjector( scenario );
 		ScoringParametersForPerson scoringParametersForPerson = injector.getInstance( ScoringParametersForPerson.class );
 
-		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
-		eventsManager.addHandler( vttsHandler );
+		if ( true ) {
+			throw new RuntimeException("vtts handler needs to come out of injection");
+		}
 
-		log.info("Reading events from file: {}", eventsPath);
-		eventsManager.initProcessing();
-		EventsUtils.readEvents(eventsManager, eventsPath.toString());
-		eventsManager.finishProcessing();
-
-		vttsHandler.computeFinalVTTS();
-		vttsHandler.printVTTS( eventsPath.getParent().resolve( config.controller().getRunId() + ".vtts.tsv" ).toString() );
-		vttsHandler.printAvgVTTSperPerson( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsPerPerson.tsv" ).toString() );
+//		VTTSHandler vttsHandler = new VTTSHandler( scenario, scoringParametersForPerson );
+//		eventsManager.addHandler( vttsHandler );
+//
+//		log.info("Reading events from file: {}", eventsPath);
+//		eventsManager.initProcessing();
+//		EventsUtils.readEvents(eventsManager, eventsPath.toString());
+//		eventsManager.finishProcessing();
+//
+//		vttsHandler.computeFinalVTTS();
+//		vttsHandler.printVTTS( eventsPath.getParent().resolve( config.controller().getRunId() + ".vtts.tsv" ).toString() );
+//		vttsHandler.printAvgVTTSperPerson( eventsPath.getParent().resolve( config.controller().getRunId() + ".vttsPerPerson.tsv" ).toString() );
 
 		return 0;
 	}
