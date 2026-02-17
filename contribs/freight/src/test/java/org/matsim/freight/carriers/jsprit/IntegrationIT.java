@@ -93,6 +93,11 @@ public class IntegrationIT {
 
 		controller.run();
 
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "freight");
+		Assertions.assertTrue(Files.deleteIfExists(out.resolve("VRP_Solution_Stats.csv")));
+		Assertions.assertTrue(Files.deleteIfExists(out.resolve("VRP_Solution_Stats_perCarrier.csv")));
+		Assertions.assertTrue(Files.deleteIfExists(out.resolve("VRP_Solution_Stats.png")));
+
 		double scoreWithRunJsprit = 0;
 		for (Carrier carrier : CarriersUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getJspritScore();
@@ -115,7 +120,6 @@ public class IntegrationIT {
 			CarriersUtils.addService(carrier, newService);
 			Assertions.assertFalse(CarriersUtils.allJobsHandledBySelectedPlan(carrier), "All jobs are handled although a new service was added");
 		}
-		Path out = Path.of(utils.getOutputDirectory(), "analysis", "freight");
 
 		Assertions.assertTrue(Files.exists(out.resolve("VRP_Solution_Stats.csv")));
 		Assertions.assertTrue(Files.exists(out.resolve("VRP_Solution_Stats_perCarrier.csv")));
