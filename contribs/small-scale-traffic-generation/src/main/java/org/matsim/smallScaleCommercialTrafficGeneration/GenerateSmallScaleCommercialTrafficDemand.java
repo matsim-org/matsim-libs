@@ -924,7 +924,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				while (resultingDataPerZone.get(stopZone).getDouble(selectedStopCategory) == 0)
 					selectedStopCategory = carrierAttributes.odMatrixEntry.stopCategoryDistribution.sample();
 				// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
-				int serviceTimePerStop = getServiceTimePerStop(newCarrier, carrierAttributes, 0);
+				int serviceTimePerStop = getServiceTimePerStop(carrierAttributes);
 				TimeWindow serviceTimeWindow = TimeWindow.newInstance(0, 36 * 3600); // extended time window so that late tours can handle it
 				createService(newCarrier, carrierAttributes.vehicleDepots, selectedStopCategory, stopZone, serviceTimePerStop, serviceTimeWindow, countedServices);
 				countedServices++;
@@ -935,12 +935,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Give a service duration based on the purpose and the trafficType under a given probability
 	 *
-	 * @param carrier                                     The carrier for which the service time should be calculated
-	 * @param carrierAttributes                           The attributes of the carrier
-	 * @param additionalTravelBufferPerIterationInMinutes Additional travel buffer per recalculation iteration for a carrier in minutes
+	 * @param carrierAttributes The attributes of the carrier
 	 * @return The service time in seconds
 	 */
-	public Integer getServiceTimePerStop(Carrier carrier, CarrierAttributes carrierAttributes, int additionalTravelBufferPerIterationInMinutes) {
+	Integer getServiceTimePerStop(CarrierAttributes carrierAttributes) {
 		ServiceDurationPerCategoryKey key;
 		// we use the start category for the service time selection because the start category represents the employees
 		if (carrierAttributes.smallScaleCommercialTrafficType().equals(SmallScaleCommercialTrafficType.commercialPersonTraffic)) {
@@ -957,16 +955,10 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		} else {
 			throw new RuntimeException("Unknown traffic type: " + carrierAttributes.smallScaleCommercialTrafficType());
 		}
-		// additionalTravelBufferPerIterationInMinutes is only used for recalculation of the service time if a carrier solution could not handle all services
-		if (additionalTravelBufferPerIterationInMinutes == 0) {
 			DurationsBounds serviceDurationBounds = serviceDurationTimeSelector.get(key).sample();
-
 			int serviceDurationLowerBound = serviceDurationBounds.minDuration();
 			int serviceDurationUpperBound = serviceDurationBounds.maxDuration();
 			return rnd.nextInt(serviceDurationLowerBound * 60, serviceDurationUpperBound * 60);
-		} else {
-			return unhandledServicesSolution.changeServiceTimePerStop(carrier, carrierAttributes, key, additionalTravelBufferPerIterationInMinutes);
-		}
 	}
 
 	/**
