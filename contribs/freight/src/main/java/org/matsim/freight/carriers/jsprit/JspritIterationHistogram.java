@@ -1,8 +1,6 @@
 package org.matsim.freight.carriers.jsprit;
 
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -22,7 +20,6 @@ import org.matsim.freight.carriers.Carriers;
 import org.matsim.freight.carriers.CarriersUtils;
 
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -87,14 +84,26 @@ public class JspritIterationHistogram {
 	 *
 	 * @return the created graphic
 	 */
-	private JFreeChart createGraphic() {
+	private JFreeChart createGraphic(NavigableMap<Integer, Double> sumSelectedCostBefore, NavigableMap<Integer, Integer> runCarrierCountBefore) {
 		XYSeries sumSelectedSeries = new XYSeries("Sum selected cost", false, true);
 		XYSeries runSeries = new XYSeries("Running carriers", false, true);
 
+		// add the series of the jsprit run before this analyzed run to the graphic, so that the series from before and after aggregation are shown in one graphic without overlapping
+		if (!sumSelectedCostBefore.isEmpty()) {
+			for (Integer iter : sumSelectedCostBefore.navigableKeySet()) {
+				Double sum = sumSelectedCostBefore.get(iter);
+				Integer run = runCarrierCountBefore.get(iter);
+
+				sumSelectedSeries.add(iter, sum);
+				if (run != null) {
+					runSeries.add(iter, run);
+				}
+			}
+		}
 		for (Integer iter : sumSelectedCost.navigableKeySet()) {
 			Double sum = sumSelectedCost.get(iter);
 			Integer run = runCarrierCount.get(iter);
-
+			iter = iter + sumSelectedCostBefore.size(); // shift iter to the right, so that the series from before and after aggregation are shown in one graphic without overlapping
 			sumSelectedSeries.add(iter, sum);
 			if (run != null) {
 				runSeries.add(iter, run);
@@ -102,6 +111,11 @@ public class JspritIterationHistogram {
 		}
 		int maxValue = sumSelectedCost.values().stream().max(Double::compareTo).orElse(0.0).intValue();
 		int minorValue = sumSelectedCost.values().stream().min(Double::compareTo).orElse(1.0).intValue();
+		int maxValueBefore = sumSelectedCostBefore.values().stream().max(Double::compareTo).orElse(0.0).intValue();
+		int minorValueBefore = sumSelectedCostBefore.values().stream().min(Double::compareTo).orElse(1.0).intValue();
+		minorValue = Math.min(minorValue, minorValueBefore);
+		maxValue = Math.max(maxValue, maxValueBefore);
+
 		XYSeriesCollection costDataset = new XYSeriesCollection();
 		costDataset.addSeries(sumSelectedSeries);
 
@@ -166,13 +180,16 @@ public class JspritIterationHistogram {
 	 * Writes the graphic to a PNG file.
 	 *
 	 * @param aggegatedJspritAnalysisCSVPath Path to the CSV file where the aggregated jsprit analysis is written to. The PNG file will be created in the same directory.
+	 * @param sumSelectedCostBefore          selected costs of the jsprit run before this analyzed run.
+	 * @param runCarrierCountBefore          running carrier count of the jsprit run before this analyzed run.
 	 */
-	public void writeGraphic(Path aggegatedJspritAnalysisCSVPath) {
+	public void writeGraphic(Path aggegatedJspritAnalysisCSVPath, NavigableMap<Integer, Double> sumSelectedCostBefore,
+							 NavigableMap<Integer, Integer> runCarrierCountBefore) {
 		Path aggegatedJspritAnalysisPNGPath = Path.of(aggegatedJspritAnalysisCSVPath.toString().replace(".csv", ".png"));
 
 		try {
 			Files.createDirectories(aggegatedJspritAnalysisPNGPath.getParent());
-			ChartUtils.saveChartAsPNG(aggegatedJspritAnalysisPNGPath.toFile(), createGraphic(), 1200, 800);
+			ChartUtils.saveChartAsPNG(aggegatedJspritAnalysisPNGPath.toFile(), createGraphic(sumSelectedCostBefore, runCarrierCountBefore), 1200, 800);
 		} catch (IOException e) {
 			log.warn("IOException occurred while writing jsprit iteration graphic to {}", aggegatedJspritAnalysisPNGPath, e);
 		}
@@ -182,25 +199,11 @@ public class JspritIterationHistogram {
 	 * Writes the aggregated jsprit analysis to a CSV file.
 	 *
 	 * @param aggegatedJspritAnalysisCSVPath Path to the CSV file where the aggregated jsprit analysis is written to.
+	 * @param sumSelectedCostBefore          selected costs of the jsprit run before this analyzed run.
 	 * @param delimiter                      Delimiter used in the CSV file.
 	 */
-	public void writeAggregatedCsv(Path aggegatedJspritAnalysisCSVPath, String delimiter) {
+	public void writeAggregatedCsv(Path aggegatedJspritAnalysisCSVPath, NavigableMap<Integer, Double> sumSelectedCostBefore, String delimiter) {
 		try {
-
-			// If the file already exists, we assume that this is a VRP solving loop and that the file should be extended. In this case, we read the existing file to get the number of iterations before and adjust the iteration numbers accordingly.
-			// An example is the generation of the small scale commercial traffic demand. Here we have a loop of solving the VRPS a agin if not all job have been assigned. In this case, we want to have one aggregated jsprit analysis CSV file that contains the results of all iterations of the loop and not one file per iteration of the loop.
-
-			int numberOfIterationsBefore = 0;
-			if (Files.exists(aggegatedJspritAnalysisCSVPath)) {
-				log.warn(
-					"Aggregated jsprit analysis CSV already exists at {}. The file will be extended and the number of iterations will adjusted, because we assume that this is a VRP solving loop.",
-					aggegatedJspritAnalysisCSVPath);
-				try (BufferedReader reader = IOUtils.getBufferedReader(aggegatedJspritAnalysisCSVPath.toString())) {
-					CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
-						.setSkipHeaderRecord(true).get().parse(reader);
-					numberOfIterationsBefore = parse.getRecords().size();
-				}
-			}
 
 			Path dir = aggegatedJspritAnalysisCSVPath.getParent();
 			if (dir != null) {
@@ -208,13 +211,12 @@ public class JspritIterationHistogram {
 			}
 
 			try (BufferedWriter writer = IOUtils.getAppendingBufferedWriter(aggegatedJspritAnalysisCSVPath.toString())) {
-
-				if (numberOfIterationsBefore == 0) {
+				if (sumSelectedCostBefore.isEmpty()) {
 					writer.write(String.join(delimiter, "jsprit_iteration", "runCarrier", "sumJspritScores"));
 					writer.newLine();
 				}
 				for (int iter = 0; iter < sumSelectedCost.size(); iter++) {
-					int writtenIter = iter + numberOfIterationsBefore;
+					int writtenIter = iter + sumSelectedCostBefore.size();
 					writer.write(writtenIter + delimiter + runCarrierCount.get(iter) + delimiter + sumSelectedCost.get(iter));
 					writer.newLine();
 				}

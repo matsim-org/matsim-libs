@@ -345,8 +345,32 @@ public class CarriersUtils {
 														   Map<Id<Carrier>, NavigableMap<Integer, VehicleRoutingProblemSolution>> bestJspritSolutionCollector) {
 		JspritIterationHistogram histogram = new JspritIterationHistogram(carriers, bestJspritSolutionCollector, "VRP aggregated statistics");
 
-		histogram.writeAggregatedCsv(aggegatedJspritAnalysisCSVPath, delimiter);
-		histogram.writeGraphic(aggegatedJspritAnalysisCSVPath);
+		// If the file already exists, we assume that this is a VRP solving loop and that the file should be extended. In this case, we read the existing file to get the number of iterations before and adjust the iteration numbers accordingly.
+		// An example is the generation of the small-scale commercial traffic demand. Here we have a loop of solving the VRPs again if not all jobs have been assigned. In this case, we want to have one aggregated jsprit analysis CSV file that contains the results of all iterations of the loop and not one file per iteration of the loop.
+		NavigableMap<Integer, Double> sumSelectedCostBefore = new TreeMap<>();
+		NavigableMap<Integer, Integer> runCarrierCountBefore = new TreeMap<>();
+		if (Files.exists(aggegatedJspritAnalysisCSVPath)) {
+			log.warn(
+				"Aggregated jsprit analysis CSV already exists at {}. The file will be extended and the number of iterations will adjusted, because we assume that this is a VRP solving loop.",
+				aggegatedJspritAnalysisCSVPath);
+			try (BufferedReader reader = IOUtils.getBufferedReader(aggegatedJspritAnalysisCSVPath.toString())) {
+				CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
+					.setSkipHeaderRecord(true).get().parse(reader);
+				for (CSVRecord record : parse) {
+					int iter = Integer.parseInt(record.get("jsprit_iteration"));
+					int runCarrier = Integer.parseInt(record.get("runCarrier"));
+					double sumJspritScores = Double.parseDouble(record.get("sumJspritScores"));
+
+					sumSelectedCostBefore.put(iter, sumJspritScores);
+					runCarrierCountBefore.put(iter, runCarrier);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		histogram.writeAggregatedCsv(aggegatedJspritAnalysisCSVPath, sumSelectedCostBefore, delimiter);
+		histogram.writeGraphic(aggegatedJspritAnalysisCSVPath, sumSelectedCostBefore, runCarrierCountBefore);
 	}
 
 
