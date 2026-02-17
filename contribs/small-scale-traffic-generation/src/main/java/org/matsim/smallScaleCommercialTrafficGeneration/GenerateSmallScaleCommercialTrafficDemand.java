@@ -991,6 +991,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		thisCarrier.getAttributes().putAttribute("purpose", carrierAttributes.purpose);
 		thisCarrier.getAttributes().putAttribute("tourStartArea", carrierAttributes.startZone);
+		thisCarrier.getAttributes().putAttribute("startCategory", carrierAttributes.selectedStartCategory);
 		if (jspritIterations > 0)
 			CarriersUtils.setJspritIterations(thisCarrier, jspritIterations);
 		CarrierCapabilities carrierCapabilities = CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build();

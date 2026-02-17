@@ -238,6 +238,9 @@ public class SmallScaleCommercialTrafficUtils {
 				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 					newPerson.getAttributes().putAttribute("tourStartArea",
 						carrier.getAttributes().getAttribute("tourStartArea"));
+				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
+					newPerson.getAttributes().putAttribute("startCategory",
+						carrier.getAttributes().getAttribute("startCategory"));
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
 				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
