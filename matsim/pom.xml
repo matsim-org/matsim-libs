@@ -123,6 +123,19 @@
 	</reporting>
 
 	<dependencies>
+		<!-- This dependency is here, because the IntelliJ build fails otherwise with:
+		     java: cannot access javax.annotation.concurrent.NotThreadSafe
+               class file for javax.annotation.concurrent.NotThreadSafe not found
+
+             Some other dependency of the project expects this dependency to be present. Unfortunately, the findbugs project is unmaintained since
+             2017. If possible, we should get rid of this workaround. The current version of findbugs is com.github.spotbugs .
+
+             So sorry, Janek Feb' 26
+         -->
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
