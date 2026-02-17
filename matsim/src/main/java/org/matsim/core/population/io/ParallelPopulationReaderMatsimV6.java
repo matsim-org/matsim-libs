@@ -235,7 +235,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 			this.stopThreads();
 
 			super.endTag(name, content, context);
-			log.info("Finished parallel population reading...");
+			log.info("Finished parallel population reading; nPersons={}", this.plans.getPersons().size() );
 			// Till parsing population
 		} else {
 			// Create a new end tag and add it to the person data.

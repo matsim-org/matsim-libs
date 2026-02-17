@@ -179,6 +179,10 @@ public class FinishedBackpackCollector implements ExperiencedPlansService {
 			.map(b -> Tuple.of(b.personId(), b.experiencedPlan()))
 			.collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 	}
+	@Override public Population getPopulationWithExperiencedPlans(){
+		throw new RuntimeException( "not implemented" );
+		// (this method was added to the interface while this class was implemented.  kai, jan'26)
+	}
 
 	/**
 	 * Collects all experienced plans on the head node so that they can be written to disk on that node.

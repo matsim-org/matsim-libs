@@ -28,4 +28,6 @@ import org.matsim.core.controler.listener.ControllerListener;
  *
  * @author thibautd
  */
-public interface PlansScoring extends ControllerListener {}
+public interface PlansScoring extends ControllerListener {
+	String EXPERIENCED_PLANS_SCORES_TXT = "experienced_plans_scores.txt";
+}

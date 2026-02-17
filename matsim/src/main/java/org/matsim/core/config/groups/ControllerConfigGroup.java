@@ -207,8 +207,9 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(COMPRESSION_TYPE)
-	public void setCompressionType(CompressionType type) {
+	public ControllerConfigGroup setCompressionType(CompressionType type) {
 		this.compressionType = type;
+		return this;
 	}
 
 	@StringGetter(RUNID)
@@ -307,8 +308,9 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 		return this.eventsFileFormats;
 	}
 
-	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
+	public ControllerConfigGroup setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
+		return this;
 	}
 
 	// ---
@@ -407,19 +409,21 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	 * @param createGraphsInterval iteration interval in which graphs are generated
 	 */
 	@StringSetter(CREATE_GRAPHS_INTERVAL)
-	public void setCreateGraphsInterval(int createGraphsInterval) {
+	public ControllerConfigGroup setCreateGraphsInterval(int createGraphsInterval) {
 		this.createGraphsInterval = createGraphsInterval;
+		return this;
 	}
 
 	@StringSetter(CREATE_GRAPHS)
 	@Deprecated
-	public void setCreateGraphs(boolean createGraphs) {
+	public ControllerConfigGroup setCreateGraphs(boolean createGraphs) {
 		log.warn("Parameter 'createGraphs' is deprecated. Using 'createGraphsInterval' instead. The output_config.xml will contain the new parameter.");
 		if (createGraphs) {
 			this.setCreateGraphsInterval(1);
 		} else {
 			this.setCreateGraphsInterval(0);
 		}
+		return this;
 	}
 
 	@StringGetter(OVERWRITE_FILE)
@@ -438,13 +442,15 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(DUMP_DATA_AT_END)
-	public void setDumpDataAtEnd(boolean dumpDataAtEnd) {
+	public ControllerConfigGroup setDumpDataAtEnd(boolean dumpDataAtEnd) {
 		this.dumpDataAtEnd = dumpDataAtEnd;
+		return this;
 	}
 
 	@StringSetter(CLEAN_ITERS_AT_END)
-	public void setCleanItersAtEnd(CleanIterations cleanItersAtEnd) {
+	public ControllerConfigGroup setCleanItersAtEnd(CleanIterations cleanItersAtEnd) {
 		this.cleanItersAtEnd = cleanItersAtEnd;
+		return this;
 	}
 
 	@StringGetter(CLEAN_ITERS_AT_END)
@@ -458,8 +464,9 @@ public final class ControllerConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(EVENT_TYPE_TO_CREATE_SCORING_FUNCTIONS)
-	public void setEventTypeToCreateScoringFunctions(EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions) {
+	public ControllerConfigGroup setEventTypeToCreateScoringFunctions(EventTypeToCreateScoringFunctions eventTypeToCreateScoringFunctions) {
 		this.eventTypeToCreateScoringFunctions = eventTypeToCreateScoringFunctions;
+		return this;
 	}
 
 	@StringGetter(MEMORY_OBSERVER_INTERVAL)

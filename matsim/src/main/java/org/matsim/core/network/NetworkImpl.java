@@ -149,19 +149,11 @@ import java.util.*;
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
 			this.nextMsg *= 4;
-			printLinksCount();
+			log.info(" link # " + this.counter );
 		}
 		if ( this.locked && link instanceof Lockable ) {
 			((Lockable)link).setLocked() ;
 		}
-	}
-
-	private void printLinksCount() {
-		log.info(" link # " + this.counter);
-	}
-
-	private void printNodesCount() {
-		log.info(" node # " + this.counter2);
 	}
 
 	@Override
@@ -197,13 +189,14 @@ import java.util.*;
 		this.counter2++;
 		if (this.counter2 % this.nextMsg2 == 0) {
 			this.nextMsg2 *= 4;
-			printNodesCount();
+			log.info(" node # " + this.counter2 );
 		}
 
 		if ( this.locked && nn instanceof Lockable ) {
 			((Lockable)nn).setLocked() ;
 		}
 	}
+
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
 	// ////////////////////////////////////////////////////////////////////

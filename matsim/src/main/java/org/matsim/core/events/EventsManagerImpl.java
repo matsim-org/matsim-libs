@@ -43,6 +43,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * EventHandling
@@ -96,8 +97,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	private final Map<Class<? extends Event>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<>(15);
 
-	private long counter = 0;
-	private long nextCounterMsg = 1;
+	private final Counter counter = new Counter("EventsManagerImpl; event #");
 
 	private HandlerData findHandler(final Class<? extends Event> evklass) {
 		for (HandlerData handler : this.handlerData) {
@@ -110,11 +110,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void processEvent(final Event event) {
-		this.counter++;
-		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 4;
-			log.info(" event # " + this.counter);
-		}
+		counter.incCounter();
 		for (HandlerInfo info : getHandlersForClass( event.getClass() )) {
 			synchronized(info.eventHandler) {
 				if (callHandlerFast(info.eventClass, event, info.eventHandler )) {
@@ -171,8 +167,7 @@ public final class EventsManagerImpl implements EventsManager {
 	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
-		this.counter = 0;
-		this.nextCounterMsg = 1;
+		this.counter.reset();
 		Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
 		for (HandlerData handlerdata : this.handlerData) {
 			for (EventHandler handler : handlerdata.handlerList) {
