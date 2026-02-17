@@ -183,8 +183,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	@CommandLine.Option(names = "--MATSimIterationsAfterDemandGeneration", description = "If selected, the MATSim simulation will be run for the selected number of iterations after demand generation. if not selected, only demand generation is performed.")
 	private Integer MATSimIterationsAfterDemandGeneration;
 
-	@CommandLine.Option(names = "--factorForNumberOfVehicles", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxReplanningIterations > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
-	private double factorForNumberOfVehicles;
+	@CommandLine.Option(names = "--factorForTravelBufferCalculation", description = " The factor describing how many vehicles should be created in relation to the number of created services. If maxNumberOfLoopsForVRPSolving > 0 more vehiclaes are added in the replanning process.", defaultValue = "1.2")
+	private double factorForTravelBufferCalculation;
 
 	private Random rnd;
 	private RandomGenerator rng;
@@ -1003,7 +1003,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 			CarriersUtils.setJspritIterations(thisCarrier, jspritIterations);
 		CarrierCapabilities carrierCapabilities = CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build();
 
-		carriers.addCarrier(thisCarrier);
+		double sumServiceDurationsJobs = thisCarrier.getServices().values().stream().mapToDouble(CarrierService::getServiceDuration).sum() * factorForTravelBufferCalculation;
 
 		while (carrierAttributes.vehicleDepots.size() < numberOfDepots) {
 			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null);
@@ -1165,8 +1165,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	public int getAdditionalTravelBufferPerIterationInMinutes(){
 		return additionalTravelBufferPerIterationInMinutes;
 	}
-	public double getFactorForNumberOfVehicles(){
-		return factorForNumberOfVehicles;
+	public double getFactorForTravelBufferCalculation(){
+		return factorForTravelBufferCalculation;
 	}
 	public record ServiceDurationPerCategoryKey(StructuralAttribute employeeCategory, String vehicleType, SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {}
 
