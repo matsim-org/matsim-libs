@@ -1,11 +1,11 @@
 package org.matsim.core.mobsim.dsim;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.InsertableMobsim;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
