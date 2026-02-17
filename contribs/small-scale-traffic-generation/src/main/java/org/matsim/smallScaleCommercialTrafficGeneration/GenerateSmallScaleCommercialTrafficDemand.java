@@ -998,25 +998,25 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 		double sumServiceDurationsJobs = thisCarrier.getServices().values().stream().mapToDouble(CarrierService::getServiceDuration).sum() * factorForTravelBufferCalculation;
 
-		while (carrierAttributes.vehicleDepots.size() < numberOfDepots) {
-			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null);
-			carrierAttributes.vehicleDepots.add(linkId.toString());
-		}
+		double sumMaxTourDurationsOfVehicles = 0;
 
-		for (String singleDepot : carrierAttributes.vehicleDepots) {
+		while (sumMaxTourDurationsOfVehicles <= sumServiceDurationsJobs) {
 			TourStartAndDuration t = tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample();
+			tourDistribution.get(carrierAttributes.smallScaleCommercialTrafficType).sample(2);
 			int vehicleStartTime = t.getVehicleStartTime(this.rnd);
 			int tourDuration = t.getVehicleTourDuration(this.rnd);
 			int vehicleEndTime = vehicleStartTime + tourDuration;
+			Id<Link> linkId = findPossibleLink(carrierAttributes.startZone, carrierAttributes.selectedStartCategory, null);
 			for (String thisVehicleType : vehicleTypes) { //TODO Flottenzusammensetzung anpassen. Momentan pro Depot alle Fahrzeugtypen 1x erzeugen
 				VehicleType thisType = carrierVehicleTypes.getVehicleTypes()
 					.get(Id.create(thisVehicleType, VehicleType.class));
 				if (fixedNumberOfVehiclePerTypeAndLocation == 0)
 					fixedNumberOfVehiclePerTypeAndLocation = 1;
 				for (int i = 0; i < fixedNumberOfVehiclePerTypeAndLocation; i++) {
+					sumMaxTourDurationsOfVehicles += tourDuration;
 					CarrierVehicle newCarrierVehicle = CarrierVehicle.Builder.newInstance(
 						Id.create(thisCarrier.getId().toString() + "_" + (carrierCapabilities.getCarrierVehicles().size() + 1), Vehicle.class),
-						Id.createLinkId(singleDepot), thisType).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
+						linkId, thisType).setEarliestStart(vehicleStartTime).setLatestEnd(vehicleEndTime).build();
 					carrierCapabilities.getCarrierVehicles().put(newCarrierVehicle.getId(), newCarrierVehicle);
 					if (!carrierCapabilities.getVehicleTypes().contains(thisType)) carrierCapabilities.getVehicleTypes().add(thisType);
 				}
@@ -1028,7 +1028,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	/**
 	 * Finds a possible link for a service or the vehicle location.
 	 */
-	private Id<Link> findPossibleLink(String zone, StructuralAttribute selectedCategory, List<String> noPossibleLinks) {
+	Id<Link> findPossibleLink(String zone, StructuralAttribute selectedCategory, List<String> noPossibleLinks) {
 		Id<Link> newLink = null;
 		for (int a = 0; newLink == null && a < facilitiesPerZoneWithProbabilities.get(zone).get(selectedCategory).getPmf().size() * 2; a++) {
 
@@ -1192,7 +1192,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 * The attributes of a carrier, used during the generation
 	 * @param purpose purpose of this carrier denoted as an index. Can be used in {@link VehicleSelection} to get more information about this carrier.
 	 * @param startZone start zone of this carrier, entry from {@link TripDistributionMatrix#getListOfZones()}
-	 * @param selectedStartCategory start category of this carrier, selected randomly from {@link VehicleSelection.OdMatrixEntryInformation#possibleStartCategories}
+	 * @param selectedStartCategory start category of this carrier, selected randomly from
 	 * @param modeORvehType entry from {@link TripDistributionMatrix#getListOfModesOrVehTypes()}
 	 * @param smallScaleCommercialTrafficType Entry from {@link SmallScaleCommercialTrafficType} for this carrier
 	 *                                        <i>(NOTE: This value only differs between carriers if {@link SmallScaleCommercialTrafficType#completeSmallScaleCommercialTraffic is selected)</i>
