@@ -33,8 +33,6 @@ public class BasicCommercialDemandGenerationTest {
 	private MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Disabled // this test fails when the whole package is run, but passes when it is run alone.  Since there are many static non-final variables
-		// in the code, I assume that those are the cause.
 	void testMainRun() {
 		try {
 			Path output = Path.of(utils.getOutputDirectory());
@@ -44,7 +42,6 @@ public class BasicCommercialDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 
-//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
 			String network = result.toString();
@@ -144,7 +141,6 @@ public class BasicCommercialDemandGenerationTest {
 			Path shapeFilePath = Path.of(utils.getPackageInputDirectory() + "testShape/testShape.shp");
 			String populationLocation = utils.getPackageInputDirectory() + "testPopulation.xml";
 
-//			String network = "https://raw.githubusercontent.com/matsim-org/matsim-libs/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
 			URL url = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" );
 			URL result = IOUtils.extendUrl( url, "grid9x9.xml" );
 			String network = result.toString();

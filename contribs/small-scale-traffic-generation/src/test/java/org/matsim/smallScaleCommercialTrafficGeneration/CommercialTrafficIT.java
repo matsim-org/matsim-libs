@@ -97,9 +97,11 @@ public class CommercialTrafficIT {
 			"--shapeCRS", shapeCRS,
 			"--nameOutputPopulation", resultPopulation,
 			"--pathOutput", output,
-			"--resistanceFactor_commercialPersonTraffic", "0.005",
-			"--resistanceFactor_goodsTraffic", "0.005",
-			"--MATSimIterationsAfterDemandGeneration", "0");
+			"--resistanceFactor_commercialPersonTraffic", "0.3",
+			"--resistanceFactor_goodsTraffic", "0.2",
+			"--MATSimIterationsAfterDemandGeneration", "0",
+			"--factorForTravelBufferCalculation", "1.2",
+			"--maxNumberOfLoopsForVRPSolving", "2");
 
 		// test results of complete run before
 		Config config = ConfigUtils.createConfig();
