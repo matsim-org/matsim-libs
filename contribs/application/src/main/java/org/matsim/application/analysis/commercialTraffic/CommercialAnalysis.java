@@ -142,6 +142,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 			printer.print("personId");
 			printer.print("groupOfSubpopulation");
+			printer.print("startCategory");
 			printer.print("activityType");
 			printer.print("activityCountPerPerson");
 			printer.print("activityDuration_group");
@@ -162,6 +163,9 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				String subpop = PopulationUtils.getSubpopulation(person);
 				String groupOfPerson = subpopToGroup.get(subpop);
+				String startCategory = "undefined";
+				if (person.getAttributes().getAttribute("startCategory") != null)
+					startCategory = person.getAttributes().getAttribute("startCategory").toString();
 				if (groupOfPerson != null) {
 					List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan(),
 						TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
@@ -173,7 +177,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						String labelForValue = AnalysisUtils.getLabelForValue(durationInMinutes.longValue(), activityDurationGroups,
 							activityDurationLabels);
 						activityToPersonMap.computeIfAbsent(labelForValue, k -> new ArrayList<>()).add(
-							new ActivityInformation(activity, i, person.getId(), groupOfPerson));
+							new ActivityInformation(activity, i, person.getId(), groupOfPerson, startCategory));
 					}
 				}
 			}
@@ -187,6 +191,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 
 					printer.print(activityInformation.personId);
 					printer.print(activityInformation.groupOfSubpopulation);
+					printer.print(activityInformation.startCategory);
 					printer.print(activity.getType());
 					printer.print(activityInformation.countForPerson);
 					printer.print(label);
@@ -727,6 +732,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 		return groupsOfSubpopulations;
 	}
 
-	record ActivityInformation(Activity activity, int countForPerson, Id<Person> personId, String groupOfSubpopulation) {
+	record ActivityInformation(Activity activity, int countForPerson, Id<Person> personId, String groupOfSubpopulation, String startCategory) {
 	}
 }

@@ -358,7 +358,30 @@ public class CommercialTrafficDashboard implements Dashboard {
 					);
 				}
 			});
+		for (String group : groupsOfCommercialSubpopulations.keySet()) {
+		layout.row("veh-Activities-PerCategory", "Activities").el(Plotly.class, (viz, data) -> {
 
+				viz.title = "Activity Durations – *" +group + "* split by startCategory (min)";
+				viz.description = "Histogram of activity durations by startCategory.";
+				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
+					.showLegend(true)
+					.build();
+				viz.colorRamp = ColorScheme.Viridis;
+				Plotly.DataSet ds = viz.addDataset(
+						data.compute(CommercialAnalysis.class, "activities.csv"))
+					.constant("source", "Act");
+				viz.addTrace(
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+//						.name("startCategory")
+						.build(),
+					ds.mapping()
+						.name("startCategory")
+						.x("activityDuration_group")
+						.y("activityDurationInMinutes_" + group)
+				);
+
+		});
+		}
 		layout.row("veh-ActivityDurations-box", "Activities").el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Activity Durations of the activities within the tours (min)";
