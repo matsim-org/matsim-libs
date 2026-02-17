@@ -323,12 +323,6 @@
 				<version>2.4.0-b180830.0359</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.google.code.findbugs</groupId>
-				<artifactId>jsr305</artifactId>
-				<version>3.0.2</version>
-			</dependency>
-
 			<!--		Using the -main version means that the native libraries are loaded automagically.  See-->
 			<!--		https://jogamp.org/wiki/index.php/Maven#Add_dependencies_on_the_correct_packages-->
 			<dependency>
