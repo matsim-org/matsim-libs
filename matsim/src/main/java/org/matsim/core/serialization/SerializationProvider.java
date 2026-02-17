@@ -8,10 +8,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.apache.fury.Fury;
-import org.apache.fury.ThreadSafeFury;
-import org.apache.fury.config.Language;
-import org.apache.fury.reflect.ReflectionUtils;
+import org.apache.fory.Fory;
+import org.apache.fory.ThreadSafeFory;
+import org.apache.fory.config.Language;
+import org.apache.fory.reflect.ReflectionUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
@@ -32,24 +32,24 @@ public class SerializationProvider {
 	private final Int2ObjectMap<Class<? extends Message>> classes = new Int2ObjectOpenHashMap<>(128);
 	private final Object2IntMap<Class<? extends Message>> types = new Object2IntOpenHashMap<>();
 
-	private final ThreadSafeFury fury;
+	private final ThreadSafeFory fory;
 
 	public SerializationProvider() {
 
-		// Fury uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fury compiles classes into
+		// Fory uses its own verbose logging. Disable this manually here, so users don't see the internals of how Fory compiles classes into
 		// wire formats.
-		org.apache.fury.logging.LoggerFactory.disableLogging();
+		org.apache.fory.logging.LoggerFactory.disableLogging();
 
 		// multiple serializations of different objects.
-		fury = Fury.builder().withLanguage(Language.JAVA)
+		fory = Fory.builder().withLanguage(Language.JAVA)
 			.withRefTracking(false)
 			.withCodegen(true)
 			.withMetaShare(false)
 			.requireClassRegistration(false)
-			.buildThreadSafeFury();
+			.buildThreadSafeFory();
 
 		// Manually register some allowed types
-		fury.register(Coord.class, true);
+		fory.register(Coord.class, true);
 
 		Class<?> idImpl;
 		try {
@@ -58,11 +58,11 @@ public class SerializationProvider {
 			throw new IllegalStateException("Id$IdImpl not found");
 		}
 
-		fury.registerSerializer(idImpl, IdSerializer.class);
-		fury.register(idImpl, true);
+		fory.registerSerializer(idImpl, IdSerializer.class);
+		fory.register(idImpl, true);
 
-		fury.registerSerializer(IntArrayList.class, IntArrayListSerializer.class);
-		fury.registerSerializer(AttributesImpl.class, AttributesSerializer.class);
+		fory.registerSerializer(IntArrayList.class, IntArrayListSerializer.class);
+		fory.registerSerializer(AttributesImpl.class, AttributesSerializer.class);
 
 		try (ScanResult scanResult = new ClassGraph().enableClassInfo().scan()) {
 
@@ -82,7 +82,7 @@ public class SerializationProvider {
 				int messageType = msgType.getName().hashCode();
 
 				// Protobuf message
-				fury.register(msgType, true);
+				fory.register(msgType, true);
 
 				if (classes.containsKey(messageType)) {
 					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgType,
@@ -112,7 +112,7 @@ public class SerializationProvider {
 	 * Serialize message object and return byte array.
 	 */
 	public <T extends Message> byte[] toBytes(T msg) {
-		return fury.serialize(msg);
+		return fory.serialize(msg);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class SerializationProvider {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends Message> T parse(ByteBuffer buf) {
-		return (T) fury.deserialize(buf);
+		return (T) fory.deserialize(buf);
 	}
 
 	public ByteMessageParser getParser(int type) {
@@ -129,7 +129,7 @@ public class SerializationProvider {
 		}
 
 		Class<? extends Message> msgType = classes.get(type);
-		return (in) -> fury.deserializeJavaObject(in, msgType);
+		return (in) -> fory.deserializeJavaObject(in, msgType);
 	}
 
 	public FuryBufferParser getFuryParser(int type) {
@@ -138,7 +138,7 @@ public class SerializationProvider {
 		}
 
 		Class<? extends Message> msgType = classes.get(type);
-		return (in) -> fury.deserializeJavaObject(in, msgType);
+		return (in) -> fory.deserializeJavaObject(in, msgType);
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class SerializationProvider {
 		return type == Event.ANY_TYPE ? Event.class : classes.get(type);
 	}
 
-	public ThreadSafeFury getFury() {
-		return fury;
+	public ThreadSafeFory getFory() {
+		return fory;
 	}
 }

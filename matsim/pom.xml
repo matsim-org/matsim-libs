@@ -362,13 +362,13 @@
 
 		<!-- These are for distributed simulation -->
 		<dependency>
-			<groupId>org.apache.fury</groupId>
-			<artifactId>fury-core</artifactId>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-core</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.fury</groupId>
-			<artifactId>fury-format</artifactId>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-format</artifactId>
 			<optional>true</optional>
 		</dependency>
 

@@ -1,6 +1,7 @@
 package org.matsim.dsim;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import jakarta.annotation.Nullable;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.matsim.api.core.v01.LP;
 import org.matsim.api.core.v01.Message;
@@ -11,7 +12,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.events.EventMessagingPattern;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
