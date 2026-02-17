@@ -188,7 +188,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private Random rnd;
 	private RandomGenerator rng;
-	private static final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
+	private final Map<String, Map<StructuralAttribute, EnumeratedDistribution<ActivityFacility>>> facilitiesPerZoneWithProbabilities = new HashMap<>();
 	private final Map<Id<Carrier>, CarrierAttributes> carrierId2carrierAttributes = new HashMap<>();
 	private final Map<SmallScaleCommercialTrafficType, Double> resistanceFactorsPerModelType = new HashMap<>();
 
@@ -197,7 +197,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 
 	private TripDistributionMatrix odMatrix;
 	private Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone;
-	private static Map<String, Map<Id<Link>, Link>> linksPerZone;
+	private Map<String, Map<Id<Link>, Link>> linksPerZone;
 
 	private Index indexZones;
 
