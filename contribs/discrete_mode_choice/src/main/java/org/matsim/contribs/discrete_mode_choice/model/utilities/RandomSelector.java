@@ -1,5 +1,8 @@
 package org.matsim.contribs.discrete_mode_choice.model.utilities;
 
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +33,7 @@ public class RandomSelector implements UtilitySelector {
 
 	static public class Factory implements UtilitySelectorFactory {
 		@Override
-		public RandomSelector createUtilitySelector() {
+		public RandomSelector createUtilitySelector(Person person, List<DiscreteModeChoiceTrip> tourTrips) {
 			return new RandomSelector();
 		}
 	}

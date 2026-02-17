@@ -27,7 +27,7 @@ import org.matsim.core.utils.timing.TimeTracker;
  * A choice model that makes decision on a tour basis. The major difference over
  * the trip-based model is, that it additionally relies on a TourFinder to
  * determine the tours in an agent's plan.
- * 
+ *
  * @author sebhoerl
  */
 public class TourBasedModel implements DiscreteModeChoiceModel {
@@ -81,7 +81,7 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 			if (tourFilter.filter(person, tourTrips)) {
 				ModeChainGenerator generator = modeChainGeneratorFactory.createModeChainGenerator(modes, person,
 						tourTrips);
-				UtilitySelector selector = selectorFactory.createUtilitySelector();
+				UtilitySelector selector = selectorFactory.createUtilitySelector(person, tourTrips);
 
 				while (generator.hasNext()) {
 					List<String> tourModes = generator.next();
@@ -175,7 +175,7 @@ public class TourBasedModel implements DiscreteModeChoiceModel {
 
 	private String buildIllegalUtilityMessage(int tripIndex, Person person, TourCandidate candidate) {
 		TripCandidate trip = candidate.getTripCandidates().get(tripIndex);
-		
+
 		return String.format(
 				"Received illegal utility for for tour starting at trip %d (%s) of agent %s. Continuing with next candidate.",
 				tripIndex, trip.getMode(), person.getId().toString());

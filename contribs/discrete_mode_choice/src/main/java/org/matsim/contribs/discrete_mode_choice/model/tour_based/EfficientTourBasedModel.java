@@ -92,7 +92,7 @@ public class EfficientTourBasedModel implements DiscreteModeChoiceModel {
 
             if (tourFilter.filter(person, tourTrips)) {
 				ModeChoiceModelTree modeChoiceModelTree = new ModeChoiceModelTree(person, tourTrips, constraint, estimator.getDelegate(), modes, tourCandidates, timeInterpretation);
-                UtilitySelector selector = selectorFactory.createUtilitySelector();
+                UtilitySelector selector = selectorFactory.createUtilitySelector(person, tourTrips);
                 modeChoiceModelTree.build();
                 for(TourCandidate tourCandidate: modeChoiceModelTree.getTourCandidates()) {
                     selector.addCandidate(tourCandidate);
