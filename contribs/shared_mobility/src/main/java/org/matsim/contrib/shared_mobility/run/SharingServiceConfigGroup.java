@@ -1,10 +1,8 @@
 package org.matsim.contrib.shared_mobility.run;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import javax.annotation.Nonnegative;
-
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.shared_mobility.service.SharingService;
 import org.matsim.core.config.Config;
@@ -12,8 +10,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.vehicles.VehicleType;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import java.util.Arrays;
+import java.util.Map;
 
 public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 
@@ -25,7 +23,7 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	public static final String ID_COMMENT = "The id of the sharing service";
 	public static final String VEHICLE_TYPE_ID_COMMENT = "The vehicle type for the sharing service. Used to create vehicles if not already present in the vehicles file and for routing during replanning";
 	public static final String SERVICE_SCHEME_COMMENT = "One of: " + String.join(", ",
-			Arrays.asList(ServiceScheme.values()).stream().map(String::valueOf).toList());
+		Arrays.asList(ServiceScheme.values()).stream().map(String::valueOf).toList());
 
 	public SharingServiceConfigGroup() {
 		super(GROUP_NAME);
@@ -66,22 +64,22 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 
 	@Parameter
 	@Comment("Time [second] fare")
-	@Nonnegative
+	@PositiveOrZero
 	private double timeFare = 0.0;
 
 	@Parameter
 	@Comment("Distance [meter] fare")
-	@Nonnegative
+	@PositiveOrZero
 	private double distanceFare = 0.0;
 
 	@Parameter
 	@Comment("Base fare")
-	@Nonnegative
+	@PositiveOrZero
 	private double baseFare = 0.0;
 
 	@Parameter
 	@Comment("Minimum fare per rental")
-	@Nonnegative
+	@PositiveOrZero
 	private double minimumFare = 0.0;
 
 	@Override
@@ -196,8 +194,8 @@ public class SharingServiceConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(VEHICLE_TYPE_ID)
 	public void setVehicleTypeIdFromString(String vehicleTypeIdString) {
 		this.vehicleTypeId = (vehicleTypeIdString != null && !vehicleTypeIdString.isBlank())
-				? Id.createVehicleTypeId(vehicleTypeIdString)
-				: null;
+			? Id.createVehicleTypeId(vehicleTypeIdString)
+			: null;
 	}
 
 	@Override

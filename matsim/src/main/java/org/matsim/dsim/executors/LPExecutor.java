@@ -1,5 +1,6 @@
 package org.matsim.dsim.executors;
 
+import jakarta.annotation.Nullable;
 import org.matsim.api.core.v01.LP;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
@@ -8,7 +9,6 @@ import org.matsim.dsim.EventHandlerTask;
 import org.matsim.dsim.LPTask;
 import org.matsim.dsim.SimTask;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 

@@ -393,6 +393,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
         config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
 		config.routing().setNetworkRouteConsistencyCheck(RoutingConfigGroup.NetworkRouteConsistencyCheck.disable);
+		config.global().setNumberOfThreads( 1 );
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);

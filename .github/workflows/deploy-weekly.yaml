@@ -30,7 +30,18 @@ jobs:
 
       # Build and publish are separated so we start deploying only after all jars are built successfully
       - name: Build and verify jars
-        run: mvn verify --batch-mode
+        run: mvn verify --batch-mode -D'maven.test.redirectTestOutputToFile'
+
+      # in case something goes wrong in the previous step, we can inspect the logs
+      - name: Upload Maven test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-test-reports-${{ matrix.os }}
+          path: |
+            **/target/surefire-reports/**
+            **/target/failsafe-reports/**
+            **/target/*-reports/**
+          if-no-files-found: warn
 
       - name: Publish jars to matsim maven repo
         # fail at end to deploy as many jars as possible
