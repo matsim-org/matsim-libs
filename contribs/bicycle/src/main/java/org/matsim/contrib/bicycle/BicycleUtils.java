@@ -31,27 +31,28 @@ public final class BicycleUtils {
 	public static final String AVERAGE_ELEVATION = "averageElevation";
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
-	public static final String CYCLEWAY = "cycleway";
+	public static final String BICYCLE_INFRA = "bicycle_infra";
 	static final String WAY_TYPE = "type";
 	/*package*/ static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
 	private BicycleUtils() {
 		// Don't allow to create instances of this class
 	}
-	public static String getCyclewaytype( Link link ){
-		return (String) link.getAttributes().getAttribute( CYCLEWAY );
+
+	public static String getBicycleInfraType(Link link) {
+		return (String) link.getAttributes().getAttribute(BICYCLE_INFRA);
 	}
 
-	public static String getSurface( Link link ){
-		return (String) link.getAttributes().getAttribute( SURFACE );
+	public static String getSurface(Link link) {
+		return (String) link.getAttributes().getAttribute(SURFACE);
 	}
 
 	// ===
-	public static void setSmoothness( Link link, String smoothness ){
-		link.getAttributes().putAttribute( SMOOTHNESS, smoothness );
+	public static void setSmoothness(Link link, String smoothness) {
+		link.getAttributes().putAttribute(SMOOTHNESS, smoothness);
 	}
 
-	public static void setBicycleInfrastructureFactor( Link link, double factor ){
-		link.getAttributes().putAttribute( BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, factor );
+	public static void setBicycleInfrastructureFactor(Link link, double factor) {
+		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, factor);
 	}
 }

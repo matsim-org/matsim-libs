@@ -65,9 +65,12 @@ class BicycleTravelDisutility implements TravelDisutility {
 	private double logNormalRndUserDef;
 	private Person prevPerson;
 
+//	private static final String DEBUG_LINK_1 = "7377141650001f";
+//	private static final String DEBUG_LINK_2 = "8279290470004f";
+
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, ScoringConfigGroup cnScoringGroup,
-													RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
+							RoutingConfigGroup routingConfigGroup, TravelTime timeCalculator, double normalization, BicycleParams bicycleParams) {
 		final ScoringConfigGroup.ModeParams bicycleModeParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleModeParams == null) {
 			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
@@ -75,7 +78,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 		this.bicycleParams = bicycleParams;
 		this.marginalCostOfDistance_m = -(bicycleModeParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
-				- bicycleModeParams.getMarginalUtilityOfDistance();
+			- bicycleModeParams.getMarginalUtilityOfDistance();
 		this.marginalCostOfTime_s = -(bicycleModeParams.getMarginalUtilityOfTraveling() / 3600.0) + cnScoringGroup.getPerforming_utils_hr() / 3600.0;
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
@@ -94,23 +97,80 @@ class BicycleTravelDisutility implements TravelDisutility {
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
-		String surface = BicycleUtils.getSurface( link );
-		String type = NetworkUtils.getType( link ) ;
-		String cyclewaytype = BicycleUtils.getCyclewaytype( link );
+		String surface = BicycleUtils.getSurface(link);
+		String type = NetworkUtils.getType(link);
+		String bicycleInfraType = BicycleUtils.getBicycleInfraType(link);
+
+
+//		//  debugging
+//		if ("FOOT_AND_CYCLEWAY_SEGREGATED_ADJOINING".equals(bicycleInfraType)) {
+//			double f = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
+//			System.out.println("INFRA " + bicycleInfraType
+//				+ " link=" + link.getId()
+//				+ " type=" + type
+//				+ " factor=" + f);
+//
+//			System.out.println("COMFORT " + surface
+//				+ " link=" + link.getId()
+//				+ " type=" + type
+//				+ " factor=" + bicycleParams.getComfortFactor(surface));
+//		}
+
+		///
+
+
+//		double travelTime_ = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+//
+//		// === DEBUG START ===
+//		if (link.getId().toString().equals(DEBUG_LINK_1) ||
+//			link.getId().toString().equals(DEBUG_LINK_2)) {
+//
+//			System.out.println("---- DEBUG LINK ----");
+//			System.out.println("linkId = " + link.getId());
+//			System.out.println("freespeed = " + link.getFreespeed());
+//			System.out.println("travelTime = " + travelTime_);
+//			System.out.println("length = " + link.getLength());
+//
+//			if (vehicle != null) {
+//				System.out.println("vehicle maxVel = " +
+//					vehicle.getType().getMaximumVelocity());
+//			} else {
+//				System.out.println("vehicle = null");
+//			}
+//
+//			System.out.println("--------------------");
+//		}
+//		// === DEBUG END ===
+
+
 		double distance = link.getLength();
 
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
 
-		double comfortFactor = bicycleParams.getComfortFactor(surface );
+		double comfortFactor = bicycleParams.getComfortFactor(surface);
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 
-		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, cyclewaytype );
+		double infrastructureFactor = bicycleParams.getInfrastructureFactor(type, bicycleInfraType);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 
-		double gradientFactor = bicycleParams.getGradient_pct(link );
+		double gradientFactor = bicycleParams.getGradient_pct(link);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 
+
+//		if (link.getId().toString().equals(DEBUG_LINK_1) ||
+//			link.getId().toString().equals(DEBUG_LINK_2)) {
+//
+//			System.out.println("---- DEBUG COSTS ----");
+//			System.out.println("link=" + link.getId() + " type=" + type + " infra=" + bicycleInfraType);
+//			System.out.println("ttD=" + travelTimeDisutility);
+//			System.out.println("distD=" + distanceDisutility);
+//			System.out.println("infraFactor=" + infrastructureFactor);
+//			System.out.println("infraD=" + infrastructureDisutility);
+//			System.out.println("total(disutility w/o rnd)=" +
+//				(travelTimeDisutility + distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
+//			System.out.println("---------------------");
+//		}
 
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
 //				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
@@ -121,9 +181,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 
 		// randomize if applicable:
 		if (sigma != 0.) {
-			if (person==null) {
+			if (person == null) {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
-						+ "sigma to zero.") ;
+					+ "sigma to zero.");
 			}
 //			normalRndLink = 0.05 * random.nextGaussian();
 			// are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
@@ -169,7 +229,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 //				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + normalRndLink
 //				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
-				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility ;
+			+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility;
 		// note that "normalRndLink" follows a Gaussian distribution, not a lognormal one as the others do!
 //		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
 //				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;

@@ -95,7 +95,7 @@ public final class RunBicycleContribExample {
 //			);
 
 			String baseOut = "C:/Users/metz_so/Workspace/data/matsim-output/";
-			String scenarioName = "nk_motorized_500";
+			String scenarioName = "nk_motorized_500_bicycleinfra_infrautil";
 
 
 			String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
@@ -120,7 +120,7 @@ public final class RunBicycleContribExample {
 		config.controller().setWriteEventsInterval(1);
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		config.routing().removeTeleportedModeParams(BICYCLE);
-		config.routing().setRoutingRandomness(4.0);
+		config.routing().setRoutingRandomness(0.0); //4.0
 
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);

@@ -77,7 +77,7 @@ class BicycleScoreEventsCreator implements
 	 * Score per overtake (negative). Choose something small; tune later.
 	 * Units are "utils" like other scoring components.
 	 */
-	private final double marginalUtilityPerOvertake = -10; // -0.004 you can tune
+	private final double marginalUtilityPerOvertake = -0.004; // -0.004 you can tune
 
 	@Inject
 	BicycleScoreEventsCreator(Scenario scenario, EventsManager eventsManager, AdditionalBicycleLinkScore additionalBicycleLinkScore) {
