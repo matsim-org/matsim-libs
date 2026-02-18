@@ -49,8 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RouteUtils {
 	private static final Logger log = LogManager.getLogger(RouteUtils.class);
 
-	private RouteUtils() {
-	} // do not instantiate
+	private RouteUtils() {} // do not instantiate
 
 	/**
 	 * Returns all nodes the route passes between the start- and the end-link of the route.
@@ -139,8 +138,7 @@ public class RouteUtils {
 	}
 
 	/**
-	 * Calculates the distance of the route, <b>excluding</b> the distance traveled
-	 * on the start- and end-link of the route.
+	 * Calculates the distance of the route, <b>excluding</b> the distance traveled on the start- and end-link of the route.
 	 *
 	 * @param route
 	 * @param network
@@ -154,27 +152,26 @@ public class RouteUtils {
 		return dist;
 	}
 
-	public static double calcTravelTimeExcludingStartEndLink(final NetworkRoute networkRoute, double now, Person person, Vehicle vehicle, final
-	Network network, TravelTime travelTime) {
+	public static double calcTravelTimeExcludingStartEndLink(final NetworkRoute networkRoute, double now, Person person, Vehicle vehicle,
+			final Network network, TravelTime travelTime) {
 		double newTravelTime = 0.0;
 		for (Id<Link> routeLinkId : networkRoute.getLinkIds())
-			newTravelTime += travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId),
-				now + newTravelTime, person, vehicle);
+			newTravelTime += travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId), now + newTravelTime, person, vehicle);
 		return newTravelTime;
 	}
 
 
 	/**
-	 * Calculates the distance of the complete route, <b>including</b> the distance traveled
-	 * on the start- and end-link of the route.
+	 * Calculates the distance of the complete route, <b>including</b> the distance traveled on the start- and end-link of the route.
 	 *
 	 * @param networkRoute
 	 * @param relPosOnDepartureLink relative position on the departure link where vehicles start traveling
-	 * @param relPosOnArrivalLink   relative position on the arrival link where vehicles stop traveling
+	 * @param relPosOnArrivalLink relative position on the arrival link where vehicles stop traveling
 	 * @param network
 	 * @return
 	 */
-	public static double calcDistance(final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink, final Network network) {
+	public static double calcDistance(final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink,
+			final Network network) {
 		// sum distance of all link besides departure and arrival link
 		double routeDistance = calcDistanceExcludingStartEndLink(networkRoute, network);
 		// add relative distance of departure link
@@ -190,7 +187,7 @@ public class RouteUtils {
 	}
 
 	public static double calcTravelTime(final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink,
-										double now, Person person, Vehicle vehicle, final Network network, TravelTime travelTime) {
+			double now, Person person, Vehicle vehicle, final Network network, TravelTime travelTime) {
 
 		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())) {
 			return 0.;
@@ -198,7 +195,8 @@ public class RouteUtils {
 		double startTime = now;
 
 		// add relative distance of departure link
-		now += (1.0 - relPosOnDepartureLink) * travelTime.getLinkTravelTime(network.getLinks().get(networkRoute.getStartLinkId()), now, person, vehicle);
+		now += (1.0 - relPosOnDepartureLink)
+				* travelTime.getLinkTravelTime(network.getLinks().get(networkRoute.getStartLinkId()), now, person, vehicle);
 
 		// sum distance of all link besides departure and arrival link
 		now += calcTravelTimeExcludingStartEndLink(networkRoute, now, person, vehicle, network, travelTime);
@@ -209,7 +207,6 @@ public class RouteUtils {
 		return now - startTime;
 	}
 
-	@Deprecated // rename to calcDistanceExcludingStartEndLink.  kai, feb'25
 	public static double calcDistance(final LeastCostPathCalculator.Path path) {
 		double length = 0.;
 		for (Link link : path.links) {
@@ -218,7 +215,7 @@ public class RouteUtils {
 		return length;
 	}
 
-	@Deprecated // network argument is not needed; please inline.  kai, sep'20
+	@Deprecated // network argument is not needed; please inline. kai, sep'20
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, Network network) {
 		return createNetworkRoute(routeLinkIds);
 	}
@@ -263,18 +260,14 @@ public class RouteUtils {
 		// enter link
 		var enterIndex = nr.getStartLinkId().equals(enterLinkId) ? -1 : nr.getLinkIds().indexOf(enterLinkId);
 		var continueTake = new AtomicBoolean(true);
-		double dist = nr.getLinkIds().stream()
-			.skip(enterIndex + 1)
-			.takeWhile(id -> {
-				// we need to include the last link id, so set the flag to false when we find it
-				// as takeWhile is exclusive
-				if (id.equals(exitLinkId)) {
-					return continueTake.getAndSet(false);
-				}
-				return continueTake.get();
-			})
-			.mapToDouble(id -> network.getLinks().get(id).getLength())
-			.sum();
+		double dist = nr.getLinkIds().stream().skip(enterIndex + 1).takeWhile(id -> {
+			// we need to include the last link id, so set the flag to false when we find it
+			// as takeWhile is exclusive
+			if (id.equals(exitLinkId)) {
+				return continueTake.getAndSet(false);
+			}
+			return continueTake.get();
+		}).mapToDouble(id -> network.getLinks().get(id).getLength()).sum();
 
 		// the last link is not included in the list of links of the network route and must be
 		// particularly handled.
@@ -286,8 +279,8 @@ public class RouteUtils {
 	}
 
 	/**
-	 * How much of route is "covered" by the links of route2.  Based on Ramming.  Note that this is not symmetric,
-	 * i.e. route1 can be fully covered by route2, but not the other way around.  kai, nov'13
+	 * How much of route is "covered" by the links of route2. Based on Ramming. Note that this is not symmetric, i.e. route1 can be fully covered by
+	 * route2, but not the other way around. kai, nov'13
 	 *
 	 * @param route1
 	 * @param route2
@@ -311,7 +304,7 @@ public class RouteUtils {
 		if (routeLength > 0.) {
 			return coveredLength / routeLength;
 		} else {
-			return 1.; // route has zero length = fully covered by any other route.  (but they are not similar!?!?!?)
+			return 1.; // route has zero length = fully covered by any other route. (but they are not similar!?!?!?)
 		}
 	}
 
@@ -323,13 +316,11 @@ public class RouteUtils {
 		return new LinkNetworkRouteImpl(startLinkId, endLinkId);
 	}
 
-	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, List<Id<Link>> linkIds,
-														  Id<Link> endLinkId) {
+	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
 	}
 
-	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, Id<Link>[] linkIds,
-														  Id<Link> endLinkId) {
+	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, Id<Link>[] linkIds, Id<Link> endLinkId) {
 		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
 	}
 }
