@@ -185,6 +185,9 @@ public final class DSim implements Mobsim {
 
 		// notify the mobsim that the simulation is finished/terminated
 		executor.afterSim();
+		// set the sequence of the message broker to Infinity, to signal that we are after the simulation
+		// Processes still in the simulation will store messages from this phase as ahead messages.
+		broker.beforeSimStep(Double.POSITIVE_INFINITY);
 		// handle all events that were generated during afterSim -- these get the same timestep as the last simulation time step
 		executor.runEventHandler();
 		// notify the events manager to trigger events processing, as well as syncing.

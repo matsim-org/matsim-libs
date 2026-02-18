@@ -296,7 +296,7 @@ public class ApplicationUtils {
 			try (Stream<Path> list = Files.list(path)) {
 				return list.filter(p -> m.matches(p.getFileName()))
 					.findFirst()
-					.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found."));
+					.orElseThrow(() -> new IllegalStateException("No " + pattern + " file found; path=" + path ) );
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

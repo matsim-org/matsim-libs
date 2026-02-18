@@ -45,7 +45,7 @@ public class MarginalSumScoringFunction {
 		taxiActParams.setTypicalDuration(1.0);
 
 		ActivityUtilityParameters actUtilityParams = new ActivityUtilityParameters.Builder(taxiActParams).build();
-		params.utilParams.put("TaxiPickup", actUtilityParams);
+		params.actParams.put("TaxiPickup", actUtilityParams );
 
 		activityScoringA = new CharyparNagelActivityScoring(params);
 		activityScoringB = new CharyparNagelActivityScoring(params);
