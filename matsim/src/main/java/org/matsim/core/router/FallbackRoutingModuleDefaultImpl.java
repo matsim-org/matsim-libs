@@ -18,34 +18,52 @@ import org.matsim.facilities.Facility;
 import java.util.Collections;
 import java.util.List;
 
-class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
+class FallbackRoutingModuleDefaultImpl implements FallbackRoutingModule {
 
 	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 	public static final String _fallback = "_fallback";
 
-	@Inject private RoutingConfigGroup pcrCfg;
-	@Inject private Config config ;
-	@Inject private Population population ;
-	@Inject private Network network ;
+	@Inject
+	private RoutingConfigGroup pcrCfg;
+	@Inject
+	private Config config;
+	@Inject
+	private Population population;
+	@Inject
+	private Network network;
 
-	@Override public List<? extends PlanElement> calcRoute( RoutingRequest request ){
+	@Override
+	public List<? extends PlanElement> calcRoute(RoutingRequest request) {
 		final Facility fromFacility = request.getFromFacility();
 		final Facility toFacility = request.getToFacility();
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
 
-		Leg leg = population.getFactory().createLeg( TransportMode.walk ) ;
-		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
-		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;
-		Id<Link> dpLinkId = FacilitiesUtils.decideOnLink( fromFacility, network ).getId() ;
-		Id<Link> arLinkId = FacilitiesUtils.decideOnLink( toFacility, network ).getId() ;
+		Leg leg = population.getFactory().createLeg(TransportMode.walk);
+		Coord fromCoord = FacilitiesUtils.decideOnCoord(fromFacility, network, config);
+		Coord toCoord = FacilitiesUtils.decideOnCoord(toFacility, network, config);
+		Id<Link> dpLinkId = FacilitiesUtils.decideOnLink(fromFacility, network).getId();
+		Id<Link> arLinkId = FacilitiesUtils.decideOnLink(toFacility, network).getId();
 		/*
-		 * Even TransportMode.walk needs an "UltimateFallbackRoutingModule", but for all other modes (pt, drt, ...) it
-		 * would be better if we would try the walkRouter first and fall back to "UltimateFallbackRoutingModule" or a
-		 * handwritten teleported walk like below only if the walkRouter returns null. - gl/kn-dec'19
+		 * Even TransportMode.walk needs an "UltimateFallbackRoutingModule", but for all other modes (pt, drt, ...) it would be better if we would try
+		 * the walkRouter first and fall back to "UltimateFallbackRoutingModule" or a handwritten teleported walk like below only if the walkRouter
+		 * returns null. - gl/kn-dec'19
 		 */
-		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(),
-				pcrCfg.getModeRoutingParams().get(TransportMode.walk) ) ;
-		return Collections.singletonList( leg ) ;
+		/*
+		 * For now, only use TransportMode.walk if it is configured as a teleported mode, otherwise use a non_network_walk mode to trigger the
+		 * intermodal access/egress module.
+		 */
+		String walkMode;
+		if (pcrCfg.getTeleportedModeSpeeds().containsKey(TransportMode.walk)) {
+			walkMode = TransportMode.walk;
+		} else if (pcrCfg.getTeleportedModeSpeeds().containsKey(TransportMode.non_network_walk)) {
+			walkMode = TransportMode.non_network_walk;
+		} else {
+			throw new IllegalStateException(String.format("Neither %s nor %s is configured as a teleported mode, cannot perform fallback routing.",
+					TransportMode.walk, TransportMode.non_network_walk));
+		}
+		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg(person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId,
+				population.getFactory(), pcrCfg.getTeleportedModeParams().get(walkMode));
+		return Collections.singletonList(leg);
 	}
 }
