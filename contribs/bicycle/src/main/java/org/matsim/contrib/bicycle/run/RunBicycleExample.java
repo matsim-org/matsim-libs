@@ -69,11 +69,11 @@ public class RunBicycleExample {
 			fillConfigWithBicycleStandardValues(config);
 
 			// simple example
-			config.network().setInputFile("bicycle_example/network_lane_bike_car.xml"); // Modify this
-			config.plans().setInputFile("bicycle_example/population_10_bike_car.xml");
+			//config.network().setInputFile("bicycle_example/network_lane_bike_car.xml"); // Modify this
+			//config.plans().setInputFile("bicycle_example/population_10_bike_car.xml");
 
 			//Neukoelln bicycle network
-			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
+			config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
 			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_slim.xml.gz"); // Modify this
 
 
@@ -82,6 +82,7 @@ public class RunBicycleExample {
 
 			//Random plans nord-Neukoelln
 			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_500.xml");
+			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_5000_bike.xml");
 		} else {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
 				+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
@@ -90,7 +91,7 @@ public class RunBicycleExample {
 
 		//custom output folder
 		config.controller().setOutputDirectory(
-			"C:/Users/metz_so/Workspace/data/matsim-output/nk_motorized"
+			"C:/Users/metz_so/Workspace/data/matsim-output/26-02-18_nk_motorized_adjustedCode_5000plans"
 		);
 
 
