@@ -44,6 +44,7 @@ import picocli.CommandLine;
 import playground.vsp.scoring.IncomeDependentUtilityOfMoneyPersonScoringParameters;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
+import tech.tablesaw.api.StringColumn;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.plotly.components.Figure;
 import tech.tablesaw.plotly.components.Layout;
@@ -108,7 +109,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	private static final String onlyMoneyAndStuck = "onlyMoneyAndStuck.";
 
 	public static void main( String[] args ){
-		Gbl.assertIf( args==null || args.length==0 );
+		//Gbl.assertIf( args==null || args.length==0 );
 
 		// equil:
 //	private static final String baseDir="/Users/kainagel/git/all-matsim/matsim-example-project/referenceOutput/";
@@ -141,8 +142,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		final String shpFile = null;
 
 		// iatbr glamobi:
-		final String baseDir="/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
-		final String policyDir = "/Users/kainagel/runs-svn/IATBR/baseCaseContinued";
+		final String baseDir="/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued";
+		final String policyDir = "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued";
 		final String shpFile = null;
 
 		// ===
@@ -303,6 +304,13 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 //		Table baseTableTrips = generateTripsTableFromPopulation( basePopulation, config, true );
 		Table baseTableTrips = null;
 		Table baseTablePersons = generatePersonTableFromPopulation( basePopulation, baseConfig, null, baseScoringFunctionFactory );
+		//baseTablePersons.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/baseTablePersons.csv");
+		//Table baseTripsTable = generateTripVTTSWithActivityDelay( basePopulation, baseConfig, baseScoringFunctionFactory );
+		//baseTripsTable.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/baseTripsTable.csv");
+
+		Table testTable = generateTripMuseTable( basePopulation, baseConfig, baseScoringFunctionFactory );
+		testTable.write().csv("/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/vtts/test.csv");
+
 
 		{
 			HistogramTrace histogramTrace = HistogramTrace.builder( baseTablePersons.doubleColumn( MUSE_h ) ).build();
@@ -345,7 +353,7 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 		ScoringFunctionFactory policyScoringFunctionFactory = this.injector2.getInstance( ScoringFunctionFactory.class );
 		Table personsTablePolicy = generatePersonTableFromPopulation( policyPopulation, policyConfig, basePopulation, policyScoringFunctionFactory );
 
-		compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
+		//compare( policyScenario, personsTablePolicy, baseTableTrips, baseTablePersons, this.baseScenario, baseConfig, inputPath );
 
 		return 0;
 	}
@@ -572,6 +580,8 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 	}
 
 
+
+
 	private static int cnt = 0;
 
 	private void somehowComputeRuleOfHalf( Population basePopulation, Population policyPopulation, Table personsTablePolicy ){
@@ -745,5 +755,307 @@ public class AgentWiseComparisonKN implements MATSimAppCommand{
 
 	}
 
+	@NotNull
+	Table generateTripVTTSWithActivityDelay(
+		Population population,
+		Config config,
+		ScoringFunctionFactory scoringFunctionFactory) {
+
+		Table table = Table.create(
+			StringColumn.create(PERSON_ID),
+			IntColumn.create("tripIdx"),
+			StringColumn.create("mainMode"),
+			DoubleColumn.create("travelDisutility_h"),
+			DoubleColumn.create("activityDelayDisutility_h"),
+			DoubleColumn.create("mUTTS_[u/h]"),
+			DoubleColumn.create(UTL_OF_MONEY),
+			DoubleColumn.create("VTTS_[EUR/h]")
+		);
+
+		MainModeIdentifier mainModeIdentifier =
+			new DefaultAnalysisMainModeIdentifier();
+
+
+		PopulationFactory pf = population.getFactory();
+
+		for (Person person : population.getPersons().values()) {
+
+			final String personId = person.getId().toString();
+			final double uom = getMarginalUtilityOfMoney(person);
+
+			ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction(person);
+			ScoringFunction sfEarly = scoringFunctionFactory.createNewScoringFunction(person);
+
+			int tripIdx = 0;
+
+			List<TripStructureUtils.Trip> trips =
+				TripStructureUtils.getTrips(person.getSelectedPlan());
+
+			for (TripStructureUtils.Trip trip : trips) {
+
+				double travelDisutility = 0.0;
+
+				String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+
+				// --- travel disutility ---
+				for (Leg leg : trip.getLegsOnly()) {
+
+					ScoringParameterSet params =
+						config.scoring().getScoringParameters(
+							PopulationUtils.getSubpopulation(person));
+
+					ModeParams modeParams =
+						params.getModes().get(leg.getMode());
+
+					double tt_h = leg.getTravelTime().seconds() / 3600.0;
+					travelDisutility +=
+						tt_h * modeParams.getMarginalUtilityOfTraveling();
+				}
+
+				// --- activity delay disutility (destination activity) ---
+				Activity destAct = trip.getDestinationActivity();
+
+				double activityDelayDisutility = 0.0;
+
+				if (destAct.getStartTime().isDefined()
+					&& destAct.getEndTime().isDefined()) {
+
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore = sfEarly.getScore();
+
+					activityDelayDisutility =
+						computeMUSE_h(
+							destAct,
+							sfNormal,
+							pf,
+							sfEarly,
+							scoreNormalBefore,
+							scoreEarlyBefore);
+				}
+
+
+				// ---- filter schedule-delay component ----
+				if (activityDelayDisutility <= 0 || activityDelayDisutility >= 16.30) {
+					continue;  // skip this trip
+				}
+
+				double mUTTS_h =
+					(travelDisutility + activityDelayDisutility);
+
+				double vtts_eur_h =
+					uom > 0 ? mUTTS_h / uom : Double.NaN;
+
+				// ---- append row ----
+				table.stringColumn(PERSON_ID).append(personId);
+				table.intColumn("tripIdx").append(tripIdx);
+				table.stringColumn("mainMode").append(mainMode);
+				table.doubleColumn("travelDisutility_h").append(travelDisutility);
+				table.doubleColumn("activityDelayDisutility_h").append(activityDelayDisutility);
+				table.doubleColumn("mUTTS_[u/h]").append(mUTTS_h);
+				table.doubleColumn(UTL_OF_MONEY).append(uom);
+				table.doubleColumn("VTTS_[EUR/h]").append(vtts_eur_h);
+
+				tripIdx++;
+			}
+		}
+
+		formatTable(table, 2);
+		return table;
+	}
+
+
+
+	@NotNull
+	public static Table generateActivityVTTS(
+		@NotNull Person person,
+		@NotNull PopulationFactory pf,
+		@NotNull ScoringFunctionFactory scoringFunctionFactory,
+		boolean isBaseTable
+	) {
+		// Create a table for per-activity output
+		Table table = Table.create(
+			StringColumn.create("PERSON_ID"),
+			IntColumn.create("ACT_INDEX"),
+			StringColumn.create("ACT_TYPE"),
+			DoubleColumn.create("VTTS_EUR_per_h")
+		);
+
+		// Scoring functions for MUSE computation
+		ScoringFunction sf = scoringFunctionFactory.createNewScoringFunction(person);
+		ScoringFunction sfNormal = scoringFunctionFactory.createNewScoringFunction(person);
+		ScoringFunction sfEarly  = scoringFunctionFactory.createNewScoringFunction(person);
+
+		Activity firstActivity = null;
+		int actIndex = 0;
+
+		for (Activity act : TripStructureUtils.getActivities(person.getSelectedPlan(), ExcludeStageActivities)) {
+			sf.handleActivity(act);
+			if (isBaseTable) {
+				Double muse_h = null;
+
+				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore  = sfEarly.getScore();
+					muse_h = computeMUSE_h(act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore);
+
+				} else if (act.getStartTime().isUndefined()) {
+					firstActivity = act;
+
+				} else { // overnight activity
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore  = sfEarly.getScore();
+
+					sfNormal.handleActivity(firstActivity);
+					sfEarly.handleActivity(firstActivity);
+
+					muse_h = computeMUSE_h(act, sfNormal, pf, sfEarly, scoreNormalBefore, scoreEarlyBefore);
+				}
+
+				// Apply the filter: only MUSE >0 and <16.3
+				if (muse_h != null && muse_h > 0 && muse_h < 16.30) {
+					double muMoney = getMarginalUtilityOfMoney(person); // your existing method
+					double vtts = muse_h / muMoney;
+
+					table.stringColumn("PERSON_ID").append(person.getId().toString());
+					table.intColumn("ACT_INDEX").append(actIndex);
+					table.stringColumn("ACT_TYPE").append(act.getType());
+					table.doubleColumn("VTTS_EUR_per_h").append(vtts);
+				}
+			}
+
+			actIndex++;
+		}
+
+		sf.finish();
+
+		return table;
+	}
+
+
+	@NotNull
+	public static Table generateTripMuseTable(
+		Population population,
+		Config config,
+		ScoringFunctionFactory scoringFunctionFactory) {
+
+		Table table = Table.create(
+			StringColumn.create("personId"),
+			StringColumn.create("mainMode"),
+			DoubleColumn.create("muse_h")
+		);
+
+		MainModeIdentifier mainModeIdentifier =
+			new DefaultAnalysisMainModeIdentifier();
+
+		PopulationFactory pf = population.getFactory();
+
+		int numberOfTripsSkippedDueToMUSEFilter = 0;
+
+		for (Person person : population.getPersons().values()) {
+
+			// -------------------------------------------------
+			// 1️⃣ Activity handling (IDENTICAL to working code)
+			// -------------------------------------------------
+
+			ScoringFunction sf =
+				scoringFunctionFactory.createNewScoringFunction(person);
+
+			ScoringFunction sfNormal =
+				scoringFunctionFactory.createNewScoringFunction(person);
+
+			ScoringFunction sfEarly =
+				scoringFunctionFactory.createNewScoringFunction(person);
+
+			Activity firstActivity = null;
+
+			for (Activity act :
+				TripStructureUtils.getActivities(
+					person.getSelectedPlan(),
+					ExcludeStageActivities)) {
+
+				// IMPORTANT: handle activity FIRST (like working code)
+				sf.handleActivity(act);
+
+				if (act.getStartTime().isDefined()
+					&& act.getEndTime().isDefined()) {
+
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore  = sfEarly.getScore();
+
+					computeMUSE_h(
+						act,
+						sfNormal,
+						pf,
+						sfEarly,
+						scoreNormalBefore,
+						scoreEarlyBefore
+					);
+
+				} else if (act.getStartTime().isUndefined()) {
+
+					firstActivity = act;
+
+				} else {
+
+					// overnight case (IDENTICAL logic)
+					Gbl.assertIf(act.getEndTime().isUndefined());
+
+					double scoreNormalBefore = sfNormal.getScore();
+					double scoreEarlyBefore  = sfEarly.getScore();
+
+					sfNormal.handleActivity(firstActivity);
+					sfEarly.handleActivity(firstActivity);
+
+					computeMUSE_h(
+						act,
+						sfNormal,
+						pf,
+						sfEarly,
+						scoreNormalBefore,
+						scoreEarlyBefore
+					);
+				}
+			}
+
+			sf.finish();
+
+			// -------------------------------------------------
+			// 2️⃣ Trip loop (ONLY reading muse)
+			// -------------------------------------------------
+
+			for (TripStructureUtils.Trip trip :
+				TripStructureUtils.getTrips(
+					person.getSelectedPlan())) {
+
+				Double muse_h =
+					getMUSE_h(trip.getDestinationActivity());
+
+				if (muse_h != null
+					&& muse_h > 0
+					&& muse_h < 16.3) {
+
+					String mainMode =
+						shortenModeString(
+							mainModeIdentifier.identifyMainMode(
+								trip.getTripElements()));
+
+					table.stringColumn("personId")
+						.append(person.getId().toString());
+
+					table.stringColumn("mainMode")
+						.append(mainMode);
+
+					table.doubleColumn("muse_h")
+						.append(muse_h);
+				} else {
+					numberOfTripsSkippedDueToMUSEFilter++;
+					// log or skip if MUSE is not in the desired range
+				}
+			}
+		}
+
+		log.info(numberOfTripsSkippedDueToMUSEFilter + " trips were skipped due to MUSE filter (<=0 or >=16.3).");
+		return table;
+	}
 
 }

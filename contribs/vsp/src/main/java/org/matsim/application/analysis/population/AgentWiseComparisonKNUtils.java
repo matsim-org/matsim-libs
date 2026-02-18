@@ -79,7 +79,7 @@ class AgentWiseComparisonKNUtils{
 		return joinedTable.doubleColumn( keyTwoOf( key ) ).subtract( joinedTable.doubleColumn( key ) ).setName( deltaOf( key ) );
 	}
 	static void handleEventsfile( Path path, String pattern, Population population ){
-		String baseEventsFile = globFile( path, pattern ).toString();
+		String baseEventsFile = "/Users/gregorr/Documents/work/respos/runs-svn/IATBR/baseCaseContinued/true.output_events.xml.gz";
 
 		double popSizeBefore = population.getPersons().size();
 
