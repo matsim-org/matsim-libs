@@ -59,6 +59,9 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 	@CommandLine.Option(names = "--single-occurrence", description = "Activity types that are only counted once per agent", split = ";")
 	private Set<String> singleOccurrence;
 
+	@CommandLine.Option(names = "--use-km2", description = "if true, area & density are converted to km2 instead of m2", defaultValue = "false")
+	private boolean useKm2;
+
 	public static void main(String[] args) {
 		new ActivityCountAnalysis().execute(args);
 	}
@@ -137,6 +140,9 @@ public class ActivityCountAnalysis implements MATSimAppCommand {
 			if (region != null && region.toString().length() > 0) {
 
 				double area = geometry.getArea();
+				if(useKm2){
+					area = area / 1000 / 1000;
+				}
 				regionAreaMap.put(region.toString(), area);
 
 				// Add region to the activity counts and person activity tracker if not already present

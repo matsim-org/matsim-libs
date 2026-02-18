@@ -28,6 +28,8 @@ public class ActivityDashboard implements Dashboard {
 	private final Map<String, String> refCsvs = new LinkedHashMap<>();
 	private final Set<String> countSingleOccurrencesSet = new HashSet<>();
 	private List<Indicator> indicators = new ArrayList<>();
+	private String projection = null;
+
 
 	/**
 	 * Create a new activity dashboard using the default shape file.
@@ -51,6 +53,10 @@ public class ActivityDashboard implements Dashboard {
 	 */
 	public ActivityDashboard addActivityType(String name, List<String> activities, List<Indicator> indicators) {
 		return addActivityType(name, activities, indicators, true, null);
+	}
+
+	public void setProjection(String projection){
+		this.projection = projection;
 	}
 
 	/**
@@ -113,6 +119,9 @@ public class ActivityDashboard implements Dashboard {
 							viz.height = 8.;
 							String shp = data.resource(shpFile);
 							viz.setShape(shp, ID_COLUMN);
+							if (projection != null) {
+								viz.projection = projection;
+							}
 							viz.addDataset("activities", data.computeWithPlaceholder(ActivityCountAnalysis.class,
 								"activities_%s_per_region.csv", activity.getKey(), args.toArray(new String[0])));
 							viz.display.fill.columnName = ind.name;
@@ -135,6 +144,9 @@ public class ActivityDashboard implements Dashboard {
 
 							String shp = data.resource(shpFile);
 							viz.setShape(shp, ID_COLUMN);
+							if (projection != null) {
+								viz.projection = projection;
+							}
 
 							viz.addDataset("activities", data.resource(refCsvs.get(activity.getKey())));
 
