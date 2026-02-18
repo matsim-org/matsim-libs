@@ -84,17 +84,17 @@ public class PopulationGenerator {
 	}
 
 	/**
-	 * Samples a departure time with realistic demand distribution.
+	 * Samples a departure time with realistic Gaussian demand distribution.
 	 * <p>
 	 * Distribution breakdown:
 	 * <ul>
 	 *   <li>5% uniform background demand throughout the day</li>
-	 *   <li>55% morning rush (6:00-10:00) with trapezoidal distribution</li>
-	 *   <li>40% evening rush (15:00-19:00) with trapezoidal distribution</li>
+	 *   <li>55% morning rush centered at 8:00 with Gaussian distribution (σ = 45 min)</li>
+	 *   <li>40% evening rush centered at 17:30 with Gaussian distribution (σ = 50 min)</li>
 	 * </ul>
 	 * <p>
-	 * The trapezoidal distribution creates a plateau effect, avoiding
-	 * extreme concentration of requests at single time points.
+	 * The Gaussian distribution creates a natural bell curve, which better reflects
+	 * empirical traffic patterns compared to trapezoidal distributions.
 	 */
 	private double sampleDepartureTime() {
 		if (!timeDependent) return random.nextDouble() * 86400;
@@ -106,57 +106,42 @@ public class PopulationGenerator {
 			return random.nextDouble() * 86400;
 		}
 
-		// 55% morning rush hour (6:00 - 10:00)
+		// 55% morning rush hour: peak at 8:00, std dev 45 min
 		if (rand < 0.60) {
-			return sampleTrapezoidal(6 * 3600, 7 * 3600, 9 * 3600, 10 * 3600);
+			return sampleGaussian(8 * 3600, 45 * 60, 5 * 3600, 11 * 3600);
 		}
 
-		// 40% evening rush hour (15:00 - 19:00)
-		return sampleTrapezoidal(15 * 3600, 16 * 3600, 18 * 3600, 19 * 3600);
+		// 40% evening rush hour: peak at 17:30, std dev 50 min
+		return sampleGaussian(17.5 * 3600, 50 * 60, 14 * 3600, 21 * 3600);
 	}
 
 	/**
-	 * Samples from a trapezoidal distribution.
+	 * Samples from a truncated Gaussian (normal) distribution.
 	 * <p>
-	 * The distribution has linear ramps at the edges and a flat plateau in the middle:
+	 * The distribution follows a bell curve centered at peakTime:
 	 * <pre>
-	 *       ___________
-	 *      /           \
-	 *     /             \
-	 * ___/               \___
-	 *   a    b       c    d
+	 *           *
+	 *          ***
+	 *         *****
+	 *        *******
+	 *       *********
+	 *      ***********
+	 * ____*************____
+	 *    min  peak   max
 	 * </pre>
 	 *
-	 * @param a start of ramp-up
-	 * @param b start of plateau
-	 * @param c end of plateau
-	 * @param d end of ramp-down
-	 * @return sampled time value
+	 * @param peakTime center of the peak (in seconds)
+	 * @param stdDev   standard deviation (in seconds)
+	 * @param minTime  earliest allowed time (truncation bound)
+	 * @param maxTime  latest allowed time (truncation bound)
+	 * @return sampled time value, guaranteed to be within [minTime, maxTime]
 	 */
-	private double sampleTrapezoidal(double a, double b, double c, double d) {
-		double rampUp = b - a;
-		double plateau = c - b;
-		double rampDown = d - c;
-
-		// Area under each section (assuming height = 1 for plateau)
-		double areaRampUp = 0.5 * rampUp;
-		double areaPlateau = plateau;
-		double areaRampDown = 0.5 * rampDown;
-		double totalArea = areaRampUp + areaPlateau + areaRampDown;
-
-		double r = random.nextDouble() * totalArea;
-
-		if (r < areaRampUp) {
-			// Ramp-up section: inverse of triangular CDF
-			return a + Math.sqrt(r * 2 * rampUp);
-		} else if (r < areaRampUp + areaPlateau) {
-			// Plateau section: uniform
-			return b + (r - areaRampUp);
-		} else {
-			// Ramp-down section: inverse of triangular CDF
-			double remaining = r - areaRampUp - areaPlateau;
-			return d - Math.sqrt((areaRampDown - remaining) * 2 * rampDown);
-		}
+	private double sampleGaussian(double peakTime, double stdDev, double minTime, double maxTime) {
+		double sample;
+		do {
+			sample = peakTime + random.nextGaussian() * stdDev;
+		} while (sample < minTime || sample > maxTime);
+		return sample;
 	}
 
 	private void createAgent(Population pop, int idx, Link origin, Link dest, double departure) {
