@@ -1,8 +1,7 @@
 package org.matsim.codeexamples.scoring.pseudoRandomErrors.replanning;
 
+import com.google.inject.Provider;
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;

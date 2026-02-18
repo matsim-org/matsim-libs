@@ -5,29 +5,24 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.matsim.core.config.groups.ReplanningConfigGroup.*;
-import static org.matsim.core.config.groups.ScoringConfigGroup.*;
+import static org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
+import static org.matsim.core.config.groups.ScoringConfigGroup.ModeParams;
 
 public final class RunBicycleContribExample{
 	private static final Logger LOG = LogManager.getLogger( RunBicycleContribExample.class );
@@ -64,10 +59,7 @@ public final class RunBicycleContribExample{
 		bicycleConfigGroup.setBicycleMode( BICYCLE );
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
-
-		bicycleConfigGroup.setMaxBicycleSpeedForRouting( BICYCLE_SPEED );
-		// (technically, this has been superseded by using the correct mode vehicle type, see below.  But there is still a faulty consistency check :-( .)
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.02);
 
 		config.routing().setRoutingRandomness( 0. );
 

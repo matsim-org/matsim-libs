@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.codeexamples.scoring.kindergartenActivityScoring;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -81,7 +80,7 @@ public class RunScenarioWithCustomScoring {
 				final ScoringParameters params =
 						new ScoringParameters.Builder(scenario, person).build();
 				sumScoringFunction.addScoringFunction(new KindergartenActivityScoring(person.getId(), kindergartenArrivalHandler));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				return sumScoringFunction;
