@@ -1,6 +1,22 @@
-/**
- * 
- */
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanSelectionByCadyts.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.contrib.cadyts.general;
 
 import cadyts.utilities.math.Vector;
@@ -22,12 +38,12 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector<Plan, Person
 
 	private final CadytsContextI<T> cContext;
 	private double beta;
-	
+
 	public PlanSelectionByCadyts(double beta, CadytsContextI<T> cContext ) {
 		this.cContext = cContext ;
 		this.beta = beta ;
 	}
-	
+
 
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
@@ -41,7 +57,7 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector<Plan, Person
 			// I guess these are supposed to be the prior probabilities. If so, than the above shoudl be correct (albeit a bit expensive).
 			// I would have expected that these are internally ignored when brute force is switched on, but they are not.
 			// I think that what it does is to use them when plans are equal according to cadyts. kai, dec'13
-			
+
 			pos++ ;
 		}
 		int idx = cContext.getCalibrator().selectPlan(plans, choiceProbs) ;
@@ -51,5 +67,5 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector<Plan, Person
 
 		return person.getPlans().get(idx) ;
 	}
-	
+
 }
