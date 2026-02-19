@@ -34,7 +34,7 @@ jobs:
 
       # in case something goes wrong in the previous step, we can inspect the logs
       - name: Upload Maven test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: maven-test-reports-${{ matrix.os }}
           path: |
