@@ -70,12 +70,6 @@ public final class DistributedEventsManager implements EventsManager {
 	private final ThreadLocal<AtomicInteger> ctxPartition = ThreadLocal.withInitial(() -> new AtomicInteger(-1));
 
 	/**
-	 * Stores addresses of events handlers. We need to have a cache for this to support inheritance for
-	 * Events.
-	 */
-	private final Long2ObjectMap<LongArrayList> addressCache = new Long2ObjectOpenHashMap<>();
-
-	/**
 	 * Set of other nodes that are waited for during event exchange.
 	 */
 	private final IntSet waitFor = new IntOpenHashSet();
@@ -204,8 +198,6 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	private void addTaskForPart(EventHandlerTask task, int part) {
-		// bust cache if a new handler is added.
-		addressCache.clear();
 
 		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
@@ -238,7 +230,6 @@ public final class DistributedEventsManager implements EventsManager {
 		tasks.remove(task);
 		broker.deregister(task);
 		executor.deregister(task);
-		addressCache.clear();
 	}
 
 	/**
@@ -348,64 +339,21 @@ public final class DistributedEventsManager implements EventsManager {
 	 */
 	private void processInternal(Event e, int type) {
 
-		var addresses = getAddressCache(e);
-		for (long address : addresses) {
+		var address = MessageBroker.address(ctxPartition.get().get(), type);
 
-			// send to local listeners.
-			List<Consumer<Message>> direct = directListener.get(address);
-			if (direct != null)
-				direct.forEach(c -> c.accept(e));
+		// send to local listeners.
+		List<Consumer<Message>> direct = directListener.get(address);
+		if (direct != null)
+			direct.forEach(c -> c.accept(e));
 
-			List<SimTask> listener = byPartitionAndType.get(address);
-			if (listener != null)
-				listener.forEach(t -> t.add(e));
+		List<SimTask> listener = byPartitionAndType.get(address);
+		if (listener != null)
+			listener.forEach(t -> t.add(e));
 
-			// Send the event remotely
-			if (remoteListener.containsKey(type)) {
-				remoteEvents.get(remoteListener.get(type)).add(e);
-				return;
-			}
+		// Send the event remotely
+		if (remoteListener.containsKey(type)) {
+			remoteEvents.get(remoteListener.get(type)).add(e);
 		}
-
-	}
-
-	private LongArrayList getAddressCache(Event e) {
-		var directAddress = MessageBroker.address(ctxPartition.get().get(), e.getType());
-		// non-synchronized check for cache. This is the fast path after we have built our caches.
-		var cache = addressCache.get(directAddress);
-		if (cache != null) {
-			return cache;
-		}
-
-		// oh no! a cache miss. build the cache and return the result.
-		return buildAddressCache(directAddress, e.getClass());
-	}
-
-	private LongArrayList buildAddressCache(long directAddress, final Class<?> eventClazz) {
-
-		Class<?> clazz = eventClazz;
-		var part = ctxPartition.get().get();
-		var listeners = new LongArrayList();
-
-		while (Event.class.isAssignableFrom(clazz)) {
-			if (serializer.hasType(clazz)) {
-				var type = serializer.getType(clazz);
-				var handlerAddress = MessageBroker.address(part, type);
-				if (directListener.containsKey(handlerAddress) || byPartitionAndType.containsKey(handlerAddress))
-					listeners.add(handlerAddress);
-			}
-			clazz = clazz.getSuperclass();
-		}
-
-		synchronized (addressCache) {
-			// some other thread could have added something in the meantime.
-			// double-check within the locked section.
-			var existing = addressCache.get(directAddress);
-			if (existing == null) {
-				addressCache.put(directAddress, listeners);
-			}
-		}
-		return listeners;
 	}
 
 	@Override

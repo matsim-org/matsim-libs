@@ -44,6 +44,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * This maps the messages types to corresponding function on the LP used for processing.
 	 */
+	//protected final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 	protected final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 
 	/**
@@ -163,20 +164,22 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 				Class<?> msgClass = methods[0].getParameterTypes()[0];
 				boolean isEvent = Event.class.isAssignableFrom(msgClass);
-				int type = serializer.getType(msgClass);
-
 				String target = isEvent ? "handleEvent" : "process";
-
 				Method consumerMethod = getConsumerMethod(target, msgClass);
+				Consumer<Message> consumer = createConsumer(handler, msgClass, target);
 
-				consumers.put(type, (Consumer<Message>) createConsumer(handler, msgClass, target));
+				// register this handler for the given message and all its subtypes.
+				for (var type : serializer.getAssignableTypes(msgClass)) {
+					consumers.put(type, consumer);
+				}
+
 				if (isEvent) {
 					EventSource source = node ? EventSource.NODE : partition ? EventSource.PARTITION : EventSource.GLOBAL;
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
 						source = consumerMethod.getAnnotation(EventsFrom.class).value();
 					}
-
-					eventSources.put(type, source);
+					var msgType = serializer.getType(msgClass);
+					eventSources.put(msgType, source);
 				}
 			}
 		}
@@ -222,7 +225,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		}
 	}
 
-	private Consumer<? extends Message> createConsumer(Object handler, Class<?> msgType, String target) {
+	private Consumer<Message> createConsumer(Object handler, Class<?> msgType, String target) {
 		try {
 			return LambdaUtils.createConsumer(handler, msgType, target);
 		} catch (Exception e) {
@@ -294,33 +297,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final void process(Message msg) {
 
-		var consumer = findConsumer(msg);
+		var consumer = consumers.get(msg.getType());
 		if (consumer == null) {
 			throw new IllegalArgumentException("No processor found for message: " + msg);
 		}
 		consumer.accept(msg);
-	}
-
-	private Consumer<Message> findConsumer(Message msg) {
-
-		Class<?> clazz = msg.getClass();
-		var consumer = consumers.get(msg.getType());
-
-		// ideally, we are passed an event for which we have stored a consumer.
-		// However, it is allowed to have events handlers that listen for events which are the base class
-		// for some event. In that case, we need to go up the inheritance hierarchy and check whether we
-		// have a suitable consumer. This relies on the events manager to only pass us events that are we
-		// might be interested in.
-		while (consumer == null && Event.class.isAssignableFrom(clazz)) {
-
-			clazz = clazz.getSuperclass();
-
-			if (serializer.hasType(clazz)) {
-				var type = serializer.getType(clazz);
-				consumer = consumers.get(type);
-			}
-		}
-		return consumer;
 	}
 
 	/**
