@@ -51,6 +51,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
 
+	protected final SerializationProvider serializer;
+
 	/**
 	 * Runtimes of each iteration.
 	 */
@@ -102,10 +104,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	public EventHandlerTask(EventHandler handler, int partition, boolean async) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async, SerializationProvider serializer) {
 		this.handler = handler;
 		this.partition = partition;
 		this.async = async;
+		this.serializer = serializer;
 	}
 
 	@Override
@@ -291,7 +294,27 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	 */
 	protected final void process(Message msg) {
 
+		var consumer = findConsumer(msg);
+		if (consumer == null) {
+			throw new IllegalArgumentException("No processor found for message: " + msg);
+		}
+		consumer.accept(msg);
+
+		/*
+		var consumerData = consumers.get(msg.getType());
+		if (consumerData != null) {
+			var clazz = msg.getClass().getSuperclass();
+			var superType = this.serializer.getType(clazz);
+		}
+
+
 		var consumer = consumers.get(msg.getType());
+		var clazz = msg.getClass();
+
+
+
+
+
 		if (consumer == null) {
 			consumer = consumers.get(Event.ANY_TYPE);
 		}
@@ -300,6 +323,27 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		}
 
 		consumer.accept(msg);
+
+		 */
+	}
+
+	private Consumer<Message> findConsumer(Message msg) {
+
+		Class<?> clazz = msg.getClass();
+		var consumer = consumers.get(msg.getType());
+
+		// ideally, we are passed an event for which we have stored a consumer.
+		// However, it is allowed to have events handlers that listen for events which are the base class
+		// for some event. In that case, we need to go up the inheritance hierarchy and check whether we
+		// have a suitable consumer. This relies on the events manager to only pass us events that are we
+		// might be interested in.
+		while (consumer == null && Event.class.isAssignableFrom(clazz)) {
+
+			clazz = clazz.getSuperclass();
+			var type = serializer.getType(clazz);
+			consumer = consumers.get(type);
+		}
+		return consumer;
 	}
 
 	/**

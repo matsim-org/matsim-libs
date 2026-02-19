@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ import org.matsim.core.serialization.SerializationProvider;
 import org.matsim.dsim.executors.LPExecutor;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -329,33 +331,55 @@ public final class DistributedEventsManager implements EventsManager {
 			return;
 		}
 
-		// Need to process two times, for handlers that registered for ANY_TYPE
-		boolean sent = processInternal(e, e.getType(), false);
-		processInternal(e, Event.ANY_TYPE, sent);
+		processInternal(e, e.getType());
 	}
 
 	/**
 	 * Return whether event was queued for remote sending.
 	 */
-	private boolean processInternal(Event e, int type, boolean alreadySent) {
+	private void processInternal(Event e, int type) {
 		// Send to all local tasks
-		long address = MessageBroker.address(ctxPartition.get().get(), type);
+		//long address = MessageBroker.address(ctxPartition.get().get(), type);
 
-		List<Consumer<Message>> direct = directListener.get(address);
-		if (direct != null)
-			direct.forEach(c -> c.accept(e));
+		var directAddress = MessageBroker.address(ctxPartition.get().get(), e.getType());
+		var addresses = addressCache.computeIfAbsent(directAddress, _ -> buildAddressCache(e.getClass()));
+		for (long address : addresses) {
 
-		List<SimTask> listener = byPartitionAndType.get(address);
-		if (listener != null)
-			listener.forEach(t -> t.add(e));
+			List<Consumer<Message>> direct = directListener.get(address);
+			if (direct != null)
+				direct.forEach(c -> c.accept(e));
 
-		// Send the event remotely
-		if (!alreadySent && remoteListener.containsKey(type)) {
-			remoteEvents.get(remoteListener.get(type)).add(e);
-			return true;
+			List<SimTask> listener = byPartitionAndType.get(address);
+			if (listener != null)
+				listener.forEach(t -> t.add(e));
+
+			// Send the event remotely
+			if (remoteListener.containsKey(type)) {
+				remoteEvents.get(remoteListener.get(type)).add(e);
+				return;
+			}
 		}
 
-		return false;
+	}
+
+	private final ConcurrentHashMap<Long, LongArrayList> addressCache = new ConcurrentHashMap<>();
+
+	private LongArrayList buildAddressCache(final Class<?> eventClazz) {
+
+		Class<?> clazz = eventClazz;
+		var part = ctxPartition.get().get();
+		var result = new LongArrayList();
+
+		while (Event.class.isAssignableFrom(clazz)) {
+			var type = this.serializer.getType(clazz);
+			var handlerAddress = MessageBroker.address(part, type);
+			if (directListener.containsKey(handlerAddress) || byPartitionAndType.containsKey(handlerAddress))
+				result.add(handlerAddress);
+
+			clazz = clazz.getSuperclass();
+		}
+
+		return result;
 	}
 
 	@Override

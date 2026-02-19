@@ -68,7 +68,7 @@ public final class DefaultEventHandlerTask extends EventHandlerTask {
 	public DefaultEventHandlerTask(EventHandler handler, int partition, int totalPartitions,
 								   DistributedEventsManager em, SerializationProvider serializer,
 								   @Nullable AtomicInteger counter) {
-		super(handler, partition, supportsAsync(handler));
+		super(handler, partition, supportsAsync(handler), serializer);
 		this.totalPartitions = totalPartitions;
 		this.counter = counter;
 		this.pattern = buildConsumers(serializer, em.getComputeNode().isDistributed());
