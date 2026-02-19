@@ -299,32 +299,6 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 			throw new IllegalArgumentException("No processor found for message: " + msg);
 		}
 		consumer.accept(msg);
-
-		/*
-		var consumerData = consumers.get(msg.getType());
-		if (consumerData != null) {
-			var clazz = msg.getClass().getSuperclass();
-			var superType = this.serializer.getType(clazz);
-		}
-
-
-		var consumer = consumers.get(msg.getType());
-		var clazz = msg.getClass();
-
-
-
-
-
-		if (consumer == null) {
-			consumer = consumers.get(Event.ANY_TYPE);
-		}
-		if (consumer == null) {
-			throw new IllegalArgumentException("No processor found for message: " + msg);
-		}
-
-		consumer.accept(msg);
-
-		 */
 	}
 
 	private Consumer<Message> findConsumer(Message msg) {
