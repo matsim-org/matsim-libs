@@ -44,12 +44,15 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 	/**
 	 * This maps the messages types to corresponding function on the LP used for processing.
 	 */
+	//protected final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 	protected final Int2ObjectMap<Consumer<Message>> consumers = new Int2ObjectOpenHashMap<>();
 
 	/**
 	 * Stores which events are accepted for each type.
 	 */
 	protected final Int2ObjectMap<EventSource> eventSources = new Int2ObjectOpenHashMap<>();
+
+	protected final SerializationProvider serializer;
 
 	/**
 	 * Runtimes of each iteration.
@@ -102,10 +105,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		this.future = future;
 	}
 
-	public EventHandlerTask(EventHandler handler, int partition, boolean async) {
+	public EventHandlerTask(EventHandler handler, int partition, boolean async, SerializationProvider serializer) {
 		this.handler = handler;
 		this.partition = partition;
 		this.async = async;
+		this.serializer = serializer;
 	}
 
 	@Override
@@ -158,22 +162,24 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				if ((!methods[0].getName().equals("process") && !methods[0].getName().equals("handleEvent")) || methods[0].getParameterCount() != 1)
 					continue;
 
-				Class<?> msgType = methods[0].getParameterTypes()[0];
-				boolean isEvent = Event.class.isAssignableFrom(msgType);
-				int type = serializer.getType(msgType);
-
+				Class<?> msgClass = methods[0].getParameterTypes()[0];
+				boolean isEvent = Event.class.isAssignableFrom(msgClass);
 				String target = isEvent ? "handleEvent" : "process";
+				Method consumerMethod = getConsumerMethod(target, msgClass);
+				Consumer<Message> consumer = createConsumer(handler, msgClass, target);
 
-				Method consumerMethod = getConsumerMethod(target, msgType);
+				// register this handler for the given message and all its subtypes.
+				for (var type : serializer.getAssignableTypes(msgClass)) {
+					consumers.put(type, consumer);
+				}
 
-				consumers.put(type, (Consumer<Message>) createConsumer(handler, msgType, target));
 				if (isEvent) {
 					EventSource source = node ? EventSource.NODE : partition ? EventSource.PARTITION : EventSource.GLOBAL;
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
 						source = consumerMethod.getAnnotation(EventsFrom.class).value();
 					}
-
-					eventSources.put(type, source);
+					var msgType = serializer.getType(msgClass);
+					eventSources.put(msgType, source);
 				}
 			}
 		}
@@ -219,7 +225,7 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		}
 	}
 
-	private Consumer<? extends Message> createConsumer(Object handler, Class<?> msgType, String target) {
+	private Consumer<Message> createConsumer(Object handler, Class<?> msgType, String target) {
 		try {
 			return LambdaUtils.createConsumer(handler, msgType, target);
 		} catch (Exception e) {
@@ -293,12 +299,8 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 
 		var consumer = consumers.get(msg.getType());
 		if (consumer == null) {
-			consumer = consumers.get(Event.ANY_TYPE);
-		}
-		if (consumer == null) {
 			throw new IllegalArgumentException("No processor found for message: " + msg);
 		}
-
 		consumer.accept(msg);
 	}
 

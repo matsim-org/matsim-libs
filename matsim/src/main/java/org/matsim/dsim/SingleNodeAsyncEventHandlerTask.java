@@ -39,7 +39,7 @@ public final class SingleNodeAsyncEventHandlerTask extends EventHandlerTask {
 
 	public SingleNodeAsyncEventHandlerTask(EventHandler handler, DistributedEventsManager manager, int partition,
 										   SerializationProvider serializer) {
-		super(handler, partition, true);
+		super(handler, partition, true, serializer);
 		buildConsumers(serializer, manager.getComputeNode().isDistributed());
 		this.manager = manager;
 	}
