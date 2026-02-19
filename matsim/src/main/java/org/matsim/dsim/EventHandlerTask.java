@@ -340,8 +340,11 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 		while (consumer == null && Event.class.isAssignableFrom(clazz)) {
 
 			clazz = clazz.getSuperclass();
-			var type = serializer.getType(clazz);
-			consumer = consumers.get(type);
+
+			if (serializer.hasType(clazz)) {
+				var type = serializer.getType(clazz);
+				consumer = consumers.get(type);
+			}
 		}
 		return consumer;
 	}
