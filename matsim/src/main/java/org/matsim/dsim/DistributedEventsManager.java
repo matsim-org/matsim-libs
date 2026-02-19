@@ -204,6 +204,9 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	private void addTaskForPart(EventHandlerTask task, int part) {
+		// bust cache if a new handler is added.
+		addressCache.clear();
+
 		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
@@ -235,6 +238,7 @@ public final class DistributedEventsManager implements EventsManager {
 		tasks.remove(task);
 		broker.deregister(task);
 		executor.deregister(task);
+		addressCache.clear();
 	}
 
 	/**
