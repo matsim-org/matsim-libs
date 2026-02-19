@@ -155,6 +155,10 @@ public class SerializationProvider {
 		return type == Event.ANY_TYPE || classes.containsKey(type);
 	}
 
+	public boolean hasType(Class<?> msgClass) {
+		return msgClass == Event.class || types.containsKey(msgClass);
+	}
+
 	public int getType(Class<?> msgType) {
 		if (msgType == Event.class) {
 			return Event.ANY_TYPE;

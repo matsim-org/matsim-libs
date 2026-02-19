@@ -161,15 +161,15 @@ public sealed abstract class EventHandlerTask implements SimTask permits Default
 				if ((!methods[0].getName().equals("process") && !methods[0].getName().equals("handleEvent")) || methods[0].getParameterCount() != 1)
 					continue;
 
-				Class<?> msgType = methods[0].getParameterTypes()[0];
-				boolean isEvent = Event.class.isAssignableFrom(msgType);
-				int type = serializer.getType(msgType);
+				Class<?> msgClass = methods[0].getParameterTypes()[0];
+				boolean isEvent = Event.class.isAssignableFrom(msgClass);
+				int type = serializer.getType(msgClass);
 
 				String target = isEvent ? "handleEvent" : "process";
 
-				Method consumerMethod = getConsumerMethod(target, msgType);
+				Method consumerMethod = getConsumerMethod(target, msgClass);
 
-				consumers.put(type, (Consumer<Message>) createConsumer(handler, msgType, target));
+				consumers.put(type, (Consumer<Message>) createConsumer(handler, msgClass, target));
 				if (isEvent) {
 					EventSource source = node ? EventSource.NODE : partition ? EventSource.PARTITION : EventSource.GLOBAL;
 					if (consumerMethod.isAnnotationPresent(EventsFrom.class)) {
