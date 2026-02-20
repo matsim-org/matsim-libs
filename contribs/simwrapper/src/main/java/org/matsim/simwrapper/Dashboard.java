@@ -16,7 +16,7 @@ public interface Dashboard {
 	/**
 	 * Method to configure a dashboard.
 	 */
-	void configure(Header header, Layout layout);
+	void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup);
 
 	/**
 	 * Dashboards are ordered by priority, while higher priority means they appear in the front.
@@ -50,8 +50,8 @@ public interface Dashboard {
 		}
 
 		@Override
-		public void configure(Header header, Layout layout) {
-			delegate.configure(header, layout);
+		public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
+			delegate.configure(header, layout, configGroup);
 			if (title != null)
 				header.title = title;
 			if (description != null)

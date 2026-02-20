@@ -3,10 +3,7 @@ package org.matsim.contrib.drt.extension.dashboards;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Data;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.*;
 import tech.tablesaw.plotly.components.Axis;
 import tech.tablesaw.plotly.traces.BarTrace;
@@ -68,7 +65,7 @@ public class DrtDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = getTitle();
 		header.description = "Overview for the demand-responsive mode '" + drtConfigGroup.getMode() + "'";

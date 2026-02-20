@@ -8,14 +8,26 @@ import org.matsim.simwrapper.Layout;
 import org.matsim.simwrapper.viz.*;
 
 import java.util.List;
+import org.matsim.simwrapper.SimWrapperConfigGroup;
+import org.matsim.simwrapper.viz.CarrierViewer;
 
 /**
  * Standard dashboard for the carrier viewer.
  */
 public class CarrierDashboard implements Dashboard  {
+	private final String carrierFileName;
+
+	public CarrierDashboard(String carrierFileName) {
+		this.carrierFileName = carrierFileName;
+	}
+
+	public CarrierDashboard() {
+		this.carrierFileName = "(*.)?output_carriers.xml.gz";
+	}
+
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.title = "Carrier Viewer";
 		header.tab = "";
@@ -83,7 +95,7 @@ public class CarrierDashboard implements Dashboard  {
 			viz.network = data.withContext("all").compute(CreateAvroNetwork.class, "network.avro",
 				"--mode-filter", "", "--shp", "none");
 
-			viz.carriers = data.output("(*.)?output_carriers.xml.gz");
+			viz.carriers = data.output(carrierFileName);
 		});
 
 		layout.row("veh-dist-violin", "Tour Analysis").el(Plotly.class, (viz, data) -> {

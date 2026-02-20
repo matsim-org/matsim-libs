@@ -30,13 +30,13 @@ class TripAnalysisTest {
 
 		new TripAnalysis().execute("--input-trips", Path.of(utils.getInputDirectory(), "trips.csv").toString(),
 			"--input-persons", Path.of(utils.getInputDirectory(), "persons.csv").toString(),
-			"--output-mode-share", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString(),
-			"--output-mode-share-per-dist", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_per_dist.csv").toString(),
-			"--output-mode-users", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_users.csv").toString(),
-			"--output-trip-stats", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats.csv").toString(),
+			"--output-mode-share-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_%s.csv").toString(),
+			"--output-mode-share-per-dist-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_per_dist_%s.csv").toString(),
+			"--output-mode-users-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_users_%s.csv").toString(),
+			"--output-trip-stats-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats_%s.csv").toString(),
 			"--output-population-trip-stats", Path.of(utils.getOutputDirectory(), "analysis", "population", "population_trip_stats.csv").toString(),
-			"--output-trip-purposes-by-hour", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_purposes_by_hour.csv").toString(),
-			"--output-mode-share-distance-distribution", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_distance_distribution.csv").toString(),
+			"--output-trip-purposes-by-hour-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_purposes_by_hour_%s.csv").toString(),
+			"--output-mode-share-distance-distribution-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_distance_distribution_%s.csv").toString(),
 			"--output-mode-choices", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choices.csv").toString(),
 			"--output-mode-choice-evaluation", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choice_evaluation.csv").toString(),
 			"--output-mode-choice-evaluation-per-mode", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choice_evaluation_per_mode.csv").toString(),
@@ -46,13 +46,13 @@ class TripAnalysisTest {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv")
-			.isDirectoryContaining("glob:**mode_share_per_dist.csv")
-			.isDirectoryContaining("glob:**mode_users.csv")
+			.isDirectoryContaining("glob:**trip_stats_total.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv")
+			.isDirectoryContaining("glob:**mode_share_per_dist_total.csv")
+			.isDirectoryContaining("glob:**mode_users_total.csv")
 			.isDirectoryContaining("glob:**population_trip_stats.csv")
-			.isDirectoryContaining("glob:**trip_purposes_by_hour.csv")
-			.isDirectoryContaining("glob:**mode_share_distance_distribution.csv");
+			.isDirectoryContaining("glob:**trip_purposes_by_hour_total.csv")
+			.isDirectoryContaining("glob:**mode_share_distance_distribution_total.csv");
 
 		Path.of(utils.getInputDirectory()).toFile().delete();
 	}
@@ -65,13 +65,13 @@ class TripAnalysisTest {
 		new TripAnalysis().execute("--person-filter", "subpopulation=person",
 			"--input-trips", Path.of(utils.getInputDirectory(), "trips.csv").toString(),
 			"--input-persons", Path.of(utils.getInputDirectory(), "persons.csv").toString(),
-			"--output-mode-share", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString(),
-			"--output-mode-share-per-dist", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_per_dist.csv").toString(),
-			"--output-mode-users", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_users.csv").toString(),
-			"--output-trip-stats", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats.csv").toString(),
+			"--output-mode-share-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_%s.csv").toString(),
+			"--output-mode-share-per-dist-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_per_dist_%s.csv").toString(),
+			"--output-mode-users-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_users_%s.csv").toString(),
+			"--output-trip-stats-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats_%s.csv").toString(),
 			"--output-population-trip-stats", Path.of(utils.getOutputDirectory(), "analysis", "population", "population_trip_stats.csv").toString(),
-			"--output-trip-purposes-by-hour", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_purposes_by_hour.csv").toString(),
-			"--output-mode-share-distance-distribution", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_distance_distribution.csv").toString(),
+			"--output-trip-purposes-by-hour-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_purposes_by_hour_%s.csv").toString(),
+			"--output-mode-share-distance-distribution-%s", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_distance_distribution_%s.csv").toString(),
 			"--output-mode-choices", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choices.csv").toString(),
 			"--output-mode-choice-evaluation", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choice_evaluation.csv").toString(),
 			"--output-mode-choice-evaluation-per-mode", Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_choice_evaluation_per_mode.csv").toString(),
@@ -81,18 +81,18 @@ class TripAnalysisTest {
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv")
-			.isDirectoryContaining("glob:**mode_share_per_dist.csv")
-			.isDirectoryContaining("glob:**mode_users.csv")
+			.isDirectoryContaining("glob:**trip_stats_total.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv")
+			.isDirectoryContaining("glob:**mode_share_per_dist_total.csv")
+			.isDirectoryContaining("glob:**mode_users_total.csv")
 			.isDirectoryContaining("glob:**population_trip_stats.csv")
-			.isDirectoryContaining("glob:**trip_purposes_by_hour.csv")
-			.isDirectoryContaining("glob:**mode_share_distance_distribution.csv");
+			.isDirectoryContaining("glob:**trip_purposes_by_hour_total.csv")
+			.isDirectoryContaining("glob:**mode_share_distance_distribution_total.csv");
 
-		Table modeShare = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString()))
+		Table modeShare = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_total.csv").toString()))
 			.columnTypesPartial(Map.of("person", ColumnType.STRING))
 			.sample(false)
-			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString())).build());
+			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_total.csv").toString())).build());
 
 		StringColumn mainMode = modeShare.stringColumn("main_mode");
 

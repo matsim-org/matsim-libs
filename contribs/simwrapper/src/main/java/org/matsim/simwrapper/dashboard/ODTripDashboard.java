@@ -2,10 +2,7 @@ package org.matsim.simwrapper.dashboard;
 
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.application.analysis.population.FilterTripModes;
-import org.matsim.simwrapper.Dashboard;
-import org.matsim.simwrapper.Data;
-import org.matsim.simwrapper.Header;
-import org.matsim.simwrapper.Layout;
+import org.matsim.simwrapper.*;
 import org.matsim.simwrapper.viz.Hexagons;
 
 import java.util.Set;
@@ -31,7 +28,7 @@ public class ODTripDashboard implements Dashboard {
 	}
 
 	@Override
-	public void configure(Header header, Layout layout) {
+	public void configure(Header header, Layout layout, SimWrapperConfigGroup configGroup) {
 
 		header.tab = "OD";
 		header.title = "OD Trips";

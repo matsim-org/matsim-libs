@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.smallScaleCommercialTrafficGeneration.data.GetGenerationRates;
+import org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.StructuralAttribute;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -43,10 +44,10 @@ public class TrafficVolumeGeneration {
 	private static final Logger log = LogManager.getLogger(TrafficVolumeGeneration.class);
 	private static final Joiner JOIN = Joiner.on("\t");
 
-	private static Map<Integer, Map<String, Double>> generationRatesStart = new HashMap<>();
-	private static Map<Integer, Map<String, Double>> generationRatesStop = new HashMap<>();
-	private static Map<String, Map<String, Double>> commitmentRatesStart = new HashMap<>();
-	private static Map<String, Map<String, Double>> commitmentRatesStop = new HashMap<>();
+	private static Map<Integer, Map<StructuralAttribute, Double>> generationRatesStart = new HashMap<>();
+	private static Map<Integer, Map<StructuralAttribute, Double>> generationRatesStop = new HashMap<>();
+	private static Map<String, Map<StructuralAttribute, Double>> commitmentRatesStart = new HashMap<>();
+	private static Map<String, Map<StructuralAttribute, Double>> commitmentRatesStop = new HashMap<>();
 
 	public record TrafficVolumeKey(String zone, String modeORvehType) {}
 
@@ -65,7 +66,7 @@ public class TrafficVolumeGeneration {
 	 * @return trafficVolume_start
 	 */
 	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_start(
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, Path output, double sample,
 		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_start = new HashMap<>();
@@ -89,7 +90,7 @@ public class TrafficVolumeGeneration {
 	 * @return trafficVolume_stop
 	 */
 	static Map<TrafficVolumeKey, Object2DoubleMap<Integer>> createTrafficVolume_stop(
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone, Path output, double sample,
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, Path output, double sample,
 		List<String> modesORvehTypes, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType trafficType) throws MalformedURLException {
 
 		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume_stop = new HashMap<>();
@@ -112,12 +113,12 @@ public class TrafficVolumeGeneration {
 	 * @param sample sample size
 	 */
 	private static void calculateTrafficVolumePerZone(
-			Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
-			Map<String, Object2DoubleMap<String>> resultingDataPerZone, String volumeType, double sample,
-			List<String> modesORvehTypes) {
+		Map<TrafficVolumeKey, Object2DoubleMap<Integer>> trafficVolume,
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone, String volumeType, double sample,
+		List<String> modesORvehTypes) {
 
-		Map<Integer, Map<String, Double>> generationRates;
-		Map<String, Map<String, Double>> commitmentRates;
+		Map<Integer, Map<StructuralAttribute, Double>> generationRates;
+		Map<String, Map<StructuralAttribute, Double>> commitmentRates;
 
 		if (volumeType.equals("start")) {
 			generationRates = generationRatesStart;
@@ -137,14 +138,20 @@ public class TrafficVolumeGeneration {
 					if (resultingDataPerZone.get(zoneId).isEmpty())
 						trafficValuesPerPurpose.merge(purpose, 0., Double::sum);
 					else
-						for (String category : resultingDataPerZone.get(zoneId).keySet()) {
+						for (StructuralAttribute category : resultingDataPerZone.get(zoneId).keySet()) {
+							if (!generationRates.get(purpose).containsKey(category))
+								continue;
 							double commitmentFactor;
 							if (modeORvehType.equals("total"))
 								commitmentFactor = 1;
-							else
-								commitmentFactor = commitmentRates
+							else {
+								if (!commitmentRates.get(purpose + "_" + modeORvehType.substring(modeORvehType.length() - 1)).containsKey(category))
+									commitmentFactor = 0;
+								else
+									commitmentFactor = commitmentRates
 										.get(purpose + "_" + modeORvehType.substring(modeORvehType.length() - 1))
 										.get(category);
+							}
 							double generationFactor = generationRates.get(purpose).get(category);
 							double newValue = resultingDataPerZone.get(zoneId).getDouble(category) * generationFactor
 									* commitmentFactor;

@@ -57,10 +57,10 @@ public class DashboardTests {
 			// Stuck agents
 			.isDirectoryRecursivelyContaining("glob:**stuck_agents.csv")
 			// Trip stats
-			.isDirectoryRecursivelyContaining("glob:**trip_stats.csv")
-			.isDirectoryRecursivelyContaining("glob:**mode_share.csv")
+			.isDirectoryRecursivelyContaining("glob:**trip_stats_total.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_share_total.csv")
 			.isDirectoryRecursivelyContaining("glob:**mode_share_per_purpose.csv")
-			.isDirectoryRecursivelyContaining("glob:**mode_shift.csv")
+			.isDirectoryRecursivelyContaining("glob:**mode_shift_total.csv")
 			// Traffic stats
 			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_link_daily.csv")
 			.isDirectoryRecursivelyContaining("glob:**traffic_stats_by_road_type_and_hour.csv")
@@ -76,12 +76,12 @@ public class DashboardTests {
 
 		run(new TripDashboard().setAnalysisArgs("--person-filter", "subpopulation=person"));
 		Assertions.assertThat(out)
-			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv");
+			.isDirectoryContaining("glob:**trip_stats_total.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv");
 
-		Table tripStats = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats.csv").toString()))
+		Table tripStats = Table.read().csv(CsvReadOptions.builder(IOUtils.getBufferedReader(Path.of(utils.getOutputDirectory(), "analysis", "population", "trip_stats_total.csv").toString()))
 			.sample(false)
-			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share.csv").toString())).build());
+			.separator(CsvOptions.detectDelimiter(Path.of(utils.getOutputDirectory(), "analysis", "population", "mode_share_total.csv").toString())).build());
 
 		Assertions.assertThat(tripStats.containsColumn("freight")).isFalse();
 	}
@@ -91,19 +91,52 @@ public class DashboardTests {
 
 		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
 
-		TripDashboard dashboard = new TripDashboard("mode_share_ref.csv", "mode_share_per_dist_ref.csv", "mode_users_ref.csv")
-			.withGroupedRefData("mode_share_per_group_dist_ref.csv")
-			.withDistanceDistribution("mode_share_distance_distribution.csv")
+		TripDashboard dashboard = new TripDashboard("person_mode_share_ref.csv", "person_mode_share_per_dist_ref.csv", "person_mode_users_ref.csv")
+			.withGroupedRefData("person_mode_share_per_group_dist_ref.csv")
+			.withDistanceDistribution("person_mode_share_distance_distribution.csv")
 			.withChoiceEvaluation(true);
 
 		run(dashboard);
 		Assertions.assertThat(out)
 			.isDirectoryContaining("glob:**trip_stats.csv")
-			.isDirectoryContaining("glob:**mode_share.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv")
 			.isDirectoryContaining("glob:**mode_choices.csv")
 			.isDirectoryContaining("glob:**mode_choice_evaluation.csv")
 			.isDirectoryContaining("glob:**mode_confusion_matrix.csv");
 
+	}
+
+	@Test
+	void tripRef_withGroupsOfSubpopulations() {
+
+		Path out = Path.of(utils.getOutputDirectory(), "analysis", "population");
+
+		TripDashboard dashboard = new TripDashboard("person_mode_share_ref.csv", "person_mode_share_per_dist_ref.csv", "person_mode_users_ref.csv")
+			.withGroupedRefData("person_mode_share_per_group_dist_ref.csv")
+			.withDistanceDistribution("person_mode_share_distance_distribution.csv")
+			.withChoiceEvaluation(true)
+			.setGroupsOfSubpopulationsForPersonAnalysis("personPerson=person;personFreight=freight");
+
+		run(dashboard);
+		Assertions.assertThat(out)
+			.isDirectoryContaining("glob:**trip_stats.csv")
+			.isDirectoryContaining("glob:**mode_choices.csv")
+			.isDirectoryContaining("glob:**mode_choice_evaluation.csv")
+			.isDirectoryContaining("glob:**mode_confusion_matrix.csv")
+			.isDirectoryContaining("glob:**mode_share_total.csv")
+			.isDirectoryContaining("glob:**mode_share_personPerson.csv")
+			.isDirectoryContaining("glob:**mode_share_personFreight.csv")
+			.isDirectoryContaining("glob:**mode_share_per_dist_total.csv")
+			.isDirectoryContaining("glob:**mode_share_per_dist_personPerson.csv")
+			.isDirectoryContaining("glob:**mode_share_per_dist_personFreight.csv")
+			.isDirectoryContaining("glob:**mode_share_distance_distribution_personPerson.csv")
+			.isDirectoryContaining("glob:**mode_share_distance_distribution_personFreight.csv")
+			.isDirectoryContaining("glob:**trip_purposes_by_hour_total.csv")
+			.isDirectoryContaining("glob:**trip_purposes_by_hour_personPerson.csv")
+			.isDirectoryContaining("glob:**trip_purposes_by_hour_personFreight.csv")
+			.isDirectoryContaining("glob:**trip_stats_total.csv")
+			.isDirectoryContaining("glob:**trip_stats_personPerson.csv")
+			.isDirectoryContaining("glob:**trip_stats_personFreight.csv");
 	}
 
 	@Test

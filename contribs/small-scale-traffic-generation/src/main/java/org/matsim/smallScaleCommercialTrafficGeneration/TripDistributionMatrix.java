@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.application.options.ShpOptions.Index;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.jsprit.NetworkBasedTransportCosts;
 import org.matsim.smallScaleCommercialTrafficGeneration.TrafficVolumeGeneration.TrafficVolumeKey;
@@ -393,17 +392,22 @@ public class TripDistributionMatrix {
 	}
 
 	/**
-	 * @param startZone     start Zone
-	 * @param modeORvehType selected mode or vehicle type
-	 * @param purpose       selected purpose
-	 * @param smallScaleCommercialTrafficType   goodsTraffic or commercialPersonTraffic
+	 * @param startZone                       start Zone
+	 * @param modeORvehType                   selected mode or vehicle type
+	 * @param purpose                         selected purpose
+	 * @param smallScaleCommercialTrafficType goodsTraffic or commercialPersonTraffic
+	 * @param occupancyRate                   occupancy rates for the specific mode or vehicle type
 	 * @return numberOfTrips
 	 */
-	int getSumOfServicesForStartZone(String startZone, String modeORvehType, int purpose, GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType) {
+	int getSumOfServicesForStartZone(String startZone, String modeORvehType, int purpose,
+									 GenerateSmallScaleCommercialTrafficDemand.SmallScaleCommercialTrafficType smallScaleCommercialTrafficType,
+									 double occupancyRate) {
 		int numberOfTrips = 0;
 		ArrayList<String> zones = getListOfZones();
-		for (String stopZone : zones)
-			numberOfTrips = numberOfTrips + matrixCache.get(makeKey(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType));
+		for (String stopZone : zones) {
+			int trips = getTripDistributionValue(startZone, stopZone, modeORvehType, purpose, smallScaleCommercialTrafficType);
+			numberOfTrips += (int) Math.ceil(trips / occupancyRate);
+		}
 		return numberOfTrips;
 	}
 

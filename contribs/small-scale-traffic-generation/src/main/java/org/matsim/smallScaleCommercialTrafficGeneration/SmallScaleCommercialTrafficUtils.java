@@ -42,6 +42,7 @@ import org.matsim.application.options.ShpOptions;
 import org.matsim.application.options.ShpOptions.Index;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.CarriersUtils;
@@ -55,10 +56,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Utils for the SmallScaleFreightTraffic
@@ -154,8 +154,7 @@ public class SmallScaleCommercialTrafficUtils {
 						NetworkUtils.findLinkInOppositeDirection(possibleLink).getId().toString())))
 						continue searchLink;
 				}
-			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-				(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+			double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 			if (distance < minDistance) {
 				newLink = possibleLink.getId();
 				minDistance = distance;
@@ -163,8 +162,7 @@ public class SmallScaleCommercialTrafficUtils {
 		}
 		if (newLink == null && numberOfPossibleLinks > 0) {
 			for (Link possibleLink : linksPerZone.get(zone).values()) {
-				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,
-					(Coord) possibleLink.getAttributes().getAttribute("newCoord"));
+				double distance = NetworkUtils.getEuclideanDistance(centroidPointOfBuildingPolygon,	possibleLink.getCoord());
 				if (distance < minDistance) {
 					newLink = possibleLink.getId();
 					minDistance = distance;
@@ -188,6 +186,10 @@ public class SmallScaleCommercialTrafficUtils {
 
 
 		for (Carrier carrier : CarriersUtils.addOrGetCarriers(scenario).getCarriers().values()) {
+			if (carrier.getSelectedPlan() == null){
+				log.warn("Carrier {} has no selected plan. Therefore, no population plans are created for this carrier.", carrier.getId());
+				continue;
+			}
 			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
 
 				Plan plan = popFactory.createPlan();
@@ -236,6 +238,9 @@ public class SmallScaleCommercialTrafficUtils {
 				if (carrier.getAttributes().getAsMap().containsKey("tourStartArea"))
 					newPerson.getAttributes().putAttribute("tourStartArea",
 						carrier.getAttributes().getAttribute("tourStartArea"));
+				if (carrier.getAttributes().getAsMap().containsKey("startCategory"))
+					newPerson.getAttributes().putAttribute("startCategory",
+						carrier.getAttributes().getAttribute("startCategory"));
 				newPerson.getAttributes().putAttribute("carrierId", carrier.getId().toString());
 				VehicleUtils.insertVehicleIdsIntoPersonAttributes(newPerson, Map.of(mode, vehicleId));
 				VehicleUtils.insertVehicleTypesIntoPersonAttributes(newPerson, Map.of(mode, tour.getVehicle().getType().getId()));
@@ -259,7 +264,7 @@ public class SmallScaleCommercialTrafficUtils {
 			log.warn(
 				"You selected {} of different plan variants per agent. This is invalid. Please check the input parameter. The default is 1 and is now set for the output.",
 				numberOfPlanVariantsPerAgent);
-
+		ProjectionUtils.putCRS(population, scenario.getConfig().global().getCoordinateSystem());
 		PopulationUtils.writePopulation(population, outputPopulationFile);
 		log.info("Population with {} persons created including the plans in {}.", population.getPersons().size(), outputPopulationFile);
 	}
@@ -290,12 +295,12 @@ public class SmallScaleCommercialTrafficUtils {
 	 * @return 								resultingDataPerZone
 	 * @throws IOException 					if the file is not found
 	 */
-	static Map<String, Object2DoubleMap<String>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
+	static Map<String, Object2DoubleMap<StructuralAttribute>> readDataDistribution(Path pathToDataDistributionToZones) throws IOException {
 		if (!Files.exists(pathToDataDistributionToZones)) {
 			log.error("Required data per zone file {} not found", pathToDataDistributionToZones);
 		}
 
-		Map<String, Object2DoubleMap<String>> resultingDataPerZone = new HashMap<>();
+		Map<String, Object2DoubleMap<StructuralAttribute>> resultingDataPerZone = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(pathToDataDistributionToZones.toString())) {
 			CSVParser parse = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter('\t').setHeader()
 				.setSkipHeaderRecord(true).get().parse(reader);
@@ -304,7 +309,12 @@ public class SmallScaleCommercialTrafficUtils {
 				String zoneID = record.get("zoneID");
 				resultingDataPerZone.put(zoneID, new Object2DoubleOpenHashMap<>());
 				for (int n = 2; n < parse.getHeaderMap().size(); n++) {
-					resultingDataPerZone.get(zoneID).mergeDouble(parse.getHeaderNames().get(n),
+					Optional<StructuralAttribute> category = StructuralAttribute.fromLabel(parse.getHeaderNames().get(n));
+					if (category.isEmpty()) {
+						log.warn("The category '{}' in the data distribution file is not known. Please check the input file and the defined categories.", parse.getHeaderNames().get(n));
+						continue;
+					}
+					resultingDataPerZone.get(zoneID).mergeDouble(category.get(),
 						Double.parseDouble(record.get(n)), Double::sum);
 				}
 			}
@@ -355,5 +365,28 @@ public class SmallScaleCommercialTrafficUtils {
 				return costs;
 			}
 		};
+	}
+
+	public enum StructuralAttribute {
+		INHABITANTS("Inhabitants"),
+		EMPLOYEE("Employee"),
+		EMPLOYEE_PRIMARY("Employee Primary Sector"),
+		EMPLOYEE_CONSTRUCTION("Employee Construction"),
+		EMPLOYEE_SECONDARY("Employee Secondary Sector Rest"),
+		EMPLOYEE_RETAIL("Employee Retail"),
+		EMPLOYEE_TRAFFIC("Employee Traffic/Parcels"),
+		EMPLOYEE_TERTIARY("Employee Tertiary Sector Rest");
+
+		private final String label;
+
+		StructuralAttribute(String label) { this.label = label; }
+		public String getLabel() { return label; }
+
+		private static final Map<String, StructuralAttribute> BY_LABEL =
+			Arrays.stream(values()).collect(Collectors.toMap(StructuralAttribute::getLabel, e -> e));
+
+		public static Optional<StructuralAttribute> fromLabel(String label) {
+			return Optional.ofNullable(BY_LABEL.get(label));
+		}
 	}
 }

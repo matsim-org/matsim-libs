@@ -180,7 +180,7 @@ public final class SimWrapper {
 			YAML yaml = new YAML();
 			Layout layout = new Layout(d.context());
 
-			d.configure(yaml.header, layout);
+			d.configure(yaml.header, layout, this.configGroup);
 			yaml.layout = layout.create(data);
 			yaml.subtabs = layout.getTabs();
 
