@@ -24,10 +24,10 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	private static final double BIKE_PCU = 0.25;
 	private static final Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
-			OsmTags.TRUNK, OsmTags.TRUNK_LINK));
+		OsmTags.TRUNK, OsmTags.TRUNK_LINK));
 	private static final Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
 //			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS // Steps should only be allowed if there are ramps.
-			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS_RAMP, OsmTags.STEPS_RAMP_BICYCLE
+		OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS_RAMP, OsmTags.STEPS_RAMP_BICYCLE
 	));
 	private final SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
@@ -41,6 +41,14 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	private static void handleLink(Link link, Map<String, String> tags, SupersonicOsmNetworkReader.Direction direction, AfterLinkCreated outfacingCallback) {
 
+
+		// >>> NEU: filtere unerwünschte footway/pedestrian sofort weg
+		if (isUnwantedFootwayOrPedestrian(tags)) {
+			link.setAllowedModes(Set.of());
+			link.setCapacity(0);
+			return; // ganz wichtig: Callback NICHT aufrufen
+		}
+		
 		String highwayType = tags.get(OsmTags.HIGHWAY);
 
 		setAllowedModes(link, highwayType);
@@ -51,6 +59,15 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 		outfacingCallback.accept(link, tags, direction);
 	}
+
+	private static boolean isUnwantedFootwayOrPedestrian(Map<String, String> tags) {
+		String h = tags.get(OsmTags.HIGHWAY);
+		if (!(OsmTags.FOOTWAY.equals(h) || OsmTags.PEDESTRIAN.equals(h))) return false;
+
+		String bicycle = tags.get(OsmTags.BICYCLE);
+		return !("yes".equals(bicycle) || "designated".equals(bicycle));
+	}
+
 
 	private static void setAllowedModes(Link link, String highwayType) {
 		HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
@@ -65,7 +82,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		if (tags.containsKey(OsmTags.SURFACE)) {
 			link.getAttributes().putAttribute(OsmTags.SURFACE, tags.get(OsmTags.SURFACE));
 		} else if (highwayType.equals(OsmTags.PRIMARY) || highwayType.equals(OsmTags.PRIMARY_LINK)
-				|| highwayType.equals(OsmTags.SECONDARY) || highwayType.equals(OsmTags.SECONDARY_LINK)) {
+			|| highwayType.equals(OsmTags.SECONDARY) || highwayType.equals(OsmTags.SECONDARY_LINK)) {
 			link.getAttributes().putAttribute(OsmTags.SURFACE, "asphalt");
 		}
 	}

@@ -12,6 +12,7 @@ import java.util.Set;
 
 public final class BicycleLinkPolicy {
 
+	public static final String BICYCLE_MODE = TransportMode.bike;  //"bicycle"; // oder "bike"
 	private final BicycleInfraClassifier classifier;
 	private final TagCopy tagCopy;
 
@@ -20,7 +21,7 @@ public final class BicycleLinkPolicy {
 		this.tagCopy = tagCopy;
 	}
 
-	public void apply(Link link, Map<String,String> tags, Direction direction) {
+	public void apply(Link link, Map<String, String> tags, Direction direction) {
 
 		// 0) optional: OSM tags kopieren (nur wenn du das wirklich brauchst)
 		tagCopy.copy(link, tags);
@@ -28,6 +29,16 @@ public final class BicycleLinkPolicy {
 		// 1) bicycle_infra
 		String infra = classifier.classify(tags, direction);
 		link.getAttributes().putAttribute("bicycle_infra", infra);
+
+		/// / new
+		enforceFootwayPedestrianWhitelist(link, tags);
+		if (link.getAllowedModes().isEmpty()) return; // optional: früh raus
+
+		if ("no".equals(tags.get("bicycle"))) {
+			kill(link);          // <- statt nur removeMode(...)
+			return;
+		}
+
 
 //		// 2) infra NONE -> bike raus
 //		if ("NONE".equals(infra)) {
@@ -39,7 +50,7 @@ public final class BicycleLinkPolicy {
 
 		// 4) bicycle=no -> bike raus + ggf. _bike-reverse deaktivieren
 		if ("no".equals(tags.get("bicycle"))) {
-			removeMode(link, TransportMode.bike);
+			removeMode(link, BICYCLE_MODE);
 			if (link.getId().toString().endsWith("_bike-reverse")) {
 				link.setAllowedModes(Set.of());
 				link.setCapacity(0);
@@ -50,7 +61,7 @@ public final class BicycleLinkPolicy {
 		// 5) oneway-cleaning (nur path/cycleway/footway)
 		if (isBicycleOnewayRelevant(tags)) {
 			if (link.getId().toString().endsWith("r")) {
-				removeMode(link, TransportMode.bike);
+				removeMode(link, BICYCLE_MODE);
 			}
 			if (link.getId().toString().endsWith("_bike-reverse")) {
 				link.setAllowedModes(Set.of());
@@ -64,14 +75,34 @@ public final class BicycleLinkPolicy {
 //		if (origId != null) link.getAttributes().putAttribute("osm:way_id", origId);
 	}
 
-	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String,String> tags) {
+//	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String, String> tags) {
+//		String h = tags.get("highway");
+//		if (!("footway".equals(h) || "pedestrian".equals(h))) return;
+//
+//		String bicycle = tags.get("bicycle");
+//		boolean ok = "yes".equals(bicycle) || "designated".equals(bicycle);
+//		if (!ok) removeMode(link, BICYCLE_MODE);
+//	}
+
+	// ERSETZT deine alte Version:
+	private static void enforceFootwayPedestrianWhitelist(Link link, Map<String, String> tags) {
 		String h = tags.get("highway");
 		if (!("footway".equals(h) || "pedestrian".equals(h))) return;
 
 		String bicycle = tags.get("bicycle");
 		boolean ok = "yes".equals(bicycle) || "designated".equals(bicycle);
-		if (!ok) removeMode(link, TransportMode.bike);
+
+		if (!ok) {
+			kill(link);
+		}
 	}
+
+	// NEU hinzufügen (z.B. bei den Helpers):
+	private static void kill(Link link) {
+		link.setAllowedModes(Set.of());
+		link.setCapacity(0);
+	}
+
 
 	private static void removeMode(Link link, String mode) {
 		var modes = new HashSet<>(link.getAllowedModes());
@@ -79,7 +110,7 @@ public final class BicycleLinkPolicy {
 		link.setAllowedModes(modes);
 	}
 
-	private static boolean isBicycleOnewayRelevant(Map<String,String> tags) {
+	private static boolean isBicycleOnewayRelevant(Map<String, String> tags) {
 		String h = tags.get("highway");
 		boolean relevant = "path".equals(h) || "cycleway".equals(h) || "footway".equals(h);
 		if (!relevant) return false;
