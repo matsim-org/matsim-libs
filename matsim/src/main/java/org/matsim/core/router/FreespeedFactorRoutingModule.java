@@ -22,11 +22,13 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.RoutingConfigGroup.TeleportedModeParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -39,17 +41,18 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final LeastCostPathCalculator routeAlgo;
+	private final LeastCostPathCalculatorFactory calculatorFactory;
+	private final TravelTime travelTime;
+	private final TravelDisutility travelDisutility;
 	private final TeleportedModeParams params;
 
-	FreespeedFactorRoutingModule(
-			final String mode,
-			final PopulationFactory populationFactory,
-            final Network network,
-			final LeastCostPathCalculator routeAlgo,
-			TeleportedModeParams params ) {
+	FreespeedFactorRoutingModule(final String mode, final PopulationFactory populationFactory, final Network network,
+			final LeastCostPathCalculatorFactory calculatorFactory, final TravelTime travelTime, final TravelDisutility travelDisutility,
+			TeleportedModeParams params) {
 		this.network = network;
-		this.routeAlgo = routeAlgo;
+		this.calculatorFactory = calculatorFactory;
+		this.travelTime = travelTime;
+		this.travelDisutility = travelDisutility;
 		this.params = params;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
@@ -62,45 +65,45 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 		final double departureTime = request.getDepartureTime();
 		final Person person = request.getPerson();
 
-		Leg newLeg = this.populationFactory.createLeg( this.mode );
-		newLeg.setDepartureTime( departureTime );
+		Leg newLeg = this.populationFactory.createLeg(this.mode);
+		newLeg.setDepartureTime(departureTime);
 
-		double travTime = routeLeg(
-				person,
-				newLeg,
-				new FacilityWrapperActivity( fromFacility ),
-				new FacilityWrapperActivity( toFacility ),
-				departureTime);
+		double travTime = routeLeg(person, newLeg, new FacilityWrapperActivity(fromFacility), new FacilityWrapperActivity(toFacility), departureTime);
 
 		// otherwise, information may be lost
-		newLeg.setTravelTime( travTime );
+		newLeg.setTravelTime(travTime);
 
-		return Arrays.asList( newLeg );
+		return Arrays.asList(newLeg);
 	}
 
 	@Override
 	public String toString() {
-		return "[LegRouterWrapper: mode="+this.mode+"]";
+		return "[LegRouterWrapper: mode=" + this.mode + "]";
 	}
 
 	/* package (for tests) */ final double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		int travTime = 0;
 		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		final Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
+		if (fromLink == null)
+			throw new RuntimeException("fromLink missing.");
+		if (toLink == null)
+			throw new RuntimeException("toLink missing.");
 		if (toLink != fromLink) {
 			// do not drive/walk around, if we stay on the same link
-			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, depTime, person, null);
-			if (path == null) throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + ".");
+			// Create algo per-call for thread-safety
+			LeastCostPathCalculator routeAlgo = this.calculatorFactory.createPathCalculator(this.network, this.travelDisutility, this.travelTime);
+			Path path = routeAlgo.calcLeastCostPath(fromLink, toLink, depTime, person, null);
+			if (path == null)
+				throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + ".");
 
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
 			double speed = toLink.getFreespeed(depTime + path.travelTime);
 
 			// correct by speed limit:
-			if ( speed > params.getTeleportedModeFreespeedLimit() ) {
-				speed = params.getTeleportedModeFreespeedLimit() ;
+			if (speed > params.getTeleportedModeFreespeedLimit()) {
+				speed = params.getTeleportedModeFreespeedLimit();
 			}
 
 			// now correct the travel time:
@@ -110,7 +113,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
 
-			// yyyyyy the following should actually rather come from the route!  There is a RouteUtils.calcDistance( route ) .  kai, nov'16
+			// yyyyyy the following should actually rather come from the route! There is a RouteUtils.calcDistance( route ) . kai, nov'16
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
 				dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
@@ -130,8 +133,8 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		Leg r = (leg);
-		r.setTravelTime( depTime + travTime - r.getDepartureTime().seconds()); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		// yy something needs to be done once there are alternative implementations of the interface. kai, apr'10
+		r.setTravelTime(depTime + travTime - r.getDepartureTime().seconds());
 		return travTime;
 	}
-
 }
