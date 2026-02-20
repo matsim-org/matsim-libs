@@ -20,12 +20,12 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,7 +34,15 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -56,9 +64,9 @@ import org.matsim.core.population.PopulationUtils;
  * are supported but UmlaufDrivers should also be supported in the future (since UmlaufDriver
  * does not extend PersonDriverAgentImpl the method signatures have been changed).
  * </p>
- * <i>The class is experimental. Use at your own risk, and expect even 
+ * <i>The class is experimental. Use at your own risk, and expect even
  * less support than with other pieces of matsim.</i>
- * 
+ *
  * @author cdobler
  */
 public final class WithinDayAgentUtils {
@@ -79,11 +87,11 @@ public final class WithinDayAgentUtils {
 		if ( agent instanceof PlanAgent ) {
 			return ((PlanAgent)agent).getCurrentPlan().getPlanElements().indexOf( ((PlanAgent)agent).getCurrentPlanElement() ) ;
 		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() +
 					" which does not support getCurrentPlanElementIndex(...). Aborting!");
 		}
 	}
-	
+
 	/** NOTES:
 	 * () The current link index does not point to where the agent is, but one ahead.
 	 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
@@ -97,7 +105,7 @@ public final class WithinDayAgentUtils {
 			return ((HasModifiablePlan) agent).getCurrentLinkIndex();
 
 //		} else if ( agent instanceof PlanAgent ) {
-//			
+//
 //			// the following does not work because of loop routes, see above
 //				Leg currentLeg = (Leg) ((PlanAgent)agent).getCurrentPlanElement() ;
 //				if ( ! (currentLeg.getRoute() instanceof NetworkRoute ) ) {
@@ -117,25 +125,25 @@ public final class WithinDayAgentUtils {
 //				return index ;
 
 			} else {
-				throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() +
 						" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
 			}
 	}
 
 	//	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
 	//		if (agent instanceof PersonDriverAgentImpl) {
-	//			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
+	//			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);
 	//		} else {
-	//			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+	//			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() +
 	//					" which does not support calculateAndSetDepartureTime(...). Aborting!");
 	//		}
 	//	}
 
 	public static void resetCaches(MobsimAgent agent) {
 		if (agent instanceof HasModifiablePlan) {
-			((HasModifiablePlan) agent).resetCaches();			
+			((HasModifiablePlan) agent).resetCaches();
 		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() +
 					" which does not support resetCaches(...). Aborting!");
 		}
 	}
@@ -159,7 +167,7 @@ public final class WithinDayAgentUtils {
 		if (agent instanceof HasModifiablePlan) {
 			return ((HasModifiablePlan) agent).getModifiablePlan();
 		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() +
 					" which does not support getModifiablePlan(...). Aborting!");
 		}
 	}
@@ -183,12 +191,12 @@ public final class WithinDayAgentUtils {
 		}
 		return true ;
 	}
-	
+
 	public static Plan printPlan(MobsimAgent agent1) {
 		final Plan plan = getModifiablePlan(agent1);
 		return printPlan(plan) ;
 	}
-	
+
 	public static Plan printPlan(Plan plan) {
 		System.err.println( "plan=" + plan );
 		for ( int ii=0 ; ii<plan.getPlanElements().size() ; ii++ ) {
@@ -196,7 +204,7 @@ public final class WithinDayAgentUtils {
 		}
 		return plan;
 	}
-	
+
 	/**
 	 * Only the PlanElements are changed - further Steps
 	 * like updating the Routes of the previous and next Leg
@@ -222,7 +230,7 @@ public final class WithinDayAgentUtils {
 
 		return true;
 	}
-	
+
 	/**
 	 * Only the PlanElements are changed - further Steps
 	 * like updating the Routes of the previous and next Leg
@@ -257,7 +265,7 @@ public final class WithinDayAgentUtils {
 
 		return true;
 	}
-	
+
 	// === search methods: ===
 	public static int indexOfPlanElement(MobsimAgent agent, PlanElement pe) {
 		Plan plan = getModifiablePlan(agent) ;
@@ -265,7 +273,7 @@ public final class WithinDayAgentUtils {
 
 		return planElements.indexOf(pe) ;
 	}
-	
+
 	public static int indexOfNextActivityWithType( MobsimAgent agent, String type ) {
 		Plan plan = getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
@@ -280,29 +288,50 @@ public final class WithinDayAgentUtils {
 		}
 		return -1 ;
 	}
-	
+
 	public static Activity findNextActivityWithType( MobsimAgent agent, String type ) {
 		int index = indexOfNextActivityWithType( agent, type ) ;
 		return (Activity) getModifiablePlan(agent).getPlanElements().get(index) ;
 	}
-	
+
 	public static List<PlanElement> subList( MobsimAgent agent, int fromIndex, int toIndex) {
 		return getModifiablePlan(agent).getPlanElements().subList( fromIndex, toIndex ) ;
 	}
-	
+
 	public static List<PlanElement> convertInteractionActivities(List<? extends PlanElement> elements) {
 		List<PlanElement> updatedElements = new ArrayList<>(elements.size());
-		
+
 		for (int i = 0; i < elements.size(); i++) {
 			PlanElement element = elements.get(i);
-			
+
 			if (element instanceof Activity) {
 				element = PopulationUtils.convertInteractionToStandardActivity((Activity) element);
 			}
-			
+
 			updatedElements.add(element);
 		}
-		
+
 		return updatedElements;
+	}
+
+	/**
+	 * Adds the vehicle of the first network route in the given trip to the simulation, if it is not already present in the simulation.
+	 * This might be needed if new next trip uses a mode not in the plan of an agent before.
+	 */
+	public static void addVehicleToQSim(List<? extends PlanElement> nextTrip, Scenario scenario, QSim sim) {
+		for (Leg leg : TripStructureUtils.getLegs(nextTrip)) {
+			if (leg.getRoute() instanceof NetworkRoute r) {
+				Id<Vehicle> vehicleId = r.getVehicleId();
+				Id<Link> startLinkId = r.getStartLinkId();
+				if (sim.getVehicles().get(vehicleId) != null) {
+					log.info("Vehicle {} already exists in the simulation. No need to add it again.", vehicleId);
+					break;
+				}
+				// for the first network route, add the vehicle to the simulation
+				log.info("Adding vehicle {} to the simulation", vehicleId);
+				sim.addParkedVehicle(new QVehicleImpl(scenario.getVehicles().getVehicles().get(vehicleId)), startLinkId);
+				break;
+			}
+		}
 	}
 }
