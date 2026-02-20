@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.contrib.drt.optimizer.StopWaypoint;
+import com.google.inject.Inject;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDetourTimeCalculator.DetourTimeInfo;
@@ -39,13 +40,16 @@ public interface CostCalculationStrategy {
     double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, DetourTimeInfo detourTimeInfo);
 
     class DefaultCostCalculationStrategy implements CostCalculationStrategy {
+
+        @Inject SoftConstraintPenalties penalties;
+
         @Override
         public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion,
                                DetourTimeInfo detourTimeInfo) {
             if (request.getConstraints().allowRejection()) {
                 return rejectSoftConstraintViolations(request, insertion, detourTimeInfo);
             } else {
-                return discourageSoftConstraintViolations(request, insertion, detourTimeInfo);
+                return discourageSoftConstraintViolations(request, insertion, detourTimeInfo, penalties);
             }
         }
 
@@ -88,15 +92,22 @@ public interface CostCalculationStrategy {
         }
     }
 
+    record SoftConstraintPenalties( double MAX_WAIT_TIME_VIOLATION_PENALTY,
+                                    double MAX_TRAVEL_TIME_VIOLATION_PENALTY,
+                                    double MAX_RIDE_TIME_VIOLATION_PENALTY,
+                                    double LATE_DIVERSION_VIOLATION_PENALTY){
+    }
+
     //XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
     //XXX however, at the same time prefer max-wait-time to max-travel-time violations
-    double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-    double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
-    double MAX_RIDE_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of exceeded detour
-    double LATE_DIVERSION_VIOLATION_PENALTY = 10;// 10 second of penalty per 1 second of late diversion of onboard requests
+//    double BASE_PENALTY = 10;
+//    double MAX_WAIT_TIME_VIOLATION_PENALTY = BASE_PENALTY*1;// 1 second of penalty per 1 second of late departure
+//    double MAX_TRAVEL_TIME_VIOLATION_PENALTY = BASE_PENALTY*10;// 10 seconds of penalty per 1 second of late arrival
+//    double MAX_RIDE_TIME_VIOLATION_PENALTY = BASE_PENALTY*10;// 10 seconds of penalty per 1 second of exceeded detour
+//    double LATE_DIVERSION_VIOLATION_PENALTY = BASE_PENALTY*10;// 10 second of penalty per 1 second of late diversion of onboard requests
 
-    private static double discourageSoftConstraintViolations(DrtRequest request, InsertionGenerator.Insertion insertion,
-                                                             DetourTimeInfo detourTimeInfo) {
+    private static double discourageSoftConstraintViolations( DrtRequest request, InsertionGenerator.Insertion insertion,
+                                                              DetourTimeInfo detourTimeInfo, SoftConstraintPenalties penalties ) {
 
         double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
         // (additional time vehicle will operate if insertion is accepted)
@@ -123,10 +134,10 @@ public interface CostCalculationStrategy {
             lateDiversionViolation = lateDiversionViolation(insertion, detourTimeInfo, insertion.vehicleEntry, effectiveDropoffTimeLoss, request.getConstraints().lateDiversionThreshold());
         }
 
-        return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
-                + MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
-                + MAX_RIDE_TIME_VIOLATION_PENALTY * detourViolation
-                + LATE_DIVERSION_VIOLATION_PENALTY * lateDiversionViolation
+        return penalties.MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
+                + penalties.MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
+                + penalties.MAX_RIDE_TIME_VIOLATION_PENALTY * detourViolation
+                + penalties.LATE_DIVERSION_VIOLATION_PENALTY * lateDiversionViolation
                 + totalTimeLoss;
     }
 
