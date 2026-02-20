@@ -404,12 +404,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
+		// use vehicle from routing request attribute, if defined
+		Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		if (vehicleId == null) {
+			vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+		}
+
 		if (toLink != fromLink) { // (a "true" route)
-			// use vehicle from routing request attribute, if defined
-			Id<Vehicle> vehicleId = (Id<Vehicle>) attributes.getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
-			if (vehicleId == null) {
-				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-			}
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 			Path path;
@@ -447,7 +448,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
-			route.setVehicleId(VehicleUtils.getVehicleId(person, leg.getMode()));
+			route.setVehicleId(vehicleId);
 			leg.setRoute(route);
 			travTime = 0;
 		}

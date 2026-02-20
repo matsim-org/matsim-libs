@@ -65,8 +65,21 @@ public class DrtParallelInserterParams extends ReflectiveConfigGroup {
 		this.logThreadActivity = logThreadActivity;
 	}
 
-	@Comment("Enable/Disable thread activity statistics. Note: Disabled by default to improve performance and save memory-")
+	@Comment("Enable/Disable thread activity statistics. Note: Disabled by default to improve performance and save memory.")
 	private boolean logThreadActivity = false;
+
+	@StringGetter("logPerformanceStats")
+	public boolean isLogPerformanceStats() {
+		return logPerformanceStats;
+	}
+
+	@StringSetter("logPerformanceStats")
+	public void setLogPerformanceStats(boolean logPerformanceStats) {
+		this.logPerformanceStats = logPerformanceStats;
+	}
+
+	@Comment("Enable/Disable detailed performance statistics including worker utilization, conflict resolution timing, and load balancing metrics. Disabled by default.")
+	private boolean logPerformanceStats = false;
 
 	@StringGetter("vehiclesPartitioner")
 	public VehiclesPartitioner getVehiclesPartitioner() {
