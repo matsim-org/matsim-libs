@@ -767,8 +767,8 @@ public final class PopulationUtils {
 
 	public static boolean hasCarLeg(Plan plan) {
 		List<PlanElement> planElements = plan.getPlanElements();
-		for (int i = 0; i < planElements.size(); i++) {
-			if (planElements.get(i) instanceof Leg leg) {
+		for (PlanElement planElement : planElements) {
+			if (planElement instanceof Leg leg) {
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 					return true;
 				}
@@ -891,7 +891,7 @@ public final class PopulationUtils {
 	}
 
 	private static void verifyCreateLeg(Plan plan) throws IllegalStateException {
-		if (plan.getPlanElements().size() == 0) {
+		if (plan.getPlanElements().isEmpty()) {
 			throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
 		}
 	}
@@ -1032,11 +1032,11 @@ public final class PopulationUtils {
 	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(0);
+		return (Activity) plan.getPlanElements().getFirst();
 	}
 
 	public static Activity getLastActivity(Plan plan) {
-		return (Activity) plan.getPlanElements().get(plan.getPlanElements().size() - 1);
+		return (Activity) plan.getPlanElements().getLast();
 	}
 
 	public static Activity getNextActivity(Plan plan, Leg leg) {
@@ -1220,11 +1220,28 @@ public final class PopulationUtils {
 		return new Coord(fromCoord.getX() + rel * (toCoord.getX() - fromCoord.getX()), fromCoord.getY() + rel * (toCoord.getY() - fromCoord.getY()));
 	}
 
-	public static void sampleDown(Population pop, double sample) {
+	/**
+	 * Method samples down the population separately for each subpopulation.
+	 * The group of persons with no subpopulation is handled as a separate subpopulation.
+	 *
+	 * @param pop    population to be downsampled
+	 * @param sampleTo sample rate, e.g. 0.1 for 10% of the population
+	 */
+	public static void sampleDown(Population pop, double sampleTo) {
 		final Random rnd = MatsimRandom.getLocalInstance();
-		log.info("population size before downsampling=" + pop.getPersons().size());
-		pop.getPersons().values().removeIf(person -> rnd.nextDouble() >= sample);
-		log.info("population size after downsampling=" + pop.getPersons().size());
+		log.info("population size before downsampling={}", pop.getPersons().size());
+
+		List<String> subpopulations = new ArrayList<>(pop.getPersons().values().stream()
+				.map(PopulationUtils::getSubpopulation)
+				.distinct()
+				.toList());
+		subpopulations.forEach(subpopulation ->
+			pop.getPersons().values().removeIf(
+				person -> Objects.equals(PopulationUtils.getSubpopulation(person), subpopulation)
+					&& rnd.nextDouble() >= sampleTo
+			)
+		);
+		log.info("population size after downsampling={}", pop.getPersons().size());
 	}
 
 	public static void readPopulation(Population population, String filename) {
@@ -1328,7 +1345,7 @@ public final class PopulationUtils {
 		if (person == null) {
 			if (tryStdCnt > 0) {
 				tryStdCnt--;
-				log.info("personId=" + personId + " not in allPersons; trying standard population container ...");
+				log.info("personId={} not in allPersons; trying standard population container ...", personId);
 				if (tryStdCnt == 0) {
 					log.info(Gbl.FUTURE_SUPPRESSED);
 				}
@@ -1336,7 +1353,7 @@ public final class PopulationUtils {
 			person = scenario.getPopulation().getPersons().get(personId);
 		}
 		if (person == null) {
-			log.info("unable to find person for personId=" + personId + "; will return null");
+			log.info("unable to find person for personId={}; will return null", personId);
 		}
 		return person;
 	}
