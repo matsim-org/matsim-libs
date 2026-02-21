@@ -5,12 +5,14 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -68,8 +70,9 @@ public class PersonWriter {
 		if (!p.getSelectedPlan().getPlanElements().isEmpty()) {
 			Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
 			if (firstAct.getCoord() != null) {
-				x = Double.toString(firstAct.getCoord().getX());
-				y = Double.toString(firstAct.getCoord().getY());
+				Coord coord = PopulationUtils.decideOnCoordForActivity(firstAct, scenario);
+				x = Double.toString(coord.getX());
+				y = Double.toString(coord.getY());
 			}
 			actType = firstAct.getType();
 		}
