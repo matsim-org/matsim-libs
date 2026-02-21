@@ -83,8 +83,8 @@ public class RunDrtWithCompanionExampleIT {
 		controler.run();
 
 		int[] actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides[0]).isEqualTo(378);
-		Assertions.assertThat(actualRides[1]).isEqualTo(706);
+		Assertions.assertThat(actualRides[0]).isEqualTo(402);
+		Assertions.assertThat(actualRides[1]).isEqualTo(752);
 	}
 
 	@Test
@@ -116,8 +116,8 @@ public class RunDrtWithCompanionExampleIT {
 		controler.run();
 
 		int[] actualRides = getTotalNumberOfDrtRides();
-		Assertions.assertThat(actualRides[0]).isEqualTo(375);
-		Assertions.assertThat(actualRides[1]).isEqualTo(699);
+		Assertions.assertThat(actualRides[0]).isEqualTo(402);
+		Assertions.assertThat(actualRides[1]).isEqualTo(752);
 	}
 
 	private int[] getTotalNumberOfDrtRides() {
