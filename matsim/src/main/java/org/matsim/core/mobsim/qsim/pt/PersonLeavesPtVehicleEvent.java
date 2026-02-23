@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -9,7 +9,10 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
-public class PersonLeavesPtVehicleEvent extends PersonEntersVehicleEvent {
+/**
+ * Counterpart of {@link PersonEntersPtVehicleEvent}.
+ */
+public class PersonLeavesPtVehicleEvent extends PersonLeavesVehicleEvent {
 
 	public static final String EVENT_TYPE = "PersonLeavesPtVehicle";
 

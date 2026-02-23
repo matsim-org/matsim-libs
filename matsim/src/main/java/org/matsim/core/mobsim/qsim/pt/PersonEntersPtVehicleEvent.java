@@ -9,7 +9,14 @@ import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
 
+/**
+ * Specialized version of the PersonEntersVehicleEvent, which has the transit line and transit route id of the entered vehicle.
+ */
 public class PersonEntersPtVehicleEvent extends PersonEntersVehicleEvent {
+// Implementation Note.
+// We derliberately extend the PersonEntersVehicleEvent here, so that we are backwards compatible, as event handlers which expect
+// PersonEntersVehicleEvent will also receive this event.
+
 
 	public static final String EVENT_TYPE = "PersonEntersPtVehicle";
 
