@@ -73,10 +73,10 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 	@Override
 	public void setDriver(DriverAgent driver) {
 
-		if (driver instanceof TransitDriverAgent) {
+		if (driver == null || driver instanceof TransitDriverAgent) {
 			baseVehicle.setDriver(driver);
 		} else {
-			throw new IllegalArgumentException("Driver for TransitQVehicle must be of type TransitDriverAgent, but was: " + driver.getClass().getSimpleName());
+			throw new IllegalArgumentException("Driver for TransitQVehicle must be of type TransitDriverAgent, but was: " + driver);
 		}
 
 	}
