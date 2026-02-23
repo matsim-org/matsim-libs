@@ -285,6 +285,7 @@ public class TransitDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(null, stop3);
 		PTPassengerAgent agent2 = new FakeAgent(null, stop3);
@@ -545,6 +546,7 @@ public class TransitDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(stop2, stop1);
 		tracker.addAgentToStop(55, agent1, stop2.getId());

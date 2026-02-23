@@ -22,14 +22,11 @@ package org.matsim.core.mobsim.qsim.pt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -65,7 +62,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	/**
-	 * @return should be 0.0 or 1.0, values greater than 1.0 may lead to buggy behavior, dependent on TransitStopHandler used
+	 * @return should be 0.0 or 1.0. Values greater than 1.0 may lead to buggy behavior, dependent on TransitStopHandler used
 	 */
 	/*package*/ double calculateStopTimeAndTriggerBoarding(TransitRoute transitRoute, TransitLine transitLine, final TransitVehicle vehicle,
 														   final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, final double now) {
@@ -78,7 +75,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 		int freeCapacity = vehicle.getPassengerCapacity() - vehicle.getPassengers().size() + passengersLeaving.size();
 
-		List<PTPassengerAgent> passengersEntering = findPassengersEntering(transitRoute, transitLine, vehicle, stop, stopsToCome, freeCapacity, now);
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(transitRoute, transitLine, vehicle, stop, stopsToCome, freeCapacity);
 
 		TransitStopHandler stopHandler = vehicle.getStopHandler();
 		double stopTime = stopHandler.handleTransitStop(stop, now, passengersLeaving, passengersEntering, passengersRelocating, this, vehicle);
@@ -103,7 +100,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 
 	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle,
-														  final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
+														  final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity) {
 		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
 
 		if (this.isGeneratingDeniedBoardingEvents) {
@@ -164,16 +161,14 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		boolean handled = vehicle.addPassenger(passenger);
 		if (handled) {
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
-			MobsimAgent planAgent = (MobsimAgent) passenger;
-//			if (planAgent instanceof PersonDriverAgentImpl) {
-			Id<Person> agentId = planAgent.getId();
-			Id<Link> linkId = planAgent.getCurrentLinkId();
-			this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
-//			}
-			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
+			this.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), passenger.getCurrentLinkId());
 			passenger.setVehicle(vehicle);
 
-			eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
+			var driver = vehicle.getDriver();
+
+			var e = new PersonEntersPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId());
+			eventsManager.processEvent(e);
+			//eventsManager.processEvent(new PersonEntersVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
 	}
@@ -183,7 +178,10 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
 			passenger.setVehicle(null);
-			eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
+			var driver = vehicle.getDriver();
+			var e = new PersonLeavesPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId());
+			eventsManager.processEvent(e);
+			//eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
 			// kai, sep'12
@@ -203,7 +201,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		boolean handled = vehicle.removePassenger(passenger);
 		if (handled) {
 			// Store passengers wanting to relocate at the stop facility
-			agentRelocating.computeIfAbsent(stopFacilityId, k -> new ArrayList<>()).add(passenger);
+			agentRelocating.computeIfAbsent(stopFacilityId, _ -> new ArrayList<>()).add(passenger);
 
 		} else
 			throw new IllegalStateException("Agent " + passenger.getId() + " was not removed from vehicle " + vehicle.getId() + " when relocating.");
@@ -246,7 +244,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 				PTPassengerAgent passenger = it.next();
 
-				// Use the chained departure if it contains a stop the passenger uses as exit stop
+				// Use the chained departure if it contains a stop the passenger uses as an exit stop
 				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
 					continue;
 
