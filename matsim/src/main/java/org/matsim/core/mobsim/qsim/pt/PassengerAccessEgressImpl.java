@@ -172,6 +172,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 //			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			passenger.setVehicle(vehicle);
+
 			eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;

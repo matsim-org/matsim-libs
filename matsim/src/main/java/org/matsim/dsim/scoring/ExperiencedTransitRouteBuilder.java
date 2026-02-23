@@ -54,7 +54,8 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			parts.add(data);
 		}
 		// we need something to track the
-		else if (e instanceof PersonEntersVehicleEvent peve)
+		else if (e instanceof PersonEntersVehicleEvent peve) {
+		}
 
 
 	}

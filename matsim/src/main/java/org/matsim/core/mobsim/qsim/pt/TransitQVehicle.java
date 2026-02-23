@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
@@ -73,7 +72,13 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 
 	@Override
 	public void setDriver(DriverAgent driver) {
-		baseVehicle.setDriver(driver);
+
+		if (driver instanceof TransitDriverAgent) {
+			baseVehicle.setDriver(driver);
+		} else {
+			throw new IllegalArgumentException("Driver for TransitQVehicle must be of type TransitDriverAgent, but was: " + driver.getClass().getSimpleName());
+		}
+
 	}
 
 	@Override
@@ -102,8 +107,10 @@ public class TransitQVehicle implements DistributedMobsimVehicle, TransitVehicle
 	}
 
 	@Override
-	public MobsimDriverAgent getDriver() {
-		return baseVehicle.getDriver();
+	public TransitDriverAgent getDriver() {
+		// SAFETY: We guard setDriver, so we know that the driver should be a TransitDriverAgent, as long as no one sets
+		// the driver directly on the baseVehicle.
+		return (TransitDriverAgent) baseVehicle.getDriver();
 	}
 
 	@Override
