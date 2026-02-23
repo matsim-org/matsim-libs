@@ -3,14 +3,20 @@ package org.matsim.dsim.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
+import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +58,22 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			var data = new Data();
 			data.startTime = pde.getTime();
 			parts.add(data);
-		}
-		// we need something to track the
-		else if (e instanceof PersonEntersVehicleEvent peve) {
+		} else if (e instanceof PersonArrivalEvent pae) {
+			parts.getLast().endTime = pae.getTime();
+		} else if (e instanceof PersonEntersPtVehicleEvent pepve) {
+			var currentPart = parts.getLast();
+			currentPart.vehicleEnterTime = pepve.getTime();
+			currentPart.line = pepve.getTransitLine();
+			currentPart.route = pepve.getTransitRoute();
+			currentPart.vehicleId = pepve.getVehicleId();
+		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
+			// this overrides the end facility at each stop. So, endFacility is more like
+			// currentEndFacility
+			parts.getLast().endFacility = vaafe.getFacilityId();
+		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
+			if (parts.getLast().startFacility != null) {
+				parts.getLast().startFacility = vdafe.getFacilityId();
+			}
 		}
 
 
@@ -62,7 +81,35 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 
 	@Override
 	public Route finishRoute() {
-		return null;
+
+		DefaultTransitPassengerRoute result = null;
+		// the following attributes are over all parts of the route. Retreive them before we
+		// remove the individual parts of the route. Yet, they have to be set on the head part
+		// of the route.
+		var firstPart = parts.getFirst();
+		var enterTime = firstPart.vehicleEnterTime;
+		var startTime = firstPart.startTime;
+		var endTime = parts.getLast().endTime;
+
+		while (!parts.isEmpty()) {
+			var part = parts.removeLast();
+
+			var start = transitSchedule.getFacilities().get(part.startFacility);
+			var end = transitSchedule.getFacilities().get(part.endFacility);
+			var transitLine = transitSchedule.getTransitLines().get(part.line);
+			var transitRoute = transitLine.getRoutes().get(part.route);
+
+			result = new DefaultTransitPassengerRoute(start, transitLine, transitRoute, end, result);
+		}
+
+		assert result != null;
+
+		// set the following
+		result.setBoardingTime(enterTime);
+		result.setTravelTime(endTime - startTime);
+		result.setDistance(RouteUtils.calcDistance(result, transitSchedule, network));
+
+		return result;
 	}
 
 	@Override
@@ -76,6 +123,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 		private double endTime;
 		private double vehicleEnterTime;
 
+		private Id<Vehicle> vehicleId;
 		private Id<TransitStopFacility> startFacility;
 		private Id<TransitStopFacility> endFacility;
 		private Id<TransitLine> line;

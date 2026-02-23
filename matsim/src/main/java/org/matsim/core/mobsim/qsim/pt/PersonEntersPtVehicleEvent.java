@@ -13,6 +13,14 @@ public class PersonEntersPtVehicleEvent extends PersonEntersVehicleEvent {
 
 	public static final String EVENT_TYPE = "PersonEntersPtVehicle";
 
+	public Id<TransitRoute> getTransitRoute() {
+		return transitRoute;
+	}
+
+	public Id<TransitLine> getTransitLine() {
+		return transitLine;
+	}
+
 	private final Id<TransitLine> transitLine;
 	private final Id<TransitRoute> transitRoute;
 
