@@ -359,6 +359,7 @@ public class UmlaufDriverTest {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
+		queueVehicle.setDriver(driver);
 
 		PTPassengerAgent agent1 = new FakeAgent(Id.createPersonId("fake-1"), null, stop1);
 		PTPassengerAgent agent2 = new FakeAgent(Id.createPersonId("fake-2"), null, stop1);
