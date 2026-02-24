@@ -22,6 +22,8 @@ package org.matsim.api.core.v01.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -40,26 +42,32 @@ public class PersonContinuesInVehicleEvent extends Event implements HasPersonId,
 	public static final String EVENT_TYPE = "PersonContinuesInVehicle";
 	public static final String ATTRIBUTE_FROM_VEHICLE = "fromVehicle";
 	public static final String ATTRIBUTE_FACILITY = "facility";
+	public static final String ATTRIBUTE_TRANSIT_LINE = "transitLine";
+	public static final String ATTRIBUTE_TRANSIT_ROUTE = "transitRoute";
 
 	private final Id<Person> personId;
 	private final Id<Vehicle> fromVehicleId;
 	private final Id<Vehicle> vehicleId;
 	private final Id<TransitStopFacility> stopFacilityId;
+	private final Id<TransitLine> transitLineId;
+	private final Id<TransitRoute> transitRouteId;
 
 
 	public PersonContinuesInVehicleEvent(final double time, final Id<Person> personId,
-										 final Id<Vehicle> fromVehicleId, final Id<Vehicle> vehicleId) {
-		this(time, personId, fromVehicleId, vehicleId, null);
+										 final Id<Vehicle> fromVehicleId, final Id<Vehicle> vehicleId, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
+		this(time, personId, fromVehicleId, vehicleId, null, transitLineId, transitRouteId);
 	}
 
 	public PersonContinuesInVehicleEvent(final double time, final Id<Person> personId,
 										 final Id<Vehicle> fromVehicleId, final Id<Vehicle> vehicleId,
-										 final Id<TransitStopFacility> stopFacilityId) {
+										 final Id<TransitStopFacility> stopFacilityId, Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 		super(time);
 		this.personId = personId;
 		this.fromVehicleId = fromVehicleId;
 		this.vehicleId = vehicleId;
 		this.stopFacilityId = stopFacilityId;
+		this.transitLineId = transitLineId;
+		this.transitRouteId = transitRouteId;
 	}
 
 	@Override
@@ -73,6 +81,14 @@ public class PersonContinuesInVehicleEvent extends Event implements HasPersonId,
 
 	public Id<TransitStopFacility> getStopFacilityId() {
 		return stopFacilityId;
+	}
+
+	public Id<TransitLine> getTransitLineId() {
+		return transitLineId;
+	}
+
+	public Id<TransitRoute> getTransitRouteId() {
+		return transitRouteId;
 	}
 
 	@Override
@@ -91,6 +107,9 @@ public class PersonContinuesInVehicleEvent extends Event implements HasPersonId,
 		if (fromVehicleId != null)
 			attrs.put(ATTRIBUTE_FROM_VEHICLE, Objects.toString(fromVehicleId));
 
+		attrs.put(ATTRIBUTE_TRANSIT_LINE, transitLineId.toString());
+		attrs.put(ATTRIBUTE_TRANSIT_ROUTE, transitRouteId.toString());
+
 		return attrs;
 	}
 
@@ -101,6 +120,8 @@ public class PersonContinuesInVehicleEvent extends Event implements HasPersonId,
 
 		writeEncodedAttributeKeyValue(out, ATTRIBUTE_FACILITY, Objects.toString(stopFacilityId, null));
 		writeEncodedAttributeKeyValue(out, ATTRIBUTE_FROM_VEHICLE, Objects.toString(fromVehicleId, null));
+		writeEncodedAttributeKeyValue(out, ATTRIBUTE_TRANSIT_LINE, Objects.toString(transitLineId, null));
+		writeEncodedAttributeKeyValue(out, ATTRIBUTE_TRANSIT_ROUTE, Objects.toString(transitRouteId, null));
 
 		writeXMLEnd(out);
 	}

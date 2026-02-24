@@ -29,7 +29,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
@@ -225,16 +224,22 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 			boolean sameVehicle = newVehicle.equals(vehicle.getVehicle().getId());
 
 			// The next vehicle is waiting for its activity to end so that it can start departing
-			MobsimVehicle nextVehicle = internalInterface.getMobsim().getVehicles().get(newVehicle);
+			var nextVehicle = internalInterface.getMobsim().getVehicles().get(newVehicle);
+			// The code I found below assumes that we have a transit driver. This means we can also assume that we have a TransitVehicle. janek feb' 26
+			assert nextVehicle instanceof TransitVehicle : "Expected TransitVehicle, but got " + nextVehicle.getClass().getSimpleName();
+			var nextTransitVehicle = (TransitVehicle) nextVehicle;
+			var nextDriver = nextTransitVehicle.getDriver();
 
 			if (!sameVehicle) {
 
 				int left = agentTracker.trackVehicleArrival(chain.getChainedDepartureId());
 				// Depart if all required trains for this departure have arrived
 				if (left <= 0) {
-					AbstractTransitDriverAgent driver = (AbstractTransitDriverAgent) nextVehicle.getDriver();
-					driver.setReadyForDeparture(time);
-					internalInterface.getMobsim().rescheduleActivityEnd(driver);
+					// It would be nicer to have this functionality in the TransitDriver interface. Yet, I don't want to refactor everything here,
+					// so we leave it as is for now. janek feb' 26
+					//AbstractTransitDriverAgent driver = (AbstractTransitDriverAgent) nextTransitVehicle.getDriver();
+					((AbstractTransitDriverAgent) nextDriver).setReadyForDeparture(time);
+					internalInterface.getMobsim().rescheduleActivityEnd(nextDriver);
 				}
 			}
 
@@ -248,11 +253,15 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				if (route.getStops().stream().map(TransitRouteStop::getStopFacility).noneMatch(passenger::getExitAtStop))
 					continue;
 
-				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle,
-					route.getStops().getFirst().getStopFacility().getId()));
 
-				nextVehicle.addPassenger(passenger);
-				passenger.setVehicle(nextVehicle);
+				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId(), newVehicle,
+					route.getStops().getFirst().getStopFacility().getId(),
+					nextDriver.getTransitLine().getId(),
+					nextDriver.getTransitRoute().getId()
+				));
+
+				nextTransitVehicle.addPassenger(passenger);
+				passenger.setVehicle(nextTransitVehicle);
 				it.remove();
 			}
 		}
