@@ -76,6 +76,11 @@ public class ExperiencedNetworkRouteBuilder implements ExperiencedRouteBuilder {
 		return data;
 	}
 
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		return data.vehicleId;
+	}
+
 	/**
 	 * This is a class and not a record, because things must be mutable.
 	 */

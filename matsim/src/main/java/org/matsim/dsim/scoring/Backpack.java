@@ -1,22 +1,22 @@
 package org.matsim.dsim.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Agents carry backpacks inside which they gather data of what they have experienced during the simulation.
  */
-public class BackPack {
+public class Backpack {
 
 	private final Id<Person> personId;
 	private final Collection<Event> events;
@@ -28,7 +28,7 @@ public class BackPack {
 	}
 
 	Id<Vehicle> currentVehicle() {
-		return backpackPlan.currentVehicle();
+		return backpackPlan.getCurrentVehicle();
 	}
 
 	boolean isInVehicle() {
@@ -39,11 +39,18 @@ public class BackPack {
 		return backpackPlan;
 	}
 
-	public BackPack(Id<Person> personId, int startingPartition) {
+	Backpack(Msg msg, Map<String, ExperiencedRouteBuilderProvider> providers) {
+		personId = msg.id();
+		events = msg.events();
+		startingPartition = msg.startingPartition();
+		backpackPlan = new BackpackPlan(msg.backpackPlan(), providers);
+	}
+
+	Backpack(Id<Person> personId, int startingPartition, Map<String, ExperiencedRouteBuilderProvider> providers) {
 		this.personId = personId;
 		this.startingPartition = startingPartition;
 		this.events = new ArrayList<>();
-		backpackPlan = new BackpackPlan();
+		backpackPlan = new BackpackPlan(providers);
 	}
 
 	void addSpecialScoringEvent(Event e) {
@@ -63,8 +70,14 @@ public class BackPack {
 		return e instanceof PersonMoneyEvent || e instanceof PersonScoreEvent || e instanceof PersonStuckEvent;
 	}
 
-	FinishedBackpack finish(Network network, TransitSchedule transitSchedule) {
-		backpackPlan.finish(network, transitSchedule);
-		return new FinishedBackpack(personId, startingPartition, events, backpackPlan.experiencedPlan());
+	FinishedBackpack finish() {
+		return new FinishedBackpack(personId, startingPartition, events, backpackPlan.finishPlan());
+	}
+
+	public Msg toMessage() {
+		return new Msg(personId, events, startingPartition, backpackPlan.toMessage());
+	}
+
+	public record Msg(Id<Person> id, Collection<Event> events, int startingPartition, BackpackPlan.Msg backpackPlan) implements Message {
 	}
 }

@@ -10,17 +10,12 @@ import org.matsim.api.core.v01.events.handler.ProcessingMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.dsim.DistributedMobsimAgent;
 import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -49,9 +44,8 @@ import java.util.Set;
 @DistributedEventHandler(value = DistributedMode.PARTITION, processing = ProcessingMode.DIRECT)
 public class BackpackDataCollector implements BasicEventHandler {
 
-	private final Map<Id<Person>, BackPack> backpackByPerson = new HashMap<>();
-	private final Map<Id<Vehicle>, Set<BackPack>> backpackByVehicle = new HashMap<>();
-	private final Map<Id<Vehicle>, TransitInformation> transitInformation = new HashMap<>();
+	private final Map<Id<Person>, Backpack> backpackByPerson = new HashMap<>();
+	private final Map<Id<Vehicle>, Set<Backpack>> backpackByVehicle = new HashMap<>();
 	private final Set<Id<Person>> ignoredAgents = new HashSet<>();
 
 	private final SimStepMessaging simStepMessaging;
@@ -60,6 +54,7 @@ public class BackpackDataCollector implements BasicEventHandler {
 
 	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
+	private final Map<String, ExperiencedRouteBuilderProvider> providers;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
 	@SuppressWarnings("FieldMayBeFinal")
@@ -67,20 +62,23 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private TransitSchedule transitSchedule;
 
 	@Inject
-	public BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
-		this(simStepMessaging, network, population, null, asc, fbc);
+	public BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc,
+								 FinishedBackpackCollector fbc, Map<String, ExperiencedRouteBuilderProvider> providers) {
+		this(simStepMessaging, network, population, null, asc, fbc, providers);
 	}
 
 	/**
 	 * Constructor for testing, which includes all dependencies
 	 */
-	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule, AgentSourcesContainer asc, FinishedBackpackCollector fbc) {
+	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule,
+						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, ExperiencedRouteBuilderProvider> providers) {
 		this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
 		this.asc = asc;
 		this.transitSchedule = transitSchedule;
 		this.backpackCollector = fbc;
+		this.providers = providers;
 	}
 
 	public void registerAgent(MobsimAgent agent) {
@@ -90,7 +88,7 @@ public class BackpackDataCollector implements BasicEventHandler {
 		if (population.getPersons().containsKey(agent.getId())) {
 			var startLink = agent.getCurrentLinkId();
 			var startPartition = network.getPartitioning().getPartition(startLink);
-			var backpack = new BackPack(agent.getId(), startPartition);
+			var backpack = new Backpack(agent.getId(), startPartition, providers);
 			this.backpackByPerson.put(agent.getId(), backpack);
 		} else {
 			ignoredAgents.add(agent.getId());
@@ -99,7 +97,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 
 	public void process(SimStepMessage msg) {
 
-		for (var backpack : msg.backPacks()) {
+		for (var backpackMsg : msg.backpacks()) {
+			var backpack = new Backpack(backpackMsg, providers);
 			this.backpackByPerson.put(backpack.personId(), backpack);
 			if (backpack.isInVehicle()) {
 				this.backpackByVehicle
@@ -122,13 +121,13 @@ public class BackpackDataCollector implements BasicEventHandler {
 			if (!backpackByPerson.containsKey(driverId)) {
 				ignoredAgents.add(driverId);
 			}
-			if (veh instanceof TransitVehicle) {
-				if (veh.getDriver() instanceof AbstractTransitDriverAgent td) {
-					var route = td.getTransitRoute().getId();
-					var line = td.getTransitLine().getId();
-					transitInformation.put(veh.getId(), new TransitInformation(route, line));
-				}
-			}
+//			if (veh instanceof TransitVehicle) {
+//				if (veh.getDriver() instanceof AbstractTransitDriverAgent td) {
+//					var route = td.getTransitRoute().getId();
+//					var line = td.getTransitLine().getId();
+//					transitInformation.put(veh.getId(), new TransitInformation(route, line));
+//				}
+//			}
 		}
 
 	}
@@ -137,12 +136,15 @@ public class BackpackDataCollector implements BasicEventHandler {
 		var driverId = vehicle.getDriver().getId();
 		var targetPart = network.getPartitioning().getPartition(vehicle.getCurrentLinkId());
 
-		// we don't want to send data for transit drivers, but we want to remove them from our bookkeeping
-		if (ignoredAgents.contains(driverId)) {
-			transitInformation.remove(driverId);
-		} else {
+		if (!ignoredAgents.contains(driverId)) {
 			personLeavingPartition(driverId, targetPart);
 		}
+		// we don't want to send data for transit drivers, but we want to remove them from our bookkeeping
+//		if (ignoredAgents.contains(driverId)) {
+//			transitInformation.remove(driverId);
+//		} else {
+//			personLeavingPartition(driverId, targetPart);
+//		}
 
 		for (var passenger : vehicle.getPassengers()) {
 			personLeavingPartition(passenger.getId(), targetPart);
@@ -177,8 +179,8 @@ public class BackpackDataCollector implements BasicEventHandler {
 		}
 	}
 
-	private void finishBackpack(BackPack backpack) {
-		var finishedBackpack = backpack.finish(network, transitSchedule);
+	private void finishBackpack(Backpack backpack) {
+		var finishedBackpack = backpack.finish();
 		backpackCollector.addBackpack(finishedBackpack);
 	}
 
@@ -192,49 +194,61 @@ public class BackpackDataCollector implements BasicEventHandler {
 				backpackByVehicle.remove(backpack.currentVehicle());
 			}
 		}
-		simStepMessaging.collectBackPack(backpack, toPart);
+		var msg = backpack.toMessage();
+		simStepMessaging.collectBackPack(msg, toPart);
 	}
 
 	@Override
 	public void handleEvent(Event e) {
 
-		// short circuit on transit drivers and pass on special scoring events
-		if (e instanceof HasPersonId hpi) {
-			if (ignoredAgents.contains(hpi.getPersonId())) {
-				return;
-			}
-			if (BackPack.isRelevantForScoring(e) && backpackByPerson.containsKey(hpi.getPersonId())) {
-				var backpack = backpackByPerson.get(hpi.getPersonId());
-				backpack.addSpecialScoringEvent(e);
-			}
-		}
-
+		// 1. bookeeping which adds things
 		if (e instanceof TransitDriverStartsEvent tdse) {
-			transitInformation.put(tdse.getVehicleId(), new TransitInformation(tdse.getTransitRouteId(), tdse.getTransitLineId()));
+			// transitInformation.put(tdse.getVehicleId(), new TransitInformation(tdse.getTransitRouteId(), tdse.getTransitLineId()));
 			ignoredAgents.add(tdse.getDriverId());
+		} else if (e instanceof PersonEntersVehicleEvent peve) {
+
+			var backpack = backpackByPerson.get(peve.getPersonId());
+			backpackByVehicle
+				.computeIfAbsent(peve.getVehicleId(), _ -> new HashSet<>())
+				.add(backpack);
+
 		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
 			var backpacksInVehicle = backpackByVehicle.get(pcive.getVehicleId());
 			var backpack = backpackByPerson.get(pcive.getPersonId());
 			backpacksInVehicle.remove(backpack);
 			backpackByVehicle.computeIfAbsent(pcive.getVehicleId(), _ -> new HashSet<>()).add(backpack);
-			var transitInfo = transitInformation.get(pcive.getVehicleId());
-			backpack.backpackPlan().startPtPart(transitInfo.line(), transitInfo.route());
-			backpack.backpackPlan().handleEvent(pcive);
+		}
 
-		} else if (e instanceof PersonEntersVehicleEvent peve) {
-			var backpack = backpackByPerson.get(peve.getPersonId());
-
-			backpackByVehicle
-				.computeIfAbsent(peve.getVehicleId(), _ -> new HashSet<>())
-				.add(backpack);
-
-			var transitInfo = transitInformation.get(peve.getVehicleId());
-			if (transitInfo != null) {
-				backpack.backpackPlan().startPtPart(transitInfo.line(), transitInfo.route());
+		// 2. take care of all person-related events
+		if (e instanceof HasPersonId hpi) {
+			// short circuit on transit drivers and pass on special scoring events
+			if (ignoredAgents.contains(hpi.getPersonId())) {
+				return;
 			}
-			backpack.backpackPlan().handleEvent(peve);
+			if (backpackByPerson.containsKey(hpi.getPersonId())) {
+				// pass on the event to the bacpack plan in any case
+				var backpack = backpackByPerson.get(hpi.getPersonId());
+				backpack.backpackPlan().handleEvent(e);
 
-		} else if (e instanceof PersonLeavesVehicleEvent plve) {
+				// if it is a special scoring event, also collect it separately
+				if (Backpack.isRelevantForScoring(e)) {
+					backpack.addSpecialScoringEvent(e);
+				}
+			}
+		}
+
+		// 3. take care of all vehicle-related events. Dispatch event to all persons in that vehicle
+		if (e instanceof HasVehicleId hvi) {
+			var backpacksInVehicle = backpackByVehicle.get(hvi.getVehicleId());
+			if (backpacksInVehicle != null) {
+				for (var backpack : backpacksInVehicle) {
+					backpack.backpackPlan().handleEvent(e);
+				}
+			}
+		}
+
+		// 4. bookkeeping which removes things
+		if (e instanceof PersonLeavesVehicleEvent plve) {
 			var personId = plve.getPersonId();
 			var backpack = backpackByPerson.get(personId);
 			var backpacksInVehicle = backpackByVehicle.get(plve.getVehicleId());
@@ -242,65 +256,120 @@ public class BackpackDataCollector implements BasicEventHandler {
 			if (backpacksInVehicle.isEmpty()) {
 				backpackByVehicle.remove(plve.getVehicleId());
 			}
-		} else if (e instanceof LinkEnterEvent lee) {
-			var backpacksInVehicle = backpackByVehicle.get(lee.getVehicleId());
-			if (backpacksInVehicle != null) {
-				for (var backpack : backpacksInVehicle) {
-					backpack.backpackPlan().handleEvent(lee);
-				}
-			}
-		} else if (e instanceof VehicleEntersTrafficEvent vete) {
-			var backpacksInVehicle = backpackByVehicle.get(vete.getVehicleId());
-			if (backpacksInVehicle != null) {
-				for (var backpack : backpacksInVehicle) {
-					backpack.backpackPlan().handleEvent(vete);
-				}
-			}
-		} else if (e instanceof VehicleLeavesTrafficEvent vlte) {
-			var backpacksInVehicle = backpackByVehicle.get(vlte.getVehicleId());
-			if (backpacksInVehicle != null) {
-				for (var backpack : backpacksInVehicle) {
-					backpack.backpackPlan().handleEvent(vlte);
-				}
-			}
-		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
-			var backpacksInVehicle = backpackByVehicle.get(vaafe.getVehicleId());
-			if (backpacksInVehicle != null) {
-				for (var backpack : backpacksInVehicle) {
-					backpack.backpackPlan().handleEvent(vaafe);
-				}
-			}
-		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
-			var backpacksInVehicle = backpackByVehicle.get(vdafe.getVehicleId());
-			if (backpacksInVehicle != null) {
-				for (var backpack : backpacksInVehicle) {
-					backpack.backpackPlan().handleEvent(vdafe);
-				}
-			}
-		} else if (e instanceof ActivityStartEvent ase) {
-			var backpack = backpackByPerson.get(ase.getPersonId());
-			backpack.backpackPlan().handleEvent(ase);
-		} else if (e instanceof ActivityEndEvent aee) {
-			var backpack = backpackByPerson.get(aee.getPersonId());
-			backpack.backpackPlan().handleEvent(aee);
-		} else if (e instanceof PersonDepartureEvent pde) {
-			var backpack = backpackByPerson.get(pde.getPersonId());
-			backpack.backpackPlan().handleEvent(pde);
-		} else if (e instanceof PersonArrivalEvent pae) {
-			var backpack = backpackByPerson.get(pae.getPersonId());
-			backpack.backpackPlan().handleEvent(pae);
-			backpack.backpackPlan().finishLeg(network, transitSchedule);
-		} else if (e instanceof TeleportationArrivalEvent tae) {
-			var backpack = backpackByPerson.get(tae.getPersonId());
-			backpack.backpackPlan().handleEvent(tae);
 		} else if (e instanceof PersonStuckEvent pse) {
 			var backpack = backpackByPerson.get(pse.getPersonId());
 			if (backpack != null) {
-				backpack.backpackPlan().handleEvent(pse);
 				finishPerson(pse.getPersonId());
 			}
 		}
 	}
+
+//	@Override
+//	public void handleEvent(Event e) {
+//
+//		// short circuit on transit drivers and pass on special scoring events
+//		if (e instanceof HasPersonId hpi) {
+//			if (ignoredAgents.contains(hpi.getPersonId())) {
+//				return;
+//			}
+//			if (Backpack.isRelevantForScoring(e) && backpackByPerson.containsKey(hpi.getPersonId())) {
+//				var backpack = backpackByPerson.get(hpi.getPersonId());
+//				backpack.addSpecialScoringEvent(e);
+//			}
+//		}
+//
+//		if (e instanceof TransitDriverStartsEvent tdse) {
+//			transitInformation.put(tdse.getVehicleId(), new TransitInformation(tdse.getTransitRouteId(), tdse.getTransitLineId()));
+//			ignoredAgents.add(tdse.getDriverId());
+//		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
+//			var backpacksInVehicle = backpackByVehicle.get(pcive.getVehicleId());
+//			var backpack = backpackByPerson.get(pcive.getPersonId());
+//			backpacksInVehicle.remove(backpack);
+//			backpackByVehicle.computeIfAbsent(pcive.getVehicleId(), _ -> new HashSet<>()).add(backpack);
+//			var transitInfo = transitInformation.get(pcive.getVehicleId());
+//			backpack.backpackPlan().startPtPart(transitInfo.line(), transitInfo.route());
+//			backpack.backpackPlan().handleEvent(pcive);
+//
+//		} else if (e instanceof PersonEntersVehicleEvent peve) {
+//			var backpack = backpackByPerson.get(peve.getPersonId());
+//
+//			backpackByVehicle
+//				.computeIfAbsent(peve.getVehicleId(), _ -> new HashSet<>())
+//				.add(backpack);
+//
+//			var transitInfo = transitInformation.get(peve.getVehicleId());
+//			if (transitInfo != null) {
+//				backpack.backpackPlan().startPtPart(transitInfo.line(), transitInfo.route());
+//			}
+//			backpack.backpackPlan().handleEvent(peve);
+//
+//		} else if (e instanceof PersonLeavesVehicleEvent plve) {
+//			var personId = plve.getPersonId();
+//			var backpack = backpackByPerson.get(personId);
+//			var backpacksInVehicle = backpackByVehicle.get(plve.getVehicleId());
+//			backpacksInVehicle.remove(backpack);
+//			if (backpacksInVehicle.isEmpty()) {
+//				backpackByVehicle.remove(plve.getVehicleId());
+//			}
+//		} else if (e instanceof LinkEnterEvent lee) {
+//			var backpacksInVehicle = backpackByVehicle.get(lee.getVehicleId());
+//			if (backpacksInVehicle != null) {
+//				for (var backpack : backpacksInVehicle) {
+//					backpack.backpackPlan().handleEvent(lee);
+//				}
+//			}
+//		} else if (e instanceof VehicleEntersTrafficEvent vete) {
+//			var backpacksInVehicle = backpackByVehicle.get(vete.getVehicleId());
+//			if (backpacksInVehicle != null) {
+//				for (var backpack : backpacksInVehicle) {
+//					backpack.backpackPlan().handleEvent(vete);
+//				}
+//			}
+//		} else if (e instanceof VehicleLeavesTrafficEvent vlte) {
+//			var backpacksInVehicle = backpackByVehicle.get(vlte.getVehicleId());
+//			if (backpacksInVehicle != null) {
+//				for (var backpack : backpacksInVehicle) {
+//					backpack.backpackPlan().handleEvent(vlte);
+//				}
+//			}
+//		} else if (e instanceof VehicleArrivesAtFacilityEvent vaafe) {
+//			var backpacksInVehicle = backpackByVehicle.get(vaafe.getVehicleId());
+//			if (backpacksInVehicle != null) {
+//				for (var backpack : backpacksInVehicle) {
+//					backpack.backpackPlan().handleEvent(vaafe);
+//				}
+//			}
+//		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
+//			var backpacksInVehicle = backpackByVehicle.get(vdafe.getVehicleId());
+//			if (backpacksInVehicle != null) {
+//				for (var backpack : backpacksInVehicle) {
+//					backpack.backpackPlan().handleEvent(vdafe);
+//				}
+//			}
+//		} else if (e instanceof ActivityStartEvent ase) {
+//			var backpack = backpackByPerson.get(ase.getPersonId());
+//			backpack.backpackPlan().handleEvent(ase);
+//		} else if (e instanceof ActivityEndEvent aee) {
+//			var backpack = backpackByPerson.get(aee.getPersonId());
+//			backpack.backpackPlan().handleEvent(aee);
+//		} else if (e instanceof PersonDepartureEvent pde) {
+//			var backpack = backpackByPerson.get(pde.getPersonId());
+//			backpack.backpackPlan().handleEvent(pde);
+//		} else if (e instanceof PersonArrivalEvent pae) {
+//			var backpack = backpackByPerson.get(pae.getPersonId());
+//			backpack.backpackPlan().handleEvent(pae);
+//			backpack.backpackPlan().finishLeg(network, transitSchedule);
+//		} else if (e instanceof TeleportationArrivalEvent tae) {
+//			var backpack = backpackByPerson.get(tae.getPersonId());
+//			backpack.backpackPlan().handleEvent(tae);
+//		} else if (e instanceof PersonStuckEvent pse) {
+//			var backpack = backpackByPerson.get(pse.getPersonId());
+//			if (backpack != null) {
+//				backpack.backpackPlan().handleEvent(pse);
+//				finishPerson(pse.getPersonId());
+//			}
+//		}
+//	}
 
 	private record TransitInformation(Id<TransitRoute> route, Id<TransitLine> line) {
 

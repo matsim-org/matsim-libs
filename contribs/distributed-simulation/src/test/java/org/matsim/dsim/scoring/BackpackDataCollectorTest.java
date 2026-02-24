@@ -3,6 +3,7 @@ package org.matsim.dsim.scoring;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,6 +16,8 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 import org.matsim.core.mobsim.dsim.SimStepMessage;
 import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
+import org.matsim.core.mobsim.qsim.pt.PersonLeavesPtVehicleEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -28,13 +31,16 @@ import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.*;
 import org.mockito.ArgumentCaptor;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.*;
 
 class BackpackDataCollectorTest {
+
 
 	@Test
 	void testTeleportation() {
@@ -61,8 +67,10 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -135,8 +143,10 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var eps = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, eps);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, eps, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(1., pId, link1, null, "home", new Coord(0, 0)));
@@ -147,7 +157,7 @@ class BackpackDataCollectorTest {
 		collector.teleportedPersonLeavesPartition(distAggent);
 
 		// capture the backpack that was passed to messaging.
-		var backPackCaptor = ArgumentCaptor.forClass(BackPack.class);
+		var backPackCaptor = ArgumentCaptor.forClass(Backpack.Msg.class);
 		verify(messaging, times(1)).collectBackPack(backPackCaptor.capture(), anyInt());
 		var backpack = backPackCaptor.getValue();
 
@@ -161,8 +171,12 @@ class BackpackDataCollectorTest {
 		collector.handleEvent(new ActivityStartEvent(25, pId, link2, null, "work", new Coord(1001, 0)));
 		collector.finishPerson(distAggent.getId());
 
+		var finishedBackpackCaptor = ArgumentCaptor.forClass(FinishedBackpack.class);
+		verify(eps, times(1)).addBackpack(finishedBackpackCaptor.capture());
+		var finishedBackpack = finishedBackpackCaptor.getValue();
+
 		// make sure all plan elements are present. The other values should be the same as in the test above.
-		assertEquals(3, backpack.backpackPlan().experiencedPlan().getPlanElements().size());
+		assertEquals(3, finishedBackpack.experiencedPlan().getPlanElements().size());
 	}
 
 	@Test
@@ -209,8 +223,10 @@ class BackpackDataCollectorTest {
 		transitLine.addRoute(transitRoute);
 		schedule.addTransitLine(transitLine);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.pt, new ExperiencedTransitRouteBuilderProvider(network, schedule));
 
-		var collector = new BackpackDataCollector(mock(SimStepMessaging.class), network, pop, schedule, mock(AgentSourcesContainer.class), fbc);
+		var collector = new BackpackDataCollector(mock(SimStepMessaging.class), network, pop, schedule, mock(AgentSourcesContainer.class), fbc, providers);
 
 		collector.registerAgent(distAgent);
 
@@ -223,14 +239,14 @@ class BackpackDataCollectorTest {
 
 		// 3. PT movement and boarding
 		collector.handleEvent(new VehicleArrivesAtFacilityEvent(105., transitVehicle, stop1.getId(), 0.0));
-		collector.handleEvent(new PersonEntersVehicleEvent(110., pId, transitVehicle));
+		collector.handleEvent(new PersonEntersPtVehicleEvent(110., pId, transitVehicle, transitLine.getId(), transitRoute.getId()));
 		collector.handleEvent(new VehicleDepartsAtFacilityEvent(115., transitVehicle, stop1.getId(), 0.0));
 
 		collector.handleEvent(new LinkLeaveEvent(120., transitVehicle, link1));
 		collector.handleEvent(new LinkEnterEvent(120., transitVehicle, link2));
 
 		collector.handleEvent(new VehicleArrivesAtFacilityEvent(130., transitVehicle, stop2.getId(), 0.0));
-		collector.handleEvent(new PersonLeavesVehicleEvent(135., pId, transitVehicle));
+		collector.handleEvent(new PersonLeavesPtVehicleEvent(135., pId, transitVehicle, transitLine.getId(), transitRoute.getId()));
 
 		// 4. Arrival at destination
 		collector.handleEvent(new PersonArrivalEvent(135., pId, link2, "pt"));
@@ -292,8 +308,10 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.car, new ExperiencedNetworkRouteBuilderProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		collector.registerAgent(distAggent);
 		collector.handleEvent(new ActivityEndEvent(100., pId, link1, null, "home", new Coord(0, 0)));
@@ -373,8 +391,11 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.car, new ExperiencedNetworkRouteBuilderProvider(network));
+		providers.put(TransportMode.ride, new ExperiencedNetworkRouteBuilderProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		collector.registerAgent(distAgent1);
 		collector.registerAgent(distAgent2);
@@ -451,8 +472,10 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider());
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		var distAgent = mock(DistributedMobsimAgent.class);
 		when(distAgent.getId()).thenReturn(pId);
@@ -502,8 +525,10 @@ class BackpackDataCollectorTest {
 		var transitSchedule = mock(TransitSchedule.class);
 		var asc = mock(AgentSourcesContainer.class);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.car, new ExperiencedNetworkRouteBuilderProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		collector.registerAgent(ignoredAgent);
 		collector.registerAgent(registeredAgent);
@@ -545,11 +570,13 @@ class BackpackDataCollectorTest {
 		when(ignoredVehicle.getDriver()).thenReturn(ignoredDriver);
 		when(asc.vehicleFromContainer(any())).thenReturn(ignoredVehicle);
 		var fbc = mock(FinishedBackpackCollector.class);
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.car, new ExperiencedNetworkRouteBuilderProvider(network));
 
-		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc);
+		var collector = new BackpackDataCollector(messaging, network, pop, transitSchedule, asc, fbc, providers);
 
 		var msg = SimStepMessage.builder()
-			.addBackPack(new BackPack(registered, 0))
+			.addBackPack(new Backpack.Msg(registered, List.of(), 0, new BackpackPlan.Msg(null, null, null)))
 			.addVehicleContainer(new VehicleContainer(null, null, new VehicleContainer.Occupant(ignoredAgent), List.of()))
 			.build();
 		collector.process(msg);

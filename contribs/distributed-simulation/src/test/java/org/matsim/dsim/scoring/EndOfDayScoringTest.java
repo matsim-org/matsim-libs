@@ -3,6 +3,7 @@ package org.matsim.dsim.scoring;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -18,7 +19,9 @@ import org.matsim.dsim.simulation.IterationInformation;
 import org.matsim.facilities.ActivityFacility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,27 +48,29 @@ class EndOfDayScoringTest {
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
 
+		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
+		providers.put(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider());
+
 		var startFacilityId = Id.create("f1", ActivityFacility.class);
-		var backpack = new BackPack(personId, 0);
+		var backpack = new Backpack(personId, 0, providers);
 		backpack.backpackPlan().handleEvent(new ActivityEndEvent(10, personId, link1, startFacilityId, "start", new Coord(0, 0)));
 		backpack.backpackPlan().handleEvent(new PersonDepartureEvent(10., personId, link1, "walk", "walk"));
 		backpack.backpackPlan().handleEvent(new TeleportationArrivalEvent(25, personId, 339, "walk"));
 		backpack.backpackPlan().handleEvent(new PersonArrivalEvent(25, personId, link2, "walk"));
-		backpack.backpackPlan().finishLeg(network, null);
 		backpack.backpackPlan().handleEvent(new ActivityStartEvent(25, personId, link2, null, "last", new Coord(1001, 0)));
 		backpack.addSpecialScoringEvent(new PersonMoneyEvent(10, personId, -10, "pay", "partner", "ref"));
 		backpack.addSpecialScoringEvent(new PersonScoreEvent(10, personId, -100, "special kind"));
 		backpack.addSpecialScoringEvent(new PersonStuckEvent(10, personId, link2, "stuckMode", "some reason"));
-		backpack.backpackPlan().finish(network, null);
 
 		// we have collected all the data but not yet scored the plan.
-		assertNull(backpack.backpackPlan().experiencedPlan().getScore());
+		var plan = backpack.backpackPlan().finishPlan();
+		assertNull(plan.getScore());
 
 		NewScoreAssigner newScoreAssigner = (_, _, p) -> assertEquals(personId, p.getId());
 		var scoringFunction = new TestScoringFunction();
 		ScoringFunctionFactory sff = _ -> scoringFunction;
 		var eods = new EndOfDayScoring(population, sff, newScoreAssigner, new IterationInformation());
-		var finishedBackpack = new FinishedBackpack(personId, 0, backpack.specialScoringEvents(), backpack.backpackPlan().experiencedPlan());
+		var finishedBackpack = new FinishedBackpack(personId, 0, backpack.specialScoringEvents(), plan);
 		eods.score(finishedBackpack);
 
 		assertEquals(2, scoringFunction.activities.size());

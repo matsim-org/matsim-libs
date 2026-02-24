@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.vehicles.Vehicle;
 
 public class ExperiencedGenericRouteBuilder implements ExperiencedRouteBuilder, Message {
 
@@ -44,5 +45,10 @@ public class ExperiencedGenericRouteBuilder implements ExperiencedRouteBuilder, 
 	public Message toMessage() {
 		// we can send ourselves as a message, as we only have plain data types.
 		return this;
+	}
+
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		return null;
 	}
 }

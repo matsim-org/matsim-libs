@@ -2,9 +2,7 @@ package org.matsim.dsim.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -71,12 +69,24 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			// currentEndFacility
 			parts.getLast().endFacility = vaafe.getFacilityId();
 		} else if (e instanceof VehicleDepartsAtFacilityEvent vdafe) {
-			if (parts.getLast().startFacility != null) {
+			if (parts.getLast().startFacility == null) {
 				parts.getLast().startFacility = vdafe.getFacilityId();
 			}
+		} else if (e instanceof PersonContinuesInVehicleEvent pcive) {
+			// finish current part
+			parts.getLast().endTime = pcive.getTime();
+
+			// start a new part
+			var data = new Data();
+			data.startTime = pcive.getTime();
+			data.vehicleEnterTime = pcive.getTime();
+			data.vehicleId = pcive.getVehicleId();
+			data.line = pcive.getTransitLineId();
+			data.route = pcive.getTransitRouteId();
+			parts.add(data);
+		} else if (e instanceof PersonStuckEvent pse) {
+			parts.getLast().endTime = pse.getTime();
 		}
-
-
 	}
 
 	@Override
@@ -114,7 +124,12 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 
 	@Override
 	public Message toMessage() {
-		return null;
+		return new Msg(parts);
+	}
+
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		return parts.isEmpty() ? null : parts.getLast().vehicleId;
 	}
 
 	static class Data {
@@ -128,5 +143,8 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 		private Id<TransitStopFacility> endFacility;
 		private Id<TransitLine> line;
 		private Id<TransitRoute> route;
+	}
+
+	record Msg(List<Data> parts) implements Message {
 	}
 }

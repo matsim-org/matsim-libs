@@ -1,14 +1,22 @@
 package org.matsim.dsim.scoring;
 
+import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PopulationUtils;
 
-public class ExperiencedActivityBuilder {
+class ExperiencedActivityBuilder {
 
 	private Activity activity;
+
+	ExperiencedActivityBuilder() {
+	}
+
+	ExperiencedActivityBuilder(Msg msg) {
+		activity = msg.activity();
+	}
 
 	void handleEvent(Event e) {
 		if (e instanceof ActivityStartEvent ase) {
@@ -30,5 +38,12 @@ public class ExperiencedActivityBuilder {
 		var result = activity;
 		activity = null;
 		return result;
+	}
+
+	public Msg toMessage() {
+		return new Msg(activity);
+	}
+
+	record Msg(Activity activity) implements Message {
 	}
 }
