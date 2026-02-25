@@ -85,24 +85,12 @@ public class PseudoTransitRoutingModuleTest {
 		{
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
-			params.setBeelineDistanceFactor(1.);
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assertions.assertEquals(400.0, tt, 1e-8);
 			Assertions.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assertions.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
-		}{
-			TeleportedModeParams params = new TeleportedModeParams("mode") ;
-			params.setTeleportedModeFreespeedFactor(3.);
-			params.setBeelineDistanceFactor(2.);
-			double tt = new FreespeedFactorRoutingModule(
-					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assertions.assertEquals(600.0, tt, 1e-8);
-			Assertions.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
-			Assertions.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(2000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
 			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
@@ -110,7 +98,6 @@ public class PseudoTransitRoutingModuleTest {
 
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
-			params.setBeelineDistanceFactor(1.);
 			params.setTeleportedModeFreespeedLimit(5.);
 			f.s.getConfig().routing().addModeRoutingParams(params);
 			f.s.getConfig().controller().setOutputDirectory(utils.getOutputDirectory());
@@ -134,8 +121,7 @@ public class PseudoTransitRoutingModuleTest {
 			Leg newLeg = (Leg) result.get(0) ;
 
 			Assertions.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-			Assertions.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
+			Assertions.assertEquals(2000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
 	}
 

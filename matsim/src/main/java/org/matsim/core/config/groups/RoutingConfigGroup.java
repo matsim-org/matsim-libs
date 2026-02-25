@@ -201,6 +201,12 @@ public final class RoutingConfigGroup extends ConfigGroup {
 				// this should not happen anyway as the setters forbid it
 				throw new RuntimeException( "cannot combine per-person speed attribute and freespeed factor for "+mode );
 			}
+
+			if (teleportedModeFreespeedFactor != null && beelineDistanceFactorForMode != null) {
+				// kept for backwards compatibility
+				log.warn("beelineDistanceFactor has no effect for freespeed-teleported mode " + mode
+						+ ", its use for freespeed teleportation is deprecated. This may be enforced in a future version of MATSim.");
+			}
 		}
 
 		@Override
