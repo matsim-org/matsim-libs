@@ -41,6 +41,7 @@ import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.drt.util.DumpDrtStopsAtEnd;
 import org.matsim.contrib.dvrp.load.DvrpLoadType;
 import org.matsim.contrib.dvrp.passenger.DvrpLoadFromTrip;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
@@ -55,6 +56,7 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.modal.ModalProviders;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -106,6 +108,18 @@ public class DrtModeRoutingModule extends AbstractDvrpModeModule {
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 		// yyyy possibly not used for door2door; try to move inside the corresponding switch statement below.  kai, feb'24
 
+		if(drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.stopbased) {
+			bindModal(DumpDrtStopsAtEnd.class).toProvider(modalProvider(
+					getter -> new DumpDrtStopsAtEnd(
+							getter.getModal(DrtStopNetwork.class),
+							getter.get(OutputDirectoryHierarchy.class)
+					))
+			).asEagerSingleton();
+
+			addControllerListenerBinding().toProvider(modalProvider(
+					getter -> getter.getModal(DumpDrtStopsAtEnd.class)
+			));
+		}
 
 		bindModal(DrtRouteConstraintsCalculator.class).toProvider(modalProvider(getter -> new DefaultDrtRouteConstraintsCalculator(
 				drtCfg, getter.getModal(ConstraintSetChooser.class)))).in(Singleton.class);
