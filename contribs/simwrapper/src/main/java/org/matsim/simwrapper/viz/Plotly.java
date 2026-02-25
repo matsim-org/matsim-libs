@@ -352,6 +352,7 @@ public final class Plotly extends Viz {
 		private final String name;
 		private final String file;
 
+		private Map<String, Object> filter;
 		private Map<String, Object> pivot;
 		private Map<String, Object> constant;
 		private Map<String, Object> aggregate;
@@ -364,7 +365,8 @@ public final class Plotly extends Viz {
 		}
 
 		private Object toJSON() {
-			if (pivot == null &&
+			if (filter == null &&
+				pivot == null &&
 				constant == null &&
 				aggregate == null &&
 				normalize == null &&
@@ -380,6 +382,84 @@ public final class Plotly extends Viz {
 		public DataMapping mapping() {
 			return new DataMapping(name);
 		}
+
+		private static final Set<String> SUPPORTED_CONDITIONALS = Set.of("<", "<=", ">", ">=");
+
+		private Map<String, Object> ensureFilter() {
+			if (filter == null)
+				filter = new LinkedHashMap<>();
+			return filter;
+		}
+
+		/**
+		 * Exact match: filter: { column: value }
+		 */
+		public DataSet filter(String columnName, Object value) {
+			Objects.requireNonNull(columnName, "columnName can not be null");
+			ensureFilter().put(columnName, value);
+			return this;
+		}
+
+		/**
+		 * IN filter: filter: { column: [v1, v2, ...] }
+		 */
+		public DataSet filterIn(String columnName, Object... values) {
+			Objects.requireNonNull(columnName, "columnName can not be null");
+			if (values == null || values.length == 0)
+				throw new IllegalArgumentException("values can not be empty");
+
+			ensureFilter().put(columnName, Arrays.asList(values));
+			return this;
+		}
+
+		/**
+		 * Conditional filter: filter: { column: { conditional: \">=\", value: 0.1 } }
+		 */
+		public DataSet filterConditional(String columnName, String conditional, Number value) {
+			Objects.requireNonNull(columnName, "columnName can not be null");
+			Objects.requireNonNull(conditional, "conditional can not be null");
+			Objects.requireNonNull(value, "value can not be null");
+
+			if (!SUPPORTED_CONDITIONALS.contains(conditional))
+				throw new IllegalArgumentException("Unsupported conditional: " + conditional);
+
+			ensureFilter().put(columnName, Map.of(
+				"conditional", conditional,
+				"value", value
+			));
+			return this;
+		}
+
+		/**
+		 * Range filter: filter: { column: { range: true, values: [min, max] } }
+		 */
+		public DataSet filterRange(String columnName, Number min, Number max) {
+			Objects.requireNonNull(columnName, "columnName can not be null");
+			Objects.requireNonNull(min, "min can not be null");
+			Objects.requireNonNull(max, "max can not be null");
+
+			ensureFilter().put(columnName, Map.of(
+				"range", true,
+				"values", List.of(min, max)
+			));
+			return this;
+		}
+
+		/**
+		 * NOT filter: filter: { column: { invert: true, values: [...] } }
+		 */
+		public DataSet filterNotIn(String columnName, Object... values) {
+			Objects.requireNonNull(columnName, "columnName can not be null");
+			if (values == null || values.length == 0)
+				throw new IllegalArgumentException("values can not be empty");
+
+			ensureFilter().put(columnName, Map.of(
+				"invert", true,
+				"values", Arrays.asList(values)
+			));
+			return this;
+		}
+
 
 		/**
 		 * Indicates that each column beside the already mapped ones contain one data group. This is also known as 'wide-format'.
