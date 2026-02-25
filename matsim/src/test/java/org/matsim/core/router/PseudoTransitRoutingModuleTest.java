@@ -49,6 +49,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesUtils;
@@ -60,6 +61,13 @@ public class PseudoTransitRoutingModuleTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
+
+	/**
+	 * Helper method to create a factory that wraps a single calculator instance for testing.
+	 */
+	private static LeastCostPathCalculatorFactory createTestFactory(LeastCostPathCalculator calculator) {
+		return (network, travelDisutility, travelTime) -> calculator;
+	}
 
 	@Test
 	void testRouteLeg() {
@@ -80,10 +88,11 @@ public class PseudoTransitRoutingModuleTest {
 			params.setBeelineDistanceFactor(1.);
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+					f.s.getNetwork(),
+					createTestFactory(routeAlgo), freespeed, freespeed,
+					params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assertions.assertEquals(400.0, tt, 1e-8);
 			Assertions.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assertions.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
@@ -91,7 +100,9 @@ public class PseudoTransitRoutingModuleTest {
 			params.setBeelineDistanceFactor(2.);
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+					f.s.getNetwork(),
+					createTestFactory(routeAlgo), freespeed, freespeed,
+					params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assertions.assertEquals(600.0, tt, 1e-8);
 			Assertions.assertEquals(600.0, leg.getTravelTime().seconds(), 1e-8);
 			Assertions.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
@@ -126,7 +137,6 @@ public class PseudoTransitRoutingModuleTest {
 			Leg newLeg = (Leg) result.get(0) ;
 
 			Assertions.assertEquals(800.0, newLeg.getTravelTime().seconds(), 1e-8);
-//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assertions.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
 	}
