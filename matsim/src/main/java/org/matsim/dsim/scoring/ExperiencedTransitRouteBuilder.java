@@ -2,7 +2,10 @@ package org.matsim.dsim.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonContinuesInVehicleEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -84,8 +87,6 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			data.line = pcive.getTransitLineId();
 			data.route = pcive.getTransitRouteId();
 			parts.add(data);
-		} else if (e instanceof PersonStuckEvent pse) {
-			parts.getLast().endTime = pse.getTime();
 		}
 	}
 

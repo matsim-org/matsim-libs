@@ -20,6 +20,8 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,8 +39,50 @@ import static org.junit.jupiter.api.Assertions.*;
 class BackpackPlanTest {
 
 	@Test
+	void initEmpty() {
+		var backpackPlan = new BackpackPlan(Map.of(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider()));
+		var plan = backpackPlan.finishPlan();
+		assertEquals(0, plan.getPlanElements().size());
+	}
+
+	@Test
+	void initWithData() {
+
+		final var startTime = 10.;
+		final var endTime = 20.;
+		final var startLink = Id.createLinkId("l1");
+		final var endLink = Id.createLinkId("l2");
+
+		var plan = PopulationUtils.createPlan();
+		var routeBuilder = new ExperiencedGenericRouteBuilder();
+		var legBuilder = new ExperiencedLegBuilder(routeBuilder);
+		// put some data into the builder
+		legBuilder.handleEvent(new PersonDepartureEvent(startTime, Id.create("1", Person.class), startLink, TransportMode.walk, TransportMode.pt));
+		legBuilder.handleEvent(new TeleportationArrivalEvent(endTime, Id.create("1", Person.class), 50.0, TransportMode.walk));
+		legBuilder.handleEvent(new PersonArrivalEvent(endTime, Id.create("1", Person.class), endLink, TransportMode.walk));
+
+		// create a message, which would be sent to another partition and recreate a Backpackplan from it
+		var msg = new BackpackPlan.Msg(plan, null, legBuilder.toMessage());
+		var backpackPlan = new BackpackPlan(msg, Map.of(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider()));
+
+		var finishedPlan = backpackPlan.finishPlan();
+		assertEquals(1, finishedPlan.getPlanElements().size());
+		assertInstanceOf(Leg.class, finishedPlan.getPlanElements().getFirst());
+		var leg = (Leg) finishedPlan.getPlanElements().getFirst();
+		assertEquals(startTime, leg.getDepartureTime().seconds(), 1e-9);
+		assertEquals(endTime - startTime, leg.getTravelTime().seconds(), 1e-9);
+		assertEquals(TransportMode.walk, leg.getMode());
+		assertEquals(TransportMode.pt, leg.getRoutingMode());
+
+		var route = leg.getRoute();
+		assertEquals(endTime - startTime, route.getTravelTime().seconds(), 1e-9);
+		assertEquals(endLink, route.getEndLinkId());
+		assertEquals(startLink, route.getStartLinkId());
+		assertInstanceOf(GenericRouteImpl.class, route);
+	}
+
+	@Test
 	void testCreatesLeg() {
-		Scenario scenario = EventsToLegsTest.createTriangularNetwork();
 		var backpackPlan = new BackpackPlan(Map.of(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider()));
 		var startLink = Id.createLinkId("l1");
 		var endLink = Id.createLinkId("l2");
@@ -94,7 +138,7 @@ class BackpackPlanTest {
 	}
 
 	@Test
-	void createsLegWithAbortedRoute() {
+	void ignoresAbortedLeg() {
 		Scenario scenario = EventsToLegsTest.createTriangularNetwork();
 		var backpackPlan = new BackpackPlan(Map.of(TransportMode.car, new ExperiencedNetworkRouteBuilderProvider(scenario.getNetwork())));
 
@@ -114,29 +158,12 @@ class BackpackPlanTest {
 		// Stuck after entering endLink
 
 		Plan experiencedPlan = backpackPlan.finishPlan();
-		assertEquals(2, experiencedPlan.getPlanElements().size());
+		assertEquals(1, experiencedPlan.getPlanElements().size());
 
 		assertInstanceOf(Activity.class, experiencedPlan.getPlanElements().getFirst());
 		var act = (Activity) experiencedPlan.getPlanElements().getFirst();
 		assertEquals("home", act.getType());
 		assertEquals(startLink, act.getLinkId());
-
-		assertInstanceOf(Leg.class, experiencedPlan.getPlanElements().getLast());
-		var leg = (Leg) experiencedPlan.getPlanElements().getLast();
-		assertEquals(10., leg.getDepartureTime().seconds(), 1e-9);
-		// we don't really care about the travel time here. It should just be positive.
-		assertEquals(7., leg.getTravelTime().seconds(), 1e-9);
-		assertEquals("car", leg.getMode());
-
-		assertInstanceOf(NetworkRoute.class, leg.getRoute());
-		var route = (NetworkRoute) leg.getRoute();
-		assertEquals(startLink, route.getStartLinkId());
-		assertEquals(endLink, route.getEndLinkId());
-		assertEquals(1, route.getLinkIds().size());
-		// the first link was entered at the end, so no distance, the middle link was traveresed, the end link is not counted,
-		// as the agent got stuck on that link. Therefore, the travelled distance should be equal to the middle links length.
-		assertEquals(scenario.getNetwork().getLinks().get(middleLink).getLength(), route.getDistance(), 1e-9);
-		assertEquals(vehId, route.getVehicleId());
 	}
 
 	@Test
@@ -171,7 +198,7 @@ class BackpackPlanTest {
 
 		backpackPlan.handleEvent(new PersonDepartureEvent(10.0, personId, startLinkId, "car", "car"));
 		backpackPlan.handleEvent(new PersonEntersVehicleEvent(10.0, personId, vehId));
-		//driver leaves out vehicle after 10 seconds of driving from one end to the other of the initial link
+		//the driver leaves out vehicle after 10 seconds of driving from one end to the other of the initial link
 		backpackPlan.handleEvent(
 			new VehicleEntersTrafficEvent(10.0, personId, startLinkId, vehId, "car", 0.0));
 		backpackPlan.handleEvent(

@@ -53,8 +53,6 @@ public class ExperiencedNetworkRouteBuilder implements ExperiencedRouteBuilder {
 			data.relativePostionOnArrivalLink = vlte.getRelativePositionOnLink();
 		} else if (e instanceof LinkEnterEvent lee) {
 			data.links.add(lee.getLinkId());
-		} else if (e instanceof PersonStuckEvent pse) {
-			data.endTime = pse.getTime();
 		}
 	}
 

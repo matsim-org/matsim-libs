@@ -490,16 +490,9 @@ class BackpackDataCollectorTest {
 		verify(fbc).addBackpack(backPackCaptor.capture());
 
 		var experiencedPlan = backPackCaptor.getValue().experiencedPlan();
-		assertEquals(2, experiencedPlan.getPlanElements().size());
+		assertEquals(1, experiencedPlan.getPlanElements().size());
 
 		assertInstanceOf(Activity.class, experiencedPlan.getPlanElements().get(0));
-		assertInstanceOf(Leg.class, experiencedPlan.getPlanElements().get(1));
-
-		var leg = (Leg) experiencedPlan.getPlanElements().get(1);
-		assertEquals("walk", leg.getMode());
-		assertEquals(110., leg.getDepartureTime().seconds(), 1e-9);
-		// Stuck time (120) - departure time (110) = 10
-		assertEquals(10., leg.getTravelTime().seconds(), 1e-9);
 	}
 
 	@Test
