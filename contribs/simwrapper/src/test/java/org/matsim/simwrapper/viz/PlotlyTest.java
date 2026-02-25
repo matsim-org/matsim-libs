@@ -3,6 +3,7 @@ package org.matsim.simwrapper.viz;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -25,6 +26,7 @@ import tech.tablesaw.plotly.traces.ScatterTrace;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class PlotlyTest {
 
@@ -142,6 +144,32 @@ public class PlotlyTest {
 		Assertions.assertThat(new File(utils.getClassInputDirectory(), "multiple.yaml"))
 				.hasContent(value);
 
+	}
+
+	@Test
+	void filter() throws IOException {
+
+		Plotly plotly = new Plotly();
+
+		plotly.addTrace(
+			BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
+				plotly.addDataset("mode_share_personTraffic.csv")
+					.filter("subpopulation", "person")
+					.filterIn("main_mode", "car", "pt", "ride")
+					.filterConditional("share", ">=", 0.05)
+					.filterRange("distance", 0.05, 0.3)
+					.filterNotIn("dist_group", "20000+")
+					.mapping()
+					.x("dist_group")
+					.y("share")
+			);
+
+		String value = writer.writeValueAsString(plotly);
+		File expectedYaml = new File(utils.getClassInputDirectory(), "filter.yaml");
+		ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+		JsonNode expected = yamlMapper.readTree(Files.readString(expectedYaml.toPath()));
+		JsonNode actual = yamlMapper.readTree(value);
+		Assertions.assertThat(actual).isEqualTo(expected);
 	}
 
 }
