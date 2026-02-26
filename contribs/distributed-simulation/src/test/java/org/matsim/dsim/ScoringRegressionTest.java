@@ -7,8 +7,17 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -16,12 +25,14 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.net.URL;
 import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ScoringRegressionTest {
 
@@ -60,7 +71,6 @@ public class ScoringRegressionTest {
 	public void ptTrip() {
 
 		var config = loadConfig("pt-simple-lineswitch", utils.getOutputDirectory());
-		config.controller().setMobsim("dsim");
 		var scenario = ScenarioUtils.loadScenario(config);
 		var controler = new Controler(scenario);
 		controler.run();
@@ -68,6 +78,31 @@ public class ScoringRegressionTest {
 		var person = getSinglePerson(scenario);
 		assertEquals(-57.284102507736776, person.getSelectedPlan().getScore(), 0.1);
 
+	}
+
+	@Test
+	public void drtTrip() {
+
+		var config = loadConfig("dvrp-grid", utils.getOutputDirectory(), "one_shared_taxi_config.xml");
+		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.accessEgressModeToLink);
+		MultiModeDrtConfigGroup multiModeDrtConfig = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtConfig, config.scoring(), config.routing());
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class);
+
+		var scenario = ScenarioUtils.loadScenario(config);
+		scenario.getPopulation()
+			.getFactory()
+			.getRouteFactories()
+			.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+
+		var controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
+		controler.run();
+
+		fail("Implement assertions here!");
 	}
 
 	/**

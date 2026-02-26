@@ -60,7 +60,8 @@ class BackpackPlan {
 		var provider = providers.get(e.getLegMode());
 
 		if (provider == null) {
-			throw new IllegalStateException("No route builder found for mode " + e.getLegMode());
+			throw new IllegalStateException("No route builder registered for mode " + e.getLegMode() +
+				" an implementation of ExperiencedRouteBuilder interface must be bound for each mode in the simulation.");
 		}
 
 		var routeBuilder = provider.get();
