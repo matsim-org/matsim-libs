@@ -4,6 +4,7 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class ScoringRegressionTest {
 
@@ -102,7 +102,16 @@ public class ScoringRegressionTest {
 		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(multiModeDrtConfig));
 		controler.run();
 
-		fail("Implement assertions here!");
+		// use score of arbitrary agents and check
+		var passenger0 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_0"));
+		var passenger3 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_3"));
+		var passenger7 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_7"));
+		var passenger9 = scenario.getPopulation().getPersons().get(Id.createPersonId("passenger_9"));
+
+		assertEquals(142.59829307717007, passenger0.getSelectedPlan().getScore(), 0.1);
+		assertEquals(141.4610627925853, passenger3.getSelectedPlan().getScore(), 0.1);
+		assertEquals(140.53623115694026, passenger7.getSelectedPlan().getScore(), 0.1);
+		assertEquals(139.9389839062014, passenger9.getSelectedPlan().getScore(), 0.1);
 	}
 
 	/**

@@ -60,7 +60,7 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 		var travelTime = OptionalTime.defined(data.endTime - data.startTime);
 		var boardingTime = OptionalTime.defined(data.pickUpTime);
 
-		return new ExperiencedDrtRoute(netRoute.getStartLinkId(), netRoute.getEndLinkId(), data.vehicle, distance, travelTime, boardingTime);
+		return new ExperiencedDrtRoute(netRoute.getStartLinkId(), netRoute.getEndLinkId(), data.vehicle, data.request, distance, travelTime, boardingTime);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 		Id<Vehicle> vehicle;
 	}
 
-	static class ExperiencedDrtRoute implements PassengerRoute {
+	public static class ExperiencedDrtRoute implements PassengerRoute {
 
 		private final Id<Link> startLink;
 		private final Id<Link> endLink;
@@ -90,14 +90,16 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 		private final OptionalTime boardingTime;
 		private final double distance;
 		private final Id<Vehicle> vehicle;
+		private final Id<Request> request;
 
-		ExperiencedDrtRoute(Id<Link> startLink, Id<Link> endLink, Id<Vehicle> vehicle, double distance, OptionalTime travelTime, OptionalTime boardingTime) {
+		ExperiencedDrtRoute(Id<Link> startLink, Id<Link> endLink, Id<Vehicle> vehicle, Id<Request> request, double distance, OptionalTime travelTime, OptionalTime boardingTime) {
 			this.startLink = startLink;
 			this.endLink = endLink;
 			this.vehicle = vehicle;
 			this.distance = distance;
 			this.travelTime = travelTime;
 			this.boardingTime = boardingTime;
+			this.request = request;
 		}
 
 		@Override
@@ -169,9 +171,15 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 			return vehicle;
 		}
 
+		public Id<Request> getRequestId() {
+			return request;
+		}
+
 		@Override
 		public Route clone() {
 			throw new UnsupportedOperationException();
 		}
+
+
 	}
 }
