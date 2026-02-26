@@ -461,7 +461,7 @@ public final class RoutingConfigGroup extends ConfigGroup {
 		TeleportedModeParams pars = (TeleportedModeParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by
 		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
-		if ( pars.getBeelineDistanceFactor()== null ) {
+		if ( pars.getTeleportedModeSpeed() != null && pars.getBeelineDistanceFactor() == null ) {
 			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
 		}
 		super.addParameterSet( set );
