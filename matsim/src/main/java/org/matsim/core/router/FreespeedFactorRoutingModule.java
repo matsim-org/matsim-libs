@@ -119,7 +119,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.params.getTeleportedModeFreespeedFactor());
 
 			// calculate the distance from the path and the last link:
-			double distance = RouteUtils.calcDistance(path) + toLink.getLength();
+			double distance = RouteUtils.calcDistanceExcludingStartEndLink(path) + toLink.getLength();
 
 			// create the route and set the travel time and distance
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());

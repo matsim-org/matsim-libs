@@ -209,7 +209,7 @@ public class RouteUtils {
 		return now - startTime;
 	}
 
-	public static double calcDistance(final LeastCostPathCalculator.Path path) {
+	public static double calcDistanceExcludingStartEndLink(final LeastCostPathCalculator.Path path) {
 		double length = 0.;
 		for (Link link : path.links) {
 			length += link.getLength();
