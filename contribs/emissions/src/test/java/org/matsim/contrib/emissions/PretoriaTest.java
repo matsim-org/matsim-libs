@@ -56,10 +56,6 @@ public class PretoriaTest {
 	private final static String HBEFA_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Concept_Aleks_V1.1.csv";
 	private final static String HBEFA_COLD_DET = HBEFA_4_1_PATH + "EFA_ColdStart_Concept_2020_detailed_perTechAverage.csv";
 
-	private final static String HBEFA_HOT_TECHAVG = HBEFA_4_1_PATH + "EFA_HOT_Concept_perTechFueltype_all_2020.csv";
-
-	private final static String HBEFA_HGV_HOT_DET = HBEFA_4_1_PATH + "EFA_HOT_Subsegm_detailed_HGV_Aleks.csv";
-
 	// TODO Remove for final commit, as this was just used once for data preparation
 	public static void main(String[] args) {
 		Network cRoute = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_pems.xml");
@@ -152,7 +148,7 @@ public class PretoriaTest {
 		try (var reader = Files.newBufferedReader(Path.of("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/data/public-ETIOS.csv")); var parser = CSVParser.parse(reader, format)) {
 			for(var record : parser){
 				coordHeights.add(
-					new Tuple<Coord, Double> (
+					new Tuple<> (
 						convertWGS84toLo29(Double.parseDouble(record.get("gps_lat")), Double.parseDouble(record.get("gps_lon"))),
 						Double.parseDouble(record.get("gps_alt"))
 					)
@@ -165,9 +161,10 @@ public class PretoriaTest {
 		// TODO Some parts of the coord mapping assume 2d coords, maybe add as attribute instead
 		for(var node : cRoute.getNodes().values()){
 			double alt = coordHeights.parallelStream()
-				.map(t -> new Tuple<>(CoordUtils.length(CoordUtils.minus(node.getCoord(), t.getFirst())), t.getSecond()))
+				.map(t -> new Tuple<>(CoordUtils.calcEuclideanDistance(node.getCoord(), t.getFirst()), t.getSecond()))
 				.min(Comparator.comparingDouble(Tuple::getFirst))
-				.get().getSecond();
+				.map(Tuple::getSecond)
+				.orElseThrow();
 
 //			node.setCoord(new Coord(node.getCoord().getX(), node.getCoord().getY(), alt));
 			node.getAttributes().putAttribute("alt", alt);
@@ -279,72 +276,15 @@ public class PretoriaTest {
 		return filteredGpsEntries;
 	}
 
-	/// Removes clusters, that happen due to standing times TODO Check if correct
+	/// Removes clusters, that happen due to standing times
 	private List<PretoriaGPSEntry> clusterStandingGpsEntries(List<PretoriaGPSEntry> gpsEntries){
-		/*List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
-
-		int i = 2;
-		while(i < cleanedEntries.size()){
-			PretoriaGPSEntry start = cleanedEntries.get(i-2);
-			PretoriaGPSEntry middle = cleanedEntries.get(i-1);
-			PretoriaGPSEntry end = cleanedEntries.get(i);
-
-			// Do not cluster between different trips
-			if (!(start.trip == middle.trip && middle.trip == end.trip))
-				throw new IllegalArgumentException("Tried to cluster entries from different driving trips!");
-
-			// If the directions change too sharply, the entry is removed and its stats are added to the next entry
-			Coord vec0 = CoordUtils.minus(cleanedEntries.get(i-2).coord, cleanedEntries.get(i-1).coord);
-			Coord vec1 = CoordUtils.minus(cleanedEntries.get(i-1).coord, cleanedEntries.get(i).coord);
-
-			// Check if the angle is larger than (or eq.) 90 degree OR if veh speed is less than 1 km/h
-			if (vec0.getX() * vec1.getX() + vec0.getY() * vec1.getY() <= 0 || middle.vehVel < 1){
-				// Angle is too sharp, save data of i-1
-				double CO = cleanedEntries.get(i-1).CO;
-				double CO2 = cleanedEntries.get(i-1).CO2;
-				double NOx = cleanedEntries.get(i-1).NOx;
-
-				// Create updated entry i
-				var updatedEntry = new PretoriaGPSEntry(
-					cleanedEntries.get(i).time,
-					cleanedEntries.get(i).trip,
-					cleanedEntries.get(i).driver,
-					cleanedEntries.get(i).route,
-					cleanedEntries.get(i).load,
-					cleanedEntries.get(i).coldStart,
-					cleanedEntries.get(i).coord,
-					cleanedEntries.get(i).gpsAlt,
-					cleanedEntries.get(i).gpsVel,
-					cleanedEntries.get(i).vehVel,
-					cleanedEntries.get(i).CO + CO,
-					cleanedEntries.get(i).CO2 + CO2,
-					cleanedEntries.get(i).NOx + NOx
-					);
-
-				// Update the list
-				cleanedEntries.set(i, updatedEntry);
-				cleanedEntries.remove(i-1);
-			} else {
-				i++;
-			}
-		}
-
-		assert gpsEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() -
-			cleanedEntries.stream().mapToDouble(e -> e.CO).reduce(Double::sum).getAsDouble() < 1e-6;
-		assert gpsEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() -
-			cleanedEntries.stream().mapToDouble(e -> e.CO2).reduce(Double::sum).getAsDouble() < 1e-6;
-		assert gpsEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() -
-			cleanedEntries.stream().mapToDouble(e -> e.NOx).reduce(Double::sum).getAsDouble() < 1e-6;
-
-		return cleanedEntries;*/
-
 		List<PretoriaGPSEntry> cleanedEntries = new ArrayList<>(gpsEntries);
 
 		int i = 0;
 		while(i < cleanedEntries.size()-1){
 			PretoriaGPSEntry e = cleanedEntries.get(i);
 
-			// Check if the angle is larger than (or eq.) 90 degree OR if veh speed is less than 1 km/h
+			// Check if veh speed is less than 1 km/h
 			if (e.vehVel < 1){
 				double CO = cleanedEntries.get(i).CO;
 				double CO2 = cleanedEntries.get(i).CO2;
@@ -409,8 +349,6 @@ public class PretoriaTest {
 	@ParameterizedTest
 	@MethodSource("pretoriaInputsExpTestParams")
 	public void pretoriaInputsExpTest(PretoriaVehicle vehicle, EmissionsConfigGroup.EmissionsComputationMethod method) throws IOException {
-//		final String SVN = "https://svn.vsp.tu-berlin.de/repos/public-svn/3507bb3997e5657ab9da76dbedbb13c9b5991d3e/0e73947443d68f95202b71a156b337f7f71604ae/";
-
 		// Prepare config
 		EmissionsConfigGroup ecg = getEmissionsConfigGroup(vehicle, method);
 		Config config = ConfigUtils.createConfig(ecg);
@@ -442,7 +380,6 @@ public class PretoriaTest {
 
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, filterUnwantedLinkEntries(entries, unwantedLinks, pretoriaNetwork)));
 		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, clusterStandingGpsEntries(entries)));
-//		tripId2pretoriaGpsEntries.forEach((tripId, entries) -> tripId2pretoriaGpsEntries.put(tripId, interpolateGpsEntries(entries))); // TODO Makes results worse
 
 		// Map GPS Information to Network Links
 		EmissionModule module = new EmissionModule(scenario, manager);
@@ -462,8 +399,8 @@ public class PretoriaTest {
 			tripId2coldStart.putIfAbsent(tripId, gpsEntries.getFirst().coldStart);
 
 			// Calculate cold Emissions (but not for RRV, as RRV has no available HBEFA Cold Table)
-			if(vehicle != PretoriaVehicle.RRV && vehicle != PretoriaVehicle.RRV_TECHAVG){
-				vehHbefaInfo.getSecond().setHbefaEmConcept("average"); // TODO Try to get better cold emissions table, so that I can access detailed data
+			if(vehicle.computeColdEmissions){
+				vehHbefaInfo.getSecond().setHbefaEmConcept("average");
 				var coldEmissionsMatsim = module.getColdEmissionAnalysisModule().calculateColdEmissions(
 					Id.createVehicleId("0"),
 					13*3600,
@@ -478,35 +415,34 @@ public class PretoriaTest {
 				tripId2pollutant2coldEmission.get(tripId).put(Pollutant.NOx, coldEmissionsMatsim.get(Pollutant.NOx));
 			}
 
-			KalmanFilter kalmanFilter = new KalmanFilter(pretoriaNetwork, gpsEntries);
-			kalmanFilter.naiveFilter();
-			kalmanFilter.computeLinkShares();
+			GPSToNetworkMapping1D mapping1D = new GPSToNetworkMapping1D(pretoriaNetwork, gpsEntries);
+			mapping1D.mapping();
+			mapping1D.computeLinkShares();
 
 			// Extract PEMS Emissions
-			kalmanFilter.gpsEntry2linkId2proportion.forEach((gpsEntry, linkId2proportion) -> {
+			mapping1D.gpsEntry2linkId2proportion.forEach((gpsEntry, linkId2proportion) ->
 				linkId2proportion.forEach((linkId, proportion) -> {
-					double CO_pems = proportion*gpsEntry.CO;
-					double CO2_pems = proportion*gpsEntry.CO2;
-					double NOx_pems = proportion*gpsEntry.NOx;
+				double CO_pems = proportion*gpsEntry.CO;
+				double CO2_pems = proportion*gpsEntry.CO2;
+				double NOx_pems = proportion*gpsEntry.NOx;
 
-					tripId2linkId2pollutant2realEmission.putIfAbsent(tripId, new HashMap<>());
-					tripId2linkId2pollutant2realEmission.get(tripId).putIfAbsent(linkId, new HashMap<>());
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.CO, 0.);
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.CO2_TOTAL, 0.);
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.NOx, 0.);
+				tripId2linkId2pollutant2realEmission.putIfAbsent(tripId, new HashMap<>());
+				tripId2linkId2pollutant2realEmission.get(tripId).putIfAbsent(linkId, new HashMap<>());
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.CO, 0.);
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.CO2_TOTAL, 0.);
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).putIfAbsent(Pollutant.NOx, 0.);
 
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.CO,
-						tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.CO) + CO_pems);
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.CO2_TOTAL,
-						tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.CO2_TOTAL) + CO2_pems);
-					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.NOx,
-						tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.NOx) + NOx_pems);
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.CO,
+					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.CO) + CO_pems);
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.CO2_TOTAL,
+					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.CO2_TOTAL) + CO2_pems);
+				tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).put(Pollutant.NOx,
+					tripId2linkId2pollutant2realEmission.get(tripId).get(linkId).get(Pollutant.NOx) + NOx_pems);
 
-				});
-			});
+			}));
 
 			// Compute MATSim Emissions
-			kalmanFilter.linkId2time.forEach((linkId, time) -> {
+			mapping1D.linkId2time.forEach((linkId, time) -> {
 				var link = pretoriaNetwork.getLinks().get(linkId);
 				double alt = (Double) link.getToNode().getAttributes().getAttribute("alt") - (Double) link.getFromNode().getAttributes().getAttribute("alt");
 
@@ -529,9 +465,6 @@ public class PretoriaTest {
 			});
 
 		});
-
-
-
 
 		// Save the results in a file
 		CSVPrinter writer = new CSVPrinter(
@@ -556,7 +489,7 @@ public class PretoriaTest {
 			var linkId2pollutant2warmEmissions = tripId2linkId2pollutant2warmEmission.get(tripId);
 
 			// Print the cold emissions if trip had a cold start
-			if(tripId2coldStart.get(tripId) && vehicle != PretoriaVehicle.RRV){
+			if(tripId2coldStart.get(tripId) && vehicle.computeColdEmissions){
 				var coldPollutantMap = tripId2pollutant2coldEmission.get(tripId);
 				try {
 					writer.printRecord(
@@ -621,36 +554,40 @@ public class PretoriaTest {
 
 	// ----- Helper definitions -----
 
-	private record PretoriaGPSEntry(double time, int trip, int driver, int route, int load, boolean coldStart, Coord coord, double gpsAlt, double gpsVel, double vehVel, double CO, double CO2, double NOx){};
+	private record PretoriaGPSEntry(double time, int trip, int driver, int route, int load, boolean coldStart, Coord coord, double gpsAlt, double gpsVel, double vehVel, double CO, double CO2, double NOx){}
 
 	public enum PretoriaVehicle{
 		/// Ford Figo 1.5 (1498ccm, 91kW) Trend hatchback light passenger vehicle with a Euro 6 classification (132g/km) (file: public-figo.csv).
-		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
-		FIGO_TECHAVG("petrol (4S)", "average", "average", HbefaVehicleCategory.PASSENGER_CAR),
+		FIGO("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR, true),
+		FIGO_TECHAVG("petrol (4S)", "average", "average", HbefaVehicleCategory.PASSENGER_CAR, true),
 
 		/// Toyota Etios 1.5 (1496ccm, 66kW) Sprint hatchback light passenger vehicle with a Euro 6 classification (138g/km) (file: public-etios.csv).
-		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR),
+		ETIOS("petrol (4S)", "PC P Euro-6", "average", HbefaVehicleCategory.PASSENGER_CAR, true),
 
 		//TODO Add load entry
 		/// Isuzu FTR850 AMT (Road-Rail Vehicle) medium heavy vehicle with a Euro 3 classification (file: public-rrv.csv).
-		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE),
-		RRV_TECHAVG("diesel", "average", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		RRV("diesel", "HGV D Euro-III", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, false),
+		RRV_TECHAVG("diesel", "average", "average", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, false),
+//		RRV("diesel", "HGV D Euro-III", "RT >7.5-12t", HbefaVehicleCategory.HEAVY_GOODS_VEHICLE),
+		;
 
 		final String hbefaTechnology;
 		final String hbefaEmConcept;
 		final String hbefaSizeClass;
 		final HbefaVehicleCategory hbefaVehicleCategory;
+		final boolean computeColdEmissions;
 
-		PretoriaVehicle(String hbefaTechnology, String hbefaEmConcept, String hbefaSizeClass, HbefaVehicleCategory hbefaVehicleCategory) {
+		PretoriaVehicle(String hbefaTechnology, String hbefaEmConcept, String hbefaSizeClass, HbefaVehicleCategory hbefaVehicleCategory, boolean computeColdEmissions) {
 			this.hbefaTechnology = hbefaTechnology;
 			this.hbefaEmConcept = hbefaEmConcept;
 			this.hbefaSizeClass = hbefaSizeClass;
 			this.hbefaVehicleCategory = hbefaVehicleCategory;
+			this.computeColdEmissions = computeColdEmissions;
 		}
 	}
 
 	// TODO Very slow, optimize
-	private static class KalmanFilter{
+	private static class GPSToNetworkMapping1D{
 		// Needed for computation
 		Network route;
 		List<PretoriaGPSEntry> gpsEntries;
@@ -658,16 +595,14 @@ public class PretoriaTest {
 		// Prepared by class
 		List<Link> linkOrder;
 		List<Double> accumulatedLinkLengths4links;
-
 		List<Double> projectedAccumulatedDistances4gpsEntries;
 
 		//Outputs
-		List<Double> accumulatedProjectedDistances4gpsEntries;
-		List<Double> NAIVEaccumulatedDistance4gpsEntries;
+		List<Double> accumulatedDistance4gpsEntries;
 		Map<PretoriaGPSEntry, Map<Id<Link>, Double>> gpsEntry2linkId2proportion;
 		Map<Id<Link>, Double> linkId2time;
 
-		public KalmanFilter(Network route, List<PretoriaGPSEntry> gpsEntries) {
+		public GPSToNetworkMapping1D(Network route, List<PretoriaGPSEntry> gpsEntries) {
 			this.route = route;
 			this.gpsEntries = gpsEntries;
 
@@ -676,7 +611,7 @@ public class PretoriaTest {
 			this.projectedAccumulatedDistances4gpsEntries = getProjectedAccumulatedDistances();
 		}
 
-		/// Returns the links in between two links using BFS. TODO Check/Test
+		/// Returns the path links from start to end using BFS. TODO Check/Test
 		private List<Link> retrieveInBetweenLinks(Link startLink, Link endLink){
 			if(startLink.getId().equals(endLink.getId()))
 				return new ArrayList<>(List.of(startLink));
@@ -711,7 +646,6 @@ public class PretoriaTest {
 			List<Link> path = new LinkedList<>();
 			for (Link cur = endLink; cur != null; cur = parent.get(cur)) {
 				path.addFirst(cur);
-				if (cur.equals(startLink)) break;
 			}
 
 			return path;
@@ -743,7 +677,7 @@ public class PretoriaTest {
 
 		private Node getSharedNode(Link a, Link b){
 			// Get the node, that is shared by both links
-			Node sharedNode = null;
+			Node sharedNode;
 			if (a.getFromNode().equals(b.getFromNode()) || a.getFromNode().equals(b.getToNode())) {
 				sharedNode = a.getFromNode();
 			} else if (a.getToNode().equals(b.getFromNode()) || a.getToNode().equals(b.getToNode())) {
@@ -765,150 +699,42 @@ public class PretoriaTest {
 
 				Coord p = CoordUtils.orthogonalProjectionOnLineSegment(l.getFromNode().getCoord(), l.getToNode().getCoord(), e.coord);
 				Node sharedNode = index == 0 ? l.getFromNode() : getSharedNode(l, linkOrder.get(index-1));
-				double projectedLen = CoordUtils.length(CoordUtils.minus(sharedNode.getCoord(), p));
+				assert sharedNode != null;
+				double projectedLen = CoordUtils.calcEuclideanDistance(sharedNode.getCoord(), p);
 
 				projectedAccumulatedDistances.add(prevLen + projectedLen);
 			}
 			return projectedAccumulatedDistances;
 		}
 
-		// TODO Check why the kalmanFilter overshoots
-		private List<Double> kalmanFilter() {
-			accumulatedProjectedDistances4gpsEntries = new ArrayList<>(gpsEntries.size());
-			accumulatedProjectedDistances4gpsEntries.add(0.);
-			NAIVEaccumulatedDistance4gpsEntries = new ArrayList<>(gpsEntries.size());
-			NAIVEaccumulatedDistance4gpsEntries.add(0.);
-
-			// Init the state variables
-			double S = 0;
-			double V = gpsEntries.getFirst().vehVel;
-
-			// Init the process noise covariance matrix
-			double p00 = 25; // stderr=5m/s
-			double p01 = 0;
-			double p11 = 4; // stderr=2m/s^2
-
-			// uncertainties TODO Compute them from dataset instead of setting them arbitrarily
-			double sigma_a = 2.0;
-			double sigma_v = 0.2;
-			double sigma_gps = 6;
-
-			double z_S;
-			double z_V = 0;
-			for (int i = 1; i < gpsEntries.size(); i++) {
-				// Step 1: Prediction
-				double dt = gpsEntries.get(i).time - gpsEntries.get(i-1).time;
-				double dz = projectedAccumulatedDistances4gpsEntries.get(i) - projectedAccumulatedDistances4gpsEntries.get(i-1);
-
-				// State transition by applying movement equation
-				S = S + V*dt;
-
-				// Create observation noise covariance matrix
-				final double q00 = 0.25 * dt*dt*dt*dt * sigma_a*sigma_a;
-				final double q01 = 0.5 * dt*dt*dt * sigma_a*sigma_a;
-				final double q11 = dt*dt * sigma_a*sigma_a;
-
-				// Update process noise covariance matrix
-				double p00_new = p00 + dt*2*p01 + dt*dt*p11 + q00;
-				double p01_new = p01 + dt*p11 + q01;
-				double p11_new = p11 + q11;
-
-				p00 = p00_new;
-				p01 = p01_new;
-				p11 = p11_new;
-
-				// Step 2: Correction ( Distance )
-				z_S = projectedAccumulatedDistances4gpsEntries.get(i);
-
-				// TODO lateral error
-				double sigma_s = sigma_gps; // + e_lateral;
-				double R = sigma_s*sigma_s;
-
-				double y = z_S - S;
-
-				double S_cov = p00 + R;
-
-				double K0 = p00 / S_cov;
-				double K1 = p01 / S_cov;
-
-				// Update state
-				S = S + K0 * y;
-
-				double p00_old = p00;
-				double p01_old = p01;
-				double p11_old = p11;
-
-				// Update covariance
-				p00 = p00_old - K0 * p00_old;
-				p01 = p01_old - K0 * p01_old;
-				p11 = p11_old - K1 * p01_old;
-
-				// Step 3: Correction ( Velocity )
-				z_V = gpsEntries.get(i).vehVel;
-
-				R = sigma_v * sigma_v;
-
-				y = z_V - V;
-
-				S_cov = p11 + R;
-
-				K0 = p01 / S_cov;
-				K1 = p11 / S_cov;
-
-				V = V + K1 * y;
-
-				p00_old = p00;
-				p01_old = p01;
-				p11_old = p11;
-
-				p00 = p00_old - K0 * p01_old;
-				p01 = p01_old - K0 * p11_old;
-				p11 = p11_old - K1 * p11_old;
-
-				// Step 4 Save the distance in a map
-				accumulatedProjectedDistances4gpsEntries.add(S);
-
-				if(V < 0 ) V = 0;
-
-				// TODO DEBUG Only
-				double naiveLen = CoordUtils.length(CoordUtils.minus(gpsEntries.get(i).coord, gpsEntries.get(i-1).coord));
-				NAIVEaccumulatedDistance4gpsEntries.add(NAIVEaccumulatedDistance4gpsEntries.getLast() + naiveLen);
-			}
-
-			return accumulatedProjectedDistances4gpsEntries;
-		}
-
-		// TODO Temporary solution
-		private List<Double> naiveFilter(){
-			NAIVEaccumulatedDistance4gpsEntries = new ArrayList<>(gpsEntries.size());
-			NAIVEaccumulatedDistance4gpsEntries.add(0.);
+		private void mapping(){
+			accumulatedDistance4gpsEntries = new ArrayList<>(gpsEntries.size());
+			accumulatedDistance4gpsEntries.add(0.);
 
 			for (int i = 1; i < gpsEntries.size(); i++){
-				double naiveLen = CoordUtils.length(CoordUtils.minus(gpsEntries.get(i).coord, gpsEntries.get(i-1).coord));
-				NAIVEaccumulatedDistance4gpsEntries.add(NAIVEaccumulatedDistance4gpsEntries.getLast() + naiveLen);
+				double naiveLen = CoordUtils.calcEuclideanDistance(gpsEntries.get(i).coord, gpsEntries.get(i-1).coord);
+				accumulatedDistance4gpsEntries.add(accumulatedDistance4gpsEntries.getLast() + naiveLen);
 			}
-
-			return NAIVEaccumulatedDistance4gpsEntries;
 		}
 
-		private int getNextSmallerIndex(List<Double> list, double dist){
-			for(int i = 0; i < list.size(); i++){
-				if (list.get(i) > dist)
-					return i;
-			}
-			return -1;
+		private int getNextLargerIndex(List<Double> list, double dist){
+			int index = Collections.binarySearch(list, dist);
+			if(index >= 0)
+				return index;
+			else
+				return -index - 1;
 		}
 
-		// TODO Check which filter works best (naive/projected/kalman)
+		// TODO Velocities still overestimated, check why
 		private void computeLinkShares() {
 			gpsEntry2linkId2proportion = new ArrayMap<>();
 			linkId2time = new ArrayMap<>();
 
-			var accDistances = NAIVEaccumulatedDistance4gpsEntries;
+			var accDistances = accumulatedDistance4gpsEntries;
 			var accLen = accDistances.getLast();
 
 			// Lengths can be different, adjust accumulated lengths to MATSim lengths
-			accDistances = accDistances.stream().map(d -> d*0.9999*(accumulatedLinkLengths4links.getLast()/accLen)).toList();
+			accDistances = accDistances.stream().map(d -> d*(1-1e-6)*(accumulatedLinkLengths4links.getLast()/accLen)).toList();
 
 			for (int i = 1; i < gpsEntries.size(); i++) {
 				var dt = gpsEntries.get(i).time - gpsEntries.get(i - 1).time;
@@ -916,8 +742,8 @@ public class PretoriaTest {
 				var startAccDist = accDistances.get(i - 1);
 				var endAccDist = accDistances.get(i);
 
-				var startIndex = getNextSmallerIndex(accumulatedLinkLengths4links, startAccDist);
-				var endIndex = getNextSmallerIndex(accumulatedLinkLengths4links, endAccDist);
+				var startIndex = getNextLargerIndex(accumulatedLinkLengths4links, startAccDist);
+				var endIndex = getNextLargerIndex(accumulatedLinkLengths4links, endAccDist);
 
 				if (startIndex == endIndex) {
 					// Both entries map to the same link, so add the whole time to the link
@@ -932,9 +758,7 @@ public class PretoriaTest {
 				}
 
 				// We are switching links, distribute the time linearly along the links
-				var startLink = linkOrder.get(startIndex);
-				var endLink = linkOrder.get(endIndex);
-				List<Link> path = retrieveInBetweenLinks(startLink, endLink);
+				List<Link> path = linkOrder.subList(startIndex, endIndex+1);
 
 				var dD = endAccDist - startAccDist;
 
@@ -961,30 +785,6 @@ public class PretoriaTest {
 				}
 				assert Math.abs(segmentShares - 1) < 1e-6;
 			}
-		}
-
-		private void printCsv(List<PretoriaGPSEntry> gpsEntries, String path) throws IOException {
-			CSVPrinter writer = new CSVPrinter(
-				IOUtils.getBufferedWriter(path),
-				CSVFormat.DEFAULT);
-			writer.printRecord(
-				"time",
-				"accDist",
-				"naiveAccDist",
-				"projectedAccDist"
-			);
-
-			for(int i = 0; i < gpsEntries.size(); i++){
-				writer.printRecord(
-					gpsEntries.get(i).time,
-					accumulatedProjectedDistances4gpsEntries.get(i),
-					NAIVEaccumulatedDistance4gpsEntries.get(i),
-					projectedAccumulatedDistances4gpsEntries.get(i)
-				);
-			}
-
-			writer.flush();
-			writer.close();
 		}
 	}
 }
