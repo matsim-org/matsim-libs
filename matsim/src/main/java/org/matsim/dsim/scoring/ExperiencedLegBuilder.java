@@ -44,6 +44,7 @@ class ExperiencedLegBuilder {
 		result.setDepartureTime(data.startTime);
 		result.setTravelTime(data.endTime - data.startTime);
 		result.setRoute(routeBuilder.finishRoute());
+
 		if (routeBuilder.getVehicleId() != null) {
 			result.getAttributes().putAttribute(EventsToLegs.VEHICLE_ID_ATTRIBUTE_NAME, routeBuilder.getVehicleId());
 		}

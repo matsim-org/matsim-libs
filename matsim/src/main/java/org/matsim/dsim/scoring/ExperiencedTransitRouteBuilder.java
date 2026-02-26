@@ -63,7 +63,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			parts.getLast().endTime = pae.getTime();
 		} else if (e instanceof PersonEntersPtVehicleEvent pepve) {
 			var currentPart = parts.getLast();
-			currentPart.vehicleEnterTime = pepve.getTime();
+			currentPart.boardingTime = pepve.getTime();
 			currentPart.line = pepve.getTransitLine();
 			currentPart.route = pepve.getTransitRoute();
 			currentPart.vehicleId = pepve.getVehicleId();
@@ -82,7 +82,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			// start a new part
 			var data = new Data();
 			data.startTime = pcive.getTime();
-			data.vehicleEnterTime = pcive.getTime();
+			data.boardingTime = pcive.getTime();
 			data.vehicleId = pcive.getVehicleId();
 			data.line = pcive.getTransitLineId();
 			data.route = pcive.getTransitRouteId();
@@ -94,14 +94,12 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 	public Route finishRoute() {
 
 		DefaultTransitPassengerRoute result = null;
-		// the following attributes are over all parts of the route. Retreive them before we
-		// remove the individual parts of the route. Yet, they have to be set on the head part
-		// of the route.
-		var firstPart = parts.getFirst();
-		var enterTime = firstPart.vehicleEnterTime;
-		var startTime = firstPart.startTime;
 		var endTime = parts.getLast().endTime;
 
+		// we recursively create the transit route. The outermost element represents the overall route.
+		// this is why we calculate the travel time always relative to the overall end time.
+		// Similarly, we calculate the distance for each part by using the distance of all chained parts
+		// plus the distance of the current part. (This is what calcRoute should do)
 		while (!parts.isEmpty()) {
 			var part = parts.removeLast();
 
@@ -111,14 +109,13 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 			var transitRoute = transitLine.getRoutes().get(part.route);
 
 			result = new DefaultTransitPassengerRoute(start, transitLine, transitRoute, end, result);
+			var partDistance = RouteUtils.calcDistance(result, transitSchedule, network);
+			var partTravelTime = endTime - part.startTime;
+
+			result.setBoardingTime(part.boardingTime);
+			result.setDistance(partDistance);
+			result.setTravelTime(partTravelTime);
 		}
-
-		assert result != null;
-
-		// set the following
-		result.setBoardingTime(enterTime);
-		result.setTravelTime(endTime - startTime);
-		result.setDistance(RouteUtils.calcDistance(result, transitSchedule, network));
 
 		return result;
 	}
@@ -137,7 +134,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 
 		private double startTime;
 		private double endTime;
-		private double vehicleEnterTime;
+		private double boardingTime;
 
 		private Id<Vehicle> vehicleId;
 		private Id<TransitStopFacility> startFacility;

@@ -28,7 +28,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.dsim.scoring.PassengerRoute;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -146,8 +146,8 @@ public class CharyparNagelLegScoring implements SumScoringFunction.TripScoring {
 	}
 
 	private double calcWaitScore(Leg leg) {
-		if (leg.getRoute() instanceof TransitPassengerRoute tpr) {
-			var waitTime = tpr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
+		if (leg.getRoute() instanceof PassengerRoute pr) {
+			var waitTime = pr.getBoardingTime().seconds() - leg.getDepartureTime().seconds();
 			var waitUtil = params.marginalUtilityOfWaitingPt_s - getModeParams(leg).marginalUtilityOfTraveling_s;
 			return waitTime * waitUtil;
 		}

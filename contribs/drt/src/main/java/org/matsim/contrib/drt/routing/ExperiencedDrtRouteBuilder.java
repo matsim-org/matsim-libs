@@ -13,6 +13,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.scoring.ExperiencedRouteBuilder;
+import org.matsim.dsim.scoring.PassengerRoute;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -57,11 +58,9 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 		var netRoute = RouteUtils.createNetworkRoute(data.links);
 		var distance = RouteUtils.calcDistance(netRoute, 1., 1., network);
 		var travelTime = OptionalTime.defined(data.endTime - data.startTime);
+		var boardingTime = OptionalTime.defined(data.pickUpTime);
 
-		var route = new ExperiencedDrtRoute(netRoute.getStartLinkId(), netRoute.getEndLinkId(), data.vehicle, distance, travelTime);
-
-		log.info("finishRoute");
-		return route;
+		return new ExperiencedDrtRoute(netRoute.getStartLinkId(), netRoute.getEndLinkId(), data.vehicle, distance, travelTime, boardingTime);
 	}
 
 	@Override
@@ -83,20 +82,27 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 		Id<Vehicle> vehicle;
 	}
 
-	static class ExperiencedDrtRoute implements Route {
+	static class ExperiencedDrtRoute implements PassengerRoute {
 
 		private final Id<Link> startLink;
 		private final Id<Link> endLink;
 		private final OptionalTime travelTime;
+		private final OptionalTime boardingTime;
 		private final double distance;
 		private final Id<Vehicle> vehicle;
 
-		ExperiencedDrtRoute(Id<Link> startLink, Id<Link> endLink, Id<Vehicle> vehicle, double distance, OptionalTime travelTime) {
+		ExperiencedDrtRoute(Id<Link> startLink, Id<Link> endLink, Id<Vehicle> vehicle, double distance, OptionalTime travelTime, OptionalTime boardingTime) {
 			this.startLink = startLink;
 			this.endLink = endLink;
 			this.vehicle = vehicle;
 			this.distance = distance;
 			this.travelTime = travelTime;
+			this.boardingTime = boardingTime;
+		}
+
+		@Override
+		public OptionalTime getBoardingTime() {
+			return boardingTime;
 		}
 
 		@Override
@@ -159,13 +165,13 @@ class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
 			return "";
 		}
 
-		@Override
-		public Route clone() {
-			return null;
+		public Id<Vehicle> getVehicleId() {
+			return vehicle;
 		}
 
-		public Id<Vehicle> getVehicle() {
-			return vehicle;
+		@Override
+		public Route clone() {
+			throw new UnsupportedOperationException();
 		}
 	}
 }
