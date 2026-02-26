@@ -106,35 +106,41 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// Eventually vehicle category and vehicle attribute should be aligned in order to make the allCombinations setting useful
 					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
 					Set<String> roadCategories = new HashSet<>();
+					Set<HbefaRoadGradient> roadGradients = new HashSet<>();
 					Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
 					Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
 					Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
 					Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
 					for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
 						roadCategories.add(emissionFactorKey.getRoadCategory());
+						roadGradients.add(emissionFactorKey.getRoadGradient());
 						trafficSituations.add(emissionFactorKey.getTrafficSituation());
 						vehicleCategories.add(emissionFactorKey.getVehicleCategory());
 						vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
 						pollutantsInTable.add(emissionFactorKey.getComponent());
 					}
 					for (String roadCategory : roadCategories) {
-						for (HbefaTrafficSituation trafficSituation : trafficSituations) {
-							for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
-								for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
-									for (Pollutant pollutant : pollutantsInTable) {
-										HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
-										key.setRoadCategory(roadCategory);
-										key.setTrafficSituation(trafficSituation);
-										key.setVehicleCategory(vehicleCategory);
-										key.setVehicleAttributes(vehicleAttribute);
-										key.setComponent(pollutant);
-										HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
-										if (result == null) {
-											throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+						for(HbefaRoadGradient roadGradient : roadGradients){
+							for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+								for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+									for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+										for (Pollutant pollutant : pollutantsInTable) {
+											HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+											key.setRoadCategory(roadCategory);
+											key.setRoadGradient(roadGradient);
+											key.setTrafficSituation(trafficSituation);
+											key.setVehicleCategory(vehicleCategory);
+											key.setVehicleAttributes(vehicleAttribute);
+											key.setComponent(pollutant);
+											HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+											if (result == null) {
+												throw new RuntimeException("emissions factor for key=" + key + " is missing." +
 													"  There used to be some " +
 													"fallback, but it was " +
 													"inconsistent and confusing, so " +
 													"we are now just aborting.");
+											}
+
 										}
 									}
 								}
@@ -239,6 +245,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return calculateWarmEmissions(travelTime_sec, roadType, freeVelocity_ms, linkLength_m, 0, vehicleInformationTuple);
 	}
 
+	// TODO The current deltaHeight implementation causes vehicles, that drive over a link to always have the same slop even if driving in opposite directions
 	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
 												  double linkLength_m, double deltaHeight_m,
 												  Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
@@ -689,7 +696,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		} else if ((averageSpeed_kmh - lowSpeedFromTable_kmh) <= 0.0) { // averageSpeed is less than lowSpeed > only lowSpeed on link
 			fractionInterpolation = 1.0;
 		} else {
-			fractionInterpolation = lowSpeedFromTable_kmh * (highSpeedFromTable_kmh - averageSpeed_kmh) / (averageSpeed_kmh * (highSpeedFromTable_kmh - lowSpeedFromTable_kmh));
+			fractionInterpolation = (highSpeedFromTable_kmh - averageSpeed_kmh) / (highSpeedFromTable_kmh - lowSpeedFromTable_kmh);
 		}
 
 		return fractionInterpolation;
@@ -873,8 +880,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			"OR \n" +
 			"... \n\n efkey: " + efkey.toString());
 	}
-
-
 
 	private HbefaWarmEmissionFactorKey getHigherVClass(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey, double freeFlowSpeed_kmh){
 		// TODO This is a temporary implementation which is inefficient and unstable. The final solutions should not determine the keys using a testing-loop but rather use a table
