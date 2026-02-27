@@ -2,9 +2,9 @@ package org.matsim.api.core.v01;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import jakarta.annotation.Nonnull;
 import org.matsim.api.core.v01.messages.ComputeNode;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
