@@ -314,14 +314,23 @@ public class TripDashboard implements Dashboard {
 				);
 			}
 		});
-		if (simWrapperConfigGroup.get("").getShp() != null)
-			first.el(MapPlot.class, (viz, data) -> {
-				viz.title = "Investigation area";
-				viz.description = "The area where the person with home activity are analyzed.";
-				viz.display.fill.fixedColors = new String[]{"#4e79a7"};
-				viz.setShape(data.resource(data.context().getShp()));
-				viz.width = 0.5d;
-			});
+		// this plot should be shown the agents are filtered by this shape for the TripAnalysis.
+		if (simWrapperConfigGroup.get("").getShp() != null) {
+			List<String> argsAsList = Arrays.asList(args);
+			if (!argsAsList.contains("--shp-filter") || (!argsAsList.get(argsAsList.indexOf("--shp-filter") + 1).equals("none")))
+				first.el(MapPlot.class, (viz, data) -> {
+					String filterType;
+					if (!argsAsList.contains("--shp-filter"))
+						filterType = "home activity in shape";
+					else
+						filterType = argsAsList.get(argsAsList.indexOf("--shp-filter") + 1);
+					viz.title = "Investigation area";
+					viz.description = "The Trip Analysis is filtered within this area with this strategy: ' " + filterType + " '.";
+					viz.display.fill.fixedColors = new String[]{"#4e79a7"};
+					viz.setShape(data.resource(data.context().getShp()));
+					viz.width = 0.5d;
+				});
+		}
 
 		layout.row("second" + rowSuffix, tabTitle).el(Table.class, (viz, data) -> {
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
