@@ -977,7 +977,14 @@ public final class PopulationUtils {
 	}
 
 	public static void copyFromTo(Activity act, Activity newAct) {
-		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+		Coord coord = null;
+		if (act.getCoord() != null) {
+			if (act.getCoord().hasZ()) {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY(), act.getCoord().getZ());
+			} else {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY());
+			}
+		}
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
