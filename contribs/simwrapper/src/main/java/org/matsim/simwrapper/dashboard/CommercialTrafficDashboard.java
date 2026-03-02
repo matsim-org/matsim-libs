@@ -958,7 +958,6 @@ public class CommercialTrafficDashboard implements Dashboard {
 			});
 		}
 	}
-
 	private void addActivityDurationRefDataComparison(Layout layout) {
 		layout.row("veh-Activities-hist_ref_total", "Calibration").el(Plotly.class, (viz, data) -> {
 
@@ -970,10 +969,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.compute(CommercialAnalysis.class, "activities.csv"))
 				.constant("source", "Simulated");
 			viz.addTrace(
-				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-					.name("source")
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 					.build(),
 				ds.mapping()
+					.name("source")
 					.x("activityDuration_group")
 					.y("activityDurationInMinutes")
 			);
@@ -1000,10 +999,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.compute(CommercialAnalysis.class, "activities.csv"), "data_"+group)
 					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
-						.name("source")
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 						.build(),
 					ds.mapping()
+						.name("source")
 						.x("activityDuration_group")
 						.y("activityDurationInMinutes")
 				);
@@ -1030,10 +1029,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
 				.constant("source", "Simulated");
 			viz.addTrace(
-				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-					.name("source")
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 					.build(),
 				ds.mapping()
+					.name("source")
 					.x("dist_group")
 					.y("distanceInKm")
 			);
@@ -1059,10 +1058,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"), "data_"+group)
 					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-						.name("source")
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 						.build(),
 					ds.mapping()
+						.name("source")
 						.y("distanceInKm")
 						.x("dist_group")
 				);
@@ -1090,8 +1089,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				.constant("source", "Simulated");
 			viz.addTrace(
-				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-					.name("source")
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 					.build(),
 				ds.mapping().name("source")
 					.y("tourDurationsInHours")
@@ -1119,10 +1117,10 @@ public class CommercialTrafficDashboard implements Dashboard {
 						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"), "data_"+group)
 					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
-						.name("source")
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.COUNT)
 						.build(),
 					ds.mapping()
+						.name("source")
 						.y("tourDurationsInHours")
 						.x("duration_group")
 				);
