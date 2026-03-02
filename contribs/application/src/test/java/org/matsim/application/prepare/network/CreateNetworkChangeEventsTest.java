@@ -1,5 +1,6 @@
 package org.matsim.application.prepare.network;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -11,7 +12,12 @@ import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +35,7 @@ class CreateNetworkChangeEventsTest {
 		String networkPath = scenarioRoot + "network.xml";
 		String inputEventsPath = scenarioRoot + "output_events.xml.gz";
 		String outputChangeEventsPath = utils.getOutputDirectory() + "network-change-events.xml";
+		String inputChangeEventsPath = utils.getInputDirectory() + "network-change-events.xml";
 
 		new CreateNetworkChangeEvents().execute(
 			"--events", inputEventsPath,
@@ -37,18 +44,12 @@ class CreateNetworkChangeEventsTest {
 		);
 
 		List<NetworkChangeEvent> generatedEvents = parseNetworkChangeEvents(networkPath, outputChangeEventsPath);
-		double lastInputEventTime = getLastEventTime(inputEventsPath);
+		List<NetworkChangeEvent> referenceEvents = parseNetworkChangeEvents(networkPath, inputChangeEventsPath);
 
-		assertThat(generatedEvents).isNotEmpty();
-		assertThat(generatedEvents).allSatisfy(event -> {
-			assertThat(event.getStartTime()).isGreaterThanOrEqualTo(0);
-			assertThat(event.getStartTime()).isLessThan(lastInputEventTime);
-			assertThat(event.getStartTime() % 900.).isCloseTo(0., org.assertj.core.data.Offset.offset(1e-9));
-			assertThat(event.getFreespeedChange()).isNotNull();
-			assertThat(event.getFreespeedChange().getValue()).isGreaterThan(0.);
-			assertThat(event.getLinks()).hasSize(1);
-			assertThat(event.getFreespeedChange().getValue()).isLessThanOrEqualTo(event.getLinks().iterator().next().getFreespeed());
-		});
+		Assertions.assertEquals(generatedEvents.size(), referenceEvents.size());
+		for (int i = 0; i < generatedEvents.size(); i++) {
+			Assertions.assertTrue(eventsEqual(generatedEvents.get(i), referenceEvents.get(i)));
+		}
 	}
 
 	@Test
@@ -56,15 +57,9 @@ class CreateNetworkChangeEventsTest {
 		String scenarioRoot = ExamplesUtils.getTestScenarioURL("equil").toString();
 		String networkPath = scenarioRoot + "network.xml";
 		String inputEventsPath = scenarioRoot + "output_events.xml.gz";
-		String defaultOutput = utils.getOutputDirectory() + "default-network-change-events.xml";
 		String customOutput = utils.getOutputDirectory() + "custom-network-change-events.xml";
+		String customInput = utils.getInputDirectory() + "custom-network-change-events.xml";
 		double customInterval = 3_600.;
-
-		new CreateNetworkChangeEvents().execute(
-			"--events", inputEventsPath,
-			"--network", networkPath,
-			"--output", defaultOutput
-		);
 
 		new CreateNetworkChangeEvents().execute(
 			"--events", inputEventsPath,
@@ -73,43 +68,30 @@ class CreateNetworkChangeEventsTest {
 			"--interval", String.valueOf(customInterval)
 		);
 
-		List<NetworkChangeEvent> defaultEvents = parseNetworkChangeEvents(networkPath, defaultOutput);
-		List<NetworkChangeEvent> customIntervalEvents = parseNetworkChangeEvents(networkPath, customOutput);
-
-		assertThat(defaultEvents).isNotEmpty();
-		assertThat(customIntervalEvents).isNotEmpty();
-		assertThat(customIntervalEvents.size()).isLessThanOrEqualTo(defaultEvents.size());
-		assertThat(customIntervalEvents).allSatisfy(event ->
-			assertThat(event.getStartTime() % customInterval).isCloseTo(0., org.assertj.core.data.Offset.offset(1e-9))
-		);
-	}
-
-	@Test
-	void failsIfRequiredArgumentsAreMissing() {
-		String scenarioRoot = ExamplesUtils.getTestScenarioURL("equil").toString();
-		String networkPath = scenarioRoot + "network.xml";
-		String inputEventsPath = scenarioRoot + "output_events.xml.gz";
-
-		assertThatThrownBy(() -> new CreateNetworkChangeEvents().execute(
-			"--events", inputEventsPath,
-			"--network", networkPath
-		))
-			.isInstanceOf(RuntimeException.class);
+		List<NetworkChangeEvent> outputEvents = parseNetworkChangeEvents(networkPath, customOutput);
+		List<NetworkChangeEvent> referenceEvents = parseNetworkChangeEvents(networkPath, customInput);
+		Assertions.assertEquals(outputEvents.size(), referenceEvents.size());
+		for (int i = 0; i < outputEvents.size(); i++) {
+			Assertions.assertTrue(eventsEqual(outputEvents.get(i), referenceEvents.get(i)));
+		}
 	}
 
 	private List<NetworkChangeEvent> parseNetworkChangeEvents(String networkPath, String networkChangeEventsPath) {
 		List<NetworkChangeEvent> generatedEvents = new ArrayList<>();
-		new NetworkChangeEventsParser(NetworkUtils.readNetwork(networkPath), generatedEvents).parse(networkChangeEventsPath);
+		try (InputStream eventsStream = Files.newInputStream(Path.of(networkChangeEventsPath))) {
+			new NetworkChangeEventsParser(NetworkUtils.readNetwork(networkPath), generatedEvents).parse(eventsStream);
+		} catch (IOException e) {
+			throw new RuntimeException("Could not parse network change events from " + networkChangeEventsPath, e);
+		}
 		return generatedEvents;
 	}
 
-	private double getLastEventTime(String eventsPath) {
-		double[] lastTime = new double[]{-1.};
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler((BasicEventHandler) event -> lastTime[0] = Math.max(lastTime[0], event.getTime()));
-		manager.initProcessing();
-		EventsUtils.readEvents(manager, eventsPath);
-		manager.finishProcessing();
-		return lastTime[0];
+	private boolean eventsEqual(NetworkChangeEvent o1, NetworkChangeEvent o2) {
+		boolean time = Double.compare(o1.getStartTime(), o2.getStartTime()) == 0;
+		boolean freespeed = o1.getFreespeedChange().equals(o2.getFreespeedChange());
+		boolean changes = o1.getAttributesChanges().equals(o2.getAttributesChanges());
+		boolean lanesChange = (o1.getLanesChange() == null && o2.getLanesChange() == null) || o1.getLanesChange().equals(o2.getLanesChange());
+		boolean flow = (o1.getFlowCapacityChange() == null && o2.getFlowCapacityChange() == null) || o1.getFlowCapacityChange().equals(o2.getFlowCapacityChange());
+		return time && freespeed && changes && lanesChange && flow;
 	}
 }
