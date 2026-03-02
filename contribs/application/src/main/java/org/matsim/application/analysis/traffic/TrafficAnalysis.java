@@ -96,11 +96,12 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		EventsUtils.readEvents(manager, input.getEventsPath());
 		manager.finishProcessing();
 
-		TrafficStatsCalculator calc = new TrafficStatsCalculator(network, travelTimes.getLinkTravelTimes(), 900);
+		TrafficStatsCalculator calc = new TrafficStatsCalculator(network, travelTimes.getLinkTravelTimes(), volumes, 900);
 
 		Table ds = createDataset(network, calc, volumes);
 
-		List<String> means = List.of("speed_performance_index", "congestion_index", "avg_speed", "road_capacity_utilization", "lane_km");
+		List<String> means = List.of("speed_performance_index", "congestion_index", "excess_travel_time_index", "avg_speed",
+			"road_capacity_utilization", "lane_km");
 		Table dailyMean = normalizeColumns(ds.summarize(means, mean).by("link_id"));
 
 		List<String> sums = ds.columnNames().stream().filter(s -> s.startsWith("vol_") || s.endsWith("_volume")).toList();
@@ -115,7 +116,8 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		copy.stringColumn("road_type").set(Selection.withRange(0, ds.rowCount()), "all");
 		copy.forEach(ds::append);
 
-		Table perRoadTypeAndHour = Table.create(StringColumn.create("road_type"), IntColumn.create("hour"), DoubleColumn.create("congestion_index"));
+		Table perRoadTypeAndHour = Table.create(StringColumn.create("road_type"), IntColumn.create("hour"), DoubleColumn.create("congestion_index"),
+			DoubleColumn.create("excess_travel_time_index"));
 		Set<String> roadTypes = new HashSet<>(ds.stringColumn("road_type").asList());
 
 		for (int hour = 0; hour < 24; hour++) {
@@ -123,11 +125,12 @@ public class TrafficAnalysis implements MATSimAppCommand {
 			for (String roadType : roadTypes) {
 
 				double congestionIndex = calc.getNetworkCongestionIndex(hour * 3600, (hour + 1) * 3600, roadType.equals("all") ? null : roadType);
-
+				double excessTravelTimeIndex = calc.getTomTomNetworkCongestionIndex(hour * 3600, (hour + 1) * 3600, roadType.equals("all") ? null : roadType);
 				Row row = perRoadTypeAndHour.appendRow();
 				row.setString("road_type", roadType);
 				row.setInt("hour", hour);
 				row.setDouble("congestion_index", congestionIndex);
+				row.setDouble("excess_travel_time_index", excessTravelTimeIndex);
 			}
 		}
 
@@ -135,18 +138,21 @@ public class TrafficAnalysis implements MATSimAppCommand {
 			.sortOn("road_type", "hour")
 			.write().csv(output.getPath("traffic_stats_by_road_type_and_hour.csv").toFile());
 
-		Table dailyCongestionIndex = Table.create(StringColumn.create("road_type"), DoubleColumn.create("congestion_index"));
+		Table dailyCongestionIndex = Table.create(StringColumn.create("road_type"), DoubleColumn.create("congestion_index"),
+			DoubleColumn.create("excess_travel_time_index"));
 
 		for (String roadType : roadTypes) {
 
 			double congestionIndex = calc.getNetworkCongestionIndex(0, 86400, roadType.equals("all") ? null : roadType);
+			double excessTravelTimeIndex = calc.getTomTomNetworkCongestionIndex(0, 86400, roadType.equals("all") ? null : roadType);
 			Row row = dailyCongestionIndex.appendRow();
 			row.setString("road_type", roadType);
 			row.setDouble("congestion_index", congestionIndex);
+			row.setDouble("excess_travel_time_index", excessTravelTimeIndex);
 		}
 
 		Table perRoadType = dailyCongestionIndex.joinOn("road_type").leftOuter(
-			weightedMeanBy(ds, means, "road_type").rejectColumns("speed_performance_index", "congestion_index")
+			weightedMeanBy(ds, means, "road_type").rejectColumns("speed_performance_index", "congestion_index", "excess_travel_time_index")
 		);
 
 		DoubleColumn meanLaneKm = perRoadType.doubleColumn("lane_km").divide(24).multiply(1000).round().divide(1000).setName("lane_km");
@@ -157,6 +163,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 		perRoadType.column("road_capacity_utilization").setName("Cap. Utilization");
 		perRoadType.column("avg_speed").setName("Avg. Speed [km/h]");
 		perRoadType.column("congestion_index").setName("Congestion Index");
+		perRoadType.column("excess_travel_time_index").setName("Excess Travel Time Index");
 
 		roundColumns(perRoadType);
 		perRoadType
@@ -223,6 +230,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 			DoubleColumn.create("lane_km"),
 			DoubleColumn.create("speed_performance_index"),
 			DoubleColumn.create("congestion_index"),
+			DoubleColumn.create("excess_travel_time_index"),
 			DoubleColumn.create("avg_speed"),
 			DoubleColumn.create("road_capacity_utilization"),
 			DoubleColumn.create("simulated_traffic_volume")
@@ -252,6 +260,7 @@ public class TrafficAnalysis implements MATSimAppCommand {
 
 				row.setDouble("speed_performance_index", calc.getSpeedPerformanceIndex(link, startTime, endTime));
 				row.setDouble("congestion_index", calc.getLinkCongestionIndex(link, startTime, endTime));
+				row.setDouble("excess_travel_time_index", calc.getLinkExcessTravelTimeIndex(link, startTime, endTime));
 
 				// as km/h
 				row.setDouble("avg_speed", calc.getAvgSpeed(link, startTime, endTime) * 3.6);
