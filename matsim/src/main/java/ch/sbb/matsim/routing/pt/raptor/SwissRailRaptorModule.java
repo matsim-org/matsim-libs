@@ -77,6 +77,7 @@ public class SwissRailRaptorModule extends AbstractModule {
             if (srrConfig.getModeToModeTransferPenaltyParameterSets().isEmpty()) {
                 bind(RaptorTransferCostCalculator.class).to(DefaultRaptorTransferCostCalculator.class);
             } else {
+                bind(ModeSpecificTransferCostCalculator.PenaltySupplier.class).toInstance(new ModeSpecificTransferCostCalculator.DefaultPenaltySupplier());
                 bind(RaptorTransferCostCalculator.class).to(ModeSpecificTransferCostCalculator.class);
             }
         }

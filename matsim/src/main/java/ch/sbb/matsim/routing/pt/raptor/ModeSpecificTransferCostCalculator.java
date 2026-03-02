@@ -22,20 +22,24 @@ package ch.sbb.matsim.routing.pt.raptor;
 import java.util.function.Supplier;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author mrieser / Simunto
  * @author sebhoerl / IRT SystemX
  */
+@Singleton
 public class ModeSpecificTransferCostCalculator implements RaptorTransferCostCalculator {
-	private final CostSupplier costSupplier;
+	private final PenaltySupplier costSupplier;
 
-	public ModeSpecificTransferCostCalculator(CostSupplier costSupplier) {
+	@Inject
+	public ModeSpecificTransferCostCalculator(PenaltySupplier costSupplier) {
 		this.costSupplier = costSupplier;
 	}
 
 	public ModeSpecificTransferCostCalculator() {
-		this(new DefaultCostSupplier());
+		this(new DefaultPenaltySupplier());
 	}
 
 	@Override
@@ -62,11 +66,11 @@ public class ModeSpecificTransferCostCalculator implements RaptorTransferCostCal
 		return transferCost;
 	}
 
-	public interface CostSupplier {
+	public interface PenaltySupplier {
 		double get(String fromMode, String toMode, RaptorStaticConfig config);
 	}
 
-	private static class DefaultCostSupplier implements CostSupplier {
+	public static class DefaultPenaltySupplier implements PenaltySupplier {
 		@Override
 		public double get(String fromMode, String toMode, RaptorStaticConfig config) {
 			return config.getModeToModeTransferPenalty(fromMode, toMode);
