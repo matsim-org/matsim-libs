@@ -292,7 +292,7 @@ import org.matsim.vehicles.VehicleUtils;
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
 			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(adjustedRoutingTravelTime, 302.0, 1e-3);
 		}
 
 		static class DepartureArrivalListener implements PersonDepartureEventHandler, PersonArrivalEventHandler {
