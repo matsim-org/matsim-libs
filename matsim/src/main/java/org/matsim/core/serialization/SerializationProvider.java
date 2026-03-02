@@ -29,8 +29,8 @@ import java.nio.ByteBuffer;
  */
 public class SerializationProvider {
 
-	private final Int2ObjectMap<Class<? extends Message>> classes = new Int2ObjectOpenHashMap<>(128);
-	private final Object2IntMap<Class<? extends Message>> types = new Object2IntOpenHashMap<>();
+	private final Int2ObjectMap<Class<? extends Message>> type2Class = new Int2ObjectOpenHashMap<>(128);
+	private final Object2IntMap<Class<? extends Message>> class2Type = new Object2IntOpenHashMap<>();
 
 	private final ThreadSafeFory fory;
 
@@ -74,24 +74,25 @@ public class SerializationProvider {
 				.union(scanResult.getSubclasses(Activity.class))
 			) {
 
-				Class<? extends Message> msgType = (Class<? extends Message>) info.loadClass();
+				@SuppressWarnings("unchecked")  // we filter for Subclasses of Message above, so this cast is safe.
+				Class<? extends Message> msgClass = (Class<? extends Message>) info.loadClass();
 
-				if (msgType.isInterface() || ReflectionUtils.isAbstract(msgType))
+				if (msgClass.isInterface() || ReflectionUtils.isAbstract(msgClass))
 					continue;
 
-				int messageType = msgType.getName().hashCode();
+				int msgType = msgClass.getName().hashCode();
 
 				// Protobuf message
-				fory.register(msgType, true);
+				fory.register(msgClass, true);
 
-				if (classes.containsKey(messageType)) {
-					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgType,
-						classes.get(messageType)));
+				if (type2Class.containsKey(msgType)) {
+					throw new IllegalArgumentException("Duplicate provider for type %s. %s already registered.".formatted(msgClass,
+						type2Class.get(msgType)));
 				}
 
-//                System.out.println("Registering " + msgType.getSimpleName() + " with type " + messageType);
-				classes.put(messageType, msgType);
-				types.put(msgType, messageType);
+//                System.out.println("Registering " + msgType.getSimpleName() + " with type " + msgType);
+				type2Class.put(msgType, msgClass);
+				class2Type.put(msgClass, msgType);
 
 			}
 		}
@@ -105,7 +106,7 @@ public class SerializationProvider {
 	 * Return whether the given type is an event.
 	 */
 	public boolean isEvent(int type) {
-		return classes.containsKey(type) && Event.class.isAssignableFrom(classes.get(type));
+		return type2Class.containsKey(type) && Event.class.isAssignableFrom(type2Class.get(type));
 	}
 
 	/**
@@ -124,27 +125,27 @@ public class SerializationProvider {
 	}
 
 	public ByteMessageParser getParser(int type) {
-		if (!classes.containsKey(type)) {
+		if (!type2Class.containsKey(type)) {
 			throw new IllegalArgumentException("No provider for type " + type);
 		}
 
-		Class<? extends Message> msgType = classes.get(type);
+		Class<? extends Message> msgType = type2Class.get(type);
 		return (in) -> fory.deserializeJavaObject(in, msgType);
 	}
 
 	public FuryBufferParser getFuryParser(int type) {
-		if (!classes.containsKey(type)) {
+		if (!type2Class.containsKey(type)) {
 			throw new IllegalArgumentException("No provider for type " + type);
 		}
 
-		Class<? extends Message> msgType = classes.get(type);
+		Class<? extends Message> msgType = type2Class.get(type);
 		return (in) -> fory.deserializeJavaObject(in, msgType);
 	}
 
 	@Override
 	public String toString() {
 		return "SerializationProvider{" +
-			"classes=" + classes +
+			"classes=" + type2Class +
 			'}';
 	}
 
@@ -152,7 +153,27 @@ public class SerializationProvider {
 	 * Return whether the given type is supported.
 	 */
 	public boolean hasType(int type) {
-		return type == Event.ANY_TYPE || classes.containsKey(type);
+		return type == Event.ANY_TYPE || type2Class.containsKey(type);
+	}
+
+	public boolean hasType(Class<?> msgClass) {
+		return msgClass == Event.class || class2Type.containsKey(msgClass);
+	}
+
+	/**
+	 * Returns all types for a given class. This is useful for event handlers which listen to a baseclass
+	 * of events. For example, an event handler that listens for ActivityEvents also needs to handle SpecializedActivityEvents if
+	 * those extend ActivityEvent. This method will return a list of message types for the given class and all
+	 * its subclasses found in the object graph.
+	 *
+	 * @param clazz the class to find assignable types for
+	 * @return an array of types for all known subclasses of clazz including the type for clazz itself.
+	 */
+	public int[] getAssignableTypes(Class<?> clazz) {
+		return class2Type.keySet().stream()
+			.filter(clazz::isAssignableFrom)
+			.mapToInt(this::getType)
+			.toArray();
 	}
 
 	public int getType(Class<?> msgType) {
@@ -160,15 +181,15 @@ public class SerializationProvider {
 			return Event.ANY_TYPE;
 		}
 
-		if (!types.containsKey(msgType)) {
+		if (!class2Type.containsKey(msgType)) {
 			throw new IllegalArgumentException("No type for class " + msgType);
 		}
 
-		return types.getInt(msgType);
+		return class2Type.getInt(msgType);
 	}
 
 	public Class<?> getType(int type) {
-		return type == Event.ANY_TYPE ? Event.class : classes.get(type);
+		return type == Event.ANY_TYPE ? Event.class : type2Class.get(type);
 	}
 
 	public ThreadSafeFory getFory() {

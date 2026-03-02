@@ -38,7 +38,7 @@ jobs:
         run: mvn verify -P release --batch-mode --fail-at-end -D'maven.test.redirectTestOutputToFile' -D'matsim.preferLocalDtds=true'
 
       - name: Upload Maven test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: maven-test-reports-${{ matrix.os }}
           path: |
