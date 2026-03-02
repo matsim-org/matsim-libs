@@ -418,17 +418,17 @@ public class TripDashboard implements Dashboard {
 				if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 					viz.title = "Mode usage";
 					ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args));
+						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", TripAnalysis.ModelType.COMPLETE_MODEL.toString());
 				}
 				else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 					viz.title = "Mode usage * " + tabTitle + " *";
 					ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", tabTitle, args));
+						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", tabTitle);
 				}
 				else {
 					viz.title = "Mode usage * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
 					ds = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args));
+						data.compute(TripAnalysis.class, "mode_users.csv", args)).filter("group", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				}
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(), ds.mapping()

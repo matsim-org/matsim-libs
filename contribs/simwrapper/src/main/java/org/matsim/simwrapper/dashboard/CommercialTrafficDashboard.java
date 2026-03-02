@@ -913,7 +913,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 					Plotly.DataSet dsSub = viz.addDataset(
-						data.computeWithPlaceholder(TripAnalysis.class, "mode_users_%s.csv", group));
+						data.compute(TripAnalysis.class, "mode_users.csv"), "data_"+ group).filter("group", group);
 					viz.addTrace(
 						BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 						dsSub.mapping()

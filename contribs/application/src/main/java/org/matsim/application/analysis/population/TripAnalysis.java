@@ -45,7 +45,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
 	produces = {
-		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users_%s.csv", "trip_stats_%s.csv",
+		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
 		"population_trip_stats.csv", "trip_purposes_by_hour_%s.csv",
 		"mode_share_distance_distribution_%s.csv", "mode_shift_%s.csv", "mode_chains.csv",
@@ -942,19 +942,22 @@ public class TripAnalysis implements MATSimAppCommand {
 		for (String group : tripsPerPerson.keySet()) {
 			totalAvgTripsPerSubpopulation.put(group, tripsPerPerson.get(group).values().intStream().average().orElse(0d));
 		}
+		Table tableModeUsages = Table.create("modal_share", StringColumn.create("main_mode"), DoubleColumn.create("user"), StringColumn.create("group"));
 
 		for (String group : tripsPerPerson.keySet()) {
-			writeModeUsages(group, null, usedModes, totalMobilePerSubpopulation, modeOrder, output);
+			addModeUsagesValue(group, null, usedModes, totalMobilePerSubpopulation, modeOrder, tableModeUsages);
 		}
 		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
-			writeModeUsages(ModelType.PERSON_TRAFFIC.id, groupsOfSubpopulationsForPersonAnalysis.keySet(), usedModes, totalMobilePerSubpopulation,
-				modeOrder, output);
+			addModeUsagesValue(ModelType.PERSON_TRAFFIC.id, groupsOfSubpopulationsForPersonAnalysis.keySet(), usedModes, totalMobilePerSubpopulation,
+				modeOrder, tableModeUsages);
 		}
 		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
-			writeModeUsages(ModelType.COMMERCIAL_TRAFFIC.id, groupsOfSubpopulationsForCommercialAnalysis.keySet(), usedModes,
-				totalMobilePerSubpopulation, modeOrder, output);
+			addModeUsagesValue(ModelType.COMMERCIAL_TRAFFIC.id, groupsOfSubpopulationsForCommercialAnalysis.keySet(), usedModes,
+				totalMobilePerSubpopulation, modeOrder, tableModeUsages);
 		}
-		writeModeUsages(ModelType.COMPLETE_MODEL.id, usedModes.keySet(), usedModes, totalMobilePerSubpopulation, modeOrder, output);
+		addModeUsagesValue(ModelType.COMPLETE_MODEL.id, usedModes.keySet(), usedModes, totalMobilePerSubpopulation, modeOrder, tableModeUsages);
+
+		tableModeUsages.write().csv(output.getPath("mode_users.csv").toFile());
 
 		try (CSVPrinter printer = new CSVPrinter(Files.newBufferedWriter(output.getPath("population_trip_stats.csv")), CSVFormat.DEFAULT)) {
 			if (groupsOfSubpopulationsForPersonAnalysis.isEmpty() && groupsOfSubpopulationsForCommercialAnalysis.isEmpty())
@@ -996,15 +999,13 @@ public class TripAnalysis implements MATSimAppCommand {
 		}
 	}
 
-	private void writeModeUsages(String groupId, Collection<String> groupsToAggregate, HashMap<String, Object2IntMap<String>> usedModes,
-								 Map<String, Double> totalMobilePerSubpopulation, List<String> modeOrder, OutputOptions output) {
+	private void addModeUsagesValue(String groupId, Collection<String> groupsToAggregate, HashMap<String, Object2IntMap<String>> usedModes,
+									Map<String, Double> totalMobilePerSubpopulation, List<String> modeOrder, Table tableModeUsages) {
 
 		// if groupsToAggregate is null, only use groupId
 		Collection<String> groups = groupsToAggregate != null
 			? groupsToAggregate
 			: Collections.singleton(groupId);
-
-		Table table = Table.create("modal_share", StringColumn.create("main_mode"), DoubleColumn.create("user"), StringColumn.create("group"));
 
 		// number of mobile persons in the selected groups
 		double numberMobilePersons = groups.stream()
@@ -1024,11 +1025,10 @@ public class TripAnalysis implements MATSimAppCommand {
 				.setScale(4, RoundingMode.HALF_UP)
 				.doubleValue();
 
-			table.stringColumn("main_mode").append(m);
-			table.doubleColumn("user").append(share);
-			table.stringColumn("group").append(groupId);
+			tableModeUsages.stringColumn("main_mode").append(m);
+			tableModeUsages.doubleColumn("user").append(share);
+			tableModeUsages.stringColumn("group").append(groupId);
 		}
-		table.write().csv(output.getPath("mode_users_%s.csv", groupId).toFile());
 	}
 
 	private void writeTripPurposes(Table trips) {
