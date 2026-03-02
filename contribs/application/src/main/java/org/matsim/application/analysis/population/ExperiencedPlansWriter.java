@@ -3,19 +3,22 @@ package org.matsim.application.analysis.population;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
-import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.ExperiencedPlansService;
-import org.matsim.core.scoring.ExperiencedPlansServiceFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import picocli.CommandLine;
 
@@ -37,35 +40,55 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 	private int numberOfThreads = 1;
 
 	public static void main(String[] args) {
+		if ( args==null || args.length==0 ) {
+			args = new String[] {
+//				"--path", "/Users/kainagel/kairuns/equil/output"
+				"--path", "/Users/kainagel/git/all-matsim/matsim-example-project/scenarios/equil/output"
+			};
+		}
 		new ExperiencedPlansWriter().execute(args);
 	}
 
 	@Override
 	public Integer call() throws Exception {
-		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
-		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename());
+		// yyyy the output_config has the input files as as files. :-(
+
+		Path configPath = ApplicationUtils.globFile( path, "*output_" + Controler.DefaultFiles.configReduced.getFilename() );
+
+//		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
+//		Path configPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.config.getFilename() );
 
 		Config config = ConfigUtils.loadConfig(configPath.toString());
+		config.controller().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		config.eventsManager().setNumberOfThreads(numberOfThreads);
 
-		EventsManager eventsManager = EventsUtils.createEventsManager(config);
+		// yyyyyy there is a runId from args, and a config.controller().getRunId().  there is also "prefix", which hedges against no runId.  Needs to be sorted out!!!!
+		runId = config.controller().getRunId();
+		String runPrefix = Objects.nonNull(runId) ? runId + "." : "";
+
 		Path eventsPath = path.resolve(runPrefix + "output_" + Controler.DefaultFiles.events.getFilename() + ".gz");
-		Path output = eventsPath.getParent().resolve(config.controller().getRunId() + ".output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
+		Path experiencedPlansPath = eventsPath.getParent().resolve(runPrefix + "output_" + Controler.DefaultFiles.experiencedPlans.getFilename() + ".gz");
 
 		Scenario scenario = new ScenarioUtils.ScenarioBuilder(config)
 			.setNetwork(NetworkUtils.readNetwork(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.network.getFilename() + ".gz").toString()))
 			.setPopulation(PopulationUtils.readPopulation(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.population.getFilename() + ".gz").toString()))
 			.build();
 
-		new TransitScheduleReader(scenario).readFile(path.resolve(runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz").toString());
+		if ( config.transit().isUseTransit() ){
+			new TransitScheduleReader( scenario ).readFile( path.resolve( runPrefix + "output_" + Controler.DefaultFiles.transitSchedule.getFilename() + ".gz" ).toString() );
+		}
 
-		EventsToActivities eventsToActivities = new EventsToActivities();
-		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
+		config.counts().setInputFile( null );
+		config.controller().setOutputDirectory( "output1" );
+		com.google.inject.Injector injector = new Injector.InjectorBuilder( scenario ).addStandardModules().build();
 
-		eventsManager.addHandler(eventsToActivities);
-		eventsManager.addHandler(eventsToLegs);
+		EventsManager eventsManager = injector.getInstance( EventsManager.class );
+		ExperiencedPlansService experiencedPlansService = injector.getInstance( ExperiencedPlansService.class );
+		EventsToActivities eventsToActivities = injector.getInstance( EventsToActivities.class );
 
-		ExperiencedPlansService experiencedPlansService = ExperiencedPlansServiceFactory.create(scenario, eventsToActivities, eventsToLegs);
+		if ( experiencedPlansService instanceof IterationStartsListener ) {
+			((IterationStartsListener) experiencedPlansService).notifyIterationStarts( null );
+		}
 
 		log.info("Reading events from file: {}", eventsPath);
 		eventsManager.initProcessing();
@@ -77,8 +100,8 @@ public class ExperiencedPlansWriter implements MATSimAppCommand {
 		// already 2 hrs to get to this point here. kai, nov'25
 		eventsToActivities.finish();
 
-		log.info("Writing experienced plans to file: {}", output);
-		experiencedPlansService.writeExperiencedPlans(output.toString());
+		log.info("Writing experienced plans to file: {}", experiencedPlansPath);
+		experiencedPlansService.writeExperiencedPlans(experiencedPlansPath.toString());
 
 		return 0;
 	}

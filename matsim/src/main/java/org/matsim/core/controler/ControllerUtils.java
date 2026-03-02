@@ -101,10 +101,11 @@ public final class ControllerUtils{
 	    StringWriter writer = new StringWriter();
 	    new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
 
-		if (log.getLevel().isMoreSpecificThan(Level.DEBUG)) {
+		if (log.getLevel().isMoreSpecificThan(Level.INFO)) {
+			// (in the implementation, this uses <=, instead of the "<" that the "more" would imply)
 			log.info("=== logging config.xml skipped ===");
 			log.info("To enable debug output, set an environment variable i.e. export LOG_LEVEL='debug', "
-				+ "or set log.setLogLevel(Level.DEBUG) in your run class.");
+				+ "or use Configurator...Level.DEBUG) in your run class.");
 		}
 	    log.debug(newline + newline + writer.getBuffer().toString());
 	    log.info("Complete config dump done.");

@@ -65,7 +65,7 @@ public class InnovationHelper {
     }
 
     public double startTime(LegBasedCandidate candidate) {
-        return endTimes.get(candidate.followingActivity());
+        return endTimes.get(precedingActivity(candidate));
     }
 
     public double endTime(LegBasedCandidate candidate) {
@@ -73,11 +73,19 @@ public class InnovationHelper {
     }
 
     public double duration(ActivityBasedCandidate candidate) {
-        return endTime(candidate) - startActivityIndex(candidate);
+        return endTime(candidate) - startTime(candidate);
     }
 
     public int followingActivityIndex(LegBasedCandidate candidate) {
         return activities.indexOf(candidate.followingActivity());
+    }
+
+    public int precedingActivityIndex(LegBasedCandidate candidate) {
+        return followingActivityIndex(candidate) - 1;
+    }
+
+    public Activity precedingActivity(LegBasedCandidate candidate) {
+        return activities.get(precedingActivityIndex(candidate));
     }
 
     // FILTERING FUNCTIONALITY
@@ -219,6 +227,27 @@ public class InnovationHelper {
         } else {
             return null;
         }
+    }
+
+    public boolean isSame(ActivityBasedCandidate candidate, ChargingPlanActivity activity) {
+        if (activity.isEnroute()) {
+            return false;
+        }
+
+        int startIndex = startActivityIndex(candidate);
+        int endIndex = endActivityIndex(candidate);
+
+        return startIndex == activity.getStartActivityIndex() && endIndex == activity.getEndActivityIndex();
+    }
+
+    public boolean isSame(LegBasedCandidate candidate, ChargingPlanActivity activity) {
+        if (!activity.isEnroute()) {
+            return false;
+        }
+
+        int followingIndex = followingActivityIndex(candidate);
+
+        return followingIndex == activity.getFollowingActivityIndex();
     }
 
     static public InnovationHelper build(Plan plan, TimeInterpretation timeInterpretation,

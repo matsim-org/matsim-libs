@@ -48,8 +48,6 @@ public final class PersonUtils {
 	private PersonUtils() {
 	} // do not instantiate
 
-	@Deprecated // use methods of interface Person
-	//yyy there is no such method in the Person interface.  paul, feb'25
 	public static Plan createAndAddPlan(Person person, final boolean selected) {
 		Plan p = PopulationUtils.createPlan(person);
 		person.addPlan(p);
@@ -95,6 +93,15 @@ public final class PersonUtils {
 	public static Double getIncome(Person person) {
 		return (Double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
 	}
+
+	public static final String MARGINAL_UTILITY_OF_MONEY = "marginalUtilityOfMoney";
+	public static Double getMarginalUtilityOfMoney( Person person ) {
+		return (Double) person.getAttributes().getAttribute( MARGINAL_UTILITY_OF_MONEY );
+	}
+	public static void setMarginalUtilityOfMoney( Person person, double marginalUtilityOfMoney ) {
+		person.getAttributes().putAttribute( MARGINAL_UTILITY_OF_MONEY, marginalUtilityOfMoney );
+	}
+
 
 	/**
 	 * convenience method for often used demographic attribute

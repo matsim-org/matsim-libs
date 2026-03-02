@@ -191,7 +191,9 @@ public class DrtIntegrationTest {
 		controler.run();
 	}
 
-
+	/**
+	 * Disabled, because distributed DRT is not supported yet.
+	 */
 	@Test
 	@Order(3)
 	@Disabled

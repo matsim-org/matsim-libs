@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class IntegersLoad implements DvrpLoad {
+public final class IntegersLoad implements DvrpLoad {
     private final int[] values;
 
     IntegersLoad(int[] values) {

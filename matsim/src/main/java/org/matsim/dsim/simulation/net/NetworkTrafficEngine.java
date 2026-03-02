@@ -2,16 +2,15 @@ package org.matsim.dsim.simulation.net;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.dsim.DSimConfigGroup;
+import org.matsim.dsim.scoring.BackpackDataCollector;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 
 public class NetworkTrafficEngine implements DistributedMobsimEngine {
@@ -25,9 +24,11 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	private final AgentSourcesContainer asc;
 	private final Wait2Link wait2Link;
+	private final BackpackDataCollector bdc;
 	//private final Set<String> modes;
 
 	private InternalInterface internalInterface;
+	private double now;
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
@@ -35,9 +36,8 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 	}
 
 	@Inject
-	public NetworkTrafficEngine(Scenario scenario, AgentSourcesContainer asc,
-								SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks, ParkedVehicles parkedVehicles,
-								Wait2Link wait2Link, EventsManager em) {
+	public NetworkTrafficEngine(AgentSourcesContainer asc, SimNetwork simNetwork, ActiveNodes activeNodes, ActiveLinks activeLinks,
+								ParkedVehicles parkedVehicles, Wait2Link wait2Link, EventsManager em, BackpackDataCollector bdc) {
 		this.asc = asc;
 		this.em = em;
 		this.wait2Link = wait2Link;
@@ -45,32 +45,36 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 		this.activeLinks = activeLinks;
 		this.parkedVehicles = parkedVehicles;
 		this.simNetwork = simNetwork;
-		var dsimConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), DSimConfigGroup.class);
-		//this.modes = new HashSet<>(dsimConfig.getNetworkModes());
+		this.bdc = bdc;
 	}
 
 	@Override
 	public void onPrepareSim() {
 		for (SimLink link : simNetwork.getLinks().values()) {
 
-			// Split out links don't have queue and buffer and have no leave handler
-			if (link instanceof SimLink.SplitOutLink)
-				continue;
+			// Split out links put vehicles into the messaging. Before they do so, we intercept and
+			// propagate an event.
+			if (link instanceof SimLink.SplitOutLink sol) {
+				sol.addLeaveHandler((vehicle, _, _) -> {
+					this.bdc.vehicleLeavesPartition(vehicle);
+					return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
+				});
+			} else {
+				// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
+				// also give it a low priority, to make sure that this handler is called last if more handlers
+				// are active
+				link.addLeaveHandler(new SimLink.OnLeaveQueue() {
+					@Override
+					public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
+						return handleVehicleIsFinished(vehicle, link, now);
+					}
 
-			// add a leave handler to each link that delegates to the 'handleVehicleIsFinished' method.
-			// also give it a low priority, to make sure that this handler is called last if more handlers
-			// are active
-			link.addLeaveHandler(new SimLink.OnLeaveQueue() {
-				@Override
-				public SimLink.OnLeaveQueueInstruction apply(DistributedMobsimVehicle vehicle, SimLink link, double now) {
-					return handleVehicleIsFinished(vehicle, link, now);
-				}
-
-				@Override
-				public double getPriority() {
-					return -10.;
-				}
-			});
+					@Override
+					public double getPriority() {
+						return -10.;
+					}
+				});
+			}
 		}
 	}
 
@@ -109,11 +113,22 @@ public class NetworkTrafficEngine implements DistributedMobsimEngine {
 
 	@Override
 	public void doSimStep(double now) {
+		this.now = now;
 		// Move vehicles over nodes, then add waiting vehicles onto links and then move vehicles from the queue into link buffers
 		// This mimiks the order in which the QSim does it.
 		activeNodes.doSimStep(now);
 		wait2Link.moveWaiting(now);
 		activeLinks.doSimStep(now);
+	}
+
+	@Override
+	public void afterSim() {
+		wait2Link.afterSim();
+		for (SimLink link : simNetwork.getLinks().values()) {
+			for (var veh : link.removeAllVehicles()) {
+				em.processEvent(new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLinkId(), veh.getDriver().getMode()));
+			}
+		}
 	}
 
 	private SimLink.OnLeaveQueueInstruction handleVehicleIsFinished(DistributedMobsimVehicle vehicle, SimLink link, double now) {

@@ -24,7 +24,7 @@ public class OperationFacilitiesModeModule extends AbstractDvrpModeModule {
 			}).asEagerSingleton();
 		}
 		bindModal(OperationFacilityReservationManager.class).toProvider(modalProvider(getter ->
-				new OperationFacilityReservationManager())).asEagerSingleton();
+				new OperationFacilityReservationManager(operationFacilitiesParams.getReservationBufferTime()))).asEagerSingleton();
 		addControllerListenerBinding().to(modalKey(OperationFacilityReservationManager.class));
 	}
 }

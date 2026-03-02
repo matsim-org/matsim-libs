@@ -24,6 +24,7 @@ import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public final class RunRoadPricingExample {
 	// do not change class name: referenced from book.  kai, dec'14
-	
+
 	/**
 	 * Executing the road pricing example.
 	 * @param args optional arguments, the first which must be a <code>config.xml</code>
@@ -49,6 +50,7 @@ public final class RunRoadPricingExample {
 
 		// load the config:
 		Config config = ConfigUtils.loadConfig( args );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// load the scenario:
 		Scenario scenario = ScenarioUtils.loadScenario( config );

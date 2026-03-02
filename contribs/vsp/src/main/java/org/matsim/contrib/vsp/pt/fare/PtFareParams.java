@@ -37,8 +37,9 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(FARE_ZONE_SHP)
-	public void setFareZoneShp(String fareZoneShp) {
+	public PtFareParams setFareZoneShp(String fareZoneShp) {
 		this.fareZoneShp = fareZoneShp;
+		return this;
 	}
 
 	@StringGetter(ORDER)
@@ -47,8 +48,9 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(ORDER)
-	public void setOrder(int order) {
+	public PtFareParams setOrder(int order) {
 		this.order = order;
+		return this;
 	}
 
 	@StringGetter(TRANSACTION_PARTNER)
@@ -57,8 +59,9 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(TRANSACTION_PARTNER)
-	public void setTransactionPartner(String transactionPartner) {
+	public PtFareParams setTransactionPartner(String transactionPartner) {
 		this.transactionPartner = transactionPartner;
+		return this;
 	}
 
 	@StringGetter(DESCRIPTION)
@@ -67,7 +70,8 @@ public abstract class PtFareParams extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(DESCRIPTION)
-	public void setDescription(String description) {
+	public PtFareParams setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 }

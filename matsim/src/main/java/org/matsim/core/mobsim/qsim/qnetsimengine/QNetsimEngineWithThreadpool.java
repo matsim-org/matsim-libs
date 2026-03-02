@@ -92,15 +92,19 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 		}
 
 		try {
+			// move nodes
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(true);
 			}
+			// wait for completion
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
+			// move links
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
 			}
+			// wait for completion
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}

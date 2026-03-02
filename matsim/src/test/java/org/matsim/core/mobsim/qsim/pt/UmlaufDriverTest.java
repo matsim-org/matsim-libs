@@ -20,12 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,16 +51,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -80,8 +75,9 @@ public class UmlaufDriverTest {
 
 	private static final Logger log = LogManager.getLogger(UmlaufDriverTest.class);
 
-	@BeforeEach public void setUp() {
-		utils.loadConfig((String)null);
+	@BeforeEach
+	public void setUp() {
+		utils.loadConfig((String) null);
 	}
 
 	@Test
@@ -91,7 +87,7 @@ public class UmlaufDriverTest {
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		Network network = NetworkUtils.createNetwork();
-        Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 3000, (double) 0));
@@ -99,19 +95,19 @@ public class UmlaufDriverTest {
 		Node node6 = NetworkUtils.createAndAddNode(network, Id.create("6", Node.class), new Coord((double) 5000, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
-		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1 );
+		Link link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), fromNode, toNode, 1000.0, 10.0, 3600.0, (double) 1);
 		final Node fromNode1 = node2;
 		final Node toNode1 = node3;
-		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1 );
+		Link link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), fromNode1, toNode1, 1000.0, 10.0, 3600.0, (double) 1);
 		final Node fromNode2 = node3;
 		final Node toNode2 = node4;
-		Link link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, 1000.0, 10.0, 3600.0, (double) 1 );
+		Link link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), fromNode2, toNode2, 1000.0, 10.0, 3600.0, (double) 1);
 		final Node fromNode3 = node4;
 		final Node toNode3 = node5;
-		Link link4 = NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode3, toNode3, 1000.0, 10.0, 3600.0, (double) 1 );
+		Link link4 = NetworkUtils.createAndAddLink(network, Id.create("4", Link.class), fromNode3, toNode3, 1000.0, 10.0, 3600.0, (double) 1);
 		final Node fromNode4 = node5;
 		final Node toNode4 = node6;
-		Link link5 = NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, 1000.0, 10.0, 3600.0, (double) 1 );
+		Link link5 = NetworkUtils.createAndAddLink(network, Id.create("5", Link.class), fromNode4, toNode4, 1000.0, 10.0, 3600.0, (double) 1);
 
 		Collections.addAll(linkIds, link2.getId(), link3.getId(), link4.getId());
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link5.getId());
@@ -122,8 +118,8 @@ public class UmlaufDriverTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, eventsManager);
+			.useDefaults() //
+			.build(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 
@@ -131,15 +127,15 @@ public class UmlaufDriverTest {
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.walk, null, trEngine.getInternalInterface());
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		driver.setVehicle(queueVehicle);
 		driver.endActivityAndComputeNextState(0);
-		trEngine.getInternalInterface().arrangeNextAgentState(driver) ;
+		trEngine.getInternalInterface().arrangeNextAgentState(driver);
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
 		List<Id<Link>> expectedLinkIds = route.getLinkIds();
@@ -151,19 +147,19 @@ public class UmlaufDriverTest {
 		assertEquals(link5.getId(), driver.getDestinationLinkId());
 
 		assertEquals(link2.getId(), driver.chooseNextLinkId());
-		Id<Link> nextLinkId = driver.chooseNextLinkId() ;
+		Id<Link> nextLinkId = driver.chooseNextLinkId();
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(link3.getId(), driver.chooseNextLinkId());
-		nextLinkId = driver.chooseNextLinkId() ;
+		nextLinkId = driver.chooseNextLinkId();
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(link4.getId(), driver.chooseNextLinkId());
-		nextLinkId = driver.chooseNextLinkId() ;
+		nextLinkId = driver.chooseNextLinkId();
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(link5.getId(), driver.chooseNextLinkId());
-		nextLinkId = driver.chooseNextLinkId() ;
+		nextLinkId = driver.chooseNextLinkId();
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(null, driver.chooseNextLinkId());
@@ -190,9 +186,9 @@ public class UmlaufDriverTest {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+			.useDefaults() //
+			.build(scenario, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
@@ -222,20 +218,20 @@ public class UmlaufDriverTest {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim tqsim = new QSimBuilder(scenario.getConfig()) //
-				.useDefaults() //
-				.build(scenario, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+			.useDefaults() //
+			.build(scenario, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -271,15 +267,15 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+			.useDefaults() //
+			.build(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(4));
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -318,7 +314,7 @@ public class UmlaufDriverTest {
 		assertTrue(stoptime2 > 0);
 		assertEquals(4, queueVehicle.getPassengers().size());
 		assertTrue(stoptime1 > stoptime2,
-				"The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2);
+			"The first stoptime should be larger as it contains door-opening/closing times as well. stoptime1=" + stoptime1 + "  stoptime2=" + stoptime2);
 		tracker.addAgentToStop(163, agent5, stop2.getId());
 		assertEquals(0.0, driver.handleTransitStop(stop2, 170), MatsimTestUtils.EPSILON, "vehicle should have reached capacity, so not more passenger can enter.");
 	}
@@ -343,17 +339,17 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-		tqsim.addMobsimEngine(trEngine) ;
+			.useDefaults() //
+			.build(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
+		tqsim.addMobsimEngine(trEngine);
 
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(5);
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -363,10 +359,10 @@ public class UmlaufDriverTest {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
-		PTPassengerAgent agent1 = new FakeAgent(null, stop1);
-		PTPassengerAgent agent2 = new FakeAgent(null, stop1);
-		PTPassengerAgent agent3 = new FakeAgent(null, stop2);
-		PTPassengerAgent agent4 = new FakeAgent(null, stop2);
+		PTPassengerAgent agent1 = new FakeAgent(Id.createPersonId("fake-1"), null, stop1);
+		PTPassengerAgent agent2 = new FakeAgent(Id.createPersonId("fake-2"), null, stop1);
+		PTPassengerAgent agent3 = new FakeAgent(Id.createPersonId("fake-3"), null, stop2);
+		PTPassengerAgent agent4 = new FakeAgent(Id.createPersonId("fake-4"), null, stop2);
 
 		queueVehicle.addPassenger(agent1);
 		queueVehicle.addPassenger(agent2);
@@ -405,16 +401,16 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
-		tqsim.addMobsimEngine(trEngine) ;
+			.useDefaults() //
+			.build(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
+		tqsim.addMobsimEngine(trEngine);
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(5);
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -449,16 +445,16 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
+			.useDefaults() //
+			.build(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -503,16 +499,16 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+			.useDefaults() //
+			.build(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -557,16 +553,16 @@ public class UmlaufDriverTest {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 		QSim tqsim = new QSimBuilder(sc.getConfig()) //
-				.useDefaults() //
-				.build(sc, events);
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+			.useDefaults() //
+			.build(sc, events);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 
-		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class));
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(5);
 //		vehType.setCapacity(capacity);
-		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -591,8 +587,7 @@ public class UmlaufDriverTest {
 		try {
 			assertEquals(0, driver.handleTransitStop(stop3, 260), MatsimTestUtils.EPSILON);
 			fail("missing exception: driver still has passengers, although it handled the last stop.");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
 	}
@@ -607,7 +602,7 @@ public class UmlaufDriverTest {
 
 		@Override
 		public boolean getEnterTransitRoute(TransitLine line,
-				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+											TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 			this.offeredLine = line;
 			return false;
 		}
@@ -655,9 +650,10 @@ public class UmlaufDriverTest {
 		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
+
 		@Override
 		public String getMode() {
-			throw new RuntimeException("not implemented") ;
+			throw new RuntimeException("not implemented");
 		}
 	}
 

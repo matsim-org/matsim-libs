@@ -20,6 +20,7 @@
 
 package org.matsim.facilities;
 
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -28,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -46,13 +48,13 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  */
 public class FacilitiesUtils {
 	private static final Logger log = LogManager.getLogger( FacilitiesUtils.class ) ;
-	
+
 	private FacilitiesUtils() {} // container for static methods; do not instantiate
-	
+
 	public static ActivityFacilities createActivityFacilities() {
 		return createActivityFacilities(null) ;
 	}
-	
+
 	public static ActivityFacilities createActivityFacilities(String name) {
 		return new ActivityFacilitiesImpl( name ) ;
 	}
@@ -63,7 +65,7 @@ public class FacilitiesUtils {
 	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
 		return new TreeMap<>(facilities.getFacilities());
 	}
-	
+
 	public static void setLinkID( final Facility facility , Id<Link> linkId ) {
 		if ( facility instanceof ActivityFacilityImpl ) {
 			((ActivityFacilityImpl) facility).setLinkId(linkId);
@@ -101,21 +103,21 @@ public class FacilitiesUtils {
 	@Deprecated
 	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
-		
+
 		Id<Link> accessActLinkId = null ;
 		try {
 			accessActLinkId = facility.getLinkId() ;
 		} catch ( Exception ee ) {
 			// there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
 		}
-		
+
 		if ( accessActLinkId!=null ) {
 			accessActLink = network.getLinks().get( facility.getLinkId() );
 			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
 			// other link.
-			
+
 		}
-		
+
 		if ( accessActLink==null ) {
 			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
 			// OR the facility does not have a street address link in the first place.
@@ -123,7 +125,7 @@ public class FacilitiesUtils {
 			if( facility.getCoord()==null ) {
 				throw new RuntimeException("link for facility cannot be determined when neither facility link id nor facility coordinate given") ;
 			}
-			
+
 			accessActLink = NetworkUtils.getNearestLink(network, facility.getCoord()) ;
 			if ( accessActLink == null ) {
 				log.warn("Facility without link for which no nearest link on the respective network could be found. " +
@@ -220,4 +222,21 @@ public class FacilitiesUtils {
 	public static <F extends Facility & Attributable> Object removeFacilityAttribute( F facility, String key ) {
 		return facility.getAttributes().removeAttribute( key );
 	}
+
+	public static void removeInvalidNetworkReferences( ActivityFacilities facilities, Network network ) {
+		for( ActivityFacility facility : facilities.getFacilities().values() ){
+			Id<Link> facilityLinkId = facility.getLinkId();
+			if ( facilityLinkId != null ) {
+				if ( network.getLinks().get( facilityLinkId ) == null ) {
+					((ActivityFacilityImpl) facility).setLinkId( null );
+					// yyyy would be better to rerun XY2Links
+				}
+			}
+		}
+	}
+
+	public static void cleanFacilities( Scenario scenario ) {
+		removeInvalidNetworkReferences( scenario.getActivityFacilities(), scenario.getNetwork() );
+	}
+
 }

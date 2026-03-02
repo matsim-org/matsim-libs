@@ -21,15 +21,17 @@
 package org.matsim.freight.carriers.usecases;
 
 import com.google.inject.Inject;
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 import org.matsim.freight.carriers.Carrier;
 import org.matsim.freight.carriers.Tour;
 import org.matsim.freight.carriers.controller.CarrierScoringFunctionFactory;
@@ -37,32 +39,63 @@ import org.matsim.freight.carriers.events.CarrierTourEndEvent;
 import org.matsim.freight.carriers.events.CarrierTourStartEvent;
 import org.matsim.freight.logistics.analysis.Driver2VehicleEventHandler;
 import org.matsim.freight.logistics.analysis.Vehicle2CarrierEventHandler;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * This is a scoring function for carriers that uses events to calculate the score.
  * This includes also tolls for vehicles driving on tolled links based on the person money event(s).
  * <p></p>
  * Currently, it includes: -
- *  - fixed costs (using CarrierTourEndEvent)
- *  - time-dependent costs (using FreightTourStart- and -EndEvent)
- *  - distance-dependent costs (using LinkEnterEvent)
- * 	- tolls (using PersonMoneyEvent)
+ * - fixed costs (using CarrierTourEndEvent)
+ * - time-dependent costs (using FreightTourStart- and -EndEvent)
+ * - distance-dependent costs (using LinkEnterEvent)
+ * - tolls (using PersonMoneyEvent)
  *
- * 	@todo 	Can this be the new default scoring function for carriers?
- * 	Discuss with RE/KN and write tests around it.
- *  @author Kai Martins-Turner (kturner)
+ * @author Kai Martins-Turner (kturner)
+ * @todo Can this be the new default scoring function for carriers?
+ * Discuss with RE/KN and write tests around it.
  */
-public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory {
+public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFactory, IterationEndsListener {
 
-	@Inject private Scenario scenario;
+	private final Scenario scenario;
+	private final EventsManager em;
+
+	private final Map<Id<Carrier>, EventBasedScoring> scoringFunctions = new HashMap<>();
+
+	@Inject
+	public CarrierScorerEventBasedInclToll(Scenario scenario, EventsManager em) {
+		this.scenario = scenario;
+		this.em = em;
+	}
 
 	public ScoringFunction createScoringFunction(Carrier carrier) {
+
+		if (scoringFunctions.containsKey(carrier.getId())) {
+			var function = scoringFunctions.get(carrier.getId());
+			var sf = new SumScoringFunction();
+			sf.addScoringFunction(function);
+			return sf;
+		}
+
 		SumScoringFunction sf = new SumScoringFunction();
-		sf.addScoringFunction(new EventBasedScoring(scenario, carrier.getId()) );
+		var scorer = new EventBasedScoring(scenario, carrier.getId());
+		scoringFunctions.put(carrier.getId(), scorer);
+		sf.addScoringFunction(scorer);
+		em.addHandler(scorer);
 		return sf;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		for (var handler : scoringFunctions.values()) {
+			em.removeHandler(handler);
+		}
+		scoringFunctions.clear();
 	}
 
 
@@ -72,7 +105,7 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 	 * distance-dependent costs (using LinkEnterEvent)
 	 * tolls (using PersonMoneyEvent)
 	 */
-	private static class EventBasedScoring implements ArbitraryEventScoring {
+	private static class EventBasedScoring implements SumScoringFunction.BasicScoring, BasicEventHandler {
 
 		final Logger log = LogManager.getLogger(EventBasedScoring.class);
 		private final Map<Id<Tour>, Double> tourStartTime = new LinkedHashMap<>();
@@ -82,7 +115,7 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 		private double score;
 		private final Scenario scenario;
 
-		public EventBasedScoring(Scenario scenario, Id<Carrier> carrierId ) {
+		public EventBasedScoring(Scenario scenario, Id<Carrier> carrierId) {
 			super();
 			this.scenario = scenario;
 			this.carrierId = carrierId;
@@ -90,7 +123,8 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 		}
 
 		@Override
-		public void finish() {}
+		public void finish() {
+		}
 
 		@Override
 		public double getScore() {
@@ -106,24 +140,36 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 				case CarrierTourEndEvent carrierTourEndEvent -> handleEvent(carrierTourEndEvent);
 				case LinkEnterEvent linkEnterEvent -> handleEvent(linkEnterEvent);
 				case PersonMoneyEvent personMoneyEvent -> handleEvent(personMoneyEvent);
-				case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> d2v.handleEvent(vehicleEntersTrafficEvent);
-				case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> d2v.handleEvent(vehicleLeavesTrafficEvent);
-				default -> {}
+				case VehicleEntersTrafficEvent vehicleEntersTrafficEvent -> handleEvent(vehicleEntersTrafficEvent);
+				case VehicleLeavesTrafficEvent vehicleLeavesTrafficEvent -> handleEvent(vehicleLeavesTrafficEvent);
+				default -> {
+				}
 			}
 		}
 
+		private void handleEvent(VehicleEntersTrafficEvent event) {
+			d2v.handleEvent(event);
+		}
+
+		private void handleEvent(VehicleLeavesTrafficEvent event) {
+			d2v.handleEvent(event);
+		}
+
 		private void handleEvent(CarrierTourStartEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+
 			v2c.handleEvent(event);
 			tourStartTime.put(event.getTourId(), event.getTime()); // Save time of freight tour start for later use
 		}
 
 		// scores fix costs for vehicle usage and variable costs per time
 		private void handleEvent(CarrierTourEndEvent event) {
+			if (!carrierId.equals(event.getCarrierId())) return;
+
 			v2c.handleEvent(event);
 			final VehicleType vehicleType = (VehicleUtils.findVehicle(event.getVehicleId(), scenario)).getType();
 
 			// Fix costs for vehicle usage
-			log.debug("Score fixed costs for vehicle type: {}", vehicleType.getId().toString());
 			score = score - vehicleType.getCostInformation().getFixedCosts();
 
 			// variable costs per time
@@ -133,6 +179,8 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 
 		// scores variable costs per distance
 		private void handleEvent(LinkEnterEvent event) {
+			if (!carrierId.equals(v2c.getCarrierOfVehicle(event.getVehicleId()))) return;
+
 			final double distance = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 			final double costPerMeter =
 				(VehicleUtils.findVehicle(event.getVehicleId(), scenario))
@@ -143,23 +191,19 @@ public class CarrierScorerEventBasedInclToll implements CarrierScoringFunctionFa
 			score = score - (distance * costPerMeter); // variable costs per distance
 		}
 
-
 		// scores tolls for vehicles driving on tolled links
 		private void handleEvent(PersonMoneyEvent event) {
+			var vehicleId = d2v.getVehicleOfDriver(event.getPersonId());
+			var carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
+			if (vehicleId == null || !this.carrierId.equals(carrierIdOfVehicle)) return;
+
 			log.debug("Scoring Carrier: {}", carrierId);
 			log.debug("Event : {}", event.toString());
 
 			if (event.getPurpose().equals("toll")) {
-				Id<Vehicle> vehicleId = d2v.getVehicleOfDriver(event.getPersonId());
-				if (vehicleId != null) {
-					Id<Carrier> carrierIdOfVehicle = v2c.getCarrierOfVehicle(vehicleId);
-					if (carrierId.equals(carrierIdOfVehicle)) {
-						log.debug("Tolling caused by event: {}, toll value {}", event, event.getAmount());
-						score = score + event.getAmount();
-					}
-				}
+				score = score + event.getAmount();
+				log.debug("{}: Tolling caused by event: {}, new score: {}", carrierId, event, score);
 			}
 		}
 	}
-
 }

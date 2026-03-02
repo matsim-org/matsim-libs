@@ -24,13 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonScoreEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -54,23 +48,9 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoreEventScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.core.scoring.functions.*;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +77,6 @@ public class CapacityDependentScoringTest {
 
 	private double calcScore(Fixture f, boolean capacityDependent) {
 		Config config = f.config;
-		Network network = f.scenario.getNetwork();
 		ScoringParametersForPerson parameters = new SubpopulationScoringParameters(f.scenario);
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -111,7 +90,7 @@ public class CapacityDependentScoringTest {
 				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, config.transit().getTransitModes()));
 				scoringFunctionAccumulator.addScoringFunction(new ScoreEventScoring());
 
 				return scoringFunctionAccumulator;
@@ -143,33 +122,33 @@ public class CapacityDependentScoringTest {
 		transitVehicles.addVehicle(veh);
 
 		Id<Person> driver1 = Id.create("d1", Person.class);
-		events.processEvent(new TransitDriverStartsEvent(7*3600 - 100, driver1, veh.getId(), f.fastLineId, f.fastRouteId, Id.create("f1", Departure.class)));
-		events.processEvent(new PersonDepartureEvent(7*3600 - 100, driver1, Id.create(1, Link.class), "car", "car"));
-		events.processEvent(new PersonEntersVehicleEvent(7*3600 - 100, driver1, veh.getId()));
+		events.processEvent(new TransitDriverStartsEvent(7 * 3600 - 100, driver1, veh.getId(), f.fastLineId, f.fastRouteId, Id.create("f1", Departure.class)));
+		events.processEvent(new PersonDepartureEvent(7 * 3600 - 100, driver1, Id.create(1, Link.class), "car", "car"));
+		events.processEvent(new PersonEntersVehicleEvent(7 * 3600 - 100, driver1, veh.getId()));
 
-		events.processEvent(new ActivityEndEvent(7*3600, person.getId(), Id.create(1, Link.class), null, "home", new Coord( 234., 5.67 )));
-		events.processEvent(new PersonDepartureEvent(7*3600, person.getId(), Id.create(1, Link.class), "pt", "pt"));
-		events.processEvent(new AgentWaitingForPtEvent(7*3600, person.getId(), f.stopAId, f.stopDId));
+		events.processEvent(new ActivityEndEvent(7 * 3600, person.getId(), Id.create(1, Link.class), null, "home", new Coord(234., 5.67)));
+		events.processEvent(new PersonDepartureEvent(7 * 3600, person.getId(), Id.create(1, Link.class), "pt", "pt"));
+		events.processEvent(new AgentWaitingForPtEvent(7 * 3600, person.getId(), f.stopAId, f.stopDId));
 
-		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600-10, veh.getId(), f.stopAId, 0));
-		events.processEvent(new PersonEntersVehicleEvent(7*3600-5, person.getId(), veh.getId()));
-		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600, veh.getId(), f.stopAId, 0));
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7 * 3600 - 10, veh.getId(), f.stopAId, 0));
+		events.processEvent(new PersonEntersVehicleEvent(7 * 3600 - 5, person.getId(), veh.getId()));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7 * 3600, veh.getId(), f.stopAId, 0));
 
-		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 5*60, veh.getId(), f.stopBId, 0));
-		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 5*60, veh.getId(), f.stopBId, 0));
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7 * 3600 + 5 * 60, veh.getId(), f.stopBId, 0));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7 * 3600 + 5 * 60, veh.getId(), f.stopBId, 0));
 
-		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 10*60, veh.getId(), f.stopCId, 0));
-		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 10*60, veh.getId(), f.stopCId, 0));
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7 * 3600 + 10 * 60, veh.getId(), f.stopCId, 0));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7 * 3600 + 10 * 60, veh.getId(), f.stopCId, 0));
 
-		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 15*60 - 10, veh.getId(), f.stopDId, 0));
-		events.processEvent(new PersonLeavesVehicleEvent(7*3600 + 15*60, person.getId(), veh.getId()));
-		events.processEvent(new PersonArrivalEvent(7*3600 + 15*60, person.getId(), Id.create(4, Link.class), "pt"));
-		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 16*60, veh.getId(), f.stopDId, 0));
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7 * 3600 + 15 * 60 - 10, veh.getId(), f.stopDId, 0));
+		events.processEvent(new PersonLeavesVehicleEvent(7 * 3600 + 15 * 60, person.getId(), veh.getId()));
+		events.processEvent(new PersonArrivalEvent(7 * 3600 + 15 * 60, person.getId(), Id.create(4, Link.class), "pt"));
+		events.processEvent(new ActivityStartEvent(7 * 3600 + 15 * 60, person.getId(), Id.createLinkId(2), null, "end", new Coord(42, 43)));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7 * 3600 + 16 * 60, veh.getId(), f.stopDId, 0));
 
 		events.finishProcessing();
 		events2Score.finish();
-		Double score = events2Score.getAgentScore(person.getId());
-		return score;
+		return events2Score.getAgentScore(person.getId());
 	}
 
 	private static class Fixture {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Creates a vehicle (DRT) animation visualization for simwrapper.
  */
-public class Vehicles extends Viz {
+public class Vehicles extends VizMap<Vehicles> {
 
 	/**
 	 * Sets the path of the processed trips file in JSON format
@@ -41,4 +41,5 @@ public class Vehicles extends Viz {
 	public Vehicles() {
 		super("vehicles");
 	}
+
 }

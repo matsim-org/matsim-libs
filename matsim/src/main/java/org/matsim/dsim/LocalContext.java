@@ -67,6 +67,6 @@ public final class LocalContext implements ExecutionContext {
 
 	@Override
 	public ComputeNode getComputeNode() {
-		return topology.getNode(0);
+		return topology.getNodeByIndex(0);
 	}
 }

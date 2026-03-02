@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.ev.discharging;
 
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
@@ -33,9 +34,31 @@ import com.google.inject.Singleton;
 public final class DischargingModule extends AbstractModule {
 	@Override
 	public void install() {
-		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
+		EvConfigGroup evConfig = EvConfigGroup.get(getConfig());
+
+		switch (evConfig.getDriveEnergyConsumption()) {
+			case OhdeSlaski:
+				bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
+				break;
+			case AttributeBased:
+				bind(DriveEnergyConsumption.Factory.class).toInstance(new AttributeBasedDriveEnergyConsumption.Factory());
+				break;
+			case None:
+				bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> (link, travelTime, enterTime) -> 0.0);
+		}
+
+		switch (evConfig.getAuxEnergyConsumption()) {
+			case OhdeSlaski:
+				bind(AuxEnergyConsumption.Factory.class).to(OhdeSlaskiAuxEnergyConsumption.Factory.class).in(Singleton.class);
+				break;
+			case AttributeBased:
+				bind(AuxEnergyConsumption.Factory.class).toInstance(new AttributeBasedAuxEnergyConsumption.Factory());
+				break;
+			case None:
+				bind(AuxEnergyConsumption.Factory.class).toInstance(ev -> (beginTime, duration, linkId) -> 0.0);
+		}
+
 		bind(TemperatureService.class).toInstance(linkId -> 15);// XXX fixed temperature 15 oC
-		bind(AuxEnergyConsumption.Factory.class).to(OhdeSlaskiAuxEnergyConsumption.Factory.class).in(Singleton.class);
 
 		installQSimModule(new AbstractQSimModule() {
 			@Override

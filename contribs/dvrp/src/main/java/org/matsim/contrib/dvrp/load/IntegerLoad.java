@@ -4,14 +4,14 @@ package org.matsim.contrib.dvrp.load;
  * @author Tarek Chouaki (tkchouaki), IRT SystemX
  * @author Sebastian Hörl (sebhoerl), IRT SystemX
  */
-public class IntegerLoad implements DvrpLoad {
+public final class IntegerLoad implements DvrpLoad {
 	private final int value;
 
 	IntegerLoad(int value) {
 		this.value = value;
 	}
 
-	protected IntegerLoad check(DvrpLoad load) {
+	private IntegerLoad check(DvrpLoad load) {
         if (load instanceof IntegerLoad otherLoad) {
             return otherLoad;
         }

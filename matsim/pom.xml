@@ -117,12 +117,25 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.5.4</version>
+				<version>3.5.5</version>
 			</plugin>
 		</plugins>
 	</reporting>
 
 	<dependencies>
+		<!-- This dependency is here, because the IntelliJ build fails otherwise with:
+		     java: cannot access javax.annotation.concurrent.NotThreadSafe
+               class file for javax.annotation.concurrent.NotThreadSafe not found
+
+             Some other dependency of the project expects this dependency to be present. Unfortunately, the findbugs project is unmaintained since
+             2017. If possible, we should get rid of this workaround. The current version of findbugs is com.github.spotbugs .
+
+             So sorry, Janek Feb' 26
+         -->
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
@@ -216,7 +229,7 @@
 		<dependency>
 			<groupId>com.github.luben</groupId>
 			<artifactId>zstd-jni</artifactId>
-			<version>1.5.7-6</version>
+			<version>1.5.7-7</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
@@ -334,14 +347,9 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.logging</groupId>
-			<artifactId>jboss-logging</artifactId>
-			<version>3.6.1.Final</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.errorprone</groupId>
 			<artifactId>error_prone_annotations</artifactId>
-			<version>2.45.0</version>
+			<version>2.48.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -367,20 +375,20 @@
 
 		<!-- These are for distributed simulation -->
 		<dependency>
-			<groupId>org.apache.fury</groupId>
-			<artifactId>fury-core</artifactId>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-core</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.fury</groupId>
-			<artifactId>fury-format</artifactId>
+			<groupId>org.apache.fory</groupId>
+			<artifactId>fory-format</artifactId>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>org.agrona</groupId>
 			<artifactId>agrona</artifactId>
-			<version>2.3.2</version>
+			<version>2.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hdrhistogram</groupId>
@@ -447,7 +455,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<version>3.7.1</version>
+						<version>3.8.0</version>
 						<configuration>
 							<descriptors>
 								<descriptor>src/main/assembly/assembly-release.xml</descriptor>

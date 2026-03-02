@@ -1,6 +1,6 @@
 package org.matsim.core.serialization;
 
-import org.apache.fury.memory.MemoryBuffer;
+import org.apache.fory.memory.MemoryBuffer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +30,7 @@ class SerializationProviderTest {
 
 			FuryBufferParser parser = provider.getFuryParser(event.getType());
 
-			byte[] bytes = provider.getFury().serializeJavaObject(event);
+			byte[] bytes = provider.getFory().serializeJavaObject(event);
 
 			MemoryBuffer buf = MemoryBuffer.fromByteArray(bytes);
 

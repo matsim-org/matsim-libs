@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.turnRestrictions.DisallowedNextLinks;
+import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.TimeDependentNetwork;
@@ -73,6 +74,12 @@ public final class TransportModeNetworkFilter {
 	 */
 	public void filter(final Network subNetwork, final Set<String> extractModes) {	
 		NetworkFactory factory = subNetwork.getFactory();
+
+		// also copy the CRS attribute if we do not override an existing one
+		String crsString = ProjectionUtils.getCRS(this.fullNetwork);
+		if (crsString != null && !crsString.isEmpty() && ProjectionUtils.getCRS(subNetwork) == null) {
+			ProjectionUtils.putCRS(subNetwork, crsString);
+		}
 
 		// first, clone all nodes to ensure their order is not changed
 		for (Node node : this.fullNetwork.getNodes().values()) {

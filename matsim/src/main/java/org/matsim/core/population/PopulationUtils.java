@@ -67,11 +67,11 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation(
 			new PlansConfigGroup(), null, null).getFactory();
 
-	/**
-	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
-	 */
-	@Deprecated
-	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+//	/**
+//	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+//	 */
+//	@Deprecated
+	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
 	/**
@@ -912,6 +912,14 @@ public final class PopulationUtils {
 
 	// --- static copy methods:
 
+	public static void copyFromTo( final Person in, final Person out ) {
+		AttributesUtils.copyAttributesFromTo( in, out );
+		for( Plan inPlan : in.getPlans() ){
+			Plan outPlan = getFactory().createPlan();
+			copyFromTo( inPlan, outPlan );
+		}
+	}
+
 	/**
 	 * loads a copy of an existing plan, but keeps the person reference
 	 *
@@ -922,10 +930,17 @@ public final class PopulationUtils {
 		/*
 		 * By default 'false' to be backwards compatible. As a result, InteractionActivities will be converted to ActivityImpl.
 		 */
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
 		copyFromTo(in, out, false);
 	}
 
 	public static void copyFromTo(final Plan in, final Plan out, final boolean withInteractionActivities) {
+		// yyyy I am doubtful that the option with/wo interaction activities should even exist.  At least in the sense in which this
+		// is meant (population-based search algorithms), a copy should just be a full copy.  kai, nov'25
+		// yyyy Also, I think that this ended up being a bit of a misnomer ... since "isInteractionActivity" can now be understood
+		// in two different ways: (1) it is what is returned by isStageActivity (a conceptual thing); (2) it is what is returned by
+		// instanceof InteractionActivity (an implementation thing).  kai, nov'25
 		out.getPlanElements().clear();
 		out.setScore(in.getScore());
 		out.setType(in.getType());
@@ -962,7 +977,14 @@ public final class PopulationUtils {
 	}
 
 	public static void copyFromTo(Activity act, Activity newAct) {
-		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
+		Coord coord = null;
+		if (act.getCoord() != null) {
+			if (act.getCoord().hasZ()) {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY(), act.getCoord().getZ());
+			} else {
+				coord = new Coord(act.getCoord().getX(), act.getCoord().getY());
+			}
+		}
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
@@ -1348,7 +1370,7 @@ public final class PopulationUtils {
 	}
 
 	/**
-	 * Checks if each link of a route has the mode of the respective leg. This may be the case, if network links were
+	 * Checks if each link of a route has the mode of the respective leg. This may be the case if network links were
 	 * If the route is not a {@link NetworkRoute}, nothing is changed. If there are inconsistencies, the route is reset.
 	 *
 	 * @param population
@@ -1359,5 +1381,10 @@ public final class PopulationUtils {
 		population.getPersons().values().forEach(
 			personRouteChecker::run
 		);
+		///  There is also a {@link PersonNetworkLinkCheck}
+	}
+	public static void cleanPopulation( Scenario scenario ) {
+		checkRouteModeAndReset( scenario.getPopulation(), scenario.getNetwork() );
+		///  There is also a {@link PersonNetworkLinkCheck}
 	}
 }

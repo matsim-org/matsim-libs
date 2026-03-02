@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 									List<PTPassengerAgent> enteringPassengers, List<PTPassengerAgent> relocatingPassengers,
-									PassengerAccessEgress accessEgress, MobsimVehicle vehicle) {
+									PassengerAccessEgress accessEgress, TransitVehicle vehicle) {
 		int cntEgress = leavingPassengers.size();
 		int cntAccess = enteringPassengers.size();
 		double stopTime = 0;

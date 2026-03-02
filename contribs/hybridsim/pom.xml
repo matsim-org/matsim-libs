@@ -10,8 +10,8 @@
 	<name>hybridsim</name>
 
 	<properties>
-		<protobuf.version>4.33.1</protobuf.version>
-		<grpc.version>1.77.0</grpc.version>
+		<protobuf.version>4.34.0</protobuf.version>
+		<grpc.version>1.79.0</grpc.version>
 	</properties>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>io.opentelemetry</groupId>
 			<artifactId>opentelemetry-sdk</artifactId>
-			<version>1.56.0</version>
+			<version>1.59.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>

@@ -20,7 +20,7 @@ public class LambdaUtils {
 
 	private static final Logger log = LogManager.getLogger(LambdaUtils.class);
 
-	public static Consumer<? extends Message> createConsumer(Object lp, Class<?> msgType, String target) throws LambdaConversionException, ReflectiveOperationException {
+	public static Consumer<Message> createConsumer(Object lp, Class<?> msgType, String target) throws LambdaConversionException, ReflectiveOperationException {
 
 		Class<?> clazz = lp.getClass();
 		if (clazz.isSynthetic() && !clazz.isLocalClass() && !clazz.isAnonymousClass() && clazz.getDeclaredMethods().length == 1) {

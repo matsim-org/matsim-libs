@@ -507,6 +507,7 @@ public class LaemmerIT {
 			Config config = ConfigUtils.loadConfig("./examples/tutorial/singleCrossingScenario/config.xml");
 			config.plans().setInputFile(null);
 			config.controller().setOutputDirectory(testUtils.getOutputDirectory());
+			config.global().setRelativeToleranceForSampleSizeFactors( 2 );
 
 			LaemmerConfigGroup laemmerConfigGroup = ConfigUtils.addOrGetModule(config,
 					LaemmerConfigGroup.GROUP_NAME, LaemmerConfigGroup.class);

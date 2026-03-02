@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -91,7 +90,7 @@ public class TripsAndLegsWriter {
 		return scenario.getConfig().global().getDefaultDelimiter().charAt(0);
 	}
 
-	public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
+	public void write(Map<Id<Person>, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
 		try (CSVPrinter tripsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(tripsFilename),
 			CSVFormat.Builder.create().setDelimiter(getDefaultDelimiter()).setHeader(TRIPSHEADER).build());
 			 CSVPrinter legsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(legsFilename),
@@ -103,7 +102,7 @@ public class TripsAndLegsWriter {
 				legsCSVprinter.printRecords(tripsAndLegRecords.getSecond());
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 

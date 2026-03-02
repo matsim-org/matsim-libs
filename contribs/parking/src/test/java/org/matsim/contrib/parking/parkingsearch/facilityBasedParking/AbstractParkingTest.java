@@ -12,6 +12,7 @@ import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControllerUtils;
 import org.matsim.core.events.EventsUtils;
@@ -83,6 +84,7 @@ public abstract class AbstractParkingTest {
 		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", parkingSearchConfigGroup);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		config.controller().setLastIteration(0);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		return config;
 	}
 

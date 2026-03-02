@@ -31,6 +31,8 @@ public interface SimLink {
 
 	DistributedMobsimVehicle popVehicle();
 
+	Collection<DistributedMobsimVehicle> removeAllVehicles();
+
 	void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now);
 
 	void addLeaveHandler(OnLeaveQueue onLeaveQueue);
@@ -171,6 +173,18 @@ public interface SimLink {
 		}
 
 		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			var result = new ArrayList<DistributedMobsimVehicle>();
+			while (q.peek() != null) {
+				result.add(q.poll(Double.MIN_VALUE));
+			}
+			while (buffer.peek() != null) {
+				result.add(buffer.pollFirst());
+			}
+			return result;
+		}
+
+		@Override
 		public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 
 			var earliestExitTime = switch (position) {
@@ -277,6 +291,7 @@ public interface SimLink {
 		private final SimpleStorageCapacity storageCapacity;
 		private final FlowCapacity inflowCapacity;
 		private final Consumer<SimLink> activateLink;
+		private OnLeaveQueue onLeaveHandler = (_, _, _) -> OnLeaveQueueInstruction.RemoveVehicle;
 
 		SplitOutLink(Link link, SimpleStorageCapacity storageCapacity, FlowCapacity inflowCapacity, Consumer<SimLink> activateLink) {
 			id = link.getId();
@@ -319,6 +334,11 @@ public interface SimLink {
 		}
 
 		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			return this.q;
+		}
+
+		@Override
 		public void pushVehicle(DistributedMobsimVehicle vehicle, LinkPosition position, double now) {
 			if (LinkPosition.QStart != position)
 				throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
@@ -334,6 +354,7 @@ public interface SimLink {
 		@Override
 		public boolean doSimStep(SimStepMessaging messaging, double now) {
 			for (var vehicle : q) {
+				onLeaveHandler.apply(vehicle, this, now);
 				messaging.collectVehicle(vehicle);
 			}
 			q.clear();
@@ -344,7 +365,7 @@ public interface SimLink {
 
 		@Override
 		public void addLeaveHandler(OnLeaveQueue onLeaveQueue) {
-			throw new RuntimeException("Split out links don't handle vehicles leaving");
+			this.onLeaveHandler = onLeaveQueue;
 		}
 
 		public void applyCapacityUpdate(double released, double consumed) {
@@ -412,6 +433,11 @@ public interface SimLink {
 			var result = localLink.popVehicle();
 			localLink.activateLink.accept(this);
 			return result;
+		}
+
+		@Override
+		public Collection<DistributedMobsimVehicle> removeAllVehicles() {
+			return this.localLink.removeAllVehicles();
 		}
 
 		@Override

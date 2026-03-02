@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -64,8 +62,6 @@ public class DistanceConstraintTest {
 
 	@RegisterExtension
 	private MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	static final Logger log = LogManager.getLogger(DistanceConstraintTest.class);
 
 	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 

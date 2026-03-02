@@ -1,5 +1,7 @@
 package org.matsim.core.population.algorithms;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -28,13 +30,25 @@ public class PersonRouteCheck implements PersonAlgorithm{
 			return;
 		}
 
-		if (!(route instanceof NetworkRoute netRoute)) {
-			return;
-		}
+		boolean allLinksHaveLegMode = true;
 
-		boolean allLinksHaveLegMode = netRoute.getLinkIds().stream()
-											  .map(id -> network.getLinks().get(id))
-											  .allMatch(link -> link.getAllowedModes().contains(leg.getMode()));
+		Link startLinkId = network.getLinks().get( route.getStartLinkId() );
+		Link endLinkId = network.getLinks().get( route.getEndLinkId() );
+		if ( startLinkId==null || endLinkId==null ) {
+			allLinksHaveLegMode = false;
+		}
+		// (start/endLinkId might also be in the netRoute.getLinkIds below, but better be safe than sorry, and we need the check for non-network-routes anyways.)
+
+		if ( route instanceof NetworkRoute ){
+			NetworkRoute netRoute = (NetworkRoute) route;
+			for( Id<Link> id : netRoute.getLinkIds() ){
+				Link link = network.getLinks().get( id );
+				if( link == null || !(link.getAllowedModes().contains( leg.getMode() )) ){
+					allLinksHaveLegMode = false;
+					break;
+				}
+			}
+		}
 
 		if (!allLinksHaveLegMode) {
 			leg.setRoute(null);

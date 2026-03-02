@@ -37,7 +37,7 @@ public class SpeedyALTTest extends AbstractLeastCostPathCalculatorTestWithTurnRe
 	protected LeastCostPathCalculator getLeastCostPathCalculator(final Network network) {
 		FreespeedTravelTimeAndDisutility travelTimeCostCalculator = new FreespeedTravelTimeAndDisutility(new ScoringConfigGroup());
 		SpeedyGraph g = SpeedyGraphBuilder.build(network);
-		SpeedyALTData altData = new SpeedyALTData(g, 4, travelTimeCostCalculator);
+		SpeedyALTData altData = new SpeedyALTData(g, 4, travelTimeCostCalculator, 4);
 		return new SpeedyALT(altData, travelTimeCostCalculator, travelTimeCostCalculator);
 	}
 

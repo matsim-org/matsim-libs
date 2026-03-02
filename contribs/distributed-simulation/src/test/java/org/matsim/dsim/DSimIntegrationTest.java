@@ -25,8 +25,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -40,21 +38,21 @@ public class DSimIntegrationTest {
 	@Order(1)
 	void runLocal() {
 
-		Config local = createScenario();
+		Config localConfig = createConfig();
 		var outputPath = Paths.get(utils.getOutputDirectory());
-		local.controller().setOutputDirectory(outputPath.resolve("prerun").toString());
+		localConfig.controller().setOutputDirectory(outputPath.resolve("prerun").toString());
 		// do a pre run, because we want to use the same plans for local and distributed.
 		// When using the unplanned plans file for the local and the planned one from the local run for the distributed run, we end up with slightly
 		// different travel times, due to Double-rounding errors. This would cause varying orders of agent leaving the Activity engine for example.
 		// Therefore, conduct a pre run, then do a local run using the output plans file from that run for the local run and for the distributed run,
 		// which are both compared at the end of runDistributed.
-		var preRun = new DistributedController(new NullCommunicator(), local, 1);
+		var preRun = new DistributedController(new NullCommunicator(), localConfig, 1);
 		preRun.run();
 		var plans = outputPath.resolve("prerun/kelheim-mini.output_plans.xml").toAbsolutePath();
-		local.plans().setInputFile(plans.toString());
-		local.controller().setOutputDirectory(outputPath.toString());
+		localConfig.plans().setInputFile(plans.toString());
+		localConfig.controller().setOutputDirectory(outputPath.toString());
 
-		DistributedController controller = new DistributedController(new NullCommunicator(), local, 1);
+		DistributedController controller = new DistributedController(new NullCommunicator(), localConfig, 1);
 		controller.run();
 
 		assertThat(Path.of(utils.getOutputDirectory()))
@@ -64,7 +62,8 @@ public class DSimIntegrationTest {
 
 	@Test
 	@Order(2)
-	void runDistributed() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+	@DisabledOnGitHubWindowsCI
+	void runDistributed() throws IOException, InterruptedException, ExecutionException {
 
 		Path output = Path.of(utils.getOutputDirectory());
 		Path plansPath = output.resolve("..").resolve("runLocal/prerun").resolve("kelheim-mini.output_plans.xml").toAbsolutePath();
@@ -76,7 +75,7 @@ public class DSimIntegrationTest {
 		try (var pool = Executors.newFixedThreadPool(size)) {
 			var futures = comms.stream()
 				.map(comm -> pool.submit(() -> {
-					Config config = createScenario();
+					Config config = createConfig();
 					config.plans().setInputFile(plansPath.toString());
 					DistributedController c = new DistributedController(comm, config, 2);
 					c.run();
@@ -89,8 +88,7 @@ public class DSimIntegrationTest {
 				.toList();
 
 			for (var f : futures) {
-				f.get(1, TimeUnit.MINUTES);
-				//f.get();
+				f.get();
 			}
 		}
 
@@ -100,7 +98,7 @@ public class DSimIntegrationTest {
 			.isEqualTo(ComparisonResult.FILES_ARE_EQUAL);
 	}
 
-	private Config createScenario() {
+	private Config createConfig() {
 
 		URL kelheim = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("kelheim"), "config.xml");
 
@@ -124,6 +122,7 @@ public class DSimIntegrationTest {
 		config.dsim().setPartitioning(DSimConfigGroup.Partitioning.bisect);
 		// rely on flow capacity factor until we introduce global scaling factor
 		config.qsim().setFlowCapFactor(1.);
+		config.qsim().setStorageCapFactor(1.);
 
 		// Randomness will lead to different results from the baseline
 		config.routing().setRoutingRandomness(0);

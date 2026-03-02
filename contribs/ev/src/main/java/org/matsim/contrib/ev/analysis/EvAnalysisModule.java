@@ -46,15 +46,47 @@ public class EvAnalysisModule extends AbstractModule {
         if (evConfig.getWriteZonalEnergyDemandInterval() > 0) {
             addControllerListenerBinding().to(ZonalEnergyDemandListener.class);
         }
+
+        if (evConfig.getWriteChargingActivitiesInterval() > 0) {
+            addControllerListenerBinding().to(ChargingActivityListener.class);
+        }
+
+        if (evConfig.getWriteVehicleSocInterval() > 0) {
+            addControllerListenerBinding().to(VehicleSocListener.class);
+            addMobsimListenerBinding().to(VehicleSocListener.class);
+        }
     }
 
     @Provides
     @Singleton
     VehicleTrajectoryListener provideVehicleTrajectoryListener(EventsManager eventsManager, Network network,
-            ElectricFleetSpecification electricFleet, OutputDirectoryHierarchy outputHierarchy,
+            ElectricFleetSpecification electricFleet, ChargingInfrastructureSpecification infrastructure,
+            OutputDirectoryHierarchy outputHierarchy,
             EvConfigGroup evConfig) {
-        return new VehicleTrajectoryListener(eventsManager, network, electricFleet, outputHierarchy,
+        return new VehicleTrajectoryListener(eventsManager, network, electricFleet, infrastructure, outputHierarchy,
                 evConfig.getWriteVehicleTrajectoriesInterval(), getConfig().controller().getCompressionType());
+    }
+
+    @Provides
+    @Singleton
+    public ChargingActivityListener provideChargingAnalysisListener(
+            ChargingInfrastructureSpecification chargingInfrastructureSpecification,
+            Network network, EventsManager eventsManager,
+            OutputDirectoryHierarchy outputDirectoryHierarchy, EvConfigGroup evConfig) {
+        return new ChargingActivityListener(chargingInfrastructureSpecification, network, outputDirectoryHierarchy,
+                eventsManager, evConfig.getWriteChargingActivitiesInterval(),
+                getConfig().controller().getCompressionType());
+    }
+
+    @Provides
+    @Singleton
+    VehicleSocListener provideVehicleSocListener(EventsManager eventsManager,
+            ElectricFleetSpecification electricFleet,
+            OutputDirectoryHierarchy outputHierarchy,
+            EvConfigGroup evConfig) {
+        return new VehicleSocListener(eventsManager, electricFleet, outputHierarchy,
+                evConfig.getWriteVehicleSocInterval(), evConfig.getWriteVehicleSocFrequency(),
+                getConfig().controller().getCompressionType());
     }
 
     @Provides

@@ -5,12 +5,12 @@ import com.google.inject.Provider;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.agrona.concurrent.ManyToOneConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.EventSource;
 import org.matsim.api.core.v01.events.handler.DistributedEventHandler;
 import org.matsim.api.core.v01.events.handler.DistributedMode;
 import org.matsim.api.core.v01.messages.ComputeNode;
@@ -94,122 +94,122 @@ public final class DistributedEventsManager implements EventsManager {
 	}
 
 	/**
-	 * Whether the handler supports async execution.
+	 * Adds one handler for a specific partition. The calling code has to make sure that each partition has one handler.
+	 * This is, for now, not part of the {@link EventsManager} interface, as this is specific for this implementation.
+	 *
+	 * @param handler the event handler
+	 * @param part    partition index this event handler can be called from
 	 */
-	public static boolean supportsAsync(EventHandler handler) {
-		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return ann != null && ann.async();
-	}
+	public void addHandler(EventHandler handler, int part) {
+		var partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		if (partition == null || partition.value() != DistributedMode.PARTITION) {
+			throw new IllegalArgumentException("Adding event handler for specific partition requires the event to be annotated with" +
+				" '@DistributedEventHandler(value = DistributedMode.PARTITION)'");
+		}
 
-	/**
-	 * Whether this is a global event handler.
-	 */
-	public static boolean isGlobal(EventHandler handler) {
-		DistributedEventHandler ann = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		return ann == null || ann.value() == DistributedMode.GLOBAL;
-	}
-
-	@Override
-	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
-		return addInternal(provider.get(), provider);
+		EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
+		addTaskForSinglePart(task, part);
 	}
 
 	@Override
 	public void addHandler(EventHandler handler) {
 
-		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
-		if (partition != null && partition.value() == DistributedMode.PARTITION) {
-			throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
+		var distMode = getDistributedMode(handler);
+		switch (distMode) {
+			case GLOBAL -> {
+				if (computeNode.isHeadNode()) addAsNodeSingleton(handler);
+			}
+			case NODE -> addAsNodeSingleton(handler);
+			case NODE_CONCURRENT -> addAsConcurrentNodeSingleton(handler);
+			case PARTITION -> throw new IllegalArgumentException("Adding instance of PartitionEventHandler without provider. " +
 				"The eventManager is not able to create the instance. Use .addHandler(Provider<EventHandler> provider)");
 		}
-
-		addInternal(handler, null);
 	}
 
-	private <T extends EventHandler> List<T> addInternal(T handler, Provider<T> provider) {
+	@Override
+	public <T extends EventHandler> List<T> addHandler(Provider<T> provider) {
+		var handler = provider.get();
+		var distMode = getDistributedMode(handler);
 
-		String name = handler.getName();
+		if (distMode == DistributedMode.PARTITION) {
+			return addPartitionHandler(handler, provider);
+		} else {
+			addHandler(handler);
+			return List.of(handler);
+		}
+	}
 
-		List<T> handlers = new ArrayList<>();
+	private DistributedMode getDistributedMode(EventHandler handler) {
+		var annotation = handler.getClass().getAnnotation(DistributedEventHandler.class);
+		return annotation == null ? DistributedMode.GLOBAL : annotation.value();
+	}
 
-		DistributedEventHandler partition = handler.getClass().getAnnotation(DistributedEventHandler.class);
+	public void addAsNodeSingleton(EventHandler handler) {
+		var part = computeNode.getParts().getInt(0);
+		EventHandlerTask task = executor.register(handler, this, part, 1, null);
+		addTaskForEachPart(task, part);
+	}
 
-		if (partition != null && partition.value() == DistributedMode.NODE_SINGLETON) {
-			log.info("Registering event handler {} for node {}", name, computeNode.getRank());
-			Integer part = computeNode.getParts().getFirst();
-			EventHandlerTask task = executor.register(handler, this, part, 1, null);
-			addTask(task, part);
-			handlers.add(handler);
+	public void addAsConcurrentNodeSingleton(EventHandler handler) {
+		AtomicInteger partitionCounter = new AtomicInteger();
+		for (int part : computeNode.getParts()) {
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+			addTaskForSinglePart(task, part);
+		}
+	}
 
-		} else if (partition != null && (partition.value() == DistributedMode.PARTITION || partition.value() == DistributedMode.PARTITION_SINGLETON)) {
-			log.info("Registering event handler {} for each partition", name);
+	private <T extends EventHandler> List<T> addPartitionHandler(T firstHandler, Provider<T> provider) {
 
-			AtomicInteger partitionCounter = new AtomicInteger();
-			for (int part : computeNode.getParts()) {
-				EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), partitionCounter);
+		// set up stuff to create multiple handlers
+		var result = new ArrayList<T>();
 
-				addTask(task, part);
-				handlers.add(handler);
+		// keep a reference to the last handler added, to ensure each partition receives a distinct handler instance
+		T handler = null;
 
-				if (partition.value() == DistributedMode.PARTITION) {
-					T next = provider.get();
-					if (handler == next)
-						throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
-
-					handler = next;
-				}
+		// add as many handlers as there are partitions
+		for (int part : computeNode.getParts()) {
+			var nextHandler = (part == computeNode.getParts().getInt(0)) ? firstHandler : provider.get();
+			if (handler == nextHandler) {
+				throw new IllegalStateException("The provider must return a new instance of the handler or PARTITION_SINGLETON must be set.");
 			}
-		} else if (computeNode.getRank() == 0) {
-			log.warn("Registering global event handler {}", name);
-			Integer part = computeNode.getParts().getFirst();
-			EventHandlerTask task = executor.register(handler, this, part, 1, null);
-			addTask(task, part);
-			handlers.add(handler);
+			handler = nextHandler;
+			EventHandlerTask task = executor.register(handler, this, part, computeNode.getParts().size(), null);
+			addTaskForSinglePart(task, part);
+			result.add(handler);
 		}
 
-		return handlers;
+		return result;
 	}
 
-	private void addTask(EventHandlerTask task, int part) {
+	private void addTaskForEachPart(EventHandlerTask task, int handlerPartition) {
+		broker.register(task, handlerPartition);
+		for (var part : computeNode.getParts()) {
+			addTaskForPart(task, part);
+		}
+		tasks.add(task);
+		task.setBroker(broker);
+	}
 
+	private void addTaskForSinglePart(EventHandlerTask task, int part) {
 		broker.register(task, part);
+		addTaskForPart(task, part);
+		tasks.add(task);
+		task.setBroker(broker);
+	}
 
-		for (int type : task.getSupportedMessages()) {
+	private void addTaskForPart(EventHandlerTask task, int part) {
 
+		for (var type : task.getSupportedMessages()) {
 			if (!serializer.hasType(type)) {
 				log.warn("No serializer for type {} from task {}", type, task.getName());
 				continue;
 			}
-
-			EventSource source = task.getEventSource(type);
-			if (!task.isDirect() && source == EventSource.GLOBAL) {
-				globalListener.computeIfAbsent(type, _ -> new ArrayList<>()).add(task);
-				remoteSyncStep = Double.min(remoteSyncStep, task.getHandler().getProcessInterval());
-			}
-			// otherwise the task is local and is not added to any queue.
-
-			// Store handler as listener for all partitions
-			if (source == EventSource.GLOBAL || source == EventSource.NODE) {
-				for (Integer p : computeNode.getParts()) {
-					long address = MessageBroker.address(p, type);
-					if (task.isDirect())
-						directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
-					else
-						byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
-				}
-			} else {
-
-				long address = MessageBroker.address(part, type);
-				if (task.isDirect())
-					directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
-				else
-					byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
-
-			}
+			long address = MessageBroker.address(part, type);
+			if (task.isDirect())
+				directListener.computeIfAbsent(address, _ -> new ArrayList<>()).add(task.getConsumer(type));
+			else
+				byPartitionAndType.computeIfAbsent(address, _ -> new ArrayList<>()).add(task);
 		}
-
-		task.setBroker(broker);
-		tasks.add(task);
 	}
 
 	/**
@@ -331,18 +331,17 @@ public final class DistributedEventsManager implements EventsManager {
 			return;
 		}
 
-		// Need to process two times, for handlers that registered for ANY_TYPE
-		boolean sent = processInternal(e, e.getType(), false);
-		processInternal(e, Event.ANY_TYPE, sent);
+		processInternal(e, e.getType());
 	}
 
 	/**
 	 * Return whether event was queued for remote sending.
 	 */
-	private boolean processInternal(Event e, int type, boolean alreadySent) {
-		// Send to all local tasks
-		long address = MessageBroker.address(ctxPartition.get().get(), type);
+	private void processInternal(Event e, int type) {
 
+		var address = MessageBroker.address(ctxPartition.get().get(), type);
+
+		// send to local listeners.
 		List<Consumer<Message>> direct = directListener.get(address);
 		if (direct != null)
 			direct.forEach(c -> c.accept(e));
@@ -352,18 +351,15 @@ public final class DistributedEventsManager implements EventsManager {
 			listener.forEach(t -> t.add(e));
 
 		// Send the event remotely
-		if (!alreadySent && remoteListener.containsKey(type)) {
+		if (remoteListener.containsKey(type)) {
 			remoteEvents.get(remoteListener.get(type)).add(e);
-			return true;
 		}
-
-		return false;
 	}
 
 	@Override
 	public void resetHandlers(int iteration) {
 		for (EventHandlerTask task : tasks) {
-			task.getHandler().reset(iteration);
+			task.resetTask(iteration);
 		}
 	}
 
@@ -378,8 +374,6 @@ public final class DistributedEventsManager implements EventsManager {
 
 		if (events.isEmpty())
 			return;
-
-//        log.debug("Received {} events from other nodes", events.size());
 
 		// Only global handlers may have received events from other nodes
 		for (Event event : events) {
@@ -409,8 +403,6 @@ public final class DistributedEventsManager implements EventsManager {
 				int receiver = kv.getIntKey();
 				ManyToOneConcurrentLinkedQueue<Event> events = remoteEvents.get(receiver);
 
-//                log.debug("Syncing {} events to {}", events.size(), receiver);
-
 				Event e;
 				while ((e = events.poll()) != null) {
 					broker.send(e, receiver);
@@ -434,7 +426,6 @@ public final class DistributedEventsManager implements EventsManager {
 		double time = lastSync + remoteSyncStep;
 
 		afterSimStep(time);
-		broker.beforeSimStep(time);
 		broker.syncTimestep(time, true);
 
 		beforeSimStep(time + 1);

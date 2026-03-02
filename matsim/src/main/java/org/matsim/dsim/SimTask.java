@@ -38,7 +38,8 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	/**
 	 * Perform cleanup after the simulation has finished.
 	 */
-	default void cleanup() {}
+	default void cleanup() {
+	}
 
 	/**
 	 * Add a message to the task.
@@ -70,7 +71,12 @@ public sealed interface SimTask extends Runnable permits LPTask, EventHandlerTas
 	 */
 	float getAvgRuntime();
 
-    record Info(String name, int partition, LongList runtime) {
-    }
+	/**
+	 * Reset the state of the task for a new iteration.
+	 */
+	void resetTask(int iteration);
+
+	record Info(String name, int partition, LongList runtime) {
+	}
 
 }

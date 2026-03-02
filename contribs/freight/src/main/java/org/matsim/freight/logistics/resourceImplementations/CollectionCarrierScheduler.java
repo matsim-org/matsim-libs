@@ -67,7 +67,7 @@ import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 			this.carrier = this.resource.getCarrier();
 			this.carrier.getServices().clear();
 			this.carrier.getShipments().clear();
-			this.carrier.getPlans().clear();
+			CarriersUtils.clearCarrierPlans(this.carrier);
 		}
 	}
 
