@@ -152,7 +152,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
-	private static int zstdCompressionLevel = 6;
+	private static int zstdCompressionLevel = 3;
 
 	public static void setZstdCompressionLevel(int level) {
 		if (level >= 1) {

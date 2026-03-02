@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.NetworkPartition;
 import org.matsim.api.core.v01.network.NetworkPartitioning;
 import org.matsim.core.mobsim.dsim.*;
 import org.matsim.dsim.MessageBroker;
+import org.matsim.dsim.scoring.BackPack;
 
 /**
  * Bridge between simulation and Message broker. Have this behind an interface, so that
@@ -61,6 +62,11 @@ public class SimStepMessaging {
 		int targetPart = networkPartitioning.getPartition(currentLinkId);
 		msgs.computeIfAbsent(targetPart, _ -> SimStepMessage.builder())
 			.addVehicleContainer(AgentSourcesContainer.vehicleToContainer(simVehicle));
+	}
+
+	public void collectBackPack(BackPack backPack, int toPart) {
+		msgs.computeIfAbsent(toPart, _ -> SimStepMessage.builder())
+			.addBackPack(backPack);
 	}
 
 	public void sendMessages(double now) {

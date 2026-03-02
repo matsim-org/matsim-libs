@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.ev.charging;
 
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
@@ -57,15 +58,23 @@ public class ChargingModule extends AbstractModule {
 
 		// standard charging priority for all chargers
 		bind(ChargingPriority.Factory.class).toInstance(ChargingPriority.FIFO);
+	
+		// standard charger output power 
+		bind(ChargerPower.Factory.class).to(DefaultChargerPower.Factory.class);
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
-		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory);
+	ChargingWithQueueingLogic.Factory provideChargingWithQueueingLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
+		return new ChargingWithQueueingLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
 	}
 
 	@Provides @Singleton
-	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory) {
-		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory);
+	ChargingWithQueueingAndAssignmentLogic.Factory provideChargingWithQueueingAndAssignmentLogicFactory(EventsManager eventsManager, ChargingPriority.Factory chargingPriorityFactory, ChargerPower.Factory chargerPowerFactory) {
+		return new ChargingWithQueueingAndAssignmentLogic.Factory(eventsManager, chargingPriorityFactory, chargerPowerFactory);
+	}
+
+	@Provides @Singleton
+	DefaultChargerPower.Factory provideDefaultChargerPowerFactory(EvConfigGroup evConfig) {
+		return new DefaultChargerPower.Factory(evConfig.getChargeTimeStep());
 	}
 }

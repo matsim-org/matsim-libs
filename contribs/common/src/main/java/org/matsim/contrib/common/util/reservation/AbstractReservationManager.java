@@ -24,11 +24,17 @@ public abstract class AbstractReservationManager<
         > implements ReservationManager<R, C> {
 
     private final Map<Id<?>, IdMap<Reservation, ReservationInfo<R, C>>> reservations;
+    private final double bufferTime;
     private int counter = 0;
 
 
     public AbstractReservationManager() {
+        this(0.);
+    }
+
+    public AbstractReservationManager(double bufferTime) {
         this.reservations = new HashMap<>();
+        this.bufferTime = bufferTime;
     }
 
     protected abstract int getCapacity(R resource);
@@ -49,7 +55,7 @@ public abstract class AbstractReservationManager<
 
         for (ReservationInfo<R, C> reservationInfo : reservations.get(resource.getId()).values()) {
             if (!reservationInfo.consumer().equals(consumer) && 
-                isOverlapping(reservationInfo, startTime, endTime)) {
+                isOverlapping(reservationInfo, startTime - bufferTime, endTime + bufferTime)) {
                 
                 consumersWithOverlappingReservations.add(reservationInfo.consumer());
             }

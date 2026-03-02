@@ -182,6 +182,21 @@ public class StrategicChargingUtils {
     }
 
     /**
+     * Sets the target SoC that the person wants to achieve at the end of the day.
+     */
+    static public void setTargetSoc(Person person, double targetSoc) {
+        ChargingPlanScoring.setTargetSoc(person, targetSoc);
+    }
+
+    /**
+     * Returns the target SoC that the person wants to achieve at the end of the
+     * day.
+     */
+    static public Double getTargetSoc(Person person) {
+        return ChargingPlanScoring.getTargetSoc(person);
+    }
+
+    /**
      * Returns whether a charger is assigned to at least one facility.
      */
     static public boolean isFacilityCharger(ChargerSpecification charger) {

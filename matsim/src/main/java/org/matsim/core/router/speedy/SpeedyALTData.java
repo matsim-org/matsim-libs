@@ -34,7 +34,7 @@ class SpeedyALTData {
 	private final int[] deadendData;
 	private final double minTravelCostPerLength;
 
-	public SpeedyALTData(SpeedyGraph graph, int landmarksCount, TravelDisutility travelCosts) {
+	public SpeedyALTData(SpeedyGraph graph, int landmarksCount, TravelDisutility travelCosts, int threads) {
 		this.graph = graph;
 		this.landmarksCount = landmarksCount;
 		this.travelCosts = travelCosts;
@@ -43,7 +43,7 @@ class SpeedyALTData {
 		this.deadendData = new int[graph.nodeCount];
 
 		this.findDeadEnds();
-		this.calcLandmarks();
+		this.calcLandmarks(threads);
 		this.minTravelCostPerLength = this.calcMinTravelCostPerLength();
 	}
 
@@ -128,7 +128,7 @@ class SpeedyALTData {
 		return otherNodeIndex;
 	}
 
-	private void calcLandmarks() {
+	private void calcLandmarks(int threads) {
 		LOG.info("calculate landmarks...");
 		Node firstNode = null;
 		for (int i = 0; i < this.graph.nodeCount; i++) {
@@ -143,7 +143,7 @@ class SpeedyALTData {
 		}
 
 		Future<double[]>[] trees = new Future[this.landmarksCount * 2];
-		ExecutorService executor = Executors.newFixedThreadPool(4);
+		ExecutorService executor = Executors.newFixedThreadPool(threads);
 
 		int firstLandmarkIndex = firstNode.getId().index();
 		this.landmarksNodeIndices[0] = firstLandmarkIndex;

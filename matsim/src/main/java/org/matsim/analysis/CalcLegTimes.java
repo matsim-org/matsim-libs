@@ -29,11 +29,9 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -42,13 +40,13 @@ import java.util.TreeMap;
 
 /**
  * @author mrieser
- *
+ * <p>
  * Calculates the distribution of legs-durations, e.g. how many legs took at
  * most 5 minutes, how many between 5 and 10 minutes, and so on.
  * Also calculates the average leg duration.
  * Legs ended because of vehicles being stuck are not counted.
  */
-@DistributedEventHandler(async = true)
+@DistributedEventHandler(blocking = BlockingMode.ASYNC)
 public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
@@ -165,9 +163,9 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 				out.write("average legs duration: no legs!");
 			} else {
 				out.write("average leg duration: "
-						+ (this.sumLegDurations / this.sumLegs)
-						+ " seconds = "
-						+ Time.writeTime(((int) (this.sumLegDurations / this.sumLegs))));
+					+ (this.sumLegDurations / this.sumLegs)
+					+ " seconds = "
+					+ Time.writeTime(((int) (this.sumLegDurations / this.sumLegs))));
 			}
 			out.write("\n");
 		} catch (IOException e) {

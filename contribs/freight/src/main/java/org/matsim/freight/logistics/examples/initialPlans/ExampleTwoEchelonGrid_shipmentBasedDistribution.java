@@ -21,7 +21,6 @@
 
 package org.matsim.freight.logistics.examples.initialPlans;
 
-import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,7 +32,10 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controller;
+import org.matsim.core.controler.ControllerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -54,6 +56,8 @@ import org.matsim.freight.logistics.shipment.LspShipment;
 import org.matsim.freight.logistics.shipment.LspShipmentUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * This is an academic example for the 2-echelon problem. It uses the 9x9-grid network from the
@@ -79,7 +83,7 @@ final class ExampleTwoEchelonGrid_shipmentBasedDistribution {
 	static final double HUBCOSTS_FIX = 100;
 	private static final DemandSetting demandSetting = DemandSetting.tenCustomers;
 	private static final CarrierCostSetting costSetting = CarrierCostSetting.lowerCost4LastMile;
-	 private static final LSPUtils.LogicOfVrp vrpLogicDistribution = LSPUtils.LogicOfVrp.shipmentBased;
+	private static final LSPUtils.LogicOfVrp vrpLogicDistribution = LSPUtils.LogicOfVrp.shipmentBased;
 	private static final double TOLL_VALUE = 1000;
 
 	private static final Logger log = LogManager.getLogger(ExampleTwoEchelonGrid_shipmentBasedDistribution.class);
@@ -90,7 +94,8 @@ final class ExampleTwoEchelonGrid_shipmentBasedDistribution {
 	private static final VehicleType VEH_TYPE_LARGE_50 = createVehTypeLarge50();
 	private static final VehicleType VEH_TYPE_SMALL_05 = createVehTypeSmall05();
 
-	private ExampleTwoEchelonGrid_shipmentBasedDistribution() {} // so it cannot be instantiated
+	private ExampleTwoEchelonGrid_shipmentBasedDistribution() {
+	} // so it cannot be instantiated
 
 	public static void main(String[] args) {
 		log.info("Prepare Config");
@@ -118,6 +123,7 @@ final class ExampleTwoEchelonGrid_shipmentBasedDistribution {
 					carrierScorer.setToll(TOLL_VALUE);
 
 					bind(CarrierScoringFunctionFactory.class).toInstance(carrierScorer);
+					addControllerListenerBinding().toInstance(carrierScorer);
 					bind(CarrierStrategyManager.class)
 						.toProvider(
 							() -> {

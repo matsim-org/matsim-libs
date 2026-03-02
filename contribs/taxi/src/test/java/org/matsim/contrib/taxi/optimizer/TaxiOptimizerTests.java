@@ -32,6 +32,7 @@ import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.PopulationComparison;
@@ -63,6 +64,7 @@ public class TaxiOptimizerTests {
 		// RunTaxiBenchmark.createControler() overrides some config params, this is a moment to adjust them
 		config.controller().setWriteEventsInterval(1);
 		config.controller().setDumpDataAtEnd(true);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		controler.run();
 

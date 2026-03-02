@@ -18,6 +18,11 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
 
     boolean hasCapacity();
 
+    /**
+     * Tries to register the vehicle at the facility and returns true if successful.
+     * If the vehicle was already registered before it also returns true.
+     * Returns false, if the vehicle could not be registered.
+     */
     boolean register(Id<DvrpVehicle> id);
 
     boolean deregisterVehicle(Id<DvrpVehicle> id);
@@ -27,4 +32,8 @@ public interface OperationFacility extends Identifiable<OperationFacility>, Faci
     OperationFacilityType getType();
 
     Set<Id<DvrpVehicle>> getRegisteredVehicles();
+
+    static Id<OperationFacility> id(String id) {
+        return Id.create(id, OperationFacility.class);
+    }
 }

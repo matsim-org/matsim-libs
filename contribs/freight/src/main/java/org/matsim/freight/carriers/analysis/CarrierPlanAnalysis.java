@@ -24,7 +24,11 @@ package org.matsim.freight.carriers.analysis;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +76,9 @@ import org.matsim.freight.carriers.*;
 			case carriersPlans_unPlanned -> path.resolve("Carriers_stats_unPlanned.tsv").toString();
 			case carriersPlans, carriersAndEvents -> path.resolve("Carriers_stats.tsv").toString();
 		};
+		switch (analysisType) {
+			case carriersPlans, carriersAndEvents -> createKPIOutput(path);
+		}
 		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(fileName))) {
 			String headerGeneral = String.join(delimiter,
 				"carrierId",
@@ -155,30 +162,44 @@ import org.matsim.freight.carriers.*;
 						bw1.write(delimiter + numberOfPlannedDemandSize);
 					}
 					case carriersPlans, carriersAndEvents -> {
-						int numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
-							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
-						int nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
-							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
-						int numberOfHandledJobs = numberOfHandledPickups + nuOfServiceHandled;
-						int notHandledJobs;
-						int numberOfHandledDemandSize;
-
-						if (jobsType == JobsType.shipments) {
-							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
-								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
-									te -> ((Tour.Pickup) te).getShipment().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlannedJobs - numberOfHandledPickups;
-						} else {
-							numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
-								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
-									te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
-							notHandledJobs = numberOfPlannedJobs - nuOfServiceHandled;
+						int numberOfHandledPickups = 0, nuOfServiceHandled = 0, numberOfHandledDemandSize = 0;
+						int notHandledJobs = numberOfPlannedJobs;
+						if (carrier.getSelectedPlan() != null) {
+							numberOfHandledPickups = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
+								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).count()).sum();
+							nuOfServiceHandled = (int) carrier.getSelectedPlan().getScheduledTours().stream().mapToDouble(
+								t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).count()).sum();
+							if (jobsType == JobsType.shipments) {
+								numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+									t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup).mapToInt(
+										te -> ((Tour.Pickup) te).getShipment().getCapacityDemand()).sum()).sum();
+								notHandledJobs -= numberOfHandledPickups;
+							} else {
+								numberOfHandledDemandSize = carrier.getSelectedPlan().getScheduledTours().stream().mapToInt(
+									t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.ServiceActivity).mapToInt(
+										te -> ((Tour.ServiceActivity) te).getService().getCapacityDemand()).sum()).sum();
+								notHandledJobs -= nuOfServiceHandled;
+							}
 						}
+						int numberOfHandledJobs = numberOfHandledPickups + nuOfServiceHandled;
+
 						CarriersUtils.allJobsHandledBySelectedPlan(carrier);
 
-						bw1.write(delimiter + carrier.getSelectedPlan().getScore());
-						bw1.write(delimiter + carrier.getSelectedPlan().getJspritScore());
-						bw1.write(delimiter + carrier.getSelectedPlan().getScheduledTours().size());
+						CarrierPlan plan = carrier.getSelectedPlan();
+
+						Double score = null;
+						Double jspritScore = null;
+						int tours = 0;
+
+						if (plan instanceof CarrierPlan p) {
+							score = (p.getScore() instanceof Double s) ? s : null;
+							jspritScore = (p.getJspritScore() instanceof Double js) ? js : null;
+							tours = (p.getScheduledTours() != null) ? p.getScheduledTours().size() : 0;
+						}
+
+						bw1.write(delimiter + score);
+						bw1.write(delimiter + jspritScore);
+						bw1.write(delimiter + tours);
 						bw1.write(delimiter + jobsType);
 						bw1.write(delimiter + numberOfPlannedJobs);
 						bw1.write(delimiter + numberOfHandledJobs);
@@ -196,6 +217,56 @@ import org.matsim.freight.carriers.*;
 
 			bw1.close();
 			log.info("Output written to {}", fileName);
+		} catch (IOException e) {
+			log.error("Could not write carrier stats to file", e);
+		}
+	}
+
+	private void createKPIOutput(Path path) {
+
+		try (BufferedWriter bw1 = new BufferedWriter(new FileWriter(path.resolve("Carriers_KPIs.tsv").toString()))) {
+
+
+			bw1.write("Number of Carrier" + delimiter + carriers.getCarriers().size());
+			bw1.newLine();
+			int numberOfVehicles = carriers.getCarriers().values().stream()
+				.mapToInt(c -> c.getSelectedPlan().getScheduledTours().size()).sum();
+			bw1.write("Number of Vehicles in Solution" + delimiter + numberOfVehicles);
+			bw1.newLine();
+			int jspritComputationTime = 0;
+			bw1.write("Jsprit Computation Time" + delimiter + jspritComputationTime);
+			bw1.newLine();
+			double jspritScore = carriers.getCarriers().values().stream()
+				.mapToDouble(c -> {
+					CarrierPlan plan = c.getSelectedPlan();
+					if (plan != null && plan.getJspritScore() != null) {
+						return plan.getJspritScore();
+					} else {
+						return 0.0;
+					}
+				}).sum();
+			NumberFormat nf = NumberFormat.getIntegerInstance(Locale.US);
+			nf.setGroupingUsed(true);
+			bw1.write("Total Jsprit Score of all Carriers" + delimiter + nf.format(new BigDecimal(jspritScore).setScale(1, RoundingMode.HALF_UP)));
+			bw1.newLine();
+
+			int numberNotHandledJobs = carriers.getCarriers().values().stream()
+				.mapToInt(c -> {
+					int plannedJobs = c.getShipments().size() + c.getServices().size();
+					int handledJobs = 0;
+					CarrierPlan plan = c.getSelectedPlan();
+					if (plan != null) {
+						handledJobs = (int) plan.getScheduledTours().stream().mapToDouble(
+							t -> t.getTour().getTourElements().stream().filter(te -> te instanceof Tour.Pickup || te instanceof Tour.ServiceActivity).count()).sum();
+					}
+					return plannedJobs - handledJobs;
+				}).sum();
+			bw1.write("Total Number of not handled Jobs" + delimiter + numberNotHandledJobs);
+			bw1.newLine();
+			bw1.close();
+			log.info("KPI Output written to {}", path.resolve("Carriers_KPIs.tsv").toString());
+
+
 		} catch (IOException e) {
 			log.error("Could not write carrier stats to file", e);
 		}

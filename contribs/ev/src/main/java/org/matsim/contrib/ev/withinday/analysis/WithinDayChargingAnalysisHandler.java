@@ -211,7 +211,7 @@ public class WithinDayChargingAnalysisHandler implements //
 
 		ChargingProcessItem chargingItem = new ChargingProcessItem(tracker.start.getPersonId(),
 				tracker.start.getVehicleId(), tracker.start.getProcessIndex(), tracker.attempts.size(),
-				tracker.attempts.getLast().start != null, tracker.start.getTime(), endTime);
+				tracker.attempts.getLast().plug != null, tracker.start.getTime(), endTime);
 
 		synchronized (chargingItems) {
 			chargingItems.add(chargingItem);

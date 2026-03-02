@@ -55,6 +55,7 @@ import org.matsim.contrib.ev.EvConfigGroup.EvAnalysisOutput;
 import org.matsim.contrib.ev.fleet.ElectricFleetUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -112,6 +113,7 @@ public class RunUrbanEVExample {
 
 		//TODO actually, should also work with all AccessEgressTypes but we have to check (write JUnit test)
 		config.routing().setAccessEgressType(RoutingConfigGroup.AccessEgressType.none );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		//register charging interaction activities for car
 		config.scoring().addActivityParams(

@@ -10,4 +10,9 @@ import org.matsim.api.core.v01.Message;
 public class TravelTimeSyncMessage implements Message {
 
 	final Int2ObjectMap<long[]> travelTimes = new Int2ObjectOpenHashMap<>();
+
+	@Override
+	public String toString() {
+		return "TravelTimeSyncMessage type: " + this.getType();
+	}
 }

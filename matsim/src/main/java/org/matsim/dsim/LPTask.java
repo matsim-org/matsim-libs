@@ -158,6 +158,11 @@ public final class LPTask implements SimTask {
 	}
 
 	@Override
+	public void resetTask(int iteration) {
+		// nothing to do here.
+	}
+
+	@Override
 	public void run() {
 
 		long t = System.nanoTime();
@@ -193,6 +198,7 @@ public final class LPTask implements SimTask {
 
 	@Override
 	public void cleanup() {
+		manager.setContext(partition);
 		lp.onCleanupSim();
 	}
 

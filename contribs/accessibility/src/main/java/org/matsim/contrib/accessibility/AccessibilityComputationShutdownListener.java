@@ -32,7 +32,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -48,7 +50,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private static final Logger LOG = LogManager.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
-    private ActivityFacilities opportunities;
+	private ActivityFacilities opportunities;
 
 	private String outputDirectory;
 
@@ -56,6 +58,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	private AccessibilityAggregator accessibilityAggregator;
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
+	private Config config;
 	private AccessibilityConfigGroup acg;
 	private final ScoringConfigGroup cnScoringGroup;
 
@@ -66,6 +69,8 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 	    this.opportunities = opportunities;
 
 		this.outputDirectory = outputDirectory;
+
+		this.config = scenario.getConfig();
 
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().scoring();
@@ -92,6 +97,7 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		if (event.isUnexpected()) {
 			return;
 		}
+
 		LOG.info("Initializing accessibility computation...");
 		accessibilityAggregator = new AccessibilityAggregator();
 		addFacilityDataExchangeListener(accessibilityAggregator);
@@ -106,66 +112,73 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		LOG.info("Finished computing accessibilities.");
 
 		writeCSVFile(outputDirectory);
+		writePoiFile(outputDirectory);
+		writeConfigUsedForAccessibilityComputation(outputDirectory, config);
+
 	}
 
 
-	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
+	public void computeAccessibilities(List<Double> departureTimes, ActivityFacilities opportunities) {
 		for (String mode : calculators.keySet()) {
-			AccessibilityContributionCalculator calculator = calculators.get(mode);
-			calculator.initialize(measuringPoints, opportunities);
 
-			// TODO
-            Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
-            Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
+			for (Double departureTime : departureTimes) {
+				AccessibilityContributionCalculator calculator = calculators.get(mode);
+				calculator.initialize(measuringPoints, opportunities);
 
-            Collection<Id<? extends BasicLocation>> aggregatedOriginIds = new LinkedList<>();
-			for (Id<? extends BasicLocation> nodeId : aggregatedOrigins.keySet()) {
-				aggregatedOriginIds.add(nodeId);
-			}
+				// TODO
+				Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
+				Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
 
-			LOG.info("Iterating over all aggregated measuring points...");
-
-			if (acg.isUseParallelization()) {
-				int numberOfProcessors = Runtime.getRuntime().availableProcessors();
-				LOG.info("There are " + numberOfProcessors + " available processors.");
-
-				final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
-				LOG.info("Size of partitions = " + partitionSize);
-				Iterable<List<Id<? extends BasicLocation>>> partitions = Iterables.partition(aggregatedOriginIds, partitionSize);
-
-				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-
-				ExecutorService service = Executors.newFixedThreadPool(numberOfProcessors);
-				List<Callable<Void>> tasks = new ArrayList<>();
-				for (final List<Id<? extends BasicLocation>> partition : partitions) {
-					tasks.add(() -> {
-						try {
-							compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-						return null;
-					});
+				Collection<Id<? extends BasicLocation>> aggregatedOriginIds = new LinkedList<>();
+				for (Id<? extends BasicLocation> nodeId : aggregatedOrigins.keySet()) {
+					aggregatedOriginIds.add(nodeId);
 				}
-				try {
-					List<Future<Void>> futures = service.invokeAll(tasks);
-					for (Future<Void> future : futures) {
-						future.get();
+
+				LOG.info("Iterating over all aggregated measuring points...");
+
+				if (acg.isUseParallelization()) {
+					int numberOfProcessors = Runtime.getRuntime().availableProcessors();
+					LOG.info("There are " + numberOfProcessors + " available processors.");
+
+					final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
+					LOG.info("Size of partitions = " + partitionSize);
+					Iterable<List<Id<? extends BasicLocation>>> partitions = Iterables.partition(aggregatedOriginIds, partitionSize);
+
+					ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+
+					ExecutorService service = Executors.newFixedThreadPool(numberOfProcessors);
+					List<Callable<Void>> tasks = new ArrayList<>();
+					for (final List<Id<? extends BasicLocation>> partition : partitions) {
+						tasks.add(() -> {
+							try {
+								compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+							return null;
+						});
 					}
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				} catch (ExecutionException e) {
-					throw new RuntimeException(e);
+					try {
+						List<Future<Void>> futures = service.invokeAll(tasks);
+						for (Future<Void> future : futures) {
+							future.get();
+						}
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					} catch (ExecutionException e) {
+						throw new RuntimeException(e);
+					}
+					service.shutdown();
+				} else {
+					LOG.info("Performing the computation without parallelization.");
+					ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+					compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);
 				}
-				service.shutdown();
-			} else {
-				LOG.info("Performing the computation without parallelization.");
-				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-				compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);
+
 			}
-		}
-		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-			zoneDataExchangeInterface.finish();
+			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+				zoneDataExchangeInterface.finish();
+			}
 		}
 	}
 
@@ -212,6 +225,34 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 		}
 	}
 
+	private void writePoiFile(String outputDirectory) {
+		LOG.info("Start writing POI output to " + outputDirectory + ".");
+
+		final CSVWriter writer = new CSVWriter(outputDirectory + "/" + CSVWriter.POI_FILE_NAME ) ;
+
+		// Write header
+//		writer.writeField(Labels.ID);
+		writer.writeField(Labels.X_COORDINATE);
+		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeNewLine();
+
+		opportunities.getFacilities().values().forEach(facility -> {
+			writer.writeField(facility.getCoord().getX());
+			writer.writeField(facility.getCoord().getY());
+			writer.writeNewLine();
+		});
+
+		writer.close() ;
+		LOG.info("Finished writing POI output to " + outputDirectory + ".");
+	}
+
+	private void writeConfigUsedForAccessibilityComputation(String adaptedOutputDirectory, Config config) {
+		LOG.info("Start writing accessibility config to " + adaptedOutputDirectory + ".");
+
+		new ConfigWriter(config).write(adaptedOutputDirectory + "/" + AccessibilityModule.CONFIG_FILENAME_ACCESSIBILITY);
+
+		LOG.info("Finished writing accessibility config to " + adaptedOutputDirectory + ".");
+	}
 
 	private void writeCSVFile(String adaptedOutputDirectory) {
 		LOG.info("Start writing accessibility output to " + adaptedOutputDirectory + ".");
@@ -242,12 +283,9 @@ final class AccessibilityComputationShutdownListener implements ShutdownListener
 			writer.writeField(tuple.getSecond());
 
 			for (String mode : getModes() ) {
-				final double value = accessibilitiesMap.get(tuple).get(mode);
-				if (!Double.isNaN(value)) {
-					writer.writeField(value) ;
-				} else {
-					writer.writeField(Double.NaN) ;
-				}
+				// Defaulting to NaN allows accessibility calculations to be skipped for certain time slices for certain modes
+				final double value = accessibilitiesMap.get(tuple).getOrDefault(mode, Double.NaN);
+				writer.writeField(value);
 			}
 			for (ActivityFacilities additionalDataFacilities : this.additionalFacilityData) { // Again: Iterate over all additional data collections
 				String additionalDataName = additionalDataFacilities.getName();

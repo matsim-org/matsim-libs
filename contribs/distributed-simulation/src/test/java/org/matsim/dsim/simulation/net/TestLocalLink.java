@@ -32,7 +32,8 @@ public class TestLocalLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -62,7 +63,8 @@ public class TestLocalLink {
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
 
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10, 1);
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
@@ -90,7 +92,8 @@ public class TestLocalLink {
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var activated = new AtomicInteger(0);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> activated.incrementAndGet(), _ -> {
+		});
 		var vehicle1 = TestUtils.createVehicle("vehicle-1", 10., 1);
 
 		// push one vehicle. This consumes the entire inflow, but only some storage
@@ -241,7 +244,9 @@ public class TestLocalLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {}, _ -> {});
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {
+		}, _ -> {
+		});
 		var vehicle = TestUtils.createVehicle("vehicle-3", 42, 10);
 
 		simLink.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, 0);
@@ -367,5 +372,34 @@ public class TestLocalLink {
 		var link = TestUtils.createSingleLink(0, 0);
 		var simLink = TestUtils.createLink(link, 0);
 		assertThrows(RuntimeException.class, simLink::popVehicle);
+	}
+
+	@Test
+	public void removeAllVehicles() {
+		var link = TestUtils.createSingleLink(0, 0);
+		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
+		config.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var simLink = TestUtils.createLink(link, config, 0);
+		var vehicle1 = TestUtils.createVehicle("vehicle-1", 1, 10);
+		var vehicle2 = TestUtils.createVehicle("vehicle-2", 1, 10);
+		var vehicle3 = TestUtils.createVehicle("vehicle-3", 1, 10);
+
+		simLink.pushVehicle(vehicle1, SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(vehicle2, SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(vehicle3, SimLink.LinkPosition.Buffer, 0);
+
+		var removed = simLink.removeAllVehicles();
+
+		assertEquals(3, removed.size());
+		assertTrue(removed.contains(vehicle1));
+		assertTrue(removed.contains(vehicle2));
+		assertTrue(removed.contains(vehicle3));
+
+		assertFalse(simLink.isOffering());
+		// capacity is is released when using queue
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 0));
+		// has not updated its outflow capacity.
+		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
 	}
 }

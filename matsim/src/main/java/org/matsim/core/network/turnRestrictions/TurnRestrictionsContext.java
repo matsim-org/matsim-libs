@@ -59,7 +59,15 @@ public final class TurnRestrictionsContext {
             this.toColoredNode = toColoredNode;
             this.toNode = toNode;
         }
-    }
+
+			@Override
+			public String toString() {
+				return "ColoredLink{" +
+					"index=" + index +
+					", link=" + link.getId() +
+					'}';
+			}
+		}
 
     public record ColoredNode(
             int index,

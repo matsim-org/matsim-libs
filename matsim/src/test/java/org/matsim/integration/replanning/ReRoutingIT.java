@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ControllerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControllerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.RoutingConfigGroup;
@@ -51,13 +52,16 @@ public class ReRoutingIT {
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
+		// (this is a local config!  It then recruits some files from the test scenarios.)
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controller().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controller().setLastIteration(1);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins:
 		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
 		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2
@@ -67,6 +71,9 @@ public class ReRoutingIT {
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+
+		config.global().setRelativeToleranceForSampleSizeFactors( 10. );
+		// (the config has flow cap 0.1 but storage cap 1.0.  I did not want to try if this is instrumental for the results.  kai, feb'26)
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap

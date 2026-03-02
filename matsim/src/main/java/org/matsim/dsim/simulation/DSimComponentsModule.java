@@ -31,7 +31,7 @@ public class DSimComponentsModule extends AbstractQSimModule {
 
 		bind(PopulationAgentSource.class).asEagerSingleton();
 		addQSimComponentBinding(PopulationModule.COMPONENT_NAME).to(PopulationAgentSource.class);
-
+		
 		if (getConfig().transit().isUseTransit()) {
 			bind(Wait2Link.class).to(DistributedPtEngine.class).in(Singleton.class);
 		} else {

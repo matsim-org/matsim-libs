@@ -492,7 +492,10 @@ public class InsertionGeneratorTest {
 		StopWaypoint stop1 = stop(70, link("stop"), LOAD_TYPE.getEmptyLoad());
 		VehicleEntry entry = entry(start, stop0, stop1);
 		assertInsertionsOnly(prebookedRequest, entry,
-			new Insertion(prebookedRequest, entry, 2, 2));
+			new Insertion(prebookedRequest, entry, 1, 1),
+			new Insertion(prebookedRequest, entry, 1, 2),
+			new Insertion(prebookedRequest, entry, 2, 2)
+		);
 	}
 
 
@@ -531,8 +534,8 @@ public class InsertionGeneratorTest {
 	@Test
 	void testWaypointOccupancyChange() {
 		IntegerLoad occupancy = LOAD_TYPE.getEmptyLoad();
-		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax);
-		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax);
+		AcceptedDrtRequest acceptedReq5Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest5Pax, 60);
+		AcceptedDrtRequest acceptedReq2Pax = AcceptedDrtRequest.createFromOriginalRequest(drtRequest2Pax, 60);
 
 		StopWaypoint stop2 = stop(0, link("stop2"), occupancy);
 		//dropoff 5 pax

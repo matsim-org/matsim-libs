@@ -52,6 +52,8 @@ interface AccessibilityContributionCalculator {
 	double computeContributionOfOpportunity(ActivityFacility origin, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime);
 	// yyyy I am somewhat sceptic if we tryly need both "fromNode" (above) and origin.
 	// yyyy And I am quite confident that we do not need the departure time twice.
+	// quite possibly, the person should be part of the computeContributionOfOpportunity signature
+	// quite possibly, the routingAttributes should be part of the computeContributionOfOpportunity signature
 
     Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints();
 
@@ -61,4 +63,5 @@ interface AccessibilityContributionCalculator {
 	Needed for perallelization
 	 */
 	AccessibilityContributionCalculator duplicate();
+	// Kai is not so happy about duplication on this level. Prone to errors since the deep copy needs to be programmed manually.
 }

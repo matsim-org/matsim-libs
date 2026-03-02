@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.*;
@@ -163,6 +164,7 @@ final class ExampleMultipleTwoEchelonChainsReplanning {
 													));
 		config.controller().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controller().setWriteEventsInterval(1);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		FreightCarriersConfigGroup freightConfig = ConfigUtils.addOrGetModule(config, FreightCarriersConfigGroup.class);
 		freightConfig.setTimeWindowHandling( TimeWindowHandling.ignore );

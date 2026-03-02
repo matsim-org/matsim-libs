@@ -68,6 +68,8 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 			};
 
 			nextTaskIdx = startTask.getTaskIdx() + 1;
+		} else if (schedule.getStatus() == ScheduleStatus.COMPLETED) { 
+			return null; // not available for dispatching anymore
 		} else { // PLANNED
 			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
 			startTask = null;
@@ -126,19 +128,17 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 		double slackTime = calcVehicleSlackTime(vehicle, now);
 		slackTimes[stops.length + 1] = slackTime;
 
-		List<AcceptedDrtRequest> onboard = new ArrayList<>();
-
 		//stops
 		for (int i = stops.length - 1; i >= 0; i--) {
-
 			StopWaypoint stop = stops[i];
 
-			onboard.addAll(stop.getTask().getDropoffRequests().values());
-
+			// Check time window constraints at this stop
 			slackTime = Math.min(stop.getLatestArrivalTime() - stop.getTask().getBeginTime(), slackTime);
 			slackTime = Math.min(stop.getLatestDepartureTime() - stop.getTask().getEndTime(), slackTime);
 
-			for (AcceptedDrtRequest req : onboard) {
+			// Check ride duration constraints for passengers dropping off at this stop
+			// The backward iteration ensures slack propagates correctly to earlier insertion points
+			for (AcceptedDrtRequest req : stop.getTask().getDropoffRequests().values()) {
 				double plannedPickupTime = req.getRequestTiming().getPlannedPickupTime().orElseThrow(()
 						-> new IllegalStateException("Accepted request should have a (planned) pickup time at this point."));
 				double plannedDropoffTime = req.getRequestTiming().getPlannedDropoffTime().orElseThrow(()
@@ -150,8 +150,6 @@ public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 
 			slackTime += precedingStayTimes.get(i); // reset slack before prebooked request
 			slackTimes[i + 1] = slackTime;
-
-			onboard.removeAll(stop.getTask().getPickupRequests().values());
 		}
 
 		// start

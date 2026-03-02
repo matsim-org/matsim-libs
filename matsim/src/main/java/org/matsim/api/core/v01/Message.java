@@ -13,5 +13,4 @@ public interface Message {
 	default int getType() {
 		return getClass().getName().hashCode();
 	}
-
 }

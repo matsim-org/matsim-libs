@@ -63,6 +63,40 @@ class TurnRestrictionsNetworkCleanerTest {
 	}
 
 	@Test
+	void testAttributesAreKept() {
+		Network network = crossingWithForbiddenUTurn(MODES, "car");
+		network.addNode(network.getFactory().createNode(Id.create("5", Node.class), new Coord(2, 2)));
+		Node node3 = network.getNodes().get(Id.create("3", Node.class));
+		Node node4 = network.getNodes().get(Id.create("4", Node.class));
+		Node node5 = network.getNodes().get(Id.create("5", Node.class));
+		Link l35 = NetworkUtils.createLink(Id.createLinkId("35"), node3, node5, network, 1, 1, 300, 1);
+		NetworkUtils.getOrCreateDisallowedNextLinks(l35).addDisallowedLinkSequence("car", List.of(Id.create("53", Link.class))); // no u-turn
+		network.addLink(l35);
+		Link l53 = NetworkUtils.createLink(Id.createLinkId("53"), node5, node3, network, 1, 1, 300, 1);
+		network.addLink(l53);
+		Link l54 = NetworkUtils.createLink(Id.createLinkId("54"), node5, node4, network, 1, 1, 300, 1);
+		network.addLink(l54);
+
+		network.getNodes().values().forEach(node -> node.getAttributes().putAttribute("testAttribute", "testValue-" + node.getId()));
+		network.getLinks().values().forEach(link -> link.getAttributes().putAttribute("testAttribute", "testValue-" + link.getId()));
+		Verify.verify(DisallowedNextLinksUtils.isValid(network));
+
+		// * --------------------------------------------------
+
+		TurnRestrictionsNetworkCleaner trc = new TurnRestrictionsNetworkCleaner();
+		trc.run(network, "car");
+
+		// * --------------------------------------------------
+
+		for (Node node : network.getNodes().values()) {
+			Assertions.assertEquals("testValue-" + node.getId(), node.getAttributes().getAttribute("testAttribute"));
+		}
+		for (Link link : network.getLinks().values()) {
+			Assertions.assertEquals("testValue-" + link.getId(), link.getAttributes().getAttribute("testAttribute"));
+		}
+	}
+
+	@Test
 	void testNoChange() {
 
 		Network network = createNetwork();

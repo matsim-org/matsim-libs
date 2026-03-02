@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -93,6 +94,7 @@ public class CountsReprojectionIOTest {
 		// but does not matter for tests. Just makes sure that (almost) every
 		// coordinate can be projected
 		config.global().setCoordinateSystem(  "EPSG:3857" );
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );

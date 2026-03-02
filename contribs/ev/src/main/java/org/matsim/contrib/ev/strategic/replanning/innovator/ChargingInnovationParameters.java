@@ -12,15 +12,22 @@ public abstract class ChargingInnovationParameters extends ReflectiveConfigGroup
 		Preconditions.checkArgument(name.startsWith(PREFIX));
 	}
 
-	public enum ErrorMode {
+	public enum ConstraintErrorMode {
 		none, printWarning, throwException
+	}
+
+	public enum ConstraintFallbackBehavior {
+		returnRandom, returnNone
 	}
 
 	@Parameter
 	private int constraintIterations = 0;
 
 	@Parameter
-	private ErrorMode constraintErrorMode = ErrorMode.printWarning;
+	private ConstraintErrorMode constraintErrorMode = ConstraintErrorMode.printWarning;
+
+	@Parameter
+	private ConstraintFallbackBehavior constraintFallbackBehavior = ConstraintFallbackBehavior.returnNone;
 
 	public int getConstraintIterations() {
 		return constraintIterations;
@@ -30,11 +37,19 @@ public abstract class ChargingInnovationParameters extends ReflectiveConfigGroup
 		constraintIterations = val;
 	}
 
-	public ErrorMode getConstraintErrorMode() {
+	public ConstraintErrorMode getConstraintErrorMode() {
 		return constraintErrorMode;
 	}
 
-	public void setConstraintErrorMode(ErrorMode val) {
+	public void setConstraintErrorMode(ConstraintErrorMode val) {
 		constraintErrorMode = val;
+	}
+
+	public ConstraintFallbackBehavior getConstraintFallbackBehavior() {
+		return constraintFallbackBehavior;
+	}
+
+	public void setConstraintFallbackBehavior(ConstraintFallbackBehavior val) {
+		constraintFallbackBehavior = val;
 	}
 }

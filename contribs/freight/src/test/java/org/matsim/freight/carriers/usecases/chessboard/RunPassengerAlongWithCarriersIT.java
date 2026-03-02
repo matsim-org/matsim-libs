@@ -45,7 +45,7 @@ public class RunPassengerAlongWithCarriersIT {
             config.controller().setLastIteration( 1 );
             config.controller().setOutputDirectory( utils.getOutputDirectory() );
             // ---
-            abc.run();
+            abc.run(config);
         } catch (Exception ee ) {
 			log.error("Exception while running example", ee);
             Assertions.fail("something went wrong: " + ee.getMessage());

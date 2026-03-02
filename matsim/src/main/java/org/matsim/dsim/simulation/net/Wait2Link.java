@@ -7,4 +7,6 @@ public interface Wait2Link {
 	boolean accept(DistributedMobsimVehicle vehicle, SimLink link, double now);
 
 	void moveWaiting(double now);
+
+	void afterSim();
 }

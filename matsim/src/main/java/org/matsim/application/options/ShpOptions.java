@@ -112,6 +112,7 @@ public final class ShpOptions {
 	 * Opens datastore to a shape-file.
 	 */
 	public static DataStore openDataStore(String shp) throws IOException {
+		/// Seems to duplicate functionality that is also in {@link org.matsim.utils.gis.shp2matsim.ShpGeometryUtils}.
 
 		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
 

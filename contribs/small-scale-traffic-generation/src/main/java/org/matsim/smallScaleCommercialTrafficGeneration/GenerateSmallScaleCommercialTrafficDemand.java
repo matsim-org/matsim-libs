@@ -42,6 +42,7 @@ import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
+import org.matsim.core.config.groups.ControllerConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup;
 import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -76,7 +77,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles;
 import static org.matsim.smallScaleCommercialTrafficGeneration.SmallScaleCommercialTrafficUtils.readDataDistribution;
 
 /**
@@ -291,8 +291,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 					CarriersUtils.getCarriers(scenario).getCarriers().values().forEach(carrier -> {
 						carrier.getPlans().clear();
 					});
-					solveSeparatedVRPs(scenario);
 				}
+				// for the case @useExistingCarrierFileWithSolution the method solveSeparatedVRPs skips carriers with existing plans. But if a carrier without plans exists, it will be solved.
+				solveSeparatedVRPs(scenario);
 			}
 			default -> {
 				if (!Files.exists(shapeFileZonePath)) {
@@ -439,6 +440,8 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 				allCarriers.remove(carrier.getId());
 				solvedCarriers.put(carrier.getId(), carrier);
 			}
+			else
+				CarriersUtils.setJspritIterations(carrier, jspritIterations);
 		});
 		int carrierSteps = 30;
 		for (int i = 0; i < allCarriers.size(); i++) {
@@ -646,22 +649,21 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		// Reset some config values that are not needed
 		config.controller().setFirstIteration(0);
 		config.controller().setLastIteration(MATSimIterationsAfterDemandGeneration);
+		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.gzip);
 		config.plans().setInputFile(null);
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
 		config.counts().setInputFile(null);
 		config.facilities().setInputFile(pathToCommercialFacilities.toString());
-		// Set flow and storage capacity to a high value
-		config.qsim().setFlowCapFactor(sample * 4);
-		config.qsim().setStorageCapFactor(sample * 4);
+		config.qsim().setFlowCapFactor(sample);
+		config.qsim().setStorageCapFactor(sample);
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
 
 		// Overwrite network
 		if (network != null)
 			config.network().setInputFile(network);
 
-		// Some files are written before the controller is created, deleting the directory is not an option
-		config.controller().setOverwriteFileSetting(overwriteExistingFiles);
+		config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(config));
 
 		new File(Path.of(config.controller().getOutputDirectory()).resolve("calculatedData").toString()).mkdir();
@@ -684,7 +686,9 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 	 */
 	private Controller prepareController(Scenario scenario) {
 		Controller controller = ControllerUtils.createController(scenario);
-
+		// use overwriteExistingFiles because before setting up the OutputDirectoryHierarchy, the OverwriteFileSetting was failIfDirectoryExists
+		// in mean time some files were already written (e.g. carriers analysis), so we need to allow overwriting here
+		controller.getConfig().controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controller.addOverridingModule(new CarrierModule());
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -694,7 +698,7 @@ public class GenerateSmallScaleCommercialTrafficDemand implements MATSimAppComma
 		});
 
 		controller.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
-
+		controller.getInjector();
 		return controller;
 	}
 

@@ -69,7 +69,7 @@ public class SimWrapperModuleTest {
 
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
-		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class).setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new SimWrapperModule());
@@ -112,7 +112,7 @@ public class SimWrapperModuleTest {
 		config.controller().setLastIteration(0);
 		config.controller().setOutputDirectory(utils.getOutputDirectory());
 		SimWrapperConfigGroup simWrapperConfigGroup = ConfigUtils.addOrGetModule(config, SimWrapperConfigGroup.class);
-		simWrapperConfigGroup.setDefaultDashboards(SimWrapperConfigGroup.Mode.disabled);
+		simWrapperConfigGroup.setDefaultDashboards( SimWrapperConfigGroup.DefaultDashboardsMode.disabled );
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new SimWrapperModule());

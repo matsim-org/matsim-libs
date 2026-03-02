@@ -199,6 +199,7 @@ public class SmallScaleCommercialTrafficUtils {
 				Tour.Start start = tour.getTour().getStart();
 				Activity startActivity = PopulationUtils.createActivityFromCoord("commercial_start",
 					scenario.getNetwork().getLinks().get(start.getLocation()).getFromNode().getCoord());
+				startActivity.setLinkId(start.getLocation());
 				startActivity.setEndTime(tour.getDeparture());
 
 				plan.addActivity(startActivity);
@@ -212,12 +213,14 @@ public class SmallScaleCommercialTrafficUtils {
 						Activity newActivity = PopulationUtils.createActivityFromCoord(activity.getActivityType(),
 							scenario.getNetwork().getLinks().get(activity.getLocation()).getFromNode().getCoord());
 						newActivity.setMaximumDuration(activity.getDuration());
+						newActivity.setLinkId(activity.getLocation());
 						plan.addActivity(newActivity);
 					}
 				}
 				Tour.End end = tour.getTour().getEnd();
 				Activity endActivity = PopulationUtils.createActivityFromCoord("commercial_end",
 					scenario.getNetwork().getLinks().get(end.getLocation()).getFromNode().getCoord());
+				endActivity.setLinkId(end.getLocation());
 				plan.addActivity(endActivity);
 				String key = String.format("%s_%s_%s", subpopulation, carrier.getAttributes().getAttribute("tourStartArea"),
 					carrier.getAttributes().getAttribute("purpose"));
