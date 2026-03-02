@@ -131,6 +131,15 @@ public final class Plotly extends Viz {
 		return addTrace(trace, null);
 	}
 
+	public DataSet addDataset(String path, String name) {
+		Objects.requireNonNull(path, "Path argument can not be null");
+		Objects.requireNonNull(name, "Name argument can not be null");
+
+		DataSet ds = new DataSet(path, name);
+		data.add(ds);
+		return ds;
+	}
+
 	/**
 	 * Adds a dataset definition to the plot that can be referenced in the traces.
 	 */
