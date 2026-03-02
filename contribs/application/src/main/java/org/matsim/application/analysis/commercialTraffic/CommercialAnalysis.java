@@ -148,9 +148,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("activityDuration_group");
 			printer.print("activityDurationInSeconds");
 			printer.print("activityDurationInMinutes");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				printer.print("activityDurationInMinutes_" + group);
-			}
 			printer.println();
 			Map<String, String> subpopToGroup = new HashMap<>();
 			for (var e : groupsOfSubpopulationsForCommercialAnalysis.entrySet()) {
@@ -198,13 +195,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 					printer.print(duration);
 					BigDecimal durationInMinutes = new BigDecimal(duration / 60).setScale(0, RoundingMode.HALF_UP);
 					printer.print(durationInMinutes);
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (activityInformation.groupOfSubpopulation.equals(group)) {
-							printer.print(durationInMinutes);
-						} else {
-							printer.print(Double.NaN);
-						}
-					}
 					printer.println();
 				}
 			}
@@ -412,8 +402,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("groupOfSubpopulation");
 			printer.print("dist_group");
 			printer.print("distanceInKm");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet())
-				printer.print("distanceInKm_" + group);
 			printer.print("distanceInKmWithDepotCharging");
 			printer.print("shareOfTravelDistanceWithDepotCharging");
 			printer.println();
@@ -425,7 +413,7 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						double traveledDistanceInKm = Math.round(traveledDistanceInMeters / 10) / 100.0;
 
 						String labelForValue = AnalysisUtils.getLabelForValue((long) traveledDistanceInKm, distGroups, distanceLabels);
-						// this needed to have the correct order of distance groups in the output, so that it is vizualized correctly later on
+						// this needed to have the correct order of distance groups in the output, so that it is visualized correctly later on
 						if (!label.equals(labelForValue))
 							continue;
 						printer.print(vehicleToPersonId.get(Id.createVehicleId(vehicleId)));
@@ -435,12 +423,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 						printer.print(groupOfSubpopulation);
 						printer.print(labelForValue);
 						printer.print(traveledDistanceInKm);
-						for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-							if (groupOfSubpopulation.equals(group))
-								printer.print(traveledDistanceInKm);
-							else
-								printer.print(Double.NaN);
-						}
 						String maxDistanceWithoutRecharging;
 						if (maxDistanceWithDepotChargingInKilometers.containsKey(vehicleType)) {
 							maxDistanceWithoutRecharging = String.valueOf(maxDistanceWithDepotChargingInKilometers.get(vehicleType));
@@ -476,9 +458,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("duration_group");
 			printer.print("tourDurationInSeconds");
 			printer.print("tourDurationsInHours");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				printer.print("tourDurationsInHours_" + group);
-			}
 			printer.println();
 			for (String label : tourDurationLabels) {
 				for (Id<Vehicle> vehicleId : tourDurations.keySet()) {
@@ -505,14 +484,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 					printer.print(labelForValue);
 					printer.print(tourDurationsInS);
 					printer.print(tourDurationInH);
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (groupOfSubpopulation.equals(group)) {
-							printer.print(
-								tourDurationInH);
-						} else {
-							printer.print(Double.NaN);
-						}
-					}
 					printer.println();
 				}
 			}
@@ -535,9 +506,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 			printer.print("groupOfSubpopulation");
 			printer.print("numberOfJobs_group");
 			printer.print("jobsPerTour");
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				printer.print("jobsPerTour_" + group);
-			}
 			printer.println();
 
 			for (String label : numberOfJobsLabels) {
@@ -573,13 +541,6 @@ public class CommercialAnalysis implements MATSimAppCommand {
 					printer.print(groupOfSubpopulation);
 					printer.print(labelForValue);
 					printer.print(jobsPerTour);
-					for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-						if (groupOfSubpopulation.equals(group)) {
-							printer.print(jobsPerTour);
-						} else {
-							printer.print(Double.NaN);
-						}
-					}
 					printer.println();
 				}
 			}

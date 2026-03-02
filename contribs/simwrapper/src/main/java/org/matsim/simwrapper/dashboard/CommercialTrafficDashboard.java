@@ -154,7 +154,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 					.constant("source", "Veh");
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.build(),
 					ds.mapping()
 						.x("numberOfJobs_group")
@@ -170,18 +170,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.showLegend(true)
 					.build();
 				viz.colorRamp = ColorScheme.Viridis;
-
-				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
-
-					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					Plotly.DataSet ds = viz.addDataset(
+							data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"), "data_" + group)
+						.constant("source", "Veh").filter("groupOfSubpopulation", group);
 					viz.addTrace(
 						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 							.name(group)
 							.build(),
 						ds.mapping()
-							.x("jobsPerTour_" + group)
+							.x("jobsPerTour")
 					);
 				}
 			})
@@ -193,19 +191,17 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.showLegend(true)
 					.build();
 				viz.colorRamp = ColorScheme.Viridis;
-
-				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
-
-					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					Plotly.DataSet ds = viz.addDataset(
+							data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"), "data_" + group)
+						.constant("source", "Veh").filter("groupOfSubpopulation", group);
 					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 							.name(group)
 							.build(),
 						ds.mapping()
 							.x("numberOfJobs_group")
-							.y("jobsPerTour_" + group)
+							.y("jobsPerTour")
 					);
 				}
 			});
@@ -244,15 +240,15 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"))
-					.constant("source", "Veh");
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "jobsPerTour"), "data_" + group)
+					.constant("source", "Veh").filter("groupOfSubpopulation", group);
 
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("jobsPerTour_" + group)
+						.y("jobsPerTour")
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -302,7 +298,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 					.constant("source", "Act");
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.build(),
 					ds.mapping()
 						.x("activityDuration_group")
@@ -318,18 +314,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 
 				viz.colorRamp = ColorScheme.Viridis;
-
-				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "activities.csv"))
-
-					.constant("source", "Act");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					Plotly.DataSet ds = viz.addDataset(
+							data.compute(CommercialAnalysis.class, "activities.csv"), "data_" + group)
+						.constant("source", "Act").filter("groupOfSubpopulation", group);
 					viz.addTrace(
 						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 							.name(group)
 							.build(),
 						ds.mapping()
-							.x("activityDurationInMinutes_" + group)
+							.x("activityDurationInMinutes")
 					);
 				}
 			})
@@ -342,19 +336,18 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 
 				viz.colorRamp = ColorScheme.Viridis;
-
-				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "activities.csv"))
-
-					.constant("source", "Act");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+
+					Plotly.DataSet ds = viz.addDataset(
+							data.compute(CommercialAnalysis.class, "activities.csv"), "data_" + group)
+						.constant("source", "Act").filter("groupOfSubpopulation", group);
 					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 							.name(group)
 							.build(),
 						ds.mapping()
 							.x("activityDuration_group")
-							.y("activityDurationInMinutes_" + group)
+							.y("activityDurationInMinutes")
 					);
 				}
 			});
@@ -368,16 +361,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 				viz.colorRamp = ColorScheme.Viridis;
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "activities.csv"))
-					.constant("source", "Act");
+						data.compute(CommercialAnalysis.class, "activities.csv"), "data_" + group)
+					.constant("source", "Act").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 //						.name("startCategory")
 						.build(),
 					ds.mapping()
 						.name("startCategory")
 						.x("activityDuration_group")
-						.y("activityDurationInMinutes_" + group)
+						.y("activityDurationInMinutes")
 				);
 
 		});
@@ -418,14 +411,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				Plotly.DataSet ds = viz.addDataset(
 						data.compute(CommercialAnalysis.class, "activities.csv"))
-					.constant("source", "Act");
+					.constant("source", "Act").filter("groupOfSubpopulation", group);
 
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.build(),
 					ds.mapping()
 						.x("activityType")
-						.y("activityDurationInMinutes_" + group)
+						.y("activityDurationInMinutes")
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -479,7 +472,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 					.constant("source", "Veh");
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.build(),
 					ds.mapping()
 						.x("dist_group")
@@ -495,18 +488,17 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.showLegend(true)
 					.build();
 				viz.colorRamp = ColorScheme.Viridis;
+				for (String group : groupsOfCommercialSubpopulations.keySet()) {
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
-
-					.constant("source", "Veh");
-				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"), "data_"+group)
+					.constant("source", "Veh").filter("groupOfSubpopulation", group);
 					viz.addTrace(
 						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 							.name(group)
 							.build(),
 						ds.mapping()
-							.x("distanceInKm_" + group)
+							.x("distanceInKm")
 					);
 				}
 			})
@@ -518,19 +510,17 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.showLegend(true)
 					.build();
 				viz.colorRamp = ColorScheme.Viridis;
-
-				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
-
-					.constant("source", "Veh");
 				for (String group : groupsOfCommercialSubpopulations.keySet()) {
+					Plotly.DataSet ds = viz.addDataset(
+							data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"), "data_"+group)
+						.constant("source", "Veh").filter("groupOfSubpopulation", group);
 					viz.addTrace(
-						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+						HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 							.name(group)
 							.build(),
 						ds.mapping()
 							.x("dist_group")
-							.y("distanceInKm_" + group)
+							.y("distanceInKm")
 					);
 				}
 			});
@@ -570,15 +560,15 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
-					.constant("source", "Veh");
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"),"data_"+group)
+					.constant("source", "Veh").filter("groupOfSubpopulation", group);
 
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("distanceInKm_" + group)
+						.y("distanceInKm")
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -627,7 +617,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 
 				.constant("source", "Veh");
 			viz.addTrace(
-				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+				HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 					.build(),
 				ds.mapping()
 					.y("tourDurationsInHours")
@@ -644,18 +634,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.build();
 
 			viz.colorRamp = ColorScheme.Viridis;
-
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
-
-				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"),"data_"+group)
+				.constant("source", "Veh").filter("groupOfSubpopulation", group);
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).nBinsX(20)
 						.name(group)
 						.build(),
 					ds.mapping()
-						.x("tourDurationsInHours_" + group)
+						.x("tourDurationsInHours")
 				);
 			}
 		}).el(Plotly.class, (viz, data) -> {
@@ -667,18 +655,16 @@ public class CommercialTrafficDashboard implements Dashboard {
 				.build();
 
 			viz.colorRamp = ColorScheme.Viridis;
-
-			Plotly.DataSet ds = viz.addDataset(
-					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
-
-				.constant("source", "Veh");
 			for (String group : groupsOfCommercialSubpopulations.keySet()) {
+			Plotly.DataSet ds = viz.addDataset(
+					data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"),"data_"+group)
+				.constant("source", "Veh").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name(group)
 						.build(),
 					ds.mapping()
-						.y("tourDurationsInHours_" + group)
+						.y("tourDurationsInHours")
 						.x("duration_group")
 				);
 			}
@@ -718,15 +704,15 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
-					.constant("source", "Veh");
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"), "data_"+group)
+					.constant("source", "Veh").filter("groupOfSubpopulation", group);
 
 				viz.addTrace(
 					tech.tablesaw.plotly.traces.ViolinTrace.builder(Plotly.INPUT, Plotly.INPUT)
 						.build(),
 					ds.mapping()
 						.x("vehicleType")
-						.y("tourDurationsInHours_" + group)
+						.y("tourDurationsInHours")
 				);
 //				viz.addTrace(
 //					tech.tablesaw.plotly.traces.ScatterTrace.builder(Plotly.INPUT, Plotly.INPUT)
@@ -1012,15 +998,15 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.compute(CommercialAnalysis.class, "activities.csv"))
-					.constant("source", "Simulated");
+						data.compute(CommercialAnalysis.class, "activities.csv"), "data_"+group)
+					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
-					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
+					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY)
 						.name("source")
 						.build(),
 					ds.mapping()
 						.x("activityDuration_group")
-						.y("activityDurationInMinutes_" + group)
+						.y("activityDurationInMinutes")
 				);
 				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialActivityDurationsRefCsv))
 					.constant("source", "Reference");
@@ -1071,14 +1057,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"))
-					.constant("source", "Simulated");
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "distances"), "data_"+group)
+					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
 						.name("source")
 						.build(),
 					ds.mapping()
-						.y("distanceInKm_" + group)
+						.y("distanceInKm")
 						.x("dist_group")
 				);
 				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDistanceRefCsv))
@@ -1131,14 +1117,14 @@ public class CommercialTrafficDashboard implements Dashboard {
 				viz.colorRamp = ColorScheme.Viridis;
 
 				Plotly.DataSet ds = viz.addDataset(
-						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"))
-					.constant("source", "Simulated");
+						data.computeWithPlaceholder(CommercialAnalysis.class, "tourAnalysis_%s.csv", "durations"), "data_"+group)
+					.constant("source", "Simulated").filter("groupOfSubpopulation", group);
 				viz.addTrace(
 					HistogramTrace.builder(Plotly.INPUT).histNorm(HistogramTrace.HistNorm.PROBABILITY).histFunc(HistogramTrace.HistFunc.SUM)
 						.name("source")
 						.build(),
 					ds.mapping()
-						.y("tourDurationsInHours_" + group)
+						.y("tourDurationsInHours")
 						.x("duration_group")
 				);
 				Plotly.DataSet dsRef = viz.addDataset(data.resource(commercialTourDurationsRefCsv))
