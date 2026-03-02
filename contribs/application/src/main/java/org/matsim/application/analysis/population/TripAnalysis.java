@@ -47,7 +47,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 	produces = {
 		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
-		"population_trip_stats.csv", "trip_purposes_by_hour_%s.csv",
+		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
 		"mode_share_distance_distribution_%s.csv", "mode_shift_%s.csv", "mode_chains.csv",
 		"mode_choices.csv", "mode_choice_evaluation.csv", "mode_choice_evaluation_per_mode.csv",
 		"mode_confusion_matrix.csv", "mode_prediction_error.csv"
@@ -1059,35 +1059,38 @@ public class TripAnalysis implements MATSimAppCommand {
 			IntColumn.create("departure_h", departure.intStream().toArray()),
 			IntColumn.create("arrival_h", arrival.intStream().toArray())
 		);
+		Table allArrivalsDepartures = null;
 		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
 			Table filtered = trips.where(
 				trips.stringColumn("modelType").isEqualTo(ModelType.PERSON_TRAFFIC.id)
 			);
-			calculateArrivalAndDepartures(ModelType.PERSON_TRAFFIC.id, filtered);
+			allArrivalsDepartures = calculateArrivalAndDepartures(allArrivalsDepartures, ModelType.PERSON_TRAFFIC.id, filtered);
 
 			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
 				filtered = trips.where(
 					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForPersonAnalysis.get(group))
 				);
-				calculateArrivalAndDepartures(group, filtered);
+				allArrivalsDepartures = calculateArrivalAndDepartures(allArrivalsDepartures, group, filtered);
 			}
 		}
 		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
 			Table filtered = trips.where(
 				trips.stringColumn("modelType").isEqualTo(ModelType.COMMERCIAL_TRAFFIC.id)
 			);
-			calculateArrivalAndDepartures(ModelType.COMMERCIAL_TRAFFIC.id, filtered);
+			allArrivalsDepartures = calculateArrivalAndDepartures(allArrivalsDepartures, ModelType.COMMERCIAL_TRAFFIC.id, filtered);
 			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
 				filtered = trips.where(
 					trips.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForCommercialAnalysis.get(group))
 				);
-				calculateArrivalAndDepartures(group, filtered);
+				allArrivalsDepartures = calculateArrivalAndDepartures(allArrivalsDepartures, group, filtered);
 			}
 		}
-		calculateArrivalAndDepartures(ModelType.COMPLETE_MODEL.id, trips);
+		allArrivalsDepartures = calculateArrivalAndDepartures(allArrivalsDepartures, ModelType.COMPLETE_MODEL.id, trips);
+		allArrivalsDepartures.write().csv(output.getPath("trip_purposes_by_hour.csv").toFile());
+
 	}
 
-	private void calculateArrivalAndDepartures(String group, Table filtered) {
+	private Table calculateArrivalAndDepartures(Table allArrivalsDepartures, String group, Table filtered) {
 		Table tArrival = filtered.summarize("trip_id", count).by("end_activity_type", "arrival_h");
 
 		tArrival.column(0).setName("purpose");
@@ -1110,7 +1113,15 @@ public class TripAnalysis implements MATSimAppCommand {
 		table.doubleColumn("departures").setMissingTo(0.0);
 		table.doubleColumn("arrivals").setMissingTo(0.0);
 
-		table.write().csv(output.getPath("trip_purposes_by_hour_%s.csv", group).toFile());
+		StringColumn groupCol = StringColumn.create("group");
+		for (int i = 0; i < table.rowCount(); i++) {
+			groupCol.append(group);
+		}
+		table.addColumns(groupCol);
+
+		table = table.retainColumns("group", "purpose", "h", "departures", "arrivals");
+		if (allArrivalsDepartures == null) return table;
+		return allArrivalsDepartures.append(table);
 	}
 
 	private void writeTripDistribution(Table trips) throws IOException {

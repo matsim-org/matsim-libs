@@ -941,7 +941,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		for (String type : typesOfTimeDifferentiation) {
 			layout.row(type, "Trips").el(Plotly.class, (viz, data) -> {
 
-				viz.title = StringUtils.capitalize(type) + "of the Trips";
+				viz.title = StringUtils.capitalize(type) + " of the Trips";
 				viz.description = "by hour and the activity type at the destination.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.xAxis(Axis.builder().title("Hour").build())
@@ -950,8 +950,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 					.build();
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
 					viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv",
-								TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString())).mapping()
+							data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).filter("group", TripAnalysis.ModelType.COMMERCIAL_TRAFFIC.toString()).mapping()
 						.name("purpose", ColorScheme.Spectral)
 						.x("h")
 						.y(type)

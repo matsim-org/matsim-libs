@@ -484,12 +484,9 @@ public class TripDashboard implements Dashboard {
 					.barMode(tech.tablesaw.plotly.components.Layout.BarMode.STACK)
 					.build();
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).build(),
-					viz.addDataset(
-							data.computeWithPlaceholder(TripAnalysis.class, "trip_purposes_by_hour_%s.csv", finalTab)).mapping()
-						.name("purpose", ColorScheme.Spectral)
-						.x("h")
-						.y(type)
-				);
+					viz.addDataset(data.compute(TripAnalysis.class, "trip_purposes_by_hour.csv")).filter("group", finalTab)
+						.mapping().name("purpose",
+						ColorScheme.Spectral).x("h").y(type));
 			});
 		}
 	}
