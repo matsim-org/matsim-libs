@@ -213,12 +213,15 @@ public class TripAnalysis implements MATSimAppCommand {
 		StringColumn subpop = persons.stringColumn("subpopulation");
 
 		StringColumn modelType = StringColumn.create("modelType");
+		StringColumn groupOfSubpopulation = StringColumn.create("groupOfSubpopulation");
 
 		for (String subpopulation : subpop) {
 			String foundModelType = getModelType(subpopulation).toString();
+			String foundGroupOfSubpopulation = getGroupOfSubpopulation(subpopulation);
 			modelType.append(foundModelType);
+			groupOfSubpopulation.append(foundGroupOfSubpopulation);
 		}
-		persons.addColumns(modelType);
+		persons.addColumns(modelType, groupOfSubpopulation);
 
 		int total = persons.rowCount();
 
