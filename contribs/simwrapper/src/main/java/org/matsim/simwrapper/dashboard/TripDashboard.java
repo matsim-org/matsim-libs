@@ -232,18 +232,18 @@ public class TripDashboard implements Dashboard {
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Modal split";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Modal split * " + tabTitle + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", tabTitle, args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Modal split * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
@@ -281,18 +281,18 @@ public class TripDashboard implements Dashboard {
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Trip distance distribution";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Trip distance distribution * " + tabTitle + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", finalTab, args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Trip distance distribution * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 			viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Simulated").build(),
 				ds.aggregate(List.of("dist_group"), column, Plotly.AggrFunc.SUM)
@@ -353,18 +353,18 @@ public class TripDashboard implements Dashboard {
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Modal distance distribution";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", TripAnalysis.ModelType.COMPLETE_MODEL.toString(), args));
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("modelType", TripAnalysis.ModelType.COMPLETE_MODEL.toString());
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
 				viz.title = "Modal distance distribution * " + tabTitle + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", tabTitle, args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("groupOfSubpopulation", tabTitle);
+				column = "share_" + tabTitle;
 			}
 			else {
 				viz.title = "Modal distance distribution * " + TripAnalysis.ModelType.PERSON_TRAFFIC + " *";
-				ds = viz.addDataset(data.computeWithPlaceholder(TripAnalysis.class, "mode_share_per_dist_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args));
-				column = "share";
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
+				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
 			viz.description = "Mode share within distance groups.";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()

@@ -45,7 +45,7 @@ import static tech.tablesaw.aggregate.AggregateFunctions.sum;
 @CommandSpec(
 	requires = {"trips.csv", "persons.csv"},
 	produces = {
-		"mode_share_%s.csv", "mode_share_per_dist_%s.csv", "mode_users.csv", "trip_stats_%s.csv",
+		"mode_share.csv", "mode_share_per_dist.csv", "mode_users.csv", "trip_stats_%s.csv",
 		"mode_share_per_purpose.csv", "mode_share_per_%s.csv",
 		"population_trip_stats.csv", "trip_purposes_by_hour.csv",
 		"mode_share_distance_distribution_%s.csv", "mode_shift_%s.csv", "mode_chains.csv",
@@ -417,7 +417,7 @@ public class TripAnalysis implements MATSimAppCommand {
 
 	private void writeModeShare(Table trips, List<String> distanceLabels) {
 
-		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation", "modelType");
+		Table aggr = trips.summarize("trip_id", count).by("dist_group", "main_mode", "subpopulation", "modelType", "groupOfSubpopulation");
 
 		aggr = setEmptyCombinationsToZero(aggr);
 
@@ -425,30 +425,17 @@ public class TripAnalysis implements MATSimAppCommand {
 		Comparator<Row> cmp = Comparator.comparingInt(row -> distanceLabels.indexOf(row.getString("dist_group")));
 		Comparator<Row> cmp_modes = Comparator.comparingInt(row -> modeOrder.indexOf(row.getString("main_mode")));
 		aggr = aggr.sortOn(cmp.thenComparing(cmp_modes).thenComparing(row -> row.getString("subpopulation")));
-		if (!groupsOfSubpopulationsForPersonAnalysis.isEmpty()) {
-			subSetAnalysisForModeShares(distanceLabels, ModelType.PERSON_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
-
-			for (String group : groupsOfSubpopulationsForPersonAnalysis.keySet()) {
-				subSetAnalysisForModeShares(distanceLabels, group, aggr, cmp, groupsOfSubpopulationsForPersonAnalysis);
-			}
-		}
-		if (!groupsOfSubpopulationsForCommercialAnalysis.isEmpty()) {
-			subSetAnalysisForModeShares(distanceLabels, ModelType.COMMERCIAL_TRAFFIC.id, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
-			for (String group : groupsOfSubpopulationsForCommercialAnalysis.keySet()) {
-				subSetAnalysisForModeShares(distanceLabels, group, aggr, cmp, groupsOfSubpopulationsForCommercialAnalysis);
-			}
-		}
 		DoubleColumn shareSum = aggr.numberColumn("Count [trip_id]").divide(aggr.numberColumn("Count [trip_id]").sum()).setName("share_total");
 		aggr.addColumns(shareSum);
 
 		aggr = addModeSharesPerModelType(aggr);
-		aggr.write().csv(output.getPath("mode_share_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
+		aggr = addModeSharesPerGroup(aggr);
+		aggr.write().csv(output.getPath("mode_share.csv").toFile());
 
 		// Norm each dist_group to 1
 		normDistanceGroups(distanceLabels, aggr);
 		aggr.removeColumns("Count [trip_id]");
-		//TODO sind die spalten count, subpopulation, modelType hier noch sinnvoll?
-		aggr.write().csv(output.getPath("mode_share_per_dist_%s.csv", ModelType.COMPLETE_MODEL.id).toFile());
+		aggr.write().csv(output.getPath("mode_share_per_dist.csv").toFile());
 	}
 
 	private static Table addModeSharesPerModelType(Table aggr) {
@@ -489,39 +476,42 @@ public class TripAnalysis implements MATSimAppCommand {
 		return aggr;
 	}
 
-	private void subSetAnalysisForModeShares(List<String> distanceLabels, String group, Table aggr, Comparator<Row> cmp,
-											 Map<String, List<String>> groupsOfSubpopulationsForAnalysis) {
-		Table subset;
-		if (groupsOfSubpopulationsForAnalysis.isEmpty())
-			subset = aggr;
-		else if (group.equals(ModelType.PERSON_TRAFFIC.id) || group.equals(ModelType.COMMERCIAL_TRAFFIC.id))
-			subset = aggr.where(
-				aggr.stringColumn("modelType").isEqualTo(group));
-		else
-			subset = aggr.where(
-			aggr.stringColumn("subpopulation").isIn(groupsOfSubpopulationsForAnalysis.get(group)));
-		Table sumsByMode = subset.summarize("Count [trip_id]", sum).by("main_mode");
+	private static Table addModeSharesPerGroup(Table aggr) {
+		List<String> groupOfSubpopulation = aggr.stringColumn("groupOfSubpopulation").unique().asList();
+		if (groupOfSubpopulation.size() == 1 && groupOfSubpopulation.getFirst().equals(ModelType.UNASSIGNED.toString())) {
+			// No need to calculate shares per model type if there is only an unassigned model type
+			return aggr;
+		}
+		String[] keys = new String[] {"dist_group", "main_mode", "subpopulation"};
 
-		String sumColName = sumsByMode.columnNames().stream()
-			.filter(n -> n.toLowerCase().contains("sum") && n.contains("Count [trip_id]"))
-			.findFirst().orElseThrow();
+		for (String group : groupOfSubpopulation) {
+			Table countsGroup = aggr.where(aggr.stringColumn("groupOfSubpopulation").isEqualTo(group))
+				.selectColumns("dist_group", "main_mode", "subpopulation", "Count [trip_id]")
+				.copy();
+			String countCol = "count_" + group;
+			countsGroup.column("Count [trip_id]").setName(countCol);
 
-		Table usedModesOnly = sumsByMode.where(sumsByMode.numberColumn(sumColName).isGreaterThan(0));
-		Set<String> usedModes = new HashSet<>(usedModesOnly.stringColumn("main_mode").asList());
+			aggr = aggr.joinOn(keys).leftOuter(countsGroup);
 
-		subset = subset.where(subset.stringColumn("main_mode").isIn(usedModes));
+			DoubleColumn c = aggr.numberColumn(countCol).asDoubleColumn();
+			for (int row : c.isMissing().toArray()) c.set(row, 0.0);
+			aggr.replaceColumn(countCol, c);
 
-		DoubleColumn share = subset.numberColumn("Count [trip_id]")
-			.divide(subset.numberColumn("Count [trip_id]").sum())
-			.setName("share");
+			double denom = c.sum();
+			String shareCol = "share_" + group;
 
-		subset = subset.replaceColumn("Count [trip_id]", share)
-			.sortOn(cmp);
-		subset.write().csv(output.getPath("mode_share_%s.csv", group).toFile());
+			DoubleColumn share;
+			if (denom == 0.0) {
+				share = DoubleColumn.create(shareCol, aggr.rowCount());
+				share.fillWith(0.0);
+			} else {
+				share = c.divide(denom).setName(shareCol);
+			}
+			aggr.addColumns(share);
 
-		normDistanceGroups(distanceLabels, subset);
-
-		subset.write().csv(output.getPath("mode_share_per_dist_%s.csv", group).toFile());
+			aggr.removeColumns(countCol);
+		}
+		return aggr;
 	}
 
 	private void normDistanceGroups(List<String> distanceLabels, Table aggr) {
@@ -543,29 +533,36 @@ public class TripAnalysis implements MATSimAppCommand {
 	 *
 	 * @param aggr table with columns dist_group, main_mode, subpopulation, Count [trip_id], modelType
 	 */
-	private static Table setEmptyCombinationsToZero(Table aggr) {
-		List<String> distVals  = aggr.stringColumn("dist_group").unique().asList();
-		List<String> modeVals  = aggr.stringColumn("main_mode").unique().asList();
-		List<String> subpVals  = aggr.stringColumn("subpopulation").unique().asList();
+	private Table setEmptyCombinationsToZero(Table aggr) {
+
+		List<String> groups = aggr.stringColumn("groupOfSubpopulation").unique().asList();
+		List<String> distVals = aggr.stringColumn("dist_group").unique().asList();
 
 		Table combos = Table.create("all_combos",
 			StringColumn.create("dist_group"),
 			StringColumn.create("main_mode"),
-			StringColumn.create("subpopulation")
-		);
+			StringColumn.create("subpopulation"),
+			StringColumn.create("groupOfSubpopulation")
+			);
+		for (String g : groups) {
+			Table gTable = aggr.where(aggr.stringColumn("groupOfSubpopulation").isEqualTo(g));
 
-		for (String d : distVals) {
-			for (String m : modeVals) {
-				for (String s : subpVals) {
-					Row r = combos.appendRow();
-					r.setString("dist_group", d);
-					r.setString("main_mode", m);
-					r.setString("subpopulation", s);
+			List<String> modeVals = gTable.stringColumn("main_mode").unique().asList();
+			List<String> subpVals = gTable.stringColumn("subpopulation").unique().asList();
+
+			for (String d : distVals) {
+				for (String m : modeVals) {
+					for (String s : subpVals) {
+						Row r = combos.appendRow();
+						r.setString("dist_group", d);
+						r.setString("main_mode", m);
+						r.setString("subpopulation", s);
+						r.setString("groupOfSubpopulation", g);
+					}
 				}
 			}
 		}
-
-		aggr = combos.joinOn("dist_group", "main_mode", "subpopulation")
+		aggr = combos.joinOn("groupOfSubpopulation", "dist_group", "main_mode", "subpopulation")
 			.leftOuter(aggr);
 
 		DoubleColumn n = aggr.numberColumn("Count [trip_id]").asDoubleColumn();
@@ -576,12 +573,16 @@ public class TripAnalysis implements MATSimAppCommand {
 
 		StringColumn subpop = aggr.stringColumn("subpopulation");
 		StringColumn modelType = StringColumn.create("modelType");
+		StringColumn groupOfSubpopulation = StringColumn.create("groupOfSubpopulation");
 
 		for (String subpopulation : subpop) {
 			String foundModelType = getModelType(subpopulation).toString();
 			modelType.append(foundModelType);
+			String foundGroupOfSubpopulation = getGroupOfSubpopulation(subpopulation);
+			groupOfSubpopulation.append(foundGroupOfSubpopulation);
 		}
 		aggr.replaceColumn("modelType", modelType);
+		aggr.replaceColumn("groupOfSubpopulation", groupOfSubpopulation);
 
 		return aggr;
 	}
