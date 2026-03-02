@@ -318,7 +318,7 @@ public final class WithinDayAgentUtils {
 	 * Adds the vehicle of the first network route in the given trip to the simulation, if it is not already present in the simulation.
 	 * This might be needed if new next trip uses a mode not in the plan of an agent before.
 	 */
-	public static void addVehicleToQSim(List<? extends PlanElement> nextTrip, Scenario scenario, QSim sim) {
+	public static void addVehicleToQSimIfNecessary(List<? extends PlanElement> nextTrip, Scenario scenario, QSim sim) {
 		for (Leg leg : TripStructureUtils.getLegs(nextTrip)) {
 			if (leg.getRoute() instanceof NetworkRoute r) {
 				Id<Vehicle> vehicleId = r.getVehicleId();

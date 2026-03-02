@@ -43,6 +43,7 @@ import java.util.TreeSet;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
+ * I.e., this does not scale the counts by the PCU.
  *
  * @author mrieser
  */

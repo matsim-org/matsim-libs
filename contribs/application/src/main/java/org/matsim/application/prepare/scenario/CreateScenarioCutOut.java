@@ -2,18 +2,21 @@ package org.matsim.application.prepare.scenario;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
+import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -25,7 +28,6 @@ import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.application.prepare.population.PersonNetworkLinkCheck;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -330,7 +332,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 		}
 
 		if (eventPath != null) {
-			List<NetworkChangeEvent> events = generateNetworkChangeEvents(changeEventsInterval);
+			List<NetworkChangeEvent> events = generateNetworkChangeEvents(scenario.getNetwork(), tt, geomBuffer, keepModes, keepCapacities, changeEventsMaxTime, changeEventsInterval);
 			new NetworkChangeEventsWriter().write(outputEvents, events);
 		}
 
@@ -469,20 +471,19 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 	 * Creates and applies the {@link NetworkChangeEvent}s to the network. It sets the capacity for all links outside the shapefile and bufferzone
 	 * to infinite and reduces the freespeed of the links so that the agents behave somehow realistically outside the cutout-area.
 	 *
-	 * @param timeFrameLength interval length of time frames in seconds
 	 * @return a list of the generated NetworkChangeEvents. Use is optional.
 	 */
-	private List<NetworkChangeEvent> generateNetworkChangeEvents(double timeFrameLength) {
+	public static List<NetworkChangeEvent> generateNetworkChangeEvents(Network network, TravelTimeCalculator tt, Geometry geomBuffer, Set<String> keepModes, boolean keepCapacities, double changeEventsMaxTime, double timeFrameLength) {
 		List<NetworkChangeEvent> events = new LinkedList<>();
 
-		for (Link link : scenario.getNetwork().getLinks().values()) {
+		for (Link link : network.getLinks().values()) {
 
 			// Don't generate events for links thar are in the shapefile + buffer
-			if (geomBuffer.contains(MGC.coord2Point(link.getCoord())))
+			if (geomBuffer != null && geomBuffer.contains(MGC.coord2Point(link.getCoord())))
 				continue;
 
 			// Don't generate events for these fixed modes.
-			if (link.getAllowedModes().equals(keepModes))
+			if (keepModes != null && link.getAllowedModes().equals(keepModes))
 				continue;
 
 
@@ -514,7 +515,7 @@ public class CreateScenarioCutOut implements MATSimAppCommand, PersonAlgorithm {
 
 				NetworkChangeEvent event = new NetworkChangeEvent(time);
 				event.setFreespeedChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, freespeed));
-				NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), event);
+				NetworkUtils.addNetworkChangeEvent(network, event);
 				event.addLink(link);
 				events.add(event);
 

@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @CommandLine.Command(
 	name = "noise-analysis",
@@ -184,7 +187,7 @@ public class NoiseAnalysis implements MATSimAppCommand {
 		Config config = co.loadConfig(input.getRunDirectory());
 
 		//it is important to match "output_vehicles.xml.gz" specifically, because otherwise dvrpVehicle files might be matched and the code crashes later
-		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles.xml.gz", input.getRunDirectory()).toAbsolutePath().toString());
+		config.vehicles().setVehiclesFile(ApplicationUtils.matchInput("output_vehicles", input.getRunDirectory()).toAbsolutePath().toString());
 		config.network().setInputFile(ApplicationUtils.matchInput("network", input.getRunDirectory()).toAbsolutePath().toString());
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
