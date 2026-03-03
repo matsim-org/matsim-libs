@@ -117,7 +117,7 @@ public class ChainedDepartureIntegrationTest {
 	@Test
 	void withChainedDepartures() throws Exception {
 
-		List<Event> events = runScenario(scenario -> {
+		List<Event> events = runScenario(_ -> {
 		});
 
 		ActivityStartEvent p1 = new ActivityStartEvent(
@@ -136,15 +136,15 @@ public class ChainedDepartureIntegrationTest {
 				32581, Id.createPersonId("person1"),
 				Id.createVehicleId("351761"), Id.createVehicleId("351714"),
 				Id.create("f15", TransitStopFacility.class),
-				Id.create("?", TransitLine.class),
-				Id.create("?", TransitRoute.class)
+				Id.create("l109", TransitLine.class),
+				Id.create("r110", TransitRoute.class)
 			))
 			.contains(new PersonContinuesInVehicleEvent(
 				36362, Id.createPersonId("person2"),
 				Id.createVehicleId("351871"), Id.createVehicleId("351874"),
 				Id.create("f74", TransitStopFacility.class),
-				Id.create("?", TransitLine.class),
-				Id.create("?", TransitRoute.class)
+				Id.create("l120", TransitLine.class),
+				Id.create("r128", TransitRoute.class)
 			))
 			.contains(p1)
 			.contains(p2);
