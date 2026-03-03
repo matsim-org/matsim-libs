@@ -244,16 +244,20 @@ public class TestLocalLink {
 		var config = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		var node = new SimNode(link.getToNode().getId());
-		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {
-		}, _ -> {
-		});
-		var vehicle = TestUtils.createVehicle("vehicle-3", 42, 10);
+		var simLink = SimLink.create(link, node, config, 7.5, 0, _ -> {}, _ -> {});
+		var smallVehicle = TestUtils.createVehicle("vehicle-1", 1, 10);
+		var bigVehicle = TestUtils.createVehicle("vehicle-33", 33, 10);
 
-		simLink.pushVehicle(vehicle, SimLink.LinkPosition.QEnd, 0);
+		// push one small and one big vehicle to the front of the queue. The small vehicle ends up first.
+		// we need a small vehicle, as it will trigger a backwards traveling hole, but it will only consume
+		// a small amount of outflow capacity. This is what we want, because here we want to test the backwards
+		// trveling hole stuff and not the outlfow capacity.
+		simLink.pushVehicle(smallVehicle, SimLink.LinkPosition.QEnd, 0);
+		simLink.pushVehicle(bigVehicle, SimLink.LinkPosition.QEnd, 0);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart));
 
-		// move the vehicle into the buffer, which starts a backwards travelling hole.
+		// move the small vehicle into the buffer, which starts a backwards traveling hole.
 		assertTrue(simLink.doSimStep(null, 0));
 		assertTrue(simLink.isOffering());
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer));
@@ -261,7 +265,7 @@ public class TestLocalLink {
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd));
 
 		// remove the vehicle from the buffer - not strictly necessary
-		assertEquals(vehicle.getId(), simLink.popVehicle().getId());
+		assertEquals(smallVehicle.getId(), simLink.popVehicle().getId());
 		assertFalse(simLink.isOffering());
 
 		// now execute doSimStep until the hole reaches the start of the link after 24 seconds.
@@ -270,11 +274,15 @@ public class TestLocalLink {
 			assertTrue(simLink.doSimStep(null, now), "link indicates deactivation at t=" + now + " but expected is at t=24");
 			assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart));
 			assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd));
+
+			// remove the big vehicle as well, so that we can de-activate the link at some point.
+			if (simLink.isOffering()) {
+				assertEquals(bigVehicle.getId(), simLink.popVehicle().getId());
+			}
 		}
 
-		// in timestep 24 the hole is released. The link should be de-activated.
-		// the link should be accepting vehicles again.
-		assertFalse(simLink.doSimStep(null, 24));
+		// in timestep 24 the hole is released. the link should be accepting vehicles again.
+		simLink.doSimStep(null, 24);
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart));
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd));
 	}

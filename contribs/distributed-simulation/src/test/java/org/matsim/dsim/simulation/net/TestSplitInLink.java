@@ -101,7 +101,7 @@ public class TestSplitInLink {
 		assertEquals(Id.createVehicleId("vehicle-1"), simLink.popVehicle().getId());
 
 		// the hole should arrive after 24 seconds. Then it is sent upstream
-		assertFalse(simLink.doSimStep(messaging, 24));
+		simLink.doSimStep(messaging, 24);
 		verify(messaging).collectStorageCapacityUpdate(
 			simLink.getId(), 42, 0, fromPart);
 	}

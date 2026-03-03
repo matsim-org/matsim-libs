@@ -4,6 +4,7 @@ import org.matsim.core.mobsim.dsim.DistributedMobsimVehicle;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 class PassingQueue implements SimDequeue {
 
@@ -42,5 +43,10 @@ class PassingQueue implements SimDequeue {
 		assert !internalQ.contains(vehicle) : "vehicle already in queue";
 
 		internalQ.add(vehicle);
+	}
+
+	@Override
+	public String toString() {
+		return internalQ.stream().map(veh -> veh.getId().toString()).collect(Collectors.joining(", "));
 	}
 }

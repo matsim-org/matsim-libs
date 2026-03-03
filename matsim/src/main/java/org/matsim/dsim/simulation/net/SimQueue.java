@@ -20,6 +20,13 @@ class SimQueue {
 		return internalQ.isEmpty();
 	}
 
+	/**
+	 * Updates internal state of the queue. In addition to holding vehicles, the queue also keeps track of
+	 * storage and inflow capacity. Triggered by vehicles entering and leaving the queue those capacities are
+	 * updated with a delay. This is what this method is for
+	 *
+	 * @param now the current simulation time step
+	 */
 	void update(double now) {
 		inflowCapacity.update(now);
 		storageCapacity.update(now);
@@ -73,7 +80,7 @@ class SimQueue {
 
 	@Override
 	public String toString() {
-		return "q=[" + internalQ.toString() + "], inflowCapacity=[" + inflowCapacity.toString() + "], storageCapacity=[" + storageCapacity.toString() + "]";
+		return "internal=[" + internalQ.toString() + "], inflowCapacity=[" + inflowCapacity.toString() + "], storageCapacity=[" + storageCapacity.toString() + "]";
 	}
 
 	static SimQueue create(Link link, DSimConfigGroup config, double effectiveCellSize) {

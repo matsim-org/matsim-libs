@@ -198,12 +198,10 @@ public interface SimLink {
 			vehicle.setCurrentLinkId(id);
 
 			switch (position) {
-				case QStart, QEnd -> {
-					q.add(vehicle, position);
-					activateLink.accept(this);
-				}
+				case QStart, QEnd -> q.add(vehicle, position);
 				case Buffer -> buffer.add(vehicle, now);
 			}
+			activateLink.accept(this);
 		}
 
 		private double calculateExitTime(DistributedMobsimVehicle vehicle, double now) {
@@ -243,13 +241,16 @@ public interface SimLink {
 				else if (leaveResult.equals(OnLeaveQueueInstruction.RemoveVehicle)) {
 					var removed = q.poll(now);
 					if (getId().toString().equals("-96640639")) {
-						log.info("LocalLink id={} t={} removed vehicle={}", now, getId(), removed.getId());
-						log.info(this.toString());
+						log.trace("LocalLink id={} t={} removed vehicle={}", now, getId(), removed.getId());
+						log.trace(this.toString());
 					}
 				}
 				// if the result is block, don't do anything. We assume that the handler has set a new exit time
 			}
-			return !q.isEmpty() || q.getOccupied() > 0;
+			// We need to keep the link active as long as we have vehicles, or until we have accumulated enough storage and inflow
+			// and outflow capacity to accept another vehicle. Once this is ensured, it is sufficient to update the capacity book keeping
+			// once the link is added to the active links again.
+			return !q.isEmpty() || !q.isAccepting(LinkPosition.QStart) || !buffer.isAvailable();
 		}
 
 		private OnLeaveQueueInstruction callLeaveHandlers(DistributedMobsimVehicle vehicle, double now) {
@@ -275,8 +276,8 @@ public interface SimLink {
 			var vehicle = q.poll(now);
 			buffer.add(vehicle, now);
 			if (getId().toString().equals("-96640639")) {
-				log.info("LocalLink id={} t={} moved vehicle={}", now, getId(), vehicle.getId());
-				log.info(this.toString());
+				log.trace("LocalLink id={} t={} moved vehicle={}", now, getId(), vehicle.getId());
+				log.trace(this.toString());
 			}
 		}
 
@@ -367,8 +368,8 @@ public interface SimLink {
 			q.add(vehicle);
 			activateLink.accept(this);
 			if (getId().toString().equals("-96640639")) {
-				log.info("SplitOutLink id={} push vehicle={}", getId(), vehicle.getId());
-				log.info(this.toString());
+				log.trace("SplitOutLink id={} push vehicle={}", getId(), vehicle.getId());
+				log.trace(this.toString());
 			}
 		}
 
@@ -399,8 +400,8 @@ public interface SimLink {
 			storageCapacity.consume(consumed);
 			storageCapacity.release(released, 0);
 			if (getId().toString().equals("-96640639")) {
-				log.info("SplitOutLink id={}, released={}, consumed={}", getId(), released, consumed);
-				log.info(this.toString());
+				log.trace("SplitOutLink id={}, released={}, consumed={}", getId(), released, consumed);
+				log.trace(this.toString());
 			}
 		}
 
@@ -486,8 +487,8 @@ public interface SimLink {
 			localLink.activateLink.accept(this);
 
 			if (getId().toString().equals("-96640639")) {
-				log.info("SplitInLink: t={} id={} pushed vehicle= {}", now, getId(), vehicle.getId());
-				log.info(this.toString());
+				log.trace("SplitInLink: t={} id={} pushed vehicle= {}", now, getId(), vehicle.getId());
+				log.trace(this.toString());
 			}
 		}
 
@@ -506,8 +507,8 @@ public interface SimLink {
 
 			if (diffOccupied > 0 || consumedStorageCap > 0) {
 				if (getId().toString().equals("-96640639")) {
-					log.info("SplitInLink t={} id={}, released={}, consumed={}", now, getId(), diffOccupied, consumedStorageCap);
-					log.info(this.toString());
+					log.trace("SplitInLink t={} id={}, released={}, consumed={}", now, getId(), diffOccupied, consumedStorageCap);
+					log.trace(this.toString());
 				}
 				messaging.collectStorageCapacityUpdate(getId(), diffOccupied, consumedStorageCap, fromPart);
 				consumedStorageCap = 0;

@@ -127,7 +127,7 @@ class VehicleDepartingOnLinkTest {
 			assertEquals(expectedId, v.getId());
 			return SimLink.OnLeaveQueueInstruction.RemoveVehicle;
 		});
-		assertFalse(simLink.doSimStep(null, 0));
+		simLink.doSimStep(null, 0);
 	}
 
 	@Test

@@ -57,6 +57,13 @@ class SimBuffer {
 		return this.internalBuffer.peek();
 	}
 
+	/**
+	 * Updates internal state of the buffer. In addition to holding vehicles, the buffer also keeps track of
+	 * outflow capacity. Triggered by vehicles entering and leaving the buffer, those capacities are updated
+	 * with a delay. This method updates these capacities
+	 *
+	 * @param now the current simulation time step
+	 */
 	void update(double now) {
 		flowCap.update(now);
 	}
