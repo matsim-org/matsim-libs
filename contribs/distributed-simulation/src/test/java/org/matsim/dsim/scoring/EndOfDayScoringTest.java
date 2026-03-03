@@ -48,8 +48,8 @@ class EndOfDayScoringTest {
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link1), node1, node2));
 		network.addLink(network.getFactory().createLink(Id.createLinkId(link2), node2, node3));
 
-		Map<String, ExperiencedRouteBuilderProvider> providers = new HashMap<>();
-		providers.put(TransportMode.walk, new ExperiencedGenericRouteBuilderProvider());
+		Map<String, BackpackRouteProvider> providers = new HashMap<>();
+		providers.put(TransportMode.walk, new BackpackGenericRouteProvider());
 
 		var startFacilityId = Id.create("f1", ActivityFacility.class);
 		var backpack = new Backpack(personId, 0, providers);

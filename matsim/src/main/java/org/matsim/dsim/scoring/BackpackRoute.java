@@ -24,7 +24,7 @@ import org.matsim.vehicles.Vehicle;
  * </pre>
  * An ExperiencedRouteBuilder receives all events for a single person. When the person has finished its leg, the finishRoute method is called.
  */
-public interface ExperiencedRouteBuilder {
+public interface BackpackRoute {
 
 	/**
 	 * Will receive all events generated during the mobsim for one person.

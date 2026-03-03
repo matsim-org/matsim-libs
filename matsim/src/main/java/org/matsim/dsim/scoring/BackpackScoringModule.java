@@ -66,7 +66,7 @@ public class BackpackScoringModule extends AbstractModule {
 
 		// the following binds providers to create experienced routes. We need one provider for each mode used
 		// during the simulation.
-		var binder = MapBinder.newMapBinder(binder(), String.class, ExperiencedRouteBuilderProvider.class);
+		var binder = MapBinder.newMapBinder(binder(), String.class, BackpackRouteProvider.class);
 
 		// create generic routes for teleported modes. This includes all modes for which we have teleported speeds, freesped factors,
 		// as well as network modes in routing, which are not contained as network modes in the mobsim. Also, pt is handled separately.
@@ -78,14 +78,14 @@ public class BackpackScoringModule extends AbstractModule {
 			.flatMap(Collection::stream)
 			.filter(m -> !getConfig().dsim().getNetworkModes().contains(m))
 			.filter(m -> !getConfig().transit().getTransitModes().contains(m))
-			.forEach(m -> binder.addBinding(m).to(ExperiencedGenericRouteBuilderProvider.class));
+			.forEach(m -> binder.addBinding(m).to(BackpackGenericRouteProvider.class));
 
 		// network routes for all modes that are registered as network modes.
-		getConfig().dsim().getNetworkModes().forEach(m -> binder.addBinding(m).to(ExperiencedNetworkRouteBuilderProvider.class));
+		getConfig().dsim().getNetworkModes().forEach(m -> binder.addBinding(m).to(BackpackNetworkRouteProvider.class));
 
 		// transit routes if pt is enabled
 		if (getConfig().transit().isUseTransit()) {
-			getConfig().transit().getTransitModes().forEach(m -> binder.addBinding(m).to(ExperiencedTransitRouteBuilderProvider.class));
+			getConfig().transit().getTransitModes().forEach(m -> binder.addBinding(m).to(BackpackTransitRouteProvider.class));
 		}
 	}
 

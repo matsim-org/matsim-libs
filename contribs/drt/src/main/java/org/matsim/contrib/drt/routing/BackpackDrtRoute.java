@@ -12,24 +12,24 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.dsim.scoring.ExperiencedRouteBuilder;
+import org.matsim.dsim.scoring.BackpackRoute;
 import org.matsim.dsim.scoring.PassengerRoute;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class ExperiencedDrtRouteBuilder implements ExperiencedRouteBuilder {
-	private static final Logger log = LogManager.getLogger(ExperiencedDrtRouteBuilder.class);
+class BackpackDrtRoute implements BackpackRoute {
+	private static final Logger log = LogManager.getLogger(BackpackDrtRoute.class);
 
 	private final Data data;
 	private final Network network;
 
-	ExperiencedDrtRouteBuilder(Network network) {
+	BackpackDrtRoute(Network network) {
 		this(network, new Data());
 	}
 
-	ExperiencedDrtRouteBuilder(Network network, Data data) {
+	BackpackDrtRoute(Network network, Data data) {
 		this.data = data;
 		this.network = network;
 	}

@@ -52,7 +52,7 @@ public class BackpackDataCollector implements BasicEventHandler {
 
 	private final AgentSourcesContainer asc;
 	private final FinishedBackpackCollector backpackCollector;
-	private final Map<String, ExperiencedRouteBuilderProvider> providers;
+	private final Map<String, BackpackRouteProvider> providers;
 
 	// transit schedule has to be optional, as not all scenarios have a transit schedule.
 	@SuppressWarnings("FieldMayBeFinal")
@@ -61,7 +61,7 @@ public class BackpackDataCollector implements BasicEventHandler {
 
 	@Inject
 	public BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc,
-								 FinishedBackpackCollector fbc, Map<String, ExperiencedRouteBuilderProvider> providers) {
+								 FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this(simStepMessaging, network, population, null, asc, fbc, providers);
 	}
 
@@ -69,7 +69,7 @@ public class BackpackDataCollector implements BasicEventHandler {
 	 * Constructor for testing, which includes all dependencies
 	 */
 	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule,
-						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, ExperiencedRouteBuilderProvider> providers) {
+						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;

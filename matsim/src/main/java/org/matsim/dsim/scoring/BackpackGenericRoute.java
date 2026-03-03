@@ -11,7 +11,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.vehicles.Vehicle;
 
-public class ExperiencedGenericRouteBuilder implements ExperiencedRouteBuilder, Message {
+class BackpackGenericRoute implements BackpackRoute, Message {
 
 	private Id<Link> startLink;
 	private Id<Link> endLink;

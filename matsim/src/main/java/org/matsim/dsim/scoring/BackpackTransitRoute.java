@@ -22,7 +22,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
+class BackpackTransitRoute implements BackpackRoute {
 
 	private final Network network;
 	private final TransitSchedule transitSchedule;
@@ -35,7 +35,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 	 * @param network         must be passed, so that we can compute distances.
 	 * @param transitSchedule must be passed, so that we fetch transit relevant data such as facilities
 	 */
-	ExperiencedTransitRouteBuilder(Network network, TransitSchedule transitSchedule) {
+	BackpackTransitRoute(Network network, TransitSchedule transitSchedule) {
 		this(network, transitSchedule, new ArrayList<>());
 	}
 
@@ -46,7 +46,7 @@ public class ExperiencedTransitRouteBuilder implements ExperiencedRouteBuilder {
 	 * @param parts           incomplete network route, which has been transferred from another partition.
 	 * @param transitSchedule must be passed, so that we fetch transit relevant data such as facilities
 	 */
-	ExperiencedTransitRouteBuilder(Network network, TransitSchedule transitSchedule, List<Data> parts) {
+	BackpackTransitRoute(Network network, TransitSchedule transitSchedule, List<Data> parts) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
 		this.parts = parts;

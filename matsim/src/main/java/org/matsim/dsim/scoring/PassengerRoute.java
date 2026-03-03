@@ -10,3 +10,4 @@ public interface PassengerRoute extends Route {
 
 	OptionalTime getBoardingTime();
 }
+.

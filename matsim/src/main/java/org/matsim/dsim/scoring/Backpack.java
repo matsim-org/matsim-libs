@@ -39,14 +39,14 @@ public class Backpack {
 		return backpackPlan;
 	}
 
-	Backpack(Msg msg, Map<String, ExperiencedRouteBuilderProvider> providers) {
+	Backpack(Msg msg, Map<String, BackpackRouteProvider> providers) {
 		personId = msg.id();
 		events = msg.events();
 		startingPartition = msg.startingPartition();
 		backpackPlan = new BackpackPlan(msg.backpackPlan(), providers);
 	}
 
-	Backpack(Id<Person> personId, int startingPartition, Map<String, ExperiencedRouteBuilderProvider> providers) {
+	Backpack(Id<Person> personId, int startingPartition, Map<String, BackpackRouteProvider> providers) {
 		this.personId = personId;
 		this.startingPartition = startingPartition;
 		this.events = new ArrayList<>();
@@ -74,7 +74,7 @@ public class Backpack {
 		return new FinishedBackpack(personId, startingPartition, events, backpackPlan.finishPlan());
 	}
 
-	public Msg toMessage() {
+	Msg toMessage() {
 		return new Msg(personId, events, startingPartition, backpackPlan.toMessage());
 	}
 

@@ -7,14 +7,14 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PopulationUtils;
 
-class ExperiencedActivityBuilder {
+class BackpackActivity {
 
 	private Activity activity;
 
-	ExperiencedActivityBuilder() {
+	BackpackActivity() {
 	}
 
-	ExperiencedActivityBuilder(Msg msg) {
+	BackpackActivity(Msg msg) {
 		activity = msg.activity();
 	}
 
@@ -40,7 +40,7 @@ class ExperiencedActivityBuilder {
 		return result;
 	}
 
-	public Msg toMessage() {
+	Msg toMessage() {
 		return new Msg(activity);
 	}
 

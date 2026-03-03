@@ -16,32 +16,32 @@ import java.util.Map;
 class BackpackPlan {
 
 	private final Plan experiencedPlan;
-	private final Map<String, ExperiencedRouteBuilderProvider> providers;
+	private final Map<String, BackpackRouteProvider> providers;
 
-	private ExperiencedActivityBuilder currentActivity;
-	private ExperiencedLegBuilder currentLeg;
+	private BackpackActivity currentActivity;
+	private BackpackLeg currentLeg;
 
-	BackpackPlan(Msg msg, Map<String, ExperiencedRouteBuilderProvider> providers) {
+	BackpackPlan(Msg msg, Map<String, BackpackRouteProvider> providers) {
 		if (msg.actState() != null) {
-			currentActivity = new ExperiencedActivityBuilder(msg.actState());
+			currentActivity = new BackpackActivity(msg.actState());
 		}
 		if (msg.legState() != null) {
 			var mode = msg.legState().getMode();
 			var provider = providers.get(mode);
 			var routeBuilder = provider.get(msg.legState().routeBuilderData());
 			var legData = msg.legState().data();
-			currentLeg = new ExperiencedLegBuilder(legData, routeBuilder);
+			currentLeg = new BackpackLeg(legData, routeBuilder);
 		}
 		experiencedPlan = msg.experiencedPlan();
 		this.providers = providers;
 	}
 
-	BackpackPlan(Map<String, ExperiencedRouteBuilderProvider> providers) {
+	BackpackPlan(Map<String, BackpackRouteProvider> providers) {
 		this.providers = providers;
 		this.experiencedPlan = PopulationUtils.createPlan();
 	}
 
-	public void handleEvent(Event e) {
+	void handleEvent(Event e) {
 
 		switch (e) {
 			case PersonDepartureEvent pde -> handlePersonDeparture(pde);
@@ -65,7 +65,7 @@ class BackpackPlan {
 		}
 
 		var routeBuilder = provider.get();
-		currentLeg = new ExperiencedLegBuilder(routeBuilder);
+		currentLeg = new BackpackLeg(routeBuilder);
 		currentLeg.handleEvent(e);
 	}
 
@@ -82,13 +82,13 @@ class BackpackPlan {
 
 	void handleActivityStart(ActivityStartEvent e) {
 		if (currentActivity != null) throw new IllegalStateException("Agent already performs an activity.");
-		currentActivity = new ExperiencedActivityBuilder();
+		currentActivity = new BackpackActivity();
 		currentActivity.handleEvent(e);
 	}
 
 	void handleActivityEnd(ActivityEndEvent e) {
 		if (currentActivity == null) {
-			currentActivity = new ExperiencedActivityBuilder();
+			currentActivity = new BackpackActivity();
 		}
 		currentActivity.handleEvent(e);
 		var act = currentActivity.finishActivity();
@@ -142,7 +142,7 @@ class BackpackPlan {
 		return new Msg(experiencedPlan, actMsg, legMsg);
 	}
 
-	record Msg(Plan experiencedPlan, ExperiencedActivityBuilder.Msg actState,
-			   ExperiencedLegBuilder.Msg legState) implements Message {
+	record Msg(Plan experiencedPlan, BackpackActivity.Msg actState,
+			   BackpackLeg.Msg legState) implements Message {
 	}
 }

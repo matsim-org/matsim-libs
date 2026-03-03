@@ -12,7 +12,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExperiencedNetworkRouteBuilder implements ExperiencedRouteBuilder {
+class BackpackNetworkRoute implements BackpackRoute {
 
 	private final Network network;
 	private final Data data;
@@ -23,7 +23,7 @@ public class ExperiencedNetworkRouteBuilder implements ExperiencedRouteBuilder {
 	 *
 	 * @param network must be passed, so that we can compute distances.
 	 */
-	ExperiencedNetworkRouteBuilder(Network network) {
+	BackpackNetworkRoute(Network network) {
 		this(network, new Data());
 	}
 
@@ -33,7 +33,7 @@ public class ExperiencedNetworkRouteBuilder implements ExperiencedRouteBuilder {
 	 * @param network the network is needed to compute distances once the route is finished
 	 * @param data    incomplete network route, which has been transferred from another partition.
 	 */
-	ExperiencedNetworkRouteBuilder(Network network, Data data) {
+	BackpackNetworkRoute(Network network, Data data) {
 		this.network = network;
 		this.data = data;
 	}

@@ -11,16 +11,16 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.vehicles.Vehicle;
 
-class ExperiencedLegBuilder {
+class BackpackLeg {
 
-	private final ExperiencedRouteBuilder routeBuilder;
+	private final BackpackRoute routeBuilder;
 	private final Data data;
 
-	ExperiencedLegBuilder(ExperiencedRouteBuilder routeBuilder) {
+	BackpackLeg(BackpackRoute routeBuilder) {
 		this(new Data(), routeBuilder);
 	}
 
-	ExperiencedLegBuilder(Data data, ExperiencedRouteBuilder routeBuilder) {
+	BackpackLeg(Data data, BackpackRoute routeBuilder) {
 		this.routeBuilder = routeBuilder;
 		this.data = data;
 	}

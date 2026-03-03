@@ -5,27 +5,27 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-public class ExperiencedTransitRouteBuilderProvider implements ExperiencedRouteBuilderProvider {
+class BackpackTransitRouteProvider implements BackpackRouteProvider {
 
 	private final Network network;
 	private final TransitSchedule transitSchedule;
 
 	@Inject
-	public ExperiencedTransitRouteBuilderProvider(Network network, TransitSchedule transitSchedule) {
+	public BackpackTransitRouteProvider(Network network, TransitSchedule transitSchedule) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
 	}
 
 	@Override
-	public ExperiencedRouteBuilder get() {
-		return new ExperiencedTransitRouteBuilder(network, transitSchedule);
+	public BackpackRoute get() {
+		return new BackpackTransitRoute(network, transitSchedule);
 	}
 
 	@Override
-	public ExperiencedRouteBuilder get(Message fromMessage) {
+	public BackpackRoute get(Message fromMessage) {
 		//noinspection DeconstructionCanBeUsed
-		if (fromMessage instanceof ExperiencedTransitRouteBuilder.Msg msg) {
-			return new ExperiencedTransitRouteBuilder(network, transitSchedule, msg.parts());
+		if (fromMessage instanceof BackpackTransitRoute.Msg msg) {
+			return new BackpackTransitRoute(network, transitSchedule, msg.parts());
 		}
 
 		throw new IllegalArgumentException("Cannot create route builder from message of type " + fromMessage.getClass());
