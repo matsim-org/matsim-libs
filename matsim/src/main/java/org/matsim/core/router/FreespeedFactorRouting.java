@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.RoutingConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -76,9 +75,8 @@ class FreespeedFactorRouting implements Provider<RoutingModule> {
 			}
 		} ;
 		Gbl.assertNotNull(leastCostPathCalculatorFactory);
-		LeastCostPathCalculator routeAlgoPtFreeFlow = leastCostPathCalculatorFactory.createPathCalculator(
-						network, travelDisutility, travelTime);
+		// Pass factory instead of creating algo instance - algo should be created per routing call for thread-safety
 		return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), populationFactory,
-				network, routeAlgoPtFreeFlow, params);
+				network, leastCostPathCalculatorFactory, travelTime, travelDisutility, params);
 	}
 }

@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.matsim.api.core.v01.Coord;
@@ -41,8 +41,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.config.groups.ReplanningConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.ScoringConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -445,6 +445,41 @@ public class SwissRailRaptorModuleTest {
             schedule.removeStopFacility(schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)));
         }
 
+    }
+
+    @Test
+	void testModeToModeTransferPenalty() {
+        Config config = ConfigUtils.createConfig();
+        config.controller().setLastIteration(0);
+        config.controller().setOutputDirectory(this.utils.getOutputDirectory());
+        config.controller().setCreateGraphs(false);
+        config.controller().setDumpDataAtEnd(false);
+        config.transit().setUseTransit(true);
+
+        SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
+        
+        SwissRailRaptorConfigGroup.ModeToModeTransferPenalty trainToShip = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty("train",TransportMode.ship,1000000.0);
+		SwissRailRaptorConfigGroup.ModeToModeTransferPenalty shipToTrain = new SwissRailRaptorConfigGroup.ModeToModeTransferPenalty(TransportMode.ship,"train",1000000.0);
+		srrConfig.addModeToModeTransferPenalty(trainToShip);
+		srrConfig.addModeToModeTransferPenalty(shipToTrain);
+
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        Controler controler = new Controler(scenario);
+
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                install(new SwissRailRaptorModule());
+            }
+        });
+        controler.run();
+
+        TripRouter tripRouter = controler.getInjector().getInstance(TripRouter.class);
+
+        // this test mostly checks that no exception occurred
+
+        RoutingModule module = tripRouter.getRoutingModule(TransportMode.pt);
+        Assertions.assertTrue(module instanceof SwissRailRaptorRoutingModule);
     }
 
 }
