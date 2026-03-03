@@ -68,7 +68,7 @@ public class DefaultWait2Link implements Wait2Link {
 	private boolean moveWaiting(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 		SimLink.LinkPosition position = vehicle.getDriver().isWantingToArriveOnCurrentLink() ? SimLink.LinkPosition.QEnd : SimLink.LinkPosition.Buffer;
 
-		if (link.isAccepting(position, now)) {
+		if (link.isAccepting(position)) {
 			em.processEvent(new VehicleEntersTrafficEvent(
 				now, vehicle.getDriver().getId(), link.getId(), vehicle.getId(),
 				vehicle.getDriver().getMode(), 1.0)

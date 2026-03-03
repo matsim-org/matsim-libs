@@ -16,10 +16,11 @@ class SimBufferTest {
 		Link link = TestUtils.createSingleLink();
 		link.setCapacity(23 * 3600);
 		var node = new SimNode(link.getToNode().getId());
-		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), 30, node, _ -> {});
+		var buffer = new SimBuffer(FlowCapacity.createOutflowCapacity(link), 30, node, _ -> {
+		});
 		assertEquals(23, buffer.getMaxFlowCapacity());
 		assertEquals(0, buffer.getPceInBuffer());
-		assertTrue(buffer.isAvailable(0));
+		assertTrue(buffer.isAvailable());
 	}
 
 	@Test
@@ -36,10 +37,10 @@ class SimBufferTest {
 		var vehicle = TestUtils.createVehicle("vehicle-1", 10, 10);
 
 		// push vehicle which consumes flow capacity and starts the stuck timer
-		assertTrue(buffer.isAvailable(0));
+		assertTrue(buffer.isAvailable());
 		buffer.add(vehicle, 0);
 		assertTrue(wasActivated.get());
-		assertFalse(buffer.isAvailable(0));
+		assertFalse(buffer.isAvailable());
 		assertEquals(vehicle.getSizeInEquivalents(), buffer.getPceInBuffer());
 		assertFalse(buffer.isStuck(0));
 		assertTrue(buffer.isStuck(stuckThreshold));
@@ -49,10 +50,12 @@ class SimBufferTest {
 
 		// make sure that flow capacity is rebuild slowly
 		var now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity() - 1;
-		assertFalse(buffer.isAvailable(now));
+		buffer.update(now);
+		assertFalse(buffer.isAvailable());
 
 		now = vehicle.getSizeInEquivalents() / buffer.getMaxFlowCapacity();
-		assertTrue(buffer.isAvailable(now));
+		buffer.update(now);
+		assertTrue(buffer.isAvailable());
 	}
 
 	@Test
@@ -67,20 +70,22 @@ class SimBufferTest {
 		var vehicle2 = TestUtils.createVehicle("vehicle-2", 10, 10);
 
 		// add vehicles
-		assertTrue(buffer.isAvailable(0));
+		assertTrue(buffer.isAvailable());
 		buffer.add(vehicle1, 0);
-		assertTrue(buffer.isAvailable(0));
+		assertTrue(buffer.isAvailable());
 		buffer.add(vehicle2, 0);
-		assertFalse(buffer.isAvailable(0));
+		assertFalse(buffer.isAvailable());
 		assertEquals(2, wasActivated.get());
 
 		// the buffer could accept more vehicles according to flow capacity, but is blocked by the vehicles still inside the buffer
-		assertFalse(buffer.isAvailable(2));
+		buffer.update(2);
+		assertFalse(buffer.isAvailable());
 
 		// remove vehicles
 		assertEquals(vehicle1.getId(), buffer.peek().getId());
 		assertEquals(vehicle1.getId(), buffer.pollFirst().getId());
-		assertTrue(buffer.isAvailable(2));
+		buffer.update(2);
+		assertTrue(buffer.isAvailable());
 		assertEquals(vehicle2.getId(), buffer.peek().getId());
 		assertEquals(vehicle2.getId(), buffer.pollFirst().getId());
 	}

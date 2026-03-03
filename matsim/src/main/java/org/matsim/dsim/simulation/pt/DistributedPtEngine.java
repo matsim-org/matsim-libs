@@ -20,12 +20,7 @@ import org.matsim.dsim.simulation.net.Wait2Link;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class DistributedPtEngine implements DistributedMobsimEngine, DistributedDepartureHandler, Wait2Link {
@@ -144,7 +139,7 @@ public class DistributedPtEngine implements DistributedMobsimEngine, Distributed
 
 	private boolean moveWaitingVehicle(DistributedMobsimVehicle vehicle, SimLink link, double now) {
 
-		if (!link.isAccepting(SimLink.LinkPosition.Buffer, now)) {
+		if (!link.isAccepting(SimLink.LinkPosition.Buffer)) {
 			return false;
 		}
 

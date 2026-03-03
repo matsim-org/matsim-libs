@@ -47,7 +47,7 @@ class VehicleDepartingOnLinkTest {
 
 		simLink.pushVehicle(blockingVehicle, SimLink.LinkPosition.Buffer, 0);
 
-		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 0));
+		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer));
 		assertTrue(simLink.isOffering());
 
 		wait2link.accept(simVehicle1, simLink, 0);
@@ -60,12 +60,13 @@ class VehicleDepartingOnLinkTest {
 		// free the link
 		assertEquals(blockingVehicle.getId(), simLink.popVehicle().getId());
 		simLink.doSimStep(null, 2);
-		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.Buffer));
 		assertFalse(simLink.isOffering());
 
 		// try again
 		wait2link.moveWaiting(2);
-		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer, 2));
+		simLink.doSimStep(null, 2);
+		assertFalse(simLink.isAccepting(SimLink.LinkPosition.Buffer));
 		assertTrue(simLink.isOffering());
 		assertEquals(simVehicle1.getId(), simLink.popVehicle().getId());
 		verify(em, times(1)).processEvent(any());
@@ -103,7 +104,7 @@ class VehicleDepartingOnLinkTest {
 
 		simLink.pushVehicle(blockingVehicle, SimLink.LinkPosition.QEnd, 0);
 
-		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
+		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QEnd));
 
 		wait2link.accept(simVehicle1, simLink, 0);
 		// add a second vehicle to assert the correct order.
@@ -114,7 +115,7 @@ class VehicleDepartingOnLinkTest {
 
 		// free the link
 		simLink.doSimStep(null, 0);
-		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd, 0));
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QEnd));
 		assertTrue(simLink.isOffering());
 		// this should put both vehicles onto the link
 		wait2link.moveWaiting(0);

@@ -20,9 +20,12 @@ class SimQueue {
 		return internalQ.isEmpty();
 	}
 
-	boolean isAccepting(SimLink.LinkPosition position, double now) {
+	void update(double now) {
 		inflowCapacity.update(now);
 		storageCapacity.update(now);
+	}
+
+	boolean isAccepting(SimLink.LinkPosition position) {
 
 		return switch (position) {
 			case QStart -> storageCapacity.isAvailable() && inflowCapacity.isAvailable();

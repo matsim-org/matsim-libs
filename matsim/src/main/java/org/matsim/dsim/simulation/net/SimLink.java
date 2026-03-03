@@ -1,5 +1,7 @@
 package org.matsim.dsim.simulation.net;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -21,7 +23,7 @@ public interface SimLink {
 
 	double getMaxFlowCapacity();
 
-	boolean isAccepting(LinkPosition position, double now);
+	boolean isAccepting(LinkPosition position);
 
 	boolean isOffering();
 
@@ -111,6 +113,7 @@ public interface SimLink {
 	class LocalLink implements SimLink {
 
 		private final Id<Link> id;
+		private static final Logger log = LogManager.getLogger(LocalLink.class);
 
 		@Override
 		public Id<Link> getId() {
@@ -135,10 +138,10 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean isAccepting(LinkPosition position, double now) {
+		public boolean isAccepting(LinkPosition position) {
 			return switch (position) {
-				case QStart, QEnd -> q.isAccepting(position, now);
-				case Buffer -> buffer.isAvailable(now);
+				case QStart, QEnd -> q.isAccepting(position);
+				case Buffer -> buffer.isAvailable();
 			};
 		}
 
@@ -216,6 +219,11 @@ public interface SimLink {
 		@Override
 		public boolean doSimStep(SimStepMessaging messaging, double now) {
 
+			// explicitly update the flow and storage capacities in q and buffer
+			q.update(now);
+			buffer.update(now);
+
+			// then, move vehicles on the link.
 			while (!q.isEmpty()) {
 
 				// get a reference to the first vehicle in the queue and check whether it is time to exit.
@@ -227,17 +235,21 @@ public interface SimLink {
 				// the vehicle should keep moving through the network. Move it to the
 				// buffer, so that it can be processed in the next intersection update
 				if (leaveResult.equals(OnLeaveQueueInstruction.MoveToBuffer)) {
-					if (!buffer.isAvailable(now)) break;
+					if (!buffer.isAvailable()) break;
 					moveVehicle(now);
 				}
 				// the vehicle was removed by some handler. For example, the vehicle has arrived.
 				// remove the vehicle from the queue
 				else if (leaveResult.equals(OnLeaveQueueInstruction.RemoveVehicle)) {
-					q.poll(now);
+					var removed = q.poll(now);
+					if (getId().toString().equals("-96640639")) {
+						log.info("LocalLink id={} t={} removed vehicle={}", now, getId(), removed.getId());
+						log.info(this.toString());
+					}
 				}
 				// if the result is block, don't do anything. We assume that the handler has set a new exit time
 			}
-			return !q.isEmpty();
+			return !q.isEmpty() || q.getOccupied() > 0;
 		}
 
 		private OnLeaveQueueInstruction callLeaveHandlers(DistributedMobsimVehicle vehicle, double now) {
@@ -262,6 +274,10 @@ public interface SimLink {
 		private void moveVehicle(double now) {
 			var vehicle = q.poll(now);
 			buffer.add(vehicle, now);
+			if (getId().toString().equals("-96640639")) {
+				log.info("LocalLink id={} t={} moved vehicle={}", now, getId(), vehicle.getId());
+				log.info(this.toString());
+			}
 		}
 
 		@Override
@@ -302,10 +318,10 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean isAccepting(LinkPosition position, double now) {
+		public boolean isAccepting(LinkPosition position) {
 			if (LinkPosition.QStart == position) {
-				storageCapacity.update(now);
-				inflowCapacity.update(now);
+//				storageCapacity.update(now);
+//				inflowCapacity.update(now);
 				return storageCapacity.isAvailable() && inflowCapacity.isAvailable();
 			}
 			throw new IllegalArgumentException("Split out links can only accept vehicles at the start of the link. The end of the link is managed by the other partition.");
@@ -343,16 +359,25 @@ public interface SimLink {
 			if (LinkPosition.QStart != position)
 				throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
 
+
 			assert !q.contains(vehicle);
 			storageCapacity.consume(vehicle.getSizeInEquivalents());
 			inflowCapacity.consume(vehicle.getSizeInEquivalents());
 			vehicle.setCurrentLinkId(id);
 			q.add(vehicle);
 			activateLink.accept(this);
+			if (getId().toString().equals("-96640639")) {
+				log.info("SplitOutLink id={} push vehicle={}", getId(), vehicle.getId());
+				log.info(this.toString());
+			}
 		}
 
 		@Override
 		public boolean doSimStep(SimStepMessaging messaging, double now) {
+
+			storageCapacity.update(now);
+			inflowCapacity.update(now);
+
 			for (var vehicle : q) {
 				onLeaveHandler.apply(vehicle, this, now);
 				messaging.collectVehicle(vehicle);
@@ -368,9 +393,15 @@ public interface SimLink {
 			this.onLeaveHandler = onLeaveQueue;
 		}
 
+		private static final Logger log = LogManager.getLogger(SimLink.class);
+
 		public void applyCapacityUpdate(double released, double consumed) {
 			storageCapacity.consume(consumed);
 			storageCapacity.release(released, 0);
+			if (getId().toString().equals("-96640639")) {
+				log.info("SplitOutLink id={}, released={}, consumed={}", getId(), released, consumed);
+				log.info(this.toString());
+			}
 		}
 
 		@Override
@@ -388,6 +419,7 @@ public interface SimLink {
 	class SplitInLink implements SimLink {
 
 		private final int fromPart;
+		private static final Logger log = LogManager.getLogger(SplitInLink.class);
 
 		public int getFromPart() {
 			return fromPart;
@@ -408,8 +440,8 @@ public interface SimLink {
 		}
 
 		@Override
-		public boolean isAccepting(LinkPosition position, double now) {
-			return localLink.isAccepting(position, now);
+		public boolean isAccepting(LinkPosition position) {
+			return localLink.isAccepting(position);
 		}
 
 		@Override
@@ -452,6 +484,11 @@ public interface SimLink {
 
 			// we push ourselves into the active links, because the local link has only registered itself
 			localLink.activateLink.accept(this);
+
+			if (getId().toString().equals("-96640639")) {
+				log.info("SplitInLink: t={} id={} pushed vehicle= {}", now, getId(), vehicle.getId());
+				log.info(this.toString());
+			}
 		}
 
 		@Override
@@ -463,11 +500,15 @@ public interface SimLink {
 			// available.
 			var occupiedBeforeSimStep = localLink.q.getOccupied();
 			var localLinkActive = localLink.doSimStep(messaging, now);
-			var storageReleased = localLink.q.isAccepting(LinkPosition.QStart, now);
+			var storageReleased = localLink.q.isAccepting(LinkPosition.QStart);
 			var occupiedAfterSimStep = localLink.q.getOccupied();
 			var diffOccupied = occupiedBeforeSimStep - occupiedAfterSimStep;
 
 			if (diffOccupied > 0 || consumedStorageCap > 0) {
+				if (getId().toString().equals("-96640639")) {
+					log.info("SplitInLink t={} id={}, released={}, consumed={}", now, getId(), diffOccupied, consumedStorageCap);
+					log.info(this.toString());
+				}
 				messaging.collectStorageCapacityUpdate(getId(), diffOccupied, consumedStorageCap, fromPart);
 				consumedStorageCap = 0;
 			}

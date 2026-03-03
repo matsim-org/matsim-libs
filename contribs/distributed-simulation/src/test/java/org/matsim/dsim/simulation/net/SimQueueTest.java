@@ -23,26 +23,26 @@ class SimQueueTest {
 		var queue = SimQueue.create(link, config, 10);
 
 		assertTrue(queue.isEmpty());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// capacity should be consumed immediately
 		vehicle1.setEarliestLinkExitTime(10);
 		queue.add(vehicle1, SimLink.LinkPosition.QStart);
 		assertFalse(queue.isEmpty());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		vehicle2.setEarliestLinkExitTime(9);
 		queue.add(vehicle2, SimLink.LinkPosition.QStart);
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		vehicle3.setEarliestLinkExitTime(10);
 		queue.add(vehicle3, SimLink.LinkPosition.QEnd);
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// we are expecting veh3, veh1, veh2, as veh3 was added at the downstream end, veh1 and veh2 should keep the
 		// insertion order, as they were added at the upstream end
 		assertEquals(vehicle3.getId(), queue.poll(0).getId());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		assertEquals(vehicle1.getId(), queue.poll(0).getId());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		assertEquals(vehicle2.getId(), queue.poll(0).getId());
 	}
 
@@ -57,23 +57,23 @@ class SimQueueTest {
 		var queue = SimQueue.create(link, config, 10);
 
 		assertTrue(queue.isEmpty());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// capacity should be consumed immediately
 		vehicle1.setEarliestLinkExitTime(10);
 		queue.add(vehicle1, SimLink.LinkPosition.QStart);
 		assertFalse(queue.isEmpty());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		vehicle2.setEarliestLinkExitTime(9);
 		queue.add(vehicle2, SimLink.LinkPosition.QStart);
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// we are using fifo queue veh1 should be at the head of the queue even though its exit time is later than veh2
 		assertEquals(vehicle2.getId(), queue.peek().getId());
 
 		// released capacity should be available immediately
 		assertEquals(vehicle2.getId(), queue.poll(0).getId());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		assertEquals(vehicle1.getId(), queue.poll(0).getId());
 	}
 
@@ -93,27 +93,34 @@ class SimQueueTest {
 		var queue = SimQueue.create(link, config, 5);
 
 		assertTrue(queue.isEmpty());
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 		// the link should accept vehicles according to its max inflow capacity
 		// vehicle-1 consumes 2pcu. Max inflow should be: 1/cellSize / (1/vHole + 1/vMax) = 0.588...
 		queue.add(vehicle1, SimLink.LinkPosition.QStart);
 		// acc inflow is -1.422
+		queue.update(0);
 		assertFalse(queue.isEmpty());
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 0));
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 		// acc inflow is 1.422 + 2 * 0.588 = -0.236
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 2));
+		queue.update(2);
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 		// acc inflow is -0.236 + 0.588 = + 0.352 > 0
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 3));
+		queue.update(3);
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// add another vehicle
 		queue.add(vehicle2, SimLink.LinkPosition.QEnd);
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 3));
+		queue.update(3);
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 
 		// remove the first vehicle from the queue which should create a hole.
 		assertEquals(vehicle2.getId(), queue.poll(3).getId());
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 3));
+		queue.update(3);
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
 
-		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart, 3 + holeTravelTime - 1));
-		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart, 3 + holeTravelTime));
+		queue.update(3 + holeTravelTime - 1);
+		assertFalse(queue.isAccepting(SimLink.LinkPosition.QStart));
+		queue.update(3 + holeTravelTime);
+		assertTrue(queue.isAccepting(SimLink.LinkPosition.QStart));
 	}
 }

@@ -28,6 +28,12 @@ class FlowCapacity {
 		accumulatedCapacity -= pce;
 	}
 
+	/**
+	 * Updates the internal state of the flow capacity based on the passed time step.
+	 * The maximum is the max value of this capacity
+	 *
+	 * @param now current simulation time step.
+	 */
 	void update(double now) {
 		if (lastUpdateTime < now) {
 			var timeSteps = now - lastUpdateTime;

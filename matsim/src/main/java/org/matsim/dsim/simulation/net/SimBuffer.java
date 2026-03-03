@@ -57,8 +57,11 @@ class SimBuffer {
 		return this.internalBuffer.peek();
 	}
 
-	boolean isAvailable(double now) {
+	void update(double now) {
 		flowCap.update(now);
+	}
+
+	boolean isAvailable() {
 		return pceInBuffer < flowCap.getMax() && flowCap.isAvailable();
 	}
 

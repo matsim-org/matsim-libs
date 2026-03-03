@@ -31,7 +31,7 @@ class ActiveNodesTest {
 		SimLink emptyInLink = mock(SimLink.class);
 		when(emptyInLink.isOffering()).thenReturn(false);
 		SimLink nextLink = mock(SimLink.class);
-		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(nextLink.isAccepting(any())).thenReturn(true);
 		var nextLinkId = Id.createLinkId("next-link");
 		when(nextLink.getId()).thenReturn(nextLinkId);
 		var node = new SimNode(Id.createNodeId("test"));
@@ -67,7 +67,7 @@ class ActiveNodesTest {
 		var inLink = TestUtils.createLink(TestUtils.createSingleLink(0, 0), config, 0);
 		inLink.pushVehicle(vehicle, SimLink.LinkPosition.QStart, 0);
 		var nextLink = mock(SimLink.class);
-		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
+		when(nextLink.isAccepting(any())).thenReturn(false);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
 		var node = new SimNode(Id.createNodeId("test"));
@@ -84,7 +84,7 @@ class ActiveNodesTest {
 		assertTrue(inLink.isOffering());
 
 		// do it again, but this time the next link has space
-		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(nextLink.isAccepting(any())).thenReturn(true);
 		activeNodes.doSimStep(100);
 		// in link should be inactive as no vehicle is on the link anymore
 		assertFalse(inLink.isOffering());
@@ -108,7 +108,7 @@ class ActiveNodesTest {
 		// call dostimstep here, so that the first vehicle is moved to the buffer
 		inLink.doSimStep(null, 99);
 		var nextLink = mock(SimLink.class);
-		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(nextLink.isAccepting(any())).thenReturn(true);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 		var node = new SimNode(Id.createNodeId("test"));
 		node.addInLink(inLink);
@@ -142,7 +142,7 @@ class ActiveNodesTest {
 		inLink.doSimStep(null, 100); // move vehicle into the buffer, which starts the stuck timer
 
 		var nextLink = mock(SimLink.class);
-		when(nextLink.isAccepting(any(), anyDouble())).thenReturn(false);
+		when(nextLink.isAccepting(any())).thenReturn(false);
 		when(nextLink.getId()).thenReturn(Id.createLinkId("next-link"));
 
 		var node = new SimNode(Id.createNodeId("test"));

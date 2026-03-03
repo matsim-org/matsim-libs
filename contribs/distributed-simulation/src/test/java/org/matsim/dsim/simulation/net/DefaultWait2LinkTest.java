@@ -45,7 +45,7 @@ public class DefaultWait2LinkTest {
 		when(driver.getMode()).thenReturn("car");
 
 		// Case 1: Link does not accept vehicle
-		when(link.isAccepting(any(), anyDouble())).thenReturn(false);
+		when(link.isAccepting(any())).thenReturn(false);
 		wait2Link.accept(vehicle, link, 0.0);
 		wait2Link.moveWaiting(1.0);
 
@@ -53,7 +53,7 @@ public class DefaultWait2LinkTest {
 		verify(eventsManager, never()).processEvent(any(VehicleEntersTrafficEvent.class));
 
 		// Case 2: Link accepts vehicle
-		when(link.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(link.isAccepting(any())).thenReturn(true);
 		wait2Link.moveWaiting(2.0);
 
 		verify(link, times(1)).pushVehicle(eq(vehicle), any(), eq(2.0));
@@ -82,8 +82,8 @@ public class DefaultWait2LinkTest {
 		when(driver1.getMode()).thenReturn("car");
 		when(driver2.getMode()).thenReturn("car");
 
-		when(link1.isAccepting(any(), anyDouble())).thenReturn(true);
-		when(link2.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(link1.isAccepting(any())).thenReturn(true);
+		when(link2.isAccepting(any())).thenReturn(true);
 
 		wait2Link.accept(veh1, link1, 0.0);
 		wait2Link.accept(veh2, link2, 0.0);
@@ -113,7 +113,7 @@ public class DefaultWait2LinkTest {
 		when(driver1.getMode()).thenReturn("car");
 		when(driver2.getMode()).thenReturn("car");
 
-		when(link.isAccepting(any(), anyDouble())).thenReturn(true);
+		when(link.isAccepting(any())).thenReturn(true);
 
 		wait2Link.accept(veh1, link, 0.0);
 		wait2Link.accept(veh2, link, 0.0);
@@ -152,7 +152,7 @@ public class DefaultWait2LinkTest {
 		when(driver3.getMode()).thenReturn("car");
 
 		// Only one vehicle can move
-		when(link.isAccepting(any(), anyDouble())).thenReturn(true).thenReturn(false);
+		when(link.isAccepting(any())).thenReturn(true).thenReturn(false);
 
 		wait2Link.accept(veh1, link, 0.0);
 		wait2Link.accept(veh2, link, 0.0);
