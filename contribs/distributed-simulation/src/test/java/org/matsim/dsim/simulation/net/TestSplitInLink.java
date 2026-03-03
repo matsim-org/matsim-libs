@@ -11,8 +11,7 @@ import org.matsim.dsim.simulation.SimStepMessaging;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class TestSplitInLink {
 
@@ -131,5 +130,33 @@ public class TestSplitInLink {
 		verify(messaging).collectStorageCapacityUpdate(
 			simLink.getId(), 3, 0, fromPart
 		);
+	}
+
+	@Test
+	public void storageCapReleasedArrivalHole() {
+		var fromPart = 42;
+		var link = TestUtils.createSingleLink(fromPart, 0);
+		link.setCapacity(3600);
+		var dsimConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), DSimConfigGroup.class);
+		dsimConfig.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
+		var node = new SimNode(link.getToNode().getId());
+		var wasActivated = new AtomicInteger(0);
+		var simLink = SimLink.create(link, node, dsimConfig, 10, 0, _ -> wasActivated.incrementAndGet(), _ -> {});
+		// push vehicles onto link and check that the consumed capacity is passed upstream
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 1, 10), SimLink.LinkPosition.QStart, 0);
+		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 10), SimLink.LinkPosition.QStart, 0);
+		assertEquals(4, wasActivated.get());
+
+		simLink.addLeaveHandler((_, _, _) -> SimLink.OnLeaveQueueInstruction.RemoveVehicle);
+		simLink.doSimStep(mock(SimStepMessaging.class), 99);
+
+		var messaging = mock(SimStepMessaging.class);
+		simLink.doSimStep(messaging, 100);
+		verify(messaging, never()).collectStorageCapacityUpdate(any(Id.class), anyDouble(), anyDouble(), anyInt());
+
+		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 124));
+		assertFalse(simLink.doSimStep(messaging, 124));
+		verify(messaging).collectStorageCapacityUpdate(simLink.getId(), 3, 0, fromPart);
 	}
 }

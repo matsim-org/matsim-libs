@@ -69,8 +69,8 @@ public class DistributedIntegrationTest {
 		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		dsimConfig.setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
 		dsimConfig.setNetworkModes(Set.of("car", "freight"));
-		dsimConfig.setStartTime(6 * 3600);
-		dsimConfig.setEndTime(6 * 3600 + 500);
+		dsimConfig.setStartTime(0. * 3600);
+		dsimConfig.setEndTime(36 * 3600);
 		dsimConfig.setThreads(1);
 
 		return config;

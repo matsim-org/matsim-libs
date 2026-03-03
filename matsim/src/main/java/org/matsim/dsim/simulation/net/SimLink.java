@@ -396,6 +396,7 @@ public interface SimLink {
 		private final LocalLink localLink;
 
 		private double consumedStorageCap = 0;
+		private double releasedStorageCap = 0;
 
 		SplitInLink(LocalLink localLink, int fromPart) {
 			this.localLink = localLink;
@@ -409,7 +410,15 @@ public interface SimLink {
 
 		@Override
 		public boolean isAccepting(LinkPosition position, double now) {
-			return localLink.isAccepting(position, now);
+
+			// if we have backwards traveling holes, the isAccepting function can trigger arrival of backwards traveling holes.
+			// this releases capacity and must be communicated to the upstream link.
+			var occupiedBefore = localLink.q.getOccupied();
+			var isAccepting = localLink.isAccepting(position, now);
+			var occupiedAfter = localLink.q.getOccupied();
+			releasedStorageCap += occupiedBefore - occupiedAfter;
+
+			return isAccepting;
 		}
 
 		@Override
@@ -465,10 +474,11 @@ public interface SimLink {
 			var localLinkActive = localLink.doSimStep(messaging, now);
 			var storageReleased = localLink.q.isAccepting(LinkPosition.QStart, now);
 			var occupiedAfterSimStep = localLink.q.getOccupied();
-			var diffOccupied = occupiedBeforeSimStep - occupiedAfterSimStep;
+			var releasedDuringSimStep = occupiedBeforeSimStep - occupiedAfterSimStep;
+			var released = releasedDuringSimStep + releasedStorageCap;
 
-			if (diffOccupied > 0 || consumedStorageCap > 0) {
-				messaging.collectStorageCapacityUpdate(getId(), diffOccupied, consumedStorageCap, fromPart);
+			if (released > 0 || consumedStorageCap > 0) {
+				messaging.collectStorageCapacityUpdate(getId(), released, consumedStorageCap, fromPart);
 				consumedStorageCap = 0;
 			}
 			return localLinkActive || !storageReleased;
