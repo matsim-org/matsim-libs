@@ -267,8 +267,7 @@ public class TripDashboard implements Dashboard {
 				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareRefCsv))
 					.constant("source", "Reference");
 
-				if (!column.equals("share"))
-					refDs.rename("share", column);
+				refDs.rename("share", column);
 
 				refDs.aggregate(List.of("main_mode"), "share", Plotly.AggrFunc.SUM);
 
@@ -314,8 +313,7 @@ public class TripDashboard implements Dashboard {
 				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareRefCsv))
 					.aggregate(List.of("dist_group"), "share", Plotly.AggrFunc.SUM);
 
-				if (!column.equals("share"))
-					refDs.rename("share", column);
+				refDs.rename("share", column);
 
 				viz.addTrace(BarTrace.builder(Plotly.OBJ_INPUT, Plotly.INPUT).name("Reference").build(),
 					refDs.mapping()
