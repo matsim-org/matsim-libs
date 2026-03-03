@@ -479,6 +479,8 @@ public class TripDashboard implements Dashboard {
 				viz.description = DashboardUtils.adjustDescriptionBasedOnSampling("by main mode. Compares initial input with output after the last iteration.", data, false);
 				if (groupsOfPersonSubpopulations.containsKey(tabTitle))
 					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", tabTitle, args);
+				else if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString()))
+					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", "total", args);
 				else
 					viz.csv = data.computeWithPlaceholder(TripAnalysis.class, "mode_shift_%s.csv", TripAnalysis.ModelType.PERSON_TRAFFIC.toString(), args);
 			});
