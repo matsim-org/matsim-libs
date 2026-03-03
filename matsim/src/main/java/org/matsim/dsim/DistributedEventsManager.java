@@ -329,8 +329,6 @@ public final class DistributedEventsManager implements EventsManager {
 		if (eventsDisabled) {
 			return;
 		}
-
-		log.trace("#{}: {}", ctxPartition.get(), e);
 		processInternal(e, e.getType());
 	}
 

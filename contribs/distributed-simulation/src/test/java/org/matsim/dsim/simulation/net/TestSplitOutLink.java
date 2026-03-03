@@ -79,8 +79,7 @@ public class TestSplitOutLink {
 		config.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.queue);
 		var node = new SimNode(link.getToNode().getId());
 		var activated = new AtomicInteger(0);
-		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {
-		});
+		SimLink.SplitOutLink simLink = (SimLink.SplitOutLink) SimLink.create(link, node, config, 50, 0, _ -> activated.incrementAndGet(), _ -> {});
 
 		// the link can take 2 vehicles. Push two and test whether there is space left.
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart));
@@ -109,17 +108,24 @@ public class TestSplitOutLink {
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart));
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-1", 2, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart));
-		// inflow is restored after 8 seconds
-		now = 8;
-		simLink.doSimStep(mock(SimStepMessaging.class), now);
+
+		// link should signal it wants to stay active until inflow is competely restored
+		now = 5;
+		assertTrue(simLink.doSimStep(mock(SimStepMessaging.class), now));
+		// inflow is restored after 6 seconds
+		now = 6;
+		assertFalse(simLink.doSimStep(mock(SimStepMessaging.class), now));
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart));
 
 		// push another vehicle
 		simLink.pushVehicle(TestUtils.createVehicle("vehicle-2", 2, 50), SimLink.LinkPosition.QStart, now);
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart));
-		// inflow is restored after 8 seconds, but storage capacity is exhausted
-		now = 16;
-		simLink.doSimStep(mock(SimStepMessaging.class), now);
+
+		now = 12;
+		assertTrue(simLink.doSimStep(mock(SimStepMessaging.class), now));
+		// inflow is restored after 6 seconds, but storage capacity is exhausted
+		now = 13;
+		assertTrue(simLink.doSimStep(mock(SimStepMessaging.class), now));
 		assertFalse(simLink.isAccepting(SimLink.LinkPosition.QStart));
 		assertEquals(2, activated.get());
 	}

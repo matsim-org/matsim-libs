@@ -1,7 +1,5 @@
 package org.matsim.dsim.simulation.net;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -113,7 +111,6 @@ public interface SimLink {
 	class LocalLink implements SimLink {
 
 		private final Id<Link> id;
-		private static final Logger log = LogManager.getLogger(LocalLink.class);
 
 		@Override
 		public Id<Link> getId() {
@@ -239,11 +236,7 @@ public interface SimLink {
 				// the vehicle was removed by some handler. For example, the vehicle has arrived.
 				// remove the vehicle from the queue
 				else if (leaveResult.equals(OnLeaveQueueInstruction.RemoveVehicle)) {
-					var removed = q.poll(now);
-					if (getId().toString().equals("-96640639")) {
-						log.trace("LocalLink id={} t={} removed vehicle={}", now, getId(), removed.getId());
-						log.trace(this.toString());
-					}
+					q.poll(now);
 				}
 				// if the result is block, don't do anything. We assume that the handler has set a new exit time
 			}
@@ -275,10 +268,6 @@ public interface SimLink {
 		private void moveVehicle(double now) {
 			var vehicle = q.poll(now);
 			buffer.add(vehicle, now);
-			if (getId().toString().equals("-96640639")) {
-				log.trace("LocalLink id={} t={} moved vehicle={}", now, getId(), vehicle.getId());
-				log.trace(this.toString());
-			}
 		}
 
 		@Override
@@ -321,8 +310,6 @@ public interface SimLink {
 		@Override
 		public boolean isAccepting(LinkPosition position) {
 			if (LinkPosition.QStart == position) {
-//				storageCapacity.update(now);
-//				inflowCapacity.update(now);
 				return storageCapacity.isAvailable() && inflowCapacity.isAvailable();
 			}
 			throw new IllegalArgumentException("Split out links can only accept vehicles at the start of the link. The end of the link is managed by the other partition.");
@@ -360,17 +347,13 @@ public interface SimLink {
 			if (LinkPosition.QStart != position)
 				throw new IllegalArgumentException("Split out links can only push vehicles at the start of the link. The end of the link is managed by the other partition.");
 
-
 			assert !q.contains(vehicle);
+
 			storageCapacity.consume(vehicle.getSizeInEquivalents());
 			inflowCapacity.consume(vehicle.getSizeInEquivalents());
 			vehicle.setCurrentLinkId(id);
 			q.add(vehicle);
 			activateLink.accept(this);
-			if (getId().toString().equals("-96640639")) {
-				log.trace("SplitOutLink id={} push vehicle={}", getId(), vehicle.getId());
-				log.trace(this.toString());
-			}
 		}
 
 		@Override
@@ -384,9 +367,8 @@ public interface SimLink {
 				messaging.collectVehicle(vehicle);
 			}
 			q.clear();
-			// mark ourselves as inactive. If the upstream node pushes vehicles onto the link
-			// it'll be marked as active again.
-			return false;
+			// mark ourselves as inactive, if other links can push vehicles to this link.
+			return !storageCapacity.isAvailable() || !inflowCapacity.isAvailable();
 		}
 
 		@Override
@@ -394,15 +376,9 @@ public interface SimLink {
 			this.onLeaveHandler = onLeaveQueue;
 		}
 
-		private static final Logger log = LogManager.getLogger(SimLink.class);
-
 		public void applyCapacityUpdate(double released, double consumed) {
 			storageCapacity.consume(consumed);
 			storageCapacity.release(released, 0);
-			if (getId().toString().equals("-96640639")) {
-				log.trace("SplitOutLink id={}, released={}, consumed={}", getId(), released, consumed);
-				log.trace(this.toString());
-			}
 		}
 
 		@Override
@@ -420,7 +396,6 @@ public interface SimLink {
 	class SplitInLink implements SimLink {
 
 		private final int fromPart;
-		private static final Logger log = LogManager.getLogger(SplitInLink.class);
 
 		public int getFromPart() {
 			return fromPart;
@@ -485,11 +460,6 @@ public interface SimLink {
 
 			// we push ourselves into the active links, because the local link has only registered itself
 			localLink.activateLink.accept(this);
-
-			if (getId().toString().equals("-96640639")) {
-				log.trace("SplitInLink: t={} id={} pushed vehicle= {}", now, getId(), vehicle.getId());
-				log.trace(this.toString());
-			}
 		}
 
 		@Override
@@ -506,10 +476,6 @@ public interface SimLink {
 			var diffOccupied = occupiedBeforeSimStep - occupiedAfterSimStep;
 
 			if (diffOccupied > 0 || consumedStorageCap > 0) {
-				if (getId().toString().equals("-96640639")) {
-					log.trace("SplitInLink t={} id={}, released={}, consumed={}", now, getId(), diffOccupied, consumedStorageCap);
-					log.trace(this.toString());
-				}
 				messaging.collectStorageCapacityUpdate(getId(), diffOccupied, consumedStorageCap, fromPart);
 				consumedStorageCap = 0;
 			}
