@@ -1,6 +1,5 @@
-package org.matsim.dsim.scoring;
+package org.matsim.api.core.v01.population;
 
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -10,4 +9,3 @@ public interface PassengerRoute extends Route {
 
 	OptionalTime getBoardingTime();
 }
-.

@@ -7,13 +7,13 @@ import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PassengerRoute;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.dsim.scoring.BackpackRoute;
-import org.matsim.dsim.scoring.PassengerRoute;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;

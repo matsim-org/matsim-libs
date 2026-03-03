@@ -24,11 +24,11 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PassengerRoute;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.dsim.scoring.PassengerRoute;
 
 import java.util.Collections;
 import java.util.HashSet;

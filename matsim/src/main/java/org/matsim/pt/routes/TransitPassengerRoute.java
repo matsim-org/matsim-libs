@@ -21,7 +21,7 @@
 package org.matsim.pt.routes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.dsim.scoring.PassengerRoute;
+import org.matsim.api.core.v01.population.PassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
