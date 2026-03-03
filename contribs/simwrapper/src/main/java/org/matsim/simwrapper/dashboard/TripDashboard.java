@@ -47,6 +47,7 @@ public class TripDashboard implements Dashboard {
 
 	private boolean choiceEvaluation;
 	private final LinkedHashMap<String, List<String>> groupsOfPersonSubpopulations = new LinkedHashMap<>();
+	private final LinkedHashMap<String, List<String>> groupsOfCommercialSubpopulations = new LinkedHashMap<>();
 	/**
 	 * Default trip dashboard constructor.
 	 */
@@ -159,8 +160,17 @@ public class TripDashboard implements Dashboard {
 	 * @param groupsOfSubpopulations e.g. "commercialGroup1=smallScaleCommercialPersonTraffic,smallScaleGoodsTraffic;longDistanceFreight=freight"
 	 */
 	public TripDashboard setGroupsOfSubpopulationsForCommercialAnalysis(String... groupsOfSubpopulations) {
-		String joined = String.join(";", groupsOfSubpopulations);
-		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", joined);
+		String groupsOfCommercialSubpopulationsString = String.join(";", groupsOfSubpopulations);
+		for (String part : groupsOfCommercialSubpopulationsString.split(";")) {
+			if (part.isBlank()) continue;
+			String[] kv = part.split("=", 2);
+			String groupName = kv[0].trim();
+			List<String> subpops = kv.length > 1 && !kv[1].isBlank()
+				? Arrays.stream(kv[1].split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList())
+				: new ArrayList<>();
+			groupsOfCommercialSubpopulations.put(groupName, subpops);
+		}
+		return setAnalysisArgs("--groups-of-subpopulations-commercialAnalysis", groupsOfCommercialSubpopulationsString);
 	}
 
 	/** Adds the description depending on if groups are set or not.
@@ -386,10 +396,28 @@ public class TripDashboard implements Dashboard {
 				Plotly.DataSet refDs = viz.addDataset(data.resource(personModeShareDistRefCsv))
 					.constant("source", "Ref")
 					.constant("subpopulation", "N/A")
-					.constant("modelType", "N/A");
-
-				if (!column.equals("share"))
-					refDs.rename("share", column);
+					.constant("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC)
+					.constant("groupOfSubpopulation", "N/A");
+				if (!groupsOfPersonSubpopulations.isEmpty()) {
+					groupsOfPersonSubpopulations.forEach((group, _) -> {
+						String newColumn = "share_" + group;
+						if (!newColumn.equals(column) && !group.equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString()))
+							refDs.constant(newColumn, "N/A");
+					});
+				}
+				if (!groupsOfCommercialSubpopulations.isEmpty()) {
+					groupsOfCommercialSubpopulations.forEach((group, _) -> {
+						String newColumn = "share_" + group;
+						if (!newColumn.equals(column))
+							refDs.constant(newColumn, "N/A");
+					});
+					refDs.constant("share_" + TripAnalysis.ModelType.COMMERCIAL_TRAFFIC, "N/A");
+				}
+				if (!column.equals("share_" + TripAnalysis.ModelType.PERSON_TRAFFIC))
+					refDs.constant("share_" + TripAnalysis.ModelType.PERSON_TRAFFIC, "N/A");
+				if (!column.equals("share_total"))
+					refDs.constant("share_total", "N/A");
+				refDs.rename("share", column);
 
 				viz.multiIndex = Map.of("dist_group", "source");
 				viz.mergeDatasets = true;
