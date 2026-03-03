@@ -156,6 +156,7 @@ public class TestSplitInLink {
 		verify(messaging, never()).collectStorageCapacityUpdate(any(Id.class), anyDouble(), anyDouble(), anyInt());
 
 		assertTrue(simLink.isAccepting(SimLink.LinkPosition.QStart, 124));
+		assertEquals(5, wasActivated.get());
 		assertFalse(simLink.doSimStep(messaging, 124));
 		verify(messaging).collectStorageCapacityUpdate(simLink.getId(), 3, 0, fromPart);
 	}

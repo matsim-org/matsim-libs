@@ -418,6 +418,10 @@ public interface SimLink {
 			var occupiedAfter = localLink.q.getOccupied();
 			releasedStorageCap += occupiedBefore - occupiedAfter;
 
+			if (releasedStorageCap > 0) {
+				localLink.activateLink.accept(this);
+			}
+
 			return isAccepting;
 		}
 
