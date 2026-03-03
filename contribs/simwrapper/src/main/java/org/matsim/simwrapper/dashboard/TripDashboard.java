@@ -353,7 +353,7 @@ public class TripDashboard implements Dashboard {
 			String column;
 			if (groupsOfPersonSubpopulations.size() == 1 && groupsOfPersonSubpopulations.firstEntry().getKey().equals(TripAnalysis.ModelType.COMPLETE_MODEL.toString())){
 				viz.title = "Modal distance distribution";
-				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("modelType", TripAnalysis.ModelType.COMPLETE_MODEL.toString());
+				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args));
 				column = "share_total";
 			}
 			else if (groupsOfPersonSubpopulations.containsKey(tabTitle)) {
