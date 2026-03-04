@@ -354,7 +354,7 @@ public class CommercialTrafficDashboard implements Dashboard {
 		for (String group : groupsOfCommercialSubpopulations.keySet()) {
 		layout.row("veh-Activities-PerCategory", "Activities").el(Plotly.class, (viz, data) -> {
 
-				viz.title = "Activity Durations – *" +group + "* split by startCategory (min)";
+				viz.title = "Activity Durations – *" + group + "* (min)";
 				viz.description = "Histogram of activity durations by startCategory.";
 				viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 					.showLegend(true)
