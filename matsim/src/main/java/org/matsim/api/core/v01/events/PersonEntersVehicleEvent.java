@@ -20,11 +20,11 @@
 
 package org.matsim.api.core.v01.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
  * @author mrieser
@@ -64,9 +64,8 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId, HasV
 
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> atts = super.getAttributes();
 		// personId, vehicleId handled by superclass
-		return atts;
+		return super.getAttributes();
 	}
 
 	@Override

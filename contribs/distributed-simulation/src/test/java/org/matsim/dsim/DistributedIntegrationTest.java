@@ -49,6 +49,7 @@ public class DistributedIntegrationTest {
 		config.controller().setLastIteration(1);
 		config.controller().setMobsim(ControllerConfigGroup.MobsimType.dsim.name());
 		config.controller().setWriteEventsInterval(1);
+		config.controller().setWritePlansInterval(1);
 		config.controller().setCompressionType(ControllerConfigGroup.CompressionType.none);
 
 		config.routing().setRoutingRandomness(0);
@@ -59,6 +60,7 @@ public class DistributedIntegrationTest {
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
+		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(36 * 3600);
 
 		// add dsim config
@@ -69,7 +71,7 @@ public class DistributedIntegrationTest {
 		dsimConfig.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 		dsimConfig.setVehicleBehavior(QSimConfigGroup.VehicleBehavior.teleport);
 		dsimConfig.setNetworkModes(Set.of("car", "freight"));
-		dsimConfig.setStartTime(0. * 3600);
+		dsimConfig.setStartTime(0);
 		dsimConfig.setEndTime(36 * 3600);
 		dsimConfig.setThreads(1);
 

@@ -41,6 +41,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -68,6 +69,11 @@ public final class EventsToLegs
 	PersonContinuesInVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
+	/**
+	 * @deprecated This constant is no longer needed, as {@link TransitPassengerRoute#getBoardingTime()} provides this information. Network and
+	 * generic routes do not need this attribute.
+	 */
+	@Deprecated(forRemoval = true)
 	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
 	public static final String VEHICLE_ID_ATTRIBUTE_NAME = "vehicleId";
 
@@ -139,7 +145,7 @@ public final class EventsToLegs
 	private final Network network;
 	private TransitSchedule transitSchedule = null;
 
-		@Inject(optional = true)
+	@Inject(optional = true)
 //	@Inject // right now this does not hedge against a null setting
 	public void setTransitSchedule(TransitSchedule transitSchedule) {
 		this.transitSchedule = transitSchedule;
