@@ -34,7 +34,7 @@ import org.matsim.contrib.drt.optimizer.StopWaypointFactoryImpl;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingModule;
 import org.matsim.contrib.drt.prebooking.PrebookingParams;
 import org.matsim.contrib.drt.prebooking.analysis.PrebookingModeAnalysisModule;
-import org.matsim.contrib.drt.routing.DrtRouteProvider;
+import org.matsim.contrib.drt.routing.BackpackDrtRouteProvider;
 import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.drt.stops.*;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
@@ -72,7 +72,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		// register route builder for this mode, so that we get proper routes in experienced plans
 		MapBinder.newMapBinder(binder(), String.class, BackpackRouteProvider.class)
-			.addBinding(getMode()).to(DrtRouteProvider.class);
+			.addBinding(getMode()).to(BackpackDrtRouteProvider.class);
 		install(new DvrpModeRoutingNetworkModule(getMode(), drtCfg.isUseModeFilteredSubnetwork(), drtCfg.getTravelTimeMatrixCachePath()));
 		bindModal(TravelTime.class).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);

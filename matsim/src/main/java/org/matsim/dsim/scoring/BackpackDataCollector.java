@@ -18,7 +18,6 @@ import org.matsim.core.mobsim.dsim.VehicleContainer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.dsim.simulation.AgentSourcesContainer;
 import org.matsim.dsim.simulation.SimStepMessaging;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
@@ -54,27 +53,13 @@ public class BackpackDataCollector implements BasicEventHandler {
 	private final FinishedBackpackCollector backpackCollector;
 	private final Map<String, BackpackRouteProvider> providers;
 
-	// transit schedule has to be optional, as not all scenarios have a transit schedule.
-	@SuppressWarnings("FieldMayBeFinal")
-	@Inject(optional = true)
-	private TransitSchedule transitSchedule;
-
 	@Inject
-	public BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, AgentSourcesContainer asc,
-								 FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
-		this(simStepMessaging, network, population, null, asc, fbc, providers);
-	}
-
-	/**
-	 * Constructor for testing, which includes all dependencies
-	 */
-	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population, TransitSchedule transitSchedule,
+	BackpackDataCollector(SimStepMessaging simStepMessaging, Network network, Population population,
 						  AgentSourcesContainer asc, FinishedBackpackCollector fbc, Map<String, BackpackRouteProvider> providers) {
 		this.simStepMessaging = simStepMessaging;
 		this.network = network;
 		this.population = population;
 		this.asc = asc;
-		this.transitSchedule = transitSchedule;
 		this.backpackCollector = fbc;
 		this.providers = providers;
 	}

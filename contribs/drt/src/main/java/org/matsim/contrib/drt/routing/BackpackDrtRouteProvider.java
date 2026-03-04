@@ -6,12 +6,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.dsim.scoring.BackpackRoute;
 import org.matsim.dsim.scoring.BackpackRouteProvider;
 
-public class DrtRouteProvider implements BackpackRouteProvider {
+public class BackpackDrtRouteProvider implements BackpackRouteProvider {
 
 	private final Network network;
 
 	@Inject
-	public DrtRouteProvider(Network network) {
+	public BackpackDrtRouteProvider(Network network) {
 		this.network = network;
 	}
 

@@ -167,7 +167,6 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
 			var e = new PersonEntersPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId());
 			eventsManager.processEvent(e);
-			//eventsManager.processEvent(new PersonEntersVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
 	}
@@ -180,7 +179,6 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 			var driver = vehicle.getDriver();
 			var e = new PersonLeavesPtVehicleEvent(time, passenger.getId(), vehicle.getId(), driver.getTransitLine().getId(), driver.getTransitRoute().getId());
 			eventsManager.processEvent(e);
-			//eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
 			// kai, sep'12

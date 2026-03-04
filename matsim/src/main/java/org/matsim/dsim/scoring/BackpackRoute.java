@@ -7,22 +7,11 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * ExperiencedRouteBuilder collect events from the simulation to re-create a route which the person actually experienced during the simulation. A new
- * builder is created for each leg an agent starts. It is expected that one ExperiencedRouteBuilder per mode is bound.
- * <pre>
- * {@code
- * class SomeModule extends AbstractModule {
- *
- *     @Override
- *     protected void install() {
- *         MapBinder.newMapBinder(binder(), String.class, ExperiencedRouteBuilder.class)
- *           .addBinding("my-special-mode").to(MySpecialModeRouteBuilder.class);
- *     }
- * }
- * }
- *
- * </pre>
- * An ExperiencedRouteBuilder receives all events for a single person. When the person has finished its leg, the finishRoute method is called.
+ * BackpackRoutes collect events from the simulation to re-create a route which the person actually experienced during the simulation. A new
+ * BackpackRoute is created for each leg an agent starts. It is expected that one {@link BackpackRouteProvider} per mode is bound. See
+ * {@link BackpackRouteProvider} on how to add custom BackpackRoutes to the simulation.
+ * <p>
+ * A BackpackRoute receives all events for a single person. When the person has finished its leg, the finishRoute method is called.
  */
 public interface BackpackRoute {
 
@@ -32,7 +21,7 @@ public interface BackpackRoute {
 	void handleEvent(Event e);
 
 	/**
-	 * Will be called when a person finishes a leg. The builder is expected to return a suitable route
+	 * Will be called when a person finishes a leg and is expected to return a suitable {@link Route} for the resulting experienced plan.
 	 *
 	 * @return the finished route of the leg
 	 */
@@ -40,9 +29,9 @@ public interface BackpackRoute {
 
 	/**
 	 * When a person switches network partitions, the corresponding backpack plan, including its current state is transferred as well.
-	 * A builder must provide a suitable representation of its internal state, which can be used to reconstruct it on the new partition.
+	 * A BackpackRoute must provide a suitable representation of its internal state, which can be used to reconstruct it on the new partition.
 	 *
-	 * @return a compact representation of the builder state.
+	 * @return a compact representation of the BackpackRoute's state.
 	 */
 	Message toMessage();
 
