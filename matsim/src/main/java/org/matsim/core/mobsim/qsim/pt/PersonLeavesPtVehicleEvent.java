@@ -15,6 +15,8 @@ import java.util.Map;
 public class PersonLeavesPtVehicleEvent extends PersonLeavesVehicleEvent {
 
 	public static final String EVENT_TYPE = "PersonLeavesPtVehicle";
+	public static final String ATTRIBUTE_LINE = "transitLine";
+	public static final String ATTRIBUTE_ROUTE = "transitRoute";
 
 	private final Id<TransitLine> transitLine;
 	private final Id<TransitRoute> transitRoute;
@@ -33,8 +35,8 @@ public class PersonLeavesPtVehicleEvent extends PersonLeavesVehicleEvent {
 	@Override
 	public Map<String, String> getAttributes() {
 		var atts = super.getAttributes();
-		atts.put("transitLine", transitLine.toString());
-		atts.put("transitRoute", transitRoute.toString());
+		atts.put(ATTRIBUTE_LINE, transitLine.toString());
+		atts.put(ATTRIBUTE_ROUTE, transitRoute.toString());
 		return atts;
 	}
 

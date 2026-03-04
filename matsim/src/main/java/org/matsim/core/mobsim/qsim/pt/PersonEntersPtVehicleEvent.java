@@ -19,6 +19,8 @@ public class PersonEntersPtVehicleEvent extends PersonEntersVehicleEvent {
 
 
 	public static final String EVENT_TYPE = "PersonEntersPtVehicle";
+	public static final String ATTRIBUTE_LINE = "transitLine";
+	public static final String ATTRIBUTE_ROUTE = "transitRoute";
 
 	public Id<TransitRoute> getTransitRoute() {
 		return transitRoute;
@@ -45,15 +47,15 @@ public class PersonEntersPtVehicleEvent extends PersonEntersVehicleEvent {
 	@Override
 	public Map<String, String> getAttributes() {
 		var atts = super.getAttributes();
-		atts.put("transitLine", transitLine.toString());
-		atts.put("transitRoute", transitRoute.toString());
+		atts.put(ATTRIBUTE_LINE, transitLine.toString());
+		atts.put(ATTRIBUTE_ROUTE, transitRoute.toString());
 		return atts;
 	}
 
 	@Override
 	public void writeAsXML(StringBuilder out) {
 		// PersonEntersVehicle only calls writeXMLStart and writeXMLEnd and nothing else
-		// all attributes of PersonEntersVehicle are handled by the base Event class.
+		// all attributes of PersonEntersVehicle are handled by the base Event class in writeXMLStart.
 		writeXMLStart(out);
 		out.append(" transitLine=\"").append(transitLine).append("\"");
 		out.append(" transitRoute=\"").append(transitRoute).append("\"");
