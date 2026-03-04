@@ -1,7 +1,5 @@
 package org.matsim.contrib.drt.routing;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Message;
 import org.matsim.api.core.v01.events.*;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class BackpackDrtRoute implements BackpackRoute {
-	private static final Logger log = LogManager.getLogger(BackpackDrtRoute.class);
 
 	private final Data data;
 	private final Network network;
@@ -36,7 +33,6 @@ class BackpackDrtRoute implements BackpackRoute {
 
 	@Override
 	public void handleEvent(Event e) {
-		log.info(e);
 		if (e instanceof PersonDepartureEvent pde) {
 			data.startTime = pde.getTime();
 			data.links.add(pde.getLinkId());
