@@ -101,8 +101,9 @@ public final class PopulationAgentSource implements AgentSource, DistributedAgen
 			qsim.insertAgentIntoMobsim(agent);
 			if (this.personHelloEventsSetting == PersonInitializedEventsSetting.all
 					|| (this.personHelloEventsSetting == PersonInitializedEventsSetting.singleActAgentsOnly && p.getSelectedPlan().getPlanElements().size() == 1)) {
-				Coord firstActCoord = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
-				this.qsim.getEventsManager().processEvent(new PersonInitializedEvent(0, p.getId(), firstActCoord));
+				Activity firstActivity = (Activity)p.getSelectedPlan().getPlanElements().get(0);
+				this.qsim.getEventsManager().processEvent(new PersonInitializedEvent(0, p.getId(), firstActivity.getLinkId(), 
+					firstActivity.getFacilityId(), firstActivity.getType(), firstActivity.getCoord()));
 			}
 		}
 	}
