@@ -79,8 +79,8 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 	public int hashCode() {
 		int result = super.hashCode();
 		result = 31 * result + trafficSituation.hashCode();
-		result = roadGradient == null ? result : 37 * result + roadGradient.hashCode();
-		result = 41 * result + roadCategory.hashCode();
+		result = roadGradient == null ? result : 31 * result + roadGradient.hashCode();
+		result = 31 * result + roadCategory.hashCode();
 		return result;
 	}
 
