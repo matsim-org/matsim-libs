@@ -1,5 +1,7 @@
 {
   library(tidyverse)
+  library(patchwork)
+  library(scales)
   library(glue)
 
   # ==== Paths to ressources ====
@@ -8,8 +10,8 @@
 
 # ==== General Pretoria Analysis ====
 {
-  vehicle <- "RRV"
-  method <- "StopAndGoFraction"
+  vehicle <- "FIGO_TECHAVG"
+  method <- "InterpolationFraction"
 
   pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
@@ -59,7 +61,7 @@
   # 3: Matches the profile of a passive driver      (avg.vel.=37.02; avg.pos.acc.=2.17)
 
   vehicle <- "FIGO"
-  method <- "InterpolationFraction"
+  method <- "StopAndGoFraction"
 
   pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
     filter(linkId != 6555) %>%
@@ -197,4 +199,85 @@
   hbefa <- rbind(hbefa, hbefa.tavg)
 
   write_delim(hbefa, "/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Concept_Aleks_V1.1.csv", delim = ";")
+}
+
+# ==== Gradient Problem analysis ====
+{
+  # Background: After implementing slopes into the emission model, it turned out that S&G method delivers better results
+  # than InterpolationFraction. However, the results make no sense, as InterpolationFraction overestimates in highways.
+  # InterpolationFraction was introduced to NOT overestimate on highway, therefore there has to be a more fundamental
+  # problem.
+
+  # Error Histograms
+  {
+    vehicle <- "FIGO_TECHAVG"
+    method <- "StopAndGoFraction"
+
+    pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv")) %>%
+      filter(linkId != 6555 & linkId != "cold") %>%
+      mutate(ERR_CO = CO_MATSim - CO_pems, ERR_CO2 = CO2_MATSim - CO2_pems, ERR_NOx = NOx_MATSim - NOx_pems) %>%
+      pivot_longer(c("ERR_CO", "ERR_CO2", "ERR_NOx"), names_to = "component", values_to = "error")
+
+    network_information <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/networkInformation.csv") %>%
+      separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
+
+    d <- pretoria_output %>%
+      inner_join(network_information, by = "linkId")
+
+    p1 <- ggplot(d) +
+      stat_summary_bin(aes(x=gradient, y=error), fun = mean, binwidth=0.05, geom="line") +
+      facet_wrap(~component, scales="free")
+
+    p2 <- ggplot(d) +
+      geom_histogram(aes(x=gradient), binwidth = 0.05) +
+      facet_wrap(~component, scales="free")
+
+    p1 / p2
+
+    p3 <- ggplot(d) +
+      stat_summary_bin(aes(x=freespeed, y=error), fun = mean, binwidth=1, geom="line") +
+      facet_wrap(~component, scales="free")
+
+    p4 <- ggplot(d) +
+      geom_histogram(aes(x=freespeed), binwidth = 1) +
+      facet_wrap(~component, scales="free")
+
+    p3 / p4
+  }
+
+  {
+    pretoria_output <- read_csv(glue("{pretoria_path}/output_{vehicle}_{method}.csv"))
+
+    network_information <- read_csv("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/networkInformation.csv") %>%
+      separate(roadType, c("Region", "RoadType", "VClass"), sep="/")
+
+    hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Concept_Aleks_Average_V1.1.csv", delim = ";")
+
+    d <- hbefa_det %>%
+      separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "VClass", "TrafficSituation")) %>%
+      filter(VehCat == "pass. car" &
+                 Technology == "petrol (4S)" &
+                 EmConcept == "average" &
+                 Component == "CO" &
+                 Region == "URB" &
+               ( VClass == 50 | VClass == 60 | VClass == 80 |VClass == 100 | VClass == 120) &
+               ( RoadType == "MW-Nat." | RoadType == "Distr" | RoadType == "MW_City" | RoadType == "Local")) %>%
+      filter(!startsWith(Gradient, "+/-")) %>%
+      mutate(Gradient = Gradient %>% str_remove("\\+/-") %>% str_remove("%") %>% as.numeric)
+
+    colors <- c("#17d2a4", "#70aef4", "#88e72f", "#f1e843", "#eb4949", "#eb49ad")
+
+    ggplot(d) +
+      geom_line(aes(x=as.numeric(Gradient), y=EFA, color=TrafficSituation)) +
+      # geom_point(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
+      facet_wrap(RoadType~as.numeric(VClass), scales = "free") +
+      theme_minimal() +
+      theme(text = element_text(size=12)) +
+      scale_color_manual(values=colors) +
+      # scale_x_continuous(breaks = seq(0, max(as.numeric(d$Freespeed)), by = 10)) +
+      # labs(title=glue("Emissions for all HBEFA keys with: {tech}, {concept}, {component}")) +
+      xlab("Speed (km/h)") +
+      ylab("Emissions (g/km)")
+  }
+
 }
