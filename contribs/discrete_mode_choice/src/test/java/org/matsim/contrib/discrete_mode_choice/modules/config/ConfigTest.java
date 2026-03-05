@@ -85,6 +85,26 @@ public class ConfigTest {
 	}
 
 	@Test
+	void testEmptyStringParsedAsEmptySet() {
+		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
+
+		dmcConfig.setTourFiltersAsString("");
+		assertTrue(dmcConfig.getTourFilters().isEmpty(), "tourFilters should be empty for empty string input");
+
+		dmcConfig.setTripFiltersAsString("");
+		assertTrue(dmcConfig.getTripFilters().isEmpty(), "tripFilters should be empty for empty string input");
+
+		dmcConfig.setTourConstraintsAsString("");
+		assertTrue(dmcConfig.getTourConstraints().isEmpty(), "tourConstraints should be empty for empty string input");
+
+		dmcConfig.setTripConstraintsAsString("");
+		assertTrue(dmcConfig.getTripConstraints().isEmpty(), "tripConstraints should be empty for empty string input");
+
+		dmcConfig.setCachedModesAsString("");
+		assertTrue(dmcConfig.getCachedModes().isEmpty(), "cachedModes should be empty for empty string input");
+	}
+
+	@Test
 	void testSetTripConstraints() {
 		DiscreteModeChoiceConfigGroup dmcConfig1 = new DiscreteModeChoiceConfigGroup();
 		dmcConfig1.setTripConstraints(Arrays.asList("A", "B", "C"));
