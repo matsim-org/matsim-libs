@@ -118,7 +118,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		} else {
 
 			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtFacility(stop.getId())) {
-				if (freeCapacity == 0) {
+				if (freeCapacity <= 0) {
 					break;
 				}
 				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
