@@ -21,6 +21,8 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -30,7 +32,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public interface TransitDriverAgent extends MobsimDriverAgent {
 
-	public TransitStopFacility getNextTransitStop();
-	
-	public double handleTransitStop(final TransitStopFacility stop, final double now);
+	TransitStopFacility getNextTransitStop();
+
+	double handleTransitStop(final TransitStopFacility stop, final double now);
+
+	TransitRoute getTransitRoute();
+
+	TransitLine getTransitLine();
+
+
 }

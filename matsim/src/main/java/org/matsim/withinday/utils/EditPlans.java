@@ -21,10 +21,6 @@
 
  package org.matsim.withinday.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -40,6 +37,10 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public final class EditPlans {
 	private static final Logger log = LogManager.getLogger( EditPlans.class ) ;
@@ -116,11 +117,16 @@ public final class EditPlans {
 		return pe ;
 	}
 	public final void rescheduleActivityEndtime( MobsimAgent agent, int index, double newEndTime ) {
-		Activity activity = (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ;
+		rescheduleActivityEndtime(agent, index, newEndTime, mobsim);
+	}
+
+	public static void rescheduleActivityEndtime(MobsimAgent agent, int index, double newEndTime, Mobsim mobsim) {
+		Activity activity = (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index);
 		activity.setEndTime(newEndTime);
 		WithinDayAgentUtils.resetCaches(agent);
 		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
 	}
+
 	public final Activity replaceActivity(MobsimAgent agent, int index, Activity newAct, String upstreamMode, String downstreamMode ) {
 		System.err.println("here310");
 		WithinDayAgentUtils.printPlan(agent) ;
@@ -344,6 +350,12 @@ public final class EditPlans {
 			pes.remove(ii) ;
 		}
 	}
+
+	public static void rescheduleCurrentActivityEndtime(MobsimAgent agent, double newEndTime, Mobsim mobsim) {
+		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
+		rescheduleActivityEndtime(agent, index, newEndTime, mobsim);
+	}
+
 	public void rescheduleCurrentActivityEndtime(MobsimAgent agent, double newEndTime) {
 		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ;
 		this.rescheduleActivityEndtime(agent, index, newEndTime);

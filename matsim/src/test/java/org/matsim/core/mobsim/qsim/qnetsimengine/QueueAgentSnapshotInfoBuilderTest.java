@@ -19,6 +19,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -399,6 +401,16 @@ public class QueueAgentSnapshotInfoBuilderTest {
 		@Override
 		public double handleTransitStop(TransitStopFacility stop, double now) {
 			return 0;
+		}
+
+		@Override
+		public TransitRoute getTransitRoute() {
+			return null;
+		}
+
+		@Override
+		public TransitLine getTransitLine() {
+			return null;
 		}
 
 		@Override

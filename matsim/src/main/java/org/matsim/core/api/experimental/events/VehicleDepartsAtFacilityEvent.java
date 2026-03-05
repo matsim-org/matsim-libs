@@ -22,6 +22,7 @@ package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.HasVehicleId;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -29,24 +30,24 @@ import java.util.Map;
 
 /**
  * @author mrieser
- * 
+ * <p>
  * Should be replaced by some more generic VehicleDepartsEvent
  * which supports both links and facilities.
  */
-public final class VehicleDepartsAtFacilityEvent extends Event {
+public final class VehicleDepartsAtFacilityEvent extends Event implements HasVehicleId {
 
 
 	public static final String EVENT_TYPE = "VehicleDepartsAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_DELAY = "delay";
-	
+
 	private final Id<Vehicle> vehicleId;
 	private final Id<TransitStopFacility> facilityId;
 	private double delay;
 
-	public VehicleDepartsAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
-			final Id<TransitStopFacility> facilityId, double delay) {
+	public VehicleDepartsAtFacilityEvent(final double time, final Id<Vehicle> vehicleId,
+										 final Id<TransitStopFacility> facilityId, double delay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.facilityId = facilityId;

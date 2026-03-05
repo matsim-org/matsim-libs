@@ -282,6 +282,8 @@ public class TripDashboard implements Dashboard {
 			);
 		});
 
+		// TODO: would like to have the distance distributions once per beeline and once per travelled distance. VSP coordination meeting mar'26
+
 		first.el(Plotly.class, (viz, data) -> {
 
 			viz.title = "Trip distance distribution";
@@ -374,7 +376,7 @@ public class TripDashboard implements Dashboard {
 				ds = viz.addDataset(data.compute(TripAnalysis.class, "mode_share_per_dist.csv", args)).filter("modelType", TripAnalysis.ModelType.PERSON_TRAFFIC.toString());
 				column = "share_" + TripAnalysis.ModelType.PERSON_TRAFFIC;
 			}
-			viz.description = "Mode share within distance groups.";
+			viz.description = "Mode share within distance groups by main mode, over whole trip (including access & egress)";
 			viz.layout = tech.tablesaw.plotly.components.Layout.builder()
 				.xAxis(Axis.builder().title("Distance group").build())
 				.yAxis(Axis.builder().title("Share").build())
