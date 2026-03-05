@@ -48,9 +48,9 @@ import static org.matsim.core.config.groups.ScoringConfigGroup.*;
 public final class RunBicycleContribExample {
 	private static final Logger LOG = LogManager.getLogger(RunBicycleContribExample.class);
 
-	private static final String BICYCLE = "bike";
+	private static final String BICYCLE = "bicycle";
 	public static final double BICYCLE_SPEED = 6.944;
-	private static final boolean USE_OWN_SCORING = true;
+	//private static final boolean USE_OWN_SCORING = true;
 
 	public static void main(String[] args) {
 		Config config;
@@ -66,26 +66,33 @@ public final class RunBicycleContribExample {
 			config = ConfigUtils.createConfig("contribs/bicycle/src/main/java/org/matsim/contrib/bicycle/run/scenarios/");
 
 			//Neukoelln bicycle network
-			config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
-			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_slim.xml.gz"); // Modify this
-
+			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bike_rules_NEW3.xml.gz"); // Modify this
+			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_nk_bicycle_custom_simp_cleanService.xml.gz"); // Modify this
 
 			//Berlin bicycle network
-			//config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_berlin_bike_rules.xml.gz"); // Modify this
+			config.network().setInputFile("C:/Users/metz_so/Workspace/data/matsim-network_berlin_bicycle_simp_cleanService.xml.gz"); // Modify this
+
 
 			//Random plans nord-Neukoelln
-			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_500_bike.xml");
+			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nnk_5k_bicycle_ew.xml");
 			//config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_nk_5000_bike.xml");
 
-			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.8));
-			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.2));
+			//Random plans Berlin (weighted on zensus)
+			config.plans().setInputFile("C:/Users/metz_so/myProjects/matsim_helper/data/plans_berlin_50k_bicycle_ew.xml");
+
+
+			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ChangeExpBeta").setWeight(0.7));
+			config.replanning().addStrategySettings(new StrategySettings().setStrategyName("ReRoute").setWeight(0.3));
 
 			config.scoring().addActivityParams(new ActivityParams("home").setTypicalDuration(12 * 60 * 60));
 			config.scoring().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 60 * 60));
 
-			config.scoring().addModeParams(new ModeParams(BICYCLE).setConstant(0.).setMarginalUtilityOfDistance(-0.0004).setMarginalUtilityOfTraveling(0.).setMonetaryDistanceRate(0.));
+			config.scoring().addModeParams(new ModeParams(BICYCLE).setConstant(0.)
+				.setMarginalUtilityOfDistance(-0.0004)  //-0.0004
+				.setMarginalUtilityOfTraveling(-6.)  // added value of time
+				.setMonetaryDistanceRate(0.));
 
-			config.global().setNumberOfThreads(1);
+			config.global().setNumberOfThreads(12);
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 			config.controller().setLastIteration(1);
@@ -95,7 +102,7 @@ public final class RunBicycleContribExample {
 //			);
 
 			String baseOut = "C:/Users/metz_so/Workspace/data/matsim-output/";
-			String scenarioName = "nk_motorized_500_bicycleinfra_infrautil";
+			String scenarioName = "berlin_motorized_50k";
 
 
 			String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
@@ -107,9 +114,9 @@ public final class RunBicycleContribExample {
 
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
 		bicycleConfigGroup.setBicycleMode(BICYCLE);
-		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
-		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.0002);
+		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003); //-0.0002
+		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);        //-0.0002
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);   //-0.0002
 
 		//bicycleConfigGroup.setMaxBicycleSpeedForRouting(BICYCLE_SPEED);
 		// (technically, this has been superseded by using the correct mode vehicle type, see below.  But there is still a faulty consistency check :-( .)
@@ -120,7 +127,7 @@ public final class RunBicycleContribExample {
 		config.controller().setWriteEventsInterval(1);
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		config.routing().removeTeleportedModeParams(BICYCLE);
-		config.routing().setRoutingRandomness(0.0); //4.0
+		config.routing().setRoutingRandomness(2.); //4.0
 
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
@@ -133,7 +140,7 @@ public final class RunBicycleContribExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		NetworkUtils.simplifyNetwork(scenario.getNetwork());
+		//NetworkUtils.simplifyNetwork(scenario.getNetwork());
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, BICYCLE));
 
 
@@ -157,39 +164,42 @@ public final class RunBicycleContribExample {
 		// ===
 
 		Controler controler = new Controler(scenario);
+
+		// wird so die AdditionalBicycleLinkScore und overtake beachtet??? JA
 		controler.addOverridingModule(new BicycleModule());
 
-		if (USE_OWN_SCORING) {
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bind(AdditionalBicycleLinkScoreDefaultImpl.class); // als Delegate verfügbar machen
-					bind(AdditionalBicycleLinkScore.class).to(MyAdditionalBicycleLinkScore.class);
-				}
-			});
-		}
+//		if (USE_OWN_SCORING) {
+//			controler.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					bind(AdditionalBicycleLinkScoreDefaultImpl.class); // als Delegate verfügbar machen
+//					//bind(AdditionalBicycleLinkScore.class).to(MyAdditionalBicycleLinkScore.class);
+//				}
+//			});
+//		}
 
 		controler.run();
 	}
 
-	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
-
-		@com.google.inject.Inject
-		private AdditionalBicycleLinkScoreDefaultImpl delegate;
-
-		@Override
-		public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode) {
-
-			Object v = link.getAttributes().getAttribute("carFreeStatus");
-			double carFree = (v instanceof Number) ? ((Number) v).doubleValue() : 0.0;
-
-			double base = delegate.computeLinkBasedScore(link, vehicleId, bicycleMode);
-
-			// Achtung: unskaliert kann das stark wirken. Besser: Gewichtung.
-			double weight = 1.0; // TODO kalibrieren
-			return base + weight * carFree;
-		}
-	}
+//	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {
+//
+//		@com.google.inject.Inject
+//		private AdditionalBicycleLinkScoreDefaultImpl delegate;
+//
+//		@Override
+//		public double computeLinkBasedScore(Link link, Id<Vehicle> vehicleId, String bicycleMode) {
+//
+//			Object v = link.getAttributes().getAttribute("carFreeStatus");
+//			double carFree = (v instanceof Number) ? ((Number) v).doubleValue() : 0.0;
+//
+//			double base = delegate.computeLinkBasedScore(link, vehicleId, bicycleMode);
+//
+//			// Achtung: unskaliert kann das stark wirken. Besser: Gewichtung.
+//			double weight = 1.0; // TODO kalibrieren
+//			//return base + weight * carFree;
+//			return base + 1000.0;
+//		}
+//	}
 
 
 }

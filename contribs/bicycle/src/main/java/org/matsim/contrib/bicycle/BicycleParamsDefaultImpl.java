@@ -107,7 +107,7 @@ public class BicycleParamsDefaultImpl implements BicycleParams {
 			case "secondary", "secondary_link" -> 0.30;
 			case "tertiary", "tertiary_link" -> 0.40;
 			case "unclassified" -> 0.80;
-			default -> 0.8;
+			default -> 0.8;  // da bspw fuer redsidentals etc.
 		};
 	}
 
