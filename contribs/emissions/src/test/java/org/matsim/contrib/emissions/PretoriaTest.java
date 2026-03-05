@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class PretoriaTest {
+	// TODO Replace paths with Test-paths
 
 	private static final Logger logger = LogManager.getLogger(PretoriaTest.class);
 
@@ -344,6 +346,33 @@ public class PretoriaTest {
 
 		return Stream.of(PretoriaVehicle.values())
 			.flatMap(v -> methods.stream().map(m -> Arguments.of(v, m)));
+	}
+
+	@BeforeAll
+	public static void printNetworkInformation() throws IOException, RuntimeException {
+		// Link information used for output analysis
+
+		// Read in the Pretoria network file with real emissions
+		Network pretoriaNetwork = NetworkUtils.readNetwork("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/network_routeC_etios.xml");
+
+		// Save the results in a file
+		CSVPrinter writer = new CSVPrinter(
+			IOUtils.getBufferedWriter("/Users/aleksander/Documents/VSP/PHEMTest/pretoria/networkInformation.csv"),
+			CSVFormat.DEFAULT);
+		writer.printRecord(
+			"linkId",
+			"freespeed",
+			"roadType",
+			"gradient"
+		);
+
+		for (Link l : pretoriaNetwork.getLinks().values()) {
+			double dAlt = (Double) l.getToNode().getAttributes().getAttribute("alt") - (Double) l.getFromNode().getAttributes().getAttribute("alt");
+			writer.printRecord(l.getId(), l.getFreespeed(), l.getAttributes().getAttribute("hbefa_road_type"), dAlt / l.getLength());
+		}
+
+		writer.flush();
+		writer.close();
 	}
 
 	@ParameterizedTest
@@ -734,6 +763,7 @@ public class PretoriaTest {
 			var accLen = accDistances.getLast();
 
 			// Lengths can be different, adjust accumulated lengths to MATSim lengths
+			System.out.println("#1234:" + (accumulatedLinkLengths4links.getLast()/accLen));
 			accDistances = accDistances.stream().map(d -> d*(1-1e-6)*(accumulatedLinkLengths4links.getLast()/accLen)).toList();
 
 			for (int i = 1; i < gpsEntries.size(); i++) {
