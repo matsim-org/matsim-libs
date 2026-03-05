@@ -22,6 +22,7 @@ package org.matsim.contrib.noise;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.ApplicationUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -35,6 +36,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -126,7 +128,9 @@ public final class NoiseOfflineCalculation{
 		if (this.scenario.getConfig().controller().getRunId() == null || this.scenario.getConfig().controller().getRunId().equals("")) {
 			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "output_events.xml.gz";
 		} else {
-			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "/" + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
+//			eventsFile = this.scenario.getConfig().controller().getOutputDirectory() + "/" + this.scenario.getConfig().controller().getRunId() + ".output_events.xml.gz";
+			// changed because compression types might change. (for now, it is zst, but this may be different in the future). paul, feb'26
+			eventsFile = ApplicationUtils.matchInput(this.scenario.getConfig().controller().getRunId() + ".output_events.xml", Path.of(this.scenario.getConfig().controller().getOutputDirectory())).toAbsolutePath().toString();
 		}
 		reader.readFile(eventsFile);
 		log.info("Reading events file... Done.");

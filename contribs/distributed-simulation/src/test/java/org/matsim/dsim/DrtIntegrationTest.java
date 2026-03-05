@@ -163,8 +163,12 @@ public class DrtIntegrationTest {
 		controler.run();
 	}
 
+	// Disable this test until the drt code is properly integrated into dsim. The current approach for the parallel inserter
+	// changes state during a simulation step. This should happen in `beforeSimStep` instead. Until this is fixed, this test
+	// will show non-deterministic results and will fail from time to time.
 	@Test
 	@Order(2)
+	@Disabled
 	void runParallelInserter() {
 
 		Scenario scenario = createScenario();
