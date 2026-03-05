@@ -39,6 +39,8 @@
 		<jogl.version>2.6.0</jogl.version>
 		<junit.version>6.0.3</junit.version>
 		<fastutil.version>8.5.18</fastutil.version>
+		<!-- We have transitive dependencies to this dependency. Therefore, move it here, so we have one version across the project -->
+		<protobuf-javalite.version>4.34.0</protobuf-javalite.version>
 	</properties>
 
 	<scm>
@@ -405,7 +407,7 @@
 			<dependency>
 				<groupId>net.bytebuddy</groupId>
 				<artifactId>byte-buddy</artifactId>
-				<version>1.18.5</version>
+				<version>1.18.7</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -426,7 +428,11 @@
 				<version>${fory.version}</version>
 				<optional>true</optional>
 			</dependency>
-
+			<dependency>
+				<groupId>com.google.protobuf</groupId>
+				<artifactId>protobuf-javalite</artifactId>
+				<version>${protobuf-javalite.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

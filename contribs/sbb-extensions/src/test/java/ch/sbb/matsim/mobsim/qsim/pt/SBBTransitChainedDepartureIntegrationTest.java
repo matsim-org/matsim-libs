@@ -143,13 +143,14 @@ public class SBBTransitChainedDepartureIntegrationTest {
 		PersonContinuesInVehicleEvent c1 = new PersonContinuesInVehicleEvent(
 			32580, Id.createPersonId("person1"),
 			Id.createVehicleId("351761"), Id.createVehicleId("351714"),
-			Id.create("f15", TransitStopFacility.class)
-
+			Id.create("f15", TransitStopFacility.class),
+			Id.create("l109", TransitLine.class), Id.create("r110", TransitRoute.class)
 		);
 		PersonContinuesInVehicleEvent c2 = new PersonContinuesInVehicleEvent(
 			36720, Id.createPersonId("person2"),
 			Id.createVehicleId("351871"), Id.createVehicleId("351874"),
-			Id.create("f74", TransitStopFacility.class)
+			Id.create("f74", TransitStopFacility.class),
+			Id.create("l120", TransitLine.class), Id.create("r128", TransitRoute.class)
 		);
 
 		assert events.contains(c1) : "person 1 did not continue in vehicle";

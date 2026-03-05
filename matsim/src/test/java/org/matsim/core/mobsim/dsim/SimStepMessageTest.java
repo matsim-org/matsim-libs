@@ -1,7 +1,7 @@
 package org.matsim.core.mobsim.dsim;
 
 import org.junit.jupiter.api.Test;
-import org.matsim.dsim.scoring.BackPack;
+import org.matsim.dsim.scoring.Backpack;
 
 import java.util.List;
 
@@ -18,12 +18,12 @@ class SimStepMessageTest {
 		CapacityUpdate cu = new CapacityUpdate(null, 1.0, 2.0);
 		Teleportation tp = new Teleportation(null, null, 42.0);
 		VehicleContainer vc = new VehicleContainer(null, null, null, List.of());
-		BackPack bp = new BackPack(null, 0);
+		var bm = new Backpack.Msg(null, null, 0, null);
 
 		b.addCapacityUpdate(cu)
 			.addTeleportation(tp)
 			.addVehicleContainer(vc)
-			.addBackPack(bp);
+			.addBackPack(bm);
 
 		SimStepMessage msg = b.build();
 
@@ -32,12 +32,12 @@ class SimStepMessageTest {
 		assertEquals(1, msg.capUpdates().size());
 		assertEquals(1, msg.teleportations().size());
 		assertEquals(1, msg.vehicles().size());
-		assertEquals(1, msg.backPacks().size());
+		assertEquals(1, msg.backpacks().size());
 
 		assertSame(cu, msg.capUpdates().getFirst());
 		assertSame(tp, msg.teleportations().getFirst());
 		assertSame(vc, msg.vehicles().getFirst());
-		assertSame(bp, msg.backPacks().getFirst());
+		assertSame(bm, msg.backpacks().getFirst());
 	}
 
 	@Test
@@ -48,19 +48,19 @@ class SimStepMessageTest {
 		CapacityUpdate cu = new CapacityUpdate(null, 1.0, 2.0);
 		Teleportation tp = new Teleportation(null, null, 7.0);
 		VehicleContainer vc = new VehicleContainer(null, null, null, List.of());
-		BackPack bp = new BackPack(null, 0);
+		var bm = new Backpack.Msg(null, null, 0, null);
 
 		b.addCapacityUpdate(cu)
 			.addTeleportation(tp)
 			.addVehicleContainer(vc)
-			.addBackPack(bp);
+			.addBackPack(bm);
 
 		SimStepMessage msgBeforeClear = b.build();
 		assertEquals(10.0, msgBeforeClear.simstep());
 		assertFalse(msgBeforeClear.capUpdates().isEmpty());
 		assertFalse(msgBeforeClear.teleportations().isEmpty());
 		assertFalse(msgBeforeClear.vehicles().isEmpty());
-		assertFalse(msgBeforeClear.backPacks().isEmpty());
+		assertFalse(msgBeforeClear.backpacks().isEmpty());
 
 		// Now clear the builder and build again
 		b.clear();
@@ -73,12 +73,12 @@ class SimStepMessageTest {
 		assertTrue(msgAfterClear.capUpdates().isEmpty());
 		assertTrue(msgAfterClear.teleportations().isEmpty());
 		assertTrue(msgAfterClear.vehicles().isEmpty());
-		assertTrue(msgAfterClear.backPacks().isEmpty());
+		assertTrue(msgAfterClear.backpacks().isEmpty());
 
 		// And list instances are fresh (not the same as before clear)
 		assertNotSame(msgBeforeClear.capUpdates(), msgAfterClear.capUpdates());
 		assertNotSame(msgBeforeClear.teleportations(), msgAfterClear.teleportations());
 		assertNotSame(msgBeforeClear.vehicles(), msgAfterClear.vehicles());
-		assertNotSame(msgBeforeClear.backPacks(), msgAfterClear.backPacks());
+		assertNotSame(msgBeforeClear.backpacks(), msgAfterClear.backpacks());
 	}
 }

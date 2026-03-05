@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.mobsim.qsim.pt.PersonEntersPtVehicleEvent;
+import org.matsim.core.mobsim.qsim.pt.PersonLeavesPtVehicleEvent;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -191,18 +193,29 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new VehicleAbortsEvent(time, Id.create(atts.getValue(VehicleAbortsEvent.ATTRIBUTE_VEHICLE), Vehicle.class), linkId));
 		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
 			this.events.processEvent(new PersonMoneyEvent(time, Id.create(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT)), atts.getValue(PersonMoneyEvent.ATTRIBUTE_PURPOSE), atts.getValue(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER), atts.getValue(PersonMoneyEvent.ATTRIBUTE_REFERENCE)));
-		} else if (PersonScoreEvent.EVENT_TYPE.equals(eventType) || "personScore".equals(eventType)) {
+		} else if (PersonScoreEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new PersonScoreEvent(time, Id.create(atts.getValue(PersonScoreEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonScoreEvent.ATTRIBUTE_AMOUNT)), atts.getValue(PersonScoreEvent.ATTRIBUTE_KIND)));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {
 			String personString = atts.getValue(PersonEntersVehicleEvent.ATTRIBUTE_PERSON);
 			String vehicleString = atts.getValue(PersonEntersVehicleEvent.ATTRIBUTE_VEHICLE);
 			this.events.processEvent(new PersonEntersVehicleEvent(time, Id.create(personString, Person.class), Id.create(vehicleString, Vehicle.class)));
+		} else if (PersonEntersPtVehicleEvent.EVENT_TYPE.equals(eventType)) {
+			String personString = atts.getValue(PersonEntersPtVehicleEvent.ATTRIBUTE_PERSON);
+			String vehicleString = atts.getValue(PersonEntersPtVehicleEvent.ATTRIBUTE_VEHICLE);
+			String lineString = atts.getValue(PersonEntersPtVehicleEvent.ATTRIBUTE_LINE);
+			String routeString = atts.getValue(PersonEntersPtVehicleEvent.ATTRIBUTE_ROUTE);
+			this.events.processEvent(new PersonEntersPtVehicleEvent(time, Id.create(personString, Person.class), Id.create(vehicleString, Vehicle.class), Id.create(lineString, TransitLine.class), Id.create(routeString, TransitRoute.class)));
 		} else if (PersonLeavesVehicleEvent.EVENT_TYPE.equals(eventType)) {
 			Id<Person> pId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON), Person.class);
 			Id<Vehicle> vId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 			this.events.processEvent(new PersonLeavesVehicleEvent(time, pId, vId));
+		} else if (PersonLeavesPtVehicleEvent.EVENT_TYPE.equals(eventType)) {
+			String personString = atts.getValue(PersonLeavesPtVehicleEvent.ATTRIBUTE_PERSON);
+			String vehicleString = atts.getValue(PersonLeavesPtVehicleEvent.ATTRIBUTE_VEHICLE);
+			String lineString = atts.getValue(PersonLeavesPtVehicleEvent.ATTRIBUTE_LINE);
+			String routeString = atts.getValue(PersonLeavesPtVehicleEvent.ATTRIBUTE_ROUTE);
+			this.events.processEvent(new PersonLeavesPtVehicleEvent(time, Id.create(personString, Person.class), Id.create(vehicleString, Vehicle.class), Id.create(lineString, TransitLine.class), Id.create(routeString, TransitRoute.class)));
 		} else if (PersonContinuesInVehicleEvent.EVENT_TYPE.equals(eventType)) {
-
 			Id<Person> personId = Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_PERSON), Person.class);
 			String fromVehicleValue = atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FROM_VEHICLE);
 			Id<Vehicle> fromVehicleId = fromVehicleValue != null ? Id.create(fromVehicleValue, Vehicle.class) : null;
@@ -210,8 +223,10 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 
 			String stopValue = atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FACILITY);
 			Id<TransitStopFacility> stopId = stopValue != null ? Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class) : null;
+			Id<TransitLine> transitLineId = Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_TRANSIT_LINE), TransitLine.class);
+			Id<TransitRoute> transitRouteId = Id.create(atts.getValue(PersonContinuesInVehicleEvent.ATTRIBUTE_TRANSIT_ROUTE), TransitRoute.class);
 
-			this.events.processEvent(new PersonContinuesInVehicleEvent(time, personId, fromVehicleId, vehicleId, stopId));
+			this.events.processEvent(new PersonContinuesInVehicleEvent(time, personId, fromVehicleId, vehicleId, stopId, transitLineId, transitRouteId));
 
 		} else if (TeleportationArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TeleportationArrivalEvent(
@@ -247,13 +262,13 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			Id<Vehicle> vehicleId = Id.createVehicleId(atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_VEHICLE));
 			String networkMode = atts.getValue(VehicleEndsParkingSearch.ATTRIBUTE_NETWORKMODE);
 			this.events.processEvent(new VehicleEndsParkingSearch(time, driverId, linkId, vehicleId, networkMode));
-		} else if (PersonInitializedEvent.EVENT_TYPE.equals(eventType)){
+		} else if (PersonInitializedEvent.EVENT_TYPE.equals(eventType)) {
 			Id<Person> personId = Id.create(atts.getValue(PersonInitializedEvent.ATTRIBUTE_PERSON), Person.class);
 			Coord coord = null;
-			if (atts.getValue(Event.ATTRIBUTE_X ) != null) {
+			if (atts.getValue(Event.ATTRIBUTE_X) != null) {
 				double xx = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_X));
 				double yy = Double.parseDouble(atts.getValue(Event.ATTRIBUTE_Y));
-				coord = new Coord(xx, yy) ;
+				coord = new Coord(xx, yy);
 			}
 			this.events.processEvent(new PersonInitializedEvent(time, personId, coord));
 		} else {

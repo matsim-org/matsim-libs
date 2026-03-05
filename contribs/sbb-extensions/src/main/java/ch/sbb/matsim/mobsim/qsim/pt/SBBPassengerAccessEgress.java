@@ -154,9 +154,9 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 	}
 
 	@Override
-	public void relocatePassengers(TransitDriverAgentImpl vehicle, List<ChainedDeparture> departures, double time) {
+	public void relocatePassengers(TransitDriverAgentImpl driver, List<ChainedDeparture> departures, double time) {
 
-		TransitRouteStop stop = vehicle.getTransitRoute().getStops().getLast();
+		TransitRouteStop stop = driver.getTransitRoute().getStops().getLast();
 		List<PTPassengerAgent> passengers = agentRelocating.getOrDefault(stop.getStopFacility().getId(), List.of());
 
 		for (ChainedDeparture chain : departures) {
@@ -166,9 +166,11 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 
 			Id<Person> newDriver = Id.createPersonId("pt_" + SBBTransitQSimEngine.createId(line, route, departure));
 			Id<Vehicle> newVehicle = departure.getVehicleId();
-			boolean sameVehicle = newVehicle.equals(vehicle.getVehicle().getId());
+			boolean sameVehicle = newVehicle.equals(driver.getVehicle().getId());
 
-			MobsimDriverAgent nextDriver = (MobsimDriverAgent) internalInterface.getMobsim().getAgents().get(newDriver);
+			// SAFETY: We expect a TransitDriverAgent, as the SBBTransitQSimEngine which is part of this package has registered an agent with
+			//         the 'newDriver' id.
+			var nextDriver = (TransitDriverAgent) internalInterface.getMobsim().getAgents().get(newDriver);
 
 			Iterator<PTPassengerAgent> it = passengers.iterator();
 
@@ -181,7 +183,8 @@ public class SBBPassengerAccessEgress implements PassengerAccessEgress {
 					continue;
 
 				eventsManager.processEvent(new PersonContinuesInVehicleEvent(time, passenger.getId(),
-					vehicle.getVehicle().getId(), newVehicle, route.getStops().getFirst().getStopFacility().getId()));
+					driver.getVehicle().getId(), newVehicle, route.getStops().getFirst().getStopFacility().getId(),
+					nextDriver.getTransitLine().getId(), nextDriver.getTransitRoute().getId()));
 
 				// Chains can be defined on the same vehicle, only need to move the passenger if vehicle is different
 				if (!sameVehicle) {
