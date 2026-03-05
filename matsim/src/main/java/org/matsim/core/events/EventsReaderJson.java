@@ -323,7 +323,11 @@ public final class EventsReaderJson {
 				double yy = o.get(Event.ATTRIBUTE_Y).asDouble();
 				coord = new Coord(xx, yy);
 			}
-			this.events.processEvent(new PersonInitializedEvent(time, personId, coord));
+			this.events.processEvent(new PersonInitializedEvent(time, personId, 
+				o.has(HasLinkId.ATTRIBUTE_LINK) ? Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class) : null,
+				o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
+				o.get(PersonInitializedEvent.ATTRIBUTE_ACTIVITY_TYPE).asText(),
+				coord));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);
 
