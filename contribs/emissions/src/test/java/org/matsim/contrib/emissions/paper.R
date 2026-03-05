@@ -155,14 +155,14 @@
   hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Subsegm_detailed_Car_Aleks_filtered.csv", delim = ";")
 
   hbefa_det_split <- hbefa_det %>%
-    separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "Freespeed", "TrafficSituation"))
+    separate_wider_delim(TrafficSit, "/", names=c("Region", "RoadType", "VClass", "TrafficSituation"))
 
   tech <- "diesel"
   concept <- "PC D Euro-4"
   component <- "CO"
 
   d <- hbefa_det_split %>%
-    mutate(Freespeed = as.numeric(Freespeed)) %>%
+    mutate(VClass = as.numeric(VClass)) %>%
     filter(VehCat == "pass. car" &
              Technology == tech &
              EmConcept == concept &
@@ -173,13 +173,13 @@
   colors <- c("#17d2a4", "#70aef4", "#88e72f", "#f1e843", "#eb4949", "#eb49ad")
 
   ggplot(d) +
-    geom_line(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
+    geom_line(aes(x=as.numeric(VClass), y=EFA, color=TrafficSituation)) +
     # geom_point(aes(x=as.numeric(Freespeed), y=EFA, color=TrafficSituation)) +
     facet_wrap(Region~RoadType, scales = "free") +
     theme_minimal() +
     theme(text = element_text(size=12)) +
     scale_color_manual(values=colors) +
-    # scale_x_continuous(breaks = seq(0, max(as.numeric(d$Freespeed)), by = 10)) +
+    # scale_x_continuous(breaks = seq(0, max(as.numeric(VClass)), by = 10)) +
     geom_hline(aes(yintercept = 0.042, color=" PLV5"), linetype="dashed") +
     labs(title=glue("Emissions for all HBEFA keys with: {tech}, {concept}, {component}")) +
     xlab("Speed (km/h)") +
@@ -235,7 +235,7 @@
 }
 
 # Plot interpolation curves for methods
-curves <- function(
+speedCurves <- function(
   trafficSit = "RUR/MW/>130",
   emConcept = "PC P Euro-4",
   curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction")){
@@ -269,12 +269,56 @@ curves <- function(
     ylab("Emissions (g/km)")
 
   ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/{trafficSit.u}_{emConcept.u}.png"),
-         width = 11,
+         width = 30,
+         height = 10,
+         dpi = 300)
+}
+
+gradientCurves <- function(
+  trafficSit = "RUR/MW/>130",
+  emConcept = "average",
+  curves = c("AverageSpeed", "StopAndGoFraction", "InterpolationFraction", "BilinearInterpolationFraction")){
+  trafficSit.u <- gsub( "/", "_", trafficSit)
+  emConcept.u <- gsub( " ", "_", emConcept)
+
+  hbefa_det <- read_delim("/Users/aleksander/Documents/VSP/PHEMTest/hbefa/EFA_HOT_Concept_Aleks_V1.1.csv", delim = ";") %>%
+    filter(Component == "CO" | Component == "CO2(total)" | Component == "NOx") %>%
+    filter(EmConcept == emConcept) %>%
+    filter(startsWith(TrafficSit, trafficSit)) %>%
+    filter(!startsWith(Gradient, "+/-")) %>%
+    mutate(component = ifelse(Component == "CO2(total)", "CO2", Component)) %>%
+    mutate(Gradient = Gradient %>% str_remove("\\+/-") %>% str_remove("%") %>% as.numeric)
+
+  curves <- read_csv(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/InterpolationCurves/{trafficSit.u}_{emConcept.u}_G.csv")) %>%
+    pivot_longer(cols = c(
+      "CO_StopAndGoFraction", "CO2_StopAndGoFraction", "NOx_StopAndGoFraction",
+      "CO_AverageSpeed", "CO2_AverageSpeed", "NOx_AverageSpeed",
+      "CO_InterpolationFraction", "CO2_InterpolationFraction", "NOx_InterpolationFraction",
+      "CO_BilinearInterpolationFraction", "CO2_BilinearInterpolationFraction", "NOx_BilinearInterpolationFraction"),
+                 names_to = "method", values_to = "value") %>%
+    separate("method", c("component", "method"), "_") %>%
+    filter(method %in% curves)
+
+  ggplot() +
+    geom_line(data=curves, aes(x=grad, y=value, color=method)) +
+    geom_point(data=hbefa_det, aes(x=Gradient, y=EFA)) +
+    facet_wrap(~component, scales = "free") +
+    theme_minimal() +
+    ggtitle(glue("Comparison of emission development for different methods ({trafficSit}, {emConcept})")) +
+    theme(text = element_text(size=12)) +
+    xlab("Average velocity (km/h)") +
+    ylab("Emissions (g/km)")
+
+  ggsave(glue("/Users/aleksander/Documents/VSP/PHEMTest/Pretoria/PAPER/{trafficSit.u}_{emConcept.u}_G.png"),
+         width = 30,
          height = 10,
          dpi = 300)
 }
 
 # Curve plots
 {
-  curves(curves = c("AverageSpeed", "StopAndGoFraction"))
+  speedCurves(curves = c("AverageSpeed", "StopAndGoFraction"))
+  speedCurves()
+  gradientCurves()
 }
+
