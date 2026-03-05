@@ -57,7 +57,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesImpl;
 
-public class PseudoTransitRoutingModuleTest {
+public class FreespeedFactorRoutingModuleTest {
 
 	@RegisterExtension
 	private MatsimTestUtils utils = new MatsimTestUtils();
@@ -85,9 +85,12 @@ public class PseudoTransitRoutingModuleTest {
 		{
 			TeleportedModeParams params = new TeleportedModeParams("mode") ;
 			params.setTeleportedModeFreespeedFactor(2.);
+			params.setBeelineDistanceFactor(1.);
 			double tt = new FreespeedFactorRoutingModule(
 					"mode", f.s.getPopulation().getFactory(),
-					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+					f.s.getNetwork(),
+					createTestFactory(routeAlgo), freespeed, freespeed,
+					params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assertions.assertEquals(400.0, tt, 1e-8);
 			Assertions.assertEquals(400.0, leg.getTravelTime().seconds(), 1e-8);
 			Assertions.assertEquals(2000.0, leg.getRoute().getDistance(), 1e-8);
