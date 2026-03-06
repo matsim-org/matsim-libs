@@ -11,7 +11,6 @@ import org.matsim.contrib.osm.networkReader.OsmTags;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -81,51 +80,31 @@ public class BicycleParamsDefaultImplTest {
 
 	@Test
 	void testInfrastructureFactors() {
-		List<ObjectDoublePair<String>> noCycleWay = List.of(
-			ObjectDoublePair.of("trunk", 0.05),
-			ObjectDoublePair.of("primary", 0.1),
-			ObjectDoublePair.of("primary_link", 0.1),
-			ObjectDoublePair.of("secondary", 0.3),
-			ObjectDoublePair.of("secondary_link", 0.3),
-			ObjectDoublePair.of("tertiary", 0.4),
-			ObjectDoublePair.of("tertiary_link", 0.4),
-			ObjectDoublePair.of("unclassified", 0.9),
-			ObjectDoublePair.of("default", 0.95)
+		record InfraCase(String type, String bicycleInfra, double expected) {}
+
+		List<InfraCase> cases = List.of(
+			new InfraCase("trunk", null, 0.05),
+			new InfraCase("primary", null, 0.10),
+			new InfraCase("secondary", null, 0.30),
+			new InfraCase("tertiary", null, 0.40),
+			new InfraCase("unclassified", null, 0.80),
+			new InfraCase("residential", null, 0.80),
+			new InfraCase(null, null, 0.80),
+
+			new InfraCase("primary", "CYCLEWAY_ISOLATED", 1.00),
+			new InfraCase("primary", "CYCLEWAY_ADJOINING", 0.95),
+			new InfraCase("primary", "BICYCLE_ROAD_VEHICLE_DESTINATION", 0.90),
+			new InfraCase("primary", "CYCLEWAY_ON_HIGHWAY_ADVISORY", 0.85),
+			new InfraCase("primary", "FOOT_AND_CYCLEWAY_SHARED_ADJOINING", 0.80),
+			new InfraCase("primary", "CROSSING", 0.75),
+
+			new InfraCase("primary", "NONE", 0.10),
+			new InfraCase("primary", "SOMETHING_UNKNOWN", 0.80)
 		);
 
-		List<ObjectDoublePair<String>> cycleWay = List.of(
-			ObjectDoublePair.of("cycleway", 1.0),
-			ObjectDoublePair.of("path", 1.0),
-			ObjectDoublePair.of("steps", 0.1),
-			ObjectDoublePair.of("default", 0.95)
-		);
-
-		Map<String, List<ObjectDoublePair<String>>> cycleWays = Map.of("noCycleWay", noCycleWay,"cycleWay", cycleWay,
-			"noTypeAttr", List.of(ObjectDoublePair.of(null, 0.85)));
-
-		Link link = createLink(new Coord(0, 0), new Coord(100, 0));
-
-		for (Map.Entry<String, List<ObjectDoublePair<String>>> entry : cycleWays.entrySet()) {
-			if (entry.getKey().equals("cycleWay")) {
-				link.getAttributes().putAttribute(BicycleUtils.CYCLEWAY, entry.getKey());
-			} else if (entry.getKey().equals("noTypeAttr")) {
-				link.getAttributes().removeAttribute("type");
-			} else {
-				//				do not set this attr for "noCycleWay"
-				link.getAttributes().removeAttribute(BicycleUtils.CYCLEWAY);
-			}
-
-			for (ObjectDoublePair<String> pair : entry.getValue()) {
-				NetworkUtils.setType(link, pair.left());
-
-				String linkType = NetworkUtils.getType(link);
-				String cycleWayType = BicycleUtils.getCyclewaytype(link);
-
-				double expected = pair.rightDouble();
-				double actual = params.getInfrastructureFactor(linkType, cycleWayType);
-
-				assertEquals(expected, actual, 0.00001);
-			}
+		for (InfraCase testCase : cases) {
+			double actual = params.getInfrastructureFactor(testCase.type(), testCase.bicycleInfra());
+			assertEquals(testCase.expected(), actual, 0.00001);
 		}
 	}
 

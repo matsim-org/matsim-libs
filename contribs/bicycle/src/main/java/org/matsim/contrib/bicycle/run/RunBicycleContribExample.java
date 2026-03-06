@@ -112,73 +112,47 @@ public final class RunBicycleContribExample {
 			config.controller().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		}
 
+		new RunBicycleContribExample().run(config);
+	}
+
+	static void fillConfigWithBicycleStandardValues(Config config) {
+		config.controller().setWriteEventsInterval(1);
+
 		BicycleConfigGroup bicycleConfigGroup = ConfigUtils.addOrGetModule(config, BicycleConfigGroup.class);
 		bicycleConfigGroup.setBicycleMode(BICYCLE);
-		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003); //-0.0002
-		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);        //-0.0002
-		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);   //-0.0002
-
-		//bicycleConfigGroup.setMaxBicycleSpeedForRouting(BICYCLE_SPEED);
-		// (technically, this has been superseded by using the correct mode vehicle type, see below.  But there is still a faulty consistency check :-( .)
-
-
-		bicycleConfigGroup.setMotorizedInteraction(true); // oder abhängig von einem boolean
-
-		config.controller().setWriteEventsInterval(1);
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
-		config.routing().removeTeleportedModeParams(BICYCLE);
-		config.routing().setRoutingRandomness(2.); //4.0
-
+		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.003);
+		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.001);
+		bicycleConfigGroup.setMarginalUtilityOfGradient_pct_m(-0.001);
+		bicycleConfigGroup.setMotorizedInteraction(true);
 
 		List<String> mainModeList = Arrays.asList(BICYCLE, TransportMode.car);
-
 		config.qsim().setMainModes(mainModeList);
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 		config.routing().setNetworkModes(mainModeList);
+		config.routing().removeTeleportedModeParams(BICYCLE);
+		config.routing().setRoutingRandomness(2.);
+	}
 
-		// ===
+	public void run(Config config) {
+		fillConfigWithBicycleStandardValues(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		//NetworkUtils.simplifyNetwork(scenario.getNetwork());
 		NetworkUtils.cleanNetwork(scenario.getNetwork(), Set.of(TransportMode.car, BICYCLE));
 
-
-		{
-			// set config such that the mode vehicles come from vehicles data:
-			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-
-			// now put hte mode vehicles into the vehicles data:
-			final VehiclesFactory vf = VehicleUtils.getFactory();
-			scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(TransportMode.car)).setNetworkMode(TransportMode.car));
-			scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(BICYCLE)).setNetworkMode(BICYCLE).setMaximumVelocity(BICYCLE_SPEED).setPcuEquivalents(0.25).setLength(2.0));
-		}
-//		{
-//			Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( 2 ) );
-//			BicycleUtils.setBicycleInfrastructureFactor( link, 3. );
-//		}
-//		{
-//			Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( 11 ) );
-//			BicycleUtils.setBicycleInfrastructureFactor( link, 3. );
-//		}
-		// ===
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		final VehiclesFactory vf = VehicleUtils.getFactory();
+		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(TransportMode.car)).setNetworkMode(TransportMode.car));
+		scenario.getVehicles().addVehicleType(vf.createVehicleType(Id.createVehicleTypeId(BICYCLE))
+			.setNetworkMode(BICYCLE)
+			.setMaximumVelocity(BICYCLE_SPEED)
+			.setPcuEquivalents(0.25)
+			.setLength(2.0));
 
 		Controler controler = new Controler(scenario);
-
-		// wird so die AdditionalBicycleLinkScore und overtake beachtet??? JA
 		controler.addOverridingModule(new BicycleModule());
-
-//		if (USE_OWN_SCORING) {
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bind(AdditionalBicycleLinkScoreDefaultImpl.class); // als Delegate verfügbar machen
-//					//bind(AdditionalBicycleLinkScore.class).to(MyAdditionalBicycleLinkScore.class);
-//				}
-//			});
-//		}
-
 		controler.run();
+
 	}
 
 //	private static class MyAdditionalBicycleLinkScore implements AdditionalBicycleLinkScore {

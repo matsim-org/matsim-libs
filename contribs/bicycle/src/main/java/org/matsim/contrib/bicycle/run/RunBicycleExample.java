@@ -49,7 +49,10 @@ import java.util.Set;
 
 /**
  * @author dziemke
+ * @deprecated Legacy runner kept for backward compatibility. Prefer using
+ * {@link RunBicycleContribExample} for new development and tests.
  */
+@Deprecated(forRemoval = true)
 public class RunBicycleExample {
 	private static final Logger LOG = LogManager.getLogger(RunBicycleExample.class);
 

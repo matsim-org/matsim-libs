@@ -184,7 +184,7 @@ public class BicycleLinkSpeedCalculatorTest {
 	void getMaximumVelocityForLink_withCycleWay() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
-        Link linkWithCobbleStone = createLink(0, "some-surface", BicycleUtils.CYCLEWAY, 1.0);
+    Link linkWithCobbleStone = createLink(0, "some-surface", BicycleUtils.BICYCLE_INFRA, 1.0);
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed(), 1);
 
 
