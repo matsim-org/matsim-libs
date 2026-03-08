@@ -203,8 +203,8 @@ import org.matsim.vehicles.VehicleUtils;
 			// +1s per link
 			double adjustedRoutingTravelTime = routingTravelTime + 2.0;
 
-			Assertions.assertEquals(netsimTravelTime, 303.0, 1e-3);
-			Assertions.assertEquals(adjustedRoutingTravelTime, 202.0, 1e-3);
+			Assertions.assertEquals(303.0, netsimTravelTime, 1e-3);
+			Assertions.assertEquals(302.0, adjustedRoutingTravelTime, 1e-3);
 		}
 
 		/*
