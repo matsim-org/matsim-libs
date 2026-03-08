@@ -21,6 +21,7 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -35,6 +36,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -95,14 +98,15 @@ public final class NetworkRoutingModule implements RoutingModule {
 		Gbl.assertNotNull(fromLink);
 		Gbl.assertNotNull(toLink);
 
+		// use vehicle from routing request attribute, if defined
+		Id<Vehicle> vehicleId = (Id<Vehicle>) request.getAttributes().getAttribute(DefaultRoutingRequest.ATTRIBUTE_VEHICLE_ID);
+		if (vehicleId == null) {
+			vehicleId = VehicleUtils.getVehicleId(person, mode);
+		}
+
 		if (toLink != fromLink) {
 			// (a "true" route)
 
-			/* The NetworkInclAccessEgressModule actually looks up the vehicle in the scenario and passes it to the routeAlgo as well as to the resulting route.
-			 * Here, we do not hold the scenario as a field (yet) and can not perform the lookup.
-			 * So i don't add it here (yet), in order not to break anything. But probably should be done in future.
-			 * ts, june '21
-			 */
 			Path path = this.routeAlgo.calcLeastCostPath(fromLink, toLink, departureTime, person, null);
 			if (path == null)
 				throw new RuntimeException("No route found from link " + fromLink.getId() + " to link " + toLink.getId() + " by mode " + this.mode + ".");
@@ -111,6 +115,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			route.setTravelTime(path.travelTime);
 			route.setTravelCost(path.travelCost);
 			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
+			route.setVehicleId(vehicleId);
 			newLeg.setRoute(route);
 			newLeg.setTravelTime(path.travelTime);
 		} else {
@@ -119,6 +124,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
+			route.setVehicleId(vehicleId);
 			newLeg.setRoute(route);
 			newLeg.setTravelTime(0);
 		}
