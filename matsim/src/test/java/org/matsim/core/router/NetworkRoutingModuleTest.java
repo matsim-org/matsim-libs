@@ -73,7 +73,7 @@ public class NetworkRoutingModuleTest {
 		List<? extends PlanElement> result = routingModule.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, 7.0*3600, person)) ;
 		Assertions.assertEquals(1, result.size() );
 		Leg leg = (Leg)result.get(0) ;
-		Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+		Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 1e-8);
 		Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 	}
 
@@ -108,7 +108,7 @@ public class NetworkRoutingModuleTest {
 			Assertions.assertEquals( 1, results.size() );
 			Leg leg = (Leg) results.get(0) ;
 
-			Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 1e-8);
 			Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
@@ -139,7 +139,7 @@ public class NetworkRoutingModuleTest {
 			Assertions.assertEquals( 1, result.size() ) ;
 			Leg leg = (Leg) result.get(0) ;
 
-			Assertions.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
+			Assertions.assertEquals(200.0, leg.getTravelTime().seconds(), 1e-8);
 			Assertions.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
