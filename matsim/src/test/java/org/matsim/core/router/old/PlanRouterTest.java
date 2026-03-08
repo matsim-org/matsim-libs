@@ -162,7 +162,7 @@ public class PlanRouterTest {
 					).calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));
 					((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
 				} else {
-					trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(),
+					trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(), scenario,
 							scenario.getNetwork(),
 							leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime))
 						.calcRoute(DefaultRoutingRequest.withoutAttributes(fromFacility, toFacility, departureTime, person));

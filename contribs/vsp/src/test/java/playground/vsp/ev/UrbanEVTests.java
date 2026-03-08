@@ -157,21 +157,21 @@ public class UrbanEVTests {
 		Assertions.assertEquals("90", pluginActStart.getLinkId().toString(), "wrong charging start location");
 
 		ActivityStartEvent pluginActStart2 = plugins.get(1);
-		Assertions.assertEquals(25580d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
+		Assertions.assertEquals(25677d, pluginActStart2.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
 		Assertions.assertEquals("90", pluginActStart2.getLinkId().toString(), "wrong charging start location");
 
 		ActivityStartEvent pluginActStart3 = plugins.get(2);
-		Assertions.assertEquals(45724d, pluginActStart3.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
+		Assertions.assertEquals(46501d, pluginActStart3.getTime(), MatsimTestUtils.EPSILON, "wrong charging start time");
 		Assertions.assertEquals("95", pluginActStart3.getLinkId().toString(), "wrong charging start location");
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Triple Charger"), List.of());
 		Assertions.assertEquals(plugouts.size(), 2, 0);
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assertions.assertEquals(3179d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(3276d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("90", plugoutActStart.getLinkId().toString(), "wrong charging end location");
 
 		ActivityEndEvent plugoutActStart2 = plugouts.get(1);
-		Assertions.assertEquals(26608d, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(27385d, plugoutActStart2.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("90", plugoutActStart2.getLinkId().toString(), "wrong charging end location");
 	}
 
@@ -188,7 +188,7 @@ public class UrbanEVTests {
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Charging during shopping"), List.of());
 		Assertions.assertEquals(1, plugouts.size(), 0);
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assertions.assertEquals(11 * 3600 + 23 * 60 + 27, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(11 * 3600 + 25 * 60 + 5, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("172", plugoutActStart.getLinkId().toString(), "wrong charging end location");
 
 	}
@@ -254,7 +254,7 @@ public class UrbanEVTests {
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Double Charger"), List.of());
 		Assertions.assertEquals(1, plugouts.size(), 0);
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assertions.assertEquals(28783d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(28880d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("90", plugoutActStart.getLinkId().toString(), "wrong charging end location");
 	}
 
@@ -285,7 +285,7 @@ public class UrbanEVTests {
 				List.of());
 		Assertions.assertEquals(1, plugouts.size(), 0);
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assertions.assertEquals(7 * 3600 + 27 * 60 + 49, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(7 * 3600 + 29 * 60 + 26, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("90", plugoutActStart.getLinkId().toString(), "wrong charging end location");
 	}
 
@@ -331,7 +331,7 @@ public class UrbanEVTests {
 
 		List<ActivityEndEvent> plugouts = this.handler.plugOutCntPerPerson.getOrDefault(Id.createPersonId("Double Charger Home Charger"), List.of());
 		ActivityEndEvent plugoutActStart = plugouts.get(0);
-		Assertions.assertEquals(33242d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
+		Assertions.assertEquals(33339d, plugoutActStart.getTime(), MatsimTestUtils.EPSILON, "wrong charging end time");
 		Assertions.assertEquals("95", plugoutActStart.getLinkId().toString(), "wrong charging end location");
 		Assertions.assertEquals(1, plugouts.size(), "Should plug out exactly once (as second plugin is for home charge)");
 	}
