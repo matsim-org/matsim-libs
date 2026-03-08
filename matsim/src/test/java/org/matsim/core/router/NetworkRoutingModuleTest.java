@@ -65,6 +65,7 @@ public class NetworkRoutingModuleTest {
 		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
 		            TransportMode.car,
 		            f.s.getPopulation().getFactory(),
+		            f.s,
 		            f.s.getNetwork(),
 		            routeAlgo);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
@@ -98,6 +99,7 @@ public class NetworkRoutingModuleTest {
                     new NetworkRoutingModule(
 							TransportMode.car,
 							f.s.getPopulation().getFactory(),
+							f.s,
 							f.s.getNetwork(),
 							routeAlgo);
 
@@ -127,6 +129,7 @@ public class NetworkRoutingModuleTest {
 					new NetworkRoutingModule(
 							TransportMode.car,
 							f.s.getPopulation().getFactory(),
+							f.s,
 							f.s.getNetwork(),
 							routeAlgo);
 

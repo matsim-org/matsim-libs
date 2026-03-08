@@ -176,7 +176,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 			LeastCostPathCalculator router = new DijkstraFactory().createPathCalculator(network, travelDisutility,
 					travelTime);
-			NetworkRoutingModule routingModule = new NetworkRoutingModule(TransportMode.car, population.getFactory(), network,
+			NetworkRoutingModule routingModule = new NetworkRoutingModule(TransportMode.car, population.getFactory(), scenario, network,
 					router);
 
 			Leg leg = (Leg) routingModule
