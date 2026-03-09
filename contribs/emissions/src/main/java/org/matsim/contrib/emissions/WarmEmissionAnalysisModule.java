@@ -287,6 +287,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 
 		// hedge against odd average speeds:
+		// TODO Rewrite for better compatibility with InterpolationFraction methods
 		if(averageSpeed_kmh <= 0.0){
 			throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
 		}
@@ -684,19 +685,33 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 										HbefaWarmEmissionFactorKey efkey) {
 
 		efkey.setTrafficSituation(higher);
-		double highSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
+		HbefaWarmEmissionFactor highEf = getEf(vehicleInformationTuple, efkey);
+		assert highEf != null;
+		double highSpeedFromTable_kmh = highEf.getSpeed();
+		double highFactorFromTable_kmh = highEf.getFactor();
+
 
 		efkey.setTrafficSituation(lower);
-		double lowSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
+		HbefaWarmEmissionFactor lowEf = getEf(vehicleInformationTuple, efkey);
+		assert lowEf != null;
+		double lowSpeedFromTable_kmh = lowEf.getSpeed();
+		double lowFactorFromTable_kmh = lowEf.getFactor();
 
 		double fractionInterpolation;
 
-		if ((averageSpeed_kmh - highSpeedFromTable_kmh) >= -1.0) { // both speeds are assumed to be not very different > only highSpeed on link
+		if (averageSpeed_kmh >= highSpeedFromTable_kmh) { // averageSpeed is greater than highSpeed > only highSpeed on link
 			fractionInterpolation = 0.0;
-		} else if ((averageSpeed_kmh - lowSpeedFromTable_kmh) <= 0.0) { // averageSpeed is less than lowSpeed > only lowSpeed on link
+		} else if (averageSpeed_kmh <= lowSpeedFromTable_kmh) { // averageSpeed is less than lowSpeed > only lowSpeed on link
 			fractionInterpolation = 1.0;
 		} else {
 			fractionInterpolation = (highSpeedFromTable_kmh - averageSpeed_kmh) / (highSpeedFromTable_kmh - lowSpeedFromTable_kmh);
+
+			// Emission Development dependant non-linear factor
+			if(lowFactorFromTable_kmh > highFactorFromTable_kmh){
+				fractionInterpolation *= lowSpeedFromTable_kmh / averageSpeed_kmh;
+			} else {
+				fractionInterpolation *= averageSpeed_kmh / lowSpeedFromTable_kmh;
+			}
 		}
 
 		return fractionInterpolation;
